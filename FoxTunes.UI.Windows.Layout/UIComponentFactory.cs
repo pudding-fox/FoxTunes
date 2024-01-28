@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -14,25 +13,24 @@ namespace FoxTunes
         {
             return new UIComponentConfiguration()
             {
-                Component = component.Id
+                Component = component
             };
-        }
-
-        public UIComponent CreateComponent(UIComponentConfiguration configuration)
-        {
-            return LayoutManager.Instance.GetComponent(configuration.Component);
         }
 
         public FrameworkElement CreateControl(UIComponentConfiguration configuration, out UIComponentBase component)
         {
-            var type = this.GetComponentType(configuration.Component);
-            if (type == null || type == LayoutManager.PLACEHOLDER)
+            if (configuration.Component == null)
+            {
+                component = null;
+                return null;
+            }
+            if (configuration.Component.Type == LayoutManager.PLACEHOLDER)
             {
                 //A plugin was uninstalled.
                 component = null;
                 return null;
             }
-            component = ComponentActivator.Instance.Activate<UIComponentBase>(type);
+            component = ComponentActivator.Instance.Activate<UIComponentBase>(configuration.Component.Type);
             if (component is IUIComponentPanel panel)
             {
                 panel.Component = configuration;
@@ -46,16 +44,6 @@ namespace FoxTunes
             });
             grid.Children.Add(component);
             return grid;
-        }
-
-        protected virtual Type GetComponentType(string id)
-        {
-            var component = LayoutManager.Instance.GetComponent(id);
-            if (component == null)
-            {
-                return LayoutManager.PLACEHOLDER;
-            }
-            return component.Type;
         }
     }
 }

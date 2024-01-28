@@ -19,8 +19,6 @@ namespace FoxTunes
             }
         }
 
-        public abstract bool IsComponentActive(string id);
-
         public abstract UIComponentBase Load(UILayoutTemplate template);
 
         protected virtual void OnUpdated()

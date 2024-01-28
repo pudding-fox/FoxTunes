@@ -26,7 +26,7 @@ namespace FoxTunes.ViewModel
             }
             if (value is UIComponentConfiguration configuration)
             {
-                return Factory.CreateComponent(configuration);
+                return configuration.Component;
             }
             return value;
         }
@@ -39,7 +39,7 @@ namespace FoxTunes.ViewModel
             }
             if (value is UIComponentConfiguration configuration)
             {
-                return Factory.CreateComponent(configuration);
+                return configuration.Component;
             }
             return value;
         }

@@ -2,21 +2,23 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 
 namespace FoxTunes
 {
-    public class UIComponentConfiguration : IEquatable<UIComponentConfiguration>
+    public class UIComponentConfiguration 
     {
         public UIComponentConfiguration()
         {
+            this.Id = Guid.NewGuid();
             this.Children = new ObservableCollection<UIComponentConfiguration>();
             this.MetaData = new ConcurrentDictionary<string, string>();
         }
 
-        private string _Component { get; set; }
+        public Guid Id { get; private set; }
 
-        public string Component
+        private UIComponent _Component { get; set; }
+
+        public UIComponent Component
         {
             get
             {
@@ -102,78 +104,5 @@ namespace FoxTunes
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public virtual bool Equals(UIComponentConfiguration other)
-        {
-            if (other == null)
-            {
-                return false;
-            }
-            if (object.ReferenceEquals(this, other))
-            {
-                return true;
-            }
-            if (!string.Equals(this.Component, other.Component, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-            if (!Enumerable.SequenceEqual(this.Children, other.Children))
-            {
-                return false;
-            }
-            if (!Enumerable.SequenceEqual(this.MetaData, other.MetaData))
-            {
-                return false;
-            }
-            return true;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return this.Equals(obj as UIComponentConfiguration);
-        }
-
-        public override int GetHashCode()
-        {
-            var hashCode = default(int);
-            unchecked
-            {
-                if (!string.IsNullOrEmpty(this.Component))
-                {
-                    hashCode += this.Component.ToLower().GetHashCode();
-                }
-                foreach (var child in this.Children)
-                {
-                    hashCode += child.GetHashCode();
-                }
-                foreach (var metaData in this.MetaData)
-                {
-                    hashCode += metaData.GetHashCode();
-                }
-            }
-            return hashCode;
-        }
-
-        public static bool operator ==(UIComponentConfiguration a, UIComponentConfiguration b)
-        {
-            if ((object)a == null && (object)b == null)
-            {
-                return true;
-            }
-            if ((object)a == null || (object)b == null)
-            {
-                return false;
-            }
-            if (object.ReferenceEquals((object)a, (object)b))
-            {
-                return true;
-            }
-            return a.Equals(b);
-        }
-
-        public static bool operator !=(UIComponentConfiguration a, UIComponentConfiguration b)
-        {
-            return !(a == b);
-        }
     }
 }

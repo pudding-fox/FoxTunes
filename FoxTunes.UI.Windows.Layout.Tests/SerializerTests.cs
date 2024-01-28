@@ -20,12 +20,12 @@ namespace FoxTunes
             var stream = new MemoryStream(Encoding.Default.GetBytes(xml));
             var expected = new UIComponentConfiguration()
             {
-                Component = "67A0F63C-DC86-4B4E-91E1-290B71822853",
+                Component = new UIComponent("67A0F63C-DC86-4B4E-91E1-290B71822853"),
                 Children = new ObservableCollection<UIComponentConfiguration>()
                 {
                     new UIComponentConfiguration()
                     {
-                        Component = "9AB8D410-B94D-492E-BF00-022A3E77762D"
+                        Component = new UIComponent("9AB8D410-B94D-492E-BF00-022A3E77762D")
                     }
                 }
             };
@@ -50,28 +50,28 @@ namespace FoxTunes
             var stream = new MemoryStream(Encoding.Default.GetBytes(xml));
             var expected = new UIComponentConfiguration()
             {
-                Component = "A6820FDA-E415-40C6-AEFB-A73B6FBE4C93",
+                Component = new UIComponent("A6820FDA-E415-40C6-AEFB-A73B6FBE4C93"),
                 Children = new ObservableCollection<UIComponentConfiguration>()
                 {
                     new UIComponentConfiguration()
                     {
-                        Component = "67A0F63C-DC86-4B4E-91E1-290B71822853",
+                        Component = new UIComponent("67A0F63C-DC86-4B4E-91E1-290B71822853"),
                         Children = new ObservableCollection<UIComponentConfiguration>()
                         {
                             new UIComponentConfiguration()
                             {
-                                Component = "9AB8D410-B94D-492E-BF00-022A3E77762D"
+                                Component = new UIComponent("9AB8D410-B94D-492E-BF00-022A3E77762D")
                             }
                         }
                     },
                    new UIComponentConfiguration()
                     {
-                        Component = "67A0F63C-DC86-4B4E-91E1-290B71822853",
+                        Component = new UIComponent("67A0F63C-DC86-4B4E-91E1-290B71822853"),
                         Children = new ObservableCollection<UIComponentConfiguration>()
                         {
                             new UIComponentConfiguration()
                             {
-                                Component = "9AB8D410-B94D-492E-BF00-022A3E77762D"
+                                Component = new UIComponent("9AB8D410-B94D-492E-BF00-022A3E77762D")
                             }
                         }
                     }

@@ -278,19 +278,17 @@ namespace FoxTunes
 
         public string GetHeader(UIComponentContainer container)
         {
-            if (container.Component != null && !string.IsNullOrEmpty(container.Component.Component))
+            if (container.Component != null)
             {
                 var header = default(string);
                 if (container.Component.MetaData.TryGetValue(Header, out header) && !string.IsNullOrEmpty(header))
                 {
                     return header;
                 }
-                //TODO: This is really bad, creating a component (FrameworkElement) just to read a property?
-                var component = Factory.CreateComponent(container.Component);
-                if (component != null)
-                {
-                    return component.Name;
-                }
+            }
+            if (container.Component.Component != null)
+            {
+                return container.Component.Component.Name;
             }
             return Strings.UIComponentTabContainer_NewTab;
         }

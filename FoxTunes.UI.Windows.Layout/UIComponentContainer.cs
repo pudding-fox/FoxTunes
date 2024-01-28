@@ -178,7 +178,7 @@ namespace FoxTunes
                 UIDisposer.Dispose(element);
             }
             var configuration = value as UIComponentConfiguration;
-            if (configuration == null || string.IsNullOrEmpty(configuration.Component))
+            if (configuration == null || configuration.Component == null)
             {
                 return this.CreateSelector();
             }
@@ -252,20 +252,16 @@ namespace FoxTunes
             get
             {
                 var attributes = InvocationComponent.ATTRIBUTE_SEPARATOR;
-                if (this.Component != null)
+                if (this.Component != null && this.Component.Component != null)
                 {
-                    var component = Factory.CreateComponent(this.Component);
-                    if (component != null)
+                    foreach (var alternative in LayoutManager.Instance.GetComponents(this.Component.Component.Role))
                     {
-                        foreach (var alternative in LayoutManager.Instance.GetComponents(component.Role))
+                        if (string.Equals(this.Component.Component.Id, alternative.Id, StringComparison.OrdinalIgnoreCase))
                         {
-                            if (string.Equals(component.Id, alternative.Id, StringComparison.OrdinalIgnoreCase))
-                            {
-                                continue;
-                            }
-                            yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, REPLACE, alternative.Name, path: Strings.UIComponentContainer_Replace, attributes: attributes);
-                            attributes = InvocationComponent.ATTRIBUTE_NONE;
+                            continue;
                         }
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, REPLACE, alternative.Name, path: Strings.UIComponentContainer_Replace, attributes: attributes);
+                        attributes = InvocationComponent.ATTRIBUTE_NONE;
                     }
                 }
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, CLEAR, Strings.UIComponentContainer_Clear, attributes: attributes);
@@ -293,16 +289,11 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                if (this.Component == null)
+                if (this.Component == null || this.Component.Component == null)
                 {
                     return;
                 }
-                var component = Factory.CreateComponent(this.Component);
-                if (component == null)
-                {
-                    return;
-                }
-                component = LayoutManager.Instance.GetComponent(name, component.Role);
+                var component = LayoutManager.Instance.GetComponent(name, this.Component.Component.Role);
                 if (component == null)
                 {
                     return;

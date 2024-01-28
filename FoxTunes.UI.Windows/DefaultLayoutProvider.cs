@@ -32,11 +32,6 @@ namespace FoxTunes
             }
         }
 
-        public override bool IsComponentActive(string id)
-        {
-            return false;
-        }
-
         public override UIComponentBase Load(UILayoutTemplate template)
         {
             switch (template)
