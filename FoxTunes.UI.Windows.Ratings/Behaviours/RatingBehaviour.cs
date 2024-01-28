@@ -21,7 +21,7 @@ namespace FoxTunes
 
         public const string SET_PLAYLIST_RATING = "CCCC";
 
-        #region IUIPlaylistColumnProvider
+        #region IPlaylistColumnProvider
 
         public string Id
         {
@@ -47,19 +47,36 @@ namespace FoxTunes
             }
         }
 
+        public bool DependsOn(IEnumerable<string> names)
+        {
+            //ViewModel.Rating tracks updates.
+            return false;
+        }
+
+        public string GetValue(PlaylistItem playlistItem)
+        {
+            lock (playlistItem.MetaDatas)
+            {
+                var metaDataItem = playlistItem.MetaDatas.FirstOrDefault(
+                    _metaDataItem => string.Equals(_metaDataItem.Name, CommonStatistics.Rating)
+                );
+                if (metaDataItem != null)
+                {
+                    return metaDataItem.Value;
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region IUIPlaylistColumnProvider
+
         public DataTemplate CellTemplate
         {
             get
             {
                 return TemplateFactory.Template;
-            }
-        }
-
-        IEnumerable<string> IUIPlaylistColumnProvider.MetaData
-        {
-            get
-            {
-                return Enumerable.Empty<string>();
             }
         }
 

@@ -12,7 +12,7 @@ namespace FoxTunes.ViewModel
 {
     public class PlaylistSettings : ViewModelBase
     {
-        public PlaylistColumnProviderManager PlaylistColumnProviderManager { get; private set; }
+        public PlaylistColumnManager PlaylistColumnProviderManager { get; private set; }
 
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
@@ -42,9 +42,9 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("PlaylistColumns");
         }
 
-        private ObservableCollection<IUIPlaylistColumnProvider> _PlaylistColumnProviders { get; set; }
+        private ObservableCollection<IPlaylistColumnProvider> _PlaylistColumnProviders { get; set; }
 
-        public ObservableCollection<IUIPlaylistColumnProvider> PlaylistColumnProviders
+        public ObservableCollection<IPlaylistColumnProvider> PlaylistColumnProviders
         {
             get
             {
@@ -175,7 +175,7 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
-            this.PlaylistColumnProviderManager = ComponentRegistry.Instance.GetComponent<PlaylistColumnProviderManager>();
+            this.PlaylistColumnProviderManager = ComponentRegistry.Instance.GetComponent<PlaylistColumnManager>();
             this.PlaylistBrowser = this.Core.Components.PlaylistBrowser;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.DatabaseFactory = this.Core.Factories.Database;
@@ -203,7 +203,7 @@ namespace FoxTunes.ViewModel
                     item2.Sequence = temp;
                 }
             };
-            this.PlaylistColumnProviders = new ObservableCollection<IUIPlaylistColumnProvider>(
+            this.PlaylistColumnProviders = new ObservableCollection<IPlaylistColumnProvider>(
                 this.PlaylistColumnProviderManager.Providers
             );
             this.Dispatch(this.Refresh);
