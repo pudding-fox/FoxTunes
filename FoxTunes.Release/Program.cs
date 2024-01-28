@@ -268,7 +268,8 @@ namespace FoxTunes
             return new Package(new PackageElement[]
             {
                 "FoxTunes.Launcher.exe",
-                "FoxTunes.Launcher.exe.config"
+                "FoxTunes.Launcher.x86.exe",
+                "FoxTunes.Launcher.exe.config",
             });
         }
 
