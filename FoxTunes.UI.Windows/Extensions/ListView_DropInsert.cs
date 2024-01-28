@@ -115,23 +115,6 @@ namespace FoxTunes
             source.SetValue(DropInsertValueProperty, value);
         }
 
-        public static readonly DependencyProperty DropInsertOffsetProperty = DependencyProperty.RegisterAttached(
-            "DropInsertOffset",
-            typeof(int),
-            typeof(ListViewExtensions),
-            new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
-        );
-
-        public static int GetDropInsertOffset(ListView source)
-        {
-            return (int)source.GetValue(DropInsertOffsetProperty);
-        }
-
-        public static void SetDropInsertOffset(ListView source, int value)
-        {
-            source.SetValue(DropInsertOffsetProperty, value);
-        }
-
         private class DropInsertBehaviour : UIBehaviour
         {
             public DropInsertBehaviour(ListView listView)
@@ -156,7 +139,7 @@ namespace FoxTunes
 
             protected virtual void OnDragOver(object sender, DragEventArgs e)
             {
-                this.UpdateDropInsertIndex(e.GetPosition(this.ListView));
+                this.UpdateDropInsertIndex(e);
             }
 
             protected virtual void OnDrop(object sender, DragEventArgs e)
@@ -186,7 +169,6 @@ namespace FoxTunes
                 SetDropInsertActive(this.ListView, true);
                 SetDropInsertItem(this.ListView, null);
                 SetDropInsertValue(this.ListView, null);
-                SetDropInsertOffset(this.ListView, 0);
             }
 
             protected virtual void AddAdorner()
@@ -205,7 +187,6 @@ namespace FoxTunes
                 SetDropInsertActive(this.ListView, false);
                 SetDropInsertItem(this.ListView, null);
                 SetDropInsertValue(this.ListView, null);
-                SetDropInsertOffset(this.ListView, 0);
             }
 
             protected virtual void RemoveAdorner()
@@ -217,30 +198,50 @@ namespace FoxTunes
                 }
             }
 
-            protected virtual void UpdateDropInsertIndex(Point point)
+            protected virtual void UpdateDropInsertIndex(DragEventArgs e)
             {
-                var result = VisualTreeHelper.HitTest(this.ListView, point);
-                if (result.VisualHit == null)
-                {
-                    return;
-                }
-                var listViewItem = result.VisualHit.FindAncestor<ListViewItem>();
+                var listViewItem = this.GetListViewItem(e);
                 if (listViewItem != null)
                 {
-                    var offset = this.ListView.TranslatePoint(point, listViewItem).Y < (listViewItem.ActualHeight / 2) ? 0 : 1;
                     SetDropInsertActive(this.ListView, true);
                     SetDropInsertItem(this.ListView, listViewItem);
                     SetDropInsertValue(this.ListView, listViewItem.DataContext);
-                    SetDropInsertOffset(this.ListView, offset);
                 }
                 else
                 {
                     SetDropInsertActive(this.ListView, false);
                     SetDropInsertItem(this.ListView, null);
                     SetDropInsertValue(this.ListView, null);
-                    SetDropInsertOffset(this.ListView, 0);
                 }
                 this.Adorner.InvalidateVisual();
+            }
+
+            protected virtual ListViewItem GetListViewItem(DragEventArgs e)
+            {
+                //This routine is kind of silly.
+                //We should be able to simply hit test the ListView to find the ListViewItem under the cursor.
+                //You *can* do that and it works most of the time.
+                //The problem is that there are small gaps between the items, this results in the hit test returning the ScrollViewer.
+                //In this case it's not easy to determine whether the mouse is between items or below the last item.
+                //It would be rare to actually "drop" between items but this issue does result in the adorner flickering as the cursor
+                //sweeps across the items (as each missed hit test between items disables it).
+                //Instead we just find the item whose mid point is closest to the cursor Y position. X is ignored as items are assumed 
+                //full width.
+                for (var position = 0; position < this.ListView.Items.Count; position++)
+                {
+                    var listViewItem = this.ListView.ItemContainerGenerator.ContainerFromIndex(position) as ListViewItem;
+                    if (listViewItem == null)
+                    {
+                        continue;
+                    }
+                    var point = e.GetPosition(listViewItem);
+                    var bounds = VisualTreeHelper.GetDescendantBounds(listViewItem);
+                    if (point.Y < bounds.Height / 2)
+                    {
+                        return listViewItem;
+                    }
+                }
+                return null;
             }
         }
 
@@ -270,13 +271,6 @@ namespace FoxTunes
                 var scrollViewer = listViewItem.FindAncestor<ScrollViewer>();
                 //Translate the top left corner of the item to the position on the list view.
                 var point = listViewItem.TransformToAncestor(this.ListView).Transform(new Point());
-                var offset = GetDropInsertOffset(this.ListView);
-                if (offset > 0)
-                {
-                    //If the offset is non zero we're inserting *after* the index.
-                    //In this case we will draw the marker at the bottom of the item.
-                    point.Y += listViewItem.ActualHeight + listViewItem.Margin.Bottom;
-                }
                 var pen = GetDropInsertPen(this.ListView);
                 //The horizontal line.
                 context.DrawLine(

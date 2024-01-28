@@ -154,32 +154,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler InsertItemChanged;
 
-        private int _InsertOffset { get; set; }
-
-        public int InsertOffset
-        {
-            get
-            {
-                return this._InsertOffset;
-            }
-            set
-            {
-                this._InsertOffset = value;
-                this.OnInsertOffsetChanged();
-            }
-        }
-
-        protected virtual void OnInsertOffsetChanged()
-        {
-            if (this.InsertOffsetChanged != null)
-            {
-                this.InsertOffsetChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("InsertOffset");
-        }
-
-        public event EventHandler InsertOffsetChanged;
-
         private ObservableCollection<PlaylistGridViewColumn> _GridColumns { get; set; }
 
         public ObservableCollection<PlaylistGridViewColumn> GridColumns
@@ -471,7 +445,7 @@ namespace FoxTunes.ViewModel
                 sequence = 0;
                 return false;
             }
-            sequence = this.InsertItem.Sequence + this.InsertOffset;
+            sequence = this.InsertItem.Sequence;
             return true;
         }
 
