@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using NUnit.Framework;
+using System;
 
 namespace FoxTunes
 {
@@ -17,10 +18,10 @@ namespace FoxTunes
                         new[]
                         {
                             new FilterParserResultEntry(CommonMetaData.Artist, FilterParserEntryOperator.Match, "*Hello World!*"),
+                            new FilterParserResultEntry(CommonMetaData.Performer, FilterParserEntryOperator.Match, "*Hello World!*"),
                             new FilterParserResultEntry(CommonMetaData.Album, FilterParserEntryOperator.Match, "*Hello World!*"),
                             new FilterParserResultEntry(CommonMetaData.Title, FilterParserEntryOperator.Match, "*Hello World!*"),
-                        },
-                        FilterParserGroupOperator.Or
+                        }
                     )
                 }
             );
@@ -43,8 +44,7 @@ namespace FoxTunes
                         new[]
                         {
                             new FilterParserResultEntry(CommonMetaData.Artist, FilterParserEntryOperator.Match, "*custard*")
-                        },
-                        FilterParserGroupOperator.And
+                        }
                     )
                 }
             );
@@ -67,8 +67,7 @@ namespace FoxTunes
                         new[]
                         {
                             new FilterParserResultEntry(CommonMetaData.Artist, FilterParserEntryOperator.Match, "*custard cream*")
-                        },
-                        FilterParserGroupOperator.And
+                        }
                     )
                 }
             );
@@ -87,15 +86,9 @@ namespace FoxTunes
             var expected = new FilterParserResult(
                 new[]
                 {
-                    new FilterParserResultGroup(
-                        new[]
-                        {
-                            new FilterParserResultEntry(CommonMetaData.Artist, FilterParserEntryOperator.Match, "*custard cream*"),
-                            new FilterParserResultEntry(CommonMetaData.Year, FilterParserEntryOperator.GreaterEqual, "1990"),
-                            new FilterParserResultEntry(CommonMetaData.Year, FilterParserEntryOperator.Less, "2000"),
-                        },
-                        FilterParserGroupOperator.And
-                    )
+                    new FilterParserResultGroup(new FilterParserResultEntry(CommonMetaData.Artist, FilterParserEntryOperator.Match, "*custard cream*")),
+                    new FilterParserResultGroup(new FilterParserResultEntry(CommonMetaData.Year, FilterParserEntryOperator.GreaterEqual, "1990")),
+                    new FilterParserResultGroup(new FilterParserResultEntry(CommonMetaData.Year, FilterParserEntryOperator.Less, "2000")),
                 }
             );
             var actual = default(IFilterParserResult);
@@ -117,17 +110,47 @@ namespace FoxTunes
                         new[]
                         {
                             new FilterParserResultEntry(CommonStatistics.Rating, FilterParserEntryOperator.Equal, "5"),
-                        },
-                        FilterParserGroupOperator.And
+                        }
                     ),
                      new FilterParserResultGroup(
                         new[]
                         {
                             new FilterParserResultEntry(CommonMetaData.Artist, FilterParserEntryOperator.Match, "*cream cakes*"),
+                            new FilterParserResultEntry(CommonMetaData.Performer, FilterParserEntryOperator.Match,  "*cream cakes*"),
                             new FilterParserResultEntry(CommonMetaData.Album, FilterParserEntryOperator.Match, "*cream cakes*"),
                             new FilterParserResultEntry(CommonMetaData.Title, FilterParserEntryOperator.Match, "*cream cakes*"),
-                        },
-                        FilterParserGroupOperator.Or
+                        }
+                    )
+                }
+            );
+            var actual = default(IFilterParserResult);
+            Assert.IsTrue(this.Core.Components.FilterParser.TryParse(
+                filter,
+                out actual
+            ));
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void FilterParserTest006()
+        {
+            var minRating = "4";
+            var maxLastPlayed = DateTimeHelper.ToString(DateTime.Now.AddDays(-30).Date);
+            var filter = string.Format("rating>:{0} lastplayed<{1}", minRating, maxLastPlayed);
+            var expected = new FilterParserResult(
+                new[]
+                {
+                    new FilterParserResultGroup(
+                        new[]
+                        {
+                            new FilterParserResultEntry(CommonStatistics.Rating, FilterParserEntryOperator.GreaterEqual, "4"),
+                        }
+                    ),
+                    new FilterParserResultGroup(
+                        new[]
+                        {
+                            new FilterParserResultEntry(CommonStatistics.LastPlayed, FilterParserEntryOperator.Less, maxLastPlayed)
+                        }
                     )
                 }
             );

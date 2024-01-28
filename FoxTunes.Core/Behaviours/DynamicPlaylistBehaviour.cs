@@ -68,18 +68,35 @@ namespace FoxTunes
             }
         }
 
-        public override async Task Refresh(Playlist playlist)
+        public override Task Refresh(Playlist playlist)
+        {
+            return this.Refresh(playlist, playlist.Filter);
+        }
+
+        protected virtual async Task Refresh(Playlist playlist, string filter)
         {
             var libraryHierarchy = this.LibraryManager.SelectedHierarchy;
             if (libraryHierarchy == null || LibraryHierarchy.Empty.Equals(libraryHierarchy))
             {
                 return;
             }
-            var libraryHierarchyNodes = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy, playlist.Filter);
-            using (var task = new AddLibraryHierarchyNodesToPlaylistTask(playlist, 0, libraryHierarchyNodes, playlist.Filter, true, false))
+            var libraryHierarchyNodes = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy, filter);
+            if (!libraryHierarchyNodes.Any())
             {
-                task.InitializeComponent(this.Core);
-                await task.Run().ConfigureAwait(false);
+                Logger.Write(this, LogLevel.Debug, "Library search returned no results: {0}", filter);
+                using (var task = new ClearPlaylistTask(playlist))
+                {
+                    task.InitializeComponent(this.Core);
+                    await task.Run().ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                using (var task = new AddLibraryHierarchyNodesToPlaylistTask(playlist, 0, libraryHierarchyNodes, filter, true, false))
+                {
+                    task.InitializeComponent(this.Core);
+                    await task.Run().ConfigureAwait(false);
+                }
             }
         }
     }

@@ -1,4 +1,6 @@
 ﻿using FoxTunes.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace FoxTunes
@@ -6,16 +8,22 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public abstract class FilterParserProvider : StandardComponent, IFilterParserProvider
     {
-        public IFilterParser FilterParser { get; private set; }
-
-        public override void InitializeComponent(ICore core)
+        public virtual bool TryParse(ref string filter, out IEnumerable<IFilterParserResultGroup> groups)
         {
-            this.FilterParser = core.Components.FilterParser;
-            this.FilterParser.Register(this);
-            base.InitializeComponent(core);
+            var group = default(IFilterParserResultGroup);
+            if (this.TryParse(ref filter, out group))
+            {
+                groups = new[] { group };
+                return true;
+            }
+            groups = default(IEnumerable<IFilterParserResultGroup>);
+            return false;
         }
 
-        public abstract bool TryParse(ref string filter, out IFilterParserResultGroup result);
+        public virtual bool TryParse(ref string filter, out IFilterParserResultGroup group)
+        {
+            throw new NotImplementedException();
+        }
 
         protected virtual void OnParsed(ref string filter, int position, int length)
         {

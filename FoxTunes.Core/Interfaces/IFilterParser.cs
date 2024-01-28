@@ -5,8 +5,6 @@ namespace FoxTunes.Interfaces
 {
     public interface IFilterParser : IStandardComponent
     {
-        void Register(IFilterParserProvider provider);
-
         bool TryParse(string filter, out IFilterParserResult result);
 
         bool AppliesTo(string filter, IEnumerable<string> names);
@@ -20,15 +18,6 @@ namespace FoxTunes.Interfaces
     public interface IFilterParserResultGroup : IEquatable<IFilterParserResultGroup>
     {
         IEnumerable<IFilterParserResultEntry> Entries { get; }
-
-        FilterParserGroupOperator Operator { get; }
-    }
-
-    public enum FilterParserGroupOperator : byte
-    {
-        None,
-        And,
-        Or
     }
 
     public interface IFilterParserResultEntry : IEquatable<IFilterParserResultEntry>
