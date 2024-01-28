@@ -301,9 +301,9 @@ namespace FoxTunes
                 BitmapHelper.DrawRectangles(ref rmsRenderInfo, rmsElements, rmsElements.Length);
             }
 
-            for (var a = 0; a < valueElements.Length; a++)
+            if (peakElements != null)
             {
-                if (peakElements != null)
+                for (var a = 0; a < valueElements.Length; a++)
                 {
                     var max = valueElements[a].Y;
                     if (rmsElements != null)
