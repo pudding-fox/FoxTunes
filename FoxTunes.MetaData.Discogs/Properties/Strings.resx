@@ -135,8 +135,14 @@
   <data name="DiscogsBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Enabled</value>
   </data>
+  <data name="DiscogsBehaviourConfiguration.MaxRequests" xml:space="preserve">
+    <value>Requests Per Second</value>
+  </data>
   <data name="DiscogsBehaviourConfiguration.Section" xml:space="preserve">
     <value>Discogs</value>
+  </data>
+  <data name="General.Advanced" xml:space="preserve">
+    <value>Advanced</value>
   </data>
   <data name="LookupArtworkTask.InsufficiantData" xml:space="preserve">
     <value>Artist and album data is required.</value>

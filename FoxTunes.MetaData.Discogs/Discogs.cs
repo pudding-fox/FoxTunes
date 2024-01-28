@@ -18,11 +18,21 @@ namespace FoxTunes
 
         public const string SECRET = "VphFeVoRgCzPewlHHWstAheIKSBduLBR";
 
-        public Discogs(string baseUrl = BASE_URL, string key = KEY, string secret = SECRET)
+        public const int MAX_REQUESTS = 2;
+
+        public Discogs(string baseUrl = BASE_URL, string key = KEY, string secret = SECRET, int maxRequests = MAX_REQUESTS)
         {
             this.BaseUrl = string.IsNullOrEmpty(baseUrl) ? BASE_URL : baseUrl;
             this.Key = string.IsNullOrEmpty(key) ? KEY : key;
             this.Secret = string.IsNullOrEmpty(secret) ? SECRET : secret;
+            if (maxRequests < 0 || maxRequests > 10)
+            {
+                this.RateLimiter = new RateLimiter(1000 / MAX_REQUESTS);
+            }
+            else
+            {
+                this.RateLimiter = new RateLimiter(1000 / maxRequests);
+            }
         }
 
         public string BaseUrl { get; private set; }
@@ -30,6 +40,8 @@ namespace FoxTunes
         public string Key { get; private set; }
 
         public string Secret { get; private set; }
+
+        public RateLimiter RateLimiter { get; private set; }
 
         public async Task<IEnumerable<Release>> GetReleases(string artist, string album)
         {
@@ -117,11 +129,14 @@ namespace FoxTunes
         protected virtual HttpWebRequest CreateRequest(string url)
         {
             var request = (HttpWebRequest)WebRequest.Create(url);
-            request.UserAgent = string.Format("{0}/{1} +{2}", Publication.Product, Publication.Version, Publication.HomePage);
-            if (this.Key != null && this.Secret != null)
+            this.RateLimiter.Exec(() =>
             {
-                request.Headers[HttpRequestHeader.Authorization] = string.Format("Discogs key={0}, secret={1}", this.Key, this.Secret);
-            }
+                request.UserAgent = string.Format("{0}/{1} +{2}", Publication.Product, Publication.Version, Publication.HomePage);
+                if (this.Key != null && this.Secret != null)
+                {
+                    request.Headers[HttpRequestHeader.Authorization] = string.Format("Discogs key={0}, secret={1}", this.Key, this.Secret);
+                }
+            });
             return request;
         }
 

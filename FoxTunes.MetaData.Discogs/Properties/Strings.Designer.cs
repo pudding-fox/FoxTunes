@@ -115,11 +115,29 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Requests Per Second.
+        /// </summary>
+        internal static string DiscogsBehaviourConfiguration_MaxRequests {
+            get {
+                return ResourceManager.GetString("DiscogsBehaviourConfiguration.MaxRequests", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Discogs.
         /// </summary>
         internal static string DiscogsBehaviourConfiguration_Section {
             get {
                 return ResourceManager.GetString("DiscogsBehaviourConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Advanced.
+        /// </summary>
+        internal static string General_Advanced {
+            get {
+                return ResourceManager.GetString("General.Advanced", resourceCulture);
             }
         }
         
