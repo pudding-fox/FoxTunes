@@ -42,4 +42,7 @@
             </Style.Triggers>
         </Style>
     </Windows:ContextMenuExtensions.ItemContainerStyle>
+    <ContextMenu.LayoutTransform>
+        <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
+    </ContextMenu.LayoutTransform>
 </ContextMenu>
