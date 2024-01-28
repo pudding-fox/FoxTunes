@@ -61,6 +61,13 @@ function extension(value) {
     if (!value) {
         return value;
     }
-    var parts = value.split('.');
-    return parts[parts.length - 1];
+    {
+        var parts = value.split(".");
+        value = parts[parts.length - 1];
+    }
+    {
+        var parts = value.split("://");
+        value = parts[0];
+    }
+    return value;
 }

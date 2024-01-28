@@ -131,6 +131,8 @@ namespace FoxTunes
             }
             BassGaplessCd.Disable();
             BassGaplessCd.Free();
+            //Ignoring result on purpose.
+            BassCd.Release(this.CdDrive);
             this.IsInitialized = false;
         }
 
@@ -299,6 +301,7 @@ namespace FoxTunes
                 await this.SetIsIndeterminate(true);
                 var info = default(CDInfo);
                 BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
+                var id = BassCd.GetID(this.Drive, CDID.CDPlayer);
                 var directoryName = string.Format("{0}:\\", info.DriveLetter);
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
@@ -306,7 +309,12 @@ namespace FoxTunes
                     {
                         for (int a = 0, b = BassCd.GetTracks(this.Drive); a < b; a++)
                         {
-                            var fileName = BassCdStreamProvider.CreateUrl(this.Drive, a);
+                            if (BassCd.GetTrackLength(this.Drive, a) == -1)
+                            {
+                                //Not a music track.
+                                continue;
+                            }
+                            var fileName = BassCdStreamProvider.CreateUrl(this.Drive, id, a);
                             Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
                             var playlistItem = new PlaylistItem()
                             {

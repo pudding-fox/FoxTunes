@@ -107,8 +107,9 @@ namespace FoxTunes
                 drive = default(int);
                 return false;
             }
+            var id = default(string);
             var track = default(int);
-            return BassCdStreamProvider.ParseUrl(outputStream.FileName, out drive, out track);
+            return BassCdStreamProvider.ParseUrl(outputStream.FileName, out drive, out id, out track);
         }
 
         protected virtual void UpdateState(bool notify)

@@ -48,6 +48,10 @@ namespace FoxTunes
 
         private async Task AddToPlaylist(bool clear)
         {
+            if (this.LibraryManager.SelectedItem == null)
+            {
+                return;
+            }
             await this.PlaylistManager.Add(this.LibraryManager.SelectedItem, clear);
         }
     }
