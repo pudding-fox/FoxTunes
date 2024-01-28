@@ -616,7 +616,7 @@ do
 		for file in $LAYOUT
 		do
 				echo $file
-				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/statistics"
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/layout"
 		done
 		echo
 
