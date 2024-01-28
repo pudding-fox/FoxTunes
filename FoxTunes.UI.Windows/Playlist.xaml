@@ -30,6 +30,9 @@
                   Windows:ListViewExtensions.DropInsertOffset="{Binding InsertOffset, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.DragSource="True"
                   Windows:ListViewExtensions.DragSourceInitialized="DragSourceInitialized">
+            <ListView.InputBindings>
+                <KeyBinding Key="Delete" Command="{Binding RemovePlaylistItemsCommand, Source={StaticResource ViewModel}}"></KeyBinding>
+            </ListView.InputBindings>
             <Windows:ListViewExtensions.DropInsertPen>
                 <Pen Brush="{DynamicResource TextBrush}" Thickness="3"/>
             </Windows:ListViewExtensions.DropInsertPen>
