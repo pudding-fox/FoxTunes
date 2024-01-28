@@ -9,6 +9,8 @@ namespace FoxTunes
 {
     public static class WindowsImaging
     {
+        public const int DIB_RGB_COLORS = 0x0;
+
         public const int ILC_COLOR32 = 0x00000020;
 
         public static Bitmap Resize(Bitmap sourceImage, int width, int height, bool scale)
@@ -50,7 +52,7 @@ namespace FoxTunes
             var bitmapBits = default(IntPtr);
             var bitmapInfo = new BITMAPINFO()
             {
-                biSize = 40,
+                biSize = Convert.ToUInt32(Marshal.SizeOf(typeof(BITMAPINFO))),
                 biBitCount = 32,
                 biPlanes = 1,
                 biWidth = width,
@@ -58,8 +60,8 @@ namespace FoxTunes
             };
             bitmapSection = CreateDIBSection(
                 hdc,
-                bitmapInfo,
-                0,
+                ref bitmapInfo,
+                DIB_RGB_COLORS,
                 out bitmapBits,
                 IntPtr.Zero,
                 0
@@ -87,14 +89,20 @@ namespace FoxTunes
             return result;
         }
 
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetDC(IntPtr hwnd);
+
         [DllImport("gdi32.dll", SetLastError = true)]
         public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
 
         [DllImport("gdi32.dll")]
         public static extern bool DeleteDC(IntPtr hdc);
 
+        [DllImport("user32.dll")]
+        public static extern bool ReleaseDC(IntPtr hwnd, IntPtr hdc);
+
         [DllImport("gdi32.dll")]
-        public static extern IntPtr CreateDIBSection(IntPtr hdc, [In, MarshalAs(UnmanagedType.LPStruct)] BITMAPINFO pbmi, uint iUsage, out IntPtr ppvBits, IntPtr hSection, uint dwOffset);
+        public static extern IntPtr CreateDIBSection(IntPtr hdc, [In] ref BITMAPINFO pbmi, uint iUsage, out IntPtr ppvBits, IntPtr hSection, uint dwOffset);
 
         [DllImport("kernel32.dll")]
         public static extern bool RtlMoveMemory(IntPtr dest, IntPtr source, int dwcount);
@@ -103,20 +111,19 @@ namespace FoxTunes
         public static extern bool DeleteObject([In] IntPtr hObject);
 
         [StructLayout(LayoutKind.Sequential)]
-        public class BITMAPINFO
+        public struct BITMAPINFO
         {
-            public Int32 biSize;
+            public UInt32 biSize;
             public Int32 biWidth;
             public Int32 biHeight;
-            public Int16 biPlanes;
-            public Int16 biBitCount;
+            public UInt16 biPlanes;
+            public UInt16 biBitCount;
             public Int32 biCompression;
-            public Int32 biSizeImage;
+            public UInt32 biSizeImage;
             public Int32 biXPelsPerMeter;
             public Int32 biYPelsPerMeter;
-            public Int32 biClrUsed;
-            public Int32 biClrImportant;
-            public Int32 colors;
+            public UInt32 biClrUsed;
+            public UInt32 biClrImportant;
         };
 
         public class ScopedDC : IDisposable
@@ -129,12 +136,26 @@ namespace FoxTunes
                 }
             }
 
-            public ScopedDC(Func<IntPtr> factory)
+            public ScopedDC(IntPtr hwnd, IntPtr dc, IntPtr cdc)
             {
-                this.DC = factory();
+                this.hwnd = hwnd;
+                this.dc = dc;
+                this.cdc = cdc;
             }
 
-            public IntPtr DC { get; private set; }
+            public IntPtr hwnd { get; private set; }
+
+            public IntPtr dc { get; private set; }
+
+            public IntPtr cdc { get; private set; }
+
+            public bool IsValid
+            {
+                get
+                {
+                    return !IntPtr.Zero.Equals(this.dc) && !IntPtr.Zero.Equals(this.cdc);
+                }
+            }
 
             public bool IsDisposed { get; private set; }
 
@@ -156,9 +177,13 @@ namespace FoxTunes
 
             protected virtual void OnDisposing()
             {
-                if (!IntPtr.Zero.Equals(this.DC))
+                if (!IntPtr.Zero.Equals(this.cdc))
                 {
-                    DeleteDC(this.DC);
+                    DeleteDC(this.cdc);
+                }
+                if (!IntPtr.Zero.Equals(this.dc))
+                {
+                    ReleaseDC(this.hwnd, this.dc);
                 }
             }
 
@@ -180,9 +205,11 @@ namespace FoxTunes
                 return Compatible(IntPtr.Zero);
             }
 
-            public static ScopedDC Compatible(IntPtr hdc)
+            public static ScopedDC Compatible(IntPtr hwnd)
             {
-                return new ScopedDC(() => CreateCompatibleDC(hdc));
+                var dc = GetDC(hwnd);
+                var cdc = CreateCompatibleDC(dc);
+                return new ScopedDC(hwnd, dc, cdc);
             }
         }
     }

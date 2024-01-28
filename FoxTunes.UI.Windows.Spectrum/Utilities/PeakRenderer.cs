@@ -132,6 +132,10 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
+                if (this.Bitmap == null)
+                {
+                    return;
+                }
                 this.RendererData = Create(
                     this,
                     this.Bitmap.PixelWidth,
@@ -211,7 +215,7 @@ namespace FoxTunes
                 {
                     UpdateElementsFast(data);
                 }
-                if (this.ShowPeaks.Value)
+                if (data.PeakElements != null)
                 {
                     var duration = Convert.ToInt32(
                         Math.Min(
@@ -219,7 +223,19 @@ namespace FoxTunes
                             this.UpdateInterval * 100
                         )
                     );
-                    UpdateElementsSmooth(data.ValueElements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, data.Orientation);
+                    if (data.RmsElements != null)
+                    {
+                        var elements = new[]
+                        {
+                            data.ValueElements,
+                            data.RmsElements
+                        };
+                        UpdateElementsSmooth(elements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, data.Orientation);
+                    }
+                    else
+                    {
+                        UpdateElementsSmooth(data.ValueElements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, data.Orientation);
+                    }
                 }
 
                 data.LastUpdated = DateTime.UtcNow;
@@ -298,7 +314,12 @@ namespace FoxTunes
                     {
                         if (orientation == Orientation.Horizontal)
                         {
-                            if (peakElements[a].X > valueElements[a].Width)
+                            var min = valueElements[a].Width;
+                            if (rmsElements != null)
+                            {
+                                min = Math.Min(min, rmsElements[a].Width);
+                            }
+                            if (peakElements[a].X > min)
                             {
                                 BitmapHelper.DrawRectangle(
                                     valueRenderInfo,
@@ -311,7 +332,12 @@ namespace FoxTunes
                         }
                         else if (orientation == Orientation.Vertical)
                         {
-                            if (peakElements[a].Y < valueElements[a].Y)
+                            var max = valueElements[a].Y;
+                            if (rmsElements != null)
+                            {
+                                max = Math.Max(max, rmsElements[a].Y);
+                            }
+                            if (peakElements[a].Y < max)
                             {
                                 BitmapHelper.DrawRectangle(
                                     valueRenderInfo,

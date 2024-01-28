@@ -102,6 +102,10 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
+                if (this.Bitmap == null)
+                {
+                    return;
+                }
                 this.RendererData = Create(
                     this.Output,
                     this.Bitmap.PixelWidth,

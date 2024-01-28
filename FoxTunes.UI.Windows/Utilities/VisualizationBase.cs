@@ -14,10 +14,18 @@ namespace FoxTunes
         {
             get
             {
+                if (this.Timer == null)
+                {
+                    return 0;
+                }
                 return Convert.ToInt32(this.Timer.Interval);
             }
             protected set
             {
+                if (this.Timer == null)
+                {
+                    return;
+                }
                 this.Timer.Interval = value;
             }
         }
