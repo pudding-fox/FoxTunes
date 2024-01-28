@@ -50,5 +50,7 @@ namespace FoxTunes.Interfaces
         ObservableCollection<PlaylistItem> SelectedItems { get; set; }
 
         event EventHandler SelectedItemsChanged;
+
+        Task SetRating(IEnumerable<PlaylistItem> playlistItems, byte rating);
     }
 }

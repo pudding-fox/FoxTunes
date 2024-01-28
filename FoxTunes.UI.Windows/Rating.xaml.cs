@@ -120,23 +120,6 @@ namespace FoxTunes
             }
             return value;
         }
-
-        public static void SetValue(PlaylistItem playlistItem, byte value)
-        {
-            if (playlistItem == null)
-            {
-                return;
-            }
-            var metaDataItem = playlistItem.MetaDatas.FirstOrDefault(
-                _metaDataItem => string.Equals(_metaDataItem.Name, CommonMetaData.Rating, StringComparison.OrdinalIgnoreCase)
-            );
-            if (metaDataItem == null)
-            {
-                metaDataItem = new MetaDataItem(CommonMetaData.Rating, MetaDataItemType.Tag);
-                playlistItem.MetaDatas.Add(metaDataItem);
-            }
-            metaDataItem.Value = Convert.ToString(value);
-        }
     }
 
     public delegate void RatingChangedEventHandler(object sender, RatingChangedEventArgs e);

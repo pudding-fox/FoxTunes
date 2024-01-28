@@ -72,21 +72,15 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void SetRating(IEnumerable<PlaylistItem> playlistItems, byte value)
+        protected virtual void SetRating(IEnumerable<PlaylistItem> playlistItems, byte rating)
         {
 #if NET40
-            var task = TaskEx.Run(async () =>
+            var task = TaskEx.Run(
 #else
-            var task = Task.Run(async () =>
+            var task = Task.Run(
 #endif
-            {
-                foreach (var playlistItem in playlistItems)
-                {
-                    Rating.SetValue(playlistItem, value);
-                }
-                await this.MetaDataManager.Save(playlistItems, CommonMetaData.Rating).ConfigureAwait(false);
-                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
-            });
+                () => this.PlaylistManager.SetRating(playlistItems, rating)
+            );
         }
 
         public bool IsDisposed { get; private set; }
