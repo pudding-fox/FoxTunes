@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Common.props = Common.props
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bitmap_utilities", "bitmap_utilities\bitmap_utilities.vcxproj", "{B66875CC-BEB5-4AE4-A810-4652BF216818}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -36,6 +38,14 @@ Global
 		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Release|x64.Build.0 = Release|x64
 		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Release|x86.ActiveCfg = Release|Win32
 		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Release|x86.Build.0 = Release|Win32
+		{B66875CC-BEB5-4AE4-A810-4652BF216818}.Debug|x64.ActiveCfg = Debug|x64
+		{B66875CC-BEB5-4AE4-A810-4652BF216818}.Debug|x64.Build.0 = Debug|x64
+		{B66875CC-BEB5-4AE4-A810-4652BF216818}.Debug|x86.ActiveCfg = Debug|Win32
+		{B66875CC-BEB5-4AE4-A810-4652BF216818}.Debug|x86.Build.0 = Debug|Win32
+		{B66875CC-BEB5-4AE4-A810-4652BF216818}.Release|x64.ActiveCfg = Release|x64
+		{B66875CC-BEB5-4AE4-A810-4652BF216818}.Release|x64.Build.0 = Release|x64
+		{B66875CC-BEB5-4AE4-A810-4652BF216818}.Release|x86.ActiveCfg = Release|Win32
+		{B66875CC-BEB5-4AE4-A810-4652BF216818}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
