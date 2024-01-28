@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
+using System;
 
 namespace FoxTunes
 {
@@ -55,6 +56,19 @@ namespace FoxTunes
                     this.OnEnded
                 ));
             }
+        }
+
+        public override bool CanReset
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public override void Reset()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -114,6 +114,19 @@ namespace FoxTunes
 
         public event EventHandler Ended;
 
+        public virtual bool CanReset
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public virtual void Reset()
+        {
+            this.Position = 0;
+        }
+
         public static IBassStream Error(Errors errors)
         {
             return new BassStream()
