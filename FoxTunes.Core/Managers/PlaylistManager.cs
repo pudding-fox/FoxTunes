@@ -621,16 +621,6 @@ namespace FoxTunes
 
         public event EventHandler SelectedItemsChanged;
 
-        public async Task IncrementPlayCount(PlaylistItem playlistItem)
-        {
-            using (var task = new UpdatePlaylistPlayCountTask(playlistItem))
-            {
-                task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
-                await task.Run().ConfigureAwait(false);
-            }
-        }
-
         protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
         {
             if (this.BackgroundTask == null)

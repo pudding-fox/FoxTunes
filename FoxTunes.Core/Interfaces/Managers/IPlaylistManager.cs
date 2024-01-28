@@ -61,7 +61,5 @@ namespace FoxTunes.Interfaces
         PlaylistItem[] SelectedItems { get; set; }
 
         event EventHandler SelectedItemsChanged;
-
-        Task IncrementPlayCount(PlaylistItem playlistItem);
     }
 }
