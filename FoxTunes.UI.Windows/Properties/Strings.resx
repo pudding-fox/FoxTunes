@@ -138,6 +138,30 @@
   <data name="General.Search" xml:space="preserve">
     <value>Search</value>
   </data>
+  <data name="KeyBindingsBehaviourConfiguration.Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="KeyBindingsBehaviourConfiguration.Play" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="KeyBindingsBehaviourConfiguration.Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="KeyBindingsBehaviourConfiguration.Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="KeyBindingsBehaviourConfiguration.Section" xml:space="preserve">
+    <value>Keyboard Shortcuts</value>
+  </data>
+  <data name="KeyBindingsBehaviourConfiguration.Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="KeyBindingsBehaviourConfiguration.Stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="KeyBindingsBehaviourConfiguration.ToggleMiniPlayer" xml:space="preserve">
+    <value>Toggle Mini Player</value>
+  </data>
   <data name="LibraryBase.Add" xml:space="preserve">
     <value>Add to collection by dropping files here.</value>
   </data>

@@ -124,6 +124,78 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Next.
+        /// </summary>
+        public static string KeyBindingsBehaviourConfiguration_Next {
+            get {
+                return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Play.
+        /// </summary>
+        public static string KeyBindingsBehaviourConfiguration_Play {
+            get {
+                return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Play", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Previous.
+        /// </summary>
+        public static string KeyBindingsBehaviourConfiguration_Previous {
+            get {
+                return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Previous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search.
+        /// </summary>
+        public static string KeyBindingsBehaviourConfiguration_Search {
+            get {
+                return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keyboard Shortcuts.
+        /// </summary>
+        public static string KeyBindingsBehaviourConfiguration_Section {
+            get {
+                return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string KeyBindingsBehaviourConfiguration_Settings {
+            get {
+                return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop.
+        /// </summary>
+        public static string KeyBindingsBehaviourConfiguration_Stop {
+            get {
+                return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Stop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle Mini Player.
+        /// </summary>
+        public static string KeyBindingsBehaviourConfiguration_ToggleMiniPlayer {
+            get {
+                return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.ToggleMiniPlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add to collection by dropping files here..
         /// </summary>
         public static string LibraryBase_Add {
