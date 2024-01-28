@@ -40,30 +40,25 @@ namespace FoxTunes
             );
         }
 
-        protected virtual async void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        protected virtual void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            await Windows.Invoke(() =>
+            if (this.IsVisible && this.ListView.SelectedItem != null)
             {
-                if (this.ListView.SelectedItem != null)
-                {
-                    this.ListView.ScrollIntoView(this.ListView.SelectedItem);
-                }
-            }).ConfigureAwait(false);
+                this.ListView.ScrollIntoView(this.ListView.SelectedItem);
+            }
         }
 
         protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var listView = sender as ListView;
-            if (listView == null || listView.SelectedItem == null)
+            if (this.ListView.SelectedItem != null)
             {
-                return;
+                if (this.ListView.SelectedItems != null && this.ListView.SelectedItems.Count > 0)
+                {
+                    //When multi-selecting don't mess with the scroll position.
+                    return;
+                }
+                this.ListView.ScrollIntoView(this.ListView.SelectedItem);
             }
-            if (listView.SelectedItems != null && listView.SelectedItems.Count > 0)
-            {
-                //When multi-selecting don't mess with the scroll position.
-                return;
-            }
-            listView.ScrollIntoView(listView.SelectedItem);
         }
 
         protected virtual void OnGroupHeaderMouseDown(object sender, MouseButtonEventArgs e)
