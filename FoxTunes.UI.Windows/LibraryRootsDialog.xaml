@@ -15,7 +15,7 @@
             <RowDefinition></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0" Header="Library Folders" Padding="0,7,0,0">
+        <GroupBox Grid.Row="0" Header="{x:Static ViewModel:StringResources.LibraryRootsDialog_GroupHeader}" Padding="0,7,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="200"></ColumnDefinition>
@@ -33,7 +33,8 @@
                     DisplayMemberPath="DirectoryName">
                 </ListBox>
                 <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding LibraryRoots.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
+                    <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding LibraryRoots.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibraryRootsDialog_New}"></Button>
+                    <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding LibraryRoots.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibraryRootsDialog_Delete}"></Button>
                 </StackPanel>
                 <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding LibraryRoots.SelectedValue, Source={StaticResource ViewModel}}">
                     <Grid.Style>
@@ -53,7 +54,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Label Grid.Column="0" Grid.Row="0">Path</Label>
+                    <Label Grid.Column="0" Grid.Row="0" Content="{x:Static ViewModel:StringResources.LibraryRootsDialog_Path}"></Label>
                     <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding DirectoryName}" IsReadOnly="True"></TextBox>
                 </Grid>
             </Grid>
@@ -70,8 +71,8 @@
                 </Style>
             </Grid.Style>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
-                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Cancel</Button>
+                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibraryRootsDialog_Save}"></Button>
+                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.LibraryRootsDialog_Cancel}"></Button>
             </StackPanel>
         </Grid>
     </Grid>

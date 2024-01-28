@@ -188,6 +188,11 @@ namespace FoxTunes
         {
             var collection = this.ItemsSource as ICollection<T>;
             var item = this.ItemFactory();
+            if (item == null)
+            {
+                //Operation cancelled.
+                return;
+            }
             if (item is ISequenceableComponent sequenceable)
             {
                 sequenceable.Sequence = this.ItemsSource.Count();

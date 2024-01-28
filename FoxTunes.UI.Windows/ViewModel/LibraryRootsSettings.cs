@@ -17,6 +17,8 @@ namespace FoxTunes.ViewModel
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
+        public IFileSystemBrowser FileSystemBrowser { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         private CollectionManager<LibraryRoot> _LibraryRoots { get; set; }
@@ -126,9 +128,34 @@ namespace FoxTunes.ViewModel
             this.LibraryManager = this.Core.Managers.Library;
             this.HierarchyManager = this.Core.Managers.Hierarchy;
             this.DatabaseFactory = this.Core.Factories.Database;
+            this.FileSystemBrowser = this.Core.Components.FileSystemBrowser;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.LibraryRoots = new CollectionManager<LibraryRoot>();
+            this.LibraryRoots = new CollectionManager<LibraryRoot>()
+            {
+                ItemFactory = () =>
+                {
+                    var options = new BrowseOptions(Strings.LibraryRootsSettings_Browse, default(string), Enumerable.Empty<BrowseFilter>(), BrowseFlags.Folder);
+                    var result = this.FileSystemBrowser.Browse(options);
+                    if (!result.Success)
+                    {
+                        return null;
+                    }
+                    var directoryName = result.Paths.FirstOrDefault();
+                    if (this.LibraryRoots.ItemsSource.Any(libraryRoot => string.Equals(libraryRoot.DirectoryName, directoryName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        //Don't allow duplicates.
+                        return null;
+                    }
+                    using (var database = this.DatabaseFactory.Create())
+                    {
+                        return database.Set<LibraryRoot>().Create().With(libraryHierarchyLevel =>
+                        {
+                            libraryHierarchyLevel.DirectoryName = directoryName;
+                        });
+                    }
+                }
+            };
             this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }

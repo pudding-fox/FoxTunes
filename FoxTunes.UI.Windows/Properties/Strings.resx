@@ -207,11 +207,56 @@
   <data name="LibraryBase.Updating" xml:space="preserve">
     <value>Updating...</value>
   </data>
+  <data name="LibraryRootsDialog.Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="LibraryRootsDialog.Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="LibraryRootsDialog.GroupHeader" xml:space="preserve">
+    <value>Library Folders</value>
+  </data>
+  <data name="LibraryRootsDialog.New" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="LibraryRootsDialog.Path" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="LibraryRootsDialog.Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="LibraryRootsSettings.Browse" xml:space="preserve">
+    <value>Add folder to library.</value>
+  </data>
   <data name="LibrarySearch.Name" xml:space="preserve">
     <value>Library Search</value>
   </data>
   <data name="LibrarySelector.Name" xml:space="preserve">
     <value>Library Selector</value>
+  </data>
+  <data name="LibrarySettingsDialog.Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="LibrarySettingsDialog.Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="LibrarySettingsDialog.Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="LibrarySettingsDialog.GroupHeader" xml:space="preserve">
+    <value>Hierarchies</value>
+  </data>
+  <data name="LibrarySettingsDialog.New" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="LibrarySettingsDialog.Rescan" xml:space="preserve">
+    <value>Rescan</value>
+  </data>
+  <data name="LibrarySettingsDialog.Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="LibrarySettingsDialog.Save" xml:space="preserve">
+    <value>Save</value>
   </data>
   <data name="LibraryTree.Name" xml:space="preserve">
     <value>Library Tree</value>
