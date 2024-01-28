@@ -132,4 +132,7 @@
   <data name="Program.DatabaseMismatch" xml:space="preserve">
     <value>The database is incompatible, delete it?</value>
   </data>
+  <data name="Program.Unresponsive" xml:space="preserve">
+    <value>A running instance is not responding, terminate it?</value>
+  </data>
 </root>

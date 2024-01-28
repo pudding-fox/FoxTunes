@@ -1,7 +1,11 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using System.Security.Cryptography;
 using System.Threading;
+using System.Xml.Linq;
 
 namespace FoxTunes.Launcher
 {
@@ -44,108 +48,201 @@ namespace FoxTunes.Launcher
 #endif
             using (var server = new Server())
             {
+                var unresponsive = default(bool);
                 if (server.IsDisposed)
                 {
-                    var client = new Client();
-                    //TODO: Bad .Wait()
-                    client.Send(Environment.CommandLine).Wait();
-                    return;
+                    ForwardCommandLine(out unresponsive);
+                    if (!unresponsive)
+                    {
+                        //Nothing left to do, exit.
+                        return;
+                    }
                 }
                 using (var core = new Core(CoreSetup.Default))
                 {
-                    AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
-                    {
-                        if (core.Components.UserInterface != null)
-                        {
-                            core.Components.UserInterface.Fatal(e.ExceptionObject as Exception);
-                        }
-                    };
+                    SetupErrorHandlers(core);
                     try
                     {
-                        core.Load();
-                        if (!CoreValidator.Instance.Validate(core))
+                        LoadCore(core);
+                        if (unresponsive)
                         {
-                            throw new InvalidOperationException(Strings.Program_CoreValidationFailed);
-                        }
-                        var test = core.Factories.Database.Test();
-                        if (test != DatabaseTestResult.OK)
-                        {
-                            if (test == DatabaseTestResult.Missing)
+                            if (TerminateOtherInstances(core))
                             {
-                                if (core.Factories.Database.Flags.HasFlag(DatabaseFactoryFlags.ConfirmCreate))
-                                {
-                                    if (!core.Components.UserInterface.Confirm(Strings.Program_CreateDatabase))
-                                    {
-                                        throw new OperationCanceledException(Strings.Program_DatabaseCreationCancelled);
-                                    }
-                                }
-                            }
-                            else if (test == DatabaseTestResult.Mismatch)
-                            {
-                                if (!core.Components.UserInterface.Confirm(Strings.Program_DatabaseMismatch))
-                                {
-                                    throw new OperationCanceledException(Strings.Program_DatabaseCreationCancelled);
-                                }
-                            }
-                            core.Factories.Database.Initialize();
-                            if (core.Factories.Database.Test() != DatabaseTestResult.OK)
-                            {
-                                throw new InvalidOperationException(Strings.Program_DatabaseCreationFailed);
-                            }
-                            using (var database = core.Factories.Database.Create())
-                            {
-                                core.InitializeDatabase(database, DatabaseInitializeType.All);
+                                StartNewInstance();
+                                return;
                             }
                         }
+                        InitializeDatabase(core);
                         core.Initialize();
-                        server.Message += (sender, e) =>
-                        {
-                            core.Managers.FileActionHandler.RunCommand(e.Message);
-                        };
-                        core.Managers.FileActionHandler.RunCommand(Environment.CommandLine);
+                        ProcessCommandLine(server, core);
                     }
                     catch (Exception e)
                     {
-                        if (core.Components.UserInterface != null)
-                        {
-                            core.Components.UserInterface.Fatal(e);
-                            return;
-                        }
+                        FatalError(core, e);
+                        return;
                     }
                     try
                     {
-                        if (core.Components.UserInterface != null)
-                        {
-                            //TODO: Bad .Wait().
-                            core.Components.UserInterface.Show().Wait();
-                        }
-                        Core.IsShuttingDown = true;
-                        if (core.Components.Output != null)
-                        {
-                            if (core.Components.Output.IsStarted)
-                            {
-                                //TODO: Bad .Wait().
-                                if (!core.Components.Output.Shutdown().Wait(SHUTDOWN_TIMEOUT))
-                                {
-                                    //TODO: Warn.
-                                }
-                            }
-                        }
-                        //TODO: Bad .Result
-                        if (!BackgroundTask.Shutdown(SHUTDOWN_INTERVAL, SHUTDOWN_TIMEOUT).Result)
-                        {
-                            //TODO: Warn.
-                        }
+                        ShowUI(core);
+                        UnloadCore(core);
                     }
                     catch (Exception e)
                     {
-                        if (core.Components.UserInterface != null)
-                        {
-                            core.Components.UserInterface.Fatal(e);
-                        }
+                        FatalError(core, e);
                     }
                 }
             }
+        }
+
+        private static void SetupErrorHandlers(ICore core)
+        {
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+                if (core.Components.UserInterface != null)
+                {
+                    core.Components.UserInterface.Fatal(e.ExceptionObject as Exception);
+                }
+            };
+        }
+
+        private static void LoadCore(ICore core)
+        {
+            core.Load();
+            if (!CoreValidator.Instance.Validate(core))
+            {
+                throw new InvalidOperationException(Strings.Program_CoreValidationFailed);
+            }
+        }
+
+        private static void UnloadCore(ICore core)
+        {
+            Core.IsShuttingDown = true;
+            if (core.Components.Output != null)
+            {
+                if (core.Components.Output.IsStarted)
+                {
+                    //TODO: Bad .Wait().
+                    if (!core.Components.Output.Shutdown().Wait(SHUTDOWN_TIMEOUT))
+                    {
+                        //TODO: Warn.
+                    }
+                }
+            }
+            //TODO: Bad .Result
+            if (!BackgroundTask.Shutdown(SHUTDOWN_INTERVAL, SHUTDOWN_TIMEOUT).Result)
+            {
+                //TODO: Warn.
+            }
+        }
+
+        private static bool TerminateOtherInstances(ICore core)
+        {
+            if (!core.Components.UserInterface.Confirm(Strings.Program_Unresponsive))
+            {
+                return false;
+            }
+            var result = default(bool);
+            var id = Process.GetCurrentProcess().Id;
+            var name = Path.GetFileNameWithoutExtension(typeof(Program).Assembly.Location);
+            foreach (var process in Process.GetProcessesByName(name))
+            {
+                if (process.Id == id)
+                {
+                    //Current process.
+                    continue;
+                }
+                try
+                {
+                    process.Kill();
+                    result = true;
+                }
+                catch
+                {
+                    //Nothing can be done.
+                }
+            }
+            return result;
+        }
+
+        private static void InitializeDatabase(ICore core)
+        {
+            switch (core.Factories.Database.Test())
+            {
+                case DatabaseTestResult.OK:
+                    //Nothing to do.
+                    return;
+                case DatabaseTestResult.Missing:
+                    if (core.Factories.Database.Flags.HasFlag(DatabaseFactoryFlags.ConfirmCreate))
+                    {
+                        if (!core.Components.UserInterface.Confirm(Strings.Program_CreateDatabase))
+                        {
+                            throw new OperationCanceledException(Strings.Program_DatabaseCreationCancelled);
+                        }
+                    }
+                    break;
+                case DatabaseTestResult.Mismatch:
+                    if (!core.Components.UserInterface.Confirm(Strings.Program_DatabaseMismatch))
+                    {
+                        throw new OperationCanceledException(Strings.Program_DatabaseCreationCancelled);
+                    }
+                    break;
+            }
+            core.Factories.Database.Initialize();
+            if (core.Factories.Database.Test() != DatabaseTestResult.OK)
+            {
+                throw new InvalidOperationException(Strings.Program_DatabaseCreationFailed);
+            }
+            using (var database = core.Factories.Database.Create())
+            {
+                core.InitializeDatabase(database, DatabaseInitializeType.All);
+            }
+        }
+
+        private static void ForwardCommandLine(out bool unresponsive)
+        {
+            var client = new Client();
+            try
+            {
+                //TODO: Bad .Wait()
+                client.Send(Environment.CommandLine).Wait();
+                unresponsive = false;
+            }
+            catch
+            {
+                //Failed to forward command line to existing instance.
+                unresponsive = true;
+            }
+        }
+
+        private static void ProcessCommandLine(Server server, ICore core)
+        {
+            server.Message += (sender, e) =>
+            {
+                core.Managers.FileActionHandler.RunCommand(e.Message);
+            };
+            core.Managers.FileActionHandler.RunCommand(Environment.CommandLine);
+        }
+
+        private static void ShowUI(ICore core)
+        {
+            if (core.Components.UserInterface != null)
+            {
+                //TODO: Bad .Wait().
+                core.Components.UserInterface.Show().Wait();
+            }
+        }
+
+        private static void FatalError(ICore core, Exception e)
+        {
+            if (core.Components.UserInterface != null)
+            {
+                core.Components.UserInterface.Fatal(e);
+            }
+        }
+
+        private static void StartNewInstance()
+        {
+            Process.Start(typeof(Program).Assembly.Location);
         }
     }
 }
