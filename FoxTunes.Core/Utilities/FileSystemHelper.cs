@@ -144,12 +144,6 @@ namespace FoxTunes
             }
         }
 
-        /// <summary>
-        /// This routine was based on PathUtility.GetRelativePath: https://source.dot.net/#Microsoft.DotNet.Cli.Utils/PathUtility.cs,
-        /// </summary>
-        /// <param name="path1"></param>
-        /// <param name="path2"></param>
-        /// <returns></returns>
         public static string GetRelativePath(string path1, string path2)
         {
             path1 = Path.GetFullPath(path1);
@@ -157,48 +151,31 @@ namespace FoxTunes
 
             if (string.Equals(path1, path2, StringComparison.OrdinalIgnoreCase))
             {
-                return path2;
+                return path1;
             }
 
-            var index = 0;
-            var path1Segments = path1.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            var path2Segments = path2.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            var len1 = path1Segments.Length - 1;
-            var len2 = path2Segments.Length;
+            var parts1 = path1.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var parts2 = path1.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
-            var min = Math.Min(len1, len2);
-            while (min > index)
+            var builder = new StringBuilder();
+
+            for (var a = 0, b = Math.Max(parts1.Length, parts2.Length); a < b; a++)
             {
-                if (!string.Equals(path1Segments[index], path2Segments[index], StringComparison.OrdinalIgnoreCase))
+                if (a > parts1.Length)
                 {
-                    break;
+
                 }
-                else if ((len1 == index && len2 > index + 1) || (len1 > index && len2 == index + 1))
+                else if (a > parts2.Length)
                 {
-                    break;
+
                 }
-                index++;
+                if (!string.Equals(parts1[a], parts2[a], StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException("Expected path1 to be inside path2.");
+                }
             }
 
-            var result = new StringBuilder();
-            for (var a = index; len1 > a; a++)
-            {
-                result.Append("..");
-                result.Append(Path.DirectorySeparatorChar);
-            }
-
-            for (var a = index; len2 - 1 > a; a++)
-            {
-                result.Append(path2Segments[a]);
-                result.Append(Path.DirectorySeparatorChar);
-            }
-
-            if (!string.IsNullOrEmpty(path2Segments[len2 - 1]))
-            {
-                result.Append(path2Segments[len2 - 1]);
-            }
-
-            return result.ToString();
+            return builder.ToString();
         }
 
         public class Cache
