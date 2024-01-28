@@ -5,10 +5,20 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:System="clr-namespace:System;assembly=mscorlib" 
+             xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core}">
     <UserControl.Resources>
         <ViewModel:Settings x:Key="ViewModel" Core="{Binding}"></ViewModel:Settings>
+        <CollectionViewSource x:Key="Sections" Source="{Binding Components.Configuration.Sections}" IsLiveSortingRequested="True">
+            <CollectionViewSource.LiveGroupingProperties>
+                <System:String>Name</System:String>
+            </CollectionViewSource.LiveGroupingProperties>
+            <CollectionViewSource.SortDescriptions>
+                <ComponentModel:SortDescription PropertyName="Name"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -16,7 +26,7 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <ScrollViewer Grid.Row="0" >
-            <ItemsControl Grid.IsSharedSizeScope="True" ItemsSource="{Binding Components.Configuration.Sections}">
+            <ItemsControl Grid.IsSharedSizeScope="True" ItemsSource="{Binding Mode=OneWay, Source={StaticResource Sections}}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <GroupBox Header="{Binding Name}" Padding="0,7,0,0">

@@ -12,7 +12,7 @@
              d:DesignHeight="500" d:DesignWidth="700" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:PlaylistSettings x:Key="ViewModel" Core="{Binding}"/>
-        <CollectionViewSource x:Key="PlaylistColumns" Source="" IsLiveSortingRequested="True">
+        <CollectionViewSource x:Key="PlaylistColumns" Source="{Binding PlaylistColumns.ItemsSource, Source={StaticResource ViewModel}}" IsLiveSortingRequested="True">
             <CollectionViewSource.LiveGroupingProperties>
                 <System:String>Sequence</System:String>
             </CollectionViewSource.LiveGroupingProperties>
