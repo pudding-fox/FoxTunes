@@ -417,26 +417,42 @@ namespace FoxTunes
             {
                 throw new NotImplementedException();
             }
-            if (channelInfo.Flags.HasFlag(BassFlags.Float) && settings.Format.BinaryFormat != BassEncoderBinaryFormat.FloatingPoint)
+            var binaryFormat = default(BassEncoderBinaryFormat);
+            var binaryEndian = BassEncoderBinaryEndian.Little;
+            var depth = default(int);
+            var rate = channelInfo.Frequency;
+            if (channelInfo.Flags.HasFlag(BassFlags.Float))
             {
-                Logger.Write(this, LogLevel.Debug, "Resampling required for binary format.");
-                return true;
+                binaryFormat = BassEncoderBinaryFormat.FloatingPoint;
+                depth = BassEncoderSettings.DEPTH_32;
             }
-            if (settings.Format.BinaryEndian != BassEncoderBinaryEndian.Little)
+            else
             {
-                Logger.Write(this, LogLevel.Debug, "Resampling required for binary endian.");
-                return true;
+                binaryFormat = BassEncoderBinaryFormat.SignedInteger;
+                depth = BassEncoderSettings.DEPTH_16;
             }
-            var sampleRates = settings.Format.SampleRates;
-            if (sampleRates != null && sampleRates.Length > 0)
+            var result = default(bool);
+            if (settings.Format.BinaryFormat != binaryFormat)
             {
-                if (!sampleRates.Contains(channelInfo.Frequency))
-                {
-                    Logger.Write(this, LogLevel.Debug, "Resampling required for rate.");
-                    return true;
-                }
+                Logger.Write(this, LogLevel.Debug, "Resampling required for binary format: {0} => {1}", Enum.GetName(typeof(BassEncoderBinaryFormat), binaryFormat), Enum.GetName(typeof(BassEncoderBinaryFormat), settings.Format.BinaryFormat));
+                result = true;
             }
-            return false;
+            if (settings.Format.BinaryEndian != binaryEndian)
+            {
+                Logger.Write(this, LogLevel.Debug, "Resampling required for binary endian: {0} => {1}", Enum.GetName(typeof(BassEncoderBinaryEndian), binaryEndian), Enum.GetName(typeof(BassEncoderBinaryEndian), settings.Format.BinaryEndian));
+                result = true;
+            }
+            if (settings.GetDepth(encoderItem, stream) != depth)
+            {
+                Logger.Write(this, LogLevel.Debug, "Resampling required for depth: {0} => {1}", depth, settings.GetDepth(encoderItem, stream));
+                result = true;
+            }
+            if (settings.GetRate(encoderItem, stream) != rate)
+            {
+                Logger.Write(this, LogLevel.Debug, "Resampling required for rate: {0} => {1}", rate, settings.GetRate(encoderItem, stream));
+                result = true;
+            }
+            return result;
         }
 
         protected virtual Action<Exception> GetErrorHandler(EncoderItem encoderItem)

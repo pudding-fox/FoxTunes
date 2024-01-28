@@ -16,8 +16,6 @@ namespace FoxTunes
 
         public const string STEEP_FILTER_ELEMENT = "DDDD0064-06D7-4EFA-B3C9-2820B8893039";
 
-        public const string ALLOW_ALIASING_ELEMENT = "EEEE7228-F94E-4ADA-88AA-85F65CBC006A";
-
         public const string INPUT_BUFFER_LENGTH = "EEFF4B8B1A-4B97-4971-AA4D-40ACC2C68828";
 
         public const string PLAYBACK_BUFFER_LENGTH_ELEMENT = "FFFF63F8-2695-4853-89E8-ADC10D8EFC2E";
@@ -29,7 +27,6 @@ namespace FoxTunes
                 .WithElement(new SelectionConfigurationElement(QUALITY_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_Quality, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithOptions(GetQualityOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
                 .WithElement(new SelectionConfigurationElement(PHASE_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_Phase, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithOptions(GetPhaseOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
                 .WithElement(new BooleanConfigurationElement(STEEP_FILTER_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_SteepFilter, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
-                .WithElement(new BooleanConfigurationElement(ALLOW_ALIASING_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_AllowAliasing, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
                 .WithElement(new IntegerConfigurationElement(INPUT_BUFFER_LENGTH, Strings.BassResamplerStreamComponentConfiguration_InputBufferLength, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithValue(100).WithValidationRule(new IntegerValidationRule(10, 1000)).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
                 .WithElement(new IntegerConfigurationElement(PLAYBACK_BUFFER_LENGTH_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_PlaybackBufferLength, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithValue(300).WithValidationRule(new IntegerValidationRule(100, 10000)).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT)
             );

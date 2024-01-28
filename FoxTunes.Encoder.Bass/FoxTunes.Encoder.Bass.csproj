@@ -1,147 +1,108 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net40;net462</TargetFrameworks>
-    <RuntimeIdentifiers>win7-x86;win7-x64</RuntimeIdentifiers>
-    <AssemblyName>FoxTunes.Encoder.Bass</AssemblyName>
-    <OutputPath>..\distribution\$(Platform)\</OutputPath>
-    <OutputType>WinExe</OutputType>
-    <StartupObject />
-    <Platforms>x86;x64</Platforms>
-    <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
-    <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
-    <AssemblyVersion>2.3.1.0</AssemblyVersion>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net40;net462</TargetFrameworks>
+		<RuntimeIdentifiers>win7-x86;win7-x64</RuntimeIdentifiers>
+		<AssemblyName>FoxTunes.Encoder.Bass</AssemblyName>
+		<OutputPath>..\distribution\$(Platform)\</OutputPath>
+		<OutputType>WinExe</OutputType>
+		<StartupObject />
+		<Platforms>x86;x64</Platforms>
+		<SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
+		<SkipValidatePackageReferences>true</SkipValidatePackageReferences>
+		<AssemblyVersion>2.3.1.0</AssemblyVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Encoders\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Encoders\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\ManagedBass.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net40'">
+			<HintPath>..\lib\net40\ManagedBass.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net462'">
-      <HintPath>..\lib\ManagedBass.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
-    <ProjectReference Include="..\FoxTunes.Output.Bass\FoxTunes.Output.Bass.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net462'">
+			<HintPath>..\lib\ManagedBass.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
-    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.14" Condition="'$(TargetFramework)' == 'net40'" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
+		<ProjectReference Include="..\FoxTunes.Output.Bass\FoxTunes.Output.Bass.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-	  <EmbeddedResource Update="Properties\Strings.resx">
-		  <Generator>ResXFileCodeGenerator</Generator>
-		  <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-		  <CustomToolNamespace>FoxTunes</CustomToolNamespace>
-	  </EmbeddedResource>
-	  <Compile Update="Properties\Strings.Designer.cs">
-		  <DesignTime>True</DesignTime>
-		  <AutoGen>True</AutoGen>
-		  <DependentUpon>Strings.resx</DependentUpon>
-	  </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
+		<PackageReference Include="Microsoft.Bcl.Build" Version="1.0.14" Condition="'$(TargetFramework)' == 'net40'" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Encoders\flac.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Encoders\flac_license.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Encoders\lame.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Encoders\lame_license.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Encoders\nsutil.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Encoders\oggenc2.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Encoders\opusenc.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Encoders\opusenc_license.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Encoders\refalac.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Encoders\sox.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Encoders\sox_license.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Encoders\wavpack.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Encoders\wavpack_license.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\libflac-8.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\libgcc_s_sjlj-1.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\libgomp-1.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\libid3tag-0.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\libogg-0.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\libpng16-16.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\libsox-3.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\libssp-0.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\libvorbis-0.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\libvorbisenc-2.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\libvorbisfile-3.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\libwavpack-1.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\libwinpthread-1.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\LICENSE.GPL.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\sox.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sox\zlib1.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Strings.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Strings.Designer.cs</LastGenOutput>
+			<CustomToolNamespace>FoxTunes</CustomToolNamespace>
+		</EmbeddedResource>
+		<Compile Update="Properties\Strings.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Strings.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-  <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
+	<ItemGroup>
+		<None Update="Encoders\flac.exe">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Encoders\flac_license.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Encoders\lame.exe">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Encoders\lame_license.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Encoders\nsutil.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Encoders\oggenc2.exe">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Encoders\opusenc.exe">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Encoders\opusenc_license.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Encoders\refalac.exe">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Encoders\sox.exe">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Encoders\sox_license.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Encoders\wavpack.exe">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Encoders\wavpack_license.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Sox\LICENSE.GPL.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Sox\sox.exe">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
 
 </Project>

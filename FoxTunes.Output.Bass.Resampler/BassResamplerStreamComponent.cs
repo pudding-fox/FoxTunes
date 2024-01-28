@@ -296,33 +296,6 @@ namespace FoxTunes
 
             public event EventHandler SteepFilterChanged;
 
-            private bool _AllowAliasing { get; set; }
-
-            public bool AllowAliasing
-            {
-                get
-                {
-                    return this._AllowAliasing;
-                }
-                set
-                {
-                    this._AllowAliasing = value;
-                    this.OnAllowAliasingChanged();
-                }
-            }
-
-            protected virtual void OnAllowAliasingChanged()
-            {
-                this.Configure();
-                if (this.AllowAliasingChanged != null)
-                {
-                    this.AllowAliasingChanged(this, EventArgs.Empty);
-                }
-                this.OnPropertyChanged("AllowAliasing");
-            }
-
-            public event EventHandler AllowAliasingChanged;
-
             private int _InputBufferLength { get; set; }
 
             public int InputBufferLength
@@ -392,10 +365,6 @@ namespace FoxTunes
                     BassOutputConfiguration.SECTION,
                     BassResamplerStreamComponentConfiguration.STEEP_FILTER_ELEMENT
                 ).ConnectValue(value => this.SteepFilter = value);
-                this.Configuration.GetElement<BooleanConfigurationElement>(
-                    BassOutputConfiguration.SECTION,
-                    BassResamplerStreamComponentConfiguration.ALLOW_ALIASING_ELEMENT
-                ).ConnectValue(value => this.AllowAliasing = value);
                 this.Configuration.GetElement<IntegerConfigurationElement>(
                     BassOutputConfiguration.SECTION,
                     BassResamplerStreamComponentConfiguration.INPUT_BUFFER_LENGTH
@@ -419,8 +388,6 @@ namespace FoxTunes
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.Phase, this.Phase));
                 Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.SteepFilter), this.SteepFilter);
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.SteepFilter, this.SteepFilter));
-                Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.AllowAliasing), this.AllowAliasing);
-                BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.AllowAliasing, this.AllowAliasing));
                 Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.InputBufferLength), this.InputBufferLength);
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.InputBufferLength, this.InputBufferLength));
                 Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.PlaybackBufferLength), this.PlaybackBufferLength);
