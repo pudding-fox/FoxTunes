@@ -36,11 +36,26 @@ namespace FoxTunes
             }
         }
 
-        public static string PresetsFolder
+        public static string SystemPresetsFolder
         {
             get
             {
                 return Path.Combine(Location, "Presets");
+            }
+        }
+
+        public static string UserPresetsFolder
+        {
+            get
+            {
+                if (Publication.IsPortable)
+                {
+                    return SystemPresetsFolder;
+                }
+                else
+                {
+                    return Path.Combine(Publication.StoragePath, "Presets");
+                }
             }
         }
 
@@ -69,21 +84,35 @@ namespace FoxTunes
                     }
                 }
             };
-            if (Directory.Exists(PresetsFolder))
+            if (Directory.Exists(SystemPresetsFolder))
             {
-                foreach (var fileName in Directory.GetFiles(PresetsFolder, "*.txt"))
+                Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Debug, "Loading system presets..");
+                LoadPresets(presets, SystemPresetsFolder);
+            }
+            if (!string.Equals(SystemPresetsFolder, UserPresetsFolder, StringComparison.OrdinalIgnoreCase))
+            {
+                if (Directory.Exists(UserPresetsFolder))
                 {
-                    try
-                    {
-                        LoadPreset(presets, fileName);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Warn, "Failed to load preset from file \"{0}\": {1}", fileName, e.Message);
-                    }
+                    Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Debug, "Loading user presets..");
+                    LoadPresets(presets, UserPresetsFolder);
                 }
             }
             return presets;
+        }
+
+        private static void LoadPresets(IDictionary<string, IDictionary<string, int>> presets, string directoryName)
+        {
+            foreach (var fileName in Directory.GetFiles(directoryName, "*.txt"))
+            {
+                try
+                {
+                    LoadPreset(presets, fileName);
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Warn, "Failed to load preset from file \"{0}\": {1}", fileName, e.Message);
+                }
+            }
         }
 
         private static void LoadPreset(IDictionary<string, IDictionary<string, int>> presets, string fileName)
@@ -158,7 +187,7 @@ namespace FoxTunes
 
         public static void SavePreset(string name)
         {
-            var fileName = Path.Combine(PresetsFolder, string.Format("{0}.txt", name.Replace(Path.GetInvalidFileNameChars(), '_')));
+            var fileName = Path.Combine(UserPresetsFolder, string.Format("{0}.txt", name.Replace(Path.GetInvalidFileNameChars(), '_')));
             using (var writer = File.CreateText(fileName))
             {
                 var write = new Action<string, string>((key, value) => writer.WriteLine("{0}={1}", key, value));
