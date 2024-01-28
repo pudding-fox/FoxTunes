@@ -178,6 +178,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Library.
+        /// </summary>
+        internal static string ImageBehaviour_Path {
+            get {
+                return ResourceManager.GetString("ImageBehaviour.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh Images.
+        /// </summary>
+        internal static string ImageBehaviour_Refresh {
+            get {
+                return ResourceManager.GetString("ImageBehaviour.Refresh", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Now Playing.
         /// </summary>
         internal static string Info_Name {
@@ -273,6 +291,15 @@ namespace FoxTunes {
         internal static string LibraryActionsBehaviour_Library {
             get {
                 return ResourceManager.GetString("LibraryActionsBehaviour.Library", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rebuild View.
+        /// </summary>
+        internal static string LibraryActionsBehaviour_Rebuild {
+            get {
+                return ResourceManager.GetString("LibraryActionsBehaviour.Rebuild", resourceCulture);
             }
         }
         
@@ -439,11 +466,29 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Hierarchies.
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        internal static string LibrarySettingsDialog_Enabled {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Views.
         /// </summary>
         internal static string LibrarySettingsDialog_GroupHeader {
             get {
                 return ResourceManager.GetString("LibrarySettingsDialog.GroupHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        internal static string LibrarySettingsDialog_Name {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.Name", resourceCulture);
             }
         }
         
@@ -480,6 +525,24 @@ namespace FoxTunes {
         internal static string LibrarySettingsDialog_Save {
             get {
                 return ResourceManager.GetString("LibrarySettingsDialog.Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Script.
+        /// </summary>
+        internal static string LibrarySettingsDialog_Script {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.Script", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type.
+        /// </summary>
+        internal static string LibrarySettingsDialog_Type {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.Type", resourceCulture);
             }
         }
         
@@ -597,6 +660,42 @@ namespace FoxTunes {
         internal static string Playlists_Name {
             get {
                 return ResourceManager.GetString("Playlists.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add Playlist.
+        /// </summary>
+        internal static string PlaylistsActionsBehaviour_Add {
+            get {
+                return ResourceManager.GetString("PlaylistsActionsBehaviour.Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create Playlist.
+        /// </summary>
+        internal static string PlaylistsActionsBehaviour_Create {
+            get {
+                return ResourceManager.GetString("PlaylistsActionsBehaviour.Create", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Playlist Manager.
+        /// </summary>
+        internal static string PlaylistsActionsBehaviour_Manage {
+            get {
+                return ResourceManager.GetString("PlaylistsActionsBehaviour.Manage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove Playlist.
+        /// </summary>
+        internal static string PlaylistsActionsBehaviour_Remove {
+            get {
+                return ResourceManager.GetString("PlaylistsActionsBehaviour.Remove", resourceCulture);
             }
         }
         

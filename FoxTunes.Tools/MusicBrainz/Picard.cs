@@ -58,11 +58,11 @@ namespace FoxTunes
                 {
                     if (this.LibraryManager.SelectedItem != null)
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, PICARD, "Picard", path: "Tools");
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, PICARD, Strings.Picard_Picard, path: Strings.Picard_Path);
                     }
                     if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, PICARD, "Picard", path: "Tools");
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, PICARD, Strings.Picard_Picard, path: Strings.Picard_Path);
                     }
                 }
             }
@@ -105,9 +105,7 @@ namespace FoxTunes
             }
             await this.Open(libraryItems).ConfigureAwait(false);
             await this.MetaDataManager.Rescan(libraryItems).ConfigureAwait(false);
-            await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
-            await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
-            await this.LibraryManager.SetStatus(libraryItems, LibraryItemStatus.None).ConfigureAwait(false);
+            await this.HierarchyManager.Refresh(libraryItems);
         }
 
         protected virtual async Task OpenPlaylist()
@@ -127,15 +125,7 @@ namespace FoxTunes
             }
             await this.Open(playlistItems).ConfigureAwait(false);
             await this.MetaDataManager.Rescan(playlistItems).ConfigureAwait(false);
-            var libraryItems = playlistItems
-                .Where(playlistItem => playlistItem.LibraryItem_Id.HasValue)
-                .Select(playlistItem => new LibraryItem() { Id = playlistItem.LibraryItem_Id.Value });
-            if (libraryItems.Any())
-            {
-                await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
-                await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
-                await this.LibraryManager.SetStatus(libraryItems, LibraryItemStatus.None).ConfigureAwait(false);
-            }
+            await this.HierarchyManager.Refresh(playlistItems);
         }
 
         protected virtual Task Open(IEnumerable<IFileData> items)

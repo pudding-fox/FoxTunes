@@ -44,7 +44,7 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REFRESH_IMAGES, "Refresh Images", path: "Library");
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REFRESH_IMAGES, Strings.ImageBehaviour_Refresh, path: Strings.ImageBehaviour_Path);
             }
         }
 

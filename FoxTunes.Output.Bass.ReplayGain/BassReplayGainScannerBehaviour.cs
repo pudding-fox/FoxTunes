@@ -64,15 +64,15 @@ namespace FoxTunes
                 {
                     if (this.LibraryManager.SelectedItem != null)
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, SCAN_TRACKS, "Scan Tracks", path: "Replay Gain");
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, SCAN_ALBUMS, "Scan Albums", path: "Replay Gain");
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, CLEAR, "Clear Data", path: "Replay Gain", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, SCAN_TRACKS, Strings.BassReplayGainScannerBehaviour_ScanTracks, path: Strings.BassReplayGainScannerBehaviour_Path);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, SCAN_ALBUMS, Strings.BassReplayGainScannerBehaviour_ScanAlbums, path: Strings.BassReplayGainScannerBehaviour_Path);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, CLEAR, Strings.BassReplayGainScannerBehaviour_ClearData, path: Strings.BassReplayGainScannerBehaviour_Path, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
                     }
                     if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, SCAN_TRACKS, "Scan Tracks", path: "Replay Gain");
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, SCAN_ALBUMS, "Scan Albums", path: "Replay Gain");
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR, "Clear Data", path: "Replay Gain", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, SCAN_TRACKS, Strings.BassReplayGainScannerBehaviour_ScanTracks, path: Strings.BassReplayGainScannerBehaviour_Path);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, SCAN_ALBUMS, Strings.BassReplayGainScannerBehaviour_ScanAlbums, path: Strings.BassReplayGainScannerBehaviour_Path);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CLEAR, Strings.BassReplayGainScannerBehaviour_ClearData, path: Strings.BassReplayGainScannerBehaviour_Path, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
                     }
                 }
             }

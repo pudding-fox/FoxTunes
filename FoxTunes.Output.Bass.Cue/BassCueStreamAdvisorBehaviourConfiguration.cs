@@ -10,8 +10,8 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "CUE")
-                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false));
+            yield return new ConfigurationSection(SECTION, Strings.BassCueStreamAdvisorBehaviourConfiguration_Section)
+                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, Strings.BassCueStreamAdvisorBehaviourConfiguration_Enabled).WithValue(false));
         }
     }
 }

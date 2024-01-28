@@ -228,6 +228,15 @@
   <data name="PlaybackBehaviourConfiguration.Section" xml:space="preserve">
     <value>Playback</value>
   </data>
+  <data name="PlaylistActionsBehaviour.Crop" xml:space="preserve">
+    <value>Crop</value>
+  </data>
+  <data name="PlaylistActionsBehaviour.Locate" xml:space="preserve">
+    <value>Locate</value>
+  </data>
+  <data name="PlaylistActionsBehaviour.Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
   <data name="PlaylistBehaviourConfiguration.Order" xml:space="preserve">
     <value>Order</value>
   </data>
@@ -251,6 +260,24 @@
   </data>
   <data name="PlaylistBehaviourConfiguration.Section" xml:space="preserve">
     <value>Playlist</value>
+  </data>
+  <data name="PlaylistManager.Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="PlaylistManager.Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="PlaylistQueue.Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="PlaylistQueue.AddNext" xml:space="preserve">
+    <value>Add (Next)</value>
+  </data>
+  <data name="PlaylistQueue.Path" xml:space="preserve">
+    <value>Queue</value>
+  </data>
+  <data name="PlaylistQueue.Reset" xml:space="preserve">
+    <value>Reset</value>
   </data>
   <data name="SearchBehaviourConfiguration.Commit" xml:space="preserve">
     <value>Commit Behaviour</value>

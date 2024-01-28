@@ -69,12 +69,12 @@ namespace FoxTunes
             {
                 if (this.Enabled)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, ADD_PLAYLIST, "Add Playlist");
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, REMOVE_PLAYLIST, "Remove Playlist");
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, MANAGE_PLAYLISTS, "Playlist Manager", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, ADD_PLAYLIST, Strings.PlaylistsActionsBehaviour_Add);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, REMOVE_PLAYLIST, Strings.PlaylistsActionsBehaviour_Remove);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLISTS, MANAGE_PLAYLISTS, Strings.PlaylistsActionsBehaviour_Manage, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
                     if (this.LibraryManager.SelectedItem != null)
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, CREATE_PLAYLIST, "Create Playlist");
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, CREATE_PLAYLIST, Strings.PlaylistsActionsBehaviour_Create);
                     }
                 }
             }

@@ -11,9 +11,13 @@ namespace FoxTunes
 
         public const string REPLACE_PLAYLIST = "AAAC";
 
-        public const string RESCAN = "ZZAA";
+        public const string REBUILD = "ZZAA";
+
+        public const string RESCAN = "ZZAB";
 
         public ILibraryManager LibraryManager { get; private set; }
+
+        public IHierarchyManager HierarchyManager { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -25,6 +29,7 @@ namespace FoxTunes
         {
             this.PlaylistManager = core.Managers.Playlist;
             this.LibraryManager = core.Managers.Library;
+            this.HierarchyManager = core.Managers.Hierarchy;
             this.MetaDataBrowser = core.Components.MetaDataBrowser;
             this.UserInterface = core.Components.UserInterface;
             base.InitializeComponent(core);
@@ -42,6 +47,7 @@ namespace FoxTunes
                         yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REPLACE_PLAYLIST, Strings.LibraryActionsBehaviour_ReplacePlaylist);
                     }
                 }
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REBUILD, Strings.LibraryActionsBehaviour_Rebuild, path: Strings.LibraryActionsBehaviour_Library);
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, RESCAN, Strings.LibraryActionsBehaviour_Rescan, path: Strings.LibraryActionsBehaviour_Library);
             }
         }
@@ -54,6 +60,8 @@ namespace FoxTunes
                     return this.AddToPlaylist(false);
                 case REPLACE_PLAYLIST:
                     return this.AddToPlaylist(true);
+                case REBUILD:
+                    return this.Rebuild();
                 case RESCAN:
                     return this.Rescan();
             }
@@ -79,6 +87,12 @@ namespace FoxTunes
                 this.LibraryManager.SelectedItem,
                 clear
             );
+        }
+
+        protected virtual async Task Rebuild()
+        {
+            await this.HierarchyManager.Clear(null, true).ConfigureAwait(false);
+            await this.HierarchyManager.Build(null).ConfigureAwait(false);
         }
 
         protected virtual Task Rescan()
