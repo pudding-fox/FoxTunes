@@ -93,66 +93,32 @@ namespace FoxTunes
             renderer.OnHeightChanged();
         }
 
-        public static readonly DependencyProperty Color1Property = DependencyProperty.Register(
-            "Color1",
+        public static readonly DependencyProperty ColorProperty = DependencyProperty.Register(
+            "Color",
             typeof(Color),
             typeof(WaveFormRenderer),
-            new FrameworkPropertyMetadata(Colors.Transparent, new PropertyChangedCallback(OnColor1Changed))
+            new FrameworkPropertyMetadata(Colors.Transparent, new PropertyChangedCallback(OnColorChanged))
         );
 
-        public static Color GetColor1(WaveFormRenderer source)
+        public static Color GetColor(WaveFormRenderer source)
         {
-            return (Color)source.GetValue(Color1Property);
+            return (Color)source.GetValue(ColorProperty);
         }
 
-        public static void SetColor1(WaveFormRenderer source, Color value)
+        public static void SetColor(WaveFormRenderer source, Color value)
         {
-            source.SetValue(Color1Property, value);
+            source.SetValue(ColorProperty, value);
         }
 
-        public static void OnColor1Changed(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        public static void OnColorChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var renderer = sender as WaveFormRenderer;
             if (renderer == null)
             {
                 return;
             }
-            renderer.OnColor1Changed();
+            renderer.OnColorChanged();
         }
-
-        public static readonly DependencyProperty Color2Property = DependencyProperty.Register(
-            "Color2",
-            typeof(Color),
-            typeof(WaveFormRenderer),
-            new FrameworkPropertyMetadata(Colors.Transparent, new PropertyChangedCallback(OnColor2Changed))
-        );
-
-        public static Color GetColor2(WaveFormRenderer source)
-        {
-            return (Color)source.GetValue(Color2Property);
-        }
-
-        public static void SetColor2(WaveFormRenderer source, Color value)
-        {
-            source.SetValue(Color2Property, value);
-        }
-
-        public static void OnColor2Changed(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var renderer = sender as WaveFormRenderer;
-            if (renderer == null)
-            {
-                return;
-            }
-            renderer.OnColor2Changed();
-        }
-
-        public WaveFormRenderer()
-        {
-            this.Semaphore = new SemaphoreSlim(1, 1);
-        }
-
-        public SemaphoreSlim Semaphore { get; private set; }
 
         public WaveFormGenerator.WaveFormGeneratorData GeneratorData { get; private set; }
 
@@ -247,59 +213,32 @@ namespace FoxTunes
 
         public event EventHandler HeightChanged;
 
-        public Color Color1
+        public Color Color
         {
             get
             {
-                return (Color)this.GetValue(Color1Property);
+                return (Color)this.GetValue(ColorProperty);
             }
             set
             {
-                this.SetValue(Color1Property, value);
+                this.SetValue(ColorProperty, value);
             }
         }
 
-        protected virtual void OnColor1Changed()
+        protected virtual void OnColorChanged()
         {
             if (this.IsInitialized)
             {
                 var task = this.CreateBitmap();
             }
-            if (this.Color1Changed != null)
+            if (this.ColorChanged != null)
             {
-                this.Color1Changed(this, EventArgs.Empty);
+                this.ColorChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("Color1");
+            this.OnPropertyChanged("Color");
         }
 
-        public event EventHandler Color1Changed;
-
-        public Color Color2
-        {
-            get
-            {
-                return (Color)this.GetValue(Color2Property);
-            }
-            set
-            {
-                this.SetValue(Color2Property, value);
-            }
-        }
-
-        protected virtual void OnColor2Changed()
-        {
-            if (this.IsInitialized)
-            {
-                var task = this.CreateBitmap();
-            }
-            if (this.Color2Changed != null)
-            {
-                this.Color2Changed(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Color2");
-        }
-
-        public event EventHandler Color2Changed;
+        public event EventHandler ColorChanged;
 
         public override void InitializeComponent(ICore core)
         {
@@ -351,55 +290,42 @@ namespace FoxTunes
         {
             var cached = default(bool);
 
-#if NET40
-            this.Semaphore.Wait();
-#else
-            await this.Semaphore.WaitAsync(LockTimeout.TimeSpan).ConfigureAwait(false);
-#endif
-
-            try
+            if (this.GeneratorData != null)
             {
-                if (this.GeneratorData != null)
+                this.GeneratorData.Updated -= this.OnUpdated;
+                if (this.GeneratorData.CancellationToken != null)
                 {
-                    this.GeneratorData.Updated -= this.OnUpdated;
-                    if (this.GeneratorData.CancellationToken != null)
-                    {
-                        this.GeneratorData.CancellationToken.Cancel();
-                    }
+                    this.GeneratorData.CancellationToken.Cancel();
                 }
-
-                this.GeneratorData = null;
-                this.RendererData = null;
-
-                if (stream == null)
-                {
-                    return;
-                }
-
-                if (this.LoadGeneratorData(stream))
-                {
-                    cached = true;
-                }
-                else
-                {
-                    stream = await this.Output.Duplicate(stream).ConfigureAwait(false);
-
-                    this.GeneratorData = WaveFormGenerator.Create(stream);
-                    this.GeneratorData.Updated += this.OnUpdated;
-                }
-
-                await Windows.Invoke(
-                    () => this.RendererData = Create(this.GeneratorData, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight)
-                ).ConfigureAwait(false);
             }
-            finally
+
+            this.GeneratorData = null;
+            this.RendererData = null;
+
+            if (stream == null)
             {
-                this.Semaphore.Release();
+                return;
             }
+
+            if (this.LoadGeneratorData(stream))
+            {
+                cached = true;
+            }
+            else
+            {
+                stream = await this.Output.Duplicate(stream).ConfigureAwait(false);
+
+                this.GeneratorData = WaveFormGenerator.Create(stream);
+                this.GeneratorData.Updated += this.OnUpdated;
+            }
+
+            await Windows.Invoke(
+                () => this.RendererData = Create(this.GeneratorData, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight)
+            ).ConfigureAwait(false);
 
             if (cached)
             {
-                var task = this.Update();
+                this.Update();
             }
             else
             {
@@ -430,7 +356,7 @@ namespace FoxTunes
 
         protected virtual void OnUpdated(object sender, EventArgs e)
         {
-            var task = this.Update();
+            this.Update();
         }
 
         protected virtual async Task CreateBitmap()
@@ -450,50 +376,33 @@ namespace FoxTunes
                     height * this.ScalingFactor.Value
                 );
 
-                this.Semaphore.Wait();
+                this.Bitmap = new WriteableBitmap(
+                    Convert.ToInt32(size.Width),
+                    Convert.ToInt32(size.Height),
+                    96,
+                    96,
+                    PixelFormats.Pbgra32,
+                    null
+                );
 
-                try
+                if (this.GeneratorData != null)
                 {
-                    this.Bitmap = new WriteableBitmap(
-                        Convert.ToInt32(size.Width),
-                        Convert.ToInt32(size.Height),
-                        96,
-                        96,
-                        PixelFormats.Pbgra32,
-                        null
-                    );
-
-                    if (this.GeneratorData != null)
-                    {
-                        this.RendererData = Create(this.GeneratorData, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight);
-                    }
-                }
-                finally
-                {
-                    this.Semaphore.Release();
+                    this.RendererData = Create(this.GeneratorData, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight);
                 }
             });
 
-            var task = this.Update();
+            this.Update();
         }
 
         protected virtual void RefreshBitmap()
         {
-            this.Semaphore.Wait();
-            try
+            if (this.RendererData != null)
             {
-                if (this.RendererData != null)
-                {
-                    this.RendererData.Available = 0;
-                    this.RendererData.Position = 0;
-                }
-            }
-            finally
-            {
-                this.Semaphore.Release();
+                this.RendererData.Available = 0;
+                this.RendererData.Position = 0;
             }
 
-            var task = this.Update();
+            this.Update();
         }
 
         public async Task Render()
@@ -502,87 +411,53 @@ namespace FoxTunes
             var success = default(bool);
             var info = default(BitmapHelper.RenderInfo);
 
-#if NET40
-            this.Semaphore.Wait();
-#else
-            await this.Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
-
-            try
+            if (this.RendererData == null)
             {
-                if (this.RendererData == null)
-                {
-                    return;
-                }
+                return;
+            }
 
-                await Windows.Invoke(() =>
-                {
-                    bitmap = this.Bitmap;
-                    success = bitmap.TryLock(LockTimeout);
-                    if (!success)
-                    {
-                        return;
-                    }
-                    info = BitmapHelper.CreateRenderInfo(bitmap, this.Color1);
-                }).ConfigureAwait(false);
-
+            await Windows.Invoke(() =>
+            {
+                bitmap = this.Bitmap;
+                success = bitmap.TryLock(LockTimeout);
                 if (!success)
                 {
-                    //No bitmap or failed to establish lock.
                     return;
                 }
+                info = BitmapHelper.CreateRenderInfo(bitmap, this.Color);
+            }).ConfigureAwait(false);
 
-                Render(
-                    this.RendererData,
-                    info,
-                    WaveBarBehaviourConfiguration.GetMode(this.Mode.Value)
-                );
-
-                await Windows.Invoke(() =>
-                {
-                    bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
-                    bitmap.Unlock();
-                }).ConfigureAwait(false);
-            }
-            finally
+            if (!success)
             {
-                this.Semaphore.Release();
+                //No bitmap or failed to establish lock.
+                return;
             }
+
+            Render(
+                this.RendererData,
+                info,
+                WaveBarBehaviourConfiguration.GetMode(this.Mode.Value)
+            );
+
+            await Windows.Invoke(() =>
+            {
+                bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+                bitmap.Unlock();
+            }).ConfigureAwait(false);
         }
 
-#if NET40
-        public Task Update()
-#else
-        public async Task Update()
-#endif
+        public void Update()
         {
-#if NET40
-            this.Semaphore.Wait();
-#else
-            await this.Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
-            try
+            if (this.GeneratorData != null && this.RendererData != null)
             {
-                if (this.GeneratorData != null && this.RendererData != null)
-                {
-                    Update(
-                        this.GeneratorData,
-                        this.RendererData,
-                        this.Amplitude.Value,
-                        WaveBarBehaviourConfiguration.GetMode(this.Mode.Value)
-                    );
-                }
+                Update(
+                    this.GeneratorData,
+                    this.RendererData,
+                    this.Amplitude.Value,
+                    WaveBarBehaviourConfiguration.GetMode(this.Mode.Value)
+                );
             }
-            finally
-            {
-                this.Semaphore.Release();
-            }
-
             var task = this.Render();
-
-#if NET40
-            return TaskEx.FromResult(false);
-#endif
         }
 
         protected override Freezable CreateInstanceCore()
@@ -592,10 +467,6 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            if (this.Semaphore != null)
-            {
-                this.Semaphore.Dispose();
-            }
             if (this.PlaybackManager != null)
             {
                 this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
@@ -794,7 +665,7 @@ namespace FoxTunes
             {
                 Width = width,
                 Height = height,
-                ValuesPerElement = Math.Max(generatorData.Capacity / width, 1),
+                ValuesPerElement = Convert.ToInt32(Math.Ceiling(Math.Max((float)generatorData.Capacity / width, 1))),
                 Elements = new Int32Rect[width, generatorData.Channels],
                 Channels = generatorData.Channels,
                 Position = 0,
