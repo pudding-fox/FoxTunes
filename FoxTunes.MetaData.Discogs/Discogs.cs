@@ -139,7 +139,7 @@ namespace FoxTunes
             }
             else
             {
-                builder.Append("type=query=");
+                builder.Append("query=");
                 builder.Append(this.GetQuery(releaseLookup));
             }
             return builder.ToString();
@@ -243,6 +243,17 @@ namespace FoxTunes
             }
         }
 
+        private static readonly Regex PARENTHESIZED = new Regex(@"\s*\([^)]*\)\s*", RegexOptions.Compiled);
+
+        public static string Sanitize(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+            return PARENTHESIZED.Replace(value, string.Empty).Trim();
+        }
+
         public class ReleaseLookup
         {
             const int ERROR_CAPACITY = 10;
@@ -261,14 +272,14 @@ namespace FoxTunes
 
             public ReleaseLookup(string artist, string title, IFileData[] fileDatas) : this(fileDatas)
             {
-                this.Artist = artist;
-                this.Title = title;
+                this.Artist = Sanitize(artist);
+                this.Title = Sanitize(title);
             }
 
             public ReleaseLookup(string artist, string album, bool isCompilation, IFileData[] fileDatas) : this(fileDatas)
             {
-                this.Artist = artist;
-                this.Album = album;
+                this.Artist = Sanitize(artist);
+                this.Album = Sanitize(album);
                 this.IsCompilation = isCompilation;
             }
 
@@ -485,7 +496,7 @@ namespace FoxTunes
                         }
                         break;
                 }
-                var similarity = this.Title.Similarity(title, true);
+                var similarity = Sanitize(this.Title).Similarity(title, true);
                 return similarity;
             }
 
