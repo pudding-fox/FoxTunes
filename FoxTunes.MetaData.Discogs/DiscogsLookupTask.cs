@@ -186,6 +186,7 @@ namespace FoxTunes
         {
             var libraryItems = new List<LibraryItem>();
             var playlistItems = new List<PlaylistItem>();
+            var hasChanges = default(bool);
             foreach (var releaseLookup in this.LookupItems)
             {
                 if (releaseLookup.Status != Discogs.ReleaseLookupStatus.Complete)
@@ -195,6 +196,12 @@ namespace FoxTunes
 
                 libraryItems.AddRange(releaseLookup.FileDatas.OfType<LibraryItem>());
                 playlistItems.AddRange(releaseLookup.FileDatas.OfType<PlaylistItem>());
+                hasChanges = true;
+            }
+            if (!hasChanges)
+            {
+                //Nothing to save.
+                return;
             }
             if (libraryItems.Any())
             {

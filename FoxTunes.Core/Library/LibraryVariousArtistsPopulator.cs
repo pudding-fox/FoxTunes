@@ -1,5 +1,4 @@
-﻿using FoxDb;
-using FoxDb.Interfaces;
+﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.Threading.Tasks;
 
