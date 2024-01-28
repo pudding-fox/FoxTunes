@@ -90,5 +90,16 @@ namespace FoxTunes
                 command.ExecuteNonQuery();
             }
         }
+
+        protected virtual void AddOrUpdateMetaDataFromLibrary(IDatabaseContext databaseContext, IDbTransaction transaction)
+        {
+            var parameters = default(IDbParameterCollection);
+            using (var command = databaseContext.Connection.CreateCommand(this.Database.CoreSQL.CopyMetaDataItems, new[] { "status" }, out parameters))
+            {
+                command.Transaction = transaction;
+                parameters["status"] = PlaylistItemStatus.Import;
+                command.ExecuteNonQuery();
+            }
+        }
     }
 }

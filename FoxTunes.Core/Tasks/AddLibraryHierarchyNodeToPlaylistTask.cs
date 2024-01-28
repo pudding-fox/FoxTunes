@@ -31,7 +31,7 @@ namespace FoxTunes
                 {
                     this.AddPlaylistItems(databaseContext, transaction);
                     this.ShiftItems(databaseContext, transaction);
-                    this.AddOrUpdateMetaData(databaseContext, transaction);
+                    this.AddOrUpdateMetaDataFromLibrary(databaseContext, transaction);
                     this.SequenceItems(databaseContext, transaction);
                     this.SetPlaylistItemsStatus(databaseContext, transaction);
                     transaction.Commit();
@@ -51,17 +51,6 @@ namespace FoxTunes
                 parameters["sequence"] = this.Sequence;
                 parameters["status"] = PlaylistItemStatus.Import;
                 this.Offset = command.ExecuteNonQuery();
-            }
-        }
-
-        private void AddOrUpdateMetaData(IDatabaseContext databaseContext, IDbTransaction transaction)
-        {
-            var parameters = default(IDbParameterCollection);
-            using (var command = databaseContext.Connection.CreateCommand(this.Database.CoreSQL.CopyMetaDataItems, new[] { "status" }, out parameters))
-            {
-                command.Transaction = transaction;
-                parameters["status"] = PlaylistItemStatus.Import;
-                command.ExecuteNonQuery();
             }
         }
     }

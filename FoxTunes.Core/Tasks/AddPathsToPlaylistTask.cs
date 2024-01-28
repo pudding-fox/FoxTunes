@@ -47,6 +47,7 @@ namespace FoxTunes
                 {
                     this.AddPlaylistItems(databaseContext, transaction);
                     this.ShiftItems(databaseContext, transaction);
+                    this.AddOrUpdateMetaDataFromLibrary(databaseContext, transaction);
                     this.AddOrUpdateMetaData(databaseContext, transaction);
                     this.SequenceItems(databaseContext, transaction);
                     this.SetPlaylistItemsStatus(databaseContext, transaction);
@@ -103,7 +104,10 @@ namespace FoxTunes
         {
             using (var metaDataPopulator = new MetaDataPopulator(this.Database, databaseContext, transaction, "Playlist", true))
             {
-                var query = databaseContext.GetQuery<PlaylistItem>().Detach().Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import);
+                var query =
+                    from playlistItem in databaseContext.GetQuery<PlaylistItem>().Detach()
+                    where playlistItem.Status == PlaylistItemStatus.Import && !playlistItem.MetaDatas.Any()
+                    select playlistItem;
                 metaDataPopulator.InitializeComponent(this.Core);
                 metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
                 metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
