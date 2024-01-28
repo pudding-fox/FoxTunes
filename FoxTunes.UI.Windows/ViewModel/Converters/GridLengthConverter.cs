@@ -9,7 +9,7 @@ namespace FoxTunes.ViewModel
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return this.ConvertFrom(value);
+            return this.ConvertFrom(null, culture, value);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -22,7 +22,7 @@ namespace FoxTunes.ViewModel
                     value = new GridLength(length.Value, GridUnitType.Pixel);
                 }
             }
-            return this.ConvertTo(value, targetType);
+            return this.ConvertTo(null, culture, value, targetType);
         }
     }
 }
