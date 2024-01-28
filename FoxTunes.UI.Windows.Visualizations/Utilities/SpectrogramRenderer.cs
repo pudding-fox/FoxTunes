@@ -201,7 +201,7 @@ namespace FoxTunes
                 return;
             }
 
-            BitmapHelper.ShiftLeft(info, 1);
+            BitmapHelper.ShiftLeft(ref info, 1);
 
             switch (data.Mode)
             {
@@ -229,7 +229,7 @@ namespace FoxTunes
                 info.Red = color.R;
                 info.Green = color.G;
                 info.Blue = color.B;
-                BitmapHelper.DrawDot(info, x, y);
+                BitmapHelper.DrawDot(ref info, x, y);
             }
         }
 
@@ -250,7 +250,7 @@ namespace FoxTunes
                     info.Red = color.R;
                     info.Green = color.G;
                     info.Blue = color.B;
-                    BitmapHelper.DrawDot(info, x, offset + y);
+                    BitmapHelper.DrawDot(ref info, x, offset + y);
                 }
             }
         }

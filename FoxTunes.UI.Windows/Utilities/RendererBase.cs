@@ -292,7 +292,8 @@ namespace FoxTunes
                 {
                     return;
                 }
-                BitmapHelper.Clear(BitmapHelper.CreateRenderInfo(bitmap, this.Color));
+                var info = BitmapHelper.CreateRenderInfo(bitmap, this.Color);
+                BitmapHelper.Clear(ref info);
                 bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             });

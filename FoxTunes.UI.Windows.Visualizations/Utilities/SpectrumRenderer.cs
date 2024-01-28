@@ -246,7 +246,7 @@ namespace FoxTunes
             var elements = data.Elements;
             var peaks = data.Peaks;
 
-            BitmapHelper.Clear(info);
+            BitmapHelper.Clear(ref info);
 
             if (data.SampleCount == 0)
             {
@@ -260,15 +260,10 @@ namespace FoxTunes
                 return;
             }
 
+            BitmapHelper.DrawRectangles(ref info, elements, elements.Length);
+
             for (var a = 0; a < elements.Length; a++)
             {
-                BitmapHelper.DrawRectangle(
-                    info,
-                    elements[a].X,
-                    elements[a].Y,
-                    elements[a].Width,
-                    elements[a].Height
-                );
                 if (peaks != null)
                 {
                     if (peaks[a].Y >= elements[a].Y)
@@ -276,7 +271,7 @@ namespace FoxTunes
                         continue;
                     }
                     BitmapHelper.DrawRectangle(
-                        info,
+                        ref info,
                         peaks[a].X,
                         peaks[a].Y,
                         peaks[a].Width,

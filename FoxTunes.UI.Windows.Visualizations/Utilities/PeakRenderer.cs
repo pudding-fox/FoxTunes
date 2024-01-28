@@ -290,7 +290,7 @@ namespace FoxTunes
             var peakElements = data.PeakElements;
             var orientation = data.Orientation;
 
-            BitmapHelper.Clear(valueRenderInfo);
+            BitmapHelper.Clear(ref valueRenderInfo);
 
             if (data.SampleCount == 0)
             {
@@ -304,67 +304,50 @@ namespace FoxTunes
                 return;
             }
 
-            if (valueElements != null)
+            BitmapHelper.DrawRectangles(ref valueRenderInfo, valueElements, valueElements.Length);
+            if (rmsElements != null)
             {
-                for (var a = 0; a < valueElements.Length; a++)
+                BitmapHelper.DrawRectangles(ref rmsRenderInfo, rmsElements, rmsElements.Length);
+            }
+
+            for (var a = 0; a < valueElements.Length; a++)
+            {
+                if (peakElements != null)
                 {
-                    BitmapHelper.DrawRectangle(
-                        valueRenderInfo,
-                        valueElements[a].X,
-                        valueElements[a].Y,
-                        valueElements[a].Width,
-                        valueElements[a].Height
-                    );
-                    if (rmsElements != null)
+                    if (orientation == Orientation.Horizontal)
                     {
-                        if (rmsElements[a].Height > 0)
+                        var min = valueElements[a].Width;
+                        if (rmsElements != null)
+                        {
+                            min = Math.Min(min, rmsElements[a].Width);
+                        }
+                        if (peakElements[a].X > min)
                         {
                             BitmapHelper.DrawRectangle(
-                                rmsRenderInfo,
-                                rmsElements[a].X,
-                                rmsElements[a].Y,
-                                rmsElements[a].Width,
-                                rmsElements[a].Height
+                                ref valueRenderInfo,
+                                peakElements[a].X,
+                                peakElements[a].Y,
+                                peakElements[a].Width,
+                                peakElements[a].Height
                             );
                         }
                     }
-                    if (peakElements != null)
+                    else if (orientation == Orientation.Vertical)
                     {
-                        if (orientation == Orientation.Horizontal)
+                        var max = valueElements[a].Y;
+                        if (rmsElements != null)
                         {
-                            var min = valueElements[a].Width;
-                            if (rmsElements != null)
-                            {
-                                min = Math.Min(min, rmsElements[a].Width);
-                            }
-                            if (peakElements[a].X > min)
-                            {
-                                BitmapHelper.DrawRectangle(
-                                    valueRenderInfo,
-                                    peakElements[a].X,
-                                    peakElements[a].Y,
-                                    peakElements[a].Width,
-                                    peakElements[a].Height
-                                );
-                            }
+                            max = Math.Max(max, rmsElements[a].Y);
                         }
-                        else if (orientation == Orientation.Vertical)
+                        if (peakElements[a].Y < max)
                         {
-                            var max = valueElements[a].Y;
-                            if (rmsElements != null)
-                            {
-                                max = Math.Max(max, rmsElements[a].Y);
-                            }
-                            if (peakElements[a].Y < max)
-                            {
-                                BitmapHelper.DrawRectangle(
-                                    valueRenderInfo,
-                                    peakElements[a].X,
-                                    peakElements[a].Y,
-                                    peakElements[a].Width,
-                                    peakElements[a].Height
-                                );
-                            }
+                            BitmapHelper.DrawRectangle(
+                                ref valueRenderInfo,
+                                peakElements[a].X,
+                                peakElements[a].Y,
+                                peakElements[a].Width,
+                                peakElements[a].Height
+                            );
                         }
                     }
                 }

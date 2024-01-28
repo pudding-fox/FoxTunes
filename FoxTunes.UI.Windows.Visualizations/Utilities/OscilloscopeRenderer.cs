@@ -336,7 +336,7 @@ namespace FoxTunes
 
         private static void Render(BitmapHelper.RenderInfo info, OscilloscopeRendererData data)
         {
-            BitmapHelper.Clear(info);
+            BitmapHelper.Clear(ref info);
 
             if (data.SampleCount == 0)
             {
@@ -372,7 +372,7 @@ namespace FoxTunes
                 var point1 = elements[0, x];
                 var point2 = elements[0, x + 1];
                 BitmapHelper.DrawLine(
-                    info,
+                    ref info,
                     point1.X,
                     point1.Y,
                     point2.X,
@@ -390,7 +390,7 @@ namespace FoxTunes
                     var point1 = elements[channel, x];
                     var point2 = elements[channel, x + 1];
                     BitmapHelper.DrawLine(
-                        info,
+                        ref info,
                         point1.X,
                         point1.Y,
                         point2.X,

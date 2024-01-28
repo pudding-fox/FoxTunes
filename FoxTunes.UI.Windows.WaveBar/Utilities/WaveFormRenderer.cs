@@ -2,6 +2,7 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -516,7 +517,20 @@ namespace FoxTunes
 
         public static void Render(WaveFormRendererData rendererData, BitmapHelper.RenderInfo waveRenderInfo, BitmapHelper.RenderInfo powerRenderInfo, bool rms, WaveFormRendererMode mode)
         {
-            BitmapHelper.Clear(waveRenderInfo);
+            BitmapHelper.Clear(ref waveRenderInfo);
+
+            if (rendererData.Capacity == 0)
+            {
+                //No data.
+                return;
+            }
+
+            if (rendererData.Width != waveRenderInfo.Width || rendererData.Height != waveRenderInfo.Height)
+            {
+                //Bitmap does not match data.
+                return;
+            }
+
             switch (mode)
             {
                 case WaveFormRendererMode.Mono:
@@ -541,14 +555,14 @@ namespace FoxTunes
                     var waveElement = waveElements[position, 0];
                     var powerElement = powerElements[position, 0];
                     BitmapHelper.DrawRectangle(
-                        waveRenderInfo,
+                        ref waveRenderInfo,
                         position,
                         waveElement.Y,
                         1,
                         waveElement.Height
                     );
                     BitmapHelper.DrawRectangle(
-                        powerRenderInfo,
+                        ref powerRenderInfo,
                         position,
                         powerElement.Y,
                         1,
@@ -563,7 +577,7 @@ namespace FoxTunes
                 {
                     var element = elements[position, 0];
                     BitmapHelper.DrawRectangle(
-                        waveRenderInfo,
+                        ref waveRenderInfo,
                         position,
                         element.Y,
                         1,
@@ -586,14 +600,14 @@ namespace FoxTunes
                         var waveElement = waveElements[position, channel];
                         var powerElement = powerElements[position, channel];
                         BitmapHelper.DrawRectangle(
-                            waveRenderInfo,
+                            ref waveRenderInfo,
                             position,
                             waveElement.Y,
                             1,
                             waveElement.Height
                         );
                         BitmapHelper.DrawRectangle(
-                            powerRenderInfo,
+                            ref powerRenderInfo,
                             position,
                             powerElement.Y,
                             1,
@@ -611,7 +625,7 @@ namespace FoxTunes
                     {
                         var element = elements[position, channel];
                         BitmapHelper.DrawRectangle(
-                            waveRenderInfo,
+                            ref waveRenderInfo,
                             position,
                             element.Y,
                             1,
