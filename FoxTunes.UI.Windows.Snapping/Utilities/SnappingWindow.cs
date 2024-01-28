@@ -1,6 +1,8 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 
 namespace FoxTunes
 {
@@ -50,9 +52,17 @@ namespace FoxTunes
         public SnappingWindow(IntPtr handle) : this()
         {
             this.Handle = handle;
+            this.Window = GetWindow(handle);
         }
 
         public IntPtr Handle { get; private set; }
+
+        public Window Window { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            base.InitializeComponent(core);
+        }
 
         public bool IsDisposed { get; private set; }
 
@@ -103,6 +113,21 @@ namespace FoxTunes
             {
                 //Nothing can be done, never throw on GC thread.
             }
+        }
+
+        public static Window GetWindow(IntPtr handle)
+        {
+            var windows = Application.Current.Windows;
+            for (var a = 0; a < windows.Count; a++)
+            {
+                var window = windows[a];
+                if (window.GetHandle() != handle)
+                {
+                    continue;
+                }
+                return window;
+            }
+            throw new InvalidOperationException(string.Format("Window for handle \"{0}\" could not be found.", handle));
         }
     }
 }

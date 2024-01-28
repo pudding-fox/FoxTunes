@@ -21,8 +21,8 @@ namespace FoxTunes
             this.Application.DispatcherUnhandledException += this.OnApplicationDispatcherUnhandledException;
             this.Queue = new PendingQueue<KeyValuePair<IFileActionHandler, string>>(TimeSpan.FromSeconds(1));
             this.Queue.Complete += this.OnComplete;
-            Windows.MainWindowCreated += this.OnWindowCreated;
-            Windows.MiniWindowCreated += this.OnWindowCreated;
+            WindowBase.Created += this.OnWindowCreated;
+            WindowBase.Destroyed += this.OnWindowDestroyed;
         }
 
         public CommandLineParser.OpenMode OpenMode { get; private set; }
@@ -192,7 +192,27 @@ namespace FoxTunes
             {
                 return;
             }
-            this.OnWindowCreated(window.GetHandle());
+            var role = UserInterfaceWindowRole.None;
+            if (window is MainWindow || window is MiniWindow)
+            {
+                role = UserInterfaceWindowRole.Main;
+            }
+            this.OnWindowCreated(window.GetHandle(), role);
+        }
+
+        protected virtual void OnWindowDestroyed(object sender, EventArgs e)
+        {
+            var window = sender as Window;
+            if (window == null)
+            {
+                return;
+            }
+            var role = UserInterfaceWindowRole.None;
+            if (window is MainWindow || window is MiniWindow)
+            {
+                role = UserInterfaceWindowRole.Main;
+            }
+            this.OnWindowDestroyed(window.GetHandle(), role);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -225,8 +245,8 @@ namespace FoxTunes
                 this.Queue.Complete -= this.OnComplete;
                 this.Queue.Dispose();
             }
-            Windows.MainWindowCreated -= this.OnWindowCreated;
-            Windows.MiniWindowCreated -= this.OnWindowCreated;
+            WindowBase.Created -= this.OnWindowCreated;
+            WindowBase.Destroyed -= this.OnWindowDestroyed;
         }
 
         ~WindowsUserInterface()
