@@ -57,6 +57,8 @@
       <DependentUpon>BackgroundTasks.xaml</DependentUpon>
     </Compile>
     <Compile Include="Behaviours\LibraryActionsBehaviour.cs" />
+    <Compile Include="Behaviours\MiniPlayerBehaviour.cs" />
+    <Compile Include="Behaviours\MiniPlayerBehaviourConfiguration.cs" />
     <Compile Include="Behaviours\PlaylistActionsBehaviour.cs" />
     <Compile Include="Behaviours\TrayIconBehaviour.cs" />
     <Compile Include="Components.xaml.cs">
@@ -86,10 +88,22 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Marquee.xaml.cs">
+      <DependentUpon>Marquee.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Menu.xaml.cs">
       <DependentUpon>Menu.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Mini.xaml.cs">
+      <DependentUpon>Mini.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MiniPlayer.xaml.cs">
+      <DependentUpon>MiniPlayer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="NotifyIconElement.cs" />
+    <Compile Include="NowPlaying.xaml.cs">
+      <DependentUpon>NowPlaying.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Playback.xaml.cs">
       <DependentUpon>Playback.xaml</DependentUpon>
     </Compile>
@@ -103,6 +117,11 @@
       <DependentUpon>PlaylistSettingsDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -141,6 +160,10 @@
     <Compile Include="ViewModel\Converters\DataGridSelectedItemConverter.cs" />
     <Compile Include="Utilities\PlaylistGridViewColumnFactory.cs" />
     <Compile Include="ViewModel\Converters\GridLengthConverter.cs" />
+    <Compile Include="ViewModel\Converters\HasFlagConverter.cs" />
+    <Compile Include="ViewModel\Converters\MathConverter.cs" />
+    <Compile Include="ViewModel\Converters\MultiConverter.cs" />
+    <Compile Include="ViewModel\Converters\NegatingConverter.cs" />
     <Compile Include="ViewModel\Extensions.cs" />
     <Compile Include="ViewModel\InvokeParameterizedCommandAction.cs" />
     <Compile Include="ViewModel\Library.cs" />
@@ -149,6 +172,9 @@
     <Compile Include="ViewModel\Main.cs" />
     <Compile Include="Utilities\PlaylistScriptBinding.cs" />
     <Compile Include="ViewModel\Menu.cs" />
+    <Compile Include="ViewModel\Mini.cs" />
+    <Compile Include="ViewModel\MiniPlayer.cs" />
+    <Compile Include="ViewModel\NowPlaying.cs" />
     <Compile Include="ViewModel\PlaylistSettings.cs" />
     <Compile Include="Utilities\ScriptBinding.cs" />
     <Compile Include="ViewModel\ValidationRule.cs" />
@@ -215,7 +241,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Marquee.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Menu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Mini.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MiniPlayer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NowPlaying.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -262,7 +304,15 @@
     <Resource Include="Images\Fox.ico" />
     <None Include="Images\Fox.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\NowPlaying.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

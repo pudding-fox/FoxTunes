@@ -19,7 +19,7 @@ namespace FoxTunes.ViewModel
 
         public ObservableCollection<ComponentError> Errors { get; set; }
 
-        protected override void OnCoreChanged()
+        public override void InitializeComponent(ICore core)
         {
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             ComponentRegistry.Instance.ForEach(component =>
@@ -31,7 +31,7 @@ namespace FoxTunes.ViewModel
                 }
             });
             ViewModelBase.Error += this.OnError;
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
 
         protected virtual async Task OnError(object sender, ComponentErrorEventArgs e)

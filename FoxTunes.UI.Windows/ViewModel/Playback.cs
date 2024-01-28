@@ -204,7 +204,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected override void OnCoreChanged()
+        public override void InitializeComponent(ICore core)
         {
             this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.Output = this.Core.Components.Output;
@@ -230,7 +230,7 @@ namespace FoxTunes.ViewModel
                 InputManagerConfiguration.STOP_ELEMENT
             ).ConnectValue<string>(value => this.StopCommandBinding = value);
             this.OnCommandsChanged();
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
 
         protected virtual void OnCommandsChanged()

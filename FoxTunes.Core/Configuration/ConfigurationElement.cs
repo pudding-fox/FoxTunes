@@ -9,9 +9,11 @@ namespace FoxTunes
         private ConfigurationElement()
         {
             this.IsHidden = false;
+            this.Flags = ConfigurationElementFlags.None;
         }
 
-        protected ConfigurationElement(string id, string name = null, string description = null) : this()
+        protected ConfigurationElement(string id, string name = null, string description = null)
+            : this()
         {
             this.Id = id;
             this.Name = name;
@@ -89,6 +91,39 @@ namespace FoxTunes
             return this;
         }
 
+        private ConfigurationElementFlags _Flags { get; set; }
+
+        public ConfigurationElementFlags Flags
+        {
+            get
+            {
+                return this._Flags;
+            }
+            set
+            {
+                this._Flags = value;
+                this.OnFlagsChanged();
+            }
+        }
+
+        protected virtual void OnFlagsChanged()
+        {
+            if (this.FlagsChanged != null)
+            {
+                this.FlagsChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Flags");
+        }
+
+        [field: NonSerialized]
+        public event EventHandler FlagsChanged = delegate { };
+
+        public ConfigurationElement WithFlags(ConfigurationElementFlags flags)
+        {
+            this.Flags = flags;
+            return this;
+        }
+
         public abstract ConfigurationElement ConnectValue<T>(Action<T> action);
 
         public void Update(ConfigurationElement element)
@@ -97,6 +132,7 @@ namespace FoxTunes
             this.Description = element.Description;
             this.IsHidden = false;
             this.ValidationRules = element.ValidationRules;
+            this.Flags = element.Flags;
             this.OnUpdate(element);
         }
 
@@ -116,5 +152,12 @@ namespace FoxTunes
             this.IsHidden = false;
             return this;
         }
+    }
+
+    [Flags]
+    public enum ConfigurationElementFlags : byte
+    {
+        None = 0,
+        MultiLine = 1
     }
 }

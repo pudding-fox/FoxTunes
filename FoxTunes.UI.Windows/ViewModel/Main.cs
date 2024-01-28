@@ -113,7 +113,33 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ScalingFactorChanged = delegate { };
 
-        protected override void OnCoreChanged()
+        private BooleanConfigurationElement _MiniPlayer { get; set; }
+
+        public BooleanConfigurationElement MiniPlayer
+        {
+            get
+            {
+                return this._MiniPlayer;
+            }
+            set
+            {
+                this._MiniPlayer = value;
+                this.OnMiniPlayerChanged();
+            }
+        }
+
+        protected virtual void OnMiniPlayerChanged()
+        {
+            if (this.MiniPlayerChanged != null)
+            {
+                this.MiniPlayerChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("MiniPlayer");
+        }
+
+        public event EventHandler MiniPlayerChanged = delegate { };
+
+        public override void InitializeComponent(ICore core)
         {
             this.Configuration = this.Core.Components.Configuration;
             this.ShowLibrary = this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -132,7 +158,11 @@ namespace FoxTunes.ViewModel
               WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
-            base.OnCoreChanged();
+            this.MiniPlayer = this.Configuration.GetElement<BooleanConfigurationElement>(
+              MiniPlayerBehaviourConfiguration.MINI_PLAYER_SECTION,
+              MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT
+            );
+            base.InitializeComponent(core);
         }
 
         public ICommand RestoreCommand

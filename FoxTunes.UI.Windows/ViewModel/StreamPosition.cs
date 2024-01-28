@@ -32,11 +32,11 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected override void OnCoreChanged()
+        public override void InitializeComponent(ICore core)
         {
             this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.OnCommandsChanged();
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
 
         protected virtual void OnCommandsChanged()

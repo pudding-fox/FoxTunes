@@ -1,26 +1,84 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace FoxTunes.Utilities
+namespace FoxTunes
 {
-    public abstract class ScriptBinding : Binding, IValueConverter
+    public abstract class ScriptBinding : Binding, INotifyPropertyChanged, IValueConverter
     {
-        private ScriptBinding()
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
+        protected ScriptBinding()
         {
             this.Converter = this;
         }
 
-        protected ScriptBinding(IScriptingContext scriptingContext, string script) : this()
+        protected ScriptBinding(IScriptingContext scriptingContext, string script)
+            : this()
         {
             this.ScriptingContext = scriptingContext;
             this.Script = script;
         }
 
-        public IScriptingContext ScriptingContext { get; private set; }
+        private IScriptingContext _ScriptingContext { get; set; }
 
-        public string Script { get; private set; }
+        public IScriptingContext ScriptingContext
+        {
+            get
+            {
+                return this._ScriptingContext;
+            }
+            set
+            {
+                this._ScriptingContext = value;
+                this.OnScriptingContextChanged();
+            }
+        }
+
+        protected virtual void OnScriptingContextChanged()
+        {
+            if (this.ScriptingContextChanged != null)
+            {
+                this.ScriptingContextChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ScriptingContext");
+        }
+
+        public event EventHandler ScriptingContextChanged = delegate { };
+
+        private string _Script { get; set; }
+
+        public string Script
+        {
+            get
+            {
+                return this._Script;
+            }
+            set
+            {
+                this._Script = value;
+                this.OnScriptChanged();
+            }
+        }
+
+        protected virtual void OnScriptChanged()
+        {
+            if (this.ScriptChanged != null)
+            {
+                this.ScriptChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Script");
+        }
+
+        public event EventHandler ScriptChanged = delegate { };
 
         public virtual object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -31,5 +89,16 @@ namespace FoxTunes.Utilities
         {
             throw new NotImplementedException();
         }
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged == null)
+            {
+                return;
+            }
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
     }
 }

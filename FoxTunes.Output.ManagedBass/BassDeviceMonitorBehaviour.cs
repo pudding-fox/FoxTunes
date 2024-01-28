@@ -18,7 +18,7 @@ namespace FoxTunes
 
         public NotificationClient NotificationClient { get; private set; }
 
-        public bool IsInitialized { get; private set; }
+        new public bool IsInitialized { get; private set; }
 
         private bool _Enabled { get; set; }
 

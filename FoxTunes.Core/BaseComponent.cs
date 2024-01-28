@@ -16,9 +16,11 @@ namespace FoxTunes
             }
         }
 
+        public bool IsInitialized { get; private set; }
+
         public virtual void InitializeComponent(ICore core)
         {
-            //Nothing to do.
+            this.IsInitialized = true;
         }
 
         protected virtual void OnPropertyChanging(string propertyName)

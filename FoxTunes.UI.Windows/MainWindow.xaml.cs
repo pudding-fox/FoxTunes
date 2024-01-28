@@ -28,8 +28,12 @@ namespace FoxTunes
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            global::FoxTunes.Properties.Settings.Default.MainWindowBounds = this.RestoreBounds;
-            global::FoxTunes.Properties.Settings.Default.Save();
+            var miniPlayerBehaviour = ComponentRegistry.Instance.GetComponent<MiniPlayerBehaviour>();
+            if (miniPlayerBehaviour == null || !miniPlayerBehaviour.Enabled)
+            {
+                global::FoxTunes.Properties.Settings.Default.MainWindowBounds = this.RestoreBounds;
+                global::FoxTunes.Properties.Settings.Default.Save();
+            }
             base.OnClosing(e);
         }
     }

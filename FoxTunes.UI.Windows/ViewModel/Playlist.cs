@@ -208,7 +208,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler GridColumnsChanged = delegate { };
 
-        protected override void OnCoreChanged()
+        public override void InitializeComponent(ICore core)
         {
             this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
@@ -226,7 +226,7 @@ namespace FoxTunes.ViewModel
             this.RefreshColumns();
             this.ReloadItems();
             this.OnCommandsChanged();
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
 
         protected virtual void OnColumnChanged(object sender, PlaylistColumn e)

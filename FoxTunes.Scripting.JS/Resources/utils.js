@@ -1,4 +1,8 @@
-﻿function timestamp(value) {
+﻿function version() {
+    return "Fox Tunes 0.9";
+}
+
+function timestamp(value) {
 
     if (!value) {
         return value;
@@ -47,7 +51,7 @@ function ucfirst(value) {
 
 function filename(value) {
     if (!value) {
-       return value; 
+        return value;
     }
     var parts = value.split('\\');
     return parts[parts.length - 1].replace(/\.[^/.]+$/, '');
