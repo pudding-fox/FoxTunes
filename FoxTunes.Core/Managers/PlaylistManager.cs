@@ -218,7 +218,7 @@ namespace FoxTunes
             }
         }
 
-        public async Task Add(Playlist playlist)
+        public async Task Create(Playlist playlist)
         {
             using (var task = new AddPlaylistTask(playlist))
             {
@@ -228,7 +228,7 @@ namespace FoxTunes
             }
         }
 
-        public async Task Add(Playlist playlist, IEnumerable<string> paths)
+        public async Task Create(Playlist playlist, IEnumerable<string> paths)
         {
             using (var task = new AddPlaylistTask(playlist, paths))
             {
@@ -238,7 +238,7 @@ namespace FoxTunes
             }
         }
 
-        public async Task Add(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode)
+        public async Task Create(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode)
         {
             using (var task = new AddPlaylistTask(playlist, libraryHierarchyNode))
             {
@@ -248,7 +248,7 @@ namespace FoxTunes
             }
         }
 
-        public async Task Add(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
+        public async Task Create(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
         {
             using (var task = new AddPlaylistTask(playlist, playlistItems))
             {
@@ -322,6 +322,24 @@ namespace FoxTunes
             }
         }
 
+        public Task Add(Playlist playlist, IEnumerable<PlaylistItem> playlistItems, bool clear)
+        {
+            Logger.Write(this, LogLevel.Debug, "Adding items to playlist.");
+            var index = this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist);
+            return this.Insert(playlist, index, playlistItems, clear);
+        }
+
+        public async Task Insert(Playlist playlist, int index, IEnumerable<PlaylistItem> playlistItems, bool clear)
+        {
+            Logger.Write(this, LogLevel.Debug, "Inserting items into playlist at index: {0}", index);
+            using (var task = new MovePlaylistItemsTask(playlist, index, playlistItems, clear))
+            {
+                task.InitializeComponent(this.Core);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
+            }
+        }
+
         public Task Move(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
         {
             Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items.");
@@ -332,7 +350,7 @@ namespace FoxTunes
         public async Task Move(Playlist playlist, int index, IEnumerable<PlaylistItem> playlistItems)
         {
             Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items at index: {0}", index);
-            using (var task = new MovePlaylistItemsTask(playlist, index, playlistItems))
+            using (var task = new MovePlaylistItemsTask(playlist, index, playlistItems, false))
             {
                 task.InitializeComponent(this.Core);
                 await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);

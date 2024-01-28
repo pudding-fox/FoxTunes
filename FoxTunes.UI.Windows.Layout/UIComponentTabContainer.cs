@@ -24,7 +24,11 @@ namespace FoxTunes
 
         public UIComponentTabContainer()
         {
-            this.TabControl = new global::System.Windows.Controls.TabControl();
+            this.TabControl = new global::System.Windows.Controls.TabControl()
+            {
+                AllowDrop = true
+            };
+            TabControlExtensions.SetDragOverSelection(this.TabControl, true);
             this.Content = this.TabControl;
         }
 

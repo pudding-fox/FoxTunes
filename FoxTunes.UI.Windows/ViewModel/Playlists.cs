@@ -207,19 +207,6 @@ namespace FoxTunes.ViewModel
             var task = Windows.Invoke(new Action(this.OnSelectedItemChanged));
         }
 
-        public ICommand AddPlaylistCommand
-        {
-            get
-            {
-                return CommandFactory.Instance.CreateCommand(this.AddPlaylist);
-            }
-        }
-
-        public Task AddPlaylist()
-        {
-            return PlaylistsActionsBehaviour.Instance.AddPlaylist();
-        }
-
         public Task AddPlaylist(LibraryHierarchyNode libraryHierarchyNode)
         {
             return PlaylistsActionsBehaviour.Instance.AddPlaylist(libraryHierarchyNode);
@@ -303,17 +290,34 @@ namespace FoxTunes.ViewModel
             e.Effects = effects;
         }
 
-        public ICommand DropCommand
+        public ICommand AddPlaylistCommand
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand<DragEventArgs>(
-                    new Func<DragEventArgs, Task>(this.OnDrop)
+                return CommandFactory.Instance.CreateCommand<RoutedEventArgs>(
+                    new Func<RoutedEventArgs, Task>(this.AddPlaylist)
                 );
             }
         }
 
-        protected virtual Task OnDrop(DragEventArgs e)
+        protected virtual Task AddPlaylist(RoutedEventArgs e)
+        {
+            if (e is DragEventArgs de)
+            {
+                return this.AddPlaylist(de);
+            }
+            else
+            {
+                return this.AddPlaylist();
+            }
+        }
+
+        protected virtual Task AddPlaylist()
+        {
+            return PlaylistsActionsBehaviour.Instance.AddPlaylist();
+        }
+
+        protected virtual Task AddPlaylist(DragEventArgs e)
         {
             try
             {
@@ -349,6 +353,78 @@ namespace FoxTunes.ViewModel
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        public ICommand AddToPlaylistCommand
+        {
+            get
+            {
+                return CommandFactory.Instance.CreateCommand<DragEventArgs>(
+                    new Func<DragEventArgs, Task>(this.AddToPlaylist)
+                );
+            }
+        }
+
+        protected virtual Task AddToPlaylist(DragEventArgs e)
+        {
+            var playlist = this.PlaylistManager.SelectedPlaylist;
+            if (playlist == null)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            try
+            {
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
+                    return this.AddToPlaylist(playlist, paths);
+                }
+                if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
+                {
+                    var libraryHierarchyNode = e.Data.GetData(typeof(LibraryHierarchyNode)) as LibraryHierarchyNode;
+                    return this.AddToPlaylist(playlist, libraryHierarchyNode);
+                }
+                if (e.Data.GetDataPresent<IEnumerable<PlaylistItem>>())
+                {
+                    var playlistItems = e.Data
+                        .GetData<IEnumerable<PlaylistItem>>()
+                        .OrderBy(playlistItem => playlistItem.Sequence);
+                    return this.AddToPlaylist(playlist, playlistItems);
+                }
+                if (ShellIDListHelper.GetDataPresent(e.Data))
+                {
+                    var paths = ShellIDListHelper.GetData(e.Data);
+                    return this.AddToPlaylist(playlist, paths);
+                }
+            }
+            catch (Exception exception)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to process clipboard contents: {0}", exception.Message);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
+        public Task AddToPlaylist(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode)
+        {
+            return this.PlaylistManager.Add(playlist, libraryHierarchyNode, false);
+        }
+
+        public Task AddToPlaylist(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
+        {
+            return this.PlaylistManager.Add(playlist, playlistItems, false);
+        }
+
+        public Task AddToPlaylist(Playlist playlist, IEnumerable<string> paths)
+        {
+            return this.PlaylistManager.Add(playlist, paths, false);
         }
 
         protected override Freezable CreateInstanceCore()

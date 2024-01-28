@@ -6,13 +6,13 @@ namespace FoxTunes.Interfaces
 {
     public interface IPlaylistManager : IStandardManager, IInvocableComponent, IFileActionHandler, IDatabaseInitializer
     {
-        Task Add(Playlist playlist);
+        Task Create(Playlist playlist);
 
-        Task Add(Playlist playlist, IEnumerable<string> paths);
+        Task Create(Playlist playlist, IEnumerable<string> paths);
 
-        Task Add(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode);
+        Task Create(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode);
 
-        Task Add(Playlist playlist, IEnumerable<PlaylistItem> playlistItems);
+        Task Create(Playlist playlist, IEnumerable<PlaylistItem> playlistItems);
 
         Task Remove(Playlist playlist);
 
@@ -27,6 +27,10 @@ namespace FoxTunes.Interfaces
         Task Add(Playlist playlist, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear);
 
         Task Insert(Playlist playlist, int index, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear);
+
+        Task Add(Playlist playlist, IEnumerable<PlaylistItem> playlistItems, bool clear);
+
+        Task Insert(Playlist playlist, int index, IEnumerable<PlaylistItem> playlistItems, bool clear);
 
         Task Move(Playlist playlist, IEnumerable<PlaylistItem> playlistItems);
 
