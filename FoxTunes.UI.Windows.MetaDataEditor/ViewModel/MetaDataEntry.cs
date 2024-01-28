@@ -14,6 +14,10 @@ namespace FoxTunes.ViewModel
         {
             CommonMetaData.Disc,
             CommonMetaData.DiscCount,
+            CommonMetaData.ReplayGainAlbumGain,
+            CommonMetaData.ReplayGainAlbumPeak,
+            CommonMetaData.ReplayGainTrackGain,
+            CommonMetaData.ReplayGainTrackPeak,
             CommonMetaData.Track,
             CommonMetaData.TrackCount,
             CommonMetaData.Year

@@ -318,6 +318,21 @@
   <data name="MetaDataItemType.Tag" xml:space="preserve">
     <value>Tag</value>
   </data>
+  <data name="MetaDataName.DirectoryName" xml:space="preserve">
+    <value>Folder</value>
+  </data>
+  <data name="MetaDataName.FileCreationTime" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="MetaDataName.FileModificationTime" xml:space="preserve">
+    <value>Modified</value>
+  </data>
+  <data name="MetaDataName.FileName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="MetaDataName.FileSize" xml:space="preserve">
+    <value>Size</value>
+  </data>
   <data name="MetaDataName.IsCompilation" xml:space="preserve">
     <value>Compilation</value>
   </data>
@@ -462,6 +477,9 @@
   <data name="SelectionProperties.Images" xml:space="preserve">
     <value>Images</value>
   </data>
+  <data name="SelectionProperties.Location" xml:space="preserve">
+    <value>Location</value>
+  </data>
   <data name="SelectionProperties.Name" xml:space="preserve">
     <value>Selection Properties</value>
   </data>
@@ -479,6 +497,9 @@
   </data>
   <data name="SelectionPropertiesConfiguration.ShowImages" xml:space="preserve">
     <value>Images</value>
+  </data>
+  <data name="SelectionPropertiesConfiguration.ShowLocation" xml:space="preserve">
+    <value>Location</value>
   </data>
   <data name="SelectionPropertiesConfiguration.ShowProperties" xml:space="preserve">
     <value>Properties</value>

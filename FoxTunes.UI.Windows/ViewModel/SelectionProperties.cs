@@ -2,18 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
-using System.Text;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace FoxTunes.ViewModel
 {
     public class SelectionProperties : ConfigurableViewModelBase
     {
         const int TIMEOUT = 100;
-
-        const string DELIMITER = "; ";
 
         private static readonly string[] TAGS = new[]
         {
@@ -41,9 +41,33 @@ namespace FoxTunes.ViewModel
             CommonProperties.Duration
         };
 
+        private static readonly string[] FILESYSTEM = new[]
+        {
+            FileSystemProperties.FileName,
+            FileSystemProperties.DirectoryName,
+            FileSystemProperties.FileSize,
+            FileSystemProperties.FileCreationTime,
+            FileSystemProperties.FileModificationTime
+        };
+
         private static readonly string[] IMAGES = new[]
         {
             CommonImageTypes.FrontCover
+        };
+
+        private static readonly IDictionary<string, ValueProvider> PROVIDERS = new Dictionary<string, ValueProvider>(StringComparer.OrdinalIgnoreCase)
+        {
+            { FileSystemProperties.FileName, FileSystemValueProvider.Instance },
+            { FileSystemProperties.DirectoryName, FileSystemValueProvider.Instance },
+            { FileSystemProperties.FileSize, FileSystemValueProvider.Instance },
+            { FileSystemProperties.FileCreationTime, FileSystemValueProvider.Instance },
+            { FileSystemProperties.FileModificationTime, FileSystemValueProvider.Instance }
+        };
+
+        private static readonly IDictionary<string, ValueAggregator> AGGREGATORS = new Dictionary<string, ValueAggregator>(StringComparer.OrdinalIgnoreCase)
+        {
+            { CommonProperties.Duration, TimeSpanValueAggregator.Instance },
+            { FileSystemProperties.FileSize, FileSystemUsageValueAggregator.Instance },
         };
 
         public SelectionProperties() : base(false)
@@ -52,6 +76,7 @@ namespace FoxTunes.ViewModel
             this.FileDatas = new ObservableCollection<IFileData>();
             this.Tags = new ObservableCollection<Row>();
             this.Properties = new ObservableCollection<Row>();
+            this.FileSystem = new ObservableCollection<Row>();
             this.Images = new ObservableCollection<Row>();
             if (Core.Instance != null)
             {
@@ -66,6 +91,8 @@ namespace FoxTunes.ViewModel
         public ObservableCollection<Row> Tags { get; private set; }
 
         public ObservableCollection<Row> Properties { get; private set; }
+
+        public ObservableCollection<Row> FileSystem { get; private set; }
 
         public ObservableCollection<Row> Images { get; private set; }
 
@@ -156,6 +183,33 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowImagesChanged;
 
+        private bool _ShowLocation { get; set; }
+
+        public bool ShowLocation
+        {
+            get
+            {
+                return this._ShowLocation;
+            }
+            set
+            {
+                this._ShowLocation = value;
+                this.OnShowLocationChanged();
+            }
+        }
+
+        protected virtual void OnShowLocationChanged()
+        {
+            this.Debouncer.Exec(this.Refresh);
+            if (this.ShowLocationChanged != null)
+            {
+                this.ShowLocationChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowLocation");
+        }
+
+        public event EventHandler ShowLocationChanged;
+
         protected override void InitializeComponent(ICore core)
         {
             this.LibraryManager = core.Managers.Library;
@@ -179,6 +233,10 @@ namespace FoxTunes.ViewModel
                     SelectionPropertiesConfiguration.SECTION,
                     SelectionPropertiesConfiguration.SHOW_PROPERTIES
                 ).ConnectValue(value => this.ShowProperties = value);
+                this.Configuration.GetElement<BooleanConfigurationElement>(
+                    SelectionPropertiesConfiguration.SECTION,
+                    SelectionPropertiesConfiguration.SHOW_LOCATION
+                ).ConnectValue(value => this.ShowLocation = value);
                 this.Configuration.GetElement<BooleanConfigurationElement>(
                     SelectionPropertiesConfiguration.SECTION,
                     SelectionPropertiesConfiguration.SHOW_IMAGES
@@ -229,6 +287,7 @@ namespace FoxTunes.ViewModel
             var metaDatas = this.GetMetaDatas(fileDatas);
             var tags = this.GetTags(fileDatas, metaDatas);
             var properties = this.GetProperties(fileDatas, metaDatas);
+            var filesystem = this.GetFileSystem(fileDatas, metaDatas);
             var images = this.GetImages(fileDatas, metaDatas);
             return Windows.Invoke(() =>
             {
@@ -238,6 +297,8 @@ namespace FoxTunes.ViewModel
                 this.Tags.AddRange(tags);
                 this.Properties.Clear();
                 this.Properties.AddRange(properties);
+                this.FileSystem.Clear();
+                this.FileSystem.AddRange(filesystem);
                 this.Images.Clear();
                 this.Images.AddRange(images);
             });
@@ -289,47 +350,106 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        protected virtual IEnumerable<Row> GetFileSystem(IEnumerable<IFileData> fileDatas, IDictionary<IFileData, IDictionary<string, string>> metaDatas)
+        {
+            if (this.ShowLocation)
+            {
+                foreach (var property in FILESYSTEM)
+                {
+                    yield return this.GetRow(property, fileDatas, metaDatas);
+                }
+            }
+        }
+
         protected virtual IEnumerable<Row> GetImages(IEnumerable<IFileData> fileDatas, IDictionary<IFileData, IDictionary<string, string>> metaDatas)
         {
+            const int LIMIT = 10;
             if (this.ShowImages)
             {
                 foreach (var image in IMAGES)
                 {
-                    yield return this.GetRow(image, fileDatas, metaDatas);
+                    foreach (var row in this.GetRows(image, fileDatas, metaDatas, LIMIT))
+                    {
+                        yield return row;
+                    }
                 }
             }
         }
 
         protected virtual Row GetRow(string name, IEnumerable<IFileData> fileDatas, IDictionary<IFileData, IDictionary<string, string>> metaDatas)
         {
-            var result = new StringBuilder();
-            var history = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var values = new List<object>();
+            var provider = this.GetProvider(name);
+            var aggregator = this.GetAggregator(name);
             foreach (var fileData in fileDatas)
             {
-                var value = default(string);
                 var metaData = default(IDictionary<string, string>);
-                if (!metaDatas.TryGetValue(fileData, out metaData) || metaData == null)
+                if (!metaDatas.TryGetValue(fileData, out metaData))
                 {
-                    value = Strings.SelectionProperties_NoValue;
+                    metaData = null;
                 }
-                else
+                try
                 {
-                    if (!metaData.TryGetValue(name, out value))
-                    {
-                        value = Strings.SelectionProperties_NoValue;
-                    }
+                    aggregator.Add(
+                        values,
+                        provider.GetValue(fileData, metaData, name)
+                    );
                 }
-                if (!history.Add(value))
+                catch (Exception e)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to read property \"{0}\" of file \"{1}\": {2}", name, fileData.FileName, e.Message);
+                }
+            }
+            var value = aggregator.GetValue(values);
+            return new Row(name, value);
+        }
+
+        protected virtual IEnumerable<Row> GetRows(string name, IEnumerable<IFileData> fileDatas, IDictionary<IFileData, IDictionary<string, string>> metaDatas, int limit)
+        {
+            var values = new List<string>();
+            var provider = this.GetProvider(name);
+            foreach (var fileData in fileDatas)
+            {
+                var metaData = default(IDictionary<string, string>);
+                if (!metaDatas.TryGetValue(fileData, out metaData))
                 {
                     continue;
                 }
-                if (result.Length > 0)
+                var value = Convert.ToString(provider.GetValue(fileData, metaData, name));
+                if (string.IsNullOrEmpty(value) || values.Contains(value, StringComparer.OrdinalIgnoreCase))
                 {
-                    result.Append(DELIMITER);
+                    continue;
                 }
-                result.Append(value);
+                values.Add(value);
+                if (values.Count >= limit)
+                {
+                    break;
+                }
             }
-            return new Row(name, result.ToString());
+            foreach (var value in values)
+            {
+                yield return new Row(name, value);
+            }
+        }
+
+        protected virtual ValueProvider GetProvider(string name)
+        {
+            var provider = default(ValueProvider);
+            if (PROVIDERS.TryGetValue(name, out provider))
+            {
+                return provider;
+            }
+            return MetaDataValueProvider.Instance;
+        }
+
+        protected virtual ValueAggregator GetAggregator(string name)
+        {
+            var aggregator = default(ValueAggregator);
+            if (AGGREGATORS.TryGetValue(name, out aggregator))
+            {
+                return aggregator;
+            }
+            return ConcatValueAggregator.Instance;
         }
 
         protected override Freezable CreateInstanceCore()
@@ -348,6 +468,174 @@ namespace FoxTunes.ViewModel
                 this.PlaylistManager.SelectedItemsChanged -= this.OnSelectedItemsChanged;
             }
             base.OnDisposing();
+        }
+
+        public abstract class ValueProvider
+        {
+            public abstract object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name);
+        }
+
+        public class MetaDataValueProvider : ValueProvider
+        {
+            public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
+            {
+                var value = default(string);
+                if (metaData != null && metaData.TryGetValue(name, out value))
+                {
+                    return value;
+                }
+                return null;
+            }
+
+            public static readonly ValueProvider Instance = new MetaDataValueProvider();
+        }
+
+        public class FileSystemValueProvider : ValueProvider
+        {
+            public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
+            {
+                try
+                {
+                    switch (name)
+                    {
+                        case FileSystemProperties.FileName:
+                            return fileData.FileName.GetName();
+                        case FileSystemProperties.DirectoryName:
+                            return fileData.DirectoryName;
+                        case FileSystemProperties.FileSize:
+                            if (!File.Exists(fileData.FileName))
+                            {
+                                return 0;
+                            }
+                            return new FileInfo(fileData.FileName).Length;
+                        case FileSystemProperties.FileCreationTime:
+                            if (!File.Exists(fileData.FileName))
+                            {
+                                return null;
+                            }
+                            return File.GetCreationTime(fileData.FileName).ToShortDateString();
+                        case FileSystemProperties.FileModificationTime:
+                            if (!File.Exists(fileData.FileName))
+                            {
+                                return null;
+                            }
+                            return File.GetLastWriteTime(fileData.FileName).ToShortDateString();
+                    }
+                }
+                catch
+                {
+                    //TODO: Warn.
+                }
+                return null;
+            }
+
+            public static readonly ValueProvider Instance = new FileSystemValueProvider();
+        }
+
+        public abstract class ValueAggregator
+        {
+            public abstract void Add(IList<object> values, object value);
+
+            public abstract string GetValue(IEnumerable<object> values);
+        }
+
+        public class ConcatValueAggregator : ValueAggregator
+        {
+            const int LIMIT = 30;
+
+            const string DELIMITER = "; ";
+
+            const string OVERFLOW = "...";
+
+            public static readonly ConditionalWeakTable<IList<object>, ISet<string>> History = new ConditionalWeakTable<IList<object>, ISet<string>>();
+
+            public override void Add(IList<object> values, object value)
+            {
+                if (values.Count > LIMIT)
+                {
+                    return;
+                }
+                else if (values.Count == LIMIT)
+                {
+                    values.Add(OVERFLOW);
+                    return;
+                }
+                var history = default(ISet<string>);
+                if (!History.TryGetValue(values, out history))
+                {
+                    history = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    History.Add(values, history);
+                }
+                if (!history.Add(Convert.ToString(value)))
+                {
+                    return;
+                }
+                values.Add(value);
+            }
+
+            public override string GetValue(IEnumerable<object> values)
+            {
+                return string.Join(
+                    DELIMITER,
+                    values
+                );
+            }
+
+            public static readonly ValueAggregator Instance = new ConcatValueAggregator();
+        }
+
+        public class TimeSpanValueAggregator : ValueAggregator
+        {
+            public override void Add(IList<object> values, object value)
+            {
+                var numeric = default(int);
+                if (!int.TryParse(Convert.ToString(value), out numeric))
+                {
+                    return;
+                }
+                values.Add(value);
+            }
+
+            public override string GetValue(IEnumerable<object> values)
+            {
+                var total = values.Select(value => Convert.ToInt64(value) / 1000).Sum();
+                if (total == 0)
+                {
+                    return null;
+                }
+                return TimeSpan.FromSeconds(total).ToString();
+            }
+
+            public static readonly ValueAggregator Instance = new TimeSpanValueAggregator();
+        }
+
+        public class FileSystemUsageValueAggregator : ValueAggregator
+        {
+            private static readonly string[] SUFFIX = { "B", "KB", "MB", "GB", "TB" };
+
+            public override void Add(IList<object> values, object value)
+            {
+                values.Add(value);
+            }
+
+            public override string GetValue(IEnumerable<object> values)
+            {
+                var total = values.Cast<long>().Sum();
+                if (total == 0)
+                {
+                    return null;
+                }
+                var length = total;
+                var order = 0;
+                while (length >= 1024 && order < SUFFIX.Length - 1)
+                {
+                    order++;
+                    length = length / 1024;
+                }
+                return string.Format("{0:0.##} {1} ({2} bytes)", length, SUFFIX[order], total);
+            }
+
+            public static readonly ValueAggregator Instance = new FileSystemUsageValueAggregator();
         }
 
         public class Row

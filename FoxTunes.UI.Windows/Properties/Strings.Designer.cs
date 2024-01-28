@@ -664,6 +664,51 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Folder.
+        /// </summary>
+        internal static string MetaDataName_DirectoryName {
+            get {
+                return ResourceManager.GetString("MetaDataName.DirectoryName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created.
+        /// </summary>
+        internal static string MetaDataName_FileCreationTime {
+            get {
+                return ResourceManager.GetString("MetaDataName.FileCreationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Modified.
+        /// </summary>
+        internal static string MetaDataName_FileModificationTime {
+            get {
+                return ResourceManager.GetString("MetaDataName.FileModificationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        internal static string MetaDataName_FileName {
+            get {
+                return ResourceManager.GetString("MetaDataName.FileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Size.
+        /// </summary>
+        internal static string MetaDataName_FileSize {
+            get {
+                return ResourceManager.GetString("MetaDataName.FileSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Compilation.
         /// </summary>
         internal static string MetaDataName_IsCompilation {
@@ -1096,6 +1141,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Location.
+        /// </summary>
+        internal static string SelectionProperties_Location {
+            get {
+                return ResourceManager.GetString("SelectionProperties.Location", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Selection Properties.
         /// </summary>
         internal static string SelectionProperties_Name {
@@ -1146,6 +1200,15 @@ namespace FoxTunes {
         internal static string SelectionPropertiesConfiguration_ShowImages {
             get {
                 return ResourceManager.GetString("SelectionPropertiesConfiguration.ShowImages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Location.
+        /// </summary>
+        internal static string SelectionPropertiesConfiguration_ShowLocation {
+            get {
+                return ResourceManager.GetString("SelectionPropertiesConfiguration.ShowLocation", resourceCulture);
             }
         }
         
