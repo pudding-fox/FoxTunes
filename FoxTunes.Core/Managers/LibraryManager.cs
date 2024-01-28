@@ -3,6 +3,7 @@ using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,6 +13,11 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class LibraryManager : StandardManager, ILibraryManager
     {
+        public LibraryManager()
+        {
+            this._SelectedItem = new ConcurrentDictionary<LibraryHierarchy, LibraryHierarchyNode>();
+        }
+
         public LibraryManagerState State
         {
             get
@@ -57,6 +63,7 @@ namespace FoxTunes
 
         protected virtual void OnSelectedHierarchyChanged()
         {
+            this.OnSelectedItemChanged();
             if (this.SelectedHierarchyChanged != null)
             {
                 this.SelectedHierarchyChanged(this, EventArgs.Empty);
@@ -66,21 +73,26 @@ namespace FoxTunes
 
         public event EventHandler SelectedHierarchyChanged;
 
-        private LibraryHierarchyNode _SelectedItem { get; set; }
+        private ConcurrentDictionary<LibraryHierarchy, LibraryHierarchyNode> _SelectedItem { get; set; }
 
         public LibraryHierarchyNode SelectedItem
         {
             get
             {
-                return this._SelectedItem;
+                var libraryHierarchyNode = default(LibraryHierarchyNode);
+                if (this.SelectedHierarchy == null || !this._SelectedItem.TryGetValue(this.SelectedHierarchy, out libraryHierarchyNode))
+                {
+                    return default(LibraryHierarchyNode);
+                }
+                return libraryHierarchyNode;
             }
             set
             {
-                if (object.Equals(this._SelectedItem, value))
+                if (this.SelectedHierarchy == null || object.Equals(this.SelectedItem, value))
                 {
                     return;
                 }
-                this._SelectedItem = value;
+                this._SelectedItem[this.SelectedHierarchy] = value;
                 this.OnSelectedItemChanged();
             }
         }
