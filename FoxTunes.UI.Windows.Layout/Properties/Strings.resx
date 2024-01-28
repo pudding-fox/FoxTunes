@@ -132,6 +132,9 @@
   <data name="LayoutDesignerBehaviourTask.Name" xml:space="preserve">
     <value>Editing Layout</value>
   </data>
+  <data name="LayoutDesignerKeyBindingsBehaviourConfiguration.Edit" xml:space="preserve">
+    <value>Edit Layout</value>
+  </data>
   <data name="LayoutEditor.Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
