@@ -20,6 +20,8 @@ namespace FoxTunes
 
         public IMetaDataManager MetaDataManager { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public BooleanConfigurationElement Enabled { get; private set; }
@@ -31,6 +33,7 @@ namespace FoxTunes
             this.Core = core;
             this.PlaylistManager = core.Managers.Playlist;
             this.MetaDataManager = core.Managers.MetaData;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
@@ -137,7 +140,7 @@ namespace FoxTunes
             return this.Clear(playlistItems);
         }
 
-        public Task Clear(PlaylistItem[] playlistItems)
+        public async Task Clear(PlaylistItem[] playlistItems)
         {
             var names = new[]
             {
@@ -161,11 +164,12 @@ namespace FoxTunes
                     }
                 }
             }
-            return this.MetaDataManager.Save(
+            await this.MetaDataManager.Save(
                playlistItems,
                this.WriteTags.Value,
                names.ToArray()
             );
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, CommonSignalFlags.SOFT)).ConfigureAwait(false);
         }
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
@@ -244,9 +248,12 @@ namespace FoxTunes
 
             public ICore Core { get; private set; }
 
+            public ISignalEmitter SignalEmitter { get; private set; }
+
             public override void InitializeComponent(ICore core)
             {
                 this.Core = core;
+                this.SignalEmitter = core.Components.SignalEmitter;
                 base.InitializeComponent(core);
             }
 
@@ -343,6 +350,7 @@ namespace FoxTunes
                     this.Behaviour.WriteTags.Value,
                     names.ToArray()
                 ).ConfigureAwait(false);
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, CommonSignalFlags.SOFT)).ConfigureAwait(false);
             }
 
             protected virtual PlaylistItem GetPlaylistItem(ScannerItem scannerItem)
