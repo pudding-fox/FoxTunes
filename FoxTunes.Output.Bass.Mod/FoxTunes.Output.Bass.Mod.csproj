@@ -26,7 +26,20 @@
     </Reference>
   </ItemGroup>
 
+	<ItemGroup Condition="'$(Platform)' == 'x86'">
+		<None Include="..\lib\x86\basszxtune.dll" Link="Addon\basszxtune.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Platform)' == 'x64'">
+		<None Include="..\lib\x64\basszxtune.dll" Link="Addon\basszxtune.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
   <ItemGroup>
+    <Folder Include="Addon\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 

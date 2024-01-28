@@ -42,7 +42,7 @@ namespace FoxTunes
             }
             foreach (var plugin in BassPluginLoader.Instance.Plugins)
             {
-                foreach (var format in plugin.Formats)
+                foreach (var format in plugin.Info.Formats)
                 {
                     foreach (var extension in format.FileExtensions.Split(';'))
                     {
