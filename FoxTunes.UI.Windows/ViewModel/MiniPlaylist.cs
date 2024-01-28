@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public class MiniPlaylist : PlaylistBase, IValueConverter, IDisposable
+    public class MiniPlaylist : PlaylistBase, IValueConverter
     {
         protected override string EMPTY
         {
@@ -89,12 +89,18 @@ namespace FoxTunes.ViewModel
         {
             base.InitializeComponent(core);
             this.ScriptingContext = this.ScriptingRuntime.CreateContext();
+            this.PlaylistManager.CurrentPlaylistChanged += this.OnCurrentPlaylistChanged;
             this.PlaylistManager.CurrentItemChanged += this.OnCurrentItemChanged;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<TextConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.PLAYLIST_SCRIPT_ELEMENT
             ).ConnectValue(async value => await this.SetScript(value).ConfigureAwait(false));
+        }
+
+        protected virtual void OnCurrentPlaylistChanged(object sender, EventArgs e)
+        {
+            var task = this.Refresh();
         }
 
         protected virtual void OnCurrentItemChanged(object sender, EventArgs e)

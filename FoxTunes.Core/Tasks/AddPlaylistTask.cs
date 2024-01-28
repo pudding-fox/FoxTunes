@@ -1,17 +1,33 @@
-﻿using System.Threading.Tasks;
+﻿using FoxTunes.Interfaces;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public class AddPlaylistTask : PlaylistTaskBase
     {
-        public AddPlaylistTask(Playlist playlist) : base(playlist)
+        public AddPlaylistTask(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode = null) : base(playlist)
         {
-
+            this.LibraryHierarchyNode = libraryHierarchyNode;
         }
 
-        protected override Task OnRun()
+        public LibraryHierarchyNode LibraryHierarchyNode { get; private set; }
+
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
+        public override void InitializeComponent(ICore core)
         {
-            return this.AddPlaylist();
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            base.InitializeComponent(core);
+        }
+
+        protected override async Task OnRun()
+        {
+            await this.AddPlaylist().ConfigureAwait(false);
+            if (this.LibraryHierarchyNode != null)
+            {
+                await this.AddPlaylistItems(this.LibraryHierarchyNode, this.LibraryHierarchyBrowser.Filter).ConfigureAwait(false);
+                await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);
+            }
         }
 
         protected override async Task OnCompleted()

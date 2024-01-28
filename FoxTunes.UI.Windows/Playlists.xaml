@@ -18,7 +18,7 @@
     </Windows:UIComponentBase.ContextMenu>
     <TabControl ItemsSource="{Binding Items, Source={StaticResource ViewModel}}" SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}" DisplayMemberPath="Name">
         <Interactivity:Interaction.Triggers>
-            <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type TabControl}">
+            <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type TabPanel}">
                 <Interactivity:InvokeCommandAction Command="{Binding AddPlaylistCommand, Source={StaticResource ViewModel}}" />
             </Windows:FilteredEventTrigger>
         </Interactivity:Interaction.Triggers>
@@ -28,7 +28,7 @@
                     <Grid.Resources>
                         <ViewModel:Wrapper x:Key="Playlist" Value="{Binding}"></ViewModel:Wrapper>
                     </Grid.Resources>
-                    <Windows:DefaultPlaylist DataContext="{Binding DataContext, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Playlists}}}" Playlist="{Binding Value, Source={StaticResource Playlist}}"></Windows:DefaultPlaylist>
+                    <Windows:TabPlaylist DataContext="{Binding DataContext, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Playlists}}}" Playlist="{Binding Value, Source={StaticResource Playlist}}"></Windows:TabPlaylist>
                 </Grid>
             </DataTemplate>
         </TabControl.ContentTemplate>

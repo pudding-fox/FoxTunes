@@ -13,7 +13,7 @@ namespace FoxTunes
 
         public const string REPLACE_PLAYLIST = "AAAC";
 
-        public const string SET_RATING = "AAAD";
+        public const string SET_RATING = "AAAE";
 
         public const string RESCAN = "ZZAA";
 
