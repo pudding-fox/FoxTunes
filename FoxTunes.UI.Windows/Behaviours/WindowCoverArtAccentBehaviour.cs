@@ -91,7 +91,7 @@ namespace FoxTunes
             {
                 windows.Add(window.Handle);
                 var currentColor = default(Color);
-                if (AccentColors.TryGetValue(window.Handle, out currentColor))
+                if (this.AccentColors.TryGetValue(window.Handle, out currentColor) && !this.IsTransparencyEnabled)
                 {
                     if (currentColor == color)
                     {
@@ -113,7 +113,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    WindowExtensions.SetAccentColor(window, color);
+                    await Windows.Invoke(() => WindowExtensions.SetAccentColor(window, color));
                 }
                 this.AccentColors[window.Handle] = color;
             }
@@ -129,7 +129,12 @@ namespace FoxTunes
         protected virtual Color GetAccentColor(string fileName)
         {
             var color = this.ImageResizer.GetMainColor(fileName);
-            return Color.FromArgb(color.A, color.R, color.G, color.B);
+            return Color.FromArgb(
+                WindowExtensions.DefaultAccentColor.A,
+                color.R,
+                color.G,
+                color.B
+            );
         }
 
         protected override void OnDisabled()

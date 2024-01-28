@@ -14,9 +14,11 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(
-                    new SelectionConfigurationElement(TRANSPARENCY_PROVIDER).WithOptions(GetProviders()))
+                    new SelectionConfigurationElement(TRANSPARENCY_PROVIDER)
+                        .WithOptions(GetProviders()))
                 .WithElement(
-                    new TextConfigurationElement(ACCENT_COLOR, Strings.WindowsUserInterfaceConfiguration_AccentColor).DependsOn(SECTION, TRANSPARENCY_PROVIDER, WindowAcrylicBlurBehaviour.ID)
+                    new TextConfigurationElement(ACCENT_COLOR, Strings.WindowsUserInterfaceConfiguration_AccentColor)
+                        .DependsOn(SECTION, TRANSPARENCY_PROVIDER, WindowAcrylicBlurBehaviour.ID)
             );
         }
 

@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 
@@ -8,13 +9,28 @@ namespace FoxTunes
     {
         public abstract string Id { get; }
 
-        public bool IsEnabled { get; private set; }
+        public bool IsTransparencyEnabled
+        {
+            get
+            {
+                using (var key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize"))
+                {
+                    if (key == null)
+                    {
+                        return false;
+                    }
+                    return Convert.ToBoolean(key.GetValue("EnableTransparency"));
+                }
+            }
+        }
 
         public IConfiguration Configuration { get; private set; }
 
         public BooleanConfigurationElement Transparency { get; private set; }
 
         public SelectionConfigurationElement Provider { get; private set; }
+
+        public RegistryMonitor RegistryMonitor { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -30,7 +46,6 @@ namespace FoxTunes
             );
             this.Transparency.ValueChanged += this.OnValueChanged;
             this.Provider.ValueChanged += this.OnValueChanged;
-            this.OnValueChanged(this, EventArgs.Empty);
             base.InitializeComponent(core);
         }
 
@@ -41,23 +56,15 @@ namespace FoxTunes
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
         {
-            var enabled = this.Transparency.Value && string.Equals(this.Provider.Value.Id, this.Id, StringComparison.OrdinalIgnoreCase);
-            if (enabled && !this.IsEnabled)
-            {
-                this.IsEnabled = true;
-                this.Refresh();
-            }
-            else
-            {
-                this.IsEnabled = false;
-                this.OnDisabled();
-            }
+            this.Refresh();
         }
 
         public void Refresh()
         {
-            if (!this.IsEnabled)
+            var enabled = this.Transparency.Value && string.Equals(this.Provider.Value.Id, this.Id, StringComparison.OrdinalIgnoreCase);
+            if (!enabled)
             {
+                this.OnDisabled();
                 return;
             }
             this.OnRefresh();

@@ -12,7 +12,8 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(
-                    new SelectionConfigurationElement(TRANSPARENCY_PROVIDER).WithOptions(GetProviders())
+                    new SelectionConfigurationElement(TRANSPARENCY_PROVIDER)
+                        .WithOptions(GetProviders())
             );
         }
 

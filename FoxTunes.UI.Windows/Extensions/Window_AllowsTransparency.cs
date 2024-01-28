@@ -149,7 +149,7 @@ namespace FoxTunes
             var accent = new AccentPolicy()
             {
                 AccentState = AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND,
-                GradientColor = (0 << 24) + (color.B << 16) + (color.G << 8) + color.R
+                GradientColor = (color.A << 24) + (color.B << 16) + (color.G << 8) + color.R
             };
             var accentStructSize = Marshal.SizeOf(accent);
             var accentPtr = Marshal.AllocHGlobal(accentStructSize);

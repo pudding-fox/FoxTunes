@@ -20,26 +20,16 @@ namespace FoxTunes
             }
         }
 
-        public Color AccentColor { get; private set; }
+        public TextConfigurationElement AccentColor { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             base.InitializeComponent(core);
-            this.Configuration.GetElement<TextConfigurationElement>(
+            this.AccentColor = this.Configuration.GetElement<TextConfigurationElement>(
                 WindowAcrylicBlurBehaviourConfiguration.SECTION,
                 WindowAcrylicBlurBehaviourConfiguration.ACCENT_COLOR
-            ).ConnectValue(value =>
-            {
-                if (string.IsNullOrEmpty(value))
-                {
-                    AccentColor = WindowExtensions.DefaultAccentColor;
-                }
-                else
-                {
-                    AccentColor = value.ToColor();
-                }
-                this.Refresh();
-            });
+            );
+            this.AccentColor.ValueChanged += this.OnValueChanged;
         }
 
         protected override void OnRefresh()
@@ -48,7 +38,28 @@ namespace FoxTunes
             foreach (var window in WindowBase.Active)
             {
                 windows.Add(window.Handle);
-                WindowExtensions.EnableAcrylicBlur(window.Handle, this.AccentColor);
+                WindowExtensions.EnableAcrylicBlur(
+                    window.Handle,
+                    this.GetAccentColor()
+                );
+            }
+        }
+
+        protected virtual Color GetAccentColor()
+        {
+            if (!string.IsNullOrEmpty(this.AccentColor.Value))
+            {
+                var color = this.AccentColor.Value.ToColor();
+                return Color.FromArgb(
+                    WindowExtensions.DefaultAccentColor.A,
+                    color.R,
+                    color.G,
+                    color.B
+                );
+            }
+            else
+            {
+                return WindowExtensions.DefaultAccentColor;
             }
         }
 
