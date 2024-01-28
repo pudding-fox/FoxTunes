@@ -2,7 +2,7 @@
 
 namespace FoxTunes
 {
-    public abstract class StandardFactory : BaseManager, IStandardFactory
+    public abstract class StandardFactory : BaseFactory, IStandardFactory
     {
     }
 }

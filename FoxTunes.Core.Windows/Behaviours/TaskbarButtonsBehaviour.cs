@@ -120,7 +120,15 @@ namespace FoxTunes
 
         protected virtual void OnWindowDestroyed(object sender, UserInterfaceWindowEventArgs e)
         {
-            //Nothing to do.
+            lock (SyncRoot)
+            {
+                if (!this.Windows.ContainsKey(e.Window.Handle))
+                {
+                    return;
+                }
+                this.Windows[e.Window.Handle] |= TaskbarButtonsWindowFlags.Destroyed;
+                this.Update();
+            }
         }
 
         public void Enable()
@@ -187,6 +195,15 @@ namespace FoxTunes
 
         protected virtual async Task Update(IntPtr handle, TaskbarButtonsWindowFlags flags)
         {
+            if (flags.HasFlag(TaskbarButtonsWindowFlags.Destroyed))
+            {
+                if (flags.HasFlag(TaskbarButtonsWindowFlags.Registered))
+                {
+                    this.RemoveHook(handle);
+                }
+                //TODO: We should remove the window from our table but it causes issues and we're likely shutting down now.
+                return;
+            }
             if (flags.HasFlag(TaskbarButtonsWindowFlags.Error))
             {
                 return;
@@ -271,6 +288,7 @@ namespace FoxTunes
             if (source == null)
             {
                 Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
                 return;
             }
             source.AddHook(this.Callback);
@@ -284,6 +302,7 @@ namespace FoxTunes
             if (source == null)
             {
                 Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
                 return;
             }
             source.RemoveHook(this.Callback);
@@ -297,6 +316,7 @@ namespace FoxTunes
             if (source == null)
             {
                 Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                this.Windows[handle] |= TaskbarButtonsWindowFlags.Error;
                 return false;
             }
             var width = WindowsImageList.GetSystemMetrics(
@@ -532,7 +552,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void UpdateButtons()
+        protected virtual async Task UpdateButtons()
         {
             lock (SyncRoot)
             {
@@ -781,6 +801,7 @@ namespace FoxTunes
         Registered = 1,
         ImagesCreated = 2,
         ButtonsCreated = 4,
-        Error = 8
+        Error = 8,
+        Destroyed = 16
     }
 }

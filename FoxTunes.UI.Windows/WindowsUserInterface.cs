@@ -32,6 +32,7 @@ namespace FoxTunes
 
         public WindowsUserInterface()
         {
+            global::FoxTunes.Windows.IsShuttingDown = false;
             this.Application = new Application();
             this.Application.DispatcherUnhandledException += this.OnApplicationDispatcherUnhandledException;
             WindowBase.Created += this.OnWindowCreated;

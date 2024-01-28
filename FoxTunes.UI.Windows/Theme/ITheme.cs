@@ -11,6 +11,8 @@ namespace FoxTunes
 
         string Description { get; }
 
+        int CornerRadius { get; }
+
         Stream GetArtworkPlaceholder();
 
         void Enable();
