@@ -3,6 +3,8 @@ A modular music player and converter using the BASS framework.
 
 The main release is [FoxTunes-2.1.0-net461.zip](https://github.com/aidan-g/FoxTunes/releases/download/2.1.0/FoxTunes-2.1.0-net461.zip)
 
+The wiki is [FoxTunes-wiki](https://github.com/aidan-g/FoxTunes/wiki)
+
 ![Main](Media/Screenshots/Main.PNG)
 
 * The following input formats are supported: aac, ac3, aif, ape, dff, dsf, dts, fla, flac, kar, m4a, m4a, m4b, mac, mid, midi, mp1, mp2, mp3, mp4, oga, ogg, ogg, opus, rmi, wav, wma, wv
