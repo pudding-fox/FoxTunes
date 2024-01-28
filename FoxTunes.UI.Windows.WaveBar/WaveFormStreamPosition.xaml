@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
+             xmlns:LocalWindows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
@@ -19,13 +20,16 @@
     <UserControl.Resources>
         <ViewModel:StreamPosition x:Key="ViewModel" Core="{Binding}"></ViewModel:StreamPosition>
     </UserControl.Resources>
+    <UserControl.ContextMenu>
+        <Windows:Menu Category="{Binding Source={x:Static LocalWindows:WaveBarBehaviour.CATEGORY}}"></Windows:Menu>
+    </UserControl.ContextMenu>
     <Grid>
-        <Windows:DraggableSlider VerticalAlignment="Center" IsMoveToPointEnabled="True" Value="{Binding CurrentStream.Position, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}" ToolTip="{Binding CurrentStream.Description, Mode=OneWay, Source={StaticResource ViewModel}}">
+        <Windows:DraggableSlider IsMoveToPointEnabled="True" Value="{Binding CurrentStream.Position, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}" ToolTip="{Binding CurrentStream.Description, Mode=OneWay, Source={StaticResource ViewModel}}">
             <Interactivity:Interaction.Triggers>
-                <Interactivity:EventTrigger EventName = "PreviewMouseDown">
+                <Interactivity:EventTrigger EventName = "PreviewMouseLeftButtonDown">
                     <Interactivity:InvokeCommandAction Command = "{Binding Source={StaticResource ViewModel}, Path=BeginSeekCommand}"></Interactivity:InvokeCommandAction>
                 </Interactivity:EventTrigger>
-                <Interactivity:EventTrigger EventName = "PreviewMouseUp">
+                <Interactivity:EventTrigger EventName = "PreviewMouseLeftButtonUp">
                     <Interactivity:InvokeCommandAction Command = "{Binding Source={StaticResource ViewModel}, Path=EndSeekCommand}"></Interactivity:InvokeCommandAction>
                 </Interactivity:EventTrigger>
             </Interactivity:Interaction.Triggers>

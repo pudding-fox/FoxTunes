@@ -157,22 +157,7 @@ namespace FoxTunes
 
             try
             {
-                var elements = this.Data.Elements;
-                var peaks = this.Data.Peaks;
-                var count = this.Data.Count;
-                BitmapHelper.Clear(info);
-                for (var a = 0; a < count; a++)
-                {
-                    BitmapHelper.DrawRectangle(info, elements[a].X, elements[a].Y, elements[a].Width, elements[a].Height);
-                    if (peaks != null)
-                    {
-                        if (peaks[a].Y >= elements[a].Y)
-                        {
-                            continue;
-                        }
-                        BitmapHelper.DrawRectangle(info, peaks[a].X, peaks[a].Y, peaks[a].Width, peaks[a].Height);
-                    }
-                }
+                Render(info, this.Data);
 
                 await Windows.Invoke(() =>
                 {
@@ -186,7 +171,6 @@ namespace FoxTunes
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to paint spectrum, disabling: {0}", e.Message);
             }
         }
-
 
         protected virtual void Clear()
         {
@@ -298,6 +282,28 @@ namespace FoxTunes
             catch
             {
                 //Nothing can be done, never throw on GC thread.
+            }
+        }
+
+        private static void Render(BitmapHelper.RenderInfo info, SpectrumData data)
+        {
+            var elements = data.Elements;
+            var peaks = data.Peaks;
+            var count = data.Count;
+
+            BitmapHelper.Clear(info);
+
+            for (var a = 0; a < count; a++)
+            {
+                BitmapHelper.DrawRectangle(info, elements[a].X, elements[a].Y, elements[a].Width, elements[a].Height);
+                if (peaks != null)
+                {
+                    if (peaks[a].Y >= elements[a].Y)
+                    {
+                        continue;
+                    }
+                    BitmapHelper.DrawRectangle(info, peaks[a].X, peaks[a].Y, peaks[a].Width, peaks[a].Height);
+                }
             }
         }
 
