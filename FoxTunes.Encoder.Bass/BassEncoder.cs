@@ -103,6 +103,12 @@ namespace FoxTunes
                         Logger.Write(this, LogLevel.Warn, "Encoding file \"{0}\" failed: Unknown error.", encoderItem.InputFileName);
                     }
                 }
+                catch (OperationCanceledException)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\" due to cancellation.", encoderItem.InputFileName);
+                    encoderItem.Status = EncoderItemStatus.Cancelled;
+                    return;
+                }
                 catch (Exception e)
                 {
                     Logger.Write(this, LogLevel.Warn, "Encoding file \"{0}\" failed: {1}", encoderItem.InputFileName, e.Message);

@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using System.Linq;
 
 namespace FoxTunes
 {
@@ -87,6 +86,14 @@ namespace FoxTunes
             get
             {
                 return ComponentRegistry.Instance.GetComponent<IArtworkProvider>();
+            }
+        }
+
+        public IFileSystemBrowser FileSystemBrowser
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IFileSystemBrowser>();
             }
         }
 

@@ -14,10 +14,6 @@ namespace FoxTunes
 
         IBassEncoderFormat Format { get; }
 
-        BassEncoderOutputDestination Destination { get; }
-
-        string Location { get; }
-
         bool CopyTags { get; }
 
         int Threads { get; }
@@ -36,7 +32,8 @@ namespace FoxTunes
     public enum BassEncoderOutputDestination : byte
     {
         None = 0,
-        Source = 1,
-        Specific = 2
+        Browse = 1,
+        Source = 2,
+        Specific = 3
     }
 }
