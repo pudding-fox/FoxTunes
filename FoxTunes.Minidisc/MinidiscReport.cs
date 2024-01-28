@@ -3,6 +3,7 @@ using MD.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -10,16 +11,17 @@ namespace FoxTunes
     public class MinidiscReport : ReportComponent
     {
         public MinidiscReport(MinidiscBehaviour behaviour, IDevice device, IDisc currentDisc, IDisc updatedDisc)
-            : this(behaviour, device, currentDisc, GetActions(currentDisc, updatedDisc))
+            : this(behaviour, device, currentDisc, updatedDisc.Title, GetActions(currentDisc, updatedDisc))
         {
 
         }
 
-        public MinidiscReport(MinidiscBehaviour behaviour, IDevice device, IDisc disc, IDictionary<ITrack, TrackAction> tracks)
+        public MinidiscReport(MinidiscBehaviour behaviour, IDevice device, IDisc disc, string discTitle, IDictionary<ITrack, TrackAction> tracks)
         {
             this.Behaviour = behaviour;
             this.Device = device;
             this.Disc = disc;
+            this.DiscTitle = discTitle;
             this.Tracks = tracks;
         }
 
@@ -29,14 +31,16 @@ namespace FoxTunes
 
         public IDisc Disc { get; private set; }
 
+        public string DiscTitle { get; private set; }
+
         public IDictionary<ITrack, TrackAction> Tracks { get; private set; }
 
         public override string Title
         {
             get
             {
-                var disc = GetUpdatedDisc(this.Disc, this.Tracks);
-                return string.Format("{0} ({1}%)", disc.Title, disc.GetCapacity().PercentUsed);
+                var disc = GetUpdatedDisc(this.Disc, this.DiscTitle, this.Tracks);
+                return string.Format("{0} ({1}%)", this.DiscTitle, disc.GetCapacity().PercentUsed);
             }
         }
 
@@ -44,7 +48,36 @@ namespace FoxTunes
         {
             get
             {
-                return string.Empty;
+                var builder = new StringBuilder();
+                if (!string.Equals(this.Disc.Title, this.DiscTitle, StringComparison.OrdinalIgnoreCase))
+                {
+                    builder.AppendFormat("Updating title: {0}", this.DiscTitle);
+                    builder.AppendLine();
+                }
+                else
+                {
+                    builder.AppendFormat("Keeping title: {0}", this.DiscTitle);
+                    builder.AppendLine();
+                }
+                foreach (var pair in this.Tracks)
+                {
+                    switch (pair.Value)
+                    {
+                        case TrackAction.None:
+                            builder.AppendFormat("Keeping track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
+                            builder.AppendLine();
+                            break;
+                        case TrackAction.Add:
+                            builder.AppendFormat("Adding track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
+                            builder.AppendLine();
+                            break;
+                        case TrackAction.Remove:
+                            builder.AppendFormat("Removing track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
+                            builder.AppendLine();
+                            break;
+                    }
+                }
+                return builder.ToString();
             }
         }
 
@@ -105,11 +138,12 @@ namespace FoxTunes
         protected virtual async Task Write()
         {
             var currentDisc = this.Disc;
-            var updatedDisc = GetUpdatedDisc(currentDisc, this.Tracks);
+            var updatedDisc = GetUpdatedDisc(currentDisc, this.DiscTitle, this.Tracks);
             var success = await this.Behaviour.WriteDisc(this.Device, currentDisc, updatedDisc).ConfigureAwait(false);
             if (!success)
             {
                 //If disc was not written then show this report again.
+                //TODO: If some data was written then our changes need re-calculating.
                 await this.Behaviour.ReportEmitter.Send(this).ConfigureAwait(false);
             }
         }
@@ -223,17 +257,32 @@ namespace FoxTunes
             return actions;
         }
 
-        public static IDisc GetUpdatedDisc(IDisc currentDisc, IDictionary<ITrack, TrackAction> tracks)
+        public static IDisc GetUpdatedDisc(IDisc currentDisc, string title, IDictionary<ITrack, TrackAction> tracks)
         {
+            Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Getting updated disc..");
             var updatedDisc = currentDisc.Clone();
+            if (!string.Equals(updatedDisc.Title, title, StringComparison.OrdinalIgnoreCase))
+            {
+                Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Updating title: {0}", title);
+                updatedDisc.Title = title;
+            }
+            else
+            {
+                Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Keeping title: {0}", title);
+            }
             foreach (var pair in tracks.OrderBy(_pair => _pair.Key.Position))
             {
                 switch (pair.Value)
                 {
+                    case TrackAction.None:
+                        Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Keeping track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
+                        break;
                     case TrackAction.Add:
+                        Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Adding track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
                         updatedDisc.Tracks.Add(pair.Key);
                         break;
                     case TrackAction.Remove:
+                        Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Removing track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
                         updatedDisc.Tracks.Remove(pair.Key);
                         break;
                 }

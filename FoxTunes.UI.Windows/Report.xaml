@@ -30,7 +30,8 @@
                         Name="ListView"
                         ItemsSource="{Binding Source.Rows, Source={StaticResource ViewModel}}"
                         SelectedValue="{Binding SelectedRow, Source={StaticResource ViewModel}}"
-                        SelectionMode="Single">
+                        SelectionMode="Single"
+                        Windows:ListViewExtensions.AutoSizeColumns="True">
                     <Interactivity:Interaction.Triggers>
                         <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type ListViewItem}">
                             <Interactivity:InvokeCommandAction Command="{Binding RowActivateCommand, Source={StaticResource ViewModel}}" />

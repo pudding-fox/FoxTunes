@@ -155,19 +155,31 @@ namespace FoxTunes.ViewModel
 
         protected virtual void Refresh()
         {
-            this.GridViewColumnFactory = new ReportGridViewColumnFactory(this.Source);
+            if (this.GridViewColumnFactory == null)
+            {
+                this.GridViewColumnFactory = new ReportGridViewColumnFactory(this.Source);
+            }
             this.OnGridColumnsChanged();
             this.OnAcceptTextChanged();
         }
 
         protected virtual void OnRowsChanged(object sender, EventArgs e)
         {
-            var task = Windows.Invoke(this.OnGridColumnsChanged);
+            var task = Windows.Invoke(this.Refresh);
         }
 
         protected override Freezable CreateInstanceCore()
         {
             return new Report();
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.Source != null)
+            {
+                this.Source.RowsChanged -= this.OnRowsChanged;
+            }
+            base.OnDisposing();
         }
     }
 }

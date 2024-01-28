@@ -2,6 +2,7 @@
 using MD.Net;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -116,28 +117,38 @@ namespace FoxTunes
 
             protected virtual StatusEventArgs GetStatus()
             {
-                var message = this.ActionMessage;
+                var message = default(string);
+                if (this.Transfers.Count > 0)
+                {
+                    message = string.Format(Strings.MinidiscActionTask_Transferring, this.GetProgress(this.Transfers.Values));
+                }
+                else if (this.Encodes.Count > 0)
+                {
+                    message = string.Format(Strings.MinidiscActionTask_Encoding, this.GetProgress(this.Encodes.Values));
+                }
+                else
+                {
+                    message = this.ActionMessage;
+                }
                 var position = this.ActionPosition;
                 var count = this.ActionCount;
-                foreach (var pair in this.Transfers)
-                {
-                    if (string.IsNullOrEmpty(message))
-                    {
-                        message = Strings.MinidiscActionTask_Transferring;
-                    }
-                    position += pair.Value.Item1;
-                    count += pair.Value.Item2;
-                }
-                foreach (var pair in this.Encodes)
-                {
-                    if (string.IsNullOrEmpty(message))
-                    {
-                        message = Strings.MinidiscActionTask_Encoding;
-                    }
-                    position += pair.Value.Item1;
-                    count += pair.Value.Item2;
-                }
                 return new StatusEventArgs(message, position, count, StatusType.None);
+            }
+
+            protected virtual int GetProgress(IEnumerable<Tuple<int, int>> values)
+            {
+                var position = default(int);
+                var count = default(int);
+                foreach (var value in values)
+                {
+                    position += value.Item1;
+                    count += value.Item2;
+                }
+                if (count == 0)
+                {
+                    return 0;
+                }
+                return Convert.ToInt32((Convert.ToSingle(position) / count) * 100);
             }
 
             public event StatusEventHandler Updated;
