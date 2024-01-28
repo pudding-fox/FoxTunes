@@ -5,6 +5,7 @@ using System.Windows;
 
 namespace FoxTunes
 {
+    [Component("1639C734-6623-40A0-97EB-7C543FBB813E", null, priority: ComponentAttribute.PRIORITY_LOW)]
     public class MiniPlayerBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string TOPMOST = "AAAA";

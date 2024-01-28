@@ -75,7 +75,6 @@ namespace FoxTunes
 
         public override void Show()
         {
-            this.RestartPending = false;
             if (Windows.IsMiniWindowCreated)
             {
                 Windows.MiniWindow.DataContext = this.Core;

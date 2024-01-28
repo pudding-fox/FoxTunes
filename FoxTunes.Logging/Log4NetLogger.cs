@@ -110,7 +110,7 @@ namespace FoxTunes
         {
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
-                Log4NetLoggerConfiguration.SECTION,
+                LoggingBehaviourConfiguration.SECTION,
                 Log4NetLoggerConfiguration.DEFAULT_APPENDER_ELEMENT
             ).ConnectValue(value =>
             {

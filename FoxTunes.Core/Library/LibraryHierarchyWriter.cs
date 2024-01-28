@@ -10,9 +10,11 @@ namespace FoxTunes
 {
     public class LibraryHierarchyWriter : Disposable
     {
+        const int CACHE_SIZE = 512;
+
         private LibraryHierarchyWriter()
         {
-            this.Store = new Cache();
+            this.Store = new Cache(CACHE_SIZE);
         }
 
         public LibraryHierarchyWriter(IDatabaseComponent database, ITransactionSource transaction) : this()
@@ -87,17 +89,28 @@ namespace FoxTunes
 
         public class Cache
         {
-            public Cache()
+            public Cache(int capacity)
             {
-                this.Store = new Dictionary<Key, int>();
+                this.Keys = new Queue<Key>(capacity);
+                this.Store = new Dictionary<Key, int>(capacity);
+                this.Capacity = capacity;
             }
 
+            public Queue<Key> Keys { get; private set; }
+
             public IDictionary<Key, int> Store { get; private set; }
+
+            public int Capacity { get; private set; }
 
             public void Add(int libraryHierarchyId, int? parentId, string value, int libraryHierarchyItemId)
             {
                 var key = new Key(libraryHierarchyId, parentId, value);
                 this.Store[key] = libraryHierarchyItemId;
+                if (this.Keys.Count >= this.Capacity)
+                {
+                    this.Store.Remove(this.Keys.Dequeue());
+                }
+                this.Keys.Enqueue(key);
             }
 
             public bool TryGetValue(int libraryHierarchyId, int? parentId, string value, out int libraryHierarchyItemId)
