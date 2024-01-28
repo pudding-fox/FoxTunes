@@ -12,7 +12,7 @@
         <ViewModel:StreamPosition x:Key="ViewModel" Core="{Binding}"></ViewModel:StreamPosition>
     </UserControl.Resources>
     <Grid>
-        <Slider VerticalAlignment="Center" IsMoveToPointEnabled="True" Value="{Binding CurrentStream.Position, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}">
+        <Slider VerticalAlignment="Center" IsMoveToPointEnabled="True" Value="{Binding CurrentStream.Position, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}" ToolTip="{Binding CurrentStream.Description, Mode=OneWay, Source={StaticResource ViewModel}}">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="PreviewMouseDown">
                     <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=BeginSeekCommand}" CommandParameter="{Binding Managers.Playback}"></Interactivity:InvokeCommandAction>

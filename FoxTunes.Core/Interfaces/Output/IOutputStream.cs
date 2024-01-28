@@ -43,6 +43,8 @@ namespace FoxTunes.Interfaces
 
         Task EndSeek();
 
+        TimeSpan GetDuration(long position);
+
         bool IsDisposed { get; }
     }
 }
