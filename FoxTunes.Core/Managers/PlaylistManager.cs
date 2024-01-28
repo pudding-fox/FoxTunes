@@ -5,7 +5,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -602,7 +601,7 @@ namespace FoxTunes
             }
             set
             {
-                if (this.SelectedPlaylist == null || object.Equals(this.SelectedPlaylist, value))
+                if (this.SelectedPlaylist == null || object.ReferenceEquals(this.SelectedItems, value))
                 {
                     return;
                 }
