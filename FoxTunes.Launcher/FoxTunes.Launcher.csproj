@@ -34,6 +34,7 @@
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="copy /Y &quot;$(TargetPath)&quot; &quot;$(TargetDir)$(TargetName).x86$(TargetExt)&quot;" />
+    <Exec Command="copy /Y &quot;$(TargetPath).config&quot; &quot;$(TargetDir)$(TargetName).x86$(TargetExt).config&quot;" />
     <Exec Command="..\.tools\x86\corflags.exe &quot;$(TargetDir)$(TargetName).x86$(TargetExt)&quot; /32BIT+" />
   </Target>
 

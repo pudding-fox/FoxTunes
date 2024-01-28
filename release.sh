@@ -41,6 +41,7 @@ do
 
 	echo "Setting the release type to default..";
 	sed -i 's/key="ReleaseType"\s\+value=".*"/key="ReleaseType" value="Default"/' "FoxTunes.Launcher.exe.config"
+	sed -i 's/key="ReleaseType"\s\+value=".*"/key="ReleaseType" value="Default"/' "FoxTunes.Launcher.x86.exe.config"
 
 	"../../../.7z/7za.exe" a "FoxTunes-$version-$target.zip" "*.*" -r
 
@@ -56,6 +57,7 @@ do
 
 	echo "Setting the release type to minimal..";
 	sed -i 's/key="ReleaseType"\s\+value=".*"/key="ReleaseType" value="Minimal"/' "FoxTunes.Launcher.exe.config"
+	sed -i 's/key="ReleaseType"\s\+value=".*"/key="ReleaseType" value="Minimal"/' "FoxTunes.Launcher.x86.exe.config"
 
 	"../../../.7z/7za.exe" a "FoxTunes-$version-$target-Minimal.zip" "*.*" -r
 

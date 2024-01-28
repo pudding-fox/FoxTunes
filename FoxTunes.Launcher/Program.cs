@@ -7,9 +7,6 @@ namespace FoxTunes.Launcher
 {
     public static class Program
     {
-        //This is always used regardless of the exe file name.
-        public const string CONFIG_FILE_NAME = "FoxTunes.Launcher.exe.config";
-
         public static readonly TimeSpan SHUTDOWN_INTERVAL = TimeSpan.FromSeconds(1);
 
         public static readonly TimeSpan SHUTDOWN_TIMEOUT = TimeSpan.FromSeconds(10);
@@ -42,7 +39,6 @@ namespace FoxTunes.Launcher
         [STAThread]
         public static void Main(string[] args)
         {
-            AppDomain.CurrentDomain.SetupInformation.ConfigurationFile = CONFIG_FILE_NAME;
 #if DEBUG
             //SetCulture("fr");
 #endif
