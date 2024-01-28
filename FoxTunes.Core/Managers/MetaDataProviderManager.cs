@@ -82,7 +82,7 @@ namespace FoxTunes
             }
             using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
             {
-                var set = database.Set<LibraryHierarchy>(transaction);
+                var set = database.Set<MetaDataBehaviour>(transaction);
                 set.Clear();
                 //No default data, yet.
                 if (transaction.HasTransaction)
