@@ -39,7 +39,7 @@
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
-                <ScrollViewer Grid.Column="1" Grid.IsSharedSizeScope="True" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Column="1" Grid.IsSharedSizeScope="True" VerticalScrollBarVisibility="Auto" Margin="4,0,0,0" Padding="4" Background="{DynamicResource NormalBrush}">
                     <ItemsControl ItemsSource="{Binding SelectedSection.Elements, Source={StaticResource ViewModel}}">
                         <ItemsControl.ItemContainerStyle>
                             <Style TargetType="{x:Type ContentPresenter}">

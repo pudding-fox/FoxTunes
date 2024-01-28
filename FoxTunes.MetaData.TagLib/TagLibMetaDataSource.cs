@@ -16,6 +16,9 @@ namespace FoxTunes
 
         public static SemaphoreSlim Semaphore { get; private set; }
 
+        //10MB
+        public static int MAX_TAG_SIZE = 10240000;
+
         //2MB
         public static int MAX_IMAGE_SIZE = 2048000;
 
@@ -43,14 +46,35 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Trace, "Reading meta data for file: {0}", fileName);
             try
             {
+                var collect = default(bool);
                 using (var file = this.Create(fileName))
                 {
-                    this.AddTags(metaData, file.Tag);
-                    this.AddProperties(metaData, file.Properties);
-                    if (!await this.AddImages(metaData, CommonMetaData.Pictures, file, file.Tag, file.Tag.Pictures))
+                    if (file.Tag != null)
                     {
-                        await this.AddImages(metaData, file);
+                        this.AddTags(metaData, file.Tag);
                     }
+                    if (file.Properties != null)
+                    {
+                        this.AddProperties(metaData, file.Properties);
+                    }
+                    if (file.InvariantStartPosition > MAX_TAG_SIZE)
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Not importing images from file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, MAX_TAG_SIZE);
+                        collect = true;
+                    }
+                    else
+                    {
+                        var pictures = file.Tag.Pictures;
+                        if (pictures == null || !await this.AddImages(metaData, CommonMetaData.Pictures, file, file.Tag, pictures))
+                        {
+                            await this.AddImages(metaData, file);
+                        }
+                    }
+                }
+                if (collect)
+                {
+                    //If we encountered a large meta data section (>10MB) then we need to try to reclaim the memory.
+                    GC.Collect();
                 }
             }
             catch (UnsupportedFormatException)

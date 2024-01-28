@@ -71,5 +71,22 @@ namespace FoxTunes
                 throw new AggregateException(exceptions);
             }
         }
+
+        public static async Task ForEach<T>(IEnumerable<T> sequence, Func<T, Task> factory, CancellationToken cancellationToken, IntegerConfigurationElement options)
+        {
+            var handler = new EventHandler((sender, e) => cancellationToken.Cancel());
+            options.ValueChanged += handler;
+            try
+            {
+                await ForEach<T>(sequence, factory, cancellationToken, new ParallelOptions()
+                {
+                    MaxDegreeOfParallelism = options.Value
+                });
+            }
+            finally
+            {
+                options.ValueChanged -= handler;
+            }
+        }
     }
 }
