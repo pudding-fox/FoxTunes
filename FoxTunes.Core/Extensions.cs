@@ -99,6 +99,7 @@ namespace FoxTunes
             return sequence;
         }
 
+        [Obsolete("Please use StringComparer.OrdinalIgnoreCase for the collections' comparer.")]
         public static bool Contains(this IEnumerable<string> sequence, string value, bool ignoreCase)
         {
             if (!ignoreCase)

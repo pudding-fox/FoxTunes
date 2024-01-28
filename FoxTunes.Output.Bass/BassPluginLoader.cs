@@ -5,34 +5,15 @@ using ManagedBass.Mix;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace FoxTunes
 {
-    public class BassPluginLoader
+    public class BassPluginLoader : StandardComponent, IBassPluginLoader
     {
         public const string DIRECTORY_NAME_ADDON = "Addon";
 
         public const string FILE_NAME_MASK = "bass*.dll";
-
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        public static object SyncRoot = new object();
-
-        public static readonly Version FxVersion;
-
-        public static readonly Version MixVersion;
-
-        static BassPluginLoader()
-        {
-            FxVersion = BassFx.Version;
-            MixVersion = BassMix.Version;
-        }
 
         public static string Location
         {
@@ -42,14 +23,94 @@ namespace FoxTunes
             }
         }
 
+        public static readonly HashSet<string> EXTENSIONS = new HashSet<string>(new[]
+        {
+            "mp1", "mp2", "mp3", "ogg", "wav", "aif"
+        }, StringComparer.OrdinalIgnoreCase);
+
+        public static readonly HashSet<string> PATHS = new HashSet<string>(new[]
+        {
+            Path.Combine(Location, "Addon")
+        }, StringComparer.OrdinalIgnoreCase);
+
+        public static object SyncRoot = new object();
+
+        public static readonly Version FxVersion;
+
+        public static readonly Version MixVersion;
+
+        public static void AddExtensions(IEnumerable<string> extensions)
+        {
+            foreach (var extension in extensions)
+            {
+                AddExtension(extension);
+            }
+        }
+
+        public static void AddExtension(string extension)
+        {
+            EXTENSIONS.Add(extension);
+        }
+
+        public static void AddPath(string path)
+        {
+            PATHS.Add(path);
+        }
+
+        static BassPluginLoader()
+        {
+            FxVersion = BassFx.Version;
+            MixVersion = BassMix.Version;
+        }
+
         public BassPluginLoader()
         {
+            this._Extensions = new Lazy<IEnumerable<string>>(() =>
+            {
+                var extensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var extension in EXTENSIONS)
+                {
+                    extensions.Add(extension);
+                }
+                foreach (var plugin in this.Plugins)
+                {
+                    foreach (var format in plugin.Info.Formats)
+                    {
+                        foreach (var extension in format.FileExtensions.Split(';'))
+                        {
+                            extensions.Add(extension.TrimStart('*', '.'));
+                        }
+                    }
+                }
+                return extensions;
+            });
             this.Plugins = new HashSet<BassPlugin>();
         }
 
-        public bool IsLoaded { get; private set; }
+        public Lazy<IEnumerable<string>> _Extensions { get; private set; }
+
+        public IEnumerable<string> Extensions
+        {
+            get
+            {
+                return this._Extensions.Value;
+            }
+        }
 
         public HashSet<BassPlugin> Plugins { get; private set; }
+
+        public bool IsLoaded { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.Load();
+            base.InitializeComponent(core);
+        }
+
+        public bool IsSupported(string extension)
+        {
+            return this.Extensions.Contains(extension);
+        }
 
         public void Load()
         {
@@ -57,18 +118,21 @@ namespace FoxTunes
             {
                 return;
             }
-            var directoryName = Path.Combine(Location, DIRECTORY_NAME_ADDON);
-            if (Directory.Exists(directoryName))
+            foreach (var path in PATHS)
             {
-                foreach (var fileName in Directory.EnumerateFiles(directoryName, FILE_NAME_MASK))
+                if (!Directory.Exists(path))
+                {
+                    continue;
+                }
+                foreach (var fileName in Directory.EnumerateFiles(path, FILE_NAME_MASK))
                 {
                     try
                     {
                         this.Load(fileName);
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        //TODO: Warn.
+                        Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", path, e.Message);
                     }
                 }
             }
@@ -77,33 +141,81 @@ namespace FoxTunes
 
         public void Load(string fileName)
         {
-            var result = Bass.PluginLoad(fileName);
-            if (result == 0)
+            var handle = Bass.PluginLoad(fileName);
+            if (handle == 0)
             {
                 Logger.Write(typeof(BassPluginLoader), LogLevel.Warn, "Failed to load plugin: {0}", fileName);
                 return;
             }
-            var info = Bass.PluginGetInfo(result);
+            var info = Bass.PluginGetInfo(handle);
             Logger.Write(typeof(BassPluginLoader), LogLevel.Debug, "Plugin loaded \"{0}\": {1}", fileName, info.Version);
             this.Plugins.Add(new BassPlugin(
                 fileName,
-                info
+                info,
+                handle
             ));
         }
 
-        public static readonly BassPluginLoader Instance = new BassPluginLoader();
+        public void Unload()
+        {
+            foreach (var plugin in this.Plugins)
+            {
+                Bass.PluginFree(plugin.Handle);
+            }
+            this.Plugins.Clear();
+            this.IsLoaded = false;
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            this.Unload();
+        }
+
+        ~BassPluginLoader()
+        {
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
+        }
 
         public class BassPlugin : IEquatable<BassPlugin>
         {
-            public BassPlugin(string fileName, PluginInfo info)
+            public BassPlugin(string fileName, PluginInfo info, int handle)
             {
                 this.FileName = fileName;
                 this.Info = info;
+                this.Handle = handle;
             }
 
             public string FileName { get; private set; }
 
             public PluginInfo Info { get; private set; }
+
+            public int Handle { get; private set; }
 
             public override int GetHashCode()
             {

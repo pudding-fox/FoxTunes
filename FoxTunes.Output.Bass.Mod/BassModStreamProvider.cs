@@ -3,12 +3,21 @@ using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace FoxTunes
 {
     public class BassModStreamProvider : BassStreamProvider
     {
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(BassPluginLoader).Assembly.Location);
+            }
+        }
+
         public static readonly string[] EXTENSIONS = new[]
         {
             "it",
@@ -21,12 +30,10 @@ namespace FoxTunes
             "xm"
         };
 
-        public BassModStreamProviderBehaviour Behaviour { get; private set; }
-
-        public override void InitializeComponent(ICore core)
+        public BassModStreamProvider()
         {
-            this.Behaviour = ComponentRegistry.Instance.GetComponent<BassModStreamProviderBehaviour>();
-            base.InitializeComponent(core);
+            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
+            BassPluginLoader.AddExtensions(EXTENSIONS);
         }
 
         public override bool CanCreateStream(PlaylistItem playlistItem)
