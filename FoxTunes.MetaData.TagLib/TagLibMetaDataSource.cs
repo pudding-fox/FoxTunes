@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using TagLib;
 
@@ -10,9 +9,11 @@ namespace FoxTunes
 {
     public class TagLibMetaDataSource : BaseComponent, IMetaDataSource
     {
+        const int TIMEOUT = 1000;
+
         public static ArtworkType ArtworkTypes = ArtworkType.FrontCover;
 
-        public static SemaphoreSlim Semaphore { get; private set; }
+        public static readonly KeyLock<string> KeyLock = new KeyLock<string>();
 
         //10MB
         public static int MAX_TAG_SIZE = 10240000;
@@ -20,16 +21,13 @@ namespace FoxTunes
         //2MB
         public static int MAX_IMAGE_SIZE = 2048000;
 
-        static TagLibMetaDataSource()
-        {
-            Semaphore = new SemaphoreSlim(1, 1);
-        }
-
         public IConfiguration Configuration { get; private set; }
 
         public BooleanConfigurationElement EmbeddedImages { get; private set; }
 
         public BooleanConfigurationElement LooseImages { get; private set; }
+
+        public SelectionConfigurationElement ImagesPreference { get; private set; }
 
         public BooleanConfigurationElement CopyImages { get; private set; }
 
@@ -53,6 +51,10 @@ namespace FoxTunes
             this.LooseImages = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.READ_LOOSE_IMAGES
+            );
+            this.ImagesPreference = this.Configuration.GetElement<SelectionConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.IMAGES_PREFERENCE
             );
             this.CopyImages = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
@@ -85,14 +87,17 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
                 return Enumerable.Empty<MetaDataItem>();
             }
+            var collect = default(bool);
             var metaData = new List<MetaDataItem>();
             Logger.Write(this, LogLevel.Trace, "Reading meta data for file: {0}", fileName);
             try
             {
-                var collect = default(bool);
-                var images = default(bool);
                 using (var file = this.Create(fileName))
                 {
+                    if (file.InvariantStartPosition > MAX_TAG_SIZE)
+                    {
+                        collect = true;
+                    }
                     if (file.Tag != null)
                     {
                         this.AddTags(metaData, file.Tag);
@@ -105,31 +110,7 @@ namespace FoxTunes
                     {
                         this.Try(() => PopularimeterManager.Read(this, metaData, file), this.ErrorHandler);
                     }
-                    if (this.EmbeddedImages.Value)
-                    {
-                        if (file.InvariantStartPosition > MAX_TAG_SIZE)
-                        {
-                            Logger.Write(this, LogLevel.Warn, "Not importing images from file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, MAX_TAG_SIZE);
-                            collect = true;
-                        }
-                        else
-                        {
-                            var pictures = file.Tag.Pictures;
-                            if (pictures != null)
-                            {
-                                images = await this.AddImages(metaData, CommonMetaData.Pictures, file, file.Tag, pictures).ConfigureAwait(false);
-                            }
-                        }
-                    }
-                }
-                if (collect)
-                {
-                    //If we encountered a large meta data section (>10MB) then we need to try to reclaim the memory.
-                    GC.Collect();
-                }
-                if (this.LooseImages.Value && !images)
-                {
-                    await this.AddImages(metaData, fileName).ConfigureAwait(false);
+                    await ImageManager.Read(this, metaData, file);
                 }
             }
             catch (UnsupportedFormatException)
@@ -139,6 +120,14 @@ namespace FoxTunes
             catch (Exception e)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to read meta data: {0} => {1}", fileName, e.Message);
+            }
+            finally
+            {
+                if (collect)
+                {
+                    //If we encountered a large meta data section (>10MB) then we need to try to reclaim the memory.
+                    GC.Collect();
+                }
             }
             return metaData;
         }
@@ -299,8 +288,9 @@ namespace FoxTunes
             metaData.Add(new MetaDataItem(name, MetaDataItemType.Property) { Value = value.Trim() });
         }
 
-        private async Task AddImages(List<MetaDataItem> metaData, string fileName)
+        private async Task<bool> AddImages(IList<MetaDataItem> metaData, string fileName)
         {
+            var types = ArtworkType.None;
             foreach (var type in new[] { ArtworkType.FrontCover, ArtworkType.BackCover })
             {
                 if (!ArtworkTypes.HasFlag(type))
@@ -320,23 +310,25 @@ namespace FoxTunes
                         Value = value,
                         Type = MetaDataItemType.Image
                     });
+                    if (ArtworkTypes.HasFlag(types |= type))
+                    {
+                        //We have everything we need.
+                        return true;
+                    }
                 }
             }
+            return types != ArtworkType.None;
         }
 
         private async Task<bool> AddImages(IList<MetaDataItem> metaData, string name, File file, Tag tag, IPicture[] pictures)
         {
-            if (pictures == null)
-            {
-                return false;
-            }
-            var types = new List<ArtworkType>();
+            var types = ArtworkType.None;
             try
             {
                 foreach (var picture in pictures.OrderBy(picture => GetPicturePriority(picture)))
                 {
                     var type = GetArtworkType(picture.Type);
-                    if (!ArtworkTypes.HasFlag(type) || types.Contains(type))
+                    if (!ArtworkTypes.HasFlag(type) || types.HasFlag(type))
                     {
                         continue;
                     }
@@ -349,19 +341,24 @@ namespace FoxTunes
                     {
                         Value = await this.ImportImage(tag, picture, type, false).ConfigureAwait(false)
                     });
-                    types.Add(type);
+                    if (ArtworkTypes.HasFlag(types |= type))
+                    {
+                        //We have everything we need.
+                        return true;
+                    }
                 }
             }
             catch (Exception e)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to read pictures: {0} => {1}", file.Name, e.Message);
             }
-            return types.Any();
+            return types != ArtworkType.None;
         }
 
         private async Task<string> ImportImage(Tag tag, IPicture picture, ArtworkType type, bool overwrite)
         {
-            return await this.ImportImage(picture, picture.Data.Checksum.ToString(), overwrite).ConfigureAwait(false);
+            var id = this.GetPictureId(tag, type);
+            return await this.ImportImage(picture, id, overwrite).ConfigureAwait(false);
         }
 
         private async Task<string> ImportImage(IPicture value, string id, bool overwrite)
@@ -370,21 +367,14 @@ namespace FoxTunes
             var result = default(string);
             if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
             {
-#if NET40
-                Semaphore.Wait();
-#else
-                await Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
-                try
+                //TODO: Setting throwOnTimeout = false so we ignore synchronization timeout.
+                //TODO: I think there exists a deadlock bug in KeyLock but I haven't been able to prove it.
+                using (KeyLock.Lock(id, TIMEOUT, false))
                 {
                     if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
                     {
                         return await FileMetaDataStore.WriteAsync(prefix, id, value.Data.Data).ConfigureAwait(false);
                     }
-                }
-                finally
-                {
-                    Semaphore.Release();
                 }
             }
             return result;
@@ -400,21 +390,14 @@ namespace FoxTunes
             var result = default(string);
             if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
             {
-#if NET40
-                Semaphore.Wait();
-#else
-                await Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
-                try
+                //TODO: Setting throwOnTimeout = false so we ignore synchronization timeout.
+                //TODO: I think there exists a deadlock bug in KeyLock but I haven't been able to prove it.
+                using (KeyLock.Lock(id, TIMEOUT, false))
                 {
                     if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
                     {
                         return await FileMetaDataStore.WriteAsync(prefix, id, fileName).ConfigureAwait(false);
                     }
-                }
-                finally
-                {
-                    Semaphore.Release();
                 }
             }
             return result;
@@ -506,13 +489,6 @@ namespace FoxTunes
 
         private async Task AddImage(MetaDataItem metaDataItem, Tag tag, IList<IPicture> pictures)
         {
-
-            /* Unmerged change from project 'FoxTunes.MetaData.TagLib(net461)'
-            Before:
-                        pictures.Add(await this.CreateImage(metaDataItem, tag));
-            After:
-                        pictures.Add(await this.CreateImage(metaDataItem, tag).ConfigureAwait(false));
-            */
             pictures.Add(await this.CreateImage(metaDataItem, tag).ConfigureAwait(false));
         }
 
@@ -541,6 +517,29 @@ namespace FoxTunes
         private void ErrorHandler(Exception e)
         {
             Logger.Write(this, LogLevel.Error, "Failed to read meta data: {0}", e.Message);
+        }
+
+        private string GetPictureId(Tag tag, ArtworkType type)
+        {
+            //(FirstAlbumArtist | FirstPerformer) + Year + Album.
+            var hashCode = default(int);
+            unchecked
+            {
+                if (!string.IsNullOrEmpty(tag.FirstAlbumArtist))
+                {
+                    hashCode += tag.FirstAlbumArtist.GetHashCode();
+                }
+                else if (!string.IsNullOrEmpty(tag.FirstPerformer))
+                {
+                    hashCode += tag.FirstPerformer.GetHashCode();
+                }
+                hashCode += tag.Year.GetHashCode();
+                if (!string.IsNullOrEmpty(tag.Album))
+                {
+                    hashCode += tag.Album.GetHashCode();
+                }
+            }
+            return Math.Abs(hashCode).ToString();
         }
 
         public static readonly IDictionary<ArtworkType, PictureType> ArtworkTypeMapping = new Dictionary<ArtworkType, PictureType>()
@@ -595,6 +594,67 @@ namespace FoxTunes
                 return artworkType;
             }
             return ArtworkType.Unknown;
+        }
+
+        public static class ImageManager
+        {
+            public static async Task<bool> Read(TagLibMetaDataSource source, IList<MetaDataItem> metaDatas, File file)
+            {
+                var embedded = source.EmbeddedImages.Value;
+                var loose = source.LooseImages.Value;
+                if (embedded && loose)
+                {
+                    switch (MetaDataBehaviourConfiguration.GetImagesPreference(source.ImagesPreference.Value))
+                    {
+                        default:
+                        case ImagePreference.Embedded:
+                            return await ReadEmbedded(source, metaDatas, file) || await ReadLoose(source, metaDatas, file);
+                        case ImagePreference.Loose:
+                            return await ReadLoose(source, metaDatas, file) || await ReadEmbedded(source, metaDatas, file);
+                    }
+                }
+                else if (embedded)
+                {
+                    return await ReadEmbedded(source, metaDatas, file);
+                }
+                else if (loose)
+                {
+                    return await ReadLoose(source, metaDatas, file);
+                }
+                return false;
+            }
+
+            private static Task<bool> ReadEmbedded(TagLibMetaDataSource source, IList<MetaDataItem> metaDatas, File file)
+            {
+                if (file.InvariantStartPosition > MAX_TAG_SIZE)
+                {
+                    Logger.Write(source, LogLevel.Warn, "Not importing images from file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, MAX_TAG_SIZE);
+                }
+                else
+                {
+                    var pictures = file.Tag.Pictures;
+                    if (pictures != null)
+                    {
+                        return source.AddImages(
+                            metaDatas,
+                            CommonMetaData.Pictures,
+                            file,
+                            file.Tag,
+                            pictures
+                        );
+                    }
+                }
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.FromResult(false);
+#endif
+            }
+
+            private static Task<bool> ReadLoose(TagLibMetaDataSource source, IList<MetaDataItem> metaDatas, File file)
+            {
+                return source.AddImages(metaDatas, file.Name);
+            }
         }
 
         public static class PopularimeterManager
