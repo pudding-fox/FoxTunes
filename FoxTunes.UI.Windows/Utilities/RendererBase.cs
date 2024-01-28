@@ -11,6 +11,8 @@ namespace FoxTunes
 {
     public abstract class RendererBase : Freezable, IBaseComponent, INotifyPropertyChanged, IDisposable
     {
+        public const int ROLLOFF_INTERVAL = 500;
+
         protected static ILogger Logger
         {
             get
@@ -340,6 +342,8 @@ namespace FoxTunes
 
         public event EventHandler ColorChanged;
 
+        public IOutput Output { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public DoubleConfigurationElement ScalingFactor { get; private set; }
@@ -348,6 +352,7 @@ namespace FoxTunes
 
         public virtual void InitializeComponent(ICore core)
         {
+            this.Output = core.Components.Output;
             this.Configuration = core.Components.Configuration;
             this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
                WindowsUserInterfaceConfiguration.SECTION,
@@ -538,7 +543,7 @@ namespace FoxTunes
             if (orientation == Orientation.Horizontal)
             {
                 var step = height / values.Length;
-                var fast = (float)width / smoothing;
+                var fast = Math.Min((float)width / smoothing, 10);
                 for (var a = 0; a < values.Length; a++)
                 {
                     var barWidth = Math.Max(Convert.ToInt32(values[a] * width), 1);
@@ -548,7 +553,7 @@ namespace FoxTunes
                     var difference = Math.Abs(elements[a].Width - barWidth);
                     if (difference > 0)
                     {
-                        if (difference < 2)
+                        if (difference < fast)
                         {
                             if (barWidth > elements[a].Width)
                             {
@@ -561,12 +566,9 @@ namespace FoxTunes
                         }
                         else
                         {
-                            var distance = (float)difference / barWidth;
-                            //TODO: We should use some kind of easing function.
-                            //var increment = distance * distance * distance;
-                            //var increment = 1 - Math.Pow(1 - distance, 5);
-                            var increment = distance;
-                            var smoothed = Math.Min(Math.Max(fast * increment, 1), difference);
+                            var distance = (float)difference / width;
+                            var increment = Math.Sqrt(1 - Math.Pow(distance - 1, 2));
+                            var smoothed = Math.Min(Math.Max(fast * increment, 1), fast);
                             if (barWidth > elements[a].Width)
                             {
                                 elements[a].Width = (int)Math.Min(elements[a].Width + smoothed, width);
@@ -582,7 +584,7 @@ namespace FoxTunes
             else if (orientation == Orientation.Vertical)
             {
                 var step = width / values.Length;
-                var fast = (float)height / smoothing;
+                var fast = Math.Min((float)height / smoothing, 10);
                 for (var a = 0; a < values.Length; a++)
                 {
                     var barHeight = Math.Max(Convert.ToInt32(values[a] * height), 1);
@@ -591,7 +593,7 @@ namespace FoxTunes
                     var difference = Math.Abs(elements[a].Height - barHeight);
                     if (difference > 0)
                     {
-                        if (difference < 2)
+                        if (difference < fast)
                         {
                             if (barHeight > elements[a].Height)
                             {
@@ -604,12 +606,9 @@ namespace FoxTunes
                         }
                         else
                         {
-                            var distance = (float)difference / barHeight;
-                            //TODO: We should use some kind of easing function.
-                            //var increment = distance * distance * distance;
-                            //var increment = 1 - Math.Pow(1 - distance, 5);
-                            var increment = distance;
-                            var smoothed = Math.Min(Math.Max(fast * increment, 1), difference);
+                            var distance = (float)difference / height;
+                            var increment = Math.Sqrt(1 - Math.Pow(distance - 1, 2));
+                            var smoothed = Math.Min(Math.Max(fast * increment, 1), fast);
                             if (barHeight > elements[a].Height)
                             {
                                 elements[a].Height = (int)Math.Min(elements[a].Height + smoothed, height);
@@ -621,6 +620,98 @@ namespace FoxTunes
                         }
                     }
                     elements[a].Y = height - elements[a].Height;
+                }
+            }
+        }
+
+        protected static void UpdatePeaks(Int32Rect[] elements, Int32Rect[] peaks, int[] holds, int width, int height, int interval, int duration, Orientation orientation)
+        {
+            if (orientation == Orientation.Horizontal)
+            {
+                var fast = width / 4;
+                var step = height / elements.Length;
+                for (int a = 0; a < elements.Length; a++)
+                {
+                    peaks[a].Y = a * step;
+                    peaks[a].Width = 1;
+                    peaks[a].Height = step;
+                    if (elements[a].Width > peaks[a].X)
+                    {
+                        peaks[a].X = elements[a].Width;
+                        holds[a] = interval + ROLLOFF_INTERVAL;
+                    }
+                    else if (elements[a].Width < peaks[a].X)
+                    {
+                        if (holds[a] > 0)
+                        {
+                            if (holds[a] < interval)
+                            {
+                                var distance = 1 - ((float)holds[a] / interval);
+                                var increment = fast * (distance * distance * distance);
+                                if (peaks[a].X > increment)
+                                {
+                                    peaks[a].X -= (int)Math.Round(increment);
+                                }
+                                else if (peaks[a].X > 0)
+                                {
+                                    peaks[a].X = 0;
+                                }
+                            }
+                            holds[a] -= duration;
+                        }
+                        else if (peaks[a].X > fast)
+                        {
+                            peaks[a].X -= fast;
+                        }
+                        else if (peaks[a].X > 0)
+                        {
+                            peaks[a].X = 0;
+                        }
+                    }
+                }
+            }
+            else if (orientation == Orientation.Vertical)
+            {
+                var fast = height / 4;
+                var step = width / elements.Length;
+                for (int a = 0; a < elements.Length; a++)
+                {
+                    peaks[a].X = a * step;
+                    peaks[a].Width = step;
+                    peaks[a].Height = 1;
+                    if (elements[a].Y < peaks[a].Y)
+                    {
+                        peaks[a].Y = elements[a].Y;
+                        holds[a] = interval + ROLLOFF_INTERVAL;
+                    }
+                    else if (elements[a].Y > peaks[a].Y)
+                    {
+                        if (holds[a] > 0)
+                        {
+                            if (holds[a] < interval)
+                            {
+                                var distance = 1 - ((float)holds[a] / interval);
+                                var increment = fast * (distance * distance * distance);
+                                if (peaks[a].Y < height - increment)
+                                {
+                                    peaks[a].Y += (int)Math.Round(increment);
+                                }
+                                else if (peaks[a].Y < height - 1)
+                                {
+                                    peaks[a].Y = height - 1;
+                                }
+                            }
+                            holds[a] -= duration;
+                        }
+                        else if (peaks[a].Y < height - fast)
+                        {
+                            peaks[a].Y += fast;
+                        }
+                        else if (peaks[a].Y < height - 1)
+                        {
+                            peaks[a].Y = height - 1;
+                        }
+                    }
                 }
             }
         }
