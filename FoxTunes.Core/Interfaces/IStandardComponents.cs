@@ -10,6 +10,8 @@
 
         IPlaylist Playlist { get; }
 
+        ILibrary Library { get; }
+
         IOutput Output { get; }
 
         IScriptingRuntime ScriptingRuntime { get; }

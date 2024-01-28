@@ -10,6 +10,8 @@
 
         public const string Playlist = "7959A650-5EEC-4CFC-B903-5C593A085182";
 
+        public const string Library = "B87113F0-2C25-4584-A27F-DE5F01DC9F96";
+
         public const string Output = "CC3CEC0B-D882-4A4F-BD4D-A0A505CFD9E1";
 
         public const string ScriptingRuntime = "24ECF207-EC44-4E98-9533-B78B050DCFDA";

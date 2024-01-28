@@ -46,6 +46,12 @@
     <Compile Include="BaseFactory.cs" />
     <Compile Include="BaseLoader.cs" />
     <Compile Include="BaseManager.cs" />
+    <Compile Include="Factories\LibraryItemFactory.cs" />
+    <Compile Include="Interfaces\Factories\ILibraryItemFactory.cs" />
+    <Compile Include="Interfaces\Library\ILibrary.cs" />
+    <Compile Include="Interfaces\Managers\ILibraryManager.cs" />
+    <Compile Include="Library\Library.cs" />
+    <Compile Include="Library\LibraryItem.cs" />
     <Compile Include="ComponentAttribute.cs" />
     <Compile Include="ComponentSlots.cs" />
     <Compile Include="Extensions.cs" />
@@ -75,6 +81,7 @@
     <Compile Include="Core.cs" />
     <Compile Include="ComponentActivator.cs" />
     <Compile Include="ComponentLoader.cs" />
+    <Compile Include="Managers\LibraryManager.cs" />
     <Compile Include="Managers\PlaybackManager.cs" />
     <Compile Include="Managers\PlaylistManager.cs" />
     <Compile Include="MetaData\CommonMetaData.cs" />
@@ -116,6 +123,7 @@
     <Compile Include="StandardFactory.cs" />
     <Compile Include="StandardManager.cs" />
     <Compile Include="StandardManagers.cs" />
+    <Compile Include="Statistic\StatisticItem.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
