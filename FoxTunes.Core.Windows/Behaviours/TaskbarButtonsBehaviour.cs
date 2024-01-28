@@ -32,7 +32,6 @@ namespace FoxTunes
             this.Callback = new HwndSourceHook(this.OnCallback);
             this.Windows = new ConcurrentDictionary<IntPtr, TaskbarButtonsWindowFlags>();
             this.ImageLists = new ConcurrentDictionary<IntPtr, IntPtr>();
-            this.Thumbnails = new ConcurrentDictionary<IntPtr, string>();
         }
 
         public Timer Timer { get; private set; }
@@ -79,42 +78,11 @@ namespace FoxTunes
 
         public ConcurrentDictionary<IntPtr, IntPtr> ImageLists { get; private set; }
 
-        public ConcurrentDictionary<IntPtr, string> Thumbnails { get; private set; }
-
-        protected virtual bool HasThumbnail(IntPtr handle, string name)
-        {
-            var currentName = default(string);
-            if (!this.Thumbnails.TryGetValue(handle, out currentName))
-            {
-                return false;
-            }
-            return string.Equals(currentName, name, StringComparison.OrdinalIgnoreCase);
-        }
-
-        protected virtual bool GetThumbnail(IntPtr handle, out string name)
-        {
-            return this.Thumbnails.TryGetValue(handle, out name);
-        }
-
-        protected virtual void SetThumbnail(IntPtr handle, string name)
-        {
-            this.Thumbnails.AddOrUpdate(handle, name);
-        }
-
-        protected virtual bool RemoveThumbnail(IntPtr handle)
-        {
-            return this.Thumbnails.TryRemove(handle);
-        }
-
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public IUserInterface UserInterface { get; private set; }
-
-        public IArtworkProvider ArtworkProvider { get; private set; }
-
-        public ILibraryBrowser LibraryBrowser { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -127,8 +95,6 @@ namespace FoxTunes
             this.UserInterface = core.Components.UserInterface;
             this.UserInterface.WindowCreated += this.OnWindowCreated;
             this.UserInterface.WindowDestroyed += this.OnWindowDestroyed;
-            this.ArtworkProvider = core.Components.ArtworkProvider;
-            this.LibraryBrowser = core.Components.LibraryBrowser;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 TaskbarButtonsBehaviourConfiguration.SECTION,
@@ -455,18 +421,18 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Creating image: {0}", name);
             using (var stream = typeof(TaskbarButtonsBehaviour).Assembly.GetManifestResourceStream(name))
             {
-                return this.GetImage(stream, width, height, false);
+                return this.GetImage(stream, width, height);
             }
         }
 
-        protected virtual Bitmap GetImage(Stream stream, int width, int height, bool scale)
+        protected virtual Bitmap GetImage(Stream stream, int width, int height)
         {
             var image = (Bitmap)Bitmap.FromStream(stream);
             if (image.Width != width || image.Height != height)
             {
                 try
                 {
-                    return WindowsImaging.Resize(image, width, height, scale);
+                    return WindowsImaging.Resize(image, width, height, false);
                 }
                 finally
                 {
