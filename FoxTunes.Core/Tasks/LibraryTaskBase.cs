@@ -56,6 +56,11 @@ namespace FoxTunes
             }
         }
 
+        protected virtual Task AddRoot(string path)
+        {
+            return this.AddRoots(new[] { path });
+        }
+
         protected virtual async Task AddRoots(IEnumerable<string> paths)
         {
             var roots = await this.NormalizeRoots(paths).ConfigureAwait(false);
