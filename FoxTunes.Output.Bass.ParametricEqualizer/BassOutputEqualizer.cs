@@ -95,6 +95,13 @@ namespace FoxTunes
             {
                 this.EnabledElement.ValueChanged -= this.OnEnabledChanged;
             }
+            if (this.Bands != null)
+            {
+                foreach (var band in this.Bands.OfType<IDisposable>())
+                {
+                    band.Dispose();
+                }
+            }
         }
 
         ~BassOutputEqualizer()

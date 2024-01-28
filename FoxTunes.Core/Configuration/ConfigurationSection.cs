@@ -98,7 +98,7 @@ namespace FoxTunes
 
         public void Update(ConfigurationSection section)
         {
-            foreach (var element in section.Elements.ToArray())
+            foreach (var element in section.Elements)
             {
                 if (!this.Contains(element.Id))
                 {

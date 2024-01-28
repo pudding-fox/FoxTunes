@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class LibraryBrowserBehaviour : StandardBehaviour, IConfigurableComponent
+    public class LibraryBrowserBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         const int TIMEOUT = 1000;
 
@@ -91,6 +91,10 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            if (this.Debouncer != null)
+            {
+                this.Debouncer.Dispose();
+            }
             if (this.ImageMode != null)
             {
                 this.ImageMode.ValueChanged += this.OnValueChanged;
