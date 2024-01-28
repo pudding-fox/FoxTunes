@@ -2,6 +2,7 @@
 using ManagedBass;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Design;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -46,7 +47,7 @@ namespace FoxTunes
 
         protected virtual bool TryGetSilence(IBassStreamProvider provider, PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, out TimeSpan leadIn, out TimeSpan leadOut)
         {
-            if (TryGetMetaData(this.Behaviour, playlistItem, out leadIn, out leadOut))
+            if (this.TryGetMetaData(this.Behaviour, playlistItem, out leadIn, out leadOut))
             {
                 return true;
             }
@@ -271,7 +272,7 @@ namespace FoxTunes
             return (stream.Position = position) == position;
         }
 
-        public static bool TryGetMetaData(BassSkipSilenceStreamAdvisorBehaviour behaviour, PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
+        protected virtual bool TryGetMetaData(BassSkipSilenceStreamAdvisorBehaviour behaviour, PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
         {
             if (playlistItem.MetaDatas == null)
             {
@@ -307,7 +308,7 @@ namespace FoxTunes
             {
                 leadIn = TimeSpan.Zero;
             }
-            else if (!TryParseDuration(behaviour, leadInMetaDataItem.Value, out leadIn))
+            else if (!this.TryParseDuration(behaviour, leadInMetaDataItem.Value, out leadIn))
             {
                 Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Lead in meta data value \"{0}\" for file \"{1}\" is not valid.", leadInMetaDataItem.Value, playlistItem.FileName);
 
@@ -320,7 +321,7 @@ namespace FoxTunes
             {
                 leadOut = TimeSpan.Zero;
             }
-            else if (!TryParseDuration(behaviour, leadOutMetaDataItem.Value, out leadOut))
+            else if (!this.TryParseDuration(behaviour, leadOutMetaDataItem.Value, out leadOut))
             {
                 Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Lead out meta data value \"{0}\" for file \"{1}\" is not valid.", leadOutMetaDataItem.Value, playlistItem.FileName);
 
@@ -334,7 +335,7 @@ namespace FoxTunes
             return true;
         }
 
-        private static bool TryParseDuration(BassSkipSilenceStreamAdvisorBehaviour behaviour, string value, out TimeSpan duration)
+        protected virtual bool TryParseDuration(BassSkipSilenceStreamAdvisorBehaviour behaviour, string value, out TimeSpan duration)
         {
             if (string.IsNullOrEmpty(value))
             {

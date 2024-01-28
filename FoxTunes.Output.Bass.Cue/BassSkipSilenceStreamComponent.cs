@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -39,17 +40,18 @@ namespace FoxTunes
                 {
                     return string.Format("{0} (none)", this.Name);
                 }
-                var leadIn = default(TimeSpan);
-                var leadOut = default(TimeSpan);
-                if (!BassSkipSilenceStreamAdvisor.TryGetMetaData(this.Behaviour, currentStream.PlaylistItem, out leadIn, out leadOut))
+                var advice = currentStream.Advice.OfType<BassSkipSilenceStreamAdvice>().FirstOrDefault(
+                    _advice => _advice.LeadIn != TimeSpan.Zero || _advice.LeadOut != TimeSpan.Zero
+                );
+                if (advice == null)
                 {
                     return string.Format("{0} (none)", this.Name);
                 }
                 return string.Format(
                     "{0} ({1:0.00}s/{2:0.00}s)",
                     this.Name,
-                    leadIn.TotalSeconds,
-                    leadOut.TotalSeconds
+                    advice.LeadIn.TotalSeconds,
+                    advice.LeadOut.TotalSeconds
                 );
             }
         }
@@ -73,9 +75,10 @@ namespace FoxTunes
                 {
                     return false;
                 }
-                var leadIn = default(TimeSpan);
-                var leadOut = default(TimeSpan);
-                return BassSkipSilenceStreamAdvisor.TryGetMetaData(this.Behaviour, currentStream.PlaylistItem, out leadIn, out leadOut);
+                var advice = currentStream.Advice.OfType<BassSkipSilenceStreamAdvice>().FirstOrDefault(
+                    _advice => _advice.LeadIn != TimeSpan.Zero || _advice.LeadOut != TimeSpan.Zero
+                );
+                return advice != null;
             }
         }
 
