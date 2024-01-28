@@ -5,6 +5,8 @@ using System.IO;
 using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Security;
 
 namespace FoxTunes
 {
@@ -113,6 +115,16 @@ namespace FoxTunes
 
         protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
         {
+            //Critical: Don't block in this event handler, it causes a deadlock.
+#if NET40
+            var task = TaskEx.Run(() => this.ShowNotification());
+#else
+            var task = Task.Run(() => this.ShowNotification());
+#endif
+        }
+
+        protected virtual void ShowNotification()
+        {
             var outputStream = this.PlaybackManager.CurrentStream;
             if (outputStream == null)
             {
@@ -139,7 +151,7 @@ namespace FoxTunes
                 metaDataItem => metaDataItem.Value,
                 StringComparer.OrdinalIgnoreCase
             );
-            var fileName = ArtworkProvider.Find(
+            var fileName = this.ArtworkProvider.Find(
                 outputStream.PlaylistItem,
                 ArtworkType.FrontCover
             );
@@ -174,9 +186,9 @@ namespace FoxTunes
 <toast>
     <visual>
         <binding template=""ToastGeneric"">" +
-(!string.IsNullOrEmpty(title) ? "<text>" + title + "</text>" : "<text>No Title</text>") +
-(!string.IsNullOrEmpty(album) ? "<text>" + album + "</text>" : string.Empty) +
-(!string.IsNullOrEmpty(artist) ? "<text>" + artist + "</text>" : string.Empty) + @"
+(!string.IsNullOrEmpty(title) ? "<text>" + SecurityElement.Escape(title) + "</text>" : "<text>No Title</text>") +
+(!string.IsNullOrEmpty(album) ? "<text>" + SecurityElement.Escape(album) + "</text>" : string.Empty) +
+(!string.IsNullOrEmpty(artist) ? "<text>" + SecurityElement.Escape(artist) + "</text>" : string.Empty) + @"
         </binding>
     </visual>
 </toast>
@@ -192,13 +204,13 @@ namespace FoxTunes
 <toast>
     <visual>
         <binding template=""ToastGeneric"">" +
-(!string.IsNullOrEmpty(title) ? "<text>" + title + "</text>" : "<text>No Title</text>") +
-(!string.IsNullOrEmpty(album) ? "<text>" + album + "</text>" : string.Empty) +
-(!string.IsNullOrEmpty(artist) ? "<text>" + artist + "</text>" : string.Empty) + @"
+(!string.IsNullOrEmpty(title) ? "<text>" + SecurityElement.Escape(title) + "</text>" : "<text>No Title</text>") +
+(!string.IsNullOrEmpty(album) ? "<text>" + SecurityElement.Escape(album) + "</text>" : string.Empty) +
+(!string.IsNullOrEmpty(artist) ? "<text>" + SecurityElement.Escape(artist) + "</text>" : string.Empty) + @"
             <image
                 placement=""appLogoOverride""
                 hint-crop=""circle""
-                src = """ + new Uri(fileName).AbsoluteUri + @""" />
+                src = """ + SecurityElement.Escape(new Uri(fileName).AbsoluteUri) + @""" />
         </binding>
     </visual>
 </toast>
@@ -214,12 +226,12 @@ namespace FoxTunes
 <toast>
     <visual>
         <binding template=""ToastGeneric"">" +
-            (!string.IsNullOrEmpty(title) ? "<text>" + title + "</text>" : "<text>No Title</text>") +
-            (!string.IsNullOrEmpty(album) ? "<text>" + album + "</text>" : string.Empty) +
-            (!string.IsNullOrEmpty(artist) ? "<text>" + artist + "</text>" : string.Empty) + @"
+            (!string.IsNullOrEmpty(title) ? "<text>" + SecurityElement.Escape(title) + "</text>" : "<text>No Title</text>") +
+            (!string.IsNullOrEmpty(album) ? "<text>" + SecurityElement.Escape(album) + "</text>" : string.Empty) +
+            (!string.IsNullOrEmpty(artist) ? "<text>" + SecurityElement.Escape(artist) + "</text>" : string.Empty) + @"
             <image
                 placement=""inline""
-                src = """ + new Uri(fileName).AbsoluteUri + @""" />
+                src = """ + SecurityElement.Escape(new Uri(fileName).AbsoluteUri) + @""" />
         </binding>
     </visual>
 </toast>
