@@ -23,11 +23,5 @@ FROM "LibraryHierarchyItems"
 			AND (@metaDataType & "MetaDataItems"."Type") =  "MetaDataItems"."Type"
 WHERE "LibraryHierarchyItems"."LibraryHierarchy_Id" = @libraryHierarchyId
 	AND "LibraryHierarchyItems"."Id" = @libraryHierarchyItemId
-	AND (@favorite IS NULL OR EXISTS(
-		SELECT * 
-		FROM "LibraryItems" 
-			JOIN "LibraryHierarchyItem_LibraryItem" 
-				ON "LibraryHierarchyItem_LibraryItem"."LibraryItem_Id" = "LibraryItems"."Id"
-					AND "LibraryItems"."Favorite" = @favorite
-		WHERE "LibraryHierarchyItem_LibraryItem"."LibraryHierarchyItem_Id" = "LibraryHierarchyItems"."Id"))
+	AND (@favorite IS NULL OR "LibraryItems"."Favorite" = @favorite)
 ORDER BY "LibraryItems"."FileName"

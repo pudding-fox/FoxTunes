@@ -102,6 +102,25 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to WITH
+        ///
+        ///LibraryHierarchyChildren(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;, &quot;IsLeaf&quot;)
+        ///AS
+        ///(
+        ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;, &quot;LibraryHierarchyItems&quot;.&quot;IsLeaf&quot;
+        ///	FROM &quot;LibraryHierarchyItems&quot;
+        ///	WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
+        ///		AND &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = @libraryHierarchyItemId
+        ///	UNION ALL 
+        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHier [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string AddLibraryHierarchyNodeToPlaylistWithFilter {
+            get {
+                return ResourceManager.GetString("AddLibraryHierarchyNodeToPlaylistWithFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to INSERT INTO &quot;LibraryItem_MetaDataItem&quot; (&quot;LibraryItem_Id&quot;, &quot;MetaDataItem_Id&quot;)
         ///SELECT @itemId, @metaDataItemId
         ///WHERE NOT EXISTS(
@@ -227,7 +246,7 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to WITH
         ///
-        ///LibraryHierarchyParents(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;)
+        ///LibraryHierarchyChildren(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;)
         ///AS
         ///(
         ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;
@@ -235,7 +254,7 @@ namespace FoxTunes {
         ///	WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
         ///		AND ((@libraryHierarchyItemId IS NULL AND &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; IS NULL) OR &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = @libraryHierarchyItemId)
         ///	UNION ALL 
-        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;,  [rest of string was truncated]&quot;;.
+        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryHierarchyNodesWithFilter {
             get {
@@ -265,16 +284,15 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to WITH
         ///
-        ///LibraryHierarchyParents(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;)
+        ///LibraryHierarchyChildren(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;, &quot;IsLeaf&quot;)
         ///AS
         ///(
-        ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;
+        ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;, &quot;LibraryHierarchyItems&quot;.&quot;IsLeaf&quot;
         ///	FROM &quot;LibraryHierarchyItems&quot;
         ///	WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
         ///		AND &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = @libraryHierarchyItemId
         ///	UNION ALL 
-        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;
-        ///	FROM &quot;LibraryHierarchyI [rest of string was truncated]&quot;;.
+        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHier [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryItemsWithFilter {
             get {
