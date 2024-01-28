@@ -11,6 +11,33 @@ namespace FoxTunes.ViewModel
 {
     public class ComponentSettings : ViewModelBase
     {
+        public static readonly DependencyProperty ConfigurationProperty = DependencyProperty.Register(
+           "Configuration",
+           typeof(IConfiguration),
+           typeof(ComponentSettings),
+           new PropertyMetadata(null, new PropertyChangedCallback(OnConfigurationChanged))
+       );
+
+        public static IConfiguration GetConfiguration(ComponentSettings source)
+        {
+            return (IConfiguration)source.GetValue(ConfigurationProperty);
+        }
+
+        public static void SetConfiguration(ComponentSettings source, IConfiguration value)
+        {
+            source.SetValue(ConfigurationProperty, value);
+        }
+
+        private static void OnConfigurationChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var componentSettings = sender as ComponentSettings;
+            if (componentSettings == null)
+            {
+                return;
+            }
+            componentSettings.OnConfigurationChanged();
+        }
+
         public static readonly DependencyProperty SectionsProperty = DependencyProperty.Register(
            "Sections",
            typeof(StringCollection),
@@ -43,7 +70,28 @@ namespace FoxTunes.ViewModel
             this.Pages = new ObservableCollection<ComponentSettingsPage>();
         }
 
-        public IConfiguration Configuration { get; private set; }
+        public IConfiguration Configuration
+        {
+            get
+            {
+                return GetConfiguration(this);
+            }
+            set
+            {
+                SetConfiguration(this, value);
+            }
+        }
+
+        protected virtual void OnConfigurationChanged()
+        {
+            if (this.ConfigurationChanged != null)
+            {
+                this.ConfigurationChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Configuration");
+        }
+
+        public event EventHandler ConfigurationChanged;
 
         public StringCollection Sections
         {
@@ -59,7 +107,6 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnSectionsChanged()
         {
-            this.Dispatch(this.Refresh);
             if (this.SectionsChanged != null)
             {
                 this.SectionsChanged(this, EventArgs.Empty);
@@ -126,7 +173,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnFilterChanged()
         {
-            this.Dispatch(this.Refresh);
+            this.Refresh();
             if (this.FilterChanged != null)
             {
                 this.FilterChanged(this, EventArgs.Empty);
@@ -141,8 +188,7 @@ namespace FoxTunes.ViewModel
             get
             {
                 return CommandFactory.Instance.CreateCommand(
-                     () => this.Configuration.Reset(),
-                     () => this.Configuration != null
+                     () => this.Configuration.Reset()
                  );
             }
         }
@@ -163,62 +209,43 @@ namespace FoxTunes.ViewModel
             get
             {
                 return new Command(
-                    () => this.Configuration.Save(),
-                    () => this.Configuration != null
+                    () => this.Configuration.Save()
                 );
             }
         }
 
-        protected override void InitializeComponent(ICore core)
+        public void Refresh()
         {
-            this.Configuration = core.Components.Configuration;
-            this.Dispatch(this.Refresh);
-            base.InitializeComponent(core);
-        }
-
-        protected virtual Task Refresh()
-        {
-            if (this.Configuration == null)
+            this.Pages.Clear();
+            foreach (var section in this.Configuration.Sections.OrderBy(section => section.Name))
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            return Windows.Invoke(() =>
-            {
-                this.Pages.Clear();
-                foreach (var section in this.Configuration.Sections.OrderBy(section => section.Name))
+                if (section.Flags.HasFlag(ConfigurationSectionFlags.System))
                 {
-                    if (section.Flags.HasFlag(ConfigurationSectionFlags.System))
-                    {
-                        //System config should not be presented to the user.
-                        continue;
-                    }
-                    if (this.Sections != null)
-                    {
-                        if (!this.Sections.Contains(section.Id, StringComparer.OrdinalIgnoreCase))
-                        {
-                            //Does not match section filter.
-                            continue;
-                        }
-                    }
-                    var sectionMatches = this.MatchesFilter(section);
-                    var elements = default(IEnumerable<ConfigurationElement>);
-                    if (sectionMatches)
-                    {
-                        elements = section.Elements;
-                    }
-                    else if (!this.MatchesFilter(section.Elements, out elements))
-                    {
-                        continue;
-                    }
-                    var page = new ComponentSettingsPage(section.Name, elements);
-                    this.Pages.Add(page);
+                    //System config should not be presented to the user.
+                    continue;
                 }
-                this.SelectedPage = this.Pages.FirstOrDefault();
-            });
+                if (this.Sections != null)
+                {
+                    if (!this.Sections.Contains(section.Id, StringComparer.OrdinalIgnoreCase))
+                    {
+                        //Does not match section filter.
+                        continue;
+                    }
+                }
+                var sectionMatches = this.MatchesFilter(section);
+                var elements = default(IEnumerable<ConfigurationElement>);
+                if (sectionMatches)
+                {
+                    elements = section.Elements;
+                }
+                else if (!this.MatchesFilter(section.Elements, out elements))
+                {
+                    continue;
+                }
+                var page = new ComponentSettingsPage(section.Name, elements);
+                this.Pages.Add(page);
+            }
+            this.SelectedPage = this.Pages.FirstOrDefault();
         }
 
         public virtual bool MatchesFilter(global::FoxTunes.ConfigurationSection section)

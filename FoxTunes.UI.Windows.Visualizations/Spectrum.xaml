@@ -1,21 +1,16 @@
-﻿<Windows:UIComponentBase x:Class="FoxTunes.Spectrum"
+﻿<Windows:ConfigurableUIComponentBase x:Class="FoxTunes.Spectrum"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
              xmlns:LocalWindows="clr-namespace:FoxTunes"
-             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" 
              Foreground="{DynamicResource TextBrush}"
              MinWidth="160"
              MinHeight="30">
-    <UserControl.ContextMenu>
-        <Windows:Menu Category="{Binding Source={x:Static LocalWindows:SpectrumBehaviour.CATEGORY}}"></Windows:Menu>
-    </UserControl.ContextMenu>
     <Windows:Visualization>
         <LocalWindows:SpectrumRenderer></LocalWindows:SpectrumRenderer>
     </Windows:Visualization>
-</Windows:UIComponentBase>
+</Windows:ConfigurableUIComponentBase>

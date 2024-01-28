@@ -1,11 +1,12 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class WaveFormCache : StandardComponent
+    public class WaveFormCache : StandardComponent, IConfigurableComponent
     {
         const int CACHE_SIZE = 4;
 
@@ -26,8 +27,8 @@ namespace FoxTunes
         {
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
-                WaveBarBehaviourConfiguration.SECTION,
-                WaveBarBehaviourConfiguration.CACHE_ELEMENT
+                WaveFormCacheConfiguration.SECTION,
+                WaveFormCacheConfiguration.CACHE_ELEMENT
             );
             base.InitializeComponent(core);
         }
@@ -117,6 +118,11 @@ namespace FoxTunes
                 hashCode = (hashCode * 29) + resolution.GetHashCode();
             }
             return Math.Abs(hashCode).ToString();
+        }
+
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return WaveFormCacheConfiguration.GetConfigurationSections();
         }
 
         public static void Cleanup()

@@ -10,7 +10,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
-        <ViewModel:ComponentSettings x:Key="ViewModel" Sections="{Binding Sections, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ComponentSettingsDialog}}}"></ViewModel:ComponentSettings>
+        <ViewModel:ComponentSettings x:Key="ViewModel" Configuration="{Binding Configuration, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ComponentSettingsDialog}}}" Sections="{Binding Sections, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ComponentSettingsDialog}}}"></ViewModel:ComponentSettings>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>

@@ -4,7 +4,7 @@ using System.Windows.Media;
 
 namespace FoxTunes
 {
-    public static class SpectrumBehaviourConfiguration
+    public static class SpectrumConfiguration
     {
         public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
 
@@ -57,12 +57,12 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
-                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Bars, path: Strings.SpectrumBehaviourConfiguration_Path).WithOptions(GetBarsOptions()))
-                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true))
-                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.SpectrumBehaviourConfiguration_Hold, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_HOLD).WithValidationRule(new IntegerValidationRule(MIN_HOLD, MAX_HOLD)).DependsOn(SECTION, PEAKS_ELEMENT))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrumBehaviourConfiguration_ColorPalette, path: Strings.SpectrumBehaviourConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
-                .WithElement(new IntegerConfigurationElement(CUT_OFF_ELEMENT, Strings.SpectrumBehaviourConfiguration_MaxFrequency, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_CUT_OFF).WithValidationRule(new IntegerValidationRule(MIN_CUT_OFF, MAX_CUT_OFF)))
-                .WithElement(new IntegerConfigurationElement(PRE_AMP_ELEMENT, Strings.SpectrumBehaviourConfiguration_PreAmp, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_PRE_AMP).WithValidationRule(new IntegerValidationRule(MIN_PRE_AMP, MAX_PRE_AMP))
+                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, Strings.SpectrumConfiguration_Bars, path: Strings.SpectrumConfiguration_Path).WithOptions(GetBarsOptions()))
+                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.SpectrumConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.SpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(true))
+                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.SpectrumConfiguration_Hold, path: string.Format("{0}/{1}", Strings.SpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_HOLD).WithValidationRule(new IntegerValidationRule(MIN_HOLD, MAX_HOLD)).DependsOn(SECTION, PEAKS_ELEMENT))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrumConfiguration_ColorPalette, path: Strings.SpectrumConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
+                .WithElement(new IntegerConfigurationElement(CUT_OFF_ELEMENT, Strings.SpectrumConfiguration_MaxFrequency, path: string.Format("{0}/{1}", Strings.SpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_CUT_OFF).WithValidationRule(new IntegerValidationRule(MIN_CUT_OFF, MAX_CUT_OFF)))
+                .WithElement(new IntegerConfigurationElement(PRE_AMP_ELEMENT, Strings.SpectrumConfiguration_PreAmp, path: string.Format("{0}/{1}", Strings.SpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_PRE_AMP).WithValidationRule(new IntegerValidationRule(MIN_PRE_AMP, MAX_PRE_AMP))
             );
         }
 

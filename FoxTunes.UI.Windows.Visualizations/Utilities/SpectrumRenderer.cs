@@ -28,44 +28,47 @@ namespace FoxTunes
 
         public SelectionConfigurationElement FFTSize { get; private set; }
 
-        public override void InitializeComponent(ICore core)
+        protected override void OnConfigurationChanged()
         {
-            base.InitializeComponent(core);
-            this.Bars = this.Configuration.GetElement<SelectionConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.BARS_ELEMENT
-            );
-            this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.PEAKS_ELEMENT
-             );
-            this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
-               SpectrumBehaviourConfiguration.SECTION,
-               SpectrumBehaviourConfiguration.HOLD_ELEMENT
-            );
-            this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.COLOR_PALETTE_ELEMENT
-            );
-            this.CutOff = this.Configuration.GetElement<IntegerConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.CUT_OFF_ELEMENT
-            );
-            this.PreAmp = this.Configuration.GetElement<IntegerConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.PRE_AMP_ELEMENT
-            );
-            this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
-            );
-            this.Bars.ValueChanged += this.OnValueChanged;
-            this.ShowPeaks.ValueChanged += this.OnValueChanged;
-            this.ColorPalette.ValueChanged += this.OnValueChanged;
-            this.CutOff.ValueChanged += this.OnValueChanged;
-            this.PreAmp.ValueChanged += this.OnValueChanged;
-            this.FFTSize.ValueChanged += this.OnValueChanged;
-            var task = this.CreateBitmap();
+            if (this.Configuration != null)
+            {
+                this.Bars = this.Configuration.GetElement<SelectionConfigurationElement>(
+                   SpectrumConfiguration.SECTION,
+                   SpectrumConfiguration.BARS_ELEMENT
+                );
+                this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    SpectrumConfiguration.SECTION,
+                    SpectrumConfiguration.PEAKS_ELEMENT
+                 );
+                this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
+                   SpectrumConfiguration.SECTION,
+                   SpectrumConfiguration.HOLD_ELEMENT
+                );
+                this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                    SpectrumConfiguration.SECTION,
+                    SpectrumConfiguration.COLOR_PALETTE_ELEMENT
+                );
+                this.CutOff = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    SpectrumConfiguration.SECTION,
+                    SpectrumConfiguration.CUT_OFF_ELEMENT
+                );
+                this.PreAmp = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    SpectrumConfiguration.SECTION,
+                    SpectrumConfiguration.PRE_AMP_ELEMENT
+                );
+                this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
+                   VisualizationBehaviourConfiguration.SECTION,
+                   VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
+                );
+                this.Bars.ValueChanged += this.OnValueChanged;
+                this.ShowPeaks.ValueChanged += this.OnValueChanged;
+                this.ColorPalette.ValueChanged += this.OnValueChanged;
+                this.CutOff.ValueChanged += this.OnValueChanged;
+                this.PreAmp.ValueChanged += this.OnValueChanged;
+                this.FFTSize.ValueChanged += this.OnValueChanged;
+                var task = this.CreateBitmap();
+            }
+            base.OnConfigurationChanged();
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
@@ -83,14 +86,18 @@ namespace FoxTunes
 
         protected override bool CreateData(int width, int height)
         {
+            if (this.Configuration == null)
+            {
+                return false;
+            }
             this.RendererData = Create(
                 this.Output,
                 width,
                 height,
-                SpectrumBehaviourConfiguration.GetBars(this.Bars.Value),
+                SpectrumConfiguration.GetBars(this.Bars.Value),
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeaks.Value,
-                SpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors),
+                SpectrumConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors),
                 this.CutOff.Value,
                 1.0f + FromDecibel(this.PreAmp.Value)
             );
@@ -198,8 +205,12 @@ namespace FoxTunes
 
         protected override int GetPixelWidth(double width)
         {
-            var min = SpectrumBehaviourConfiguration.GetWidth(this.Bars.Value);
-            var bars = SpectrumBehaviourConfiguration.GetBars(this.Bars.Value);
+            if (this.Bars == null)
+            {
+                return 0;
+            }
+            var min = SpectrumConfiguration.GetWidth(this.Bars.Value);
+            var bars = SpectrumConfiguration.GetBars(this.Bars.Value);
             return base.GetPixelWidth(Math.Max(bars * (Convert.ToInt32(width) / bars), min));
         }
 

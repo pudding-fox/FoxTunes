@@ -281,10 +281,13 @@ namespace FoxTunes.ViewModel
             {
                 return false;
             }
-            var categories = component.InvocationCategories.ToArray();
-            if (categories.Any() && !categories.Contains(this.Category, StringComparer.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(this.Category))
             {
-                return false;
+                var categories = component.InvocationCategories.ToArray();
+                if (categories.Any() && !categories.Contains(this.Category, StringComparer.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
             }
             return true;
         }

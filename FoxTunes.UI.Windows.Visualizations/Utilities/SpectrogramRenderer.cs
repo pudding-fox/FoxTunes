@@ -33,40 +33,43 @@ namespace FoxTunes
 
         public SelectionConfigurationElement FFTSize { get; private set; }
 
-        public override void InitializeComponent(ICore core)
+        protected override void OnConfigurationChanged()
         {
-            base.InitializeComponent(core);
-            this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
-                SpectrogramBehaviourConfiguration.SECTION,
-                SpectrogramBehaviourConfiguration.MODE_ELEMENT
-            );
-            this.Scale = this.Configuration.GetElement<SelectionConfigurationElement>(
-                SpectrogramBehaviourConfiguration.SECTION,
-                SpectrogramBehaviourConfiguration.SCALE_ELEMENT
-            );
-            this.Smoothing = this.Configuration.GetElement<IntegerConfigurationElement>(
-                SpectrogramBehaviourConfiguration.SECTION,
-                SpectrogramBehaviourConfiguration.SMOOTHING_ELEMENT
-            );
-            this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
-                SpectrogramBehaviourConfiguration.SECTION,
-                SpectrogramBehaviourConfiguration.COLOR_PALETTE_ELEMENT
-            );
-            this.History = this.Configuration.GetElement<IntegerConfigurationElement>(
-               SpectrogramBehaviourConfiguration.SECTION,
-               SpectrogramBehaviourConfiguration.HISTORY_ELEMENT
-            );
-            this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
-            );
-            this.Mode.ValueChanged += this.OnValueChanged;
-            this.Scale.ValueChanged += this.OnValueChanged;
-            this.Smoothing.ValueChanged += this.OnValueChanged;
-            this.ColorPalette.ValueChanged += this.OnValueChanged;
-            this.History.ValueChanged += this.OnValueChanged;
-            this.FFTSize.ValueChanged += this.OnValueChanged;
-            var task = this.CreateBitmap();
+            if (this.Configuration != null)
+            {
+                this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
+                    SpectrogramConfiguration.SECTION,
+                    SpectrogramConfiguration.MODE_ELEMENT
+                );
+                this.Scale = this.Configuration.GetElement<SelectionConfigurationElement>(
+                    SpectrogramConfiguration.SECTION,
+                    SpectrogramConfiguration.SCALE_ELEMENT
+                );
+                this.Smoothing = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    SpectrogramConfiguration.SECTION,
+                    SpectrogramConfiguration.SMOOTHING_ELEMENT
+                );
+                this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                    SpectrogramConfiguration.SECTION,
+                    SpectrogramConfiguration.COLOR_PALETTE_ELEMENT
+                );
+                this.History = this.Configuration.GetElement<IntegerConfigurationElement>(
+                   SpectrogramConfiguration.SECTION,
+                   SpectrogramConfiguration.HISTORY_ELEMENT
+                );
+                this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
+                   VisualizationBehaviourConfiguration.SECTION,
+                   VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
+                );
+                this.Mode.ValueChanged += this.OnValueChanged;
+                this.Scale.ValueChanged += this.OnValueChanged;
+                this.Smoothing.ValueChanged += this.OnValueChanged;
+                this.ColorPalette.ValueChanged += this.OnValueChanged;
+                this.History.ValueChanged += this.OnValueChanged;
+                this.FFTSize.ValueChanged += this.OnValueChanged;
+                var task = this.CreateBitmap();
+            }
+            base.OnConfigurationChanged();
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
@@ -76,14 +79,18 @@ namespace FoxTunes
 
         protected override bool CreateData(int width, int height)
         {
+            if (this.Configuration == null)
+            {
+                return false;
+            }
             this.RendererData = Create(
                 this.Output,
                 width,
                 height,
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
-                SpectrogramBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value),
-                SpectrogramBehaviourConfiguration.GetMode(this.Mode.Value),
-                SpectrogramBehaviourConfiguration.GetScale(this.Scale.Value),
+                SpectrogramConfiguration.GetColorPalette(this.ColorPalette.Value),
+                SpectrogramConfiguration.GetMode(this.Mode.Value),
+                SpectrogramConfiguration.GetScale(this.Scale.Value),
                 this.Smoothing.Value
             );
             if (this.History.Value > 0)

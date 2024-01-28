@@ -71,10 +71,13 @@ namespace FoxTunes
 
         public IOutput Output { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.Output = core.Components.Output;
+            this.Configuration = core.Components.Configuration;
             base.InitializeComponent(core);
         }
 
@@ -185,12 +188,18 @@ namespace FoxTunes
             Explorer.Open(fileName);
         }
 
-        public override async Task ShowSettings(string title, IEnumerable<string> sections)
+        public override Task ShowSettings(string title, IEnumerable<string> sections)
+        {
+            return this.ShowSettings(title, this.Configuration, sections);
+        }
+
+        public override async Task ShowSettings(string title, IConfiguration configuration, IEnumerable<string> sections)
         {
             var settings = default(ComponentSettingsDialog);
             await global::FoxTunes.Windows.Invoke(() =>
             {
                 settings = new ComponentSettingsDialog();
+                settings.Configuration = configuration;
                 settings.Sections = new StringCollection(sections);
             }).ConfigureAwait(false);
             await global::FoxTunes.Windows.ShowDialog(this.Core, title, settings).ConfigureAwait(false);

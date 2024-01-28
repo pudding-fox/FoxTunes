@@ -38,6 +38,14 @@
             }
         }
 
+        public static string General_Settings
+        {
+            get
+            {
+                return Strings.General_Settings;
+            }
+        }
+
         public static string SettingsDialog_EmptyPage
         {
             get

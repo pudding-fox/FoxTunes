@@ -22,20 +22,23 @@ namespace FoxTunes
 
         public IntegerConfigurationElement Duration { get; private set; }
 
-        public override void InitializeComponent(ICore core)
+        protected override void OnConfigurationChanged()
         {
-            base.InitializeComponent(core);
-            this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
-                OscilloscopeBehaviourConfiguration.SECTION,
-                OscilloscopeBehaviourConfiguration.MODE_ELEMENT
-            );
-            this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
-                OscilloscopeBehaviourConfiguration.SECTION,
-                OscilloscopeBehaviourConfiguration.DURATION_ELEMENT
-            );
-            this.Mode.ValueChanged += this.OnValueChanged;
-            this.Duration.ValueChanged += this.OnValueChanged;
-            var task = this.CreateBitmap();
+            if (this.Configuration != null)
+            {
+                this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
+                    OscilloscopeConfiguration.SECTION,
+                    OscilloscopeConfiguration.MODE_ELEMENT
+                );
+                this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    OscilloscopeConfiguration.SECTION,
+                    OscilloscopeConfiguration.DURATION_ELEMENT
+                );
+                this.Mode.ValueChanged += this.OnValueChanged;
+                this.Duration.ValueChanged += this.OnValueChanged;
+                var task = this.CreateBitmap();
+            }
+            base.OnConfigurationChanged();
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
@@ -45,12 +48,16 @@ namespace FoxTunes
 
         protected override bool CreateData(int width, int height)
         {
+            if (this.Configuration == null)
+            {
+                return false;
+            }
             this.RendererData = Create(
                 this.Output,
                 width,
                 height,
-                OscilloscopeBehaviourConfiguration.GetDuration(this.Duration.Value),
-                OscilloscopeBehaviourConfiguration.GetMode(this.Mode.Value)
+                OscilloscopeConfiguration.GetDuration(this.Duration.Value),
+                OscilloscopeConfiguration.GetMode(this.Mode.Value)
             );
             return true;
         }

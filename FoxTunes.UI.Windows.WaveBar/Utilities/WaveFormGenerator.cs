@@ -1,11 +1,11 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class WaveFormGenerator : StandardComponent
+    public class WaveFormGenerator : StandardComponent, IConfigurableComponent
     {
         public WaveFormCache Cache { get; private set; }
 
@@ -21,8 +21,8 @@ namespace FoxTunes
             this.Output = core.Components.Output;
             this.Configuration = core.Components.Configuration;
             this.Resolution = this.Configuration.GetElement<IntegerConfigurationElement>(
-                WaveBarBehaviourConfiguration.SECTION,
-                WaveBarBehaviourConfiguration.RESOLUTION_ELEMENT
+                WaveFormGeneratorConfiguration.SECTION,
+                WaveFormGeneratorConfiguration.RESOLUTION_ELEMENT
             );
             base.InitializeComponent(core);
         }
@@ -96,6 +96,11 @@ namespace FoxTunes
             {
                 Logger.Write(typeof(WaveFormGenerator), LogLevel.Warn, "Failed to save wave form data for file \"{0}\": {1}", stream.FileName, e.Message);
             }
+        }
+
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return WaveFormGeneratorConfiguration.GetConfigurationSections();
         }
 
         private static void PopulateShort(IOutput output, IOutputStream stream, WaveFormGeneratorData data)

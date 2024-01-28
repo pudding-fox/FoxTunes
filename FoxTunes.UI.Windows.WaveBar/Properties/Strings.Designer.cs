@@ -72,81 +72,81 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Cache.
         /// </summary>
-        internal static string WaveBarBehaviourConfiguration_Cache {
+        internal static string WaveFormCacheConfiguration_Cache {
             get {
-                return ResourceManager.GetString("WaveBarBehaviourConfiguration.Cache", resourceCulture);
+                return ResourceManager.GetString("WaveFormCacheConfiguration.Cache", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Cleanup Temp Files.
         /// </summary>
-        internal static string WaveBarBehaviourConfiguration_Cleanup {
+        internal static string WaveFormCacheConfiguration_Cleanup {
             get {
-                return ResourceManager.GetString("WaveBarBehaviourConfiguration.Cleanup", resourceCulture);
+                return ResourceManager.GetString("WaveFormCacheConfiguration.Cleanup", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Color Palette.
         /// </summary>
-        internal static string WaveBarBehaviourConfiguration_ColorPalette {
+        internal static string WaveFormStreamPositionConfiguration_ColorPalette {
             get {
-                return ResourceManager.GetString("WaveBarBehaviourConfiguration.ColorPalette", resourceCulture);
+                return ResourceManager.GetString("WaveFormStreamPositionConfiguration.ColorPalette", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Mode.
         /// </summary>
-        internal static string WaveBarBehaviourConfiguration_Mode {
+        internal static string WaveFormStreamPositionConfiguration_Mode {
             get {
-                return ResourceManager.GetString("WaveBarBehaviourConfiguration.Mode", resourceCulture);
+                return ResourceManager.GetString("WaveFormStreamPositionConfiguration.Mode", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Mono.
         /// </summary>
-        internal static string WaveBarBehaviourConfiguration_Mode_Mono {
+        internal static string WaveFormStreamPositionConfiguration_Mode_Mono {
             get {
-                return ResourceManager.GetString("WaveBarBehaviourConfiguration.Mode.Mono", resourceCulture);
+                return ResourceManager.GetString("WaveFormStreamPositionConfiguration.Mode.Mono", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Seperate.
         /// </summary>
-        internal static string WaveBarBehaviourConfiguration_Mode_Seperate {
+        internal static string WaveFormStreamPositionConfiguration_Mode_Seperate {
             get {
-                return ResourceManager.GetString("WaveBarBehaviourConfiguration.Mode.Seperate", resourceCulture);
+                return ResourceManager.GetString("WaveFormStreamPositionConfiguration.Mode.Seperate", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Resolution.
         /// </summary>
-        internal static string WaveBarBehaviourConfiguration_Resolution {
+        internal static string WaveFormGeneratorConfiguration_Resolution {
             get {
-                return ResourceManager.GetString("WaveBarBehaviourConfiguration.Resolution", resourceCulture);
+                return ResourceManager.GetString("WaveFormGeneratorConfiguration.Resolution", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to RMS.
         /// </summary>
-        internal static string WaveBarBehaviourConfiguration_RMS {
+        internal static string WaveFormStreamPositionConfiguration_RMS {
             get {
-                return ResourceManager.GetString("WaveBarBehaviourConfiguration.RMS", resourceCulture);
+                return ResourceManager.GetString("WaveFormStreamPositionConfiguration.RMS", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Wave Form.
         /// </summary>
-        internal static string WaveBarBehaviourConfiguration_Section {
+        internal static string WaveFormStreamPositionConfiguration_Section {
             get {
-                return ResourceManager.GetString("WaveBarBehaviourConfiguration.Section", resourceCulture);
+                return ResourceManager.GetString("WaveFormStreamPositionConfiguration.Section", resourceCulture);
             }
         }
         

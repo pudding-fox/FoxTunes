@@ -29,6 +29,8 @@ namespace FoxTunes
 
         public abstract Task ShowSettings(string title, IEnumerable<string> sections);
 
+        public abstract Task ShowSettings(string title, IConfiguration configuration, IEnumerable<string> sections);
+
         public abstract void Restart();
 
         protected virtual void OnWindowCreated(IUserInterfaceWindow window)

@@ -28,44 +28,47 @@ namespace FoxTunes
 
         public SelectionConfigurationElement FFTSize { get; private set; }
 
-        public override void InitializeComponent(ICore core)
+        protected override void OnConfigurationChanged()
         {
-            base.InitializeComponent(core);
-            this.Bands = this.Configuration.GetElement<SelectionConfigurationElement>(
-                EnhancedSpectrumBehaviourConfiguration.SECTION,
-                EnhancedSpectrumBehaviourConfiguration.BANDS_ELEMENT
-            );
-            this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
-                EnhancedSpectrumBehaviourConfiguration.SECTION,
-                EnhancedSpectrumBehaviourConfiguration.PEAKS_ELEMENT
-             );
-            this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
-               EnhancedSpectrumBehaviourConfiguration.SECTION,
-               EnhancedSpectrumBehaviourConfiguration.HOLD_ELEMENT
-            );
-            this.ShowRms = this.Configuration.GetElement<BooleanConfigurationElement>(
-                EnhancedSpectrumBehaviourConfiguration.SECTION,
-                EnhancedSpectrumBehaviourConfiguration.RMS_ELEMENT
-             );
-            this.ShowCrestFactor = this.Configuration.GetElement<BooleanConfigurationElement>(
-                EnhancedSpectrumBehaviourConfiguration.SECTION,
-                EnhancedSpectrumBehaviourConfiguration.CREST_ELEMENT
-            );
-            this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
-                EnhancedSpectrumBehaviourConfiguration.SECTION,
-                EnhancedSpectrumBehaviourConfiguration.COLOR_PALETTE_ELEMENT
-            );
-            this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
-            );
-            this.Bands.ValueChanged += this.OnValueChanged;
-            this.ShowPeaks.ValueChanged += this.OnValueChanged;
-            this.ShowRms.ValueChanged += this.OnValueChanged;
-            this.ShowCrestFactor.ValueChanged += this.OnValueChanged;
-            this.ColorPalette.ValueChanged += this.OnValueChanged;
-            this.FFTSize.ValueChanged += this.OnValueChanged;
-            var task = this.CreateBitmap();
+            if (this.Configuration != null)
+            {
+                this.Bands = this.Configuration.GetElement<SelectionConfigurationElement>(
+                   EnhancedSpectrumConfiguration.SECTION,
+                   EnhancedSpectrumConfiguration.BANDS_ELEMENT
+               );
+                this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    EnhancedSpectrumConfiguration.SECTION,
+                    EnhancedSpectrumConfiguration.PEAKS_ELEMENT
+                 );
+                this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
+                   EnhancedSpectrumConfiguration.SECTION,
+                   EnhancedSpectrumConfiguration.HOLD_ELEMENT
+                );
+                this.ShowRms = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    EnhancedSpectrumConfiguration.SECTION,
+                    EnhancedSpectrumConfiguration.RMS_ELEMENT
+                 );
+                this.ShowCrestFactor = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    EnhancedSpectrumConfiguration.SECTION,
+                    EnhancedSpectrumConfiguration.CREST_ELEMENT
+                );
+                this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                    EnhancedSpectrumConfiguration.SECTION,
+                    EnhancedSpectrumConfiguration.COLOR_PALETTE_ELEMENT
+                );
+                this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
+                   VisualizationBehaviourConfiguration.SECTION,
+                   VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
+                );
+                this.Bands.ValueChanged += this.OnValueChanged;
+                this.ShowPeaks.ValueChanged += this.OnValueChanged;
+                this.ShowRms.ValueChanged += this.OnValueChanged;
+                this.ShowCrestFactor.ValueChanged += this.OnValueChanged;
+                this.ColorPalette.ValueChanged += this.OnValueChanged;
+                this.FFTSize.ValueChanged += this.OnValueChanged;
+                var task = this.CreateBitmap();
+            }
+            base.OnConfigurationChanged();
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
@@ -83,16 +86,20 @@ namespace FoxTunes
 
         protected override bool CreateData(int width, int height)
         {
+            if (this.Configuration == null)
+            {
+                return false;
+            }
             this.RendererData = Create(
                 this,
                 width,
                 height,
-                EnhancedSpectrumBehaviourConfiguration.GetBands(this.Bands.Value),
-                EnhancedSpectrumBehaviourConfiguration.GetFFTSize(this.FFTSize.Value, this.Bands.Value),
+                EnhancedSpectrumConfiguration.GetBands(this.Bands.Value),
+                EnhancedSpectrumConfiguration.GetFFTSize(this.FFTSize.Value, this.Bands.Value),
                 this.ShowPeaks.Value,
                 this.ShowRms.Value,
                 this.ShowCrestFactor.Value,
-                this.ShowRms.Value ? this.Colors : EnhancedSpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors)
+                this.ShowRms.Value ? this.Colors : EnhancedSpectrumConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors)
             );
             return true;
         }
@@ -218,8 +225,8 @@ namespace FoxTunes
 
         protected override int GetPixelWidth(double width)
         {
-            var min = EnhancedSpectrumBehaviourConfiguration.GetWidth(this.Bands.Value);
-            var bands = EnhancedSpectrumBehaviourConfiguration.GetBands(this.Bands.Value);
+            var min = EnhancedSpectrumConfiguration.GetWidth(this.Bands.Value);
+            var bands = EnhancedSpectrumConfiguration.GetBands(this.Bands.Value);
             return base.GetPixelWidth(Math.Max(bands.Length * (Convert.ToInt32(width) / bands.Length), min));
         }
 

@@ -28,6 +28,8 @@ namespace FoxTunes.Interfaces
 
         Task ShowSettings(string title, IEnumerable<string> sections);
 
+        Task ShowSettings(string title, IConfiguration configuration, IEnumerable<string> sections);
+
         void Restart();
 
         event UserInterfaceWindowEventHandler WindowCreated;

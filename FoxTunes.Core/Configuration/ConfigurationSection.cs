@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Drawing.Design;
 using System.Linq;
 
 namespace FoxTunes
@@ -36,7 +37,7 @@ namespace FoxTunes
 
         public string Description { get; private set; }
 
-        public ObservableCollection<ConfigurationElement> Elements { get; private set; }
+        public ObservableCollection<ConfigurationElement> Elements { get; protected set; }
 
         public bool IsInitialized { get; private set; }
 
@@ -123,13 +124,13 @@ namespace FoxTunes
             }
         }
 
-        private void Add(ConfigurationElement element)
+        protected virtual void Add(ConfigurationElement element)
         {
             Logger.Write(typeof(ConfigurationSection), LogLevel.Debug, "Adding configuration element: {0} => {1}", element.Id, element.Name);
             this.Elements.Add(element);
         }
 
-        private void Update(ConfigurationElement element)
+        protected virtual void Update(ConfigurationElement element)
         {
             Logger.Write(typeof(ConfigurationSection), LogLevel.Debug, "Updating configuration element: {0} => {1}", element.Id, element.Name);
             var existing = this.GetElement(element.Id);
@@ -148,7 +149,7 @@ namespace FoxTunes
             return this.GetElement(elementId) as T;
         }
 
-        public ConfigurationElement GetElement(string elementId)
+        public virtual ConfigurationElement GetElement(string elementId)
         {
             return this.Elements.FirstOrDefault(element => string.Equals(element.Id, elementId, StringComparison.OrdinalIgnoreCase));
         }

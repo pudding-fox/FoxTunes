@@ -69,6 +69,11 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
+        public Task ShowSettings(string title, IConfiguration configuration, IEnumerable<string> sections)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Warn(string message)
         {
             throw new NotImplementedException();

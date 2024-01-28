@@ -1,12 +1,11 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public class EnhancedSpectrum : ViewModelBase
+    public class EnhancedSpectrum : ConfigurableViewModelBase
     {
         public StringCollection Levels
         {
@@ -47,19 +46,22 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler BandsChanged;
 
-        protected override void InitializeComponent(ICore core)
+        protected override void OnConfigurationChanged()
         {
-            core.Components.Configuration.GetElement<SelectionConfigurationElement>(
-                EnhancedSpectrumBehaviourConfiguration.SECTION,
-                EnhancedSpectrumBehaviourConfiguration.BANDS_ELEMENT
-            ).ConnectValue(value =>
+            if (this.Configuration != null)
             {
-                var bands = EnhancedSpectrumBehaviourConfiguration.GetBands(value).Select(
-                    band => band < 1000 ? Convert.ToString(band) : string.Format("{0:0.##}K", (float)band / 1000)
-                );
-                this.Bands = new StringCollection(bands);
-            });
-            base.InitializeComponent(core);
+                this.Configuration.GetElement<SelectionConfigurationElement>(
+                    EnhancedSpectrumConfiguration.SECTION,
+                    EnhancedSpectrumConfiguration.BANDS_ELEMENT
+                ).ConnectValue(value =>
+                {
+                    var bands = EnhancedSpectrumConfiguration.GetBands(value).Select(
+                        band => band < 1000 ? Convert.ToString(band) : string.Format("{0:0.##}K", (float)band / 1000)
+                    );
+                    this.Bands = new StringCollection(bands);
+                });
+            }
+            base.OnConfigurationChanged();
         }
 
         protected override Freezable CreateInstanceCore()

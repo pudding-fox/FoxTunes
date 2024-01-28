@@ -1,4 +1,4 @@
-﻿<Windows:UIComponentBase x:Class="FoxTunes.Oscilloscope"
+﻿<Windows:ConfigurableUIComponentBase x:Class="FoxTunes.Oscilloscope"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -16,9 +16,6 @@
     <UserControl.Resources>
         <LocalViewModel:Oscilloscope x:Key="ViewModel"></LocalViewModel:Oscilloscope>
     </UserControl.Resources>
-    <UserControl.ContextMenu>
-        <Windows:Menu Category="{Binding Source={x:Static LocalWindows:OscilloscopeBehaviour.CATEGORY}}"></Windows:Menu>
-    </UserControl.ContextMenu>
     <Windows:Visualization>
         <LocalWindows:OscilloscopeRenderer>
             <LocalWindows:OscilloscopeRenderer.Style>
@@ -37,4 +34,4 @@
             </LocalWindows:OscilloscopeRenderer.Style>
         </LocalWindows:OscilloscopeRenderer>
     </Windows:Visualization>
-</Windows:UIComponentBase>
+</Windows:ConfigurableUIComponentBase>

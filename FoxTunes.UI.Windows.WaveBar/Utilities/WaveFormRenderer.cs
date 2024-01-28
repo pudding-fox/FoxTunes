@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -8,6 +9,36 @@ namespace FoxTunes
 {
     public class WaveFormRenderer : RendererBase
     {
+        public static readonly DependencyProperty ConfigurationProperty = ConfigurableUIComponentBase.ConfigurationProperty.AddOwner(
+            typeof(WaveFormRenderer),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits, OnConfigurationChanged)
+        );
+
+        private static void OnConfigurationChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var waveFormRenderer = sender as WaveFormRenderer;
+            if (waveFormRenderer == null)
+            {
+                return;
+            }
+            waveFormRenderer.OnConfigurationChanged();
+        }
+
+        public static IConfiguration GetConfiguration(WaveFormRenderer source)
+        {
+            return (IConfiguration)source.GetValue(ConfigurationProperty);
+        }
+
+        public static void SetConfiguration(WaveFormRenderer source, IConfiguration value)
+        {
+            source.SetValue(ConfigurationProperty, value);
+        }
+
+        public WaveFormRenderer()
+        {
+
+        }
+
         public WaveFormGenerator.WaveFormGeneratorData GeneratorData { get; private set; }
 
         public WaveFormRendererData RendererData { get; private set; }
@@ -15,8 +46,6 @@ namespace FoxTunes
         public WaveFormGenerator Generator { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
-
-        public IConfiguration Configuration { get; private set; }
 
         public SelectionConfigurationElement Mode { get; private set; }
 
@@ -26,44 +55,77 @@ namespace FoxTunes
 
         public TextConfigurationElement ColorPalette { get; private set; }
 
+        private IConfiguration _Configuration { get; set; }
+
+        protected IConfiguration GetConfiguration()
+        {
+            return this._Configuration;
+        }
+
+        public IConfiguration Configuration
+        {
+            get
+            {
+                return GetConfiguration(this);
+            }
+            set
+            {
+                SetConfiguration(this, value);
+            }
+        }
+
+        protected virtual void OnConfigurationChanged()
+        {
+            this._Configuration = this.Configuration;
+            if (this.Configuration != null)
+            {
+                this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
+                    WaveFormStreamPositionConfiguration.SECTION,
+                    WaveFormStreamPositionConfiguration.MODE_ELEMENT
+                );
+                this.Resolution = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    WaveFormGeneratorConfiguration.SECTION,
+                    WaveFormGeneratorConfiguration.RESOLUTION_ELEMENT
+                );
+                this.Rms = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    WaveFormStreamPositionConfiguration.SECTION,
+                    WaveFormStreamPositionConfiguration.RMS_ELEMENT
+                );
+                this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                    WaveFormStreamPositionConfiguration.SECTION,
+                    WaveFormStreamPositionConfiguration.COLOR_PALETTE_ELEMENT
+                );
+                this.Mode.ValueChanged += this.OnValueChanged;
+                this.Resolution.ValueChanged += this.OnValueChanged;
+                this.Rms.ValueChanged += this.OnValueChanged;
+                this.ColorPalette.ValueChanged += this.OnValueChanged;
+#if NET40
+                var task = TaskEx.Run(async () =>
+#else
+                var task = Task.Run(async () =>
+#endif
+                {
+                    if (this.PlaybackManager.CurrentStream != null)
+                    {
+                        await this.Update(this.PlaybackManager.CurrentStream).ConfigureAwait(false);
+                    }
+                });
+            }
+            if (this.ConfigurationChanged != null)
+            {
+                this.ConfigurationChanged(this, EventArgs.Empty);
+            }
+        }
+
+        public event EventHandler ConfigurationChanged;
+
         public override void InitializeComponent(ICore core)
         {
             this.Generator = ComponentRegistry.Instance.GetComponent<WaveFormGenerator>();
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
-            this.Configuration = core.Components.Configuration;
-            this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
-                WaveBarBehaviourConfiguration.SECTION,
-                WaveBarBehaviourConfiguration.MODE_ELEMENT
-            );
-            this.Resolution = this.Configuration.GetElement<IntegerConfigurationElement>(
-                WaveBarBehaviourConfiguration.SECTION,
-                WaveBarBehaviourConfiguration.RESOLUTION_ELEMENT
-            );
-            this.Rms = this.Configuration.GetElement<BooleanConfigurationElement>(
-                WaveBarBehaviourConfiguration.SECTION,
-                WaveBarBehaviourConfiguration.RMS_ELEMENT
-            );
-            this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
-                WaveBarBehaviourConfiguration.SECTION,
-                WaveBarBehaviourConfiguration.COLOR_PALETTE_ELEMENT
-            );
-            this.Mode.ValueChanged += this.OnValueChanged;
-            this.Resolution.ValueChanged += this.OnValueChanged;
-            this.Rms.ValueChanged += this.OnValueChanged;
-            this.ColorPalette.ValueChanged += this.OnValueChanged;
             base.InitializeComponent(core);
-#if NET40
-            var task = TaskEx.Run(async () =>
-#else
-            var task = Task.Run(async () =>
-#endif
-            {
-                if (this.PlaybackManager.CurrentStream != null)
-                {
-                    await this.Update(this.PlaybackManager.CurrentStream).ConfigureAwait(false);
-                }
-            });
+
         }
 
         protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
@@ -116,13 +178,17 @@ namespace FoxTunes
 
         protected override bool CreateData(int width, int height)
         {
+            if (this.Configuration == null)
+            {
+                return false;
+            }
             var generatorData = this.GeneratorData;
             if (generatorData == null)
             {
                 return false;
             }
-            var mode = WaveBarBehaviourConfiguration.GetMode(this.Mode.Value);
-            var colors = WaveBarBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors);
+            var mode = WaveFormStreamPositionConfiguration.GetMode(this.Mode.Value);
+            var colors = WaveFormStreamPositionConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors);
             switch (mode)
             {
                 default:
