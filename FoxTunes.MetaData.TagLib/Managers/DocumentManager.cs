@@ -25,6 +25,12 @@ namespace FoxTunes
         {
             try
             {
+                if (file.InvariantStartPosition > TagLibMetaDataSource.MAX_TAG_SIZE)
+                {
+                    Logger.Write(typeof(ImageManager), LogLevel.Warn, "Not importing documents from file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, TagLibMetaDataSource.MAX_TAG_SIZE);
+                    return;
+                }
+
                 var pictures = file.Tag.Pictures;
                 foreach (var picture in pictures)
                 {
@@ -39,7 +45,7 @@ namespace FoxTunes
                         {
                             metaDatas.Add(new MetaDataItem(picture.Description, MetaDataItemType.Document)
                             {
-                                Value = string.Format("{0}:{1}", MIME_TYPE_JSON, ReadJsonDocument(picture.Data.Data))
+                                Value = string.Concat(MIME_TYPE_JSON, ":", ReadJsonDocument(picture.Data.Data))
                             });
                         }
                     }
@@ -67,7 +73,71 @@ namespace FoxTunes
 
         public static void Write(TagLibMetaDataSource source, MetaDataItem metaDataItem, File file)
         {
-            //Not yet implemented.
+            var index = default(int);
+            var pictures = new List<IPicture>(file.Tag.Pictures);
+            if (HasDocument(metaDataItem.Name, file.Tag, pictures, out index))
+            {
+                if (!string.IsNullOrEmpty(metaDataItem.Value))
+                {
+                    ReplaceDocument(metaDataItem, file, pictures, index);
+                }
+                else
+                {
+                    RemoveDocument(metaDataItem, file.Tag, pictures, index);
+                }
+            }
+            else if (!string.IsNullOrEmpty(metaDataItem.Value))
+            {
+                AddDocument(metaDataItem, file, pictures);
+            }
+            file.Tag.Pictures = pictures.ToArray();
+        }
+
+        private static bool HasDocument(string name, Tag tag, IList<IPicture> pictures, out int index)
+        {
+            for (var a = 0; a < pictures.Count; a++)
+            {
+                if (pictures[a] != null && string.Equals(pictures[a].Description, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    index = a;
+                    return true;
+                }
+            }
+            index = default(int);
+            return false;
+        }
+
+        private static void AddDocument(MetaDataItem metaDataItem, File file, IList<IPicture> pictures)
+        {
+            pictures.Add(CreateDocument(metaDataItem, file));
+        }
+
+        private static void ReplaceDocument(MetaDataItem metaDataItem, File file, IList<IPicture> pictures, int index)
+        {
+            pictures[index] = CreateDocument(metaDataItem, file);
+        }
+
+        private static void RemoveDocument(MetaDataItem metaDataItem, Tag tag, IList<IPicture> pictures, int index)
+        {
+            pictures.RemoveAt(index);
+        }
+
+        private static IPicture CreateDocument(MetaDataItem metaDataItem, File file)
+        {
+            var parts = metaDataItem.Value.Split(new[] { ':' }, 2);
+            if (parts.Length != 2)
+            {
+                Logger.Write(typeof(DocumentManager), LogLevel.Warn, "Failed to parse document: {0}", metaDataItem.Value);
+                return null;
+            }
+            var mimeType = parts[0];
+            var data = parts[1];
+            var picture = new Picture(Encoding.UTF8.GetBytes(data))
+            {
+                Type = PictureType.NotAPicture,
+                MimeType = mimeType
+            };
+            return picture;
         }
     }
 }

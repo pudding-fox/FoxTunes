@@ -263,6 +263,12 @@ namespace FoxTunes
                             }
                             await ImageManager.Write(this, metaDataItem, file).ConfigureAwait(false);
                             break;
+                        case MetaDataItemType.Document:
+                            if (this.Documents.Value)
+                            {
+                                DocumentManager.Write(this, metaDataItem, file);
+                            }
+                            break;
                     }
                 }
                 if (file is IMetaDataSource metaDataSource)
