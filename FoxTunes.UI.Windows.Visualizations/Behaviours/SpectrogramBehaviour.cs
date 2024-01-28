@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,6 +17,8 @@ namespace FoxTunes
 
         public SelectionConfigurationElement Scale { get; private set; }
 
+        public IntegerConfigurationElement Smoothing { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
@@ -26,6 +29,10 @@ namespace FoxTunes
             this.Scale = this.Configuration.GetElement<SelectionConfigurationElement>(
                 SpectrogramBehaviourConfiguration.SECTION,
                 SpectrogramBehaviourConfiguration.SCALE_ELEMENT
+            );
+            this.Smoothing = this.Configuration.GetElement<IntegerConfigurationElement>(
+                SpectrogramBehaviourConfiguration.SECTION,
+                SpectrogramBehaviourConfiguration.SMOOTHING_ELEMENT
             );
             base.InitializeComponent(core);
         }
@@ -52,6 +59,15 @@ namespace FoxTunes
                         path: this.Scale.Name,
                         attributes: this.Scale.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
                 }
+                for (var value = this.Smoothing.MinValue; value <= this.Smoothing.MaxValue; value++)
+                {
+                    yield return new InvocationComponent(
+                        CATEGORY,
+                        this.Smoothing.Id,
+                        value == 0 ? Strings.SpectrogramBehaviourConfiguration_Smoothing_Off : value.ToString(),
+                        path: this.Smoothing.Name,
+                        attributes: this.Smoothing.Value == value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
+                }
             }
         }
 
@@ -64,6 +80,18 @@ namespace FoxTunes
             else if (string.Equals(this.Scale.Name, component.Path))
             {
                 this.Scale.Value = this.Scale.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id));
+            }
+            else if (string.Equals(this.Smoothing.Name, component.Path))
+            {
+                var value = default(int);
+                if (int.TryParse(component.Name, out value))
+                {
+                    this.Smoothing.Value = value;
+                }
+                else
+                {
+                    this.Smoothing.Value = 0;
+                }
             }
             this.Configuration.Save();
 #if NET40

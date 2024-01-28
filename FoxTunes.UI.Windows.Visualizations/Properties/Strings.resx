@@ -216,6 +216,12 @@
   <data name="SpectrogramBehaviourConfiguration.Scale.Logarithmic" xml:space="preserve">
     <value>Logarithmic</value>
   </data>
+  <data name="SpectrogramBehaviourConfiguration.Smoothing" xml:space="preserve">
+    <value>Smoothing</value>
+  </data>
+  <data name="SpectrogramBehaviourConfiguration.Smoothing.Off" xml:space="preserve">
+    <value>Off</value>
+  </data>
   <data name="Spectrum.Name" xml:space="preserve">
     <value>Spectrum</value>
   </data>

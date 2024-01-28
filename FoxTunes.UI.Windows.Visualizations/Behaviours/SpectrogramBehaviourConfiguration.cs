@@ -25,13 +25,16 @@ namespace FoxTunes
 
         public const string SCALE_LOGARITHMIC_OPTION = "BBBB5C59-8888-4734-A191-954709375BD0";
 
-        public const string COLOR_PALETTE_ELEMENT = "CCCCBAFC-0C99-4329-9DA2-C041E674597E";
+        public const string SMOOTHING_ELEMENT = "CCCC0B5F-C79E-410F-B302-704BF628DD57";
+
+        public const string COLOR_PALETTE_ELEMENT = "DDDDBAFC-0C99-4329-9DA2-C041E674597E";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_Mode, path: Strings.SpectrogramBehaviourConfiguration_Path).WithOptions(GetModeOptions()))
                 .WithElement(new SelectionConfigurationElement(SCALE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_Scale, path: Strings.SpectrogramBehaviourConfiguration_Path).WithOptions(GetScaleOptions()))
+                .WithElement(new IntegerConfigurationElement(SMOOTHING_ELEMENT, Strings.SpectrogramBehaviourConfiguration_Smoothing, path: Strings.SpectrogramBehaviourConfiguration_Path).WithValue(1).WithValidationRule(new IntegerValidationRule(0, 5)))
                 .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_ColorPalette, path: Strings.SpectrogramBehaviourConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine)
             );
         }
