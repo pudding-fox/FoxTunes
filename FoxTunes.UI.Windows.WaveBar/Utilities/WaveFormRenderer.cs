@@ -188,7 +188,7 @@ namespace FoxTunes
 
             await Windows.Invoke(() =>
             {
-                bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }).ConfigureAwait(false);
         }
@@ -328,7 +328,7 @@ namespace FoxTunes
                     bottomValue = Math.Min(bottomValue, 1);
 
                     y = Convert.ToInt32(center - (topValue * center));
-                    height = Convert.ToInt32((center - y) + (bottomValue * center));
+                    height = Math.Max(Convert.ToInt32((center - y) + (bottomValue * center)), 1);
 
                     waveElements[rendererData.Position, 0].Y = y;
                     waveElements[rendererData.Position, 0].Height = height;
@@ -356,7 +356,7 @@ namespace FoxTunes
                     value = Math.Min(value, 1);
 
                     y = Convert.ToInt32(center - (value * center));
-                    height = Convert.ToInt32((center - y) + (value * center));
+                    height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
 
                     powerElements[rendererData.Position, 0].Y = y;
                     powerElements[rendererData.Position, 0].Height = height;
@@ -426,7 +426,7 @@ namespace FoxTunes
                         bottomValue = Math.Min(bottomValue, 1);
 
                         y = Convert.ToInt32(waveCenter - (topValue * (waveHeight / 2)));
-                        height = Convert.ToInt32((waveCenter - y) + (bottomValue * (waveHeight / 2)));
+                        height = Math.Max(Convert.ToInt32((waveCenter - y) + (bottomValue * (waveHeight / 2))), 1);
 
                         waveElements[rendererData.Position, channel].Y = y;
                         waveElements[rendererData.Position, channel].Height = height;
@@ -451,7 +451,7 @@ namespace FoxTunes
                         value = Math.Min(value, 1);
 
                         y = Convert.ToInt32(waveCenter - (value * (waveHeight / 2)));
-                        height = Convert.ToInt32((waveCenter - y) + (value * (waveHeight / 2)));
+                        height = Math.Max(Convert.ToInt32((waveCenter - y) + (value * (waveHeight / 2))), 1);
 
                         powerElements[rendererData.Position, channel].Y = y;
                         powerElements[rendererData.Position, channel].Height = height;

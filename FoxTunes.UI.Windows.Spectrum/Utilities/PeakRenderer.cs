@@ -185,7 +185,7 @@ namespace FoxTunes
 
             await Windows.Invoke(() =>
             {
-                bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }).ConfigureAwait(false);
 
@@ -236,6 +236,7 @@ namespace FoxTunes
                     {
                         UpdateElementsSmooth(data.ValueElements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, data.Orientation);
                     }
+                    data.LastUpdated = DateTime.UtcNow;
                 }
 
                 var task = this.Render();
@@ -360,7 +361,6 @@ namespace FoxTunes
         private static void UpdateValues(PeakRendererData data)
         {
             UpdateValues(data.Samples, data.Values, data.Rms, data.Channels, data.SampleCount);
-            data.LastUpdated = DateTime.UtcNow;
         }
 
         private static void UpdateValues(float[,] samples, float[] values, float[] rms, int channels, int count)

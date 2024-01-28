@@ -14,19 +14,24 @@ namespace FoxTunes
 
         public static void DrawRectangle(RenderInfo info, int x, int y, int width, int height)
         {
-#if DEBUG
             //Check arguments are valid.
-
             if (x < 0 || y < 0 || width <= 0 || height <= 0)
             {
+#if DEBUG
                 throw new ArgumentOutOfRangeException();
+#else
+                return;
+#endif
             }
 
             if (x + width > info.Width || y + height > info.Height)
             {
+#if DEBUG
                 throw new ArgumentOutOfRangeException();
-            }
+#else
+                return;
 #endif
+            }
 
             var topLeft = IntPtr.Add(info.Buffer, (x * info.BytesPerPixel) + (y * info.Stride));
 
@@ -73,19 +78,24 @@ namespace FoxTunes
             var dx = Math.Abs(x2 - x1);
             var dy = Math.Abs(y2 - y1);
 
-#if DEBUG
             //Check arguments are valid.
-
             if (x1 < 0 || y1 < 0 || x2 < 0 || y2 < 0)
             {
+#if DEBUG
                 throw new ArgumentOutOfRangeException();
+#else
+                return;
+#endif
             }
 
             if (Math.Max(x1, x2) >= info.Width || Math.Max(y1, y2) >= info.Height)
             {
+#if DEBUG
                 throw new ArgumentOutOfRangeException();
-            }
+#else
+                return;
 #endif
+            }
 
             var source = IntPtr.Add(info.Buffer, (x1 * info.BytesPerPixel) + (y1 * info.Stride));
 
@@ -205,5 +215,24 @@ namespace FoxTunes
         public int X;
 
         public int Y;
+    }
+
+    public struct Int32Rect
+    {
+        public Int32Rect(int x, int y, int width, int height)
+        {
+            this.X = x;
+            this.Y = y;
+            this.Width = width;
+            this.Height = height;
+        }
+
+        public int X;
+
+        public int Y;
+
+        public int Width;
+
+        public int Height;
     }
 }

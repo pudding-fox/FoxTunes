@@ -173,7 +173,7 @@ namespace FoxTunes
 
             await Windows.Invoke(() =>
             {
-                bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }).ConfigureAwait(false);
 
@@ -226,6 +226,7 @@ namespace FoxTunes
                         {
                             UpdateElementsSmooth(data.ValueElements, data.PeakElements, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
                         }
+                        data.LastUpdated = DateTime.UtcNow;
                     }
                 }
 
@@ -384,7 +385,6 @@ namespace FoxTunes
                     }
                 }
             }
-            data.LastUpdated = DateTime.UtcNow;
         }
 
         private static void UpdateValue(SpectrumRendererData data, int band, int start, int end)
