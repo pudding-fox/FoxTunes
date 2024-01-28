@@ -5,7 +5,7 @@ CREATE TABLE [MetaDataItems](
     [Value] nvarchar(260));
 
 CREATE TABLE [LibraryRoots] (
-    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL
+    [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	[DirectoryName] nvarchar(260) NOT NULL);
 
 CREATE TABLE [LibraryItems] (
