@@ -425,13 +425,13 @@ namespace FoxTunes
             {
                 BitmapHelper.DrawRectangles(ref info.Peak, data.PeakElements, data.PeakElements.Length);
             }
-            if (data.RmsElements != null)
-            {
-                BitmapHelper.DrawRectangles(ref info.Rms, data.RmsElements, data.RmsElements.Length);
-            }
             if (data.ValueElements != null)
             {
                 BitmapHelper.DrawRectangles(ref info.Value, data.ValueElements, data.ValueElements.Length);
+            }
+            if (data.RmsElements != null)
+            {
+                BitmapHelper.DrawRectangles(ref info.Rms, data.RmsElements, data.RmsElements.Length);
             }
         }
 
@@ -601,6 +601,26 @@ namespace FoxTunes
                     this.PeakElements = CreatePeaks(this.Channels);
                 }
                 base.OnAllocated();
+            }
+
+            ~PeakRendererData()
+            {
+                try
+                {
+                    if (this.Colors != null)
+                    {
+                        foreach (var pair in this.Colors)
+                        {
+                            var value = pair.Value;
+                            BitmapHelper.DestroyPalette(ref value);
+                        }
+                        this.Colors.Clear();
+                    }
+                }
+                catch
+                {
+                    //Nothing can be done, never throw on GC thread.
+                }
             }
 
             private static Int32Rect[] CreatePeaks(int count)

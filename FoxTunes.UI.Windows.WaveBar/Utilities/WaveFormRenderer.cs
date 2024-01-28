@@ -761,6 +761,26 @@ namespace FoxTunes
             public float Peak;
 
             public float NormalizedPeak;
+
+            ~WaveFormRendererData()
+            {
+                try
+                {
+                    if (this.Colors != null)
+                    {
+                        foreach (var pair in this.Colors)
+                        {
+                            var value = pair.Value;
+                            BitmapHelper.DestroyPalette(ref value);
+                        }
+                        this.Colors.Clear();
+                    }
+                }
+                catch
+                {
+                    //Nothing can be done, never throw on GC thread.
+                }
+            }
         }
     }
 

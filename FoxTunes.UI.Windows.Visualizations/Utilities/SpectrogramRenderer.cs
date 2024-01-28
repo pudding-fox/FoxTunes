@@ -567,6 +567,18 @@ namespace FoxTunes
                 }
                 base.OnAllocated();
             }
+
+            ~SpectrogramRendererData()
+            {
+                try
+                {
+                    BitmapHelper.DestroyPalette(ref this.Colors);
+                }
+                catch
+                {
+                    //Nothing can be done, never throw on GC thread.
+                }
+            }
         }
 
         public static SpectrogramRendererHistory Create(int history)
