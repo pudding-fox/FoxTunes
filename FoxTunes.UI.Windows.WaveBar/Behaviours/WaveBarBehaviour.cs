@@ -24,6 +24,14 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        public IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                yield return CATEGORY;
+            }
+        }
+
         public IEnumerable<IInvocationComponent> Invocations
         {
             get

@@ -51,6 +51,15 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        public IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                yield return BASIC_CATEGORY;
+                yield return ENHANCED_CATEGORY;
+            }
+        }
+
         public IEnumerable<IInvocationComponent> Invocations
         {
             get

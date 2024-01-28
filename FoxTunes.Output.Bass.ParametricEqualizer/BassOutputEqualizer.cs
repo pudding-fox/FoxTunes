@@ -126,6 +126,14 @@ namespace FoxTunes
             this.OnPresetsChanged();
         }
 
+        public IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                yield return InvocationComponent.CATEGORY_EQUALIZER;
+            }
+        }
+
         public IEnumerable<IInvocationComponent> Invocations
         {
             get

@@ -287,6 +287,14 @@ namespace FoxTunes
             this.Window = null;
         }
 
+        public IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                yield return InvocationComponent.CATEGORY_NOTIFY_ICON;
+            }
+        }
+
         public IEnumerable<IInvocationComponent> Invocations
         {
             get

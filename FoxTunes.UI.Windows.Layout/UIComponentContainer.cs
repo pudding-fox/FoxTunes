@@ -234,6 +234,14 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
+        public virtual IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                yield return InvocationComponent.CATEGORY_GLOBAL;
+            }
+        }
+
         public virtual IEnumerable<IInvocationComponent> Invocations
         {
             get

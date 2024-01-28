@@ -88,6 +88,14 @@ namespace FoxTunes
             }
         }
 
+        public override IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                yield return InvocationComponent.CATEGORY_REPORT;
+            }
+        }
+
         public override IEnumerable<IInvocationComponent> Invocations
         {
             get
@@ -132,6 +140,14 @@ namespace FoxTunes
                         this.Release.Title,
                         this.Release.Url
                     };
+                }
+            }
+
+            public override IEnumerable<string> InvocationCategories
+            {
+                get
+                {
+                    yield return InvocationComponent.CATEGORY_REPORT;
                 }
             }
 
