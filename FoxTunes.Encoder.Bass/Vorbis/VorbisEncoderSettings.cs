@@ -39,15 +39,7 @@ namespace FoxTunes
         {
             get
             {
-                return new BassEncoderFormat(
-                    DEPTH_16,
-                    OutputRate.PCM_44100,
-                    OutputRate.PCM_48000,
-                    OutputRate.PCM_88200,
-                    OutputRate.PCM_96000,
-                    OutputRate.PCM_176400,
-                    OutputRate.PCM_192000
-                );
+                return new BassEncoderFormat(BassEncoderBinaryFormat.SignedInteger, BassEncoderBinaryEndian.Little, DEPTH_16);
             }
         }
 
@@ -70,8 +62,8 @@ namespace FoxTunes
                 throw new NotImplementedException();
             }
             return string.Format(
-                "--quiet --raw --raw-rate={0} --raw-chan={1} --raw-bits={2} --raw-endianness=0 - --quality={3} -o \"{4}\"",
-                channelInfo.Frequency,
+                "--quiet --raw --raw-format=1 --raw-rate={0} --raw-chan={1} --raw-bits={2} --raw-endianness=0 - --quality={3} -o \"{4}\"",
+                this.GetRate(encoderItem, stream),
                 channelInfo.Channels,
                 this.GetDepth(encoderItem, stream),
                 this.Quality,

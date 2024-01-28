@@ -29,7 +29,7 @@ namespace FoxTunes
         {
             get
             {
-                return new BassEncoderFormat(DEPTH_16, OutputRate.PCM_44100);
+                return new BassEncoderFormat(BassEncoderBinaryFormat.SignedInteger, BassEncoderBinaryEndian.Little, DEPTH_16, OutputRate.PCM_44100);
             }
         }
 

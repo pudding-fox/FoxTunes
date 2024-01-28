@@ -13,45 +13,46 @@ namespace FoxTunes
             return new Resampler(inputFormat, outputFormat);
         }
 
-        public static ResamplerFormat GetInputFormat(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
+        public static Resampler.ResamplerFormat GetInputFormat(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
         {
             var channelInfo = default(ChannelInfo);
             if (!Bass.ChannelGetInfo(stream.ChannelHandle, out channelInfo))
             {
                 throw new NotImplementedException();
             }
+
+            var format = default(BassEncoderBinaryFormat);
             //I think all supported platforms are little endian.
-            var encoding = ResamplerEncoding.EndianLittle;
+            var endian = BassEncoderBinaryEndian.Little;
             var depth = default(int);
             if (channelInfo.Flags.HasFlag(BassFlags.Float))
             {
-                encoding |= ResamplerEncoding.FloatingPoint;
+                format = BassEncoderBinaryFormat.FloatingPoint;
                 depth = 32;
             }
             else
             {
-                encoding |= ResamplerEncoding.SignedInteger;
+                format = BassEncoderBinaryFormat.SignedInteger;
                 depth = 16;
             }
             var rate = channelInfo.Frequency;
             var channels = channelInfo.Channels;
-            return new ResamplerFormat(encoding, rate, depth, channels);
+            return new Resampler.ResamplerFormat(format, endian, depth, rate, channels);
         }
 
-        public static ResamplerFormat GetOutputFormat(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
+        public static Resampler.ResamplerFormat GetOutputFormat(EncoderItem encoderItem, IBassStream stream, IBassEncoderSettings settings)
         {
             var channelInfo = default(ChannelInfo);
             if (!Bass.ChannelGetInfo(stream.ChannelHandle, out channelInfo))
             {
                 throw new NotImplementedException();
             }
-            //I think all supported platforms are little endian;
-            //TODO: Encoders should expose more format info.
-            var encoding = ResamplerEncoding.EndianLittle | ResamplerEncoding.SignedInteger;
+            var format = settings.Format.BinaryFormat;
+            var endian = settings.Format.BinaryEndian;
             var depth = settings.GetDepth(encoderItem, stream);
             var rate = settings.GetRate(encoderItem, stream);
             var channels = channelInfo.Channels;
-            return new ResamplerFormat(encoding, rate, depth, channels);
+            return new Resampler.ResamplerFormat(format, endian, depth, rate, channels);
         }
     }
 }

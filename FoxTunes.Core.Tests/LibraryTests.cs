@@ -25,11 +25,11 @@ namespace FoxTunes
         {
             if ((this.Configuration & TAGLIB) != 0)
             {
-                ComponentResolver.Slots.Add(ComponentSlots.MetaData, "679D9459-BBCE-4D95-BB65-DD20C335719C");
+                ComponentResolver.Slots[ComponentSlots.MetaData] = "679D9459-BBCE-4D95-BB65-DD20C335719C";
             }
             else if ((this.Configuration & FILENAME) != 0)
             {
-                ComponentResolver.Slots.Add(ComponentSlots.MetaData, "BDAAF3E1-84CC-4D36-A7CB-278663E65844");
+                ComponentResolver.Slots[ComponentSlots.MetaData] = "BDAAF3E1-84CC-4D36-A7CB-278663E65844";
             }
             base.SetUp();
         }

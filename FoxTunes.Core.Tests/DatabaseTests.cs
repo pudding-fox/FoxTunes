@@ -22,11 +22,11 @@ namespace FoxTunes
         {
             if ((this.Configuration & SQLITE) != 0)
             {
-                ComponentResolver.Slots.Add(ComponentSlots.Database, "13A75018-8A24-413D-A731-C558C8FAF08F");
+                ComponentResolver.Slots[ComponentSlots.Database] = "13A75018-8A24-413D-A731-C558C8FAF08F";
             }
             else if ((this.Configuration & SQLSERVER) != 0)
             {
-                ComponentResolver.Slots.Add(ComponentSlots.Database, "ECF542D9-ABB3-4E82-8045-7E13F1727695");
+                ComponentResolver.Slots[ComponentSlots.Database] = "ECF542D9-ABB3-4E82-8045-7E13F1727695";
             }
             base.SetUp();
         }

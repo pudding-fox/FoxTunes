@@ -15,7 +15,7 @@ namespace FoxTunes
                 var directory = Path.GetDirectoryName(
                     typeof(Resampler).Assembly.Location
                 );
-                return Path.Combine(directory, "Encoders\\sox.exe");
+                return Path.Combine(directory, "Sox\\sox.exe");
             }
         }
 
@@ -30,9 +30,20 @@ namespace FoxTunes
         public Resampler(ResamplerFormat inputFormat, ResamplerFormat outputFormat)
         {
             this.Process = CreateProcess(inputFormat, outputFormat);
+            this.Process.ErrorDataReceived += this.OnErrorDataReceived;
+            this.Process.BeginErrorReadLine();
         }
 
         public Process Process { get; private set; }
+
+        protected virtual void OnErrorDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(e.Data))
+            {
+                return;
+            }
+            Logger.Write(typeof(Resampler), LogLevel.Trace, "{0}: {1}", FileName, e.Data);
+        }
 
         public bool IsDisposed { get; private set; }
 
@@ -54,7 +65,11 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            this.Process.Dispose();
+            if (this.Process != null)
+            {
+                this.Process.ErrorDataReceived -= this.OnErrorDataReceived;
+                this.Process.Dispose();
+            }
         }
 
         ~Resampler()
@@ -92,15 +107,6 @@ namespace FoxTunes
             {
                 //Nothing can be done, probably access denied.
             }
-            process.ErrorDataReceived += (sender, e) =>
-            {
-                if (string.IsNullOrEmpty(e.Data))
-                {
-                    return;
-                }
-                Logger.Write(typeof(Resampler), LogLevel.Trace, "{0}: {1}", FileName, e.Data);
-            };
-            process.BeginErrorReadLine();
             return process;
         }
 
@@ -115,11 +121,10 @@ namespace FoxTunes
 
         private static string GetArguments(ResamplerFormat format)
         {
-            var encoding = default(string);
-            var endian = default(string);
-            GetEncoding(format.Encoding, out encoding, out endian);
+            var encoding = GetBinaryFormat(format.Format);
+            var endian = GetBinaryEndian(format.Endian);
             return string.Format(
-                "-t raw --encoding {0} --endian {1} --bits {2} --rate {3} --channels {4} -",
+                "--type raw --encoding {0} --endian {1} --bits {2} --rate {3} --channels {4} -",
                 encoding,
                 endian,
                 format.Depth,
@@ -128,67 +133,53 @@ namespace FoxTunes
             );
         }
 
-        private static void GetEncoding(ResamplerEncoding format, out string encoding, out string endian)
+        private static string GetBinaryFormat(BassEncoderBinaryFormat binaryFormat)
         {
-            if (format.HasFlag(ResamplerEncoding.SignedInteger))
+            switch (binaryFormat)
             {
-                encoding = "signed-integer";
-            }
-            else if (format.HasFlag(ResamplerEncoding.UnsignedInteger))
-            {
-                encoding = "unsigned-integer";
-            }
-            else if (format.HasFlag(ResamplerEncoding.FloatingPoint))
-            {
-                encoding = "floating-point";
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-
-            if (format.HasFlag(ResamplerEncoding.EndianBig))
-            {
-                endian = "big";
-            }
-            else if (format.HasFlag(ResamplerEncoding.EndianBig))
-            {
-                endian = "little";
-            }
-            else
-            {
-                throw new NotImplementedException();
+                case BassEncoderBinaryFormat.SignedInteger:
+                    return "signed-integer";
+                case BassEncoderBinaryFormat.UnsignedInteger:
+                    return "unsigned-integer";
+                case BassEncoderBinaryFormat.FloatingPoint:
+                    return "floating-point";
+                default:
+                    throw new NotImplementedException();
             }
         }
-    }
-
-    public class ResamplerFormat
-    {
-        public ResamplerFormat(ResamplerEncoding encoding, int depth, int rate, int channels)
+        private static string GetBinaryEndian(BassEncoderBinaryEndian binaryEndian)
         {
-            this.Encoding = encoding;
-            this.Depth = depth;
-            this.Rate = rate;
-            this.Channels = channels;
+            switch (binaryEndian)
+            {
+                case BassEncoderBinaryEndian.Little:
+                    return "little";
+                case BassEncoderBinaryEndian.Big:
+                    return "big";
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
-        public ResamplerEncoding Encoding { get; private set; }
+        public class ResamplerFormat
+        {
+            public ResamplerFormat(BassEncoderBinaryFormat format, BassEncoderBinaryEndian endian, int depth, int rate, int channels)
+            {
+                this.Format = format;
+                this.Endian = endian;
+                this.Depth = depth;
+                this.Rate = rate;
+                this.Channels = channels;
+            }
 
-        public int Depth { get; private set; }
+            public BassEncoderBinaryFormat Format { get; private set; }
 
-        public int Rate { get; private set; }
+            public BassEncoderBinaryEndian Endian { get; private set; }
 
-        public int Channels { get; private set; }
-    }
+            public int Depth { get; private set; }
 
-    [Flags]
-    public enum ResamplerEncoding : byte
-    {
-        None = 0,
-        SignedInteger = 1,
-        UnsignedInteger = 2,
-        FloatingPoint = 4,
-        EndianBig = 8,
-        EndianLittle = 16
+            public int Rate { get; private set; }
+
+            public int Channels { get; private set; }
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace FoxTunes
         {
             if ((this.Configuration & FILENAME) != 0)
             {
-                ComponentResolver.Slots.Add(ComponentSlots.MetaData, "BDAAF3E1-84CC-4D36-A7CB-278663E65844");
+                ComponentResolver.Slots[ComponentSlots.MetaData] = "BDAAF3E1-84CC-4D36-A7CB-278663E65844";
             }
             base.SetUp();
         }

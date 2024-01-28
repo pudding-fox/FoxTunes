@@ -39,10 +39,7 @@ namespace FoxTunes
         {
             get
             {
-                return new BassEncoderFormat(
-                    this.Depth, 
-                    OutputRate.PCM //I'm not sure which sample rates FLAC actually supports.
-                );
+                return new BassEncoderFormat(BassEncoderBinaryFormat.SignedInteger, BassEncoderBinaryEndian.Little, this.Depth);
             }
         }
 
@@ -79,7 +76,7 @@ namespace FoxTunes
             var length = this.GetLength(encoderItem, stream);
             var arguments = string.Format(
                 "--no-seektable --force-raw-format --endian=little --sign=signed --sample-rate={0} --channels={1} --bps={2} - --compression-level-{3} -o \"{4}\"",
-                channelInfo.Frequency,
+                this.GetRate(encoderItem, stream),
                 channelInfo.Channels,
                 this.GetDepth(encoderItem, stream),
                 this.Compression,
