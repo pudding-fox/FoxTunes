@@ -55,11 +55,16 @@ namespace FoxTunes
         {
             this.Name = "Getting file list";
             this.IsIndeterminate = true;
-            this.Offset = this.Database.ExecuteScalar<int>(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, parameters =>
+            this.Offset = this.Database.ExecuteScalar<int>(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, (parameters, phase) =>
             {
-                parameters["libraryHierarchyItemId"] = this.LibraryHierarchyNode.Id;
-                parameters["sequence"] = this.Sequence;
-                parameters["status"] = PlaylistItemStatus.Import;
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["libraryHierarchyItemId"] = this.LibraryHierarchyNode.Id;
+                        parameters["sequence"] = this.Sequence;
+                        parameters["status"] = PlaylistItemStatus.Import;
+                        break;
+                }
             }, transaction);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using FoxDb;
+using FoxDb.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,10 +43,15 @@ namespace FoxTunes
                         var id = record.Get<int>(this.Database.Tables.PlaylistItem.PrimaryKey);
                         if (this.PlaylistItems.Any(playlistItem => playlistItem.Id == id))
                         {
-                            this.Database.Execute(update, parameters =>
+                            this.Database.Execute(update, (parameters, phase) =>
                             {
-                                parameters["id"] = id;
-                                parameters["sequence"] = this.Sequence++;
+                                switch (phase)
+                                {
+                                    case DatabaseParameterPhase.Fetch:
+                                        parameters["id"] = id;
+                                        parameters["sequence"] = this.Sequence++;
+                                        break;
+                                }
                             }, transaction);
                         }
                         else
@@ -54,10 +60,15 @@ namespace FoxTunes
                             {
                                 sequence += this.Offset;
                             }
-                            this.Database.Execute(update, parameters =>
+                            this.Database.Execute(update, (parameters, phase) =>
                             {
-                                parameters["id"] = id;
-                                parameters["sequence"] = sequence++;
+                                switch (phase)
+                                {
+                                    case DatabaseParameterPhase.Fetch:
+                                        parameters["id"] = id;
+                                        parameters["sequence"] = sequence++;
+                                        break;
+                                }
                             }, transaction);
                         }
                     }

@@ -97,9 +97,15 @@ echo "Current version is $TAG.."
 
 MSBUILD="/c/Program Files (x86)/MSBuild/12.0/Bin/MSBuild.exe"
 
-rm -rf "./distribution"
+if [ -f "$MSBUILD" ]
+then
 
-"$MSBUILD" FoxTunes.sln //t:Build //p:Configuration=Release
+	rm -rf "./distribution"
+
+	"$MSBUILD" FoxTunes.sln //t:Build //p:Configuration=Release
+else 
+	echo "Skipping build, not such $MSBUILD."
+fi
 
 rm -rf "./release"
 

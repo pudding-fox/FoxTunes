@@ -1,5 +1,7 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
+using System.Collections.ObjectModel;
 
 namespace FoxTunes
 {
@@ -10,6 +12,20 @@ namespace FoxTunes
         public string FileName { get; set; }
 
         public LibraryItemStatus Status { get; set; }
+
+        [Relation(Flags = RelationFlags.AutoExpression | RelationFlags.EagerFetch | RelationFlags.ManyToMany)]
+        public ObservableCollection<MetaDataItem> MetaDatas { get; set; }
+
+        protected virtual void OnMetaDatasChanged()
+        {
+            if (this.MetaDatasChanged != null)
+            {
+                this.MetaDatasChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("MetaDatas");
+        }
+
+        public event EventHandler MetaDatasChanged = delegate { };
 
         public override bool Equals(IPersistableComponent other)
         {

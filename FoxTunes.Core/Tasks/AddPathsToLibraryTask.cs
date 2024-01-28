@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -64,9 +65,9 @@ namespace FoxTunes
             query.Add.AddColumn(this.Database.Tables.LibraryItem.Column("FileName"));
             query.Add.AddColumn(this.Database.Tables.LibraryItem.Column("Status"));
             query.Add.SetTable(this.Database.Tables.LibraryItem);
-            query.Output.AddParameter("DirectoryName", DbType.String, ParameterDirection.Input);
-            query.Output.AddParameter("FileName", DbType.String, ParameterDirection.Input);
-            query.Output.AddParameter("Status", DbType.Byte, ParameterDirection.Input);
+            query.Output.AddParameter("DirectoryName", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None);
+            query.Output.AddParameter("FileName", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None);
+            query.Output.AddParameter("Status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None);
             query.Filter.Expressions.Add(
                 query.Filter.CreateUnary(
                     QueryOperator.Not,
@@ -94,7 +95,15 @@ namespace FoxTunes
                     command.Parameters["directoryName"] = Path.GetDirectoryName(fileName);
                     command.Parameters["fileName"] = fileName;
                     command.Parameters["status"] = LibraryItemStatus.Import;
-                    command.ExecuteNonQuery();
+                    var count = command.ExecuteNonQuery();
+                    if (count != 0)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Added file to library: {0}", fileName);
+                    }
+                    else
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Skipped adding file to library: {0}", fileName);
+                    }
                 });
                 foreach (var path in this.Paths)
                 {
@@ -102,13 +111,11 @@ namespace FoxTunes
                     {
                         foreach (var fileName in Directory.GetFiles(path, "*.*", SearchOption.AllDirectories))
                         {
-                            Logger.Write(this, LogLevel.Debug, "Adding file to library: {0}", fileName);
                             addLibraryItem(fileName);
                         }
                     }
                     else if (File.Exists(path))
                     {
-                        Logger.Write(this, LogLevel.Debug, "Adding file to library: {0}", path);
                         addLibraryItem(path);
                     }
                 }
@@ -119,17 +126,15 @@ namespace FoxTunes
         {
             using (var metaDataPopulator = new MetaDataPopulator(this.Database, transaction, this.Database.Queries.AddLibraryMetaDataItems, true))
             {
-                var query = this.Database.QueryFactory.Build();
-                query.Output.AddOperator(QueryOperator.Star);
-                query.Source.AddTable(this.Database.Tables.LibraryItem);
-                query.Filter.AddColumn(this.Database.Tables.LibraryItem.Column("Status"));
-                var enumerable = this.Database.ExecuteEnumerator<LibraryItem>(query, parameters => parameters["status"] = LibraryItemStatus.Import, transaction);
+                var query = this.Database
+                    .AsQueryable<LibraryItem>(this.Database.Source(new DatabaseQueryComposer<LibraryItem>(this.Database)))
+                    .Where(libraryItem => libraryItem.Status == LibraryItemStatus.Import && !libraryItem.MetaDatas.Any());
                 metaDataPopulator.InitializeComponent(this.Core);
                 metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
                 metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
                 metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
                 metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
-                metaDataPopulator.Populate(enumerable);
+                metaDataPopulator.Populate(query);
             }
         }
 
@@ -139,7 +144,15 @@ namespace FoxTunes
             var query = this.Database.QueryFactory.Build();
             query.Update.SetTable(this.Database.Tables.LibraryItem);
             query.Update.AddColumn(this.Database.Tables.LibraryItem.Column("Status"));
-            this.Database.Execute(query, parameters => parameters["status"] = LibraryItemStatus.None, transaction);
+            this.Database.Execute(query, (parameters, phase) =>
+            {
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["status"] = LibraryItemStatus.None;
+                        break;
+                }
+            }, transaction);
         }
     }
 }

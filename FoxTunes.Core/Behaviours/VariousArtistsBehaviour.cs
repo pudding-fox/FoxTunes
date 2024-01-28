@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb.Interfaces;
+using FoxTunes.Interfaces;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -30,11 +31,16 @@ namespace FoxTunes
 
         protected virtual Task OnRun()
         {
-            this.Database.Execute(this.Database.Queries.VariousArtists, parameters =>
+            this.Database.Execute(this.Database.Queries.VariousArtists, (parameters, phase) =>
             {
-                parameters["name"] = CustomMetaData.VariousArtists;
-                parameters["type"] = MetaDataItemType.Tag;
-                parameters["numericValue"] = 1;
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["name"] = CustomMetaData.VariousArtists;
+                        parameters["type"] = MetaDataItemType.Tag;
+                        parameters["numericValue"] = 1;
+                        break;
+                }
             });
             return Task.CompletedTask;
         }

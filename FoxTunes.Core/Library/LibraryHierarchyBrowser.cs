@@ -68,13 +68,18 @@ namespace FoxTunes
             {
                 query = this.Database.Queries.GetLibraryHierarchyNodesWithFilter;
             }
-            var nodes = this.Database.ExecuteEnumerator<LibraryHierarchyNode>(query, parameters =>
+            var nodes = this.Database.ExecuteEnumerator<LibraryHierarchyNode>(query, (parameters, phase) =>
             {
-                parameters["libraryHierarchyId"] = libraryHierarchyId;
-                parameters["libraryHierarchyItemId"] = libraryHierarchyItemId;
-                if (parameters.Contains("filter"))
+                switch (phase)
                 {
-                    parameters["filter"] = this.GetFilter();
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["libraryHierarchyId"] = libraryHierarchyId;
+                        parameters["libraryHierarchyItemId"] = libraryHierarchyItemId;
+                        if (parameters.Contains("filter"))
+                        {
+                            parameters["filter"] = this.GetFilter();
+                        }
+                        break;
                 }
             }).ToArray();
             foreach (var node in nodes)
