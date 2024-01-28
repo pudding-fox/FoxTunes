@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Configuration;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,7 +11,8 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for Spectrum.xaml
     /// </summary>
-    public partial class Spectrum : UserControl
+    [UIComponent("381328C3-C2CE-4FDA-AC92-71A15C3FC387", UIComponentSlots.NONE, "Spectrum")]
+    public partial class Spectrum : UIComponentBase
     {
         public static readonly IOutput Output = ComponentRegistry.Instance.GetComponent<IOutput>();
 
@@ -117,11 +119,11 @@ namespace FoxTunes
                 if (BarCount != null)
                 {
                     BarCount.ConnectValue(value =>
-                        this.Configure(
-                            SpectrumBehaviourConfiguration.GetBars(value),
-                            SpectrumBehaviourConfiguration.GetWidth(value)
-                        )
-                    );
+                    {
+                        this.ElementCount = SpectrumBehaviourConfiguration.GetBars(value);
+                        var task = Windows.Invoke(() => this.MinWidth = SpectrumBehaviourConfiguration.GetWidth(value));
+                        Configure();
+                    });
                 }
                 if (UpdateInterval != null)
                 {
@@ -181,6 +183,7 @@ namespace FoxTunes
                 base.OnRenderSizeChanged(sizeInfo);
                 this.Dimentions[0] = Convert.ToInt32(this.ActualWidth);
                 this.Dimentions[1] = Convert.ToInt32(this.ActualHeight);
+                Configure();
             }
 
             protected override void OnRender(DrawingContext drawingContext)
@@ -250,16 +253,14 @@ namespace FoxTunes
                 }
             }
 
-            protected virtual void Configure(int count, int width)
+            protected virtual void Configure()
             {
-                Windows.Invoke(() => this.Width = width);
-                this.ElementCount = count;
-                this.Elements = new int[count, 4];
-                this.Peaks = new int[count, 4];
-                this.Holds = new int[count];
-                this.SamplesPerElement = SampleCount / count;
+                this.Elements = new int[this.ElementCount, 4];
+                this.Peaks = new int[this.ElementCount, 4];
+                this.Holds = new int[this.ElementCount];
+                this.SamplesPerElement = SampleCount / this.ElementCount;
                 this.Weight = (float)16 / this.ElementCount;
-                this.Step = width / ElementCount;
+                this.Step = this.Dimentions[0] / ElementCount;
             }
 
             private static void Update(int count, int samples, float weight, int step, int height, int[,] elements, int[,] peaks, int[] holds)
@@ -299,19 +300,25 @@ namespace FoxTunes
 
             private static void Update(int count, int height, int[,] elements, int[,] peaks, int[] holds)
             {
+                const int HOLD = 3;
+                var fast = height / 6;
                 for (int a = 0; a < count; a++)
                 {
                     if (elements[a, 1] > peaks[a, 1] && peaks[a, 1] < height - 1)
                     {
                         if (holds[a] > 0)
                         {
-                            if (holds[a] < HOLD_INTERVAL - 3)
+                            if (holds[a] < HOLD_INTERVAL - HOLD)
                             {
-                                var distance = (float)holds[a] / HOLD_INTERVAL;
-                                var increment = 1 - Math.Pow(1 - distance, 3);
-                                peaks[a, 1] += (int)(4 / increment);
+                                var distance = 1 - (float)holds[a] / (HOLD_INTERVAL - HOLD);
+                                var increment = distance * distance * distance;
+                                peaks[a, 1] += (int)Math.Round(fast * increment);
                             }
                             holds[a]--;
+                        }
+                        else if (peaks[a, 1] < height - fast)
+                        {
+                            peaks[a, 1] += fast;
                         }
                         else if (peaks[a, 1] < height - 1)
                         {

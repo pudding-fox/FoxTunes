@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="FoxTunes.Spectrum"
+﻿<Windows:UIComponentBase x:Class="FoxTunes.Spectrum"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -14,4 +14,4 @@
         <Windows:Menu Category="{Binding Source={x:Static Windows:SpectrumBehaviour.CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
     <Border Name="Border" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1" Padding="1"></Border>
-</UserControl>
+</Windows:UIComponentBase>
