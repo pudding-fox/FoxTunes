@@ -31,12 +31,10 @@ namespace FoxTunes.Behaviours
         {
             using (var context = this.DataManager.CreateWriteContext())
             {
-                var query = context.Sets.LibraryItem.Query(Resources.VariousArtists);
-                foreach (var libraryItem in query)
+                using (var command = context.Connection.CreateCommand(Resources.VariousArtists))
                 {
-                    libraryItem.MetaDatas.Add(new MetaDataItem(CustomMetaData.VariousArtists) { NumericValue = 1 });
+                    command.ExecuteNonQuery();
                 }
-                context.WithAutoDetectChanges(() => context.SaveChanges());
             }
         }
     }

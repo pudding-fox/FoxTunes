@@ -20,6 +20,21 @@ namespace FoxTunes
             this.Queries = new RootDataQueries(this);
         }
 
+        public override IDbConnection Connection
+        {
+            get
+            {
+                var connection = this.DbContext.Database.Connection;
+                switch (connection.State)
+                {
+                    case ConnectionState.Closed:
+                        connection.Open();
+                        break;
+                }
+                return connection;
+            }
+        }
+
         protected DbContext DbContext { get; private set; }
 
         protected ObjectContext ObjectContext
@@ -27,24 +42,6 @@ namespace FoxTunes
             get
             {
                 return (this.DbContext as IObjectContextAdapter).ObjectContext;
-            }
-        }
-
-        protected IDbConnection Connection
-        {
-            get
-            {
-                return this.DbContext.Database.Connection;
-            }
-        }
-
-        protected virtual void EnsureConnected()
-        {
-            switch (this.Connection.State)
-            {
-                case ConnectionState.Closed:
-                    this.Connection.Open();
-                    break;
             }
         }
 
@@ -94,20 +91,6 @@ namespace FoxTunes
                 this.DbContext.Set<TMember>(),
                 entry.Collection(member).Query()
             );
-        }
-
-        public override int Execute(string commandText, IDictionary<string, object> parameters = null)
-        {
-            this.EnsureConnected();
-            using (var command = this.Connection.CreateCommand(commandText, parameters))
-            {
-                return command.ExecuteNonQuery();
-            }
-        }
-
-        public override T Execute<T>(string commandText, IDictionary<string, object> parameters = null)
-        {
-            throw new NotImplementedException();
         }
 
         public override void WithAutoDetectChanges(Action action)

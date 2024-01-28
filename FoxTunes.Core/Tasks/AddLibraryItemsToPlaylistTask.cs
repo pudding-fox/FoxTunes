@@ -1,8 +1,8 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.Tasks;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -18,71 +18,74 @@ namespace FoxTunes
             this.LibraryItems = libraryItems;
         }
 
-        public override bool Visible
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         public int Sequence { get; private set; }
+
+        public int Offset { get; private set; }
 
         public IEnumerable<LibraryItem> LibraryItems { get; private set; }
 
-        public IDataManager DataManager { get; private set; }
+        public ICore Core { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
-        public IPlaylistItemFactory PlaylistItemFactory { get; private set; }
-
-        public ISignalEmitter SignalEmitter { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
-            this.DataManager = core.Managers.Data;
+            this.Core = core;
             this.PlaybackManager = core.Managers.Playback;
-            this.PlaylistItemFactory = core.Factories.PlaylistItem;
-            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
-        protected override async Task OnRun()
+        protected override Task OnRun()
         {
-            using (var context = this.DataManager.CreateWriteContext())
+            using (var databaseContext = this.DataManager.CreateWriteContext())
             {
-                this.ShiftItems(context, this.Sequence, this.LibraryItems.Count());
-                this.AddItems(context);
-                await this.SaveChanges(context);
+                using (var transaction = databaseContext.Connection.BeginTransaction())
+                {
+                    this.AddPlaylistItems(databaseContext);
+                    this.ShiftItems(databaseContext, this.Sequence, this.Offset);
+                    this.AddOrUpdateMetaData(databaseContext);
+                    this.SetPlaylistItemsStatus(databaseContext);
+                    transaction.Commit();
+                }
             }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+            return Task.CompletedTask;
         }
 
-        private void AddItems(IDatabaseContext context)
+        private void AddPlaylistItems(IDatabaseContext databaseContext)
         {
-            this.Name = "Processing library items";
-            this.Position = 0;
-            this.Count = this.LibraryItems.Count();
-            var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
-            var position = 0;
-            Logger.Write(this, LogLevel.Debug, "Converting library items to playlist items.");
-            var query =
-                from libraryItem in this.LibraryItems
-                where this.PlaybackManager.IsSupported(libraryItem.FileName)
-                select this.PlaylistItemFactory.Create(this.Sequence++, libraryItem);
-            foreach (var playlistItem in query)
+            var parameters = default(IDbParameterCollection);
+            using (var command = databaseContext.Connection.CreateCommand(Resources.AddPlaylistItem, new[] { "sequence", "directoryName", "fileName", "status" }, out parameters))
             {
-                Logger.Write(this, LogLevel.Debug, "Adding item to playlist: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-                context.Sets.PlaylistItem.Add(playlistItem);
-                this.ForegroundTaskRunner.Run(() => this.DataManager.ReadContext.Sets.PlaylistItem.Add(playlistItem));
-                if (position % interval == 0)
+                var sequence = 0;
+                var addPlaylistItem = new Action<string>(fileName =>
                 {
-                    this.Description = Path.GetFileName(playlistItem.FileName);
-                    this.Position = position;
+                    if (!this.PlaybackManager.IsSupported(fileName))
+                    {
+                        return;
+                    }
+                    parameters["sequence"] = this.Sequence + sequence++;
+                    parameters["directoryName"] = Path.GetDirectoryName(fileName);
+                    parameters["fileName"] = fileName;
+                    parameters["status"] = PlaylistItemStatus.Import;
+                    command.ExecuteNonQuery();
+                });
+                foreach (var libraryItem in this.LibraryItems)
+                {
+                    addPlaylistItem(libraryItem.FileName);
                 }
-                position++;
+                this.Offset = sequence;
             }
-            this.Position = this.Count;
+        }
+
+        private void AddOrUpdateMetaData(IDatabaseContext databaseContext)
+        {
+            var parameters = default(IDbParameterCollection);
+            using (var command = databaseContext.Connection.CreateCommand(Resources.CopyMetaDataItems, new[] { "status" }, out parameters))
+            {
+                parameters["status"] = PlaylistItemStatus.Import;
+                command.ExecuteNonQuery();
+            }
         }
     }
 }

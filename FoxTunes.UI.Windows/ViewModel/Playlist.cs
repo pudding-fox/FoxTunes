@@ -249,7 +249,7 @@ namespace FoxTunes.ViewModel
         private string ExecuteScript(PlaylistItem playlistItem, string script)
         {
             this.EnsureScriptingContext();
-            var runner = new PlaylistItemScriptRunner(this.ScriptingContext, playlistItem, script);
+            var runner = new PlaylistItemScriptRunner(this.PlaybackManager, this.ScriptingContext, playlistItem, script);
             runner.Prepare();
             return global::System.Convert.ToString(runner.Run());
         }

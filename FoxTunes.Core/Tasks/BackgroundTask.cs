@@ -133,6 +133,7 @@ namespace FoxTunes
                     this.PositionChanged(this, EventArgs.Empty);
                 }
                 this.OnPropertyChanged("Position");
+                this.OnIsIndeterminateChanged();
             });
         }
 
@@ -162,12 +163,13 @@ namespace FoxTunes
                     this.CountChanged(this, EventArgs.Empty);
                 }
                 this.OnPropertyChanged("Count");
+                this.OnIsIndeterminateChanged();
             });
         }
 
         public event EventHandler CountChanged = delegate { };
 
-        protected bool IsIndeterminate
+        public bool IsIndeterminate
         {
             get
             {
@@ -184,8 +186,23 @@ namespace FoxTunes
                 {
                     //Nothing to do.
                 }
+                this.OnIsIndeterminateChanged();
             }
         }
+
+        protected virtual void OnIsIndeterminateChanged()
+        {
+            this.ForegroundTaskRunner.Run(() =>
+            {
+                if (this.IsIndeterminateChanged != null)
+                {
+                    this.IsIndeterminateChanged(this, EventArgs.Empty);
+                }
+                this.OnPropertyChanged("IsIndeterminate");
+            });
+        }
+
+        public event EventHandler IsIndeterminateChanged = delegate { };
 
         public Task Run()
         {

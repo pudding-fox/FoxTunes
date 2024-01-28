@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace FoxTunes
@@ -54,6 +55,51 @@ namespace FoxTunes
                 return subject.Contains(value);
             }
             return subject.IndexOf(value, StringComparison.OrdinalIgnoreCase) != -1;
+        }
+
+        public static IDbCommand CreateCommand(this IDbConnection connection, string commandText)
+        {
+            var parameters = default(IDbParameterCollection);
+            return connection.CreateCommand(commandText, Enumerable.Empty<string>(), out parameters);
+        }
+
+        public static IDbCommand CreateCommand(this IDbConnection connection, string commandText, IEnumerable<string> parameterNames, out IDbParameterCollection parameters)
+        {
+            var command = connection.CreateCommand();
+            command.CommandText = commandText;
+            if (parameterNames != null)
+            {
+                foreach (var parameterName in parameterNames)
+                {
+                    var parameter = command.CreateParameter();
+                    parameter.ParameterName = parameterName;
+                    command.Parameters.Add(parameter);
+                }
+            }
+            parameters = new DbParameterCollection(command.Parameters);
+            return command;
+        }
+
+        private class DbParameterCollection : IDbParameterCollection
+        {
+            public DbParameterCollection(IDataParameterCollection parameters)
+            {
+                this.Parameters = parameters;
+            }
+
+            public IDataParameterCollection Parameters { get; private set; }
+
+            public object this[string parameterName]
+            {
+                get
+                {
+                    return (this.Parameters[parameterName] as IDataParameter).Value;
+                }
+                set
+                {
+                    (this.Parameters[parameterName] as IDataParameter).Value = value;
+                }
+            }
         }
     }
 }

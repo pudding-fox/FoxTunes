@@ -9,13 +9,15 @@ namespace FoxTunes.Interfaces
 {
     public interface IDatabaseQuery : IOrderedQueryable, IQueryable, IEnumerable, INotifyCollectionChanged
     {
-        void Detach();
 
-        void Include(string path);
     }
 
     public interface IDatabaseQuery<T> : IDatabaseQuery, IOrderedQueryable<T>, IQueryable<T>, IEnumerable<T> where T : class
     {
-        void Include<TProperty>(Expression<Func<T, TProperty>> path);
+        IDatabaseQuery<T> Detach();
+
+        IDatabaseQuery<T> Include(string path);
+
+        IDatabaseQuery<T> Include<TProperty>(Expression<Func<T, TProperty>> path);
     }
 }

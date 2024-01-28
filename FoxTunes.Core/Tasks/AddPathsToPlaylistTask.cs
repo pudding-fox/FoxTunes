@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.Tasks;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,99 +29,91 @@ namespace FoxTunes
 
         public int Sequence { get; private set; }
 
+        public int Offset { get; private set; }
+
         public IEnumerable<string> Paths { get; private set; }
 
-        public IEnumerable<string> FileNames { get; private set; }
+        public ICore Core { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
-        public IPlaylistItemFactory PlaylistItemFactory { get; private set; }
-
-        public ISignalEmitter SignalEmitter { get; private set; }
+        public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.PlaybackManager = core.Managers.Playback;
-            this.PlaylistItemFactory = core.Factories.PlaylistItem;
-            this.SignalEmitter = core.Components.SignalEmitter;
+            this.MetaDataSourceFactory = core.Factories.MetaDataSource;
             base.InitializeComponent(core);
         }
 
-        protected override async Task OnRun()
+        protected override Task OnRun()
         {
-            this.EnumerateFiles();
-            using (var context = this.DataManager.CreateWriteContext())
+            using (var databaseContext = this.DataManager.CreateWriteContext())
             {
-                this.ShiftItems(context, this.Sequence, this.FileNames.Count());
-                this.AddFiles(context);
-                await this.SaveChanges(context);
+                using (var transaction = databaseContext.Connection.BeginTransaction())
+                {
+                    this.AddPlaylistItems(databaseContext);
+                    this.ShiftItems(databaseContext, this.Sequence, this.Offset);
+                    this.AddOrUpdateMetaData(databaseContext);
+                    this.SetPlaylistItemsStatus(databaseContext);
+                    transaction.Commit();
+                }
             }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+            return Task.CompletedTask;
         }
 
-        private void EnumerateFiles()
+        private void AddPlaylistItems(IDatabaseContext databaseContext)
         {
             this.Name = "Getting file list";
-            this.Position = 0;
-            this.Count = this.Paths.Count();
-            var fileNames = new List<string>();
-            foreach (var path in this.Paths)
+            this.IsIndeterminate = true;
+            var parameters = default(IDbParameterCollection);
+            using (var command = databaseContext.Connection.CreateCommand(Resources.AddPlaylistItem, new[] { "sequence", "directoryName", "fileName", "status" }, out parameters))
             {
-                Logger.Write(this, LogLevel.Debug, "Enumerating files in path: {0}", path);
-                if (Directory.Exists(path))
+                var sequence = 1;
+                var addPlaylistItem = new Action<string>(fileName =>
                 {
-                    this.Description = new DirectoryInfo(path).Name;
-                    fileNames.AddRange(Directory.GetFiles(path, "*.*", SearchOption.AllDirectories));
-                }
-                else if (File.Exists(path))
+                    if (!this.PlaybackManager.IsSupported(fileName))
+                    {
+                        return;
+                    }
+                    parameters["sequence"] = this.Sequence + sequence++;
+                    parameters["directoryName"] = Path.GetDirectoryName(fileName);
+                    parameters["fileName"] = fileName;
+                    parameters["status"] = PlaylistItemStatus.Import;
+                    command.ExecuteNonQuery();
+                });
+                foreach (var path in this.Paths)
                 {
-                    this.Description = new FileInfo(path).Name;
-                    fileNames.Add(path);
+                    if (Directory.Exists(path))
+                    {
+                        foreach (var fileName in Directory.GetFiles(path, "*.*", SearchOption.AllDirectories))
+                        {
+                            addPlaylistItem(fileName);
+                        }
+                    }
+                    else if (File.Exists(path))
+                    {
+                        addPlaylistItem(path);
+                    }
                 }
-                this.Position = this.Position + 1;
+                this.Offset = sequence;
             }
-            Logger.Write(this, LogLevel.Debug, "Enumerated {0} files.", fileNames.Count);
-            this.FileNames = fileNames;
-            this.Position = this.Count;
         }
 
-        private void AddFiles(IDatabaseContext context)
+        private void AddOrUpdateMetaData(IDatabaseContext databaseContext)
         {
-            this.Name = "Processing files";
-            this.Position = 0;
-            this.Count = this.FileNames.Count();
-            var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
-            var position = 0;
-            Logger.Write(this, LogLevel.Debug, "Converting file names to playlist items.");
-            var query =
-                from fileName in this.FileNames
-                where this.PlaybackManager.IsSupported(fileName)
-                select this.PlaylistItemFactory.Create(this.Sequence++, fileName);
-            foreach (var playlistItem in this.OrderBy(query))
+            using (var metaDataPopulator = new MetaDataPopulator(databaseContext, "Playlist"))
             {
-                Logger.Write(this, LogLevel.Debug, "Adding item to playlist: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-                context.Sets.PlaylistItem.Add(playlistItem);
-                this.ForegroundTaskRunner.Run(() => this.DataManager.ReadContext.Sets.PlaylistItem.Add(playlistItem));
-                if (position % interval == 0)
-                {
-                    this.Description = Path.GetFileName(playlistItem.FileName);
-                    this.Position = position;
-                }
-                position++;
+                var query = databaseContext.GetQuery<PlaylistItem>().Detach().Where(playlistItem => playlistItem.Status == PlaylistItemStatus.Import);
+                metaDataPopulator.InitializeComponent(this.Core);
+                metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
+                metaDataPopulator.DescriptionChanged += (sender, e) => this.Description = metaDataPopulator.Description;
+                metaDataPopulator.PositionChanged += (sender, e) => this.Position = metaDataPopulator.Position;
+                metaDataPopulator.CountChanged += (sender, e) => this.Count = metaDataPopulator.Count;
+                metaDataPopulator.Populate(query);
             }
-            this.Position = this.Count;
-        }
-
-        private IEnumerable<PlaylistItem> OrderBy(IEnumerable<PlaylistItem> playlistItems)
-        {
-            var query =
-                from playlistItem in playlistItems
-                orderby
-                    Path.GetDirectoryName(playlistItem.FileName),
-                    playlistItem.MetaDatas.Value<int>(CommonMetaData.Track),
-                    playlistItem.FileName
-                select playlistItem;
-            return query;
         }
     }
 }

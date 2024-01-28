@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -8,6 +9,8 @@ namespace FoxTunes
 {
     public abstract class DatabaseContext : BaseComponent, IDatabaseContext
     {
+        public abstract IDbConnection Connection { get; }
+
         public IRootDataSets Sets { get; protected set; }
 
         public IRootDataQueries Queries { get; protected set; }
@@ -25,11 +28,6 @@ namespace FoxTunes
         public abstract IDatabaseQuery<TMember> GetMemberQuery<T, TMember>(T item, Expression<Func<T, ICollection<TMember>>> member)
             where T : class
             where TMember : class;
-
-
-        public abstract int Execute(string commandText, IDictionary<string, object> parameters = null);
-
-        public abstract T Execute<T>(string commandText, IDictionary<string, object> parameters = null);
 
         public abstract void WithAutoDetectChanges(Action action);
 

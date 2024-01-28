@@ -68,17 +68,17 @@ namespace FoxTunes
             }
         }
 
-        public void Detach()
+        public IDatabaseQuery<T> Detach()
         {
             throw new NotImplementedException();
         }
 
-        public void Include(string path)
+        public IDatabaseQuery<T> Include(string path)
         {
             throw new NotImplementedException();
         }
 
-        public void Include<TProperty>(Expression<Func<T, TProperty>> path)
+        public IDatabaseQuery<T> Include<TProperty>(Expression<Func<T, TProperty>> path)
         {
             throw new NotImplementedException();
         }

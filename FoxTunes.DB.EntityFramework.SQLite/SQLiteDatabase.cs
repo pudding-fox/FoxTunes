@@ -66,6 +66,8 @@ namespace FoxTunes
             {
                 var builder = new SQLiteConnectionStringBuilder();
                 builder.DataSource = DatabaseFileName;
+                builder.SyncMode = SynchronizationModes.Off;
+                builder.JournalMode = SQLiteJournalModeEnum.Memory;
                 return builder.ToString();
             }
         }

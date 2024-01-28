@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace FoxTunes
 {
-    public class PlaylistItem : PersistableComponent, IMetaDataSource
+    public class PlaylistItem : PersistableComponent, IMetaDataSource, IFileData
     {
         public PlaylistItem()
         {
@@ -13,7 +13,8 @@ namespace FoxTunes
             this.Images = new ObservableCollection<ImageItem>();
         }
 
-        public PlaylistItem(int sequence, string directoryName, string fileName, IMetaDataSource metaData) : this()
+        public PlaylistItem(int sequence, string directoryName, string fileName, PlaylistItemStatus status, IMetaDataSource metaData)
+            : this()
         {
             this.Sequence = sequence;
             this.DirectoryName = directoryName;
@@ -52,6 +53,8 @@ namespace FoxTunes
         public string DirectoryName { get; set; }
 
         public string FileName { get; set; }
+
+        public PlaylistItemStatus Status { get; set; }
 
         public ObservableCollection<MetaDataItem> MetaDatas { get; private set; }
 
@@ -103,5 +106,12 @@ namespace FoxTunes
         {
             return !(a == b);
         }
+    }
+
+    public enum PlaylistItemStatus : byte
+    {
+        None = 0,
+        Import = 1,
+        Update = 2
     }
 }

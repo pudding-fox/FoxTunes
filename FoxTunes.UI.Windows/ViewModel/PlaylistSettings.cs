@@ -89,6 +89,8 @@ namespace FoxTunes.ViewModel
         public void Save()
         {
             this.DatabaseContext.SaveChanges();
+            this.DatabaseContext.Dispose();
+            this.DatabaseContext = this.Core.Managers.Data.CreateWriteContext();
             this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
         }
 

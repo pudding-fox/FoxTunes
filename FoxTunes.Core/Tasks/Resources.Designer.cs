@@ -61,11 +61,167 @@ namespace FoxTunes.Tasks {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to WITH 
+        ///&quot;ImageItems_Lookup&quot; AS
+        ///(
+        ///	SELECT *
+        ///	FROM &quot;ImageItems&quot; 
+        ///	WHERE &quot;FileName&quot; = @fileName AND &quot;ImageType&quot; = @imageType 
+        ///)
+        ///
+        ///INSERT INTO &quot;ImageItems&quot; (&quot;FileName&quot;, &quot;ImageType&quot;) 
+        ///SELECT @fileName, @imageType
+        ///WHERE NOT EXISTS(SELECT * FROM &quot;ImageItems_Lookup&quot;);
+        ///
+        ///WITH 
+        ///&quot;ImageItems_Lookup&quot; AS
+        ///(
+        ///	SELECT *
+        ///	FROM &quot;ImageItems&quot; 
+        ///	WHERE &quot;FileName&quot; = @fileName AND &quot;ImageType&quot; = @imageType 
+        ///),
+        ///
+        ///&quot;{0}Item_ImageItem_Lookup&quot; AS 
+        ///(
+        ///	SELECT &quot;{0}Item_ImageItem&quot;.*
+        ///	FROM &quot;{0}Item_ImageItem&quot;
+        ///		JOIN &quot;ImageIt [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string AddImageItems {
+            get {
+                return ResourceManager.GetString("AddImageItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to INSERT INTO &quot;LibraryItems&quot; (&quot;DirectoryName&quot;, &quot;FileName&quot;, &quot;Status&quot;) 
+        ///SELECT @directoryName, @fileName, @status
+        ///WHERE NOT EXISTS(SELECT * FROM &quot;LibraryItems&quot; WHERE &quot;FileName&quot; = @fileName).
+        /// </summary>
+        internal static string AddLibraryItem {
+            get {
+                return ResourceManager.GetString("AddLibraryItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WITH 
+        ///&quot;MetaDataItems_Lookup&quot; AS
+        ///(
+        ///	SELECT *
+        ///	FROM &quot;MetaDataItems&quot; 
+        ///	WHERE &quot;Name&quot; = @name 
+        ///		AND ((&quot;NumericValue&quot; IS NULL AND @numericValue IS NULL) OR &quot;NumericValue&quot; = @numericValue)
+        ///		AND ((&quot;TextValue&quot; IS NULL AND @textValue IS NULL) OR &quot;TextValue&quot; = @textValue) 
+        ///		AND ((&quot;FileValue&quot; IS NULL AND @fileValue IS NULL) OR &quot;FileValue&quot; = @fileValue)
+        ///)
+        ///
+        ///INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;NumericValue&quot;, &quot;TextValue&quot;, &quot;FileValue&quot;) 
+        ///SELECT @name, @numericValue, @textValue, @fileValue
+        ///WHERE NOT EXISTS(S [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string AddMetaDataItems {
+            get {
+                return ResourceManager.GetString("AddMetaDataItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistItems&quot; (&quot;Sequence&quot;, &quot;DirectoryName&quot;, &quot;FileName&quot;, &quot;Status&quot;) 
+        ///SELECT @sequence, @directoryName, @fileName, @status.
+        /// </summary>
+        internal static string AddPlaylistItem {
+            get {
+                return ResourceManager.GetString("AddPlaylistItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WITH 
+        ///&quot;PropertyItems_Lookup&quot; AS
+        ///(
+        ///	SELECT *
+        ///	FROM &quot;PropertyItems&quot; 
+        ///	WHERE &quot;Name&quot; = @name 
+        ///		AND ((&quot;NumericValue&quot; IS NULL AND @numericValue IS NULL) OR &quot;NumericValue&quot; = @numericValue)
+        ///		AND ((&quot;TextValue&quot; IS NULL AND @textValue IS NULL) OR &quot;TextValue&quot; = @textValue) 
+        ///)
+        ///
+        ///INSERT INTO &quot;PropertyItems&quot; (&quot;Name&quot;, &quot;NumericValue&quot;, &quot;TextValue&quot;) 
+        ///SELECT @name, @numericValue, @textValue
+        ///WHERE NOT EXISTS(SELECT * FROM &quot;PropertyItems_Lookup&quot;);
+        ///
+        ///WITH 
+        ///&quot;PropertyItems_Lookup&quot; AS
+        ///(
+        ///	SELECT *
+        ///	FROM &quot;PropertyIte [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string AddPropertyItems {
+            get {
+                return ResourceManager.GetString("AddPropertyItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DELETE FROM &quot;PlaylistItems&quot;;
+        ///DELETE FROM &quot;PlaylistItem_ImageItem&quot;;
+        ///DELETE FROM &quot;PlaylistItem_MetaDataItem&quot;;
+        ///DELETE FROM &quot;PlaylistItem_PropertyItem&quot;;.
         /// </summary>
         internal static string ClearPlaylist {
             get {
                 return ResourceManager.GetString("ClearPlaylist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistItem_MetaDataItem&quot; (&quot;PlaylistItem_Id&quot;, &quot;MetaDataItem_Id&quot;)
+        ///SELECT &quot;PlaylistItems&quot;.&quot;Id&quot;, &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot;
+        ///FROM &quot;PlaylistItems&quot;
+        ///	JOIN &quot;LibraryItems&quot; 
+        ///		ON &quot;PlaylistItems&quot;.&quot;FileName&quot; = &quot;LibraryItems&quot;.&quot;FileName&quot;
+        ///	JOIN &quot;LibraryItem_MetaDataItem&quot; 
+        ///		ON &quot;LibraryItems&quot;.&quot;Id&quot; = &quot;LibraryItem_MetaDataItem&quot;.&quot;LibraryItem_Id&quot;
+        ///WHERE &quot;PlaylistItems&quot;.&quot;Status&quot; = @status;
+        ///
+        ///INSERT INTO &quot;PlaylistItem_PropertyItem&quot; (&quot;PlaylistItem_Id&quot;, &quot;PropertyItem_Id&quot;)
+        ///SELECT &quot;PlaylistIte [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CopyMetaDataItems {
+            get {
+                return ResourceManager.GetString("CopyMetaDataItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UPDATE &quot;LibraryItems&quot;
+        ///SET &quot;Status&quot; = @status.
+        /// </summary>
+        internal static string SetLibraryItemStatus {
+            get {
+                return ResourceManager.GetString("SetLibraryItemStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UPDATE &quot;PlaylistItems&quot;
+        ///SET &quot;Status&quot; = @status.
+        /// </summary>
+        internal static string SetPlaylistItemStatus {
+            get {
+                return ResourceManager.GetString("SetPlaylistItemStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UPDATE &quot;PlaylistItems&quot;
+        ///SET &quot;Sequence&quot; = &quot;Sequence&quot; + @offset
+        ///WHERE &quot;Status&quot; = @status AND &quot;Sequence&quot; &gt;= @sequence.
+        /// </summary>
+        internal static string ShiftPlaylistItems {
+            get {
+                return ResourceManager.GetString("ShiftPlaylistItems", resourceCulture);
             }
         }
     }
