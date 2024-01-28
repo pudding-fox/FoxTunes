@@ -142,6 +142,13 @@ namespace FoxTunes
             }
 
             var source = GetSource(target, package, element, flags);
+
+            if (!File.Exists(source))
+            {
+                Console.WriteLine("File not found: {0}", source);
+                return;
+            }
+
             var destination = GetDestination(target, package, element, flags);
 
             CopyFile(source, destination, flags);
