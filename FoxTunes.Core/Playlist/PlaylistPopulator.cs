@@ -3,6 +3,7 @@ using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace FoxTunes
 {
@@ -28,10 +29,16 @@ namespace FoxTunes
 
         public ITransactionSource Transaction { get; private set; }
 
+        public string Current { get; private set; }
+
         public async Task Populate(IEnumerable<string> paths, CancellationToken cancellationToken)
         {
-            var interval = 10;
-            var position = 0;
+            if (this.ReportProgress)
+            {
+                this.Timer.Interval = FAST_INTERVAL;
+                this.Timer.Start();
+            }
+
             using (var writer = new PlaylistWriter(this.Database, this.Transaction))
             {
                 foreach (var path in paths)
@@ -52,12 +59,7 @@ namespace FoxTunes
                             await this.AddPlaylistItem(writer, fileName);
                             if (this.ReportProgress)
                             {
-                                if (position % interval == 0)
-                                {
-                                    await this.SetDescription(new FileInfo(fileName).Name);
-                                    await this.SetPosition(position);
-                                }
-                                position++;
+                                this.Current = fileName;
                             }
                         }
                     }
@@ -85,6 +87,15 @@ namespace FoxTunes
             };
             await writer.Write(playlistItem);
             this.Offset++;
+        }
+
+        protected override async void OnElapsed(object sender, ElapsedEventArgs e)
+        {
+            if (this.Current != null)
+            {
+                await this.SetDescription(new FileInfo(this.Current).Name);
+            }
+            base.OnElapsed(sender, e);
         }
     }
 }

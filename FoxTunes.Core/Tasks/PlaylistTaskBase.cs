@@ -69,6 +69,11 @@ namespace FoxTunes
 
         protected virtual async Task AddPlaylistItems(IEnumerable<string> paths, CancellationToken cancellationToken)
         {
+            //We don't know how many files we're about to enumerate.
+            if (!this.IsIndeterminate)
+            {
+                await this.SetIsIndeterminate(true);
+            }
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 using (var playlistPopulator = new PlaylistPopulator(this.Database, this.PlaybackManager, this.Sequence, this.Offset, this.Visible, transaction))

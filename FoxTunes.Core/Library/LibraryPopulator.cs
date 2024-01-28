@@ -4,13 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace FoxTunes
 {
     public class LibraryPopulator : PopulatorBase
     {
-        public const string ID = "00672118-A730-4CD8-8B0A-F3DA42712165";
-
         public LibraryPopulator(IDatabaseComponent database, IPlaybackManager playbackManager, bool reportProgress, ITransactionSource transaction)
             : base(reportProgress)
         {
@@ -25,10 +24,18 @@ namespace FoxTunes
 
         public ITransactionSource Transaction { get; private set; }
 
+        public string Current { get; private set; }
+
         public async Task Populate(IEnumerable<string> paths, CancellationToken cancellationToken)
         {
-            var interval = 10;
-            var position = 0;
+            if (this.ReportProgress)
+            {
+                await this.SetName("Populating library");
+                await this.SetPosition(0);
+                this.Timer.Interval = FAST_INTERVAL;
+                this.Timer.Start();
+            }
+
             using (var writer = new LibraryWriter(this.Database, this.Transaction))
             {
                 foreach (var path in paths)
@@ -44,12 +51,7 @@ namespace FoxTunes
                             await this.AddLibraryItem(writer, fileName);
                             if (this.ReportProgress)
                             {
-                                if (position % interval == 0)
-                                {
-                                    await this.SetDescription(new FileInfo(fileName).Name);
-                                    await this.SetPosition(position);
-                                }
-                                position++;
+                                this.Current = fileName;
                             }
                         }
                     }
@@ -79,6 +81,15 @@ namespace FoxTunes
             };
             libraryItem.SetImportDate(DateTime.UtcNow);
             return writer.Write(libraryItem);
+        }
+
+        protected override async void OnElapsed(object sender, ElapsedEventArgs e)
+        {
+            if (this.Current != null)
+            {
+                await this.SetDescription(new FileInfo(this.Current).Name);
+            }
+            base.OnElapsed(sender, e);
         }
     }
 }

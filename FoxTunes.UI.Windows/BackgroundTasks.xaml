@@ -36,9 +36,9 @@
                         </Grid.RowDefinitions>
                         <DockPanel>
                             <Button DockPanel.Dock="Right" FontFamily="Marlett" FontSize="12" Command="{Binding CancelCommand, Mode=OneWay}">&#x72;</Button>
-                            <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis"></TextBlock>
+                            <TextBlock Text="{Binding Name, Mode=OneWay}" ToolTip="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis"></TextBlock>
                         </DockPanel>
-                        <TextBlock Grid.Row="1" Text="{Binding Description, Mode=OneWay}" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis"></TextBlock>
+                        <TextBlock Grid.Row="1" Text="{Binding Description, Mode=OneWay}" ToolTip="{Binding Description, Mode=OneWay}" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis"></TextBlock>
                         <ProgressBar Grid.Row="2" Value="{Binding Position, Mode=OneWay}" Maximum="{Binding Count, Mode=OneWay}">
                             <ProgressBar.Style>
                                 <Style TargetType="{x:Type ProgressBar}" BasedOn="{StaticResource {x:Type ProgressBar}}">
