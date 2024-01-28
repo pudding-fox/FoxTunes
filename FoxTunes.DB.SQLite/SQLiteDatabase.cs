@@ -39,7 +39,10 @@ namespace FoxTunes
         {
             var builder = new SQLiteConnectionStringBuilder();
             builder.DataSource = FileName;
+            builder.Pooling = true;
             builder.JournalMode = SQLiteJournalModeEnum.Wal;
+            builder["cache"] = "shared";
+            builder["mode"] = "rwc";
             return new SQLiteProvider(builder);
         }
     }
