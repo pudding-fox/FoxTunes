@@ -184,9 +184,9 @@ namespace FoxTunes
             }
         }
 
-        public async Task Rescan()
+        public async Task Rescan(bool force)
         {
-            using (var task = new RescanLibraryTask())
+            using (var task = new RescanLibraryTask(force))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);

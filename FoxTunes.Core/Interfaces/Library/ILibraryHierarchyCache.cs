@@ -5,6 +5,8 @@ namespace FoxTunes.Interfaces
 {
     public interface ILibraryHierarchyCache : IStandardComponent
     {
+        bool HasItems { get; }
+
         IEnumerable<LibraryHierarchyCacheKey> Keys { get; }
 
         LibraryHierarchy[] GetHierarchies(Func<IEnumerable<LibraryHierarchy>> factory);

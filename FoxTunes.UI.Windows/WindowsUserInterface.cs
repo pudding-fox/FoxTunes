@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -111,7 +112,11 @@ namespace FoxTunes
 
         public override bool Confirm(string message)
         {
-            return MessageBox.Show(message, "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK;
+            var result = default(bool);
+            //TODO: This is the only MessageBox provided with a Window.
+            //TODO: Bad .Wait().
+            global::FoxTunes.Windows.Invoke(() => result = MessageBox.Show(ActiveWindow, message, "Confirm", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK).Wait();
+            return result;
         }
 
         public override string Prompt(string message)
@@ -193,6 +198,17 @@ namespace FoxTunes
             catch
             {
                 //Nothing can be done, never throw on GC thread.
+            }
+        }
+
+        public static Window ActiveWindow
+        {
+            get
+            {
+                //Try and get the focused window, fall back to one of the "main" windows.
+                return Application.Current.Windows.OfType<Window>().FirstOrDefault(
+                    window => window.IsActive
+                ) ?? global::FoxTunes.Windows.ActiveWindow;
             }
         }
     }

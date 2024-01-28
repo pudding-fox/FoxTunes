@@ -12,6 +12,30 @@ namespace FoxTunes
     [Component("267C58E3-8794-4377-97BF-C71118B27DB5", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class LibraryHierarchyCache : StandardComponent, ILibraryHierarchyCache, IDisposable
     {
+        public bool HasItems
+        {
+            get
+            {
+                foreach (var key in this.Keys)
+                {
+                    var value = default(Lazy<LibraryHierarchyNode[]>);
+                    if (!this.Nodes.TryGetValue(key, out value))
+                    {
+                        continue;
+                    }
+                    if (!value.IsValueCreated)
+                    {
+                        continue;
+                    }
+                    if (value.Value.Length > 0)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
         public IEnumerable<LibraryHierarchyCacheKey> Keys
         {
             get

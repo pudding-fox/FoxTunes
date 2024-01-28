@@ -169,7 +169,7 @@ namespace FoxTunes.ViewModel
 
         public Task Rescan()
         {
-            return this.LibraryManager.Rescan();
+            return this.LibraryManager.Rescan(false);
         }
 
         public ICommand ClearCommand
