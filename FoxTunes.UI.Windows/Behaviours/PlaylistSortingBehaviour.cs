@@ -1,17 +1,20 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class PlaylistSortingBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
+    public class PlaylistSortingBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent, IDisposable
     {
         public const string TOGGLE_SORTING = "NNNN";
 
         public PlaylistColumn SortColumn { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
+
+        public ISignalEmitter SignalEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -20,12 +23,29 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.PlaylistManager = core.Managers.Playlist;
+            this.SignalEmitter = core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = core.Components.Configuration;
             this.Sorting = this.Configuration.GetElement<BooleanConfigurationElement>(
                 PlaylistBehaviourConfiguration.SECTION,
                 PlaylistSortingBehaviourConfiguration.SORT_ENABLED_ELEMENT
             );
             base.InitializeComponent(core);
+        }
+
+        protected virtual Task OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.PlaylistUpdated:
+                    this.SortColumn = null;
+                    break;
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         public IEnumerable<IInvocationComponent> Invocations
@@ -89,6 +109,45 @@ namespace FoxTunes
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return PlaylistSortingBehaviourConfiguration.GetConfigurationSections();
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.SignalEmitter != null)
+            {
+                this.SignalEmitter.Signal -= this.OnSignal;
+            }
+        }
+
+        ~PlaylistSortingBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }
