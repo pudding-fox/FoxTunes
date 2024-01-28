@@ -8,6 +8,7 @@ x64
 TARGET="
 net40
 net462
+net48
 "
 
 if [ -z "$1" ]
