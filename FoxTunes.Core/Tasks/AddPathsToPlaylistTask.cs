@@ -56,10 +56,10 @@ namespace FoxTunes
             {
                 if (this.Clear)
                 {
-                    this.ClearItems(transaction);
+                    await this.ClearItems(transaction);
                 }
-                this.AddPlaylistItems(transaction);
-                this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
+                await this.AddPlaylistItems(transaction);
+                await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
                 using (var task = new SingletonReentrantTask(MetaDataPopulator.ID, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                 {
                     await this.AddOrUpdateMetaData(cancellationToken, transaction);
@@ -69,9 +69,9 @@ namespace FoxTunes
                         this.Description = string.Empty;
                         return;
                     }
-                    this.UpdateVariousArtists(transaction);
+                    await this.UpdateVariousArtists(transaction);
                     this.SequenceItems(transaction);
-                    this.SetPlaylistItemsStatus(transaction);
+                    await this.SetPlaylistItemsStatus(transaction);
                     transaction.Commit();
                 }))
                 {
@@ -81,26 +81,10 @@ namespace FoxTunes
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
 
-        protected virtual void AddPlaylistItems(ITransactionSource transaction)
+        protected virtual async Task AddPlaylistItems(ITransactionSource transaction)
         {
             using (var writer = new PlaylistWriter(this.Database, transaction))
             {
-                var addPlaylistItem = new Action<string>(fileName =>
-                {
-                    if (!this.PlaybackManager.IsSupported(fileName))
-                    {
-                        Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
-                        return;
-                    }
-                    var playlistItem = new PlaylistItem()
-                    {
-                        DirectoryName = Path.GetDirectoryName(fileName),
-                        FileName = fileName,
-                        Sequence = this.Sequence
-                    };
-                    writer.Write(playlistItem);
-                    this.Offset++;
-                });
                 foreach (var path in this.Paths)
                 {
                     if (Directory.Exists(path))
@@ -108,16 +92,33 @@ namespace FoxTunes
                         foreach (var fileName in Directory.GetFiles(path, "*.*", SearchOption.AllDirectories))
                         {
                             Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
-                            addPlaylistItem(fileName);
+                            await this.AddPlaylistItem(writer, fileName);
                         }
                     }
                     else if (File.Exists(path))
                     {
                         Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", path);
-                        addPlaylistItem(path);
+                        await this.AddPlaylistItem(writer, path);
                     }
                 }
             }
+        }
+
+        protected virtual async Task AddPlaylistItem(PlaylistWriter writer, string fileName)
+        {
+            if (!this.PlaybackManager.IsSupported(fileName))
+            {
+                Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
+                return;
+            }
+            var playlistItem = new PlaylistItem()
+            {
+                DirectoryName = Path.GetDirectoryName(fileName),
+                FileName = fileName,
+                Sequence = this.Sequence
+            };
+            await writer.Write(playlistItem);
+            this.Offset++;
         }
 
         protected virtual async Task AddOrUpdateMetaData(CancellationToken cancellationToken, ITransactionSource transaction)

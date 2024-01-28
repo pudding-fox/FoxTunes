@@ -1,4 +1,5 @@
-﻿using FoxDb;
+﻿#pragma warning disable 612, 618
+using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ namespace FoxTunes
                     var query = this.Database.QueryFactory.Build();
                     query.Delete.Touch();
                     query.Source.AddTable(table);
-                    this.Database.Execute(query, transaction);
+                    await this.Database.ExecuteAsync(query, transaction);
                 }
                 transaction.Commit();
             }

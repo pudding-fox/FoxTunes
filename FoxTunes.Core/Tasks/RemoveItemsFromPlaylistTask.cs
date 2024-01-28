@@ -27,10 +27,10 @@ namespace FoxTunes
                     foreach (var playlistItem in this.PlaylistItems)
                     {
                         command.Parameters[Conventions.ParameterName(this.Database.Tables.PlaylistItem.PrimaryKey)] = playlistItem.Id;
-                        command.ExecuteNonQuery();
+                        await command.ExecuteNonQueryAsync();
                     }
                 }
-                this.CleanupMetaData(transaction);
+                await this.CleanupMetaData(transaction);
                 transaction.Commit();
             }
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));

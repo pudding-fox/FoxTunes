@@ -1,4 +1,5 @@
-﻿using FoxDb;
+﻿#pragma warning disable 612, 618
+using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.Collections.Generic;

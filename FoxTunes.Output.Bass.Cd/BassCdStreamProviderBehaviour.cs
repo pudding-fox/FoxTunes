@@ -224,10 +224,10 @@ namespace FoxTunes
                     }
                     using (var transaction = this.Database.BeginTransaction())
                     {
-                        this.AddPlaylistItems(transaction);
-                        this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
+                        await this.AddPlaylistItems(transaction);
+                        await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
                         await this.AddOrUpdateMetaData(transaction);
-                        this.SetPlaylistItemsStatus(transaction);
+                        await this.SetPlaylistItemsStatus(transaction);
                         transaction.Commit();
                     }
                 }
@@ -239,7 +239,7 @@ namespace FoxTunes
                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
             }
 
-            private void AddPlaylistItems(ITransactionSource transaction)
+            private async Task AddPlaylistItems(ITransactionSource transaction)
             {
                 this.Name = "Getting track list";
                 this.IsIndeterminate = true;
@@ -258,7 +258,7 @@ namespace FoxTunes
                             FileName = fileName,
                             Sequence = this.Sequence + a
                         };
-                        writer.Write(playlistItem);
+                        await writer.Write(playlistItem);
                         this.Offset++;
                     }
                 }
@@ -282,7 +282,7 @@ namespace FoxTunes
                         var metaData = await metaDataSource.GetMetaData(playlistItem.FileName);
                         foreach (var metaDataItem in metaData)
                         {
-                            writer.Write(playlistItem.Id, metaDataItem);
+                            await writer.Write(playlistItem.Id, metaDataItem);
                         }
                     }
                 }

@@ -3,6 +3,7 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -21,7 +22,7 @@ namespace FoxTunes
 
         public IScriptingContext Context { get; private set; }
 
-        public void Write(IDatabaseReaderRecord record)
+        public Task Write(IDatabaseReaderRecord record)
         {
             this.Command.Parameters["playlistItemId"] = record["PlaylistItem_Id"];
 
@@ -40,7 +41,7 @@ namespace FoxTunes
                 this.Command.Parameters[string.Format("value{0}", a + 1)] = value;
             }
 
-            this.Command.ExecuteNonQuery();
+            return this.Command.ExecuteNonQueryAsync();
         }
 
         private object[] ExecuteScript(IDatabaseReaderRecord record)

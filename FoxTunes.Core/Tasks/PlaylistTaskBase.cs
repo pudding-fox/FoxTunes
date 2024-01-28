@@ -1,8 +1,10 @@
-﻿using FoxDb;
+﻿#pragma warning disable 612, 618
+using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -35,18 +37,18 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual void ClearItems(ITransactionSource transaction)
+        protected virtual async Task ClearItems(ITransactionSource transaction)
         {
             this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Clearing playlist.");
             var query = this.Database.QueryFactory.Build();
             query.Delete.Touch();
             query.Source.AddTable(this.Database.Tables.PlaylistItem);
-            this.Database.Execute(query, transaction);
-            this.CleanupMetaData(transaction);
+            await this.Database.ExecuteAsync(query, transaction);
+            await this.CleanupMetaData(transaction);
         }
 
-        protected virtual void ShiftItems(QueryOperator @operator, int at, int by, ITransactionSource transaction)
+        protected virtual Task ShiftItems(QueryOperator @operator, int at, int by, ITransactionSource transaction)
         {
             Logger.Write(
                 this,
@@ -73,7 +75,7 @@ namespace FoxTunes
                 expression.Operator = expression.CreateOperator(@operator);
                 expression.Right = expression.CreateParameter("sequence", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None);
             });
-            this.Database.Execute(query, (parameters, phase) =>
+            return this.Database.ExecuteAsync(query, (parameters, phase) =>
             {
                 switch (phase)
                 {
@@ -114,14 +116,14 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void SetPlaylistItemsStatus(ITransactionSource transaction)
+        protected virtual Task SetPlaylistItemsStatus(ITransactionSource transaction)
         {
             Logger.Write(this, LogLevel.Debug, "Setting playlist status: {0}", Enum.GetName(typeof(LibraryItemStatus), LibraryItemStatus.None));
             this.IsIndeterminate = true;
             var query = this.Database.QueryFactory.Build();
             query.Update.SetTable(this.Database.Tables.PlaylistItem);
             query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));
-            this.Database.Execute(query, (parameters, phase) =>
+            return this.Database.ExecuteAsync(query, (parameters, phase) =>
             {
                 switch (phase)
                 {
@@ -132,9 +134,9 @@ namespace FoxTunes
             }, transaction);
         }
 
-        protected virtual void UpdateVariousArtists(ITransactionSource transaction)
+        protected virtual Task UpdateVariousArtists(ITransactionSource transaction)
         {
-            this.Database.Execute(this.Database.Queries.UpdatePlaylistVariousArtists, (parameters, phase) =>
+           return this.Database.ExecuteAsync(this.Database.Queries.UpdatePlaylistVariousArtists, (parameters, phase) =>
             {
                 switch (phase)
                 {
@@ -148,7 +150,7 @@ namespace FoxTunes
             }, transaction);
         }
 
-        protected virtual void CleanupMetaData(ITransactionSource transaction)
+        protected virtual Task CleanupMetaData(ITransactionSource transaction)
         {
             Logger.Write(this, LogLevel.Debug, "Cleaning up unused meta data.");
             this.IsIndeterminate = true;
@@ -170,7 +172,7 @@ namespace FoxTunes
                     }))
                 );
             });
-            this.Database.Execute(query, transaction);
+            return this.Database.ExecuteAsync(query, transaction);
         }
     }
 }

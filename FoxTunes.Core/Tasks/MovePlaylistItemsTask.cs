@@ -1,4 +1,5 @@
-﻿using FoxDb;
+﻿#pragma warning disable 612, 618
+using FoxDb;
 using FoxDb.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +44,7 @@ namespace FoxTunes
                         var id = record.Get<int>(this.Database.Tables.PlaylistItem.PrimaryKey);
                         if (this.PlaylistItems.Any(playlistItem => playlistItem.Id == id))
                         {
-                            this.Database.Execute(update, (parameters, phase) =>
+                            await this.Database.ExecuteAsync(update, (parameters, phase) =>
                             {
                                 switch (phase)
                                 {
@@ -60,7 +61,7 @@ namespace FoxTunes
                             {
                                 sequence += this.Offset;
                             }
-                            this.Database.Execute(update, (parameters, phase) =>
+                            await this.Database.ExecuteAsync(update, (parameters, phase) =>
                             {
                                 switch (phase)
                                 {

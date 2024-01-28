@@ -40,22 +40,22 @@ namespace FoxTunes
             {
                 if (this.Clear)
                 {
-                    this.ClearItems(transaction);
+                    await this.ClearItems(transaction);
                 }
-                this.AddPlaylistItems(transaction);
-                this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
+                await this.AddPlaylistItems(transaction);
+                await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset, transaction);
                 this.SequenceItems(transaction);
-                this.SetPlaylistItemsStatus(transaction);
+                await this.SetPlaylistItemsStatus(transaction);
                 transaction.Commit();
             }
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
         }
 
-        private void AddPlaylistItems(ITransactionSource transaction)
+        private async Task AddPlaylistItems(ITransactionSource transaction)
         {
             this.Name = "Getting file list";
             this.IsIndeterminate = true;
-            this.Offset = this.Database.ExecuteScalar<int>(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, (parameters, phase) =>
+            this.Offset = await this.Database.ExecuteScalarAsync<int>(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, (parameters, phase) =>
             {
                 switch (phase)
                 {

@@ -44,7 +44,7 @@ namespace FoxTunes
                 var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
                 using (var reader = this.Database.ExecuteReader(this.Database.Queries.LibraryHierarchyBuilder(metaDataNames), null, transaction))
                 {
-                    this.AddHiearchies(reader, transaction);
+                    await this.AddHiearchies(reader, new CancellationToken(), transaction);
                     this.Description = "Finalizing";
                     this.IsIndeterminate = true;
                 }
@@ -53,7 +53,7 @@ namespace FoxTunes
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
         }
 
-        private void AddHiearchies(IDatabaseReader reader, ITransactionSource transaction)
+        private async Task AddHiearchies(IDatabaseReader reader, CancellationToken cancellationToken, ITransactionSource transaction)
         {
             using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, true, transaction))
             {
@@ -62,7 +62,7 @@ namespace FoxTunes
                 libraryHierarchyPopulator.DescriptionChanged += (sender, e) => this.Description = libraryHierarchyPopulator.Description;
                 libraryHierarchyPopulator.PositionChanged += (sender, e) => this.Position = libraryHierarchyPopulator.Position;
                 libraryHierarchyPopulator.CountChanged += (sender, e) => this.Count = libraryHierarchyPopulator.Count;
-                libraryHierarchyPopulator.Populate(reader);
+                await libraryHierarchyPopulator.Populate(reader, cancellationToken);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using FoxDb;
+﻿#pragma warning disable 612, 618
+using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
@@ -55,7 +56,7 @@ namespace FoxTunes
         {
             using (var transaction = this.Database.BeginTransaction())
             {
-                this.AddLibraryItems(transaction);
+                await this.AddLibraryItems(transaction);
                 using (var task = new SingletonReentrantTask(MetaDataPopulator.ID, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
                 {
                     await this.AddOrUpdateMetaData(cancellationToken, transaction);
@@ -65,8 +66,8 @@ namespace FoxTunes
                         this.Description = string.Empty;
                         return;
                     }
-                    this.UpdateVariousArtists(transaction);
-                    this.SetLibraryItemsStatus(transaction);
+                    await this.UpdateVariousArtists(transaction);
+                    await this.SetLibraryItemsStatus(transaction);
                     transaction.Commit();
                 }))
                 {
@@ -76,7 +77,7 @@ namespace FoxTunes
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
         }
 
-        protected virtual void AddLibraryItems(ITransactionSource transaction)
+        protected virtual async Task AddLibraryItems(ITransactionSource transaction)
         {
             var query = this.Database.QueryFactory.Build();
             query.Add.AddColumn(this.Database.Tables.LibraryItem.Column("DirectoryName"));
@@ -104,39 +105,40 @@ namespace FoxTunes
             );
             using (var command = this.Database.CreateCommand(query.Build(), transaction))
             {
-                var addLibraryItem = new Action<string>(fileName =>
-                {
-                    if (!this.PlaybackManager.IsSupported(fileName))
-                    {
-                        return;
-                    }
-                    command.Parameters["directoryName"] = Path.GetDirectoryName(fileName);
-                    command.Parameters["fileName"] = fileName;
-                    command.Parameters["status"] = LibraryItemStatus.Import;
-                    var count = command.ExecuteNonQuery();
-                    if (count != 0)
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Added file to library: {0}", fileName);
-                    }
-                    else
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Skipped adding file to library: {0}", fileName);
-                    }
-                });
                 foreach (var path in this.Paths)
                 {
                     if (Directory.Exists(path))
                     {
                         foreach (var fileName in Directory.GetFiles(path, "*.*", SearchOption.AllDirectories))
                         {
-                            addLibraryItem(fileName);
+                            await this.AddLibraryItem(command, fileName);
                         }
                     }
                     else if (File.Exists(path))
                     {
-                        addLibraryItem(path);
+                        await this.AddLibraryItem(command, path);
                     }
                 }
+            }
+        }
+
+        protected virtual async Task AddLibraryItem(IDatabaseCommand command, string fileName)
+        {
+            if (!this.PlaybackManager.IsSupported(fileName))
+            {
+                return;
+            }
+            command.Parameters["directoryName"] = Path.GetDirectoryName(fileName);
+            command.Parameters["fileName"] = fileName;
+            command.Parameters["status"] = LibraryItemStatus.Import;
+            var count = await command.ExecuteNonQueryAsync();
+            if (count != 0)
+            {
+                Logger.Write(this, LogLevel.Debug, "Added file to library: {0}", fileName);
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "Skipped adding file to library: {0}", fileName);
             }
         }
 
