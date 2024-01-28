@@ -1,12 +1,11 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
 using TagLib;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.MetaData)]
-    public class TagLibFileFactory : StandardFactory, IConfigurableComponent
+    public class TagLibFileFactory : StandardFactory
     {
         public IConfiguration Configuration { get; private set; }
 
@@ -17,7 +16,7 @@ namespace FoxTunes
             this.Configuration = core.Components.Configuration;
             this.WindowsMedia = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
-                TagLibFileFactoryConfiguration.READ_WINDOWS_MEDIA_TAGS
+                MetaDataBehaviourConfiguration.READ_WINDOWS_MEDIA_TAGS
              );
             base.InitializeComponent(core);
         }
@@ -39,11 +38,6 @@ namespace FoxTunes
         public File Create(IFileAbstraction fileAbstraction)
         {
             return File.Create(TagLibFileAbstraction.Create(fileAbstraction));
-        }
-
-        public IEnumerable<ConfigurationSection> GetConfigurationSections()
-        {
-            return TagLibFileFactoryConfiguration.GetConfigurationSections();
         }
     }
 }

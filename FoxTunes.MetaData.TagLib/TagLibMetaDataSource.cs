@@ -66,6 +66,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Documents { get; private set; }
 
+        public BooleanConfigurationElement FileSystem { get; private set; }
+
         public SelectionConfigurationElement Write { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -116,6 +118,10 @@ namespace FoxTunes
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.READ_DOCUMENTS
             );
+            this.FileSystem = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.READ_FILESYSTEM
+            );
             this.Write = this.Configuration.GetElement<SelectionConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.WRITE_ELEMENT
@@ -164,6 +170,7 @@ namespace FoxTunes
                     {
                         this.AddProperties(metaData, file.Properties);
                     }
+                    this.Try(() => FileSystemManager.Read(this, metaData, file), this.ErrorHandler);
                     if (this.Popularimeter.Value)
                     {
                         this.Try(() => PopularimeterManager.Read(this, metaData, file), this.ErrorHandler);

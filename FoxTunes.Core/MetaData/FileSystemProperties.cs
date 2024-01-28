@@ -8,6 +8,7 @@ namespace FoxTunes
     {
         public const string FileName = "FileName";
         public const string DirectoryName = "DirectoryName";
+        public const string FileExtension = "FileExtension";
         public const string FileSize = "FileSize";
         public const string FileCreationTime = "FileCreationTime";
         public const string FileModificationTime = "FileModificationTime";

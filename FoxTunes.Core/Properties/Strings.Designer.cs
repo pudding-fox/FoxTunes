@@ -259,6 +259,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filesystem.
+        /// </summary>
+        internal static string MetaDataBehaviourConfiguration_FileSystem {
+            get {
+                return ResourceManager.GetString("MetaDataBehaviourConfiguration.FileSystem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Front Cover.
         /// </summary>
         internal static string MetaDataBehaviourConfiguration_FrontCover {
@@ -354,6 +363,15 @@ namespace FoxTunes {
         internal static string MetaDataBehaviourConfiguration_Threads {
             get {
                 return ResourceManager.GetString("MetaDataBehaviourConfiguration.Threads", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Windows Media.
+        /// </summary>
+        internal static string MetaDataBehaviourConfiguration_WindowsMedia {
+            get {
+                return ResourceManager.GetString("MetaDataBehaviourConfiguration.WindowsMedia", resourceCulture);
             }
         }
         

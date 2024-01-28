@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace FoxTunes
 {
@@ -35,7 +36,11 @@ namespace FoxTunes
 
         public const string READ_POPULARIMETER_TAGS = "JJJJ6988-D3BF-434F-B326-3354D2922926";
 
+        public const string READ_WINDOWS_MEDIA_TAGS = "JJKK0057-52AD-4914-BF4A-692EF76C7C83";
+
         public const string READ_DOCUMENTS = "JJJK51C0-D530-44B8-B9E9-7280041C0524";
+
+        public const string READ_FILESYSTEM = "JJKK6ADD-C5BE-4A1C-B315-FFE903AC181B";
 
         public const string DETECT_COMPILATIONS = "JJKK150D-DB8D-4C64-99E4-10B453B26295";
 
@@ -79,7 +84,11 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(READ_POPULARIMETER_TAGS, Strings.MetaDataBehaviourConfiguration_Popularimeter).WithValue(Publication.ReleaseType == ReleaseType.Default))
                 .WithElement(
+                    new BooleanConfigurationElement(READ_WINDOWS_MEDIA_TAGS, Strings.MetaDataBehaviourConfiguration_WindowsMedia).WithValue(false))
+                .WithElement(
                     new BooleanConfigurationElement(READ_DOCUMENTS, Strings.MetaDataBehaviourConfiguration_Documents).WithValue(false))
+                .WithElement(
+                    new BooleanConfigurationElement(READ_FILESYSTEM, Strings.MetaDataBehaviourConfiguration_FileSystem).WithValue(true))
                 .WithElement(
                     new BooleanConfigurationElement(DETECT_COMPILATIONS, Strings.MetaDataBehaviourConfiguration_DetectCompilations).WithValue(Publication.ReleaseType == ReleaseType.Default))
                 .WithElement(

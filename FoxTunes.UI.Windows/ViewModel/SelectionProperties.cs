@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -39,7 +38,7 @@ namespace FoxTunes.ViewModel
             CommonProperties.AudioSampleRate,
             CommonProperties.BitsPerSample,
             CommonProperties.Duration,
-            CodecValueProvider.NAME
+            CommonProperties.Description,
         };
 
         private static readonly string[] FILESYSTEM = new[]
@@ -62,12 +61,6 @@ namespace FoxTunes.ViewModel
             { CommonProperties.AudioBitrate, BitrateValueProvider.Instance },
             { CommonProperties.AudioSampleRate, SamplerateValueProvider.Instance },
             { CommonProperties.Duration, NumericMetaDataValueProvider.Instance },
-            { CodecValueProvider.NAME, CodecValueProvider.Instance },
-            { FileSystemProperties.FileName, FileSystemValueProvider.Instance },
-            { FileSystemProperties.DirectoryName, FileSystemValueProvider.Instance },
-            { FileSystemProperties.FileSize, FileSystemValueProvider.Instance },
-            { FileSystemProperties.FileCreationTime, FileSystemValueProvider.Instance },
-            { FileSystemProperties.FileModificationTime, FileSystemValueProvider.Instance }
         };
 
         private static readonly IDictionary<string, ValueAggregator> AGGREGATORS = new Dictionary<string, ValueAggregator>(StringComparer.OrdinalIgnoreCase)
@@ -516,48 +509,6 @@ namespace FoxTunes.ViewModel
             new public static readonly ValueProvider Instance = new NumericMetaDataValueProvider();
         }
 
-        public class FileSystemValueProvider : ValueProvider
-        {
-            public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
-            {
-                try
-                {
-                    switch (name)
-                    {
-                        case FileSystemProperties.FileName:
-                            return fileData.FileName.GetName();
-                        case FileSystemProperties.DirectoryName:
-                            return fileData.DirectoryName;
-                        case FileSystemProperties.FileSize:
-                            if (!File.Exists(fileData.FileName))
-                            {
-                                return 0;
-                            }
-                            return new FileInfo(fileData.FileName).Length;
-                        case FileSystemProperties.FileCreationTime:
-                            if (!File.Exists(fileData.FileName))
-                            {
-                                return null;
-                            }
-                            return File.GetCreationTime(fileData.FileName).ToShortDateString();
-                        case FileSystemProperties.FileModificationTime:
-                            if (!File.Exists(fileData.FileName))
-                            {
-                                return null;
-                            }
-                            return File.GetLastWriteTime(fileData.FileName).ToShortDateString();
-                    }
-                }
-                catch
-                {
-                    //TODO: Warn.
-                }
-                return null;
-            }
-
-            public static readonly ValueProvider Instance = new FileSystemValueProvider();
-        }
-
         public class CountValueProvider : ValueProvider
         {
             public const string NAME = "SelectionCount";
@@ -568,18 +519,6 @@ namespace FoxTunes.ViewModel
             }
 
             public static readonly ValueProvider Instance = new CountValueProvider();
-        }
-
-        public class CodecValueProvider : ValueProvider
-        {
-            public const string NAME = "Codec";
-
-            public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
-            {
-                return fileData.FileName.GetExtension().ToUpper();
-            }
-
-            public static readonly ValueProvider Instance = new CodecValueProvider();
         }
 
         public class BitrateValueProvider : ValueProvider
@@ -682,6 +621,14 @@ namespace FoxTunes.ViewModel
         {
             public override void Add(IList<object> values, object value)
             {
+                if (value is string text)
+                {
+                    var numeric = default(long);
+                    if (!long.TryParse(text, out numeric))
+                    {
+                        return;
+                    }
+                }
                 values.Add(value);
             }
 
@@ -708,6 +655,14 @@ namespace FoxTunes.ViewModel
 
             public override void Add(IList<object> values, object value)
             {
+                if (value is string text)
+                {
+                    var numeric = default(long);
+                    if (!long.TryParse(text, out numeric))
+                    {
+                        return;
+                    }
+                }
                 values.Add(value);
             }
 
@@ -717,7 +672,7 @@ namespace FoxTunes.ViewModel
                 {
                     return Strings.SelectionProperties_NoValue;
                 }
-                var total = values.Cast<long>().Sum();
+                var total = values.Select(value => Convert.ToInt64(value)).Sum();
                 if (total == 0)
                 {
                     return Strings.SelectionProperties_NoValue;
