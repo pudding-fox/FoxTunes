@@ -11,7 +11,7 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, "File Name Meta Data")
-                .WithElement(new TextConfigurationElement(PATTERNS_ELEMENT, "Pattern").WithValue(Resources.Patterns)
+                .WithElement(new TextConfigurationElement(PATTERNS_ELEMENT, "Pattern").WithValue(Resources.Patterns).WithFlags(ConfigurationElementFlags.MultiLine)
             );
         }
     }

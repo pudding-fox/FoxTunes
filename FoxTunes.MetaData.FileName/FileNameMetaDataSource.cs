@@ -13,6 +13,7 @@ namespace FoxTunes
         {
             var lookup = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             lookup.Add("artist", CommonMetaData.FirstAlbumArtist);
+            lookup.Add("performer", CommonMetaData.FirstPerformer);
             lookup.Add("genre", CommonMetaData.FirstGenre);
             return lookup;
         }
@@ -43,6 +44,7 @@ namespace FoxTunes
                     }
                     result.Add(this.GetMetaData(name, metaData[key]));
                 }
+                break;
             }
             return Task.FromResult<IEnumerable<MetaDataItem>>(result);
         }

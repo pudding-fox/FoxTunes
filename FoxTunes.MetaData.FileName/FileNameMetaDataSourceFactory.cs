@@ -62,6 +62,10 @@ namespace FoxTunes
             {
                 foreach (var pattern in patterns.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
                 {
+                    if (string.IsNullOrEmpty(pattern) || pattern.StartsWith("//"))
+                    {
+                        continue;
+                    }
                     yield return new FileNameMetaDataExtractor(pattern);
                 }
             }

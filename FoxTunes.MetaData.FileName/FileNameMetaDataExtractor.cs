@@ -46,7 +46,8 @@ namespace FoxTunes
             return new Regex(
                 pattern
                     .Replace(@"DIR", Regex.Escape(Path.DirectorySeparatorChar.ToString()))
-                    .Replace(@"SEP", @"[\s-]+"),
+                    .Replace(@"SEP", @"[\s-]+")
+                    .Replace(@"HYP", @"\s+-\s+"),
                 RegexOptions.Compiled | RegexOptions.ExplicitCapture
             );
         }
