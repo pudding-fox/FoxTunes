@@ -66,7 +66,7 @@ namespace FoxTunes.ViewModel.Config
                     return null;
                 }
                 return CommandFactory.Instance.CreateCommand(
-                    this.Element.Invoke
+                    new Action(this.Element.Invoke)
                 );
             }
         }

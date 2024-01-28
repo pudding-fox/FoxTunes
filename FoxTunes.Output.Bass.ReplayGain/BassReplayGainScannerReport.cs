@@ -3,15 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace FoxTunes
 {
     public class BassReplayGainScannerReport : BaseComponent, IReport
     {
-        public BassReplayGainScannerReport(IEnumerable<ScannerItem> scannerItems)
+        public BassReplayGainScannerReport(IEnumerable<PlaylistItem> playlistItems, IEnumerable<ScannerItem> scannerItems)
         {
+            this.PlaylistItems = playlistItems.ToDictionary(playlistItem => playlistItem.FileName, StringComparer.OrdinalIgnoreCase);
             this.ScannerItems = scannerItems.ToDictionary(scannerItem => Guid.NewGuid());
         }
+
+        public Dictionary<string, PlaylistItem> PlaylistItems { get; private set; }
 
         public Dictionary<Guid, ScannerItem> ScannerItems { get; private set; }
 
@@ -38,14 +42,34 @@ namespace FoxTunes
 
         protected virtual string GetDescription(ScannerItem scannerItem)
         {
-            throw new NotImplementedException();
+            var builder = new StringBuilder();
+            builder.AppendFormat("{0}", scannerItem.FileName);
+            if (scannerItem.Status != ScannerItemStatus.Complete && scannerItem.Errors.Any())
+            {
+                builder.Append(Environment.NewLine);
+                foreach (var error in scannerItem.Errors)
+                {
+                    builder.Append("\t");
+                    builder.Append(error);
+                }
+            }
+            return builder.ToString();
         }
 
         public string[] Headers
         {
             get
             {
-                throw new NotImplementedException();
+                return new[]
+                {
+                    "Path",
+                    "Album",
+                    "Album gain",
+                    "Album peak",
+                    "Track gain",
+                    "Track peak",
+                    "Status"
+                };
             }
         }
 
@@ -53,7 +77,10 @@ namespace FoxTunes
         {
             get
             {
-                return this.ScannerItems.Select(element => new ReportRow(element.Key, element.Value));
+                return this.ScannerItems.Select(element =>
+                {
+                    return new ReportRow(element.Key, this.PlaylistItems[element.Value.FileName], element.Value);
+                });
             }
         }
 
@@ -83,13 +110,16 @@ namespace FoxTunes
 
         public class ReportRow : IReportRow
         {
-            public ReportRow(Guid id, ScannerItem scannerItem)
+            public ReportRow(Guid id, PlaylistItem playlistItem, ScannerItem scannerItem)
             {
                 this.Id = id;
+                this.PlaylistItem = playlistItem;
                 this.ScannerItem = scannerItem;
             }
 
             public Guid Id { get; private set; }
+
+            public PlaylistItem PlaylistItem { get; private set; }
 
             public ScannerItem ScannerItem { get; private set; }
 
@@ -97,7 +127,78 @@ namespace FoxTunes
             {
                 get
                 {
-                    throw new NotImplementedException();
+                    var value = default(double);
+                    var path = this.ScannerItem.FileName;
+                    var album = this.ScannerItem.GroupName;
+                    var albumGain = default(string);
+                    var albumPeak = default(string);
+                    var trackGain = default(string);
+                    var trackPeak = default(string);
+                    var status = Enum.GetName(typeof(ScannerItemStatus), this.ScannerItem.Status);
+                    lock (this.PlaylistItem.MetaDatas)
+                    {
+                        var metaDatas = this.PlaylistItem.MetaDatas.ToDictionary(
+                            element => element.Name,
+                            StringComparer.OrdinalIgnoreCase
+                        );
+                        var metaDataItem = default(MetaDataItem);
+                        if (metaDatas.TryGetValue(CommonMetaData.ReplayGainAlbumGain, out metaDataItem) && double.TryParse(metaDataItem.Value, out value))
+                        {
+                            albumGain = string.Format(
+                                "{0}{1:0.00} dB",
+                                value > 0 ? "+" : string.Empty,
+                                value
+                            );
+                        }
+                        else
+                        {
+                            albumGain = string.Empty;
+                        }
+                        if (metaDatas.TryGetValue(CommonMetaData.ReplayGainAlbumPeak, out metaDataItem) && double.TryParse(metaDataItem.Value, out value))
+                        {
+                            albumPeak = string.Format(
+                                "{0:0.000000}",
+                                value
+                            );
+                        }
+                        else
+                        {
+                            albumPeak = string.Empty;
+                        }
+                        if (metaDatas.TryGetValue(CommonMetaData.ReplayGainTrackGain, out metaDataItem) && double.TryParse(metaDataItem.Value, out value))
+                        {
+                            trackGain = string.Format(
+                                "{0}{1:0.00} dB",
+                                value > 0 ? "+" : string.Empty,
+                                value
+                            );
+                        }
+                        else
+                        {
+                            trackGain = string.Empty;
+                        }
+                        if (metaDatas.TryGetValue(CommonMetaData.ReplayGainTrackPeak, out metaDataItem) && double.TryParse(metaDataItem.Value, out value))
+                        {
+                            trackPeak = string.Format(
+                                "{0:0.000000}",
+                                value
+                            );
+                        }
+                        else
+                        {
+                            trackPeak = string.Empty;
+                        }
+                    }
+                    return new[]
+                    {
+                        path,
+                        album,
+                        albumGain,
+                        albumPeak,
+                        trackGain,
+                        trackPeak,
+                        status
+                    };
                 }
             }
         }

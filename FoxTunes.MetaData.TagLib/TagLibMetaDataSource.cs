@@ -280,12 +280,30 @@ namespace FoxTunes
             {
                 (this).Try(() =>
                 {
+                    if (tag.ReplayGainAlbumPeak == 0 || double.IsNaN(tag.ReplayGainAlbumPeak) || double.IsInfinity(tag.ReplayGainAlbumPeak))
+                    {
+                        //Invalid replay gain value.
+                        return;
+                    }
+                    this.AddTag(metaData, CommonMetaData.ReplayGainAlbumPeak, tag.ReplayGainAlbumPeak.ToString());
+                }, this.ErrorHandler);
+                (this).Try(() =>
+                {
                     if (tag.ReplayGainAlbumGain == 0 || double.IsNaN(tag.ReplayGainAlbumGain) || double.IsInfinity(tag.ReplayGainAlbumGain))
                     {
                         //Invalid replay gain value.
                         return;
                     }
                     this.AddTag(metaData, CommonMetaData.ReplayGainAlbumGain, tag.ReplayGainAlbumGain.ToString());
+                }, this.ErrorHandler);
+                (this).Try(() =>
+                {
+                    if (tag.ReplayGainTrackPeak == 0 || double.IsNaN(tag.ReplayGainTrackPeak) || double.IsInfinity(tag.ReplayGainTrackPeak))
+                    {
+                        //Invalid replay gain value.
+                        return;
+                    }
+                    this.AddTag(metaData, CommonMetaData.ReplayGainTrackPeak, tag.ReplayGainTrackPeak.ToString());
                 }, this.ErrorHandler);
                 (this).Try(() =>
                 {

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace FoxTunes
@@ -32,7 +33,7 @@ namespace FoxTunes
         {
             get
             {
-                return AudioFileNames.Select(fileName => new PlaylistItem() { FileName = fileName }).ToArray();
+                return AudioFileNames.Select(fileName => new PlaylistItem() { FileName = fileName, MetaDatas = new List<MetaDataItem>() }).ToArray();
             }
         }
     }

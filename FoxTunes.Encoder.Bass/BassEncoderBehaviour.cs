@@ -16,34 +16,16 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public SelectionConfigurationElement Destination { get; private set; }
-
-        public TextConfigurationElement Location { get; private set; }
-
         public BooleanConfigurationElement CopyTags { get; private set; }
-
-        public IntegerConfigurationElement Threads { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.PlaylistManager = core.Managers.Playlist;
             this.Configuration = core.Components.Configuration;
-            this.Destination = this.Configuration.GetElement<SelectionConfigurationElement>(
-                BassEncoderBehaviourConfiguration.SECTION,
-                BassEncoderBehaviourConfiguration.DESTINATION_ELEMENT
-            );
-            this.Location = this.Configuration.GetElement<TextConfigurationElement>(
-                BassEncoderBehaviourConfiguration.SECTION,
-                BassEncoderBehaviourConfiguration.DESTINATION_LOCATION_ELEMENT
-            );
             this.CopyTags = this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassEncoderBehaviourConfiguration.SECTION,
                 BassEncoderBehaviourConfiguration.COPY_TAGS
-            );
-            this.Threads = this.Configuration.GetElement<IntegerConfigurationElement>(
-                BassEncoderBehaviourConfiguration.SECTION,
-                BassEncoderBehaviourConfiguration.THREADS_ELEMENT
             );
             base.InitializeComponent(core);
         }

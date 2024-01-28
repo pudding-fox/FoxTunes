@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -22,6 +23,16 @@ namespace FoxTunes
 
         public string FileName { get; private set; }
 
+        public string GroupName { get; private set; }
+
+        public double ItemPeak { get; set; }
+
+        public double ItemGain { get; set; }
+
+        public double GroupPeak { get; set; }
+
+        public double GroupGain { get; set; }
+
         private IList<string> _Errors { get; set; }
 
         public IEnumerable<string> Errors
@@ -36,6 +47,8 @@ namespace FoxTunes
 
         public ScannerItemStatus Status { get; set; }
 
+        public ReplayGainMode Mode { get; set; }
+
         public void AddError(string error)
         {
             this._Errors.Add(error);
@@ -45,13 +58,35 @@ namespace FoxTunes
             }
         }
 
-        public static ScannerItem FromPlaylistItem(PlaylistItem playlistItem)
+        public static ScannerItem FromPlaylistItem(PlaylistItem playlistItem, ReplayGainMode mode)
         {
-            var encoderItem = new ScannerItem()
+            var scannerItem = new ScannerItem()
             {
-                FileName = playlistItem.FileName
+                FileName = playlistItem.FileName,
+                Mode = mode
             };
-            return encoderItem;
+            if (mode == ReplayGainMode.Album)
+            {
+                var parts = new List<string>();
+                lock (playlistItem.MetaDatas)
+                {
+                    var metaDatas = playlistItem.MetaDatas.ToDictionary(
+                        element => element.Name,
+                        StringComparer.OrdinalIgnoreCase
+                    );
+                    var metaDataItem = default(MetaDataItem);
+                    if (metaDatas.TryGetValue(CommonMetaData.Year, out metaDataItem))
+                    {
+                        parts.Add(metaDataItem.Value);
+                    }
+                    if (metaDatas.TryGetValue(CommonMetaData.Album, out metaDataItem))
+                    {
+                        parts.Add(metaDataItem.Value);
+                    }
+                }
+                scannerItem.GroupName = string.Join(" - ", parts);
+            }
+            return scannerItem;
         }
     }
 
