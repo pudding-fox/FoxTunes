@@ -103,9 +103,9 @@ namespace FoxTunes
                 var date = DateTimeHelper.FromString(Convert.ToString(value));
                 if (date == default(DateTime))
                 {
-                    return value;
+                    return string.Empty;
                 }
-                return date.ToShortDateString() + " " + date.ToShortTimeString();
+                return string.Concat(date.ToShortDateString(), " ", date.ToShortTimeString());
             }
 
             public static bool CanFormat(string format)
