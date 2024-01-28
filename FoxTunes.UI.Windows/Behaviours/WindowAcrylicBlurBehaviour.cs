@@ -76,6 +76,12 @@ namespace FoxTunes
             }
         }
 
+        protected override void OnDisabled()
+        {
+            this.AccentColors.Clear();
+            base.OnDisabled();
+        }
+
         public override IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return WindowAcrylicBlurBehaviourConfiguration.GetConfigurationSections();

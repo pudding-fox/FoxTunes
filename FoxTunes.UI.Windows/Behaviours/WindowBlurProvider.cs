@@ -41,8 +41,17 @@ namespace FoxTunes
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
         {
-            this.IsEnabled = this.Transparency.Value && string.Equals(this.Provider.Value.Id, this.Id, StringComparison.OrdinalIgnoreCase);
-            this.Refresh();
+            var enabled = this.Transparency.Value && string.Equals(this.Provider.Value.Id, this.Id, StringComparison.OrdinalIgnoreCase);
+            if (enabled && !this.IsEnabled)
+            {
+                this.IsEnabled = true;
+                this.Refresh();
+            }
+            else
+            {
+                this.IsEnabled = false;
+                this.OnDisabled();
+            }
         }
 
         public void Refresh()
@@ -55,6 +64,11 @@ namespace FoxTunes
         }
 
         protected abstract void OnRefresh();
+
+        protected virtual void OnDisabled()
+        {
+            //Nothing to do.
+        }
 
         public abstract IEnumerable<ConfigurationSection> GetConfigurationSections();
 

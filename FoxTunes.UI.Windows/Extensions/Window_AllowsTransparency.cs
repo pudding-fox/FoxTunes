@@ -144,8 +144,6 @@ namespace FoxTunes
             }
         }
 
-        public static Color CurrentAccentColor;
-
         public static void EnableAcrylicBlur(IntPtr handle, Color color)
         {
             var accent = new AccentPolicy()
@@ -168,7 +166,6 @@ namespace FoxTunes
             {
                 Marshal.FreeHGlobal(accentPtr);
             }
-            CurrentAccentColor = color;
         }
 
         public struct DwmColors

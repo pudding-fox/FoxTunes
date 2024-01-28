@@ -60,6 +60,7 @@ namespace FoxTunes
             var outputStream = this.PlaybackManager.CurrentStream;
             if (outputStream == null)
             {
+                await this.Refresh(WindowExtensions.DefaultAccentColor).ConfigureAwait(false);
                 return;
             }
             var fileData = default(IFileData);
@@ -126,6 +127,12 @@ namespace FoxTunes
         {
             var color = this.ImageResizer.GetMainColor(fileName);
             return Color.FromArgb(color.A, color.R, color.G, color.B);
+        }
+
+        protected override void OnDisabled()
+        {
+            this.AccentColors.Clear();
+            base.OnDisabled();
         }
 
         public override IEnumerable<ConfigurationSection> GetConfigurationSections()
