@@ -9,8 +9,15 @@ namespace FoxTunes
     [Serializable]
     public abstract class BaseComponent : IBaseComponent
     {
-        [NonSerialized]
-        public readonly SemaphoreSlim Semaphore = new SemaphoreSlim(1);
+        private volatile SemaphoreSlim Semaphore;
+
+        private void EnsureSemaphore()
+        {
+            if (this.Semaphore == null)
+            {
+                this.Semaphore = new SemaphoreSlim(1);
+            }
+        }
 
         public virtual void InitializeComponent(ICore core)
         {
@@ -53,6 +60,7 @@ namespace FoxTunes
 
         public void Interlocked(Action action, TimeSpan timeout)
         {
+            this.EnsureSemaphore();
             if (!this.Semaphore.Wait(timeout))
             {
                 throw new TimeoutException(string.Format("Failed to enter critical section after {0}ms", timeout.TotalMilliseconds));
@@ -69,6 +77,7 @@ namespace FoxTunes
 
         public async Task Interlocked(Func<Task> func, TimeSpan timeout)
         {
+            this.EnsureSemaphore();
             if (!await this.Semaphore.WaitAsync(timeout))
             {
                 throw new TimeoutException(string.Format("Failed to enter critical section after {0}ms", timeout.TotalMilliseconds));
@@ -85,6 +94,7 @@ namespace FoxTunes
 
         public T Interlocked<T>(Func<T> func, TimeSpan timeout)
         {
+            this.EnsureSemaphore();
             if (!this.Semaphore.Wait(timeout))
             {
                 throw new TimeoutException(string.Format("Failed to enter critical section after {0}ms", timeout.TotalMilliseconds));
@@ -101,6 +111,7 @@ namespace FoxTunes
 
         public async Task<T> Interlocked<T>(Func<Task<T>> func, TimeSpan timeout)
         {
+            this.EnsureSemaphore();
             if (!await this.Semaphore.WaitAsync(timeout))
             {
                 throw new TimeoutException(string.Format("Failed to enter critical section after {0}ms", timeout.TotalMilliseconds));

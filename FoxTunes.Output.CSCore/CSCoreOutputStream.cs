@@ -10,8 +10,8 @@ namespace FoxTunes
     {
         const int UPDATE_INTERVAL = 100;
 
-        public CSCoreOutputStream(string fileName, IWaveSource waveSource, ISoundOut soundOut)
-            : base(fileName)
+        public CSCoreOutputStream(PlaylistItem playlistItem, IWaveSource waveSource, ISoundOut soundOut)
+            : base(playlistItem)
         {
             this.WaveSource = waveSource;
             this.SoundOut = soundOut;

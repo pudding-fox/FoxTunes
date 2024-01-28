@@ -32,7 +32,14 @@ namespace FoxTunes.Managers
 
         protected virtual void PlaybackManager_CurrentStreamChanged(object sender, EventArgs e)
         {
-            this.UpdateCurrentItem();
+            if (this.PlaybackManager.CurrentStream == null)
+            {
+                this.CurrentItem = null;
+            }
+            else if (this.PlaybackManager.CurrentStream.PlaylistItem != this.CurrentItem)
+            {
+                this.CurrentItem = this.PlaybackManager.CurrentStream.PlaylistItem;
+            }
         }
 
         public Task Add(IEnumerable<string> paths)
@@ -84,7 +91,7 @@ namespace FoxTunes.Managers
                 {
                     index = 0;
                 }
-                await this.Play(this.Playlist.Set[index].FileName);
+                await this.Play(this.Playlist.Set[index]);
             }
             finally
             {
@@ -114,7 +121,7 @@ namespace FoxTunes.Managers
                 {
                     index = this.Playlist.Set.Count - 1;
                 }
-                await this.Play(this.Playlist.Set[index].FileName);
+                await this.Play(this.Playlist.Set[index]);
             }
             finally
             {
@@ -122,13 +129,13 @@ namespace FoxTunes.Managers
             }
         }
 
-        private Task Play(string fileName)
+        private Task Play(PlaylistItem playlistItem)
         {
             return this.PlaybackManager
-                .Load(fileName)
+                .Load(playlistItem)
                 .ContinueWith(_ =>
                 {
-                    if (!string.Equals(fileName, this.PlaybackManager.CurrentStream.FileName, StringComparison.OrdinalIgnoreCase))
+                    if (this.PlaybackManager.CurrentStream.PlaylistItem != playlistItem)
                     {
                         return;
                     }
@@ -142,23 +149,6 @@ namespace FoxTunes.Managers
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
             return task.Run().ContinueWith(_ => this.OnUpdated());
-        }
-
-        protected virtual void UpdateCurrentItem()
-        {
-            if (this.PlaybackManager.CurrentStream != null)
-            {
-                foreach (var item in this.Playlist.Set)
-                {
-                    if (!string.Equals(item.FileName, this.PlaybackManager.CurrentStream.FileName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-                    this.CurrentItem = item;
-                    return;
-                }
-            }
-            this.CurrentItem = null;
         }
 
         private PlaylistItem _CurrentItem { get; set; }

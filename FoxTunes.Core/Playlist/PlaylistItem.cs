@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.ObjectModel;
 
 namespace FoxTunes
@@ -23,5 +24,49 @@ namespace FoxTunes
         public ObservableCollection<MetaDataItem> MetaDatas { get; private set; }
 
         public ObservableCollection<PropertyItem> Properties { get; private set; }
+
+        public bool Equals(PlaylistItem other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            return this.Id == other.Id && string.Equals(this.FileName, other.FileName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as PlaylistItem);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode += this.Id.GetHashCode();
+            hashCode += this.FileName.GetHashCode();
+            return hashCode;
+        }
+
+        public static bool operator ==(PlaylistItem a, PlaylistItem b)
+        {
+            if ((object)a == null && (object)b == null)
+            {
+                return true;
+            }
+            if ((object)a == null || (object)b == null)
+            {
+                return false;
+            }
+            if (object.ReferenceEquals((object)a, (object)b))
+            {
+                return true;
+            }
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(PlaylistItem a, PlaylistItem b)
+        {
+            return !(a == b);
+        }
     }
 }

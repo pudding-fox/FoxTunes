@@ -6,7 +6,7 @@ namespace FoxTunes.Interfaces
     {
         bool IsSupported(string fileName);
 
-        Task<IOutputStream> Load(string fileName);
+        Task<IOutputStream> Load(PlaylistItem playlistItem);
 
         Task Unload(IOutputStream stream);
     }

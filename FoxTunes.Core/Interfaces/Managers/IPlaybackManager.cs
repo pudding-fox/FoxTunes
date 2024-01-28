@@ -11,7 +11,7 @@ namespace FoxTunes.Interfaces
 
         event EventHandler CurrentStreamChanged;
 
-        Task Load(string fileName);
+        Task Load(PlaylistItem playlistItem);
 
         Task Unload();
 
