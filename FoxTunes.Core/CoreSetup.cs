@@ -20,7 +20,7 @@ namespace FoxTunes
             }
         }
 
-        bool ICoreSetup.HasSlot(string slot)
+        public bool HasSlot(string slot)
         {
             return this.Slots.Contains(slot);
         }

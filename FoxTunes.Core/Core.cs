@@ -10,7 +10,6 @@ namespace FoxTunes
         private Core()
         {
             ComponentRegistry.Instance.Clear();
-            ComponentResolver.Slots.Clear();
             IsShuttingDown = false;
         }
 
@@ -21,7 +20,7 @@ namespace FoxTunes
             {
                 if (!this.Setup.HasSlot(slot))
                 {
-                    ComponentResolver.Slots.Add(slot, ComponentSlots.Blocked);
+                    ComponentResolver.Slots[slot] = ComponentSlots.Blocked;
                 }
             }
         }

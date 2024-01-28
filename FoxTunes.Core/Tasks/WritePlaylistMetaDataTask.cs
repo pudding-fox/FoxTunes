@@ -161,11 +161,14 @@ namespace FoxTunes
                         ).ConfigureAwait(false);
 
                         //Update the import date otherwise the file might be re-scanned and changes lost.
-                        var libraryItem = new LibraryItem()
+                        if (playlistItem.LibraryItem_Id.HasValue)
                         {
-                            Id = playlistItem.LibraryItem_Id.Value
-                        };
-                        await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow);
+                            var libraryItem = new LibraryItem()
+                            {
+                                Id = playlistItem.LibraryItem_Id.Value
+                            };
+                            await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow);
+                        }
                     }
                     catch (Exception e)
                     {
