@@ -19,6 +19,30 @@ namespace FoxTunes
             this.InitializeComponent();
         }
 
+        public LibraryBrowserViewMode ViewMode
+        {
+            get
+            {
+                var viewModel = this.FindResource("ViewModel") as global::FoxTunes.ViewModel.LibraryBrowser;
+                if (viewModel == null)
+                {
+                    return LibraryBrowserViewMode.Grid;
+                }
+                return viewModel.ViewMode;
+            }
+        }
+
+        public ListBox GetActiveListBox()
+        {
+            var container = this.ItemsControl.ItemContainerGenerator.ContainerFromIndex(this.ItemsControl.Items.Count - 1) as ContentPresenter;
+            if (container == null)
+            {
+                return null;
+            }
+            var listBox = container.ContentTemplate.FindName("ListBox", container) as ListBox;
+            return listBox;
+        }
+
         protected virtual void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var listBox = sender as ListBox;
@@ -41,28 +65,24 @@ namespace FoxTunes
 
         protected virtual void OnLoaded(object sender, RoutedEventArgs e)
         {
-            this.TrackVisibility();
+            this.EnableVisibilityTracking();
             this.FixFocus();
         }
 
         protected virtual void OnUnloaded(object sender, RoutedEventArgs e)
         {
+            this.DisableVisibilityTracking();
             this.FixFocus();
         }
 
-        protected virtual void TrackVisibility()
+        protected virtual void EnableVisibilityTracking()
         {
-            var viewModel = this.FindResource("ViewModel") as global::FoxTunes.ViewModel.LibraryBrowser;
-            if (viewModel == null)
-            {
-                return;
-            }
-            var listBox = this.ItemsControl.GetVisualChild<ListBox>();
+            var listBox = this.GetActiveListBox();
             if (listBox == null)
             {
                 return;
             }
-            switch (viewModel.ViewMode)
+            switch (this.ViewMode)
             {
                 default:
                 case LibraryBrowserViewMode.Grid:
@@ -76,6 +96,17 @@ namespace FoxTunes
             }
         }
 
+        protected virtual void DisableVisibilityTracking()
+        {
+            var listBox = this.GetActiveListBox();
+            if (listBox == null)
+            {
+                return;
+            }
+            ItemsControlExtensions.SetTrackItemVisibility(listBox, false);
+            ItemsControlExtensions.RemoveIsItemVisibleChangedHandler(listBox, this.OnIsItemVisibleChanged);
+        }
+
         protected virtual void FixFocus()
         {
             if (!this.ItemsControl.IsKeyboardFocusWithin)
@@ -83,17 +114,11 @@ namespace FoxTunes
                 return;
             }
             Keyboard.ClearFocus();
-            var container = this.ItemsControl.ItemContainerGenerator.ContainerFromIndex(this.ItemsControl.Items.Count - 1) as ContentPresenter;
-            if (container == null)
+            var listBox = this.GetActiveListBox();
+            if (listBox == null)
             {
                 return;
             }
-            var listBox = container.ContentTemplate.FindName("ListBox", container) as ListBox;
-            this.FixFocus(listBox);
-        }
-
-        protected virtual void FixFocus(ListBox listBox)
-        {
             var index = listBox.SelectedIndex;
             if (index == -1)
             {
