@@ -23,7 +23,7 @@ namespace FoxTunes
 
         const string NET40 = "net40";
 
-        const string NET461 = "net461";
+        const string NET462 = "net462";
 
         const string LIB = "lib";
 
@@ -45,13 +45,21 @@ namespace FoxTunes
             Console.WriteLine("Version: {0}", version);
             CreateRelease(version, ReleaseFlags.FrameworkNET40 | ReleaseFlags.PlatformX86 | ReleaseFlags.L10N_FR);
             CreateRelease(version, ReleaseFlags.FrameworkNET40 | ReleaseFlags.PlatformX64 | ReleaseFlags.L10N_FR);
-            CreateRelease(version, ReleaseFlags.FrameworkNET461 | ReleaseFlags.PlatformX86 | ReleaseFlags.L10N_FR);
-            CreateRelease(version, ReleaseFlags.FrameworkNET461 | ReleaseFlags.PlatformX64 | ReleaseFlags.L10N_FR);
+            CreateRelease(version, ReleaseFlags.FrameworkNET462 | ReleaseFlags.PlatformX86 | ReleaseFlags.L10N_FR);
+            CreateRelease(version, ReleaseFlags.FrameworkNET462 | ReleaseFlags.PlatformX64 | ReleaseFlags.L10N_FR);
         }
 
         private static void CreateRelease(string version, ReleaseFlags flags)
         {
             var target = GetTarget(flags);
+            var source = GetSource(target, flags);
+
+            if (!Directory.Exists(source))
+            {
+                Console.WriteLine("Source was not build: {0}", source);
+                return;
+            }
+
             Console.WriteLine("Creating release: {0}", target);
             if (Directory.Exists(target))
             {
@@ -99,13 +107,13 @@ namespace FoxTunes
         private static void AddPackageElement(string target, Package package, PackageElement element, ReleaseFlags flags)
         {
             //Filter by framework.
-            if (element.Flags.HasFlag(PackageElementFlags.FrameworkNET40) || element.Flags.HasFlag(PackageElementFlags.FrameworkNET461))
+            if (element.Flags.HasFlag(PackageElementFlags.FrameworkNET40) || element.Flags.HasFlag(PackageElementFlags.FrameworkNET462))
             {
                 if (flags.HasFlag(ReleaseFlags.FrameworkNET40) && !element.Flags.HasFlag(PackageElementFlags.FrameworkNET40))
                 {
                     return;
                 }
-                if (flags.HasFlag(ReleaseFlags.FrameworkNET461) && !element.Flags.HasFlag(PackageElementFlags.FrameworkNET461))
+                if (flags.HasFlag(ReleaseFlags.FrameworkNET462) && !element.Flags.HasFlag(PackageElementFlags.FrameworkNET462))
                 {
                     return;
                 }
@@ -211,7 +219,7 @@ namespace FoxTunes
             Process.Start(info).WaitForExit();
         }
 
-        private static string GetSource(string target, Package package, PackageElement element, ReleaseFlags flags)
+        private static string GetSource(string target, ReleaseFlags flags)
         {
             var parts = new List<string>()
             {
@@ -230,12 +238,16 @@ namespace FoxTunes
             {
                 parts.Add(NET40);
             }
-            if (flags.HasFlag(ReleaseFlags.FrameworkNET461))
+            if (flags.HasFlag(ReleaseFlags.FrameworkNET462))
             {
-                parts.Add(NET461);
+                parts.Add(NET462);
             }
-            parts.Add(element.FileName);
             return Path.Combine(parts.ToArray());
+        }
+
+        private static string GetSource(string target, Package package, PackageElement element, ReleaseFlags flags)
+        {
+            return Path.Combine(GetSource(target, flags), element.FileName);
         }
 
         private static string GetDestination(string target, Package package, PackageElement element, ReleaseFlags flags)
@@ -268,9 +280,9 @@ namespace FoxTunes
             {
                 parts.Add(NET40);
             }
-            if (flags.HasFlag(ReleaseFlags.FrameworkNET461))
+            if (flags.HasFlag(ReleaseFlags.FrameworkNET462))
             {
-                parts.Add(NET461);
+                parts.Add(NET462);
             }
             return Path.Combine(parts.ToArray());
         }
@@ -654,7 +666,7 @@ namespace FoxTunes
                     new PackageElement[]
                     {
                         "FoxTunes.Core.Windows.dll",
-                        new PackageElement("FoxTunes.Core.Windows.UWP.dll", PackageElementFlags.FrameworkNET461)
+                        new PackageElement("FoxTunes.Core.Windows.UWP.dll", PackageElementFlags.FrameworkNET462)
                     },
                     PackageFlags.Default
                 ),
@@ -675,7 +687,7 @@ namespace FoxTunes
         {
             None = 0,
             FrameworkNET40 = 1,
-            FrameworkNET461 = 2,
+            FrameworkNET462 = 2,
             PlatformX86 = 4,
             PlatformX64 = 8,
             L10N_FR = 16
@@ -733,7 +745,7 @@ namespace FoxTunes
         {
             None = 0,
             FrameworkNET40 = 1,
-            FrameworkNET461 = 2,
+            FrameworkNET462 = 2,
             PlatformX86 = 4,
             PlatformX64 = 8,
             LargeAddressAware = 16

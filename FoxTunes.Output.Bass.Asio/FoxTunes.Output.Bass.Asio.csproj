@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net40;net461</TargetFrameworks>
+    <TargetFrameworks>net40;net462</TargetFrameworks>
     <AssemblyName>FoxTunes.Output.Bass.Asio</AssemblyName>
     <OutputPath>..\distribution\$(Platform)\</OutputPath>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
@@ -23,13 +23,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net461'">
+    <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net462'">
       <HintPath>..\lib\ManagedBass.dll</HintPath>
     </Reference>
-    <Reference Include="ManagedBass.Mix" Condition="'$(TargetFramework)' == 'net461'">
+    <Reference Include="ManagedBass.Mix" Condition="'$(TargetFramework)' == 'net462'">
       <HintPath>..\lib\ManagedBass.Mix.dll</HintPath>
     </Reference>
-    <Reference Include="ManagedBass.Asio" Condition="'$(TargetFramework)' == 'net461'">
+    <Reference Include="ManagedBass.Asio" Condition="'$(TargetFramework)' == 'net462'">
       <HintPath>..\lib\ManagedBass.Asio.dll</HintPath>
     </Reference>
   </ItemGroup>

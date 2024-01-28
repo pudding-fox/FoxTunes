@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net40;net461</TargetFrameworks>
+    <TargetFrameworks>net40;net462</TargetFrameworks>
     <AssemblyName>FoxTunes.Output.Bass.Tempo</AssemblyName>
     <OutputPath>..\distribution\$(Platform)\</OutputPath>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
@@ -20,10 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net461'">
+    <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net462'">
       <HintPath>..\lib\ManagedBass.dll</HintPath>
     </Reference>
-    <Reference Include="ManagedBass.Fx" Condition="'$(TargetFramework)' == 'net461'">
+    <Reference Include="ManagedBass.Fx" Condition="'$(TargetFramework)' == 'net462'">
       <HintPath>..\lib\ManagedBass.Fx.dll</HintPath>
     </Reference>
   </ItemGroup>
