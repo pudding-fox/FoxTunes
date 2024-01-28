@@ -71,8 +71,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Images\Fox.ico" />
-    <EmbeddedResource Include="Images\Fox.png" />
+    <None Remove="Images\Fox.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Images\Fox.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

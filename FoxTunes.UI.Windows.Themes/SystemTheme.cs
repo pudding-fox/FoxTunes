@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 
@@ -6,6 +7,14 @@ namespace FoxTunes
 {
     public class SystemTheme : ThemeBase
     {
+        static SystemTheme()
+        {
+            ResourceExtractor.Extract(typeof(SystemTheme), new Dictionary<string, string>()
+            {
+                {  "FoxTunes.UI.Windows.Themes.Images.System_Artwork.png", string.Format("Images{0}System_Artwork.png", Path.DirectorySeparatorChar) }
+            });
+        }
+
         public SystemTheme()
             : base("D4EBB53F-BF59-4D61-99E1-D6D52926AE3F", "System")
         {
@@ -17,11 +26,11 @@ namespace FoxTunes
 
         public ResourceDictionary ResourceDictionary { get; private set; }
 
-        public override Stream ArtworkPlaceholder
+        public override string ArtworkPlaceholder
         {
             get
             {
-                return typeof(SystemTheme).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Themes.Resources.System_Artwork.png");
+                return "pack://siteoforigin:,,,/Images/System_Artwork.png";
             }
         }
 
