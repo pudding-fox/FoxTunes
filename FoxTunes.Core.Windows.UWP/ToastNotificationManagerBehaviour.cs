@@ -85,21 +85,28 @@ namespace FoxTunes
             {
                 return;
             }
-            ToastNotificationHelper.Install();
-            ToastNotificationHelper.Invoke(new Action(
-                () =>
-                {
-                    if (Publication.IsPortable)
+            try
+            {
+                ToastNotificationHelper.Install();
+                ToastNotificationHelper.Invoke(new Action(
+                    () =>
                     {
-                        this.ToastNotifier = ToastNotificationManager.CreateToastNotifier(ToastNotificationHelper.ID);
+                        if (Publication.IsPortable)
+                        {
+                            this.ToastNotifier = ToastNotificationManager.CreateToastNotifier(ToastNotificationHelper.ID);
+                        }
+                        else
+                        {
+                            this.ToastNotifier = ToastNotificationManager.CreateToastNotifier();
+                        }
                     }
-                    else
-                    {
-                        this.ToastNotifier = ToastNotificationManager.CreateToastNotifier();
-                    }
-                }
-            ), null);
-            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
+                ), null);
+                this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to enable: {0}", e.Message);
+            }
         }
 
         public void Disable()
@@ -112,14 +119,21 @@ namespace FoxTunes
             {
                 this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
             }
-            ToastNotificationHelper.NotificationActivator.Disable();
             try
             {
-                ToastNotificationManager.History.Remove(TAG, GROUP, ToastNotificationHelper.ID);
+                ToastNotificationHelper.NotificationActivator.Disable();
+                try
+                {
+                    ToastNotificationManager.History.Remove(TAG, GROUP, ToastNotificationHelper.ID);
+                }
+                catch
+                {
+                    //Nothing can be done.
+                }
             }
-            catch
+            catch (Exception e)
             {
-                //Nothing can be done.
+                Logger.Write(this, LogLevel.Warn, "Failed to disable: {0}", e.Message);
             }
             this.ToastNotifier = null;
         }
@@ -141,8 +155,15 @@ namespace FoxTunes
             {
                 return;
             }
-            var notification = this.CreateNotification(outputStream);
-            ToastNotificationHelper.Invoke(new Action(() => this.ToastNotifier.Show(notification)), null);
+            try
+            {
+                var notification = this.CreateNotification(outputStream);
+                ToastNotificationHelper.Invoke(new Action(() => this.ToastNotifier.Show(notification)), null);
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to show notification: {0}", e.Message);
+            }
         }
 
         protected virtual ToastNotification CreateNotification(IOutputStream outputStream)
