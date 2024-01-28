@@ -23,9 +23,9 @@ namespace FoxTunes
             AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= this.OnReflectionOnlyAssemblyResolve;
         }
 
-        public string Resolve(string name)
+        public string Resolve(string directoryName, string name)
         {
-            foreach (var fileName in ComponentScanner.Instance.FileNames)
+            foreach (var fileName in this.GetFiles(directoryName))
             {
                 var assemblyName = default(AssemblyName);
                 try
@@ -59,6 +59,23 @@ namespace FoxTunes
             throw new AssemblyResolverException(string.Format("Failed to resolve assembly {0}.", name));
         }
 
+        public IEnumerable<string> GetFiles(string directoryName)
+        {
+            //Prefer assemblies in the base directory.
+            foreach (var fileName in Directory.GetFiles(ComponentScanner.Instance.Location, "*.dll"))
+            {
+                yield return fileName;
+            }
+            //If the requesting assembly is in another folder then check that too.
+            if (Directory.Exists(directoryName) && !string.Equals(Path.GetFullPath(ComponentScanner.Instance.Location), Path.GetFullPath(directoryName)))
+            {
+                foreach (var fileName in Directory.GetFiles(directoryName, "*.dll"))
+                {
+                    yield return fileName;
+                }
+            }
+        }
+
         protected virtual Assembly OnReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
         {
             try
@@ -69,7 +86,12 @@ namespace FoxTunes
             {
                 //Nothing to do.
             }
-            var fileName = this.Resolve(args.Name);
+            var directoryName = default(string);
+            if (File.Exists(args.RequestingAssembly.Location))
+            {
+                directoryName = Path.GetDirectoryName(args.RequestingAssembly.Location);
+            }
+            var fileName = this.Resolve(directoryName, args.Name);
             var assembly = AssemblyRegistry.Instance.GetOrLoadReflectionAssembly(fileName);
             foreach (var reference in assembly.GetReferencedAssemblies())
             {

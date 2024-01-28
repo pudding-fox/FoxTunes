@@ -26,7 +26,7 @@ namespace FoxTunes
         {
             get
             {
-                return Directory.GetFiles(this.Location, "FoxTunes*.dll");
+                return Directory.GetFiles(this.Location, "FoxTunes*.dll", SearchOption.AllDirectories);
             }
         }
 
