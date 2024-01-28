@@ -1,5 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,6 +9,8 @@ namespace FoxTunes
 {
     public class UpdatePlaylistPlayCountTask : PlaylistTaskBase
     {
+        public const string DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
+
         public UpdatePlaylistPlayCountTask(PlaylistItem playlistItem)
         {
             this.PlaylistItem = playlistItem;
@@ -35,23 +39,12 @@ namespace FoxTunes
         {
             lock (this.PlaylistItem.MetaDatas)
             {
-                var metaDataItem = this.PlaylistItem.MetaDatas.FirstOrDefault(
-                    _metaDataItem => string.Equals(_metaDataItem.Name, CommonMetaData.PlayCount, StringComparison.OrdinalIgnoreCase)
+                var metaDatas = this.PlaylistItem.MetaDatas.ToDictionary(
+                    metaDataItem => metaDataItem.Name,
+                    StringComparer.OrdinalIgnoreCase
                 );
-                if (metaDataItem == null)
-                {
-                    metaDataItem = new MetaDataItem(CommonMetaData.PlayCount, MetaDataItemType.Tag);
-                    this.PlaylistItem.MetaDatas.Add(metaDataItem);
-                }
-                var playCount = default(int);
-                if (!string.IsNullOrEmpty(metaDataItem.Value) && int.TryParse(metaDataItem.Value, out playCount))
-                {
-                    metaDataItem.Value = (playCount + 1).ToString();
-                }
-                else
-                {
-                    metaDataItem.Value = "1";
-                }
+                this.UpdatePlayCount(metaDatas);
+                this.UpdateLastPlayed(metaDatas);
             }
             var write = MetaDataBehaviourConfiguration.GetWriteBehaviour(
                 this.Write.Value
@@ -59,8 +52,42 @@ namespace FoxTunes
             await this.MetaDataManager.Save(
                 new[] { this.PlaylistItem },
                 write,
-                CommonMetaData.PlayCount
+                CommonMetaData.PlayCount,
+                CommonMetaData.LastPlayed
             ).ConfigureAwait(false);
+        }
+
+        protected virtual void UpdatePlayCount(IDictionary<string, MetaDataItem> metaDatas)
+        {
+            var metaDataItem = default(MetaDataItem);
+            if (!metaDatas.TryGetValue(CommonMetaData.PlayCount, out metaDataItem))
+            {
+                metaDataItem = new MetaDataItem(CommonMetaData.PlayCount, MetaDataItemType.Tag);
+                this.PlaylistItem.MetaDatas.Add(metaDataItem);
+            }
+            var playCount = default(int);
+            if (!string.IsNullOrEmpty(metaDataItem.Value) && int.TryParse(metaDataItem.Value, out playCount))
+            {
+                metaDataItem.Value = Convert.ToString(playCount + 1);
+            }
+            else
+            {
+                metaDataItem.Value = "1";
+            }
+        }
+
+        protected virtual void UpdateLastPlayed(IDictionary<string, MetaDataItem> metaDatas)
+        {
+            var metaDataItem = default(MetaDataItem);
+            if (!metaDatas.TryGetValue(CommonMetaData.LastPlayed, out metaDataItem))
+            {
+                metaDataItem = new MetaDataItem(CommonMetaData.LastPlayed, MetaDataItemType.Tag);
+                this.PlaylistItem.MetaDatas.Add(metaDataItem);
+            }
+            //TODO: I can't work out what the standard is for this value.
+            //TODO: I've seen DateTime.ToFileTime() but that seems a little too windows-ish.
+            //TODO: Using yyyy/MM/dd HH:mm:ss for now.
+            metaDataItem.Value = DateTime.UtcNow.ToString(DATE_FORMAT, CultureInfo.InvariantCulture);
         }
     }
 }
