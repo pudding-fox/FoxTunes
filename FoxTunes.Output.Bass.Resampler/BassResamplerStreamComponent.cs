@@ -42,8 +42,9 @@ namespace FoxTunes
             get
             {
                 return string.Format(
-                    "{0} ({1} -> {2})",
+                    "{0} ({1}/{2} -> {1}/{3})",
                     this.Name,
+                    BassUtils.DepthDescription(this.Flags),
                     BassUtils.RateDescription(this.InputRate),
                     BassUtils.RateDescription(this.Rate)
                 );
