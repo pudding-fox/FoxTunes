@@ -101,7 +101,7 @@ namespace FoxTunes {
         ///        }
         ///        parts.push(tag.title);
         ///        return parts.join(&quot; - &quot;);
-        ///    } return fileName;
+        ///    } return filename(fileName);
         ///})().
         /// </summary>
         internal static string Disk_Track_Title {
