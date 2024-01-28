@@ -216,6 +216,9 @@
   <data name="UIComponentLayoutProviderPresets.Main.2" xml:space="preserve">
     <value>Default (With WaveBar)</value>
   </data>
+  <data name="UIComponentLayoutProviderPresets.Main.3" xml:space="preserve">
+    <value>Default (With Visualizations)</value>
+  </data>
   <data name="UIComponentStackContainer.Name" xml:space="preserve">
     <value>Stack Grid</value>
   </data>

@@ -13,6 +13,8 @@ namespace FoxTunes
 
             public const string B = "BBBB00AD-2D37-41EB-968F-86EE5C566C78";
 
+            public const string C = "CCCCEA3C-E75C-48CE-B15D-B11873448DE2";
+
             public static readonly IEnumerable<Preset> Presets = new[]
             {
                 new Preset(
@@ -24,6 +26,11 @@ namespace FoxTunes
                     B,
                     Strings.UIComponentLayoutProviderPresets_Main_2,
                     Resources.Main_2
+                ),
+                new Preset(
+                    C,
+                    Strings.UIComponentLayoutProviderPresets_Main_3,
+                    Resources.Main_3
                 ),
             };
         }

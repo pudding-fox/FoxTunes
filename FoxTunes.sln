@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32901.82
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Core", "FoxTunes.Core\FoxTunes.Core.csproj", "{62CD8F70-8415-4C15-B672-CB18475ABD7E}"
 EndProject
@@ -140,6 +140,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Scripting.JS.ClearScript", "FoxTunes.Scripting.JS.ClearScript\FoxTunes.Scripting.JS.ClearScript.csproj", "{5340FAA8-21D2-4C48-9AFA-C4D77370DF72}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Scripting.JS.V8Net", "FoxTunes.Scripting.JS.V8Net\FoxTunes.Scripting.JS.V8Net.csproj", "{97788B04-94B9-46CE-87FC-050217C999A8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.UI.Windows.Layout.Tests", "FoxTunes.UI.Windows.Layout.Tests\FoxTunes.UI.Windows.Layout.Tests.csproj", "{1AD2F86E-BBC0-47DD-AABD-348FEA0FDA3E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -391,6 +393,10 @@ Global
 		{97788B04-94B9-46CE-87FC-050217C999A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97788B04-94B9-46CE-87FC-050217C999A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97788B04-94B9-46CE-87FC-050217C999A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AD2F86E-BBC0-47DD-AABD-348FEA0FDA3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AD2F86E-BBC0-47DD-AABD-348FEA0FDA3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AD2F86E-BBC0-47DD-AABD-348FEA0FDA3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AD2F86E-BBC0-47DD-AABD-348FEA0FDA3E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -457,6 +463,7 @@ Global
 		{D1C88C28-8314-4F09-AFBD-A7C44422F4CC} = {B084C572-A727-4879-A10F-0C2ECFB86E3C}
 		{5340FAA8-21D2-4C48-9AFA-C4D77370DF72} = {B084C572-A727-4879-A10F-0C2ECFB86E3C}
 		{97788B04-94B9-46CE-87FC-050217C999A8} = {B084C572-A727-4879-A10F-0C2ECFB86E3C}
+		{1AD2F86E-BBC0-47DD-AABD-348FEA0FDA3E} = {E9BFA65B-36CD-40D3-8EAE-B5D544A1E7F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9293982D-B2F3-4C86-A307-057EE1CFA115}
