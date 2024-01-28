@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace FoxTunes.Config
 {
@@ -10,6 +12,15 @@ namespace FoxTunes.Config
         public IntegerConfigurationElement()
         {
             this.InitializeComponent();
+        }
+
+        protected virtual void OnDragCompleted(object sender, RoutedEventArgs e)
+        {
+            var expression = BindingOperations.GetBindingExpression(this.Slider, Slider.ValueProperty);
+            if (expression != null)
+            {
+                expression.UpdateSource();
+            }
         }
     }
 }

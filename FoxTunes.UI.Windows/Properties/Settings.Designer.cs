@@ -58,5 +58,17 @@ namespace FoxTunes.Properties {
                 this["MiniWindowBounds"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0,0,0,0")]
+        public global::System.Windows.Rect SettingsWindowBounds {
+            get {
+                return ((global::System.Windows.Rect)(this["SettingsWindowBounds"]));
+            }
+            set {
+                this["SettingsWindowBounds"] = value;
+            }
+        }
     }
 }

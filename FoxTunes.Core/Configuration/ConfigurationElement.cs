@@ -132,7 +132,7 @@ namespace FoxTunes
             this.Name = element.Name;
             this.Description = element.Description;
             this.Path = element.Path;
-            this.IsHidden = false;
+            this.IsHidden = element.IsHidden;
             this.ValidationRules = element.ValidationRules;
             this.Flags = element.Flags;
             this.OnUpdate(element);
@@ -166,7 +166,7 @@ namespace FoxTunes
 
         }
 
-        public T DefaultValue { get; private set; }
+        public object DefaultValue { get; private set; }
 
         private T _Value { get; set; }
 
@@ -178,7 +178,7 @@ namespace FoxTunes
             }
             set
             {
-                if (this.DefaultValue == null || this.DefaultValue.Equals(default(T)))
+                if (this.DefaultValue == null)
                 {
                     this.DefaultValue = value;
                 }
@@ -214,7 +214,7 @@ namespace FoxTunes
 
         public override void Reset()
         {
-            this.Value = this.DefaultValue;
+            this.Value = (T)Convert.ChangeType(this.DefaultValue, typeof(T));
         }
     }
 
@@ -222,7 +222,6 @@ namespace FoxTunes
     public enum ConfigurationElementFlags : byte
     {
         None = 0,
-        MultiLine = 1,
-        Slider = 2
+        MultiLine = 1
     }
 }
