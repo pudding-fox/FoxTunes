@@ -355,17 +355,18 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                if (this.Bitmap == null)
+                var bitmap = this.Bitmap;
+                if (bitmap == null)
                 {
                     return;
                 }
-                if (!this.Bitmap.TryLock(LockTimeout))
+                if (!bitmap.TryLock(LockTimeout))
                 {
                     return;
                 }
-                BitmapHelper.Clear(BitmapHelper.CreateRenderInfo(this.Bitmap, this.Color));
-                this.Bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight));
-                this.Bitmap.Unlock();
+                BitmapHelper.Clear(BitmapHelper.CreateRenderInfo(bitmap, this.Color));
+                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+                bitmap.Unlock();
             });
         }
 
