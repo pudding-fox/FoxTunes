@@ -40,6 +40,8 @@ namespace FoxTunes.Interfaces
 
         bool GetFormat(out int rate, out int channels, out OutputStreamFormat format);
 
+        bool GetChannelMap(out IDictionary<int, OutputChannel> channels);
+
         bool CanGetData { get; }
 
         event EventHandler CanGetDataChanged;
@@ -65,5 +67,18 @@ namespace FoxTunes.Interfaces
         }
 
         public IOutputStream Stream { get; private set; }
+    }
+
+    public enum OutputChannel : byte
+    {
+        None,
+        Left,
+        Right,
+        FrontLeft,
+        FrontRight,
+        RearLeft,
+        RearRight,
+        Center,
+        LFE
     }
 }

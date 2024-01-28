@@ -153,6 +153,33 @@
   <data name="PeakMeterBehaviourConfiguration.Path" xml:space="preserve">
     <value>Peak Meter</value>
   </data>
+  <data name="Speakers.Center" xml:space="preserve">
+    <value>C</value>
+  </data>
+  <data name="Speakers.FrontLeft" xml:space="preserve">
+    <value>FL</value>
+  </data>
+  <data name="Speakers.FrontRight" xml:space="preserve">
+    <value>FR</value>
+  </data>
+  <data name="Speakers.Left" xml:space="preserve">
+    <value>L</value>
+  </data>
+  <data name="Speakers.LFE" xml:space="preserve">
+    <value>LFE</value>
+  </data>
+  <data name="Speakers.RearLeft" xml:space="preserve">
+    <value>RL</value>
+  </data>
+  <data name="Speakers.RearRight" xml:space="preserve">
+    <value>RR</value>
+  </data>
+  <data name="Speakers.Right" xml:space="preserve">
+    <value>R</value>
+  </data>
+  <data name="Speakers.Unknown" xml:space="preserve">
+    <value>?</value>
+  </data>
   <data name="SpectrumBehaviourConfiguration.Bands" xml:space="preserve">
     <value>Bands (Enhanced)</value>
   </data>

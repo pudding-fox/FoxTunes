@@ -329,24 +329,10 @@ namespace FoxTunes
 
         private static void UpdateValues(PeakRendererData data)
         {
-            switch (data.Format)
-            {
-                case OutputStreamFormat.Short:
-                    UpdateValues(data.Samples16, data.Samples32, data.SampleCount);
-                    break;
-            }
-            UpdateValues(data.Samples32, data.Values, data.Rms, data.Channels, data.SampleCount);
+            UpdateValues(data.Samples, data.Values, data.Rms, data.Channels, data.SampleCount);
         }
 
-        private static void UpdateValues(short[] samples16, float[] samples32, int count)
-        {
-            for (var a = 0; a < count; a++)
-            {
-                samples32[a] = (float)samples16[a] / short.MaxValue;
-            }
-        }
-
-        private static void UpdateValues(float[] samples, float[] values, float[] rms, int channels, int count)
+        private static void UpdateValues(float[,] samples, float[] values, float[] rms, int channels, int count)
         {
             var doRms = rms != null;
             for (var channel = 0; channel < channels; channel++)
@@ -367,7 +353,7 @@ namespace FoxTunes
             {
                 for (var channel = 0; channel < channels; channel++)
                 {
-                    var value = samples[position + channel];
+                    var value = samples[channel, position];
                     values[channel] = Math.Max(value, values[channel]);
                     if (doRms)
                     {
@@ -440,6 +426,8 @@ namespace FoxTunes
 
             public float[] Samples32;
 
+            public float[,] Samples;
+
             public int SampleCount;
 
             public float[] Values;
@@ -470,12 +458,21 @@ namespace FoxTunes
                 {
                     case OutputStreamFormat.Short:
                         this.SampleCount = this.Renderer.Output.GetData(this.Samples16) / sizeof(short);
+                        for (var a = 0; a < this.SampleCount; a++)
+                        {
+                            this.Samples32[a] = (float)this.Samples16[a] / short.MaxValue;
+                        }
                         break;
                     case OutputStreamFormat.Float:
                         this.SampleCount = this.Renderer.Output.GetData(this.Samples32) / sizeof(float);
                         break;
                 }
-                return this.Rate > 0 && this.Channels > 0 && this.SampleCount > 0;
+                if (this.Rate > 0 && this.Channels > 0 && this.SampleCount > 0)
+                {
+                    this.SampleCount = Deinterlace(this.Samples, this.Samples32, this.Channels, this.SampleCount);
+                    return true;
+                }
+                return false;
             }
 
             private void Update(int rate, int channels, OutputStreamFormat format)
@@ -498,6 +495,7 @@ namespace FoxTunes
                 {
                     this.Samples32 = this.Renderer.Output.GetBuffer<float>(TimeSpan.FromMilliseconds(this.Renderer.UpdateInterval));
                 }
+                this.Samples = new float[this.Channels, this.Samples32.Length];
 
                 this.Values = new float[channels];
                 this.ValueElements = new Int32Rect[channels];
@@ -520,7 +518,14 @@ namespace FoxTunes
                 {
                     Array.Clear(this.Samples16, 0, this.Samples16.Length);
                 }
-                Array.Clear(this.Samples32, 0, this.Samples32.Length);
+                if (this.Samples32 != null)
+                {
+                    Array.Clear(this.Samples32, 0, this.Samples32.Length);
+                }
+                if (this.Samples != null)
+                {
+                    Array.Clear(this.Samples, 0, this.Samples.Length);
+                }
                 this.SampleCount = 0;
             }
         }

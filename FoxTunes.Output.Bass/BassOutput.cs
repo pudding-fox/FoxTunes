@@ -546,6 +546,20 @@ namespace FoxTunes
             return true;
         }
 
+        public override bool GetChannelMap(out IDictionary<int, OutputChannel> channels)
+        {
+            var _rate = default(int);
+            var _channels = default(int);
+            var _format = default(OutputStreamFormat);
+            if (!this.GetFormat(out _rate, out _channels, out _format))
+            {
+                channels = default(IDictionary<int, OutputChannel>);
+                return false;
+            }
+            channels = BassChannelMap.GetChannelMap(_channels);
+            return true;
+        }
+
         public override bool CanGetData
         {
             get

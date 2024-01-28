@@ -169,6 +169,87 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to C.
+        /// </summary>
+        internal static string Speakers_Center {
+            get {
+                return ResourceManager.GetString("Speakers.Center", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FL.
+        /// </summary>
+        internal static string Speakers_FrontLeft {
+            get {
+                return ResourceManager.GetString("Speakers.FrontLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FR.
+        /// </summary>
+        internal static string Speakers_FrontRight {
+            get {
+                return ResourceManager.GetString("Speakers.FrontRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to L.
+        /// </summary>
+        internal static string Speakers_Left {
+            get {
+                return ResourceManager.GetString("Speakers.Left", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LFE.
+        /// </summary>
+        internal static string Speakers_LFE {
+            get {
+                return ResourceManager.GetString("Speakers.LFE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RL.
+        /// </summary>
+        internal static string Speakers_RearLeft {
+            get {
+                return ResourceManager.GetString("Speakers.RearLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RR.
+        /// </summary>
+        internal static string Speakers_RearRight {
+            get {
+                return ResourceManager.GetString("Speakers.RearRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to R.
+        /// </summary>
+        internal static string Speakers_Right {
+            get {
+                return ResourceManager.GetString("Speakers.Right", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ?.
+        /// </summary>
+        internal static string Speakers_Unknown {
+            get {
+                return ResourceManager.GetString("Speakers.Unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bands (Enhanced).
         /// </summary>
         internal static string SpectrumBehaviourConfiguration_Bands {
