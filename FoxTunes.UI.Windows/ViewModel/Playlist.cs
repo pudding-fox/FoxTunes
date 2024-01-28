@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using FoxDb;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -383,7 +384,8 @@ namespace FoxTunes.ViewModel
         {
             if (this.Database != null && this.GridViewColumnFactory != null)
             {
-                foreach (var column in this.Database.Sets.PlaylistColumn)
+                var queryable = this.Database.AsQueryable<PlaylistColumn>();
+                foreach (var column in queryable.OrderBy(playlistColumn => playlistColumn.Sequence))
                 {
                     yield return this.GridViewColumnFactory.Create(column);
                 }

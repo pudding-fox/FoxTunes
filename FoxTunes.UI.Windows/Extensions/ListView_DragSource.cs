@@ -30,18 +30,18 @@ namespace FoxTunes
 
         private static void OnDragSourcePropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var ListView = sender as ListView;
-            if (ListView == null)
+            var listView = sender as ListView;
+            if (listView == null)
             {
                 return;
             }
-            if (GetDragSource(ListView))
+            if (GetDragSource(listView))
             {
-                DragSourceBehaviours.TryAdd(ListView, new DragSourceBehaviour(ListView));
+                DragSourceBehaviours.TryAdd(listView, new DragSourceBehaviour(listView));
             }
             else
             {
-                DragSourceBehaviours.TryRemove(ListView);
+                DragSourceBehaviours.TryRemove(listView);
 
             }
         }
@@ -106,8 +106,6 @@ namespace FoxTunes
 
             public Point DragStartPosition { get; private set; }
 
-            public bool DragInitialized { get; private set; }
-
             public ListView ListView { get; private set; }
 
             protected virtual bool ShouldInitializeDrag(object source, Point position)
@@ -138,7 +136,7 @@ namespace FoxTunes
 
             protected virtual void OnMouseMove(object sender, MouseEventArgs e)
             {
-                if (e.LeftButton != MouseButtonState.Pressed || this.DragInitialized)
+                if (e.LeftButton != MouseButtonState.Pressed)
                 {
                     return;
                 }

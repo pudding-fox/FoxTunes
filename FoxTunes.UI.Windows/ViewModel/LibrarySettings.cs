@@ -14,43 +14,9 @@ namespace FoxTunes.ViewModel
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
-        private LibraryHierarchy _SelectedLibraryHierarchy { get; set; }
+        private CollectionManager<LibraryHierarchy> _LibraryHierarchies { get; set; }
 
-        public LibraryHierarchy SelectedLibraryHierarchy
-        {
-            get
-            {
-                return this._SelectedLibraryHierarchy;
-            }
-            set
-            {
-                this._SelectedLibraryHierarchy = value;
-                this.OnSelectedLibraryHierarchyChanged();
-            }
-        }
-
-        protected virtual void OnSelectedLibraryHierarchyChanged()
-        {
-            if (this.SelectedLibraryHierarchy != null)
-            {
-                this.SelectedHierarchyLevel = this.SelectedLibraryHierarchy.Levels.FirstOrDefault();
-            }
-            else
-            {
-                this.SelectedHierarchyLevel = null;
-            }
-            if (this.SelectedLibraryHierarchyChanged != null)
-            {
-                this.SelectedLibraryHierarchyChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("SelectedLibraryHierarchy");
-        }
-
-        public event EventHandler SelectedLibraryHierarchyChanged = delegate { };
-
-        private ObservableCollection<LibraryHierarchy> _LibraryHierarchies { get; set; }
-
-        public ObservableCollection<LibraryHierarchy> LibraryHierarchies
+        public CollectionManager<LibraryHierarchy> LibraryHierarchies
         {
             get
             {
@@ -65,40 +31,28 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnLibraryHierarchiesChanged()
         {
-            if (this.LibraryHierarchiesChanged != null)
-            {
-                this.LibraryHierarchiesChanged(this, EventArgs.Empty);
-            }
             this.OnPropertyChanged("LibraryHierarchies");
         }
 
-        public event EventHandler LibraryHierarchiesChanged = delegate { };
+        private CollectionManager<LibraryHierarchyLevel> _LibraryHierarchyLevels { get; set; }
 
-        private LibraryHierarchyLevel _SelectedHierarchyLevel { get; set; }
-
-        public LibraryHierarchyLevel SelectedHierarchyLevel
+        public CollectionManager<LibraryHierarchyLevel> LibraryHierarchyLevels
         {
             get
             {
-                return this._SelectedHierarchyLevel;
+                return this._LibraryHierarchyLevels;
             }
             set
             {
-                this._SelectedHierarchyLevel = value;
-                this.OnSelectedHierarchyLevelChanged();
+                this._LibraryHierarchyLevels = value;
+                this.OnLibraryHierarchyLevelsChanged();
             }
         }
 
-        protected virtual void OnSelectedHierarchyLevelChanged()
+        protected virtual void OnLibraryHierarchyLevelsChanged()
         {
-            if (this.SelectedHierarchyLevelChanged != null)
-            {
-                this.SelectedHierarchyLevelChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("SelectedHierarchyLevel");
+            this.OnPropertyChanged("LibraryHierarchyLevels");
         }
-
-        public event EventHandler SelectedHierarchyLevelChanged = delegate { };
 
         private bool _SettingsVisible { get; set; }
 
@@ -126,68 +80,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SettingsVisibleChanged = delegate { };
 
-        public ICommand NewHierarchyCommand
-        {
-            get
-            {
-                return new Command(
-                    () => this.Database.Sets.LibraryHierarchy.Create().With(libraryHierarchy =>
-                    {
-                        libraryHierarchy.Name = "New";
-                        this.LibraryHierarchies.Add(libraryHierarchy);
-                        this.SelectedLibraryHierarchy = libraryHierarchy;
-                    }),
-                    () => this.LibraryHierarchies != null
-                );
-            }
-        }
-
-        public ICommand DeleteHierarchyCommand
-        {
-            get
-            {
-                return new Command(
-                    () =>
-                    {
-                        this.LibraryHierarchies.Remove(this.SelectedLibraryHierarchy);
-                        this.SelectedLibraryHierarchy = null;
-                    },
-                    () => this.LibraryHierarchies != null && this.SelectedLibraryHierarchy != null
-                );
-            }
-        }
-
-        public ICommand NewHierarchyLevelCommand
-        {
-            get
-            {
-                return new Command(
-                    () => this.Database.Sets.LibraryHierarchyLevel.Create().With(libraryHierarchyLevel =>
-                    {
-                        libraryHierarchyLevel.Name = "New";
-                        this.SelectedLibraryHierarchy.Levels.Add(libraryHierarchyLevel);
-                        this.SelectedHierarchyLevel = libraryHierarchyLevel;
-                    }),
-                    () => this.SelectedLibraryHierarchy != null
-                );
-            }
-        }
-
-        public ICommand DeleteHierarchyLevelCommand
-        {
-            get
-            {
-                return new Command(
-                    () =>
-                    {
-                        this.SelectedLibraryHierarchy.Levels.Remove(this.SelectedHierarchyLevel);
-                        this.SelectedHierarchyLevel = null;
-                    },
-                    () => this.SelectedHierarchyLevel != null
-                );
-            }
-        }
-
         public ICommand SaveCommand
         {
             get
@@ -206,8 +98,8 @@ namespace FoxTunes.ViewModel
                 using (var transaction = this.Database.BeginTransaction())
                 {
                     var libraryHierarchies = this.Database.Set<LibraryHierarchy>(transaction);
-                    libraryHierarchies.Remove(libraryHierarchies.Except(this.LibraryHierarchies));
-                    libraryHierarchies.AddOrUpdate(this.LibraryHierarchies);
+                    libraryHierarchies.Remove(libraryHierarchies.Except(this.LibraryHierarchies.ItemsSource));
+                    libraryHierarchies.AddOrUpdate(this.LibraryHierarchies.ItemsSource);
                     transaction.Commit();
                 }
                 this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
@@ -240,14 +132,51 @@ namespace FoxTunes.ViewModel
         {
             this.Database = this.Core.Components.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.LibraryHierarchyLevels = new CollectionManager<LibraryHierarchyLevel>()
+            {
+                ItemFactory = () => this.Database.Sets.LibraryHierarchyLevel.Create().With(libraryHierarchyLevel =>
+                {
+                    libraryHierarchyLevel.Name = "New";
+                    libraryHierarchyLevel.DisplayScript = "'New'";
+                }),
+                ExchangeHandler = (item1, item2) =>
+                {
+                    var temp = item1.Sequence;
+                    item1.Sequence = item2.Sequence;
+                    item2.Sequence = temp;
+                }
+            };
+            this.LibraryHierarchies = new CollectionManager<LibraryHierarchy>()
+            {
+                ItemFactory = () => this.Database.Sets.LibraryHierarchy.Create().With(libraryHierarchy =>
+                {
+                    libraryHierarchy.Name = "New";
+                }),
+                ExchangeHandler = (item1, item2) =>
+                {
+                    var temp = item1.Sequence;
+                    item1.Sequence = item2.Sequence;
+                    item2.Sequence = temp;
+                }
+            };
+            this.LibraryHierarchies.SelectedValueChanged += (sender, e) =>
+            {
+                if (this.LibraryHierarchies.SelectedValue != null)
+                {
+                    this.LibraryHierarchyLevels.ItemsSource = this.LibraryHierarchies.SelectedValue.Levels;
+                }
+                else
+                {
+                    this.LibraryHierarchyLevels.ItemsSource = null;
+                }
+            };
             this.Refresh();
             base.OnCoreChanged();
         }
 
         protected virtual void Refresh()
         {
-            this.LibraryHierarchies = new ObservableCollection<LibraryHierarchy>(this.Database.Sets.LibraryHierarchy);
-            this.SelectedLibraryHierarchy = this.LibraryHierarchies.FirstOrDefault();
+            this.LibraryHierarchies.ItemsSource = new ObservableCollection<LibraryHierarchy>(this.Database.Sets.LibraryHierarchy);
         }
 
         protected override Freezable CreateInstanceCore()

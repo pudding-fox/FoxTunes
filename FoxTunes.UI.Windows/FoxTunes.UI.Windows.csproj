@@ -29,6 +29,10 @@
     <Reference Include="FoxDb.Core">
       <HintPath>..\lib\FoxDb.Core.dll</HintPath>
     </Reference>
+    <Reference Include="FoxDb.Linq, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\FoxDb.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -58,6 +62,7 @@
     <Compile Include="Extensions\Command_Decorator.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Extensions\GridView_ColumnsSource.cs" />
+    <Compile Include="Extensions\ListBox_DragDropReorder.cs" />
     <Compile Include="Extensions\ListView_DropInsert.cs" />
     <Compile Include="Extensions\ListView_SelectedItems.cs" />
     <Compile Include="Extensions\ListView_DragSource.cs" />
@@ -65,9 +70,6 @@
     <Compile Include="Extensions\TreeView_RightButtonSelect.cs" />
     <Compile Include="Extensions\TreeView_SelectedItem.cs" />
     <Compile Include="Integration\Explorer.cs" />
-    <Compile Include="LibraryBrowser.xaml.cs">
-      <DependentUpon>LibraryBrowser.xaml</DependentUpon>
-    </Compile>
     <Compile Include="LibraryTree.xaml.cs">
       <DependentUpon>LibraryTree.xaml</DependentUpon>
     </Compile>
@@ -120,6 +122,7 @@
     <Compile Include="Theme\IThemeLoader.cs" />
     <Compile Include="Theme\ThemeBase.cs" />
     <Compile Include="Theme\ThemeLoader.cs" />
+    <Compile Include="Utilities\CollectionManager.cs" />
     <Compile Include="Utilities\DiagonalStackPanel.cs" />
     <Compile Include="Utilities\MouseCursorAdorner.cs" />
     <Compile Include="Utilities\RefreshableGridViewColumn.cs" />
@@ -133,7 +136,6 @@
     <Compile Include="Utilities\PlaylistGridViewColumnFactory.cs" />
     <Compile Include="ViewModel\InvokeParameterizedCommandAction.cs" />
     <Compile Include="ViewModel\Library.cs" />
-    <Compile Include="ViewModel\LibraryBrowser.cs" />
     <Compile Include="ViewModel\LibraryTree.cs" />
     <Compile Include="ViewModel\LibrarySettings.cs" />
     <Compile Include="ViewModel\Main.cs" />
@@ -183,10 +185,6 @@
       <SubType>Designer</SubType>
     </None>
     <Page Include="Components.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="LibraryBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

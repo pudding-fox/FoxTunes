@@ -4,11 +4,30 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:System="clr-namespace:System;assembly=mscorlib" 
+             xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="700" d:DataContext="{d:DesignInstance Core:Core}">
     <UserControl.Resources>
         <ViewModel:LibrarySettings x:Key="ViewModel" Core="{Binding}"/>
+        <CollectionViewSource x:Key="LibraryHierarchies" Source="{Binding LibraryHierarchies.ItemsSource, Source={StaticResource ViewModel}}" IsLiveSortingRequested="True">
+            <CollectionViewSource.LiveGroupingProperties>
+                <System:String>Sequence</System:String>
+            </CollectionViewSource.LiveGroupingProperties>
+            <CollectionViewSource.SortDescriptions>
+                <ComponentModel:SortDescription PropertyName="Sequence"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+        <CollectionViewSource x:Key="LibraryHierarchyLevels" Source="{Binding LibraryHierarchyLevels.ItemsSource, Source={StaticResource ViewModel}}" IsLiveSortingRequested="True">
+            <CollectionViewSource.LiveGroupingProperties>
+                <System:String>Sequence</System:String>
+            </CollectionViewSource.LiveGroupingProperties>
+            <CollectionViewSource.SortDescriptions>
+                <ComponentModel:SortDescription PropertyName="Sequence"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -34,10 +53,16 @@
                                 <Setter Property="Margin" Value="7,7,0,0"></Setter>
                             </Style>
                         </StackPanel.Resources>
-                        <Button Command="{Binding NewHierarchyCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
-                        <Button Command="{Binding DeleteHierarchyCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
+                        <Button Command="{Binding LibraryHierarchies.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
+                        <Button Command="{Binding LibraryHierarchies.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
                     </StackPanel>
-                    <ListBox ItemsSource="{Binding LibraryHierarchies, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedLibraryHierarchy, Source={StaticResource ViewModel}}" DisplayMemberPath="Name"></ListBox>
+                    <ListBox 
+                        ItemsSource="{Binding Mode=OneWay, Source={StaticResource LibraryHierarchies}}" 
+                        SelectedValue="{Binding LibraryHierarchies.SelectedValue, Source={StaticResource ViewModel}}" 
+                        DisplayMemberPath="Name"
+                        Windows:ListBoxExtensions.DragDropReorder="True"
+                        Windows:ListBoxExtensions.DragDropReorderCommand="{Binding LibraryHierarchies.ExchangeCommand, Source={StaticResource ViewModel}}">
+                    </ListBox>
                 </DockPanel>
                 <DockPanel Grid.Row="1">
                     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -48,13 +73,20 @@
                                 <Setter Property="Margin" Value="7,7,0,0"></Setter>
                             </Style>
                         </StackPanel.Resources>
-                        <Button Command="{Binding NewHierarchyLevelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
-                        <Button Command="{Binding DeleteHierarchyLevelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
+                        <Button Command="{Binding LibraryHierarchyLevels.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
+                        <Button Command="{Binding LibraryHierarchyLevels.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
                     </StackPanel>
-                    <ListBox Margin="0,7,0,0" ItemsSource="{Binding SelectedLibraryHierarchy.Levels, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedHierarchyLevel, Source={StaticResource ViewModel}}" DisplayMemberPath="Name"></ListBox>
+                    <ListBox 
+                        Margin="0,7,0,0" 
+                        ItemsSource="{Binding Mode=OneWay, Source={StaticResource LibraryHierarchyLevels}}" 
+                        SelectedValue="{Binding LibraryHierarchyLevels.SelectedValue, Source={StaticResource ViewModel}}" 
+                        DisplayMemberPath="Name"
+                        Windows:ListBoxExtensions.DragDropReorder="True"
+                        Windows:ListBoxExtensions.DragDropReorderCommand="{Binding LibraryHierarchyLevels.ExchangeCommand, Source={StaticResource ViewModel}}">
+                    </ListBox>
                 </DockPanel>
                 <DockPanel Grid.Column="1" Grid.RowSpan="2" Grid.IsSharedSizeScope="True">
-                    <Grid DockPanel.Dock="Top" DataContext="{Binding SelectedLibraryHierarchy, Source={StaticResource ViewModel}}">
+                    <Grid DockPanel.Dock="Top" DataContext="{Binding LibraryHierarchies.SelectedValue, Source={StaticResource ViewModel}}">
                         <Grid.Style>
                             <Style TargetType="{x:Type Grid}">
                                 <Setter Property="IsEnabled" Value="True"></Setter>
@@ -75,7 +107,7 @@
                         <Label Grid.Column="0" Grid.Row="0">Heirarchy Name</Label>
                         <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Name}"></TextBox>
                     </Grid>
-                    <Grid DockPanel.Dock="Bottom" DataContext="{Binding SelectedHierarchyLevel, Source={StaticResource ViewModel}}">
+                    <Grid DockPanel.Dock="Bottom" DataContext="{Binding LibraryHierarchyLevels.SelectedValue, Source={StaticResource ViewModel}}">
                         <Grid.Style>
                             <Style TargetType="{x:Type Grid}">
                                 <Setter Property="IsEnabled" Value="True"></Setter>

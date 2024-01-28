@@ -4,11 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:System="clr-namespace:System;assembly=mscorlib" 
+             xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="700" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:PlaylistSettings x:Key="ViewModel" Core="{Binding}"/>
+        <CollectionViewSource x:Key="PlaylistColumns" Source="{Binding PlaylistColumns.ItemsSource, Source={StaticResource ViewModel}}" IsLiveSortingRequested="True">
+            <CollectionViewSource.LiveGroupingProperties>
+                <System:String>Sequence</System:String>
+            </CollectionViewSource.LiveGroupingProperties>
+            <CollectionViewSource.SortDescriptions>
+                <ComponentModel:SortDescription PropertyName="Sequence"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -25,7 +36,15 @@
                     <RowDefinition></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <ListBox Grid.Column="0" Grid.Row="0" ItemsSource="{Binding PlaylistColumns, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedPlaylistColumn, Source={StaticResource ViewModel}}" DisplayMemberPath="Name"></ListBox>
+                <ListBox 
+                    Grid.Column="0" 
+                    Grid.Row="0" 
+                    ItemsSource="{Binding Mode=OneWay, Source={StaticResource PlaylistColumns}}" 
+                    SelectedValue="{Binding PlaylistColumns.SelectedValue, Source={StaticResource ViewModel}}" 
+                    DisplayMemberPath="Name"
+                    Windows:ListBoxExtensions.DragDropReorder="True"
+                    Windows:ListBoxExtensions.DragDropReorderCommand="{Binding PlaylistColumns.ExchangeCommand, Source={StaticResource ViewModel}}">
+                </ListBox>
                 <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <StackPanel.Resources>
                         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
@@ -34,10 +53,10 @@
                             <Setter Property="Margin" Value="7,7,0,0"></Setter>
                         </Style>
                     </StackPanel.Resources>
-                    <Button Command="{Binding NewCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
-                    <Button Command="{Binding DeleteCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
+                    <Button Command="{Binding PlaylistColumns.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
+                    <Button Command="{Binding PlaylistColumns.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
                 </StackPanel>
-                <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding SelectedPlaylistColumn, Source={StaticResource ViewModel}}">
+                <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding PlaylistColumns.SelectedValue, Source={StaticResource ViewModel}}">
                     <Grid.Style>
                         <Style TargetType="{x:Type Grid}">
                             <Setter Property="IsEnabled" Value="True"></Setter>
