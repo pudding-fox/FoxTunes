@@ -179,6 +179,7 @@ namespace FoxTunes
                         metaDataItem.Value = Discogs.Release.None;
                     }
                 }
+                Logger.Write(this, LogLevel.Debug, "Discogs release: {0} => {1}", fileData.FileName, releaseLookup.Release.Id);
             }
             var libraryItems = releaseLookup.FileDatas.OfType<LibraryItem>().ToArray();
             var playlistItems = releaseLookup.FileDatas.OfType<PlaylistItem>().ToArray();

@@ -31,7 +31,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual Task<string> ImportImage(Discogs.ReleaseLookup releaseLookup)
+        protected virtual async Task<string> ImportImage(Discogs.ReleaseLookup releaseLookup)
         {
             var urls = new[]
             {
@@ -44,12 +44,21 @@ namespace FoxTunes
                 {
                     try
                     {
-                        return FileMetaDataStore.IfNotExistsAsync(PREFIX, url, async result =>
+                        var fileName = await FileMetaDataStore.IfNotExistsAsync(PREFIX, url, async result =>
                         {
                             Logger.Write(this, LogLevel.Debug, "Downloading data from url: {0}", url);
                             var data = await this.Discogs.GetData(url).ConfigureAwait(false);
+                            if (data == null)
+                            {
+                                Logger.Write(this, LogLevel.Error, "Failed to download data from url \"{0}\": Unknown error.", url);
+                                return string.Empty;
+                            }
                             return await FileMetaDataStore.WriteAsync(PREFIX, url, data).ConfigureAwait(false);
-                        });
+                        }).ConfigureAwait(false);
+                        if (!string.IsNullOrEmpty(fileName))
+                        {
+                            return fileName;
+                        }
                     }
                     catch (Exception e)
                     {
@@ -58,11 +67,7 @@ namespace FoxTunes
                     }
                 }
             }
-#if NET40
-            return TaskEx.FromResult(string.Empty);
-#else
-            return Task.FromResult(string.Empty);
-#endif
+            return string.Empty;
         }
     }
 }
