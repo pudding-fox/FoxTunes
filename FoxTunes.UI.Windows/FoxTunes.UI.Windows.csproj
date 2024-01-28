@@ -70,7 +70,6 @@
 
   <ItemGroup>
     <Page Remove="Resources\PlaybackState.xaml" />
-    <Page Remove="Resources\Rating.xaml" />
     <Page Remove="Resources\WindowBase.xaml" />
   </ItemGroup>
 

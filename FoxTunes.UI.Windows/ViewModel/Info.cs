@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
@@ -36,34 +35,6 @@ namespace FoxTunes.ViewModel
         public ILibraryBrowser LibraryBrowser { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
-
-        public IConfiguration Configuration { get; private set; }
-
-        private bool _ShowRating { get; set; }
-
-        public bool ShowRating
-        {
-            get
-            {
-                return this._ShowRating;
-            }
-            set
-            {
-                this._ShowRating = value;
-                this.OnShowRatingChanged();
-            }
-        }
-
-        protected virtual void OnShowRatingChanged()
-        {
-            if (this.ShowRatingChanged != null)
-            {
-                this.ShowRatingChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ShowRating");
-        }
-
-        public event EventHandler ShowRatingChanged;
 
         private bool _HasData { get; set; }
 
@@ -482,11 +453,6 @@ namespace FoxTunes.ViewModel
             this.LibraryBrowser = this.Core.Components.LibraryBrowser;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.Configuration = this.Core.Components.Configuration;
-            this.Configuration.GetElement<BooleanConfigurationElement>(
-                MetaDataBehaviourConfiguration.SECTION,
-                MetaDataBehaviourConfiguration.READ_POPULARIMETER_TAGS
-            ).ConnectValue(value => this.ShowRating = value);
             this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
@@ -599,31 +565,6 @@ namespace FoxTunes.ViewModel
                     this.Bitrate = null;
                 }
             });
-        }
-
-        public ICommand UpdateRatingCommand
-        {
-            get
-            {
-                return CommandFactory.Instance.CreateCommand<RatingEventArgs>(this.OnUpdateRating);
-            }
-        }
-
-        protected virtual Task OnUpdateRating(RatingEventArgs e)
-        {
-            if (e.FileData is LibraryItem libraryItem)
-            {
-                return this.LibraryManager.SetRating(new[] { libraryItem }, e.Value);
-            }
-            else if (e.FileData is PlaylistItem playlistItem)
-            {
-                return this.PlaylistManager.SetRating(new[] { playlistItem }, e.Value);
-            }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
         }
 
         protected override Freezable CreateInstanceCore()

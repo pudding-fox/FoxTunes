@@ -226,26 +226,6 @@ namespace FoxTunes
             }
         }
 
-        public async Task SetRating(LibraryHierarchyNode libraryHierarchyNode, byte rating)
-        {
-            using (var task = new UpdateLibraryRatingTask(libraryHierarchyNode, rating))
-            {
-                task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
-                await task.Run().ConfigureAwait(false);
-            }
-        }
-
-        public async Task SetRating(IEnumerable<LibraryItem> libraryItems, byte rating)
-        {
-            using (var task = new UpdateLibraryRatingTask(libraryItems, rating))
-            {
-                task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
-                await task.Run().ConfigureAwait(false);
-            }
-        }
-
         protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
         {
             if (this.BackgroundTask == null)

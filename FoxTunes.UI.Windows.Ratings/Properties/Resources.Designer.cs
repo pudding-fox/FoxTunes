@@ -39,7 +39,7 @@ namespace FoxTunes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.UI.Windows.Layout.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.UI.Windows.Ratings.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,18 +61,18 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;Windows-1252&quot;?&gt;
-        ///&lt;FoxTunes&gt;
-        ///  &lt;UIComponentConfiguration Component=&quot;3E899F79-380C-4EF7-8570-4B4E3B3467CB&quot;&gt;
-        ///    &lt;UIComponentConfiguration Component=&quot;3451DAA4-C643-4CB2-8105-B441F0277559&quot;&gt;
-        ///      &lt;UIComponentConfiguration Component=&quot;18E98420-F039-4504-A116-3D0F26BEAAD5&quot;&gt;
-        ///        &lt;UIComponentConfiguration Component=&quot;3E899F79-380C-4EF7-8570-4B4E3B3467CB&quot;&gt;
-        ///          &lt;UIComponentConfiguration Component=&quot;3E899F79-380C-4EF7-8570-4B4E3B3467CB&quot;&gt;
-        ///            &lt;UIComponentConfiguration  [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to &lt;DataTemplate 
+        ///    xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        ///    xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+        ///    xmlns:Core=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.Core&quot; 
+        ///    xmlns:LocalWindows=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows.Ratings&quot;
+        ///    DataType=&quot;{x:Type Core:PlaylistItem}&quot;&gt;
+        ///    &lt;LocalWindows:RatingBase Height=&quot;15&quot; FileData=&quot;{Binding}&quot;  LocalWindows:RatingExtensions.UpdatePlaylistItems=&quot;True&quot;&gt;&lt;/LocalWindows:RatingBase&gt;
+        ///&lt;/DataTemplate&gt;.
         /// </summary>
-        internal static string Main {
+        internal static string Rating {
             get {
-                return ResourceManager.GetString("Main", resourceCulture);
+                return ResourceManager.GetString("Rating", resourceCulture);
             }
         }
     }
