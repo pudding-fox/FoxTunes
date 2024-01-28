@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Interop;
@@ -9,6 +10,11 @@ namespace FoxTunes
 {
     public static partial class Extensions
     {
+        public static T FindChild<T>(this DependencyObject visual) where T : DependencyObject
+        {
+            return visual.FindChildren<T>().FirstOrDefault();
+        }
+
         public static IEnumerable<T> FindChildren<T>(this DependencyObject visual) where T : DependencyObject
         {
             var stack = new Stack<DependencyObject>();

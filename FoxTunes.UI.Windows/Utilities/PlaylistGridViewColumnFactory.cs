@@ -16,8 +16,6 @@ namespace FoxTunes
 
         public Lazy<IScriptingContext> ScriptingContext { get; private set; }
 
-        public bool Suspended { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.PlaylistColumnProviderManager = ComponentRegistry.Instance.GetComponent<PlaylistColumnProviderManager>();
@@ -69,7 +67,15 @@ namespace FoxTunes
                 column,
                 "Width",
                 ColumnWidthConverter.Instance,
-                (sender, e) => this.OnWidthChanged(column)
+                (sender, e) =>
+                {
+                    if (ListViewExtensions.GetIsAutoSizing(gridViewColumn))
+                    {
+                        //Don't raise events while auto sizing is in progress.
+                        return;
+                    }
+                    this.OnWidthChanged(column);
+                }
             );
             BindingHelper.Create(
                 gridViewColumn,
@@ -84,7 +90,7 @@ namespace FoxTunes
 
         protected virtual void OnWidthChanged(PlaylistColumn column)
         {
-            if (this.Suspended || this.WidthChanged == null)
+            if (this.WidthChanged == null)
             {
                 return;
             }
@@ -95,7 +101,7 @@ namespace FoxTunes
 
         protected virtual void OnPositionChanged(PlaylistColumn column)
         {
-            if (this.Suspended || this.PositionChanged == null)
+            if (this.PositionChanged == null)
             {
                 return;
             }
@@ -128,23 +134,6 @@ namespace FoxTunes
                     break;
             }
             return true;
-        }
-
-        public void Resize(GridViewColumn column)
-        {
-            this.Suspended = true;
-            try
-            {
-                if (double.IsNaN(column.Width))
-                {
-                    column.Width = column.ActualWidth;
-                    column.Width = double.NaN;
-                }
-            }
-            finally
-            {
-                this.Suspended = false;
-            }
         }
 
         public bool IsDisposed { get; private set; }
