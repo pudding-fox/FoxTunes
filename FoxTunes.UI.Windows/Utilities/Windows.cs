@@ -489,7 +489,7 @@ namespace FoxTunes
                     }
                     window.IsVisibleChanged += this.OnIsVisibleChanged;
                     window.Closed += this.OnClosed;
-                    this.OnCreated(factory, EventArgs.Empty);
+                    this.OnCreated(window, EventArgs.Empty);
                     return window;
                 };
             }

@@ -268,15 +268,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Toggle Mini Player.
-        /// </summary>
-        internal static string KeyBindingsBehaviourConfiguration_ToggleMiniPlayer {
-            get {
-                return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.ToggleMiniPlayer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Add To Playlist.
         /// </summary>
         internal static string LibraryActionsBehaviour_AppendPlaylist {

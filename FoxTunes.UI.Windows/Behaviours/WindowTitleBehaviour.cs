@@ -104,7 +104,7 @@ namespace FoxTunes
 
         protected virtual void SetWindowTitle(string title)
         {
-            foreach (var window in Windows.Registrations.WindowsByIds(Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main)))
+            foreach (var window in Windows.Registrations.WindowsByRole(UserInterfaceWindowRole.Main))
             {
                 this.SetWindowTitle(window, title);
             }
