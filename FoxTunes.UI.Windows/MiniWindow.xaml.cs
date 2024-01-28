@@ -11,10 +11,13 @@ namespace FoxTunes
     {
         public MiniWindow()
         {
-            if (!global::FoxTunes.Properties.Settings.Default.MainWindowBounds.IsEmpty())
+            if (!global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.IsEmpty())
             {
-                this.Left = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Left;
-                this.Top = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Top;
+                if (ScreenHelper.WindowBoundsVisible(global::FoxTunes.Properties.Settings.Default.MiniWindowBounds))
+                {
+                    this.Left = global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.Left;
+                    this.Top = global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.Top;
+                }
             }
             this.InitializeComponent();
         }
