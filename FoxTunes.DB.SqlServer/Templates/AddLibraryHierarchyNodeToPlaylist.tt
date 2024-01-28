@@ -66,7 +66,7 @@ FROM "LibraryHierarchyItems"
 		ON "LibraryHierarchyItems"."Id" = "LibraryHierarchyItem_LibraryItem"."LibraryHierarchyItem_Id"
 	JOIN "LibraryItems"
 		ON "LibraryItems"."Id" = "LibraryHierarchyItem_LibraryItem"."LibraryItem_Id"
-	JOIN "HorizontalMetaData"
+	LEFT OUTER JOIN "HorizontalMetaData"
 		ON "HorizontalMetaData"."Id" = "LibraryItems"."Id"
 WHERE "LibraryHierarchyItems"."Id" = @libraryHierarchyItemId
 <#= new LibraryHierarchyFilterBuilder(this.Database, this.Filter, LibraryHierarchyFilterSource.LibraryItem).TransformText() #>;
