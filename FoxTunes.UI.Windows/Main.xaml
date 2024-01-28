@@ -6,7 +6,7 @@
         xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
         xmlns:Windows="clr-namespace:FoxTunes" 
         x:Class="FoxTunes.Main"
-        mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
+        mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" Title="Fox Tunes" Icon="pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
