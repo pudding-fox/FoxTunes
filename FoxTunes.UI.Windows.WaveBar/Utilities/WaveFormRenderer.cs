@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -154,6 +153,10 @@ namespace FoxTunes
                 mode,
                 colors
             );
+            if (this.RendererData == null)
+            {
+                return false;
+            }
             this.Dispatch(this.Update);
             return true;
         }
@@ -589,6 +592,10 @@ namespace FoxTunes
         public static WaveFormRendererData Create(WaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height, bool rms, WaveFormRendererMode mode, Color[] colors)
         {
             var valuesPerElement = generatorData.Capacity / width;
+            if (valuesPerElement == 0)
+            {
+                return null;
+            }
             var data = new WaveFormRendererData()
             {
                 Width = width,
