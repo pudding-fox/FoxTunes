@@ -22,16 +22,10 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public BooleanConfigurationElement ShowFavorites { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.Configuration = core.Components.Configuration;
-            this.ShowFavorites = this.Configuration.GetElement<BooleanConfigurationElement>(
-                LibraryFavoritesBehaviourConfiguration.SECTION,
-                LibraryFavoritesBehaviourConfiguration.SHOW_FAVORITES_ELEMENT
-            );
             base.InitializeComponent(core);
         }
 
@@ -83,10 +77,6 @@ namespace FoxTunes
                                 if (parameters.Contains("filter"))
                                 {
                                     parameters["filter"] = this.GetFilter();
-                                }
-                                if (this.ShowFavorites.Value)
-                                {
-                                    parameters["favorite"] = true;
                                 }
                                 break;
                         }

@@ -108,7 +108,7 @@ namespace FoxTunes {
         ///	DirectoryName nvarchar(260) NOT NULL, 
         ///	FileName nvarchar(260) NOT NULL, 
         ///	ImportDate varchar(50) NOT NULL,
-        ///	Favorite bit NOT NULL, [rest of string was truncated]&quot;;.
+        ///	Status INTEGER NOT NUL [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Database {
             get {

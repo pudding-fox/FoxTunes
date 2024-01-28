@@ -30,7 +30,6 @@ SELECT
 	"LibraryItems"."DirectoryName" AS "LibraryItems_DirectoryName",
 	"LibraryItems"."FileName" AS "LibraryItems_FileName",
 	"LibraryItems"."ImportDate" AS "LibraryItems_ImportDate",
-	"LibraryItems"."Favorite" AS "LibraryItems_Favorite",
 	"LibraryItems"."Status" AS "LibraryItems_Status",
 	"MetaDataItems"."Id" AS "MetaDataItems_Id",
 	"MetaDataItems"."Name" AS "MetaDataItems_Name",
@@ -62,6 +61,5 @@ WHERE
 			)
 		)
 	) 
-	AND (@favorite IS NULL OR "LibraryItems"."Favorite" = @favorite)
 	AND LibraryHierarchyChildren."IsLeaf" = 1
 ORDER BY "LibraryItems"."FileName"
