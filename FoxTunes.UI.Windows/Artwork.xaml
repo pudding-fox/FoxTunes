@@ -8,7 +8,10 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              SizeChanged="OnSizeChanged"
-             MouseUp="OnMouseUp">
+             MouseUp="OnMouseUp"
+            Background="{DynamicResource ControlBrush}"
+            BorderBrush="{DynamicResource ControlBorderBrush}"
+            BorderThickness="1">
     <Windows:SquareUIComponentBase.Resources>
         <ViewModel:Artwork x:Key="ViewModel" FileNameChanged="OnFileNameChanged"></ViewModel:Artwork>
         <ViewModel:ArtworkImageConverter x:Key="ArtworkImageConverter" Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Artwork}}}" Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Artwork}}}"></ViewModel:ArtworkImageConverter>

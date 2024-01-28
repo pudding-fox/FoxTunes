@@ -122,7 +122,7 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to //BACKGROUND
-        ///#00000000
+        ///#4C000000
         /////VALUE
         ///#FFFFFFFF.
         /// </summary>

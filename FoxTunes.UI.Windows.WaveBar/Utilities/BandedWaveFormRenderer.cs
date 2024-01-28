@@ -233,6 +233,7 @@ namespace FoxTunes
             {
                 bitmap.Unlock();
             }
+            this.Dispatch(this.Update);
         }
 
         public Task Render(WaveFormRendererData data)
