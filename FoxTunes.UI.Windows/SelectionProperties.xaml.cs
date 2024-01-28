@@ -25,6 +25,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement ShowProperties { get; private set; }
 
+        public BooleanConfigurationElement ShowReplayGain { get; private set; }
+
         public BooleanConfigurationElement ShowLocation { get; private set; }
 
         public BooleanConfigurationElement ShowImages { get; private set; }
@@ -40,6 +42,10 @@ namespace FoxTunes
                 this.ShowProperties = this.Configuration.GetElement<BooleanConfigurationElement>(
                     SelectionPropertiesConfiguration.SECTION,
                     SelectionPropertiesConfiguration.SHOW_PROPERTIES
+                );
+                this.ShowReplayGain = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    SelectionPropertiesConfiguration.SECTION,
+                    SelectionPropertiesConfiguration.SHOW_REPLAYGAIN
                 );
                 this.ShowLocation = this.Configuration.GetElement<BooleanConfigurationElement>(
                     SelectionPropertiesConfiguration.SECTION,
@@ -79,6 +85,12 @@ namespace FoxTunes
                 );
                 yield return new InvocationComponent(
                     CATEGORY,
+                    this.ShowReplayGain.Id,
+                    this.ShowReplayGain.Name,
+                    attributes: this.ShowReplayGain.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
+                yield return new InvocationComponent(
+                    CATEGORY,
                     this.ShowLocation.Id,
                     this.ShowLocation.Name,
                     attributes: this.ShowLocation.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
@@ -101,6 +113,10 @@ namespace FoxTunes
             else if (string.Equals(this.ShowProperties.Name, component.Name))
             {
                 this.ShowProperties.Toggle();
+            }
+            else if (string.Equals(this.ShowReplayGain.Name, component.Name))
+            {
+                this.ShowReplayGain.Toggle();
             }
             else if (string.Equals(this.ShowLocation.Name, component.Name))
             {
