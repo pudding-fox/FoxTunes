@@ -9,11 +9,16 @@ namespace FoxTunes
     {
         public static IEnumerable<string> GetMetaDataNames(IDatabaseComponent database, ITransactionSource transaction = null)
         {
-            using (var reader = database.ExecuteReader(database.Queries.GetMetaDataNames, null, transaction))
+            var query = database.QueryFactory.Build();
+            var name = database.Tables.MetaDataItem.Column("Name");
+            query.Output.AddColumn(name);
+            query.Source.AddTable(database.Tables.MetaDataItem);
+            query.Aggregate.AddColumn(name);
+            using (var reader = database.ExecuteReader(query, null, transaction))
             {
                 foreach (var record in reader)
                 {
-                    yield return record.Get<string>("Name");
+                    yield return record.Get<string>(name.Identifier);
                 }
             }
         }

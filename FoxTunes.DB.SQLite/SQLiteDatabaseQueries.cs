@@ -106,13 +106,5 @@ namespace FoxTunes
             var playlistSequenceBuilder = new LibraryHierarchyBuilder(this.Database, metaDataNames);
             return this.Database.QueryFactory.Create(playlistSequenceBuilder.TransformText());
         }
-
-        public IDatabaseQuery GetMetaDataNames
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(Resources.GetMetaDataNames);
-            }
-        }
     }
 }

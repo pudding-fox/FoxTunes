@@ -219,17 +219,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT &quot;Name&quot;
-        ///FROM &quot;MetaDataItems&quot;
-        ///GROUP BY &quot;Name&quot;.
-        /// </summary>
-        internal static string GetMetaDataNames {
-            get {
-                return ResourceManager.GetString("GetMetaDataNames", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to INSERT INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;NumericValue&quot;)
         ///SELECT @name, @type, @numericValue
         ///WHERE NOT EXISTS(SELECT * FROM &quot;MetaDataItems&quot; WHERE &quot;Name&quot; = @name AND &quot;Type&quot; = @type AND &quot;NumericValue&quot; = @numericValue);
