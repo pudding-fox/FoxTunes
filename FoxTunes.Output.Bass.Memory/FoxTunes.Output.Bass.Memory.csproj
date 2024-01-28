@@ -37,7 +37,7 @@
 	<ItemGroup>
 		<PackageReference Include="ManagedBass.Memory" Version="0.0.6" />
 		<PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
-    	<PackageReference Include="Microsoft.Bcl.Build" Version="1.0.14" Condition="'$(TargetFramework)' == 'net40'" />
+    	<PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" Condition="'$(TargetFramework)' == 'net40'" />
 	</ItemGroup>
 
 	<ItemGroup>
