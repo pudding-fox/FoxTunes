@@ -146,6 +146,11 @@ namespace FoxTunes
 
         protected virtual void OnWindowDestroyed(object sender, UserInterfaceWindowEventArgs e)
         {
+            if (e.Window.Role != UserInterfaceWindowRole.Main)
+            {
+                //Only create taskbar thumbnail for main windows.
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Window destroyed: {0}", e.Window.Handle);
             this.AddFlag(e.Window.Handle, TaskbarThumbnailWindowFlags.Destroyed);
         }
@@ -414,23 +419,32 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 return false;
             }
-            var bitmapSection = default(IntPtr);
-            if (!WindowsImaging.CreateDIBSection(bitmap, bitmap.Width, -bitmap.Height/* This isn't a mistake, DIB is top down. */, out bitmapSection))
+            using (var hdc = WindowsImaging.ScopedDC.Compatible())
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to create native bitmap.");
-                this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
-                return false;
-            }
-            var result = default(WindowsIconicThumbnail.HResult);
-            await source.Invoke(
-                () => result = WindowsIconicThumbnail.DwmSetIconicThumbnail(handle, bitmapSection, 0)
-            ).ConfigureAwait(false);
-            WindowsImaging.DeleteObject(bitmapSection);
-            if (result != WindowsIconicThumbnail.HResult.Ok)
-            {
-                Logger.Write(this, LogLevel.Warn, "Failed to set iconic thumbnail: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
-                this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
-                return false;
+                if (IntPtr.Zero.Equals(hdc))
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to create device context.");
+                    this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
+                    return false;
+                }
+                var bitmapSection = default(IntPtr);
+                if (!WindowsImaging.CreateDIBSection(hdc.DC, bitmap, bitmap.Width, -bitmap.Height/* This isn't a mistake, DIB is top down. */, out bitmapSection))
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to create native bitmap.");
+                    this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
+                    return false;
+                }
+                var result = default(WindowsIconicThumbnail.HResult);
+                await source.Invoke(
+                    () => result = WindowsIconicThumbnail.DwmSetIconicThumbnail(handle, bitmapSection, 0)
+                ).ConfigureAwait(false);
+                WindowsImaging.DeleteObject(bitmapSection);
+                if (result != WindowsIconicThumbnail.HResult.Ok)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to set iconic thumbnail: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                    this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
+                    return false;
+                }
             }
             return true;
         }
@@ -481,18 +495,33 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 return false;
             }
-            var bitmapSection = bitmap.GetHbitmap();
-            var offset = new WindowsIconicThumbnail.POINT();
-            var result = default(WindowsIconicThumbnail.HResult);
-            await source.Invoke(
-                () => result = WindowsIconicThumbnail.DwmSetIconicLivePreviewBitmap(handle, bitmapSection, ref offset, 0)
-            ).ConfigureAwait(false);
-            WindowsImaging.DeleteObject(bitmapSection);
-            if (result != WindowsIconicThumbnail.HResult.Ok)
+            using (var hdc = WindowsImaging.ScopedDC.Compatible())
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to set iconic live preview: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
-                this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
-                return false;
+                if (IntPtr.Zero.Equals(hdc))
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to create device context.");
+                    this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
+                    return false;
+                }
+                var bitmapSection = default(IntPtr);
+                if (!WindowsImaging.CreateDIBSection(hdc.DC, bitmap, bitmap.Width, bitmap.Height, out bitmapSection))
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to create native bitmap.");
+                    this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
+                    return false;
+                }
+                var offset = new WindowsIconicThumbnail.POINT();
+                var result = default(WindowsIconicThumbnail.HResult);
+                await source.Invoke(
+                    () => result = WindowsIconicThumbnail.DwmSetIconicLivePreviewBitmap(handle, bitmapSection, ref offset, 0)
+                ).ConfigureAwait(false);
+                WindowsImaging.DeleteObject(bitmapSection);
+                if (result != WindowsIconicThumbnail.HResult.Ok)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to set iconic live preview: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                    this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
+                    return false;
+                }
             }
             return true;
         }
