@@ -27,11 +27,21 @@ namespace FoxTunes
             this.Windows = new Dictionary<ToolWindowConfiguration, ToolWindow>();
         }
 
+        public bool Enabled
+        {
+            get
+            {
+                return this.Layout != null && string.Equals(this.Layout.Value.Id, UIComponentLayoutProviderConfiguration.ID);
+            }
+        }
+
         public ICore Core { get; private set; }
 
         public LayoutDesignerBehaviour LayoutDesignerBehaviour { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
+
+        public SelectionConfigurationElement Layout { get; private set; }
 
         public TextConfigurationElement Element { get; private set; }
 
@@ -187,22 +197,54 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            global::FoxTunes.LayoutManager.Instance.ProviderChanged += this.OnProviderChanged;
             global::FoxTunes.Windows.ActiveWindowChanged += this.OnActiveWindowChanged;
             global::FoxTunes.Windows.ShuttingDown += this.OnShuttingDown;
             this.Core = core;
             this.LayoutDesignerBehaviour = ComponentRegistry.Instance.GetComponent<LayoutDesignerBehaviour>();
             this.LayoutDesignerBehaviour.IsDesigningChanged += this.OnIsDesigningChanged;
             this.Configuration = core.Components.Configuration;
+            this.Layout = this.Configuration.GetElement<SelectionConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.LAYOUT_ELEMENT
+            );
             this.Element = this.Configuration.GetElement<TextConfigurationElement>(
                 ToolWindowBehaviourConfiguration.SECTION,
                 ToolWindowBehaviourConfiguration.ELEMENT
             );
-            var task = this.Load();
+            if (this.Enabled)
+            {
+                var task = this.Load();
+            }
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnProviderChanged(object sender, EventArgs e)
+        {
+            if (this.Enabled)
+            {
+                this.Dispatch(async () =>
+                {
+                    if (!this.IsLoaded)
+                    {
+                        await this.Load().ConfigureAwait(false);
+                    }
+                    await this.Show().ConfigureAwait(false);
+                });
+            }
+            else if (this.IsLoaded)
+            {
+                this.Save();
+                var task = this.Shutdown();
+            }
         }
 
         protected virtual void OnActiveWindowChanged(object sender, EventArgs e)
         {
+            if (!this.Enabled)
+            {
+                return;
+            }
             this.Dispatch(async () =>
             {
                 if (!this.IsLoaded)
@@ -215,6 +257,10 @@ namespace FoxTunes
 
         protected virtual void OnShuttingDown(object sender, EventArgs e)
         {
+            if (!this.IsLoaded)
+            {
+                return;
+            }
             this.Save();
             var task = this.Shutdown();
         }
@@ -232,8 +278,11 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, NEW, "New Window");
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, MANAGE, "Manage Windows", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                if (this.Enabled)
+                {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, NEW, "New Window");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, MANAGE, "Manage Windows", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                }
             }
         }
 
@@ -286,6 +335,7 @@ namespace FoxTunes
 
         public Task Shutdown()
         {
+            this.IsLoaded = false;
             return global::FoxTunes.Windows.Invoke(() =>
             {
                 if (IsToolWindowManagerWindowCreated)
@@ -334,6 +384,7 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            global::FoxTunes.LayoutManager.Instance.ProviderChanged -= this.OnProviderChanged;
             global::FoxTunes.Windows.ActiveWindowChanged -= this.OnActiveWindowChanged;
             global::FoxTunes.Windows.ShuttingDown -= this.OnShuttingDown;
         }

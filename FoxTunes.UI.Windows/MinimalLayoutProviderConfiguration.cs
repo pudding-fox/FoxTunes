@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using FoxTunes.Interfaces;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    public static class DefaultLayoutProviderConfiguration
+    public static class MinimalLayoutProviderConfiguration
     {
-        public const string ID = "BBBB4ED2-782D-4622-ADF4-AAE2B543E0F3";
+        public const string ID = "AAAAA18B-86F0-45A6-988D-B15A56128429";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -16,7 +17,13 @@ namespace FoxTunes
 
         private static IEnumerable<SelectionConfigurationOption> GetLayoutOptions()
         {
-            yield return new SelectionConfigurationOption(ID, "Default");
+            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
+            var option = new SelectionConfigurationOption(ID, "Minimal");
+            if (releaseType == ReleaseType.Minimal)
+            {
+                option.Default();
+            }
+            yield return option;
         }
     }
 }

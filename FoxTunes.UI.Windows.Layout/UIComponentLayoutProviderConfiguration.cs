@@ -5,7 +5,7 @@ namespace FoxTunes
 {
     public static class UIComponentLayoutProviderConfiguration
     {
-        public const string ID = "BBBB083C-3C19-4AAC-97C7-565AF8F83115";
+        public const string ID = "CCCC083C-3C19-4AAC-97C7-565AF8F83115";
 
         public const string MAIN = "AAAAE4B-657B-45C2-B365-8FD69498D7C2";
 
@@ -26,7 +26,7 @@ namespace FoxTunes
         private static IEnumerable<SelectionConfigurationOption> GetLayoutOptions()
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
-            var option = new SelectionConfigurationOption(ID, "Dynamic");
+            var option = new SelectionConfigurationOption(ID, "Customizable");
             if (releaseType == ReleaseType.Default)
             {
                 option.Default();
