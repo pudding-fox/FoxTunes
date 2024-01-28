@@ -18,4 +18,8 @@
         <Setter Property="VerticalContentAlignment" Value="Top"></Setter>
     </Style>
 
+    <Style TargetType="{x:Type ListViewItem}">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    </Style>
+
 </ResourceDictionary>
