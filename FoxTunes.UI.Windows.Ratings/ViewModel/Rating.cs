@@ -1,12 +1,64 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
     public class Rating : ViewModelBase
     {
+        static Rating()
+        {
+            Instances = new List<WeakReference<Rating>>();
+            SignalEmitter = ComponentRegistry.Instance.GetComponent<ISignalEmitter>();
+            if (SignalEmitter != null)
+            {
+                SignalEmitter.Signal += OnSignal;
+            }
+        }
+
+        private static readonly IList<WeakReference<Rating>> Instances;
+
+        private static readonly ISignalEmitter SignalEmitter;
+
+        private static Task OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.MetaDataUpdated:
+                    var names = signal.State as IEnumerable<string>;
+                    if (names == null || names.Contains(CommonStatistics.Rating, StringComparer.OrdinalIgnoreCase))
+                    {
+                        foreach (var rating in Active)
+                        {
+                            rating.Refresh();
+                        }
+                    }
+                    break;
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
+        public static IEnumerable<Rating> Active
+        {
+            get
+            {
+                lock (Instances)
+                {
+                    return Instances
+                        .Where(instance => instance != null && instance.IsAlive)
+                        .Select(instance => instance.Target)
+                        .ToArray();
+                }
+            }
+        }
+
         public static readonly DependencyProperty FileDataProperty = DependencyProperty.Register(
             "FileData",
             typeof(IFileData),
@@ -32,6 +84,11 @@ namespace FoxTunes.ViewModel
                 return;
             }
             rating.OnFileDataChanged();
+        }
+
+        public Rating()
+        {
+            Instances.Add(new WeakReference<Rating>(this));
         }
 
         public bool Star1
@@ -129,19 +186,6 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public byte Value
-        {
-            get
-            {
-                var value = default(byte);
-                if (this.MetaDataItem != null && byte.TryParse(this.MetaDataItem.Value, out value))
-                {
-                    return value;
-                }
-                return 0;
-            }
-        }
-
         protected virtual void OnValueChanged(byte value)
         {
             if (this.ValueChanged == null)
@@ -153,54 +197,36 @@ namespace FoxTunes.ViewModel
 
         public event RatingEventHandler ValueChanged;
 
+        protected virtual byte GetValue()
+        {
+            var fileData = this.FileData;
+            if (fileData == null)
+            {
+                return 0;
+            }
+            var metaDataItem = default(MetaDataItem);
+            if (this.FileData != null)
+            {
+                lock (this.FileData.MetaDatas)
+                {
+                    metaDataItem = this.FileData.GetOrAdd(CommonStatistics.Rating, MetaDataItemType.Tag);
+                }
+            }
+            if (metaDataItem == null)
+            {
+                return 0;
+            }
+            var value = default(byte);
+            if (!byte.TryParse(metaDataItem.Value, out value))
+            {
+                return 0;
+            }
+            return value;
+        }
+
         protected virtual void SetValue(byte value)
         {
             this.OnValueChanged(value);
-        }
-
-        private MetaDataItem _MetaDataItem { get; set; }
-
-        public MetaDataItem MetaDataItem
-        {
-            get
-            {
-                return this._MetaDataItem;
-            }
-            set
-            {
-                this.OnMetaDataItemChanging();
-                this._MetaDataItem = value;
-                this.OnMetaDataItemChanged();
-            }
-        }
-
-        protected virtual void OnMetaDataItemChanging()
-        {
-            if (this.MetaDataItem != null)
-            {
-                this.MetaDataItem.ValueChanged -= this.OnMetaDataItemValueChanged;
-            }
-        }
-
-        protected virtual void OnMetaDataItemChanged()
-        {
-            if (this.MetaDataItem != null)
-            {
-                this.MetaDataItem.ValueChanged += this.OnMetaDataItemValueChanged;
-            }
-            this.Refresh();
-            if (this.MetaDataItemChanged != null)
-            {
-                this.MetaDataItemChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("MetaDataItem");
-        }
-
-        public event EventHandler MetaDataItemChanged;
-
-        protected virtual void OnMetaDataItemValueChanged(object sender, EventArgs e)
-        {
-            var task = Windows.Invoke(new Action(this.Refresh));
         }
 
         public IFileData FileData
@@ -217,17 +243,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnFileDataChanged()
         {
-            if (this.FileData == null)
-            {
-                this.MetaDataItem = null;
-            }
-            else
-            {
-                lock (this.FileData.MetaDatas)
-                {
-                    this.MetaDataItem = this.FileData.GetOrAdd(CommonStatistics.Rating, MetaDataItemType.Tag);
-                }
-            }
+            this.Refresh();
             if (this.FileDataChanged != null)
             {
                 this.FileDataChanged(this, EventArgs.Empty);
@@ -237,17 +253,48 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler FileDataChanged;
 
-        protected virtual void Refresh()
+        private byte Value { get; set; }
+
+        public void Refresh()
         {
-            for (var a = 1; a <= 5; a++)
+            var task = Windows.Invoke(() =>
             {
-                this.OnPropertyChanged("Star" + a);
-            }
+                var value = this.GetValue();
+                if (this.Value == value)
+                {
+                    return;
+                }
+                this.Value = value;
+                for (var a = 1; a <= 5; a++)
+                {
+                    this.OnPropertyChanged("Star" + a);
+                }
+            });
         }
 
         protected override Freezable CreateInstanceCore()
         {
             return new Rating();
+        }
+
+        protected override void OnDisposing()
+        {
+            lock (Instances)
+            {
+                for (var a = Instances.Count - 1; a >= 0; a--)
+                {
+                    var instance = Instances[a];
+                    if (instance == null || !instance.IsAlive)
+                    {
+                        Instances.RemoveAt(a);
+                    }
+                    else if (object.ReferenceEquals(this, instance.Target))
+                    {
+                        Instances.RemoveAt(a);
+                    }
+                }
+            }
+            base.OnDisposing();
         }
     }
 }
