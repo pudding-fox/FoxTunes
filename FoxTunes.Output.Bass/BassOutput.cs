@@ -380,9 +380,9 @@ namespace FoxTunes
                 {
                     if (pipeline != null)
                     {
-                        if (pipeline.Input.CheckFormat(outputStream.ChannelHandle))
+                        if (pipeline.Input.CheckFormat(outputStream))
                         {
-                            if (pipeline.Input.Add(outputStream.ChannelHandle))
+                            if (pipeline.Input.Add(outputStream))
                             {
                                 Logger.Write(this, LogLevel.Debug, "Pre-empted playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
                                 return true;
@@ -413,33 +413,34 @@ namespace FoxTunes
 
         public override async Task Unload(IOutputStream stream)
         {
+            var disposed = default(bool);
             var outputStream = stream as BassOutputStream;
-            Logger.Write(this, LogLevel.Debug, "Unloading stream: {0}", outputStream.ChannelHandle);
             if (this.IsStarted)
             {
-                await this.PipelineManager.WithPipelineExclusive(pipeline =>
+                Logger.Write(this, LogLevel.Debug, "Unloading stream for file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+                disposed = await this.PipelineManager.WithPipelineExclusive(pipeline =>
                 {
                     if (pipeline != null)
                     {
-                        if (pipeline.Input.Contains(outputStream.ChannelHandle))
+                        if (pipeline.Input.Remove(outputStream, true))
                         {
-                            //var current = pipeline.Input.Position(outputStream.ChannelHandle) == 0;
-                            pipeline.Input.Remove(outputStream.ChannelHandle);
-                            //if (current)
-                            //{
-                            //    Logger.Write(this, LogLevel.Debug, "Stream is playing, stopping the pipeline and clearing the buffer: {0}", outputStream.ChannelHandle);
-                            //    pipeline.Stop();
-                            //}
-                            //if (current)
-                            //{
-                            //    pipeline.ClearBuffer();
-                            //}
+                            Logger.Write(this, LogLevel.Debug, "Pipeline unloaded stream for file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+                            return true;
+                        }
+                        else
+                        {
+                            //Probably not in the queue.
                         }
                     }
+                    return false;
                 }).ConfigureAwait(false);
             }
             this.OnUnloaded(outputStream);
-            outputStream.Dispose();
+            if (!disposed)
+            {
+                outputStream.Dispose();
+            }
+            Logger.Write(this, LogLevel.Debug, "Unloaded stream for file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
         }
 
         public override int GetData(float[] buffer)

@@ -6,15 +6,15 @@ namespace FoxTunes.Interfaces
     {
         IEnumerable<int> Queue { get; }
 
-        bool CheckFormat(int channelHandle);
+        bool CheckFormat(BassOutputStream stream);
 
-        bool Contains(int channelHandle);
+        bool Contains(BassOutputStream stream);
 
-        int Position(int channelHandle);
+        int Position(BassOutputStream stream);
 
-        bool Add(int channelHandle);
+        bool Add(BassOutputStream stream);
 
-        bool Remove(int channelHandle);
+        bool Remove(BassOutputStream stream, bool dispose);
 
         void Reset();
     }
