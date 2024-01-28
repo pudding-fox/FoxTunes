@@ -14,6 +14,8 @@ namespace FoxTunes
 
         public int Minor { get; set; }
 
+        public int Build { get; set; }
+
         public ProcessorArchitecture Architecture { get; set; }
     }
 

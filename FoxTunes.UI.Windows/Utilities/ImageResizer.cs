@@ -1,9 +1,11 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -73,6 +75,38 @@ namespace FoxTunes
                 graphics.DrawImage(image, new Rectangle(0, 0, width, height));
             }
         }
+
+        public Color GetMainColor(string fileName)
+        {
+            const int MAX_WIDTH = 128;
+            const int MAX_HEIGHT = 128;
+            var bitmap = Bitmap.FromFile(fileName) as Bitmap;
+            if (bitmap.Width > MAX_WIDTH || bitmap.Height > MAX_HEIGHT)
+            {
+                bitmap = Bitmap.FromFile(
+                    this.Resize(
+                        fileName,
+                        () => bitmap,
+                        MAX_WIDTH,
+                        MAX_HEIGHT
+                    )
+                ) as Bitmap;
+            }
+            var colors = new Dictionary<Color, int>();
+            for (int x = 0, w = bitmap.Width, h = bitmap.Height; x < w; x++)
+            {
+                for (int y = 0; y < h; y++)
+                {
+                    var color = bitmap.GetPixel(x, y);
+                    colors[color] = colors.GetOrAdd(color, 0) + 1;
+                }
+            }
+            return colors
+                .OrderBy(pair => pair.Value)
+                .Select(pair => pair.Key)
+                .FirstOrDefault();
+        }
+
 
         private string GetImageId(string fileName, int width, int height)
         {

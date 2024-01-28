@@ -1,12 +1,10 @@
-﻿using FoxDb;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 
 namespace FoxTunes
 {
@@ -65,7 +63,6 @@ namespace FoxTunes
             public AllowsTransparencyBehaviour(Window window) : this()
             {
                 this.Window = window;
-                this.Window.Loaded += this.OnLoaded;
                 if (this.Configuration != null)
                 {
                     this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -79,24 +76,6 @@ namespace FoxTunes
                             this.EnableTransparency(value);
                         }
                     });
-                    this.Configuration.GetElement<TextConfigurationElement>(
-                        WindowsUserInterfaceConfiguration.SECTION,
-                        WindowsUserInterfaceConfiguration.ACCENT_COLOR
-                    ).ConnectValue(value =>
-                    {
-                        if (string.IsNullOrEmpty(value))
-                        {
-                            this.AccentColor = DefaultAccentColor;
-                        }
-                        else
-                        {
-                            this.AccentColor = value.ToColor();
-                        }
-                        if (this.Window != null && this.Enabled)
-                        {
-                            this.EnableBlur();
-                        }
-                    });
                 }
             }
 
@@ -106,18 +85,7 @@ namespace FoxTunes
 
             public bool Enabled { get; private set; }
 
-            public Color AccentColor { get; private set; }
-
             public Window Window { get; private set; }
-
-            protected virtual void OnLoaded(object sender, RoutedEventArgs e)
-            {
-                if (!this.Window.AllowsTransparency)
-                {
-                    return;
-                }
-                this.EnableBlur();
-            }
 
             public virtual void EnableTransparency(bool enable)
             {
@@ -133,19 +101,6 @@ namespace FoxTunes
                         return;
                     }
                     this.Window.AllowsTransparency = enable;
-                }
-            }
-
-            protected virtual void EnableBlur()
-            {
-                var windowHelper = new WindowInteropHelper(this.Window);
-                if (SupportsAcrylicBlur)
-                {
-                    WindowExtensions.EnableAcrylicBlur(windowHelper.Handle, this.AccentColor);
-                }
-                else
-                {
-                    WindowExtensions.EnableBlur(windowHelper.Handle);
                 }
             }
         }
@@ -205,6 +160,8 @@ namespace FoxTunes
             }
         }
 
+        public static Color CurrentAccentColor;
+
         public static void EnableAcrylicBlur(IntPtr handle, Color color)
         {
             var accent = new AccentPolicy()
@@ -227,6 +184,7 @@ namespace FoxTunes
             {
                 Marshal.FreeHGlobal(accentPtr);
             }
+            CurrentAccentColor = color;
         }
 
         [StructLayout(LayoutKind.Sequential)]

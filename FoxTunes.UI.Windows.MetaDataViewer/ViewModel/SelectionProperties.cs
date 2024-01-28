@@ -117,6 +117,8 @@ namespace FoxTunes.ViewModel
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IPlaybackManager PlaybackManager { get; private set; }
+
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
@@ -265,6 +267,8 @@ namespace FoxTunes.ViewModel
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistManager.SelectedPlaylistChanged += this.OnSelectedPlaylistChanged;
             this.PlaylistManager.SelectedItemsChanged += this.OnSelectedItemsChanged;
+            this.PlaybackManager = core.Managers.Playback;
+            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.SignalEmitter = core.Components.SignalEmitter;
@@ -336,6 +340,22 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
+            if (object.ReferenceEquals(this.FileDatasSource, playlistItems))
+            {
+                return;
+            }
+            this.FileDatasSource = playlistItems;
+            this.Dispatch(() => this.Refresh(playlistItems));
+        }
+
+        protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
+        {
+            var outputStream = this.PlaybackManager.CurrentStream;
+            if (outputStream == null)
+            {
+                return;
+            }
+            var playlistItems = new[] { outputStream.PlaylistItem };
             if (object.ReferenceEquals(this.FileDatasSource, playlistItems))
             {
                 return;

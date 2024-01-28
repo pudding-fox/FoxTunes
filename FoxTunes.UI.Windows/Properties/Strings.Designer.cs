@@ -1528,6 +1528,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cover Art Accent.
+        /// </summary>
+        internal static string WindowsUserInterfaceConfiguration_ArtworkAccent {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.ArtworkAccent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Counters.
         /// </summary>
         internal static string WindowsUserInterfaceConfiguration_Counters {

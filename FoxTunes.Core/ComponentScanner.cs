@@ -274,7 +274,7 @@ namespace FoxTunes
                 {
                     foreach (var dependency in dependencies)
                     {
-                        var version = new Version(dependency.Major, dependency.Minor);
+                        var version = new Version(dependency.Major, dependency.Minor, dependency.Build);
                         if (Environment.OSVersion.Version < version)
                         {
                             Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires platform {1}.{2}.", type.FullName, dependency.Major, dependency.Minor);

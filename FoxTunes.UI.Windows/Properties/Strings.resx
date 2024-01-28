@@ -606,6 +606,9 @@
   <data name="WindowsUserInterfaceConfiguration.AccentColor" xml:space="preserve">
     <value>Accent Color</value>
   </data>
+  <data name="WindowsUserInterfaceConfiguration.ArtworkAccent" xml:space="preserve">
+    <value>Cover Art Accent</value>
+  </data>
   <data name="WindowsUserInterfaceConfiguration.Counters" xml:space="preserve">
     <value>Show Counters</value>
   </data>

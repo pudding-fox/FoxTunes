@@ -11,6 +11,10 @@ namespace FoxTunes
 {
     [Component(ID)]
     [WindowsUserInterfaceDependency]
+    //TODO: Not sure of the exact required platform.
+    //TODO: SetWindowCompositionAttribute is undocumented.
+    //TODO: Assuming Windows 8.
+    [PlatformDependency(Major = 6, Minor = 2)]
     public class TransparentTheme : ThemeBase, IConfigurableComponent
     {
         public const string ID = "191C2E5B-4732-4CC7-BC31-4CC040DCFEC9";
