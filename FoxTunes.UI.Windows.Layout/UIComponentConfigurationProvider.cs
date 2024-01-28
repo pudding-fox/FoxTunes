@@ -2,7 +2,6 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace FoxTunes
@@ -14,7 +13,7 @@ namespace FoxTunes
         public UIComponentConfigurationProvider(UIComponentConfiguration component)
         {
             this.Component = component;
-            this.Sections = new ObservableCollection<ConfigurationSection>();
+            this.Sections = new Dictionary<string, ConfigurationSection>(StringComparer.OrdinalIgnoreCase);
             this.Elements = new Dictionary<string, ConfigurationElement>(StringComparer.OrdinalIgnoreCase);
         }
 
@@ -44,7 +43,15 @@ namespace FoxTunes
             }
         }
 
-        public ObservableCollection<ConfigurationSection> Sections { get; private set; }
+        IEnumerable<ConfigurationSection> IConfiguration.Sections
+        {
+            get
+            {
+                return this.Sections.Values;
+            }
+        }
+
+        public IDictionary<string, ConfigurationSection> Sections { get; private set; }
 
         public IDictionary<string, ConfigurationElement> Elements { get; private set; }
 
@@ -67,13 +74,13 @@ namespace FoxTunes
 
         public void Load(string profile)
         {
-            foreach (var section in this.Sections)
+            foreach (var pair in this.Sections)
             {
-                if (section.IsInitialized)
+                if (pair.Value.IsInitialized)
                 {
                     continue;
                 }
-                section.InitializeComponent();
+                pair.Value.InitializeComponent();
             }
             foreach (var pair in this.Component.MetaData)
             {
@@ -130,7 +137,12 @@ namespace FoxTunes
 
         public ConfigurationSection GetSection(string sectionId)
         {
-            return this.Sections.FirstOrDefault(section => string.Equals(section.Id, sectionId, StringComparison.OrdinalIgnoreCase));
+            var section = default(ConfigurationSection);
+            if (this.Sections.TryGetValue(sectionId, out section))
+            {
+                return section;
+            }
+            return default(ConfigurationSection);
         }
 
         public T GetElement<T>(string sectionId, string elementId) where T : ConfigurationElement
@@ -150,9 +162,9 @@ namespace FoxTunes
 
         public void Reset()
         {
-            foreach (var section in this.Sections)
+            foreach (var pair in this.Sections)
             {
-                section.Reset();
+                pair.Value.Reset();
             }
         }
 
@@ -205,7 +217,7 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Adding configuration section: {0} => {1}", section.Id, section.Name);
             section = new ConfigurationSectionWrapper(this, section);
-            this.Sections.Add(section);
+            this.Sections.Add(section.Id, section);
         }
 
         private void Update(ConfigurationSection section)
@@ -223,10 +235,7 @@ namespace FoxTunes
                 this.Elements.AddRange(section.Elements);
                 if (this.Provider.IsInitialized)
                 {
-                    foreach (var element in section.Elements)
-                    {
-                        this.Provider.Elements.Add(element.Id, element);
-                    }
+                    this.Provider.Elements.AddRange(section.Elements);
                 }
                 this.Flags = section.Flags;
             }

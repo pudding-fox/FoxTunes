@@ -1,8 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing.Design;
 using System.Linq;
 
 namespace FoxTunes
@@ -19,7 +18,7 @@ namespace FoxTunes
 
         public ConfigurationSection()
         {
-            this.Elements = new ObservableCollection<ConfigurationElement>();
+            this.Elements = new Dictionary<string, ConfigurationElement>(StringComparer.OrdinalIgnoreCase);
             this.Flags = ConfigurationSectionFlags.None;
         }
 
@@ -37,7 +36,7 @@ namespace FoxTunes
 
         public string Description { get; private set; }
 
-        public ObservableCollection<ConfigurationElement> Elements { get; protected set; }
+        public IDictionary<string, ConfigurationElement> Elements { get; protected set; }
 
         public bool IsInitialized { get; private set; }
 
@@ -93,9 +92,9 @@ namespace FoxTunes
 
         public void InitializeComponent()
         {
-            foreach (var element in this.Elements)
+            foreach (var pair in this.Elements)
             {
-                element.InitializeComponent();
+                pair.Value.InitializeComponent();
             }
             this.IsInitialized = true;
         }
@@ -111,15 +110,15 @@ namespace FoxTunes
                 this.Description = section.Description;
             }
             this.Flags |= section.Flags;
-            foreach (var element in section.Elements)
+            foreach (var pair in section.Elements)
             {
-                if (!this.Contains(element.Id))
+                if (!this.Contains(pair.Key))
                 {
-                    this.Add(element);
+                    this.Add(pair.Value);
                 }
                 else
                 {
-                    this.Update(element);
+                    this.Update(pair.Value);
                 }
             }
         }
@@ -127,7 +126,7 @@ namespace FoxTunes
         protected virtual void Add(ConfigurationElement element)
         {
             Logger.Write(typeof(ConfigurationSection), LogLevel.Debug, "Adding configuration element: {0} => {1}", element.Id, element.Name);
-            this.Elements.Add(element);
+            this.Elements.Add(element.Id, element);
         }
 
         protected virtual void Update(ConfigurationElement element)
@@ -151,14 +150,19 @@ namespace FoxTunes
 
         public virtual ConfigurationElement GetElement(string elementId)
         {
-            return this.Elements.FirstOrDefault(element => string.Equals(element.Id, elementId, StringComparison.OrdinalIgnoreCase));
+            var element = default(ConfigurationElement);
+            if (this.Elements.TryGetValue(elementId, out element))
+            {
+                return element;
+            }
+            return default(ConfigurationElement);
         }
-
+                                                                                                       
         public void Reset()
         {
-            foreach (var element in this.Elements)
+            foreach (var pair in this.Elements)
             {
-                element.Reset();
+                pair.Value.Reset();
             }
         }
 
