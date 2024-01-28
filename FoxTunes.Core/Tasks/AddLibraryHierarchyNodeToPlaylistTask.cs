@@ -39,22 +39,26 @@ namespace FoxTunes
 
         private async Task AddPlaylistItems()
         {
-            await this.SetName("Getting file list");
-            await this.SetIsIndeterminate(true);
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            using (var task = new SingletonReentrantTask(ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
-                this.Offset = await this.Database.ExecuteScalarAsync<int>(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, (parameters, phase) =>
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    switch (phase)
+                    this.Offset = await this.Database.ExecuteScalarAsync<int>(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, (parameters, phase) =>
                     {
-                        case DatabaseParameterPhase.Fetch:
-                            parameters["libraryHierarchyItemId"] = this.LibraryHierarchyNode.Id;
-                            parameters["sequence"] = this.Sequence;
-                            parameters["status"] = PlaylistItemStatus.Import;
-                            break;
-                    }
-                }, transaction);
-                transaction.Commit();
+                        switch (phase)
+                        {
+                            case DatabaseParameterPhase.Fetch:
+                                parameters["libraryHierarchyItemId"] = this.LibraryHierarchyNode.Id;
+                                parameters["sequence"] = this.Sequence;
+                                parameters["status"] = PlaylistItemStatus.Import;
+                                break;
+                        }
+                    }, transaction);
+                    transaction.Commit();
+                }
+            }))
+            {
+                await task.Run();
             }
         }
     }
