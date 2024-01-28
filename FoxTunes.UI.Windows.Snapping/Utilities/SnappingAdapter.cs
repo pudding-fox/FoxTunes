@@ -138,6 +138,28 @@ namespace FoxTunes
             this.Window.Topmost = false;
         }
 
+        public void SetCursor(ResizeDirection direction)
+        {
+            var cursor = default(global::System.Windows.Input.Cursor);
+            if (direction.HasFlag(ResizeDirection.Left | ResizeDirection.Top) || direction.HasFlag(ResizeDirection.Right | ResizeDirection.Bottom))
+            {
+                cursor = global::System.Windows.Input.Cursors.SizeNWSE;
+            }
+            else if (direction.HasFlag(ResizeDirection.Right | ResizeDirection.Top) || direction.HasFlag(ResizeDirection.Left | ResizeDirection.Bottom))
+            {
+                cursor = global::System.Windows.Input.Cursors.SizeNESW;
+            }
+            else if (direction.HasFlag(ResizeDirection.Top) || direction.HasFlag(ResizeDirection.Bottom))
+            {
+                cursor = global::System.Windows.Input.Cursors.SizeNS;
+            }
+            else if (direction.HasFlag(ResizeDirection.Left) || direction.HasFlag(ResizeDirection.Right))
+            {
+                cursor = global::System.Windows.Input.Cursors.SizeWE;
+            }
+            global::System.Windows.Input.Mouse.OverrideCursor = cursor;
+        }
+
         public static global::System.Windows.Window GetWindow(IntPtr handle)
         {
             var windows = System.Windows.Application.Current.Windows;
