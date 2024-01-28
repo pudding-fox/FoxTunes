@@ -94,9 +94,7 @@ namespace FoxTunes
                     switch (signal.State as string)
                     {
                         case ImageBehaviour.REFRESH_IMAGES:
-                            this.FallbackValue.Reset();
-                            this.Store.Clear();
-                            return Windows.Invoke(() => this.CalculateTileSize());
+                            return this.Reset();
                     }
                     break;
             }
@@ -179,6 +177,13 @@ namespace FoxTunes
             );
             this.TileWidth = global::System.Convert.ToInt32(size.Width);
             this.TileHeight = global::System.Convert.ToInt32(size.Height);
+        }
+
+        protected virtual Task Reset()
+        {
+            this.FallbackValue.Reset();
+            this.Store.Clear();
+            return Windows.Invoke(() => this.CalculateTileSize());
         }
 
         protected override void OnDisposing()
