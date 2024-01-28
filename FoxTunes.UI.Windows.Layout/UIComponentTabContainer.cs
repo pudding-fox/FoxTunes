@@ -262,7 +262,7 @@ namespace FoxTunes
                 {
                     container.Component = new UIComponentConfiguration();
                 }
-                if (string.IsNullOrEmpty(header))
+                if (!string.IsNullOrEmpty(header))
                 {
                     container.Component.MetaData.AddOrUpdate(Header, header);
                 }
