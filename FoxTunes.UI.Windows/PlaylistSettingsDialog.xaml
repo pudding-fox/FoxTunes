@@ -12,6 +12,7 @@
              d:DesignHeight="500" d:DesignWidth="700" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:PlaylistSettings x:Key="ViewModel" Core="{Binding}"/>
+        <ViewModel:ColumnWidthConverter x:Key="ColumnWidthConverter"></ViewModel:ColumnWidthConverter>
         <CollectionViewSource x:Key="PlaylistColumns" Source="{Binding PlaylistColumns.ItemsSource, Source={StaticResource ViewModel}}" IsLiveSortingRequested="True">
             <CollectionViewSource.LiveGroupingProperties>
                 <System:String>Sequence</System:String>
@@ -80,14 +81,17 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
                     <Label Grid.Column="0" Grid.Row="0">Column Name</Label>
                     <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Name}"></TextBox>
                     <Label Grid.Column="0" Grid.Row="1">Dynamic</Label>
                     <CheckBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" IsChecked="{Binding IsDynamic}"></CheckBox>
-                    <Label Grid.Column="0" Grid.Row="2">Script</Label>
-                    <TextBox Grid.Column="1" Grid.Row="2" AcceptsReturn="True" AcceptsTab="True" SpellCheck.IsEnabled="False" TextWrapping="Wrap" Text="{Binding DisplayScript}"></TextBox>
+                    <Label Grid.Column="0" Grid.Row="2">Auto Size</Label>
+                    <CheckBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" IsChecked="{Binding Width, Converter={StaticResource ColumnWidthConverter}}"></CheckBox>
+                    <Label Grid.Column="0" Grid.Row="3">Script</Label>
+                    <TextBox Grid.Column="1" Grid.Row="3" AcceptsReturn="True" AcceptsTab="True" SpellCheck.IsEnabled="False" TextWrapping="Wrap" Text="{Binding DisplayScript}"></TextBox>
                 </Grid>
             </Grid>
         </GroupBox>

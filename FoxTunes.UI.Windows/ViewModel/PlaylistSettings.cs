@@ -3,6 +3,7 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -10,6 +11,8 @@ namespace FoxTunes.ViewModel
 {
     public class PlaylistSettings : ViewModelBase
     {
+        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
+
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
@@ -86,8 +89,10 @@ namespace FoxTunes.ViewModel
 
         protected override void OnCoreChanged()
         {
+            this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.DatabaseFactory = this.Core.Factories.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             this.PlaylistColumns = new CollectionManager<PlaylistColumn>()
             {
                 ItemFactory = () =>
@@ -111,6 +116,16 @@ namespace FoxTunes.ViewModel
             };
             this.Refresh();
             base.OnCoreChanged();
+        }
+
+        private Task OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.PlaylistColumnsUpdated:
+                    return this.ForegroundTaskRunner.Run(() => this.Refresh());
+            }
+            return Task.CompletedTask;
         }
 
         protected virtual void Refresh()

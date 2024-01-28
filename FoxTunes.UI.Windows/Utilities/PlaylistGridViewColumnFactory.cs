@@ -1,5 +1,9 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.ViewModel;
+using System;
+using System.ComponentModel;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace FoxTunes.Utilities
 {
@@ -31,9 +35,27 @@ namespace FoxTunes.Utilities
             }
             gridViewColumn.Header = column.Name;
             gridViewColumn.DisplayMemberBinding = new PlaylistScriptBinding(this.PlaybackManager, this.ScriptingContext, column.DisplayScript);
-            gridViewColumn.Width = column.Width.HasValue ? column.Width.Value : double.NaN;
+            BindingOperations.SetBinding(gridViewColumn, GridViewColumn.WidthProperty, new Binding("Width")
+            {
+                Source = column,
+                Converter = ColumnWidthConverter.Instance,
+                Mode = BindingMode.TwoWay
+            });
+            var descriptor = DependencyPropertyDescriptor.FromProperty(GridViewColumn.WidthProperty, typeof(GridViewColumn));
+            descriptor.AddValueChanged(gridViewColumn, (sender, e) => this.OnWidthChanged(column));
             return gridViewColumn;
         }
+
+        protected virtual void OnWidthChanged(PlaylistColumn column)
+        {
+            if (this.WidthChanged == null)
+            {
+                return;
+            }
+            this.WidthChanged(this, column);
+        }
+
+        public event EventHandler<PlaylistColumn> WidthChanged = delegate { };
 
         public void Refresh(GridViewColumn column)
         {
