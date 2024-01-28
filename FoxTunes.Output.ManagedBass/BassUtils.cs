@@ -75,12 +75,19 @@ namespace FoxTunes
 
         public static int GetChannelPcmRate(int channelHandle)
         {
-            return (int)Convert.ChangeType(Bass.ChannelGetAttribute(channelHandle, ChannelAttribute.Frequency), typeof(int));
+            return Convert.ToInt32(Bass.ChannelGetAttribute(channelHandle, ChannelAttribute.Frequency));
         }
 
         public static int GetChannelDsdRate(int channelHandle)
         {
-            return (int)Convert.ChangeType(Bass.ChannelGetAttribute(channelHandle, ChannelAttribute.DSDRate), typeof(int));
+            return Convert.ToInt32(Bass.ChannelGetAttribute(channelHandle, ChannelAttribute.DSDRate));
+        }
+
+        public static BassFlags GetChannelFlags(int channelHandle)
+        {
+            var channelInfo = default(ChannelInfo);
+            OK(Bass.ChannelGetInfo(channelHandle, out channelInfo));
+            return channelInfo.Flags;
         }
     }
 }
