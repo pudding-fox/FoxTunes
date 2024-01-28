@@ -22,10 +22,6 @@ namespace FoxTunes
 
         public const string ImagesUpdated = "ImagesUpdated";
 
-        public const string StreamLoaded = "StreamLoaded";
-
-        public const string StreamFault = "StreamFault";
-
         public const string PluginInvocation = "PluginInvocation";
     }
 
