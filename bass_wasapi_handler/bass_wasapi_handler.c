@@ -8,6 +8,13 @@
 BOOL is_initialized = FALSE;
 DWORD channel_handle = 0;
 
+//I have no idea how to prevent linking against this routine in msvcrt.
+//It doesn't exist on Windows XP.
+//Hopefully it doesn't do anything important.
+int _except_handler4_common() {
+	return 0;
+}
+
 BOOL BASSWASAPIHANDLERDEF(BASS_WASAPI_HANDLER_Init)(int device, DWORD freq, DWORD chans, DWORD flags, float buffer, float period, void *user) {
 	BOOL success;
 	if (is_initialized) {

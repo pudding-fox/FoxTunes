@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿#if VISTA
+using FoxTunes.Interfaces;
 using System;
 using System.Threading.Tasks;
 
@@ -203,3 +204,4 @@ namespace FoxTunes
         }
     }
 }
+#endif

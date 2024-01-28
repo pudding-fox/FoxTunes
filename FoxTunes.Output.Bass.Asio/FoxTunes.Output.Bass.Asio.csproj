@@ -33,6 +33,9 @@
     <None Include="..\lib\bassasio.dll" Link="bassasio.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\lib\bass_asio_handler.dll" Link="bass_asio_handler.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

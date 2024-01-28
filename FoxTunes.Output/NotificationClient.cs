@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if VISTA
+using System;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -118,7 +119,7 @@ namespace FoxTunes
             this.Dispose(true);
         }
 
-        public static readonly IMMDeviceEnumerator Enumerator = new DeviceEnumerator() as IMMDeviceEnumerator;
+        public static readonly IMMDeviceEnumerator Enumerator = DeviceEnumeratorFactory.Create();
     }
 
     public delegate void NotificationClientEventHandler(object sender, NotificationClientEventArgs e);
@@ -145,3 +146,4 @@ namespace FoxTunes
         public PropertyKey Key { get; private set; }
     }
 }
+#endif
