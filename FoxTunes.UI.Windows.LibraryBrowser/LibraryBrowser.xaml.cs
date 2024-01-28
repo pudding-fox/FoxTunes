@@ -63,5 +63,20 @@ namespace FoxTunes
                 this.MouseCursorAdorner.Hide();
             }
         }
+
+        protected virtual void OnIsItemVisibleChanged(object sender, ListBoxExtensions.IsItemVisibleChangedEventArgs e)
+        {
+            var element = e.OriginalSource as FrameworkElement;
+            if (element == null)
+            {
+                return;
+            }
+            var artworkGrid = element.GetVisualChild<ArtworkGrid>();
+            if (artworkGrid == null)
+            {
+                return;
+            }
+            var task = artworkGrid.Refresh();
+        }
     }
 }

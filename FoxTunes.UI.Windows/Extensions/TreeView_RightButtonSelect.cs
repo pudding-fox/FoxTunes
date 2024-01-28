@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -9,7 +7,7 @@ namespace FoxTunes
 {
     public static partial class TreeViewExtensions
     {
-        private static readonly ConcurrentDictionary<TreeView, RightButtonSelectBehaviour> RightButtonSelectBehaviours = new ConcurrentDictionary<TreeView, RightButtonSelectBehaviour>();
+        private static readonly ConditionalWeakTable<TreeView, RightButtonSelectBehaviour> RightButtonSelectBehaviours = new ConditionalWeakTable<TreeView, RightButtonSelectBehaviour>();
 
         public static readonly DependencyProperty RightButtonSelectProperty = DependencyProperty.RegisterAttached(
             "RightButtonSelect",
@@ -37,11 +35,15 @@ namespace FoxTunes
             }
             if (GetRightButtonSelect(treeView))
             {
-                RightButtonSelectBehaviours.TryAdd(treeView, new RightButtonSelectBehaviour(treeView));
+                var behaviour = default(RightButtonSelectBehaviour);
+                if (!RightButtonSelectBehaviours.TryGetValue(treeView, out behaviour))
+                {
+                    RightButtonSelectBehaviours.Add(treeView, new RightButtonSelectBehaviour(treeView));
+                }
             }
             else
             {
-                RightButtonSelectBehaviours.TryRemove(treeView);
+                RightButtonSelectBehaviours.Remove(treeView);
 
             }
         }

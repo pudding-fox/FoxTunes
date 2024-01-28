@@ -28,7 +28,13 @@ WITH
 
 INSERT INTO [LibraryHierarchyItem_LibraryItem] ([LibraryHierarchyItem_Id], [LibraryItem_Id])
 SELECT [Id], @libraryItemId
-FROM "LibraryHierarchyItems_Lookup";
+FROM "LibraryHierarchyItems_Lookup"
+WHERE NOT EXISTS(
+	SELECT * 
+	FROM [LibraryHierarchyItem_LibraryItem]
+	WHERE [LibraryHierarchyItem_Id] = [Id]
+		AND [LibraryItem_Id] = @libraryItemId
+);
 
 WITH
 "LibraryHierarchyItems_Lookup" AS

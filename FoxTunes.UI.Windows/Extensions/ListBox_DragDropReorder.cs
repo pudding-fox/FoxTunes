@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -10,7 +10,7 @@ namespace FoxTunes
 {
     public static partial class ListBoxExtensions
     {
-        private static readonly ConcurrentDictionary<ListBox, DragDropReorderBehaviour> DragDropReorderBehaviours = new ConcurrentDictionary<ListBox, DragDropReorderBehaviour>();
+        private static readonly ConditionalWeakTable<ListBox, DragDropReorderBehaviour> DragDropReorderBehaviours = new ConditionalWeakTable<ListBox, DragDropReorderBehaviour>();
 
         public static readonly DependencyProperty DragDropReorderProperty = DependencyProperty.RegisterAttached(
             "DragDropReorder",
@@ -38,12 +38,15 @@ namespace FoxTunes
             }
             if (GetDragDropReorder(listBox))
             {
-                DragDropReorderBehaviours.TryAdd(listBox, new DragDropReorderBehaviour(listBox));
+                var behaviour = default(DragDropReorderBehaviour);
+                if (!DragDropReorderBehaviours.TryGetValue(listBox, out behaviour))
+                {
+                    DragDropReorderBehaviours.Add(listBox, new DragDropReorderBehaviour(listBox));
+                }
             }
             else
             {
-                DragDropReorderBehaviours.TryRemove(listBox);
-
+                DragDropReorderBehaviours.Remove(listBox);
             }
         }
 

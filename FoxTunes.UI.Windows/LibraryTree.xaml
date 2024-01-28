@@ -40,9 +40,9 @@
                   IsTextSearchEnabled="True"
                   TextSearch.TextPath="Value">
             <Interactivity:Interaction.Triggers>
-                <Interactivity:EventTrigger EventName="MouseDoubleClick">
+                <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type TreeViewItem}">
                     <Interactivity:InvokeCommandAction Command="{Binding AddToPlaylistCommand, Source={StaticResource ViewModel}}"/>
-                </Interactivity:EventTrigger>
+                </Windows:FilteredEventTrigger>
             </Interactivity:Interaction.Triggers>
             <TreeView.ContextMenu>
                 <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_LIBRARY}}"></Windows:Menu>

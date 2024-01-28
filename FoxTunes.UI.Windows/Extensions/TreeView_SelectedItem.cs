@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -6,7 +6,7 @@ namespace FoxTunes
 {
     public static partial class TreeViewExtensions
     {
-        private static readonly Dictionary<TreeView, SelectedItemBehaviour> SelectedItemBehaviours = new Dictionary<TreeView, SelectedItemBehaviour>();
+        private static readonly ConditionalWeakTable<TreeView, SelectedItemBehaviour> SelectedItemBehaviours = new ConditionalWeakTable<TreeView, SelectedItemBehaviour>();
 
         public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.RegisterAttached(
             "SelectedItem",
@@ -32,7 +32,8 @@ namespace FoxTunes
             {
                 return;
             }
-            if (!SelectedItemBehaviours.ContainsKey(treeView))
+            var behaviour = default(SelectedItemBehaviour);
+            if (!SelectedItemBehaviours.TryGetValue(treeView, out behaviour))
             {
                 SelectedItemBehaviours.Add(treeView, new SelectedItemBehaviour(treeView));
             }

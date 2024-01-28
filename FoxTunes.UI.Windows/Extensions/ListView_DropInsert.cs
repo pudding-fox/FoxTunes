@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace FoxTunes
 {
     public static partial class ListViewExtensions
     {
-        private static readonly ConcurrentDictionary<ListView, DropInsertBehaviour> DropInsertBehaviours = new ConcurrentDictionary<ListView, DropInsertBehaviour>();
+        private static readonly ConditionalWeakTable<ListView, DropInsertBehaviour> DropInsertBehaviours = new ConditionalWeakTable<ListView, DropInsertBehaviour>();
 
         public static readonly DependencyProperty DropInsertProperty = DependencyProperty.RegisterAttached(
             "DropInsert",
@@ -40,11 +37,15 @@ namespace FoxTunes
             }
             if (GetDropInsert(listView))
             {
-                DropInsertBehaviours.TryAdd(listView, new DropInsertBehaviour(listView));
+                var behaviour = default(DropInsertBehaviour);
+                if (!DropInsertBehaviours.TryGetValue(listView, out behaviour))
+                {
+                    DropInsertBehaviours.Add(listView, new DropInsertBehaviour(listView));
+                }
             }
             else
             {
-                DropInsertBehaviours.TryRemove(listView);
+                DropInsertBehaviours.Remove(listView);
             }
         }
 

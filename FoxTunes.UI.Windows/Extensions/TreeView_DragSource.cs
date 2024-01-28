@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 namespace FoxTunes
 {
     public static partial class TreeViewExtensions
     {
-        private static readonly ConcurrentDictionary<TreeView, DragSourceBehaviour> DragSourceBehaviours = new ConcurrentDictionary<TreeView, DragSourceBehaviour>();
+        private static readonly ConditionalWeakTable<TreeView, DragSourceBehaviour> DragSourceBehaviours = new ConditionalWeakTable<TreeView, DragSourceBehaviour>();
 
         public static readonly DependencyProperty DragSourceProperty = DependencyProperty.RegisterAttached(
             "DragSource",
@@ -37,12 +36,15 @@ namespace FoxTunes
             }
             if (GetDragSource(treeView))
             {
-                DragSourceBehaviours.TryAdd(treeView, new DragSourceBehaviour(treeView));
+                var behaviour = default(DragSourceBehaviour);
+                if (!DragSourceBehaviours.TryGetValue(treeView, out behaviour))
+                {
+                    DragSourceBehaviours.Add(treeView, new DragSourceBehaviour(treeView));
+                }
             }
             else
             {
-                DragSourceBehaviours.TryRemove(treeView);
-
+                DragSourceBehaviours.Remove(treeView);
             }
         }
 

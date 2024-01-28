@@ -55,11 +55,13 @@
                         SelectionChanged="OnSelectionChanged"
                         Windows:ListBoxExtensions.DragSource="True"
                         Windows:ListBoxExtensions.DragSourceInitialized="DragSourceInitialized"
+                        Windows:ListBoxExtensions.TrackItemVisibility="True"
+                        Windows:ListBoxExtensions.IsItemVisibleChanged="OnIsItemVisibleChanged"
                         TextSearch.TextPath="Value">
                         <Interactivity:Interaction.Triggers>
-                            <Interactivity:EventTrigger EventName="MouseDoubleClick">
+                            <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type ListBoxItem}">
                                 <Interactivity:InvokeCommandAction Command="{Binding BrowseCommand, Source={StaticResource ViewModel}}"/>
-                            </Interactivity:EventTrigger>
+                            </Windows:FilteredEventTrigger>
                         </Interactivity:Interaction.Triggers>
                         <ListBox.InputBindings>
                             <KeyBinding Key="Return" Command="{Binding BrowseCommand, Source={StaticResource ViewModel}}"></KeyBinding>
@@ -73,11 +75,6 @@
                                 <WrapPanel Orientation="Horizontal" IsItemsHost="True"></WrapPanel>
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
-                        <!--<ListBox.ItemContainerStyle>
-                            <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-                                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"></Setter>
-                            </Style>
-                        </ListBox.ItemContainerStyle>-->
                         <ListBox.ItemTemplateSelector>
                             <Windows:LibraryBrowserTemplateSelector>
                                 <Windows:LibraryBrowserTemplateSelector.UpTemplate>

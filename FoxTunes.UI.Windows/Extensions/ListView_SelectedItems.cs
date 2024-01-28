@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     public static partial class ListViewExtensions
     {
-        private static readonly Dictionary<ListView, SelectedItemsBehaviour> SelectedItemsBehaviours = new Dictionary<ListView, SelectedItemsBehaviour>();
+        private static readonly ConditionalWeakTable<ListView, SelectedItemsBehaviour> SelectedItemsBehaviours = new ConditionalWeakTable<ListView, SelectedItemsBehaviour>();
 
         public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.RegisterAttached(
             "SelectedItems",
@@ -33,7 +33,8 @@ namespace FoxTunes
             {
                 return;
             }
-            if (!SelectedItemsBehaviours.ContainsKey(listView))
+            var behaviour = default(SelectedItemsBehaviour);
+            if (!SelectedItemsBehaviours.TryGetValue(listView, out behaviour))
             {
                 SelectedItemsBehaviours.Add(listView, new SelectedItemsBehaviour(listView));
             }
