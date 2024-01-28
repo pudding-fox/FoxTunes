@@ -21,7 +21,7 @@ namespace FoxTunes
         {
             this.Application = new Application();
             this.Application.DispatcherUnhandledException += this.OnApplicationDispatcherUnhandledException;
-            this.Queue = new PendingQueue<string>(TimeSpan.FromMilliseconds(100));
+            this.Queue = new PendingQueue<string>(TimeSpan.FromSeconds(1));
             this.Queue.Complete += this.OnComplete;
             Windows.MainWindowCreated += this.OnWindowCreated;
             Windows.MiniWindowCreated += this.OnWindowCreated;
