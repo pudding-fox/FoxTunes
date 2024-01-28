@@ -12,6 +12,8 @@ namespace FoxTunes
 {
     public abstract class PlaylistNavigationStrategy : BaseComponent
     {
+        public PlaylistQueue PlaylistQueue { get; private set; }
+
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
@@ -31,8 +33,19 @@ namespace FoxTunes
 
         public abstract PlaylistItem GetPrevious(PlaylistItem playlistItem);
 
+        public Task Enqueue(Playlist playlist, PlaylistItem playlistItem, PlaylistQueueFlags flags)
+        {
+            return this.PlaylistQueue.Enqueue(playlist, playlistItem, flags);
+        }
+
+        public Task<int> GetQueuePosition(Playlist playlist, PlaylistItem playlistItem)
+        {
+            return this.PlaylistQueue.GetQueuePosition(playlist, playlistItem);
+        }
+
         public override void InitializeComponent(ICore core)
         {
+            this.PlaylistQueue = ComponentRegistry.Instance.GetComponent<PlaylistQueue>();
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.PlaylistManager = core.Managers.Playlist;
             this.DatabaseFactory = core.Factories.Database;
