@@ -22,6 +22,8 @@ namespace FoxTunes
 
         public static readonly ImageLoader ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
 
+        public static readonly IConfiguration Configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
+
         public Artwork()
         {
             this.InitializeComponent();
@@ -33,11 +35,48 @@ namespace FoxTunes
             {
                 ThemeLoader.ThemeChanged += this.OnThemeChanged;
             }
+            if (Configuration != null)
+            {
+                Configuration.GetElement<DoubleConfigurationElement>(
+                    WindowsUserInterfaceConfiguration.SECTION,
+                    WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
+                ).ConnectValue(value => this.ScalingFactor = value);
+            }
         }
+
+        private double _ScalingFactor { get; set; }
+
+        public double ScalingFactor
+        {
+            get
+            {
+                return this._ScalingFactor;
+            }
+            set
+            {
+                this._ScalingFactor = value;
+                this.OnScalingFactorChanged();
+            }
+        }
+
+        protected virtual void OnScalingFactorChanged()
+        {
+            if (this.IsInitialized)
+            {
+                this.Dispatch(this.Refresh);
+            }
+            if (this.ScalingFactorChanged != null)
+            {
+                this.ScalingFactorChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ScalingFactor");
+        }
+
+        public event EventHandler ScalingFactorChanged;
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
@@ -47,21 +86,27 @@ namespace FoxTunes
 
         protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
         {
-            //Critical: Don't block in this event handler, it causes a deadlock.
-#if NET40
-            var task = TaskEx.Run(() => this.Refresh());
-#else
-            var task = Task.Run(() => this.Refresh());
-#endif
+            this.Dispatch(this.Refresh);
         }
 
         protected virtual void OnThemeChanged(object sender, EventArgs e)
         {
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
+        }
+
+        protected override void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            base.OnSizeChanged(sender, e);
+            this.Dispatch(this.Refresh);
         }
 
         public async Task Refresh()
         {
+            if (double.IsNaN(this.ActualWidth) || double.IsNaN(this.ActualHeight) || this.ActualWidth == 0 || this.ActualHeight == 0)
+            {
+                //No size is available.
+                return;
+            }
             var fileName = default(string);
             var outputStream = PlaybackManager.CurrentStream;
             if (outputStream != null)
@@ -93,8 +138,8 @@ namespace FoxTunes
             {
                 var source = ImageLoader.Load(
                     fileName,
-                    0,
-                    0,
+                    Convert.ToInt32(this.ActualWidth * this.ScalingFactor),
+                    Convert.ToInt32(this.ActualHeight * this.ScalingFactor),
                     true
                 );
                 var brush = new ImageBrush(source)
