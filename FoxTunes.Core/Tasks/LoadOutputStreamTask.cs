@@ -23,10 +23,13 @@ namespace FoxTunes
 
         public IOutputStreamQueue OutputStreamQueue { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
+            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
@@ -60,6 +63,7 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Debug, "Output stream added to the queue: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
                 }
             });
+            this.SignalEmitter.Send(new Signal(this, CommonSignals.StreamLoaded));
         }
     }
 }

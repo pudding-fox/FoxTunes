@@ -24,15 +24,18 @@ namespace FoxTunes
 
         public IDatabase Database { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Library = core.Components.Library;
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
             this.Database = core.Components.Database;
+            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
             this.Position = 0;
             this.Count = this.Database.Interlocked(() => this.Library.LibraryItemQuery.Count() * this.Library.LibraryHierarchyQuery.Count());
@@ -48,7 +51,8 @@ namespace FoxTunes
                 }
             }
             this.Position = this.Count;
-            return this.SaveChanges();
+            await this.SaveChanges();
+            this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
         }
 
         private void ClearHierarchy(LibraryHierarchy libraryHierarchy)

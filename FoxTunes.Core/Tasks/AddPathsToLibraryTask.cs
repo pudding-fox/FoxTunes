@@ -29,21 +29,25 @@ namespace FoxTunes
 
         public IDatabase Database { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Library = core.Components.Library;
             this.PlaybackManager = core.Managers.Playback;
             this.LibraryItemFactory = core.Factories.LibraryItem;
             this.Database = core.Components.Database;
+            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
             this.EnumerateFiles();
             this.SanitizeFiles();
             this.AddFiles();
-            return this.SaveChanges();
+            await this.SaveChanges();
+            this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
         }
 
         private void EnumerateFiles()
@@ -81,7 +85,7 @@ namespace FoxTunes
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
             Logger.Write(this, LogLevel.Debug, "Sanitizing files.");
-            for (var a = 0; a < fileNames.Count; )
+            for (var a = 0; a < fileNames.Count;)
             {
                 var fileName = fileNames[a];
                 if (this.Database.Interlocked(() => this.Library.LibraryItemSet.Any(libraryItem => libraryItem.FileName == fileName)))
