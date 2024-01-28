@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Interop;
@@ -311,6 +312,16 @@ namespace FoxTunes
             var target = new RenderTargetBitmap((int)size.Width, (int)size.Height, source.DpiX, source.DpiY, source.Format);
             target.Render(visual);
             return new WriteableBitmap(target);
+        }
+
+        public static void ScrollToItemOffset<T>(this ScrollViewer scrollViewer, int offset) where T : FrameworkElement
+        {
+            var item = scrollViewer.FindChild<T>();
+            if (item == null)
+            {
+                return;
+            }
+            scrollViewer.ScrollToVerticalOffset(offset * item.ActualHeight);
         }
     }
 }
