@@ -38,6 +38,8 @@ namespace FoxTunes
 
         public SelectionConfigurationElement AutoLookupProvider { get; private set; }
 
+        public BooleanConfigurationElement WriteTags { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.PlaybackManager = core.Managers.Playback;
@@ -71,6 +73,10 @@ namespace FoxTunes
             this.AutoLookupProvider = this.Configuration.GetElement<SelectionConfigurationElement>(
                 LyricsBehaviourConfiguration.SECTION,
                 LyricsBehaviourConfiguration.AUTO_LOOKUP_PROVIDER
+            );
+            this.WriteTags = this.Configuration.GetElement<BooleanConfigurationElement>(
+                LyricsBehaviourConfiguration.SECTION,
+                LyricsBehaviourConfiguration.WRITE_TAGS
             );
             base.InitializeComponent(core);
         }
@@ -205,7 +211,7 @@ namespace FoxTunes
                 metaDataItem.Value = File.ReadAllText(fileName);
                 await this.MetaDataManager.Save(
                     new[] { playlistItem },
-                    true,
+                    this.WriteTags.Value,
                     false,
                     CommonMetaData.Lyrics
                 ).ConfigureAwait(false);
@@ -316,7 +322,7 @@ namespace FoxTunes
             }
             await this.MetaDataManager.Save(
                 new[] { playlistItem },
-                true,
+                this.WriteTags.Value,
                 false,
                 CommonMetaData.Lyrics
             ).ConfigureAwait(false);

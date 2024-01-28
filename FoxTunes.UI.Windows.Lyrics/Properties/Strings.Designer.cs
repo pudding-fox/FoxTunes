@@ -131,5 +131,14 @@ namespace FoxTunes {
                 return ResourceManager.GetString("LyricsBehaviourConfiguration.Section", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Write Tags.
+        /// </summary>
+        internal static string LyricsBehaviourConfiguration_WriteTags {
+            get {
+                return ResourceManager.GetString("LyricsBehaviourConfiguration.WriteTags", resourceCulture);
+            }
+        }
     }
 }

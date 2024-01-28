@@ -18,6 +18,8 @@ namespace FoxTunes
 
         public const string MIN_CONFIDENCE = "FFFFDFA1-BB70-44A8-AA80-DFDD67235356";
 
+        public const string WRITE_TAGS = "GGGG4763-D42F-46E2-BB25-E225EF15CE67";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.DiscogsBehaviourConfiguration_Section)
@@ -41,6 +43,9 @@ namespace FoxTunes
                 .WithElement(new DoubleConfigurationElement(MIN_CONFIDENCE, Strings.DiscogsBehaviourConfiguration_MinConfidence, path: Strings.General_Advanced)
                     .WithValue(0.8)
                     .WithValidationRule(new DoubleValidationRule(0, 1, 0.1))
+                    .DependsOn(SECTION, ENABLED))
+                .WithElement(new BooleanConfigurationElement(WRITE_TAGS, Strings.DiscogsBehaviourConfiguration_WriteTags)
+                    .WithValue(true)
                     .DependsOn(SECTION, ENABLED));
         }
     }

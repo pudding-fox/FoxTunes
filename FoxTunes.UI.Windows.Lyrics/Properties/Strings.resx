@@ -141,4 +141,7 @@
   <data name="LyricsBehaviourConfiguration.Section" xml:space="preserve">
     <value>Lyrics</value>
   </data>
+  <data name="LyricsBehaviourConfiguration.WriteTags" xml:space="preserve">
+    <value>Write Tags</value>
+  </data>
 </root>

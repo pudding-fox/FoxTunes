@@ -142,6 +142,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Write Tags.
+        /// </summary>
+        internal static string DiscogsBehaviourConfiguration_WriteTags {
+            get {
+                return ResourceManager.GetString("DiscogsBehaviourConfiguration.WriteTags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Advanced.
         /// </summary>
         internal static string General_Advanced {
