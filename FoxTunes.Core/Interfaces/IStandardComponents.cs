@@ -24,6 +24,8 @@
 
         IMetaDataBrowser MetaDataBrowser { get; }
 
+        IMetaDataCache MetaDataCache { get; }
+
         IPlaylistBrowser PlaylistBrowser { get; }
 
         IPlaylistCache PlaylistCache { get; }

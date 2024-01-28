@@ -97,6 +97,14 @@ namespace FoxTunes
             }
         }
 
+        public IMetaDataCache MetaDataCache
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IMetaDataCache>();
+            }
+        }
+
         public IPlaylistBrowser PlaylistBrowser
         {
             get
