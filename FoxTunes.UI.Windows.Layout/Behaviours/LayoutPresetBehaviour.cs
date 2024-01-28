@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FoxTunes.UI.Windows.Layout.Behaviours
+namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
     public class LayoutPresetBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
@@ -59,7 +59,38 @@ namespace FoxTunes.UI.Windows.Layout.Behaviours
                 return;
             }
             this.MainLayout.Value = preset.Layout;
+            this.OnActivePresetChanged();
         }
+
+
+        public IUIComponentLayoutProviderPreset ActivePreset
+        {
+            get
+            {
+                return UIComponentLayoutProviderPresets.Instance.GetPresetsByCategory(
+                    UIComponentLayoutProviderPreset.CATEGORY_MAIN
+                ).FirstOrDefault(UIComponentLayoutProviderPresets.Instance.IsLoaded);
+            }
+            set
+            {
+                if (value == null)
+                {
+                    return;
+                }
+                this.Load(value.Name);
+            }
+        }
+
+        protected virtual void OnActivePresetChanged()
+        {
+            if (this.ActivePresetChanged != null)
+            {
+                this.ActivePresetChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ActivePreset");
+        }
+
+        public event EventHandler ActivePresetChanged;
 
         public IEnumerable<string> InvocationCategories
         {

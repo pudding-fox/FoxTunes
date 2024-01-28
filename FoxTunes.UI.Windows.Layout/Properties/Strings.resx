@@ -138,6 +138,9 @@
   <data name="LayoutEditor.Save" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="LayoutSelector.Name" xml:space="preserve">
+    <value>Layout Selector</value>
+  </data>
   <data name="LayoutTreeWindow.Title" xml:space="preserve">
     <value>Layout Tree</value>
   </data>

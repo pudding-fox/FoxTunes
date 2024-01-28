@@ -124,6 +124,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Layout Selector.
+        /// </summary>
+        internal static string LayoutSelector_Name {
+            get {
+                return ResourceManager.GetString("LayoutSelector.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Layout Tree.
         /// </summary>
         internal static string LayoutTreeWindow_Title {
