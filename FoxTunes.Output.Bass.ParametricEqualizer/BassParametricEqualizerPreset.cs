@@ -1,38 +1,60 @@
-﻿using System.Collections.Generic;
+﻿using FoxTunes.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 
 namespace FoxTunes
 {
     public static class BassParametricEqualizerPreset
     {
-        public const string PRESET_NONE = "None";
+        const string NAME = "NAME";
+        const string BAND_32 = "BAND_32";
+        const string BAND_64 = "BAND_64";
+        const string BAND_125 = "BAND_125";
+        const string BAND_250 = "BAND_250";
+        const string BAND_500 = "BAND_500";
+        const string BAND_1000 = "BAND_1000";
+        const string BAND_2000 = "BAND_2000";
+        const string BAND_4000 = "BAND_4000";
+        const string BAND_8000 = "BAND_8000";
+        const string BAND_16000 = "BAND_16000";
 
-        public const string PRESET_BASS = "Bass";
-
-        public const string PRESET_FLAT = "Flat";
-
-        public const string PRESET_POP = "Pop";
-
-        public const string PRESET_ROCK = "Rock";
-
-        public static IEnumerable<string> Presets
+        public static ILogger Logger
         {
             get
             {
-                yield return PRESET_NONE;
-                yield return PRESET_BASS;
-                yield return PRESET_FLAT;
-                yield return PRESET_POP;
-                yield return PRESET_ROCK;
+                return LogManager.Logger;
             }
         }
 
-        public static void LoadPreset(string name)
+        public static string Location
         {
-            var bands = default(Dictionary<string, int>);
-            switch (name)
+            get
             {
-                case PRESET_NONE:
-                    bands = new Dictionary<string, int>()
+                return Path.GetDirectoryName(typeof(BassParametricEqualizerPreset).Assembly.Location);
+            }
+        }
+
+        public static string PresetsFolder
+        {
+            get
+            {
+                return Path.Combine(Location, "Presets");
+            }
+        }
+
+        public static readonly string PRESET_NONE = Strings.BassParametricEqualizerPreset_None;
+
+        public static readonly IDictionary<string, IDictionary<string, int>> PRESETS = LoadPresets();
+
+        private static IDictionary<string, IDictionary<string, int>> LoadPresets()
+        {
+            var presets = new Dictionary<string, IDictionary<string, int>>(StringComparer.OrdinalIgnoreCase)
+            {
+                {
+                    Strings.BassParametricEqualizerPreset_None,
+                    new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
                     {
                         { BassParametricEqualizerStreamComponentConfiguration.BAND_32, 0 },
                         { BassParametricEqualizerStreamComponentConfiguration.BAND_64, 0 },
@@ -44,82 +66,203 @@ namespace FoxTunes
                         { BassParametricEqualizerStreamComponentConfiguration.BAND_4000, 0 },
                         { BassParametricEqualizerStreamComponentConfiguration.BAND_8000, 0 },
                         { BassParametricEqualizerStreamComponentConfiguration.BAND_16000, 0 }
-                    };
-                    break;
-                case PRESET_BASS:
-                    bands = new Dictionary<string, int>()
-                    {
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_32, 9 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_64, 6 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_125, 2 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_250, 0 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_500, -1 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_1000, -1 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_2000, 0 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_4000, 0 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_8000, 0 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_16000, 0 }
-                    };
-                    break;
-                case PRESET_FLAT:
-                    bands = new Dictionary<string, int>()
-                    {
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_32, -5 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_64, -5 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_125, -2 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_250, 0 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_500, 2 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_1000, 3 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_2000, 3 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_4000, 3 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_8000, 3 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_16000, 3 }
-                    };
-                    break;
-                case PRESET_POP:
-                    bands = new Dictionary<string, int>()
-                    {
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_32, -1 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_64, 1 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_125, 3 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_250, 4 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_500, 4 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_1000, 3 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_2000, 2 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_4000, 1 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_8000, 2 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_16000, 4 }
-                    };
-                    break;
-                case PRESET_ROCK:
-                    bands = new Dictionary<string, int>()
-                    {
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_32, 5 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_64, 3 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_125, 0 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_250, 0 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_500, 0 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_1000, 3 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_2000, 4 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_4000, 4 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_8000, 3 },
-                        { BassParametricEqualizerStreamComponentConfiguration.BAND_16000, 3 }
-                    };
-                    break;
-            }
-            foreach (var band in BassParametricEqualizerStreamComponentConfiguration.Bands)
+                    }
+                }
+            };
+            if (Directory.Exists(PresetsFolder))
             {
-                var element = StandardComponents.Instance.Configuration.GetElement<DoubleConfigurationElement>(
-                    BassOutputConfiguration.SECTION,
-                    band.Key
-                );
-                if (element == null)
+                foreach (var fileName in Directory.GetFiles(PresetsFolder, "*.txt"))
                 {
+                    try
+                    {
+                        LoadPreset(presets, fileName);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Warn, "Failed to load preset from file \"{0}\": {1}", fileName, e.Message);
+                    }
+                }
+            }
+            return presets;
+        }
+
+        private static void LoadPreset(IDictionary<string, IDictionary<string, int>> presets, string fileName)
+        {
+            var name = Path.GetFileNameWithoutExtension(fileName);
+            var bands = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+            {
+                { BassParametricEqualizerStreamComponentConfiguration.BAND_32, 0 },
+                { BassParametricEqualizerStreamComponentConfiguration.BAND_64, 0 },
+                { BassParametricEqualizerStreamComponentConfiguration.BAND_125, 0 },
+                { BassParametricEqualizerStreamComponentConfiguration.BAND_250, 0 },
+                { BassParametricEqualizerStreamComponentConfiguration.BAND_500, 0 },
+                { BassParametricEqualizerStreamComponentConfiguration.BAND_1000, 0 },
+                { BassParametricEqualizerStreamComponentConfiguration.BAND_2000, 0 },
+                { BassParametricEqualizerStreamComponentConfiguration.BAND_4000, 0 },
+                { BassParametricEqualizerStreamComponentConfiguration.BAND_8000, 0 },
+                { BassParametricEqualizerStreamComponentConfiguration.BAND_16000, 0 }
+            };
+            var add = new Action<string, string>((band, value) =>
+            {
+                var numeric = default(int);
+                int.TryParse(value, out numeric);
+                numeric = Convert.ToInt32(
+                    Math.Max(Math.Min(numeric, PeakEQ.MAX_GAIN), PeakEQ.MIN_GAIN)
+                );
+                bands[band] = numeric;
+            });
+            var handlers = new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
+            {
+                { NAME, value => name = value },
+                { string.Format("{0}.{1}", NAME, CultureInfo.CurrentCulture.TwoLetterISOLanguageName), value => name = value },
+                { BAND_32, value =>  add(BassParametricEqualizerStreamComponentConfiguration.BAND_32, value) },
+                { BAND_64, value =>  add(BassParametricEqualizerStreamComponentConfiguration.BAND_64, value) },
+                { BAND_125, value =>  add(BassParametricEqualizerStreamComponentConfiguration.BAND_125, value) },
+                { BAND_250, value =>  add(BassParametricEqualizerStreamComponentConfiguration.BAND_250, value) },
+                { BAND_500, value =>  add(BassParametricEqualizerStreamComponentConfiguration.BAND_500, value) },
+                { BAND_1000, value =>  add(BassParametricEqualizerStreamComponentConfiguration.BAND_1000, value) },
+                { BAND_2000, value =>  add(BassParametricEqualizerStreamComponentConfiguration.BAND_2000, value) },
+                { BAND_4000, value =>  add(BassParametricEqualizerStreamComponentConfiguration.BAND_4000, value) },
+                { BAND_8000, value =>  add(BassParametricEqualizerStreamComponentConfiguration.BAND_8000, value) },
+                { BAND_16000, value =>  add(BassParametricEqualizerStreamComponentConfiguration.BAND_16000, value) },
+            };
+            var lines = File.ReadAllLines(fileName);
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrEmpty(line))
+                {
+                    //Empty line.
                     continue;
                 }
-                element.Value = bands[band.Key];
+                var parts = line.Split('=');
+                if (parts.Length != 2)
+                {
+                    //Unrecognized format.
+                    continue;
+                }
+                var key = parts[0].Trim();
+                var value = parts[1].Trim();
+                var handler = default(Action<string>);
+                if (handlers.TryGetValue(key, out handler))
+                {
+                    handler(value);
+                }
+                else
+                {
+                    Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Warn, "Warning while loading preset from file \"{0}\": Unrecognized expression: {1} = {2}", fileName, key, value);
+                }
             }
-            StandardComponents.Instance.Configuration.Save();
+            presets[name] = bands;
+            Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Debug, "Loaded preset from file \"{0}\".", fileName);
+        }
+
+        public static void SavePreset(string name)
+        {
+            var fileName = Path.Combine(PresetsFolder, string.Format("{0}.txt", name.Replace(Path.GetInvalidFileNameChars(), '_')));
+            using (var writer = File.CreateText(fileName))
+            {
+                var write = new Action<string, string>((key, value) => writer.WriteLine("{0}={1}", key, value));
+                var handlers = new Dictionary<string, Action<string>>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { BassParametricEqualizerStreamComponentConfiguration.BAND_32, value =>  write(BAND_32, value) },
+                    { BassParametricEqualizerStreamComponentConfiguration.BAND_64, value =>  write(BAND_64, value) },
+                    { BassParametricEqualizerStreamComponentConfiguration.BAND_125, value =>  write(BAND_125, value) },
+                    { BassParametricEqualizerStreamComponentConfiguration.BAND_250, value =>  write(BAND_250, value) },
+                    { BassParametricEqualizerStreamComponentConfiguration.BAND_500, value =>  write(BAND_500, value) },
+                    { BassParametricEqualizerStreamComponentConfiguration.BAND_1000, value =>  write(BAND_1000, value) },
+                    { BassParametricEqualizerStreamComponentConfiguration.BAND_2000, value =>  write(BAND_2000, value) },
+                    { BassParametricEqualizerStreamComponentConfiguration.BAND_4000, value =>  write(BAND_4000, value) },
+                    { BassParametricEqualizerStreamComponentConfiguration.BAND_8000, value =>  write(BAND_8000, value) },
+                    { BassParametricEqualizerStreamComponentConfiguration.BAND_16000, value =>  write(BAND_16000, value) },
+                };
+                write(NAME, name);
+                write(string.Format("{0}.{1}", NAME, CultureInfo.CurrentCulture.TwoLetterISOLanguageName), name);
+                foreach (var band in BassParametricEqualizerStreamComponentConfiguration.Bands)
+                {
+                    var element = StandardComponents.Instance.Configuration.GetElement<DoubleConfigurationElement>(
+                        BassOutputConfiguration.SECTION,
+                        band.Key
+                    );
+                    if (element == null)
+                    {
+                        continue;
+                    }
+                    var handler = default(Action<string>);
+                    if (handlers.TryGetValue(element.Id, out handler))
+                    {
+                        handler(Convert.ToString(Convert.ToInt32(element.Value)));
+                    }
+                    else
+                    {
+                        //TODO: The setting was not recognized?
+                    }
+                }
+            }
+            try
+            {
+                LoadPreset(PRESETS, fileName);
+            }
+            catch (Exception e)
+            {
+                Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Warn, "Failed to load preset from file \"{0}\": {1}", fileName, e.Message);
+            }
+        }
+
+        public static IEnumerable<string> Presets
+        {
+            get
+            {
+                return PRESETS.Keys;
+            }
+        }
+
+        public static string Preset
+        {
+            get
+            {
+                foreach (var preset in PRESETS)
+                {
+                    var active = true;
+                    foreach (var band in preset.Value)
+                    {
+                        var element = StandardComponents.Instance.Configuration.GetElement<DoubleConfigurationElement>(
+                            BassOutputConfiguration.SECTION,
+                            band.Key
+                        );
+                        if (element.Value != band.Value)
+                        {
+                            active = false;
+                            break;
+                        }
+                    }
+                    if (active)
+                    {
+                        return preset.Key;
+                    }
+                }
+                return PRESET_NONE;
+            }
+            set
+            {
+                var bands = default(IDictionary<string, int>);
+                if (!PRESETS.TryGetValue(value, out bands))
+                {
+                    return;
+                }
+                foreach (var band in BassParametricEqualizerStreamComponentConfiguration.Bands)
+                {
+                    var element = StandardComponents.Instance.Configuration.GetElement<DoubleConfigurationElement>(
+                        BassOutputConfiguration.SECTION,
+                        band.Key
+                    );
+                    if (element == null)
+                    {
+                        continue;
+                    }
+                    element.Value = bands[band.Key];
+                }
+                StandardComponents.Instance.Configuration.Save();
+            }
         }
     }
 }

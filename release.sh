@@ -195,6 +195,13 @@ EQ="
 FoxTunes.Output.Bass.ParametricEqualizer.dll
 "
 
+EQ_PRESETS="
+Presets/Bass.txt
+Presets/Flat.txt
+Presets/Pop.txt
+Presets/Rock.txt
+"
+
 TOOLS="
 FoxTunes.Tools.dll
 "
@@ -339,6 +346,7 @@ do
 		mkdir -p "./release/$platform/$target/Plugins/encoder"
 		mkdir -p "./release/$platform/$target/Plugins/encoder/encoders"
 		mkdir -p "./release/$platform/$target/Plugins/eq"
+		mkdir -p "./release/$platform/$target/Plugins/eq/presets"
 		mkdir -p "./release/$platform/$target/Plugins/js"
 		mkdir -p "./release/$platform/$target/Plugins/layout"
 		mkdir -p "./release/$platform/$target/Plugins/librarybrowser"
@@ -489,6 +497,14 @@ do
 		do
 				echo $file
 				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/eq"
+		done
+		echo
+
+		echo "Installing presets: eq"
+		for file in $EQ_PRESETS
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/eq/presets"
 		done
 		echo
 
