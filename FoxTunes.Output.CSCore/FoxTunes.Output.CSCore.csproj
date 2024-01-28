@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CSCoreOutput.cs" />
+    <Compile Include="CSCoreOutputConfiguration.cs" />
     <Compile Include="CSCoreOutputStream.cs" />
     <Compile Include="DirectSoundOutFactory.cs" />
     <Compile Include="FfmpegWaveSourceFactory.cs" />
