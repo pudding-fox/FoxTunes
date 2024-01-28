@@ -1,5 +1,6 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -83,21 +84,29 @@ namespace FoxTunes
 
         protected virtual async Task<bool> AddPlaylistItem(PlaylistWriter writer, string fileName)
         {
-            if (!this.PlaybackManager.IsSupported(fileName))
+            try
             {
-                Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
+                if (!this.PlaybackManager.IsSupported(fileName))
+                {
+                    Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
+                    return false;
+                }
+                Logger.Write(this, LogLevel.Trace, "Adding file to playlist: {0}", fileName);
+                var playlistItem = new PlaylistItem()
+                {
+                    DirectoryName = Path.GetDirectoryName(fileName),
+                    FileName = fileName,
+                    Sequence = this.Sequence
+                };
+                await writer.Write(playlistItem).ConfigureAwait(false);
+                this.Offset++;
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Debug, "Failed to add file \"{0}\" to playlist: {0}", fileName, e.Message);
                 return false;
             }
-            Logger.Write(this, LogLevel.Trace, "Adding file to playlist: {0}", fileName);
-            var playlistItem = new PlaylistItem()
-            {
-                DirectoryName = Path.GetDirectoryName(fileName),
-                FileName = fileName,
-                Sequence = this.Sequence
-            };
-            await writer.Write(playlistItem).ConfigureAwait(false);
-            this.Offset++;
-            return true;
         }
 
         protected override async void OnElapsed(object sender, ElapsedEventArgs e)
