@@ -46,8 +46,11 @@ namespace FoxTunes
             {
                 if (this.LibraryManager.SelectedItem != null)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, APPEND_PLAYLIST, "Add To Playlist");
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REPLACE_PLAYLIST, "Replace Playlist");
+                    if (this.PlaylistManager.SelectedPlaylist != null)
+                    {
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, APPEND_PLAYLIST, "Add To Playlist");
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REPLACE_PLAYLIST, "Replace Playlist");
+                    }
                     if (this.Popularimeter.Value)
                     {
                         var invocationComponents = new Dictionary<byte, InvocationComponent>();

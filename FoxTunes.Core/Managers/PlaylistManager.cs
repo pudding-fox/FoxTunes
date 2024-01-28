@@ -338,6 +338,11 @@ namespace FoxTunes
 
         public async Task Next()
         {
+            if (this.SelectedPlaylist == null)
+            {
+                Logger.Write(this, LogLevel.Debug, "No playlist.");
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Navigating to next playlist item.");
             if (this.IsNavigating)
             {
@@ -363,6 +368,11 @@ namespace FoxTunes
 
         public async Task Previous()
         {
+            if (this.SelectedPlaylist == null)
+            {
+                Logger.Write(this, LogLevel.Debug, "No playlist.");
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Navigating to previous playlist item.");
             if (this.IsNavigating)
             {
