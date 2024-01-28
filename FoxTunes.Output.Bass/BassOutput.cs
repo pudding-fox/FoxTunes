@@ -422,9 +422,18 @@ namespace FoxTunes
                 {
                     if (pipeline != null)
                     {
+                        var isPlaying = pipeline.Input.Position(outputStream) == 0;
                         if (pipeline.Input.Remove(outputStream, true))
                         {
                             Logger.Write(this, LogLevel.Debug, "Pipeline unloaded stream for file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+                            if (isPlaying && !pipeline.Input.PreserveBuffer)
+                            {
+                                //For the normal gapless input we should clear the buffer when the current stream is removed.
+                                //This reduces latency when skipping tracks.
+                                //The crossfade input disables this as it would prevent fade out.
+                                Logger.Write(this, LogLevel.Debug, "The current stream was removed, clearing the buffer.");
+                                pipeline.ClearBuffer();
+                            }
                             return true;
                         }
                         else

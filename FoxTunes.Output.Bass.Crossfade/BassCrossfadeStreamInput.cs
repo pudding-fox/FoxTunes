@@ -72,6 +72,15 @@ namespace FoxTunes
             }
         }
 
+        public override bool PreserveBuffer
+        {
+            get
+            {
+                //Disable clearing the buffer when the current track is removed as this would prevent fade out.
+                return true;
+            }
+        }
+
         public override void Connect(IBassStreamComponent previous)
         {
             //BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.KeepAlive, true));
