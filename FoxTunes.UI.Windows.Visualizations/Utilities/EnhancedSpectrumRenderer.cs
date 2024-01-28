@@ -79,11 +79,11 @@ namespace FoxTunes
             if (object.ReferenceEquals(sender, this.Bands))
             {
                 //Changing bands requires full refresh.
-                this.Debouncer.Exec(this.CreateBitmap);
+                var task = this.CreateBitmap();
             }
             else
             {
-                this.Debouncer.Exec(this.CreateData);
+                var task = this.CreateData();
             }
         }
 

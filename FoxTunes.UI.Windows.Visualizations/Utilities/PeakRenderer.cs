@@ -110,7 +110,7 @@ namespace FoxTunes
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
         {
-            this.Debouncer.Exec(this.CreateData);
+            var task = this.CreateData();
         }
 
         protected override bool CreateData(int width, int height)

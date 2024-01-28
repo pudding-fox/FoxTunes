@@ -69,18 +69,13 @@ namespace FoxTunes
             source.SetValue(ForegroundProperty, value);
         }
 
-        const int TIMEOUT = 100;
-
         protected RendererBase(bool initialize = true)
         {
-            this.Debouncer = new AsyncDebouncer(TIMEOUT);
             if (initialize && Core.Instance != null)
             {
                 this.InitializeComponent(Core.Instance);
             }
         }
-
-        public AsyncDebouncer Debouncer { get; private set; }
 
         public Brush Background
         {
@@ -154,7 +149,7 @@ namespace FoxTunes
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
-            this.Debouncer.Exec(this.CreateBitmap);
+            var task = this.CreateBitmap();
             base.OnRenderSizeChanged(sizeInfo);
         }
 
@@ -354,10 +349,7 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            if (this.Debouncer != null)
-            {
-                this.Debouncer.Dispose();
-            }
+            //Nothing to do.
         }
 
         ~RendererBase()
