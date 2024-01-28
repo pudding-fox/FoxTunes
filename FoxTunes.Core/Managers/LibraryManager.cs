@@ -213,6 +213,17 @@ namespace FoxTunes
             }
         }
 
+
+        public async Task Set(LibraryItemStatus status)
+        {
+            using (var task = new UpdateLibraryTask(status))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task);
+                await task.Run();
+            }
+        }
+
         protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
         {
             if (this.BackgroundTask == null)
