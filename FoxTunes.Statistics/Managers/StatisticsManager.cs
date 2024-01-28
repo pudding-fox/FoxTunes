@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class StatisticsManager : StandardManager, IBackgroundTaskSource
     {
         public ICore Core { get; private set; }

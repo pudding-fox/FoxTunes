@@ -187,7 +187,7 @@ namespace FoxTunes.ViewModel
 
         public async Task Save()
         {
-            var names = new HashSet<string>();
+            var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var sources = new HashSet<IFileData>();
             if (this.Tags != null)
             {

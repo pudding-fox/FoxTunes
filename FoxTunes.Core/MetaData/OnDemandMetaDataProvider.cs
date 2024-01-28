@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class OnDemandMetaDataProvider : StandardComponent, IOnDemandMetaDataProvider
     {
         public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);

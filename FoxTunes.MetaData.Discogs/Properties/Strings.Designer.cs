@@ -79,6 +79,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fetch Tags.
+        /// </summary>
+        internal static string DiscogsBehaviour_FetchTags {
+            get {
+                return ResourceManager.GetString("DiscogsBehaviour.FetchTags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Auto Lookup.
         /// </summary>
         internal static string DiscogsBehaviourConfiguration_AutoLookup {
@@ -160,20 +169,38 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Advanced.
+        ///   Looks up a localized string similar to No artwork found..
         /// </summary>
-        internal static string General_Advanced {
+        internal static string DiscogsFetchArtworkTask_NotFound {
             get {
-                return ResourceManager.GetString("General.Advanced", resourceCulture);
+                return ResourceManager.GetString("DiscogsFetchArtworkTask.NotFound", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Artist and album data is required..
         /// </summary>
-        internal static string LookupArtworkTask_InsufficiantData {
+        internal static string DiscogsLookupTask_InsufficiantData {
             get {
-                return ResourceManager.GetString("LookupArtworkTask.InsufficiantData", resourceCulture);
+                return ResourceManager.GetString("DiscogsLookupTask.InsufficiantData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No release found..
+        /// </summary>
+        internal static string DiscogsLookupTask_NotFound {
+            get {
+                return ResourceManager.GetString("DiscogsLookupTask.NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Advanced.
+        /// </summary>
+        internal static string General_Advanced {
+            get {
+                return ResourceManager.GetString("General.Advanced", resourceCulture);
             }
         }
         
@@ -187,11 +214,11 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No release or artwork found..
+        ///   Looks up a localized string similar to Fetching tags...
         /// </summary>
-        internal static string LookupArtworkTask_NotFound {
+        internal static string LookupTagsTask_Name {
             get {
-                return ResourceManager.GetString("LookupArtworkTask.NotFound", resourceCulture);
+                return ResourceManager.GetString("LookupTagsTask.Name", resourceCulture);
             }
         }
         

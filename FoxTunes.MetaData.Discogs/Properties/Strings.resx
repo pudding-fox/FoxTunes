@@ -123,6 +123,9 @@
   <data name="DiscogsBehaviour.FetchArtwork" xml:space="preserve">
     <value>Fetch Artwork</value>
   </data>
+  <data name="DiscogsBehaviour.FetchTags" xml:space="preserve">
+    <value>Fetch Tags</value>
+  </data>
   <data name="DiscogsBehaviourConfiguration.AutoLookup" xml:space="preserve">
     <value>Auto Lookup</value>
   </data>
@@ -150,17 +153,23 @@
   <data name="DiscogsBehaviourConfiguration.WriteTags" xml:space="preserve">
     <value>Write Tags</value>
   </data>
+  <data name="DiscogsFetchArtworkTask.NotFound" xml:space="preserve">
+    <value>No artwork found.</value>
+  </data>
+  <data name="DiscogsLookupTask.InsufficiantData" xml:space="preserve">
+    <value>Artist and album data is required.</value>
+  </data>
+  <data name="DiscogsLookupTask.NotFound" xml:space="preserve">
+    <value>No release found.</value>
+  </data>
   <data name="General.Advanced" xml:space="preserve">
     <value>Advanced</value>
-  </data>
-  <data name="LookupArtworkTask.InsufficiantData" xml:space="preserve">
-    <value>Artist and album data is required.</value>
   </data>
   <data name="LookupArtworkTask.Name" xml:space="preserve">
     <value>Fetching artwork..</value>
   </data>
-  <data name="LookupArtworkTask.NotFound" xml:space="preserve">
-    <value>No release or artwork found.</value>
+  <data name="LookupTagsTask.Name" xml:space="preserve">
+    <value>Fetching tags..</value>
   </data>
   <data name="ReleaseLookupReport.Album" xml:space="preserve">
     <value>Album</value>

@@ -84,6 +84,36 @@ namespace FoxTunes
             return Enumerable.Empty<Release>();
         }
 
+        public async Task<ReleaseDetails> GetRelease(Release release)
+        {
+            var url = release.ResourceUrl;
+            Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
+            var request = this.CreateRequest(url);
+            using (var response = (HttpWebResponse)request.GetResponse())
+            {
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Status code does not indicate success.");
+                    return null;
+                }
+                return await this.GetRelease(response.GetResponseStream()).ConfigureAwait(false);
+            }
+        }
+
+        protected virtual async Task<ReleaseDetails> GetRelease(Stream stream)
+        {
+            using (var reader = new StreamReader(stream))
+            {
+                var json = await reader.ReadToEndAsync().ConfigureAwait(false);
+                var data = json.FromJson<Dictionary<string, object>>();
+                if (data != null)
+                {
+                    return new ReleaseDetails(data);
+                }
+            }
+            return default(ReleaseDetails);
+        }
+
         public Task<byte[]> GetData(string url)
         {
             Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
@@ -445,11 +475,13 @@ namespace FoxTunes
             {
                 const string ID = "id";
                 const string URI = "uri";
+                const string RESOURCE_URL = "resource_url";
                 const string TITLE = "title";
                 const string THUMB = "thumb";
                 const string COVER_IMAGE = "cover_image";
                 this.Id = Convert.ToString(data.GetValueOrDefault(ID));
                 this.Url = Convert.ToString(data.GetValueOrDefault(URI));
+                this.ResourceUrl = Convert.ToString(data.GetValueOrDefault(RESOURCE_URL));
                 this.Title = Convert.ToString(data.GetValueOrDefault(TITLE));
                 this.ThumbUrl = Convert.ToString(data.GetValueOrDefault(THUMB));
                 this.CoverUrl = Convert.ToString(data.GetValueOrDefault(COVER_IMAGE));
@@ -458,6 +490,8 @@ namespace FoxTunes
             public string Id { get; private set; }
 
             public string Url { get; private set; }
+
+            public string ResourceUrl { get; private set; }
 
             public string Title { get; private set; }
 
@@ -506,11 +540,123 @@ namespace FoxTunes
 
             public static IEnumerable<Release> FromResults(IList<object> results)
             {
-                foreach (var result in results)
+                if (results != null)
                 {
-                    if (result is IDictionary<string, object> data)
+                    foreach (var result in results)
                     {
-                        yield return new Release(data);
+                        if (result is IDictionary<string, object> data)
+                        {
+                            yield return new Release(data);
+                        }
+                    }
+                }
+            }
+        }
+
+        public class ReleaseDetails
+        {
+            public ReleaseDetails(IDictionary<string, object> data)
+            {
+                const string ID = "id";
+                const string URI = "uri";
+                const string RESOURCE_URL = "resource_url";
+                const string TITLE = "title";
+                const string YEAR = "year";
+                const string ARTISTS = "artists";
+                const string GENRES = "genres";
+                const string TRACKLIST = "tracklist";
+                this.Id = Convert.ToString(data.GetValueOrDefault(ID));
+                this.Url = Convert.ToString(data.GetValueOrDefault(URI));
+                this.ResourceUrl = Convert.ToString(data.GetValueOrDefault(RESOURCE_URL));
+                this.Title = Convert.ToString(data.GetValueOrDefault(TITLE));
+                this.Year = Convert.ToString(data.GetValueOrDefault(YEAR));
+                this.Artists = ArtistDetails.FromResults(data.GetValueOrDefault(ARTISTS) as IList<object>).ToArray();
+                this.Genres = data.GetValueOrDefault(GENRES) is IList<object> genres ? genres.OfType<string>().ToArray() : new string[] { };
+                this.Tracks = TrackDetails.FromResults(data.GetValueOrDefault(TRACKLIST) as IList<object>).ToArray();
+            }
+
+            public string Id { get; private set; }
+
+            public string Url { get; private set; }
+
+            public string ResourceUrl { get; private set; }
+
+            public string Title { get; private set; }
+
+            public string Year { get; private set; }
+
+            public ArtistDetails[] Artists { get; private set; }
+
+            public string[] Genres { get; private set; }
+
+            public TrackDetails[] Tracks { get; private set; }
+        }
+
+        public class ArtistDetails
+        {
+            private ArtistDetails(IDictionary<string, object> data)
+            {
+                const string ID = "id";
+                const string RESOURCE_URL = "resource_url";
+                const string NAME = "name";
+                this.Id = Convert.ToString(data.GetValueOrDefault(ID));
+                this.ResourceUrl = Convert.ToString(data.GetValueOrDefault(RESOURCE_URL));
+                this.Name = Convert.ToString(data.GetValueOrDefault(NAME));
+            }
+
+            public string Id { get; private set; }
+
+            public string ResourceUrl { get; private set; }
+
+            public string Name { get; private set; }
+
+            public static IEnumerable<ArtistDetails> FromResults(IList<object> results)
+            {
+                if (results != null)
+                {
+                    foreach (var result in results)
+                    {
+                        if (result is IDictionary<string, object> data)
+                        {
+                            yield return new ArtistDetails(data);
+                        }
+                    }
+                }
+            }
+        }
+
+        public class TrackDetails
+        {
+            private TrackDetails(IDictionary<string, object> data)
+            {
+                const string POSITION = "position";
+                const string TITLE = "title";
+                const string EXTRAARTISTS = "extraartists";
+                const string TYPE = "type_";
+                this.Position = Convert.ToString(data.GetValueOrDefault(POSITION));
+                this.Artists = ArtistDetails.FromResults(data.GetValueOrDefault(EXTRAARTISTS) as IList<object>).ToArray();
+                this.Title = Convert.ToString(data.GetValueOrDefault(TITLE));
+                this.Type = Convert.ToString(data.GetValueOrDefault(TYPE));
+            }
+
+            public string Position { get; private set; }
+
+            public ArtistDetails[] Artists { get; private set; }
+
+            public string Title { get; private set; }
+
+            public string Type { get; private set; }
+
+            public static IEnumerable<TrackDetails> FromResults(IList<object> results)
+            {
+                if (results != null)
+                {
+                    foreach (var result in results)
+                    {
+                        if (result is IDictionary<string, object> data)
+                        {
+                            yield return new TrackDetails(data);
+                        }
                     }
                 }
             }
