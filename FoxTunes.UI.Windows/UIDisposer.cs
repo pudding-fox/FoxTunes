@@ -6,7 +6,7 @@ using System.Windows.Media;
 
 namespace FoxTunes
 {
-    public static class ResourceDisposer
+    public static class UIDisposer
     {
         public static void Dispose(FrameworkElement element)
         {
@@ -15,6 +15,17 @@ namespace FoxTunes
             while (stack.Count > 0)
             {
                 element = stack.Pop();
+                if (element is IDisposable disposable)
+                {
+                    try
+                    {
+                        disposable.Dispose();
+                    }
+                    catch
+                    {
+                        //Nothing can be done.
+                    }
+                }
                 Dispose(element.Resources);
                 for (int a = 0, b = VisualTreeHelper.GetChildrenCount(element); a < b; a++)
                 {

@@ -165,8 +165,7 @@ namespace FoxTunes
                     this.Configuration.Save();
                     break;
                 case QUIT:
-                    Windows.Shutdown();
-                    break;
+                    return Windows.Shutdown();
             }
 #if NET40
             return TaskEx.FromResult(false);

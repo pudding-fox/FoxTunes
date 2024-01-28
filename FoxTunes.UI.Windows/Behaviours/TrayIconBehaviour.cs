@@ -105,12 +105,12 @@ namespace FoxTunes
         protected virtual void OnClose(object sender, EventArgs e)
         {
             this.Disable();
-            this.Quit();
+            var task = this.Quit();
         }
 
-        protected virtual void Quit()
+        protected virtual Task Quit()
         {
-            Windows.Shutdown();
+            return Windows.Shutdown();
         }
 
         protected virtual void OnStateChanged(object sender, EventArgs e)
