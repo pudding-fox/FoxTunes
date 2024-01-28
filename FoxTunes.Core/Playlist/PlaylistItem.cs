@@ -34,7 +34,7 @@ namespace FoxTunes
             this.OnPropertyChanged("MetaDatas");
         }
 
-        public event EventHandler MetaDatasChanged = delegate { };
+        public event EventHandler MetaDatasChanged;
 
         public Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)
         {

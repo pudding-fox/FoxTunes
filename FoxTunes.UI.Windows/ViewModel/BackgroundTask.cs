@@ -44,7 +44,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public event EventHandler NameChanged = delegate { };
+        public event EventHandler NameChanged;
 
         public string Description
         {
@@ -69,7 +69,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public event EventHandler DescriptionChanged = delegate { };
+        public event EventHandler DescriptionChanged;
 
         public int Position
         {
@@ -94,7 +94,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public event EventHandler PositionChanged = delegate { };
+        public event EventHandler PositionChanged;
 
         public int Count
         {
@@ -119,7 +119,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public event EventHandler CountChanged = delegate { };
+        public event EventHandler CountChanged;
 
         public bool IsIndeterminate
         {
@@ -144,7 +144,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public event EventHandler IsIndeterminateChanged = delegate { };
+        public event EventHandler IsIndeterminateChanged;
 
         protected override void OnDisposing()
         {

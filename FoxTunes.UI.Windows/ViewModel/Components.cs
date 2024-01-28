@@ -41,7 +41,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Enabled");
         }
 
-        public event EventHandler EnabledChanged = delegate { };
+        public event EventHandler EnabledChanged;
 
         public override void InitializeComponent(ICore core)
         {

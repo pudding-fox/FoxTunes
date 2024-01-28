@@ -53,7 +53,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Value");
         }
 
-        public event EventHandler ValueChanged = delegate { };
+        public event EventHandler ValueChanged;
 
         protected override Freezable CreateInstanceCore()
         {

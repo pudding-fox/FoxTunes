@@ -39,7 +39,7 @@ namespace FoxTunes.Managers
             this.OnPropertyChanged("CanNavigate");
         }
 
-        public event EventHandler CanNavigateChanged = delegate { };
+        public event EventHandler CanNavigateChanged;
 
         public override void InitializeComponent(ICore core)
         {
@@ -148,6 +148,6 @@ namespace FoxTunes.Managers
             return e.Complete();
         }
 
-        public event BackgroundTaskEventHandler BackgroundTask = delegate { };
+        public event BackgroundTaskEventHandler BackgroundTask;
     }
 }

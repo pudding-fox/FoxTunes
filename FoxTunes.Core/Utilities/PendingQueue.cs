@@ -96,7 +96,7 @@ namespace FoxTunes
             return e.Complete();
         }
 
-        public event PendingQueueEventHandler<T> Complete = delegate { };
+        public event PendingQueueEventHandler<T> Complete;
 
         public IEnumerator<T> GetEnumerator()
         {

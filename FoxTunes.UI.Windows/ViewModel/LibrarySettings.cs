@@ -83,7 +83,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("SettingsVisible");
         }
 
-        public event EventHandler SettingsVisibleChanged = delegate { };
+        public event EventHandler SettingsVisibleChanged;
 
         public ICommand SaveCommand
         {

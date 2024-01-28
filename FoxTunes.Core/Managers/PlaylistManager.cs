@@ -50,7 +50,7 @@ namespace FoxTunes.Managers
             this.OnPropertyChanged("CanNavigate");
         }
 
-        public event AsyncEventHandler CanNavigateChanged = delegate { };
+        public event AsyncEventHandler CanNavigateChanged;
 
         public override void InitializeComponent(ICore core)
         {
@@ -524,7 +524,7 @@ namespace FoxTunes.Managers
             this.OnPropertyChanged("CurrentItem");
         }
 
-        public event AsyncEventHandler CurrentItemChanged = delegate { };
+        public event AsyncEventHandler CurrentItemChanged;
 
         protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
         {
@@ -541,7 +541,7 @@ namespace FoxTunes.Managers
             return e.Complete();
         }
 
-        public event BackgroundTaskEventHandler BackgroundTask = delegate { };
+        public event BackgroundTaskEventHandler BackgroundTask;
 
         public IEnumerable<IInvocationComponent> Invocations
         {

@@ -86,7 +86,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("ImageSource");
         }
 
-        public event EventHandler ImageSourceChanged = delegate { };
+        public event EventHandler ImageSourceChanged;
 
         public async Task Refresh()
         {

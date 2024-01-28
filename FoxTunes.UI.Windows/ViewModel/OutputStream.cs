@@ -53,7 +53,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Position");
         }
 
-        public event EventHandler PositionChanged = delegate { };
+        public event EventHandler PositionChanged;
 
         public long Length
         {

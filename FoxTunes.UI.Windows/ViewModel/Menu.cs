@@ -92,7 +92,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Category");
         }
 
-        public event EventHandler CategoryChanged = delegate { };
+        public event EventHandler CategoryChanged;
 
         private bool _MenuVisible { get; set; }
 
@@ -121,7 +121,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("MenuVisible");
         }
 
-        public event EventHandler MenuVisibleChanged = delegate { };
+        public event EventHandler MenuVisibleChanged;
 
         public ObservableCollection<IInvocableComponent> InvocableComponents { get; set; }
 

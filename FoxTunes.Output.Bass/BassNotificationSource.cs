@@ -66,7 +66,7 @@ namespace FoxTunes
             return e.Complete();
         }
 
-        public event AsyncEventHandler Ending = delegate { };
+        public event AsyncEventHandler Ending;
 
         protected virtual void OnEnded(int Handle, int Channel, int Data, IntPtr User)
         {
@@ -93,6 +93,6 @@ namespace FoxTunes
             return e.Complete();
         }
 
-        public event AsyncEventHandler Ended = delegate { };
+        public event AsyncEventHandler Ended;
     }
 }

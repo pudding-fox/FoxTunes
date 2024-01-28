@@ -38,7 +38,7 @@ namespace FoxTunes
             this.OnPropertyChanging("Theme");
         }
 
-        public event AsyncEventHandler ThemeChanging = delegate { };
+        public event AsyncEventHandler ThemeChanging;
 
         protected virtual async Task OnThemeChanged()
         {
@@ -55,7 +55,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Theme");
         }
 
-        public event AsyncEventHandler ThemeChanged = delegate { };
+        public event AsyncEventHandler ThemeChanged;
 
         public IConfiguration Configuration { get; private set; }
 

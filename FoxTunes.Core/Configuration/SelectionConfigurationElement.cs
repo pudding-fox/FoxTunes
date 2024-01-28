@@ -42,7 +42,7 @@ namespace FoxTunes
         }
 
         [field: NonSerialized]
-        public event EventHandler SelectedOptionChanged = delegate { };
+        public event EventHandler SelectedOptionChanged;
 
         private bool Contains(string id)
         {

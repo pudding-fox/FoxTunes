@@ -15,7 +15,7 @@ namespace FoxTunes
             }
         }
 
-        public event EventHandler MouseLeftButtonDown = delegate { };
+        public event EventHandler MouseLeftButtonDown;
 
         protected virtual void OnMouseLeftButtonUp()
         {
@@ -25,7 +25,7 @@ namespace FoxTunes
             }
         }
 
-        public event EventHandler MouseLeftButtonUp = delegate { };
+        public event EventHandler MouseLeftButtonUp;
 
         protected virtual void OnMouseRightButtonDown()
         {
@@ -35,7 +35,7 @@ namespace FoxTunes
             }
         }
 
-        public event EventHandler MouseRightButtonDown = delegate { };
+        public event EventHandler MouseRightButtonDown;
 
         protected virtual void OnMouseRightButtonUp()
         {
@@ -45,7 +45,7 @@ namespace FoxTunes
             }
         }
 
-        public event EventHandler MouseRightButtonUp = delegate { };
+        public event EventHandler MouseRightButtonUp;
 
         protected virtual void OnMouseMove()
         {
@@ -55,7 +55,7 @@ namespace FoxTunes
             }
         }
 
-        public event EventHandler MouseMove = delegate { };
+        public event EventHandler MouseMove;
 
         protected virtual void OnMouseDoubleClick()
         {
@@ -65,7 +65,7 @@ namespace FoxTunes
             }
         }
 
-        public event EventHandler MouseDoubleClick = delegate { };
+        public event EventHandler MouseDoubleClick;
 
         public bool IsDisposed { get; private set; }
 

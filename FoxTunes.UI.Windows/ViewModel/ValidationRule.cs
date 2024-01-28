@@ -32,7 +32,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("ConfigurationElement");
         }
 
-        public event EventHandler ConfigurationElementChanged = delegate { };
+        public event EventHandler ConfigurationElementChanged;
 
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
@@ -61,6 +61,6 @@ namespace FoxTunes.ViewModel
             this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

@@ -53,7 +53,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("ShowArtwork");
         }
 
-        public event EventHandler ShowArtworkChanged = delegate { };
+        public event EventHandler ShowArtworkChanged;
 
         private BooleanConfigurationElement _ShowPlaylist { get; set; }
 
@@ -79,7 +79,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("ShowPlaylist");
         }
 
-        public event EventHandler ShowPlaylistChanged = delegate { };
+        public event EventHandler ShowPlaylistChanged;
 
         private BooleanConfigurationElement _ResetPlaylist { get; set; }
 
@@ -105,7 +105,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("ResetPlaylist");
         }
 
-        public event EventHandler ResetPlaylistChanged = delegate { };
+        public event EventHandler ResetPlaylistChanged;
 
         private BooleanConfigurationElement _AutoPlay { get; set; }
 
@@ -131,7 +131,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("AutoPlay");
         }
 
-        public event EventHandler AutoPlayChanged = delegate { };
+        public event EventHandler AutoPlayChanged;
 
         private BooleanConfigurationElement _ShowNotifyIcon { get; set; }
 
@@ -157,7 +157,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("ShowNotifyIcon");
         }
 
-        public event EventHandler ShowNotifyIconChanged = delegate { };
+        public event EventHandler ShowNotifyIconChanged;
 
         private TextConfigurationElement _ScalingFactor { get; set; }
 
@@ -183,7 +183,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("ScalingFactor");
         }
 
-        public event EventHandler ScalingFactorChanged = delegate { };
+        public event EventHandler ScalingFactorChanged;
 
         private BooleanConfigurationElement _ExtendGlass { get; set; }
 
@@ -209,7 +209,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("ExtendGlass");
         }
 
-        public event EventHandler ExtendGlassChanged = delegate { };
+        public event EventHandler ExtendGlassChanged;
 
         public ICommand DragEnterCommand
         {

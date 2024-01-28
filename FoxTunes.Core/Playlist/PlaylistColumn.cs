@@ -34,7 +34,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Sequence");
         }
 
-        public event EventHandler SequenceChanged = delegate { };
+        public event EventHandler SequenceChanged;
 
         private string _Name { get; set; }
 
@@ -60,7 +60,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Name");
         }
 
-        public event EventHandler NameChanged = delegate { };
+        public event EventHandler NameChanged;
 
         private string _Script { get; set; }
 
@@ -86,7 +86,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Script");
         }
 
-        public event EventHandler ScriptChanged = delegate { };
+        public event EventHandler ScriptChanged;
 
         private bool _IsDynamic { get; set; }
 
@@ -112,7 +112,7 @@ namespace FoxTunes
             this.OnPropertyChanged("IsDynamic");
         }
 
-        public event EventHandler IsDynamicChanged = delegate { };
+        public event EventHandler IsDynamicChanged;
 
         private double? _Width { get; set; }
 
@@ -138,6 +138,6 @@ namespace FoxTunes
             this.OnPropertyChanged("Width");
         }
 
-        public event EventHandler WidthChanged = delegate { };
+        public event EventHandler WidthChanged;
     }
 }

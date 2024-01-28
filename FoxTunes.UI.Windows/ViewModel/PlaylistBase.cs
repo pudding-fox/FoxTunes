@@ -57,7 +57,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Items");
         }
 
-        public event EventHandler ItemsChanged = delegate { };
+        public event EventHandler ItemsChanged;
 
         public override void InitializeComponent(ICore core)
         {

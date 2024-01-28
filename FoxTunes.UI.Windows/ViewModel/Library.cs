@@ -61,7 +61,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Hierarchies");
         }
 
-        public event EventHandler HierarchiesChanged = delegate { };
+        public event EventHandler HierarchiesChanged;
 
         private LibraryHierarchy _SelectedHierarchy { get; set; }
 
@@ -122,7 +122,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Items");
         }
 
-        public event EventHandler ItemsChanged = delegate { };
+        public event EventHandler ItemsChanged;
 
         private Dictionary<LibraryHierarchy, LibraryHierarchyNode> _SelectedItem { get; set; }
 
@@ -161,7 +161,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanging("SelectedItem");
         }
 
-        public event EventHandler SelectedItemChanging = delegate { };
+        public event EventHandler SelectedItemChanging;
 
         protected virtual void OnSelectedItemChanged()
         {
@@ -172,7 +172,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("SelectedItem");
         }
 
-        public event EventHandler SelectedItemChanged = delegate { };
+        public event EventHandler SelectedItemChanged;
 
         public virtual void Refresh()
         {
@@ -326,7 +326,7 @@ namespace FoxTunes.ViewModel
 #endif
         }
 
-        public event EventHandler SelectedHierarchyChanged = delegate { };
+        public event EventHandler SelectedHierarchyChanged;
 
         protected override void Dispose(bool disposing)
         {

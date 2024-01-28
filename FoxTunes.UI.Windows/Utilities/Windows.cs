@@ -73,7 +73,7 @@ namespace FoxTunes
             MainWindowCreated(MainWindow, EventArgs.Empty);
         }
 
-        public static event EventHandler MainWindowCreated = delegate { };
+        public static event EventHandler MainWindowCreated;
 
         private static void OnMainWindowClosed(object sender, EventArgs e)
         {
@@ -121,7 +121,7 @@ namespace FoxTunes
             MiniWindowCreated(MiniWindow, EventArgs.Empty);
         }
 
-        public static event EventHandler MiniWindowCreated = delegate { };
+        public static event EventHandler MiniWindowCreated;
 
         private static void OnMiniWindowClosed(object sender, EventArgs e)
         {
@@ -166,7 +166,7 @@ namespace FoxTunes
             ActiveWindowChanging(null, EventArgs.Empty);
         }
 
-        public static event EventHandler ActiveWindowChanging = delegate { };
+        public static event EventHandler ActiveWindowChanging;
 
         private static void OnActiveWindowChanged()
         {
@@ -177,7 +177,7 @@ namespace FoxTunes
             ActiveWindowChanged(null, EventArgs.Empty);
         }
 
-        public static event EventHandler ActiveWindowChanged = delegate { };
+        public static event EventHandler ActiveWindowChanged;
 
         private static void CheckShutdown()
         {

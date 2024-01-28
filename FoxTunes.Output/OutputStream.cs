@@ -66,7 +66,7 @@ namespace FoxTunes
             return e.Complete();
         }
 
-        public event AsyncEventHandler Ending = delegate { };
+        public event AsyncEventHandler Ending;
 
         protected virtual Task OnEnded()
         {
@@ -83,7 +83,7 @@ namespace FoxTunes
             return e.Complete();
         }
 
-        public event AsyncEventHandler Ended = delegate { };
+        public event AsyncEventHandler Ended;
 
         public virtual Task BeginSeek()
         {

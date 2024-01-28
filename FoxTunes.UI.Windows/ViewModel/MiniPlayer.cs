@@ -32,7 +32,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Enabled");
         }
 
-        public event EventHandler EnabledChanged = delegate { };
+        public event EventHandler EnabledChanged;
 
         public bool _SaveChanges { get; private set; }
 
@@ -58,7 +58,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("SaveChanges");
         }
 
-        public event EventHandler SaveChangesChanged = delegate { };
+        public event EventHandler SaveChangesChanged;
 
         public override void InitializeComponent(ICore core)
         {

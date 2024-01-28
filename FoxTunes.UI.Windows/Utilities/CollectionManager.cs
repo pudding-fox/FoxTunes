@@ -35,7 +35,7 @@ namespace FoxTunes
             this.OnPropertyChanged("ItemFactory");
         }
 
-        public event EventHandler ItemFactoryChanged = delegate { };
+        public event EventHandler ItemFactoryChanged;
 
         private Action<T, T> _ExchangeHandler { get; set; }
 
@@ -61,7 +61,7 @@ namespace FoxTunes
             this.OnPropertyChanged("ExchangeHandler");
         }
 
-        public event EventHandler ExchangeHandlerChanged = delegate { };
+        public event EventHandler ExchangeHandlerChanged;
 
         private IEnumerable<T> _ItemsSource { get; set; }
 
@@ -113,7 +113,7 @@ namespace FoxTunes
             this.OnPropertyChanged("ItemsSource");
         }
 
-        public event EventHandler ItemsSourceChanged = delegate { };
+        public event EventHandler ItemsSourceChanged;
 
         private IEnumerable<T> _OrderedItemsSource { get; set; }
 
@@ -139,7 +139,7 @@ namespace FoxTunes
             this.OnPropertyChanged("OrderedItemsSource");
         }
 
-        public event EventHandler OrderedItemsSourceChanged = delegate { };
+        public event EventHandler OrderedItemsSourceChanged;
 
         private T _SelectedValue { get; set; }
 
@@ -165,7 +165,7 @@ namespace FoxTunes
             this.OnPropertyChanged("SelectedValue");
         }
 
-        public event EventHandler SelectedValueChanged = delegate { };
+        public event EventHandler SelectedValueChanged;
 
         public ICommand AddCommand
         {
@@ -267,7 +267,7 @@ namespace FoxTunes
             this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public event PropertyChangedEventHandler PropertyChanged;
 
         protected override Freezable CreateInstanceCore()
         {

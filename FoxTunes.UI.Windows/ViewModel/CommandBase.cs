@@ -22,7 +22,7 @@ namespace FoxTunes.ViewModel
             Phase(this, new CommandPhaseEventArgs(phase, tag, parameter));
         }
 
-        public static event CommandPhaseEventHandler Phase = delegate { };
+        public static event CommandPhaseEventHandler Phase;
 
         protected virtual void OnCanExecuteChanged()
         {
@@ -33,7 +33,7 @@ namespace FoxTunes.ViewModel
             this._CanExecuteChanged(this, EventArgs.Empty);
         }
 
-        public event EventHandler _CanExecuteChanged = delegate { };
+        public event EventHandler _CanExecuteChanged;
 
         public event EventHandler CanExecuteChanged
         {

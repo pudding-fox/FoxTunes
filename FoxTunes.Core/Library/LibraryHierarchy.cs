@@ -30,7 +30,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Sequence");
         }
 
-        public event EventHandler SequenceChanged = delegate { };
+        public event EventHandler SequenceChanged;
 
         private string _Name { get; set; }
 
@@ -56,7 +56,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Name");
         }
 
-        public event EventHandler NameChanged = delegate { };
+        public event EventHandler NameChanged;
 
         public ObservableCollection<LibraryHierarchyLevel> Levels { get; set; }
     }

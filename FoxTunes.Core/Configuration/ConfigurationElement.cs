@@ -54,7 +54,7 @@ namespace FoxTunes
         }
 
         [field: NonSerialized]
-        public event EventHandler IsHiddenChanged = delegate { };
+        public event EventHandler IsHiddenChanged;
 
         [field: NonSerialized]
         private ObservableCollection<ValidationRule> _ValidationRules;
@@ -82,7 +82,7 @@ namespace FoxTunes
         }
 
         [field: NonSerialized]
-        public event EventHandler ValidationRulesChanged = delegate { };
+        public event EventHandler ValidationRulesChanged;
 
         public ConfigurationElement WithValidationRule(ValidationRule validationRule)
         {
@@ -119,7 +119,7 @@ namespace FoxTunes
         }
 
         [field: NonSerialized]
-        public event EventHandler FlagsChanged = delegate { };
+        public event EventHandler FlagsChanged;
 
         public ConfigurationElement WithFlags(ConfigurationElementFlags flags)
         {

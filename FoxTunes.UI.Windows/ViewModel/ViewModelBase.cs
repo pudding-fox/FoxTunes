@@ -68,7 +68,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Core");
         }
 
-        public event EventHandler CoreChanged = delegate { };
+        public event EventHandler CoreChanged;
 
         public bool IsInitialized { get; private set; }
 
@@ -86,7 +86,7 @@ namespace FoxTunes.ViewModel
             this.PropertyChanging(this, new PropertyChangingEventArgs(propertyName));
         }
 
-        public event PropertyChangingEventHandler PropertyChanging = delegate { };
+        public event PropertyChangingEventHandler PropertyChanging;
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
@@ -97,7 +97,7 @@ namespace FoxTunes.ViewModel
             this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual Task OnError(string message, Exception exception)
         {

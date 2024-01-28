@@ -179,7 +179,7 @@ namespace FoxTunes
             this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
         }
 
-        public event BackgroundTaskEventHandler BackgroundTask = delegate { };
+        public event BackgroundTaskEventHandler BackgroundTask;
 
         public bool IsDisposed { get; private set; }
 

@@ -25,7 +25,7 @@ namespace FoxTunes
 #endif
         }
 
-        public event NotificationClientEventHandler DeviceStateChanged = delegate { };
+        public event NotificationClientEventHandler DeviceStateChanged;
 
         public void OnDeviceAdded(string deviceId)
         {
@@ -41,7 +41,7 @@ namespace FoxTunes
 #endif
         }
 
-        public event NotificationClientEventHandler DeviceAdded = delegate { };
+        public event NotificationClientEventHandler DeviceAdded;
 
         public void OnDeviceRemoved(string deviceId)
         {
@@ -57,7 +57,7 @@ namespace FoxTunes
 #endif
         }
 
-        public event NotificationClientEventHandler DeviceRemoved = delegate { };
+        public event NotificationClientEventHandler DeviceRemoved;
 
         public void OnDefaultDeviceChanged(DataFlow flow, Role role, string deviceId)
         {
@@ -73,7 +73,7 @@ namespace FoxTunes
 #endif
         }
 
-        public event NotificationClientEventHandler DefaultDeviceChanged = delegate { };
+        public event NotificationClientEventHandler DefaultDeviceChanged;
 
         public void OnPropertyValueChanged(string deviceId, PropertyKey key)
         {
@@ -89,7 +89,7 @@ namespace FoxTunes
 #endif
         }
 
-        public event NotificationClientEventHandler PropertyValueChanged = delegate { };
+        public event NotificationClientEventHandler PropertyValueChanged;
 
         public bool IsDisposed { get; private set; }
 

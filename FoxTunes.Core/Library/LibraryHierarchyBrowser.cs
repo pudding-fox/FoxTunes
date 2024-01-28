@@ -39,7 +39,7 @@ namespace FoxTunes
             this.OnPropertyChanged("Filter");
         }
 
-        public event EventHandler FilterChanged = delegate { };
+        public event EventHandler FilterChanged;
 
         public override void InitializeComponent(ICore core)
         {

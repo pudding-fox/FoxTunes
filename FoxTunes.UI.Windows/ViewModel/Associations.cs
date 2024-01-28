@@ -179,7 +179,7 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("IsSelected");
         }
 
-        public event EventHandler IsSelectedChanged = delegate { };
+        public event EventHandler IsSelectedChanged;
 
         protected override Freezable CreateInstanceCore()
         {
