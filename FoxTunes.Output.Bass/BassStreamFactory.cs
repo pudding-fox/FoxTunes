@@ -76,6 +76,7 @@ namespace FoxTunes
 
         public IBassStream CreateBasicStream(PlaylistItem playlistItem, BassFlags flags)
         {
+            flags |= BassFlags.Decode;
             Logger.Write(this, LogLevel.Debug, "Attempting to create stream for playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
             var providers = this.GetProviders(playlistItem);
             foreach (var provider in providers)

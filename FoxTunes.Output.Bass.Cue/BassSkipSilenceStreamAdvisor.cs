@@ -34,12 +34,6 @@ namespace FoxTunes
                 return;
             }
 
-            if (provider.GetType() != typeof(BassStreamProvider))
-            {
-                Logger.Write(this, LogLevel.Warn, "Not attempting to calculate lead in/out for file \"{0}\": Provider \"{1}\" is not supported.", playlistItem.FileName, provider.GetType().Name);
-                return;
-            }
-
             var leadIn = default(TimeSpan);
             var leadOut = default(TimeSpan);
             if (!this.TryGetSilence(provider, playlistItem, out leadIn, out leadOut))
@@ -113,8 +107,8 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead in/out for file \"{0}\".", playlistItem.FileName);
 
-            var channelHandle = Bass.CreateStream(playlistItem.FileName, 0, 0, BassFlags.Decode | BassFlags.Byte | BassFlags.Prescan);
-            if (channelHandle == 0)
+            var stream = provider.CreateBasicStream(playlistItem, Enumerable.Empty<IBassStreamAdvice>(), BassFlags.Decode | BassFlags.Byte);
+            if (stream.IsEmpty)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to create stream for file \"{0}\": {1}", playlistItem.FileName, Enum.GetName(typeof(Errors), Bass.LastError));
 
@@ -124,7 +118,7 @@ namespace FoxTunes
             }
             try
             {
-                var leadInBytes = this.GetLeadIn(channelHandle, this.Behaviour.Threshold);
+                var leadInBytes = this.GetLeadIn(stream.ChannelHandle, this.Behaviour.Threshold);
                 if (leadInBytes == -1)
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to calculate lead in for file \"{0}\": Track was considered silent.", playlistItem.FileName);
@@ -133,7 +127,7 @@ namespace FoxTunes
                     leadOut = default(TimeSpan);
                     return false;
                 }
-                var leadOutBytes = this.GetLeadOut(channelHandle, this.Behaviour.Threshold);
+                var leadOutBytes = this.GetLeadOut(stream.ChannelHandle, this.Behaviour.Threshold);
                 if (leadOutBytes == -1)
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to calculate lead out for file \"{0}\": Track was considered silent.", playlistItem.FileName);
@@ -144,13 +138,13 @@ namespace FoxTunes
                 }
                 leadIn = TimeSpan.FromSeconds(
                     Bass.ChannelBytes2Seconds(
-                        channelHandle,
+                        stream.ChannelHandle,
                         leadInBytes
                     )
                 );
                 leadOut = TimeSpan.FromSeconds(
                     Bass.ChannelBytes2Seconds(
-                        channelHandle,
+                        stream.ChannelHandle,
                         leadOutBytes
                     )
                 );
@@ -161,7 +155,7 @@ namespace FoxTunes
             }
             finally
             {
-                Bass.StreamFree(channelHandle); //Not checking result code as it contains an error if the application is shutting down.
+                provider.FreeStream(playlistItem, stream.ChannelHandle);
             }
         }
 
@@ -191,7 +185,7 @@ namespace FoxTunes
                     break;
                 }
                 var dB = levels[0] > 0 ? 20 * Math.Log10(levels[0]) : -1000;
-                if (dB >= threshold)
+                if (dB > threshold)
                 {
                     //TODO: Sometimes this value is less than zero so clamp it.
                     //TODO: Some problem with BASS/ManagedBass, if you have exactly N bytes available call Bass.ChannelGetLevel with Length = Bass.ChannelBytesToSeconds(N) sometimes results in Errors.Ended.
@@ -243,7 +237,7 @@ namespace FoxTunes
                     break;
                 }
                 var dB = levels[0] > 0 ? 20 * Math.Log10(levels[0]) : -1000;
-                if (dB >= threshold)
+                if (dB > threshold)
                 {
                     //TODO: Sometimes this value is less than zero so clamp it.
                     //TODO: Some problem with BASS/ManagedBass, if you have exactly N bytes available call Bass.ChannelGetLevel with Length = Bass.ChannelBytesToSeconds(N) sometimes results in Errors.Ended.
