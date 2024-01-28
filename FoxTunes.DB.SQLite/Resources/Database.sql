@@ -24,7 +24,7 @@ CREATE TABLE [PlaylistColumns] (
 INSERT INTO `PlaylistColumns` VALUES (1,'Playing','playing != null && item.Id == playing.Id && item.FileName == playing.FileName ? "\u2022" : ""',1,NULL);
 INSERT INTO `PlaylistColumns` VALUES (2,'Artist / album','(function(){ var parts = [tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist]; if(tag.album) { parts.push(tag.album); } return parts.join(" - "); })()',0,NULL);
 INSERT INTO `PlaylistColumns` VALUES (3,'Track no','(function(){ var parts = []; if (tag.disccount != 1 && tag.disc) { parts.push(tag.disc); } if (tag.track) { parts.push(zeropad(tag.track, 2)); } return parts.join(" - "); })()',0,NULL);
-INSERT INTO `PlaylistColumns` VALUES (4,'Title / track artist','(function(){var parts= []; if (tag.title) { parts.push(tag.title); } if (tag.firstperformer && tag.firstperformer != (tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist)) { parts.push(tag.firstperformer); } return parts.join(" - "); })()',0,NULL);
+INSERT INTO `PlaylistColumns` VALUES (4,'Title / track artist','(function(){var parts= []; if (tag.title) { parts.push(tag.title); } if (tag.firstperformer && tag.firstperformer != (tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist)) { parts.push(tag.firstperformer); } if (parts.length) { return parts.join(" - "); } else { return filename(item.FileName); } })()',0,NULL);
 INSERT INTO `PlaylistColumns` VALUES (5,'Duration','timestamp(property.duration)',0,NULL);
 CREATE TABLE [MetaDataItems](
     [Id] INTEGER PRIMARY KEY NOT NULL, 

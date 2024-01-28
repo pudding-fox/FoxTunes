@@ -10,6 +10,11 @@ namespace FoxTunes
     [Component("E0318CB1-57A0-4DC3-AA8D-F6E100F86190", ComponentSlots.Output)]
     public class BassOutput : Output, IBassOutput
     {
+        static BassOutput()
+        {
+            BassPluginLoader.Instance.Load();
+        }
+
         const int START_ATTEMPTS = 5;
 
         const int START_ATTEMPT_INTERVAL = 400;
@@ -160,7 +165,6 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            BassPluginLoader.Instance.Load();
             this.Core = core;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<SelectionConfigurationElement>(
@@ -188,14 +192,18 @@ namespace FoxTunes
                 .Contains(fileName.GetExtension(), true);
         }
 
-        public override Task<IOutputStream> Load(PlaylistItem playlistItem)
+        public override Task<IOutputStream> Load(PlaylistItem playlistItem, bool immidiate)
         {
             if (!this.IsStarted)
             {
                 this.Start();
             }
             Logger.Write(this, LogLevel.Debug, "Loading stream: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-            var channelHandle = this.StreamFactory.CreateStream(playlistItem);
+            var channelHandle = default(int);
+            if (!this.StreamFactory.CreateStream(playlistItem, immidiate, out channelHandle))
+            {
+                return Task.FromResult<IOutputStream>(null);
+            }
             var outputStream = new BassOutputStream(this, playlistItem, channelHandle);
             outputStream.InitializeComponent(this.Core);
             return Task.FromResult<IOutputStream>(outputStream);

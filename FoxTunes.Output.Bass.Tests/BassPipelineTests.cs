@@ -10,7 +10,7 @@ namespace FoxTunes.Output.Bass.Tests
         public async Task CanCreateStream()
         {
             await this.Core.Components.Output.Unload(
-                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0])
+                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false)
             );
         }
 
@@ -19,8 +19,8 @@ namespace FoxTunes.Output.Bass.Tests
         {
             var outputStreams = new[]
             {
-                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0]),
-                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[1])
+                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false),
+                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[1], false)
             };
             outputStreams[0].Play();
             Assert.IsFalse(await this.Core.Components.Output.Preempt(outputStreams[1]));
@@ -31,8 +31,8 @@ namespace FoxTunes.Output.Bass.Tests
         {
             var outputStreams = new[]
             {
-                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0]),
-                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[1])
+                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false),
+                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[1], false)
             };
             outputStreams[0].Play();
             outputStreams[1].Play();

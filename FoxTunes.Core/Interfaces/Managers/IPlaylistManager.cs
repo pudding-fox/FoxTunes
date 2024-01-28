@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IPlaylistManager : IStandardManager, IBackgroundTaskSource
+    public interface IPlaylistManager : IStandardManager, IBackgroundTaskSource, IInvocableComponent
     {
         Task Add(IEnumerable<string> paths);
 
@@ -14,8 +14,6 @@ namespace FoxTunes.Interfaces
 
         Task Insert(int index, LibraryHierarchyNode libraryHierarchyNode);
 
-        event EventHandler Updated;
-
         Task Play(PlaylistItem playlistItem);
 
         bool CanNavigate { get; }
@@ -23,6 +21,8 @@ namespace FoxTunes.Interfaces
         PlaylistItem GetNext();
 
         PlaylistItem GetPrevious();
+
+        int GetInsertIndex();
 
         Task Next();
 

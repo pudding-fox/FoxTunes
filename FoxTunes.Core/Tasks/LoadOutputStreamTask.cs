@@ -36,7 +36,7 @@ namespace FoxTunes
         protected override async Task OnRun()
         {
             this.Name = "Buffering";
-            this.Description = new FileInfo(this.PlaylistItem.FileName).Name;
+            this.Description = this.PlaylistItem.FileName.GetName();
             this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Loading play list item into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
             if (this.OutputStreamQueue.IsQueued(this.PlaylistItem))
@@ -49,7 +49,12 @@ namespace FoxTunes
                 }
                 return;
             }
-            var outputStream = await this.Output.Load(this.PlaylistItem);
+            var outputStream = await this.Output.Load(this.PlaylistItem, this.Immediate);
+            if (outputStream == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to load play list item into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Play list item loaded into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
             this.OutputStreamQueue.Enqueue(outputStream, this.Immediate);
             if (this.Immediate)

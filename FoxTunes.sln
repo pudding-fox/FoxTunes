@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27428.2002
+VisualStudioVersion = 15.0.27428.2043
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Core", "FoxTunes.Core\FoxTunes.Core.csproj", "{62CD8F70-8415-4C15-B672-CB18475ABD7E}"
 EndProject
@@ -58,6 +58,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Output.Bass.Wasapi
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bass_wasapi_handler", "bass_wasapi_handler\bass_wasapi_handler.vcxproj", "{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Output.Bass.Cd", "FoxTunes.Output.Bass.Cd\FoxTunes.Output.Bass.Cd.csproj", "{23D4420F-18BA-4A72-BC63-8ACB7FA2B09A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -163,6 +165,10 @@ Global
 		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Debug|Mixed Platforms.ActiveCfg = Release|Win32
 		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Release|Mixed Platforms.ActiveCfg = Release|Win32
 		{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{23D4420F-18BA-4A72-BC63-8ACB7FA2B09A}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{23D4420F-18BA-4A72-BC63-8ACB7FA2B09A}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{23D4420F-18BA-4A72-BC63-8ACB7FA2B09A}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{23D4420F-18BA-4A72-BC63-8ACB7FA2B09A}.Release|Mixed Platforms.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

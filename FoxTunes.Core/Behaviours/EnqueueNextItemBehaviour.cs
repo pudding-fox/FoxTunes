@@ -46,7 +46,14 @@ namespace FoxTunes.Behaviours
             Logger.Write(this, LogLevel.Debug, "Preemptively buffering playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
             this.BackgroundTaskRunner.Run(async () =>
             {
-                await this.PlaybackManager.Load(playlistItem, false);
+                try
+                {
+                    await this.PlaybackManager.Load(playlistItem, false);
+                }
+                catch
+                {
+                    //Nothing can be done.
+                }
             });
         }
     }

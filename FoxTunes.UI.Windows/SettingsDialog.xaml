@@ -56,6 +56,9 @@
                                                 <DataTemplate DataType="{x:Type Core:BooleanConfigurationElement}">
                                                     <CheckBox IsChecked="{Binding Value}"></CheckBox>
                                                 </DataTemplate>
+                                                <DataTemplate DataType="{x:Type Core:TextConfigurationElement}">
+                                                    <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus}"></TextBox>
+                                                </DataTemplate>
                                             </ContentControl.Resources>
                                         </ContentControl>
                                     </Grid>

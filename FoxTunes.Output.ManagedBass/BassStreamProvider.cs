@@ -31,12 +31,7 @@ namespace FoxTunes
             {
                 flags |= BassFlags.Float;
             }
-            var channelHandle = Bass.CreateStream(playlistItem.FileName, 0, 0, flags);
-            if (channelHandle == 0)
-            {
-                BassUtils.Throw();
-            }
-            return channelHandle;
+            return Bass.CreateStream(playlistItem.FileName, 0, 0, flags);
         }
     }
 }

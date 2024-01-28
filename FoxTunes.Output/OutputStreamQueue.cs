@@ -1,7 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Linq;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -20,12 +20,11 @@ namespace FoxTunes
         {
             core.Components.Output.IsStartedChanged += (sender, e) =>
             {
-                if (this.Queue.Count == 0)
+                if (this.Queue.Count > 0)
                 {
-                    return;
+                    Logger.Write(this, LogLevel.Warn, "Output state changed, disposing queued output streams.");
+                    this.Clear();
                 }
-                Logger.Write(this, LogLevel.Warn, "Output state changed, disposing queued output streams.");
-                this.Clear();
             };
             base.InitializeComponent(core);
         }

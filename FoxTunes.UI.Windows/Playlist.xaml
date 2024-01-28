@@ -15,6 +15,7 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
         <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}" AutoSizeGridColumns="True"></ViewModel:Playlist>
+        <ViewModel:Menu x:Key="Menu" Core="{Binding}"></ViewModel:Menu>
         <CollectionViewSource x:Key="PlaylistItems" Source="{Binding Components.Database.Sets.PlaylistItem}" IsLiveSortingRequested="True">
             <CollectionViewSource.LiveGroupingProperties>
                 <System:String>Sequence</System:String>
@@ -48,10 +49,13 @@
                 </Interactivity:EventTrigger>
             </Interactivity:Interaction.Triggers>
             <ListView.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Locate" Command="{Binding LocateCommand, Source={StaticResource ViewModel}}"/>
-                    <Separator/>
-                    <MenuItem Header="Clear" Command="{Binding ClearCommand, Source={StaticResource ViewModel}}"/>
+                <ContextMenu ItemsSource="{Binding Items, Source={StaticResource Menu}}">
+                    <ContextMenu.Resources>
+                        <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                            <Setter Property="Header" Value="{Binding Invocation.Name}"></Setter>
+                            <Setter Property="Command" Value="{Binding Command}"></Setter>
+                        </Style>
+                    </ContextMenu.Resources>
                 </ContextMenu>
             </ListView.ContextMenu>
             <ListView.View>

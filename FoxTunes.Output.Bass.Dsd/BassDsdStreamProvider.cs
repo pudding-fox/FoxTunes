@@ -38,18 +38,17 @@ namespace FoxTunes
         {
             var flags = BassFlags.Decode | BassFlags.DSDRaw;
             var channelHandle = BassDsd.CreateStream(playlistItem.FileName, 0, 0, flags);
-            if (channelHandle == 0)
+            if (channelHandle != 0)
             {
-                BassUtils.Throw();
-            }
-            var query = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>().QueryPipeline();
-            var channels = BassUtils.GetChannelCount(channelHandle);
-            var rate = BassUtils.GetChannelDsdRate(channelHandle);
-            if (query.OutputChannels < channels || !query.OutputRates.Contains(rate))
-            {
-                Logger.Write(this, LogLevel.Warn, "DSD format {0}:{1} is unsupported, the stream will be unloaded. This warning is expensive, please don't attempt to play unsupported DSD.", rate, channels);
-                output.FreeStream(channelHandle);
-                return 0;
+                var query = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>().QueryPipeline();
+                var channels = BassUtils.GetChannelCount(channelHandle);
+                var rate = BassUtils.GetChannelDsdRate(channelHandle);
+                if (query.OutputChannels < channels || !query.OutputRates.Contains(rate))
+                {
+                    Logger.Write(this, LogLevel.Warn, "DSD format {0}:{1} is unsupported, the stream will be unloaded. This warning is expensive, please don't attempt to play unsupported DSD.", rate, channels);
+                    output.FreeStream(channelHandle);
+                    channelHandle = 0;
+                }
             }
             return channelHandle;
         }
