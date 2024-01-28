@@ -122,18 +122,48 @@ namespace FoxTunes
             }
         }
 
-        private bool _PauseSeek { get; set; }
+        private bool _Start { get; set; }
 
-        public bool PauseSeek
+        public bool Start
         {
             get
             {
-                return this._PauseSeek;
+                return this._Start;
             }
             set
             {
-                this._PauseSeek = value;
-                Logger.Write(this, LogLevel.Debug, "Pause/Seek = {0}", this.PauseSeek);
+                this._Start = value;
+                Logger.Write(this, LogLevel.Debug, "Start = {0}", this.Start);
+            }
+        }
+
+        private bool _PauseResume { get; set; }
+
+        public bool PauseResume
+        {
+            get
+            {
+                return this._PauseResume;
+            }
+            set
+            {
+                this._PauseResume = value;
+                Logger.Write(this, LogLevel.Debug, "Pause/Resume = {0}", this.PauseResume);
+            }
+        }
+
+        private bool _Stop { get; set; }
+
+        public bool Stop
+        {
+            get
+            {
+                return this._Stop;
+            }
+            set
+            {
+                this._Stop = value;
+                Logger.Write(this, LogLevel.Debug, "Stop = {0}", this.Stop);
             }
         }
 
@@ -172,8 +202,16 @@ namespace FoxTunes
             ).ConnectValue(value => this.Mix = value);
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
-                BassCrossfadeStreamInputConfiguration.PAUSE_SEEK_ELEMENT
-            ).ConnectValue(value => this.PauseSeek = value);
+                BassCrossfadeStreamInputConfiguration.START_ELEMENT
+            ).ConnectValue(value => this.Start = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassCrossfadeStreamInputConfiguration.PAUSE_RESUME_ELEMENT
+            ).ConnectValue(value => this.PauseResume = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassCrossfadeStreamInputConfiguration.STOP_ELEMENT
+            ).ConnectValue(value => this.Stop = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             if (this.BassStreamPipelineFactory != null)
             {
