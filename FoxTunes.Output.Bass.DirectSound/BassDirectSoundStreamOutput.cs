@@ -3,6 +3,7 @@ using ManagedBass;
 using ManagedBass.Mix;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -16,7 +17,7 @@ namespace FoxTunes
         public BassDirectSoundStreamOutput(BassDirectSoundStreamOutputBehaviour behaviour, BassOutputStream stream) : this()
         {
             this.Behaviour = behaviour;
-            this.Rate = BassDirectSoundDevice.Info.Rate;
+            this.Rate = behaviour.Output.Rate;
             this.Channels = BassDirectSoundDevice.Info.Outputs;
             this.Flags = BassFlags.Default;
             if (this.Behaviour.Output.Float)
@@ -66,6 +67,7 @@ namespace FoxTunes
 
         public override void Connect(IBassStreamComponent previous)
         {
+            this.ConfigureDirectSound(previous);
             Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", this.Rate, this.Channels);
             this.ChannelHandle = BassMix.CreateMixerStream(this.Rate, this.Channels, this.Flags);
             if (this.ChannelHandle == 0)
@@ -78,6 +80,36 @@ namespace FoxTunes
             this.UpdateVolume();
         }
 
+        protected virtual void ConfigureDirectSound(IBassStreamComponent previous)
+        {
+            if (this.Behaviour.Output.EnforceRate)
+            {
+                if (!BassDirectSoundDevice.Info.SupportedRates.Contains(this.Rate))
+                {
+                    var nearestRate = BassDirectSoundDevice.Info.GetNearestRate(this.Rate);
+                    Logger.Write(this, LogLevel.Warn, "Enforced rate {0} isn't supposed by the device, falling back to {1}.", this.Rate, nearestRate);
+                    this.Rate = nearestRate;
+                }
+                else
+                {
+                    //Enfoced rate is supported by the device, nothing to do.
+                }
+            }
+            else
+            {
+                if (!BassDirectSoundDevice.Info.SupportedRates.Contains(previous.Rate))
+                {
+                    var nearestRate = BassDirectSoundDevice.Info.GetNearestRate(previous.Rate);
+                    Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", this.Rate, nearestRate);
+                    this.Rate = nearestRate;
+                }
+                else
+                {
+                    //Stream rate is supported by the device, nothing to do.
+                    this.Rate = previous.Rate;
+                }
+            }
+        }
 
         public override bool IsPlaying
         {
