@@ -8,8 +8,6 @@ namespace FoxTunes
     [WindowsUserInterfaceDependency]
     public class LayoutDesignerKeyBindingsBehaviour : KeyBindingsBehaviourBase
     {
-        public ISignalEmitter SignalEmitter { get; private set; }
-
         public IConfiguration Configuration { get; private set; }
 
         public TextConfigurationElement Edit { get; private set; }
@@ -26,7 +24,6 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.SignalEmitter = core.Components.SignalEmitter;
             this.Configuration = core.Components.Configuration;
             this.Edit = this.Configuration.GetElement<TextConfigurationElement>(
                 LayoutDesignerKeyBindingsBehaviourConfiguration.SECTION,

@@ -50,6 +50,14 @@
             }
         }
 
+        public static string ToolWindowManager_CopyToMain
+        {
+            get
+            {
+                return Strings.ToolWindowManager_CopyToMain;
+            }
+        }
+
         public static string LayoutEditor_Save
         {
             get

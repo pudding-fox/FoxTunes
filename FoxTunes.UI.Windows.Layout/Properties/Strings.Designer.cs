@@ -187,6 +187,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dialogs.
+        /// </summary>
+        internal static string ToolWindowKeyBindingsBehaviourConfiguration_Manage {
+            get {
+                return ResourceManager.GetString("ToolWindowKeyBindingsBehaviourConfiguration.Manage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Always On Top.
         /// </summary>
         internal static string ToolWindowManager_AlwaysOnTop {
@@ -201,6 +210,15 @@ namespace FoxTunes {
         internal static string ToolWindowManager_Component {
             get {
                 return ResourceManager.GetString("ToolWindowManager.Component", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy To Main.
+        /// </summary>
+        internal static string ToolWindowManager_CopyToMain {
+            get {
+                return ResourceManager.GetString("ToolWindowManager.CopyToMain", resourceCulture);
             }
         }
         
