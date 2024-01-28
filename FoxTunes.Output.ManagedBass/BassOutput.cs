@@ -4,26 +4,74 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
     [Component("E0318CB1-57A0-4DC3-AA8D-F6E100F86190", ComponentSlots.Output)]
-    public class BassOutput : Output, IDisposable
+    public class BassOutput : Output, IConfigurableComponent, IDisposable
     {
         public ICore Core { get; private set; }
 
+        private int _Rate { get; set; }
+
+        public int Rate
+        {
+            get
+            {
+                return this._Rate;
+            }
+            private set
+            {
+                this._Rate = value;
+                Logger.Write(this, LogLevel.Debug, "Rate = {0}", this.Rate);
+                this.Shutdown();
+            }
+        }
+
+        private bool _Float { get; set; }
+
+        public bool Float
+        {
+            get
+            {
+                return this._Float;
+            }
+            private set
+            {
+                this._Float = value;
+                Logger.Write(this, LogLevel.Debug, "Float = {0}", this.Float);
+                this.Shutdown();
+            }
+        }
+
+        public BassFlags Flags
+        {
+            get
+            {
+                var flags = BassFlags.Decode;
+                if (this.Float)
+                {
+                    flags |= BassFlags.Float;
+                }
+                return flags;
+            }
+        }
+
         public BassMasterChannel MasterChannel { get; private set; }
 
-        public bool IsStarted { get; private set; }
-
-        public void Start(ICore core)
+        public void Start()
         {
+            if (this.IsStarted)
+            {
+                this.Shutdown();
+            }
             Logger.Write(this, LogLevel.Debug, "Starting BASS.");
             try
             {
-                BassUtils.OK(Bass.Init());
+                BassUtils.OK(Bass.Init(Bass.DefaultDevice, this.Rate));
                 this.MasterChannel = new BassMasterChannel(this);
-                this.MasterChannel.InitializeComponent(core);
+                this.MasterChannel.InitializeComponent(this.Core);
                 this.MasterChannel.Error += this.MasterChannel_Error;
                 this.IsStarted = true;
                 Logger.Write(this, LogLevel.Debug, "Started BASS.");
@@ -36,6 +84,10 @@ namespace FoxTunes
 
         public void Shutdown()
         {
+            if (!this.IsStarted)
+            {
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
             try
             {
@@ -62,8 +114,16 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Core = core;
             BassPluginLoader.Instance.Load();
+            this.Core = core;
+            this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.RATE_ELEMENT
+            ).ConnectValue<string>(value => this.Rate = BassOutputConfiguration.GetRate(value));
+            this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.DEPTH_ELEMENT
+            ).ConnectValue<string>(value => this.Float = BassOutputConfiguration.GetFloat(value));
             base.InitializeComponent(core);
         }
 
@@ -84,10 +144,14 @@ namespace FoxTunes
         {
             if (!this.IsStarted)
             {
-                this.Start(this.Core);
+                this.Start();
             }
             Logger.Write(this, LogLevel.Debug, "Creating stream from file {0}", playlistItem.FileName);
-            var channelHandle = Bass.CreateStream(playlistItem.FileName, 0, 0, BassFlags.Decode);
+            var channelHandle = Bass.CreateStream(playlistItem.FileName, 0, 0, this.Flags);
+            if (channelHandle == 0)
+            {
+                BassUtils.Throw();
+            }
             Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, channelHandle);
             var outputStream = new BassOutputStream(this, playlistItem, channelHandle);
             outputStream.InitializeComponent(this.Core);
@@ -104,12 +168,13 @@ namespace FoxTunes
 
         public override Task Unload(IOutputStream stream)
         {
-            //if (!stream.IsStopped)
-            //{
-            //    stream.Stop();
-            //}
             stream.Dispose();
             return Task.CompletedTask;
+        }
+
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return BassOutputConfiguration.GetConfigurationSections();
         }
 
         public bool IsDisposed { get; private set; }

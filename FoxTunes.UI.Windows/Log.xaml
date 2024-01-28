@@ -7,7 +7,7 @@
         xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
         xmlns:Windows="clr-namespace:FoxTunes" 
         mc:Ignorable="d" 
-        Title="Log" Height="300" Width="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" Icon="pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico" ShowActivated="False" WindowStyle="ToolWindow" Closing="OnClosing">
+        Title="Log" Height="500" Width="800" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" Icon="pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico" ShowActivated="False" WindowStyle="ToolWindow" Closing="OnClosing">
     <Window.Resources>
         <ViewModel:Log x:Key="ViewModel" Core="{Binding}"></ViewModel:Log>
     </Window.Resources>

@@ -84,6 +84,7 @@ namespace FoxTunes.ViewModel
             this.Database = this.Core.Components.Database;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
+            this.Core.Components.Output.IsStartedChanged += (sender, e) => Command.InvalidateRequerySuggested();
             base.OnCoreChanged();
         }
 

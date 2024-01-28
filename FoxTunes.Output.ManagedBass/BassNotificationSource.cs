@@ -26,14 +26,14 @@ namespace FoxTunes
             this.Timer.Interval = this.Interval;
             this.Timer.Elapsed += this.Timer_Elapsed;
             this.Timer.Start();
-            Logger.Write(this, LogLevel.Debug, "Creating \"Ending\" channel sync {0} seconds from the end.", STOPPING_THRESHOLD);
+            Logger.Write(this, LogLevel.Debug, "Creating \"Ending\" channel sync {0} seconds from the end for channel: {1}", STOPPING_THRESHOLD, this.OutputStream.ChannelHandle);
             BassUtils.OK(Bass.ChannelSetSync(
                 this.OutputStream.ChannelHandle,
                 SyncFlags.Position,
                 this.OutputStream.Length - Bass.ChannelSeconds2Bytes(this.OutputStream.ChannelHandle, STOPPING_THRESHOLD),
                 this.ChannelSync_Ending
             ));
-            Logger.Write(this, LogLevel.Debug, "Creating \"End\" channel sync.", STOPPING_THRESHOLD);
+            Logger.Write(this, LogLevel.Debug, "Creating \"End\" channel sync for channel: {0}", this.OutputStream.ChannelHandle);
             BassUtils.OK(Bass.ChannelSetSync(
                 this.OutputStream.ChannelHandle,
                 SyncFlags.End,

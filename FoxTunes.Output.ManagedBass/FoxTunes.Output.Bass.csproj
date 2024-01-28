@@ -48,6 +48,7 @@
     <Compile Include="BassMasterChannel.cs" />
     <Compile Include="BassNotificationSource.cs" />
     <Compile Include="BassOutput.cs" />
+    <Compile Include="BassOutputConfiguration.cs" />
     <Compile Include="BassOutputStream.cs" />
     <Compile Include="BassPluginLoader.cs" />
     <Compile Include="BassUtils.cs" />

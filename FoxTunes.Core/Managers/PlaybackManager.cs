@@ -18,17 +18,20 @@ namespace FoxTunes.Managers
         {
             this.Core = core;
             this.Output = core.Components.Output;
-            this.Output.Error += this.OutputError;
+            core.Components.Output.IsStartedChanged += (sender, e) =>
+            {
+                if (this.CurrentStream == null)
+                {
+                    return;
+                }
+                Logger.Write(this, LogLevel.Warn, "Output state changed, disposing current stream: {0} => {1}", this.CurrentStream.Id, this.CurrentStream.FileName);
+                this.CurrentStream.Dispose();
+                this.CurrentStream = null;
+            };
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
             this.OutputStreamQueue.Dequeued += this.OutputStreamQueueDequeued;
             this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             base.InitializeComponent(core);
-        }
-
-        protected virtual void OutputError(object sender, ComponentOutputErrorEventArgs e)
-        {
-            this.CurrentStream.Dispose();
-            this.CurrentStream = null;
         }
 
         protected virtual void OutputStreamQueueDequeued(object sender, OutputStreamQueueEventArgs e)

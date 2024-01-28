@@ -132,6 +132,10 @@ namespace FoxTunes
 
         public override void Play()
         {
+            if (!this.Output.IsStarted)
+            {
+                throw BassOutputStreamException.StaleStream;
+            }
             this.Output.MasterChannel.SetPrimaryChannel(this.ChannelHandle);
             if (!this.Output.MasterChannel.IsPlaying)
             {
@@ -143,6 +147,10 @@ namespace FoxTunes
 
         public override void Pause()
         {
+            if (!this.Output.IsStarted)
+            {
+                throw BassOutputStreamException.StaleStream;
+            }
             this.Output.MasterChannel.Pause();
             this.EmitState();
             this.OnPaused();
@@ -150,6 +158,10 @@ namespace FoxTunes
 
         public override void Resume()
         {
+            if (!this.Output.IsStarted)
+            {
+                throw BassOutputStreamException.StaleStream;
+            }
             this.Output.MasterChannel.Resume();
             this.EmitState();
             this.OnResumed();
@@ -157,6 +169,10 @@ namespace FoxTunes
 
         public override void Stop()
         {
+            if (!this.Output.IsStarted)
+            {
+                throw BassOutputStreamException.StaleStream;
+            }
             this.Output.MasterChannel.Stop();
             this.EmitState();
             this.OnStopped(true);
@@ -173,5 +189,15 @@ namespace FoxTunes
             Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
             this.ChannelHandle = 0;
         }
+    }
+
+    public class BassOutputStreamException : OutputStreamException
+    {
+        private BassOutputStreamException(string message) : base(message)
+        {
+
+        }
+
+        public static readonly BassOutputStreamException StaleStream = new BassOutputStreamException("Output was shut down since the stream was created, it should have been disposed.");
     }
 }

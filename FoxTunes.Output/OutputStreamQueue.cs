@@ -18,7 +18,11 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            core.Components.Output.Error += (sender, e) => this.Clear(); //When the output encounters an error we write off all cached streams.
+            core.Components.Output.IsStartedChanged += (sender, e) =>
+            {
+                Logger.Write(this, LogLevel.Warn, "Output state changed, disposing queued output streams.");
+                this.Clear();
+            };
             base.InitializeComponent(core);
         }
 
@@ -102,8 +106,11 @@ namespace FoxTunes
         {
             foreach (var key in this.Queue.Keys)
             {
-                this.Queue[key].OutputStream.Dispose();
+                var outputStream = this.Queue[key].OutputStream;
+                Logger.Write(this, LogLevel.Debug, "Disposing queued output stream: {0} => {1}", outputStream.Id, outputStream.FileName);
+                outputStream.Dispose();
             }
+            Logger.Write(this, LogLevel.Debug, "Clearing output stream queue.");
             this.Queue.Clear();
         }
 
