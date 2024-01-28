@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -16,10 +18,59 @@ namespace FoxTunes
     {
         public const string CATEGORY = "B11C3491-8765-4B6F-8AB8-D20E90A38400";
 
+        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(
+            "Source",
+            typeof(Brush),
+            typeof(StaticImage),
+            new PropertyMetadata(new PropertyChangedCallback(OnSourceChanged))
+        );
+
+        public static Brush GetSource(StaticImage source)
+        {
+            return (Brush)source.GetValue(SourceProperty);
+        }
+
+        public static void SetSource(StaticImage source, Brush value)
+        {
+            source.SetValue(SourceProperty, value);
+        }
+
+        public static void OnSourceChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var asyncImage = sender as StaticImage;
+            if (asyncImage == null)
+            {
+                return;
+            }
+            asyncImage.OnSourceChanged();
+        }
+
         public StaticImage()
         {
             this.InitializeComponent();
         }
+
+        public Brush Source
+        {
+            get
+            {
+                return GetSource(this);
+            }
+            set
+            {
+                SetSource(this, value);
+            }
+        }
+
+        protected virtual void OnSourceChanged()
+        {
+            if (this.SourceChanged != null)
+            {
+                this.SourceChanged(this, EventArgs.Empty);
+            }
+        }
+
+        public event EventHandler SourceChanged;
 
         public DispatcherTimer Timer { get; private set; }
 
@@ -139,7 +190,11 @@ namespace FoxTunes
 
         protected virtual void LoadImage()
         {
-            this.Image.Source = new BitmapImage(new Uri(this.FileName));
+            if (string.IsNullOrEmpty(this.FileName))
+            {
+                return;
+            }
+            this.Source = new ImageBrush(new BitmapImage(new Uri(this.FileName)));
         }
 
         protected override Task<bool> ShowSettings()
