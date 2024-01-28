@@ -1,4 +1,5 @@
-﻿using FoxTunes.Tasks;
+﻿using FoxTunes.Interfaces;
+using FoxTunes.Tasks;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -16,6 +17,7 @@ namespace FoxTunes
         protected override Task OnRun()
         {
             this.IsIndeterminate = true;
+            Logger.Write(this, LogLevel.Debug, "Clearing playlist.");
             using (var context = this.DataManager.CreateWriteContext())
             {
                 using (var command = context.Connection.CreateCommand(Resources.ClearPlaylist))

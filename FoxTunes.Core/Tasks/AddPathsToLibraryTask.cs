@@ -88,11 +88,13 @@ namespace FoxTunes
                     {
                         foreach (var fileName in Directory.GetFiles(path, "*.*", SearchOption.AllDirectories))
                         {
+                            Logger.Write(this, LogLevel.Debug, "Adding file to library: {0} => {1}", fileName);
                             addLibraryItem(fileName);
                         }
                     }
                     else if (File.Exists(path))
                     {
+                        Logger.Write(this, LogLevel.Debug, "Adding file to library: {0} => {1}", path);
                         addLibraryItem(path);
                     }
                 }
@@ -115,6 +117,7 @@ namespace FoxTunes
 
         private void SetLibraryItemsStatus(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
+            this.IsIndeterminate = true;
             var parameters = default(IDbParameterCollection);
             using (var command = databaseContext.Connection.CreateCommand(Resources.SetLibraryItemStatus, new[] { "status" }, out parameters))
             {

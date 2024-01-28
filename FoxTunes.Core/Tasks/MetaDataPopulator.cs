@@ -156,6 +156,8 @@ namespace FoxTunes.Tasks
 
         public void Populate(IEnumerable<IFileData> fileDatas)
         {
+            Logger.Write(this, LogLevel.Debug, "Begin populating meta data.");
+
             this.Name = "Populating meta data";
             this.Position = 0;
             this.Count = fileDatas.Count();
@@ -165,6 +167,8 @@ namespace FoxTunes.Tasks
 
             fileDatas.AsParallel().ForAll(fileData =>
             {
+                Logger.Write(this, LogLevel.Debug, "Populating meta data for file data: {0} => {1}", fileData.Id, fileData.FileName);
+
                 var commands = this.GetOrAddCommands();
                 var metaDataSource = this.MetaDataSourceFactory.Create(fileData.FileName);
 
@@ -249,6 +253,8 @@ namespace FoxTunes.Tasks
         {
             public MetaDataPopulatorCommands(IDatabaseContext databaseContext, IDbTransaction transaction, string prefix)
             {
+                Logger.Write(this, LogLevel.Debug, "Creating meta data populator command set.");
+
                 var metaDataParameters = default(IDbParameterCollection);
                 var propertyParameters = default(IDbParameterCollection);
                 var imageParameters = default(IDbParameterCollection);

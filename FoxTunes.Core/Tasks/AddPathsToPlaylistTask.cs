@@ -92,11 +92,13 @@ namespace FoxTunes
                     {
                         foreach (var fileName in Directory.GetFiles(path, "*.*", SearchOption.AllDirectories))
                         {
+                            Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0} => {1}", fileName);
                             addPlaylistItem(fileName);
                         }
                     }
                     else if (File.Exists(path))
                     {
+                        Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0} => {1}", path);
                         addPlaylistItem(path);
                     }
                 }
