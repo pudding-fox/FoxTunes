@@ -147,7 +147,7 @@ namespace FoxTunes
 
         private static IEnumerable<string> GetSegments(string id)
         {
-            return BitConverter.GetBytes(id.GetHashCode()).Select(value => Convert.ToString(value));
+            return BitConverter.GetBytes(id.GetDeterministicHashCode()).Select(value => Convert.ToString(value));
         }
 
         public static string GetFileName(string prefix, string id)

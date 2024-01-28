@@ -129,7 +129,7 @@ namespace FoxTunes
             }
             return Path.Combine(
                 Publication.StoragePath,
-                string.Format("Settings_{0}.xml", Convert.ToString(Math.Abs(profile.GetHashCode())))
+                string.Format("Settings_{0}.xml", Convert.ToString(Math.Abs(profile.GetDeterministicHashCode())))
             );
         }
     }
