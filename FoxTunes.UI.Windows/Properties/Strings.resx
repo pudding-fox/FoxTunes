@@ -165,6 +165,21 @@
   <data name="Info.Name" xml:space="preserve">
     <value>Now Playing</value>
   </data>
+  <data name="Info.NoAlbum" xml:space="preserve">
+    <value>No Album</value>
+  </data>
+  <data name="Info.NoArtist" xml:space="preserve">
+    <value>No Artist</value>
+  </data>
+  <data name="Info.NoGenre" xml:space="preserve">
+    <value>No Genre</value>
+  </data>
+  <data name="Info.NoPerformer" xml:space="preserve">
+    <value>No Performer</value>
+  </data>
+  <data name="Info.NoYear" xml:space="preserve">
+    <value>No Year</value>
+  </data>
   <data name="KeyBindingsBehaviourConfiguration.Next" xml:space="preserve">
     <value>Next</value>
   </data>
