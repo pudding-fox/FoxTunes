@@ -10,5 +10,7 @@ namespace FoxTunes
         public abstract TimeSpan Offset { get; protected set; }
 
         public abstract TimeSpan Length { get; protected set; }
+
+        public abstract bool Wrap(IBassStreamProvider provider, int channelHandle, out IBassStream stream);
     }
 }

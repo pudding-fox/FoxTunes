@@ -9,5 +9,7 @@ namespace FoxTunes.Interfaces
         TimeSpan Offset { get; }
 
         TimeSpan Length { get; }
+
+        bool Wrap(IBassStreamProvider provider, int channelHandle, out IBassStream stream);
     }
 }
