@@ -20,6 +20,19 @@ namespace FoxTunes
             return default(T);
         }
 
+        public static DependencyObject FindAncestor(this DependencyObject visual, Type type)
+        {
+            do
+            {
+                if (type.IsAssignableFrom(visual.GetType()))
+                {
+                    return visual;
+                }
+                visual = VisualTreeHelper.GetParent(visual);
+            } while (visual != null);
+            return default(DependencyObject);
+        }
+
         public static T FindResource<T>(this FrameworkElement element, object resourceKey) where T : class
         {
             return element.FindResource(resourceKey) as T;
