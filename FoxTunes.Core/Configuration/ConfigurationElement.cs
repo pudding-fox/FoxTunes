@@ -207,8 +207,19 @@ namespace FoxTunes
 
         public ConfigurationElement<T> ConnectValue(Action<T> action)
         {
-            action(this.Value);
-            this.ValueChanged += (sender, e) => action(this.Value);
+            var handler = new EventHandler((sender, e) =>
+            {
+                try
+                {
+                    action(this.Value);
+                }
+                catch (Exception exception)
+                {
+                    this.OnError(exception);
+                }
+            });
+            handler(this, EventArgs.Empty);
+            this.ValueChanged += handler;
             return this;
         }
 

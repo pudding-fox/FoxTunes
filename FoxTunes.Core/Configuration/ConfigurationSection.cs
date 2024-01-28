@@ -31,7 +31,7 @@ namespace FoxTunes
 
         public ConfigurationSection WithElement(ConfigurationElement element)
         {
-            this.Elements.Add(element);
+            this.Add(element);
             return this;
         }
 
@@ -60,6 +60,7 @@ namespace FoxTunes
         private void Add(ConfigurationElement element)
         {
             Logger.Write(this, LogLevel.Debug, "Adding configuration element: {0} => {1}", element.Id, element.Name);
+            element.Error += this.OnError;
             this.Elements.Add(element);
         }
 
