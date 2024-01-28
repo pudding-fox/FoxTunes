@@ -42,7 +42,7 @@ namespace FoxTunes
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 InputManagerConfiguration.SECTION,
                 InputManagerConfiguration.ENABLED_ELEMENT
-            ).ConnectValue<bool>(value => this.Enabled = value);
+            ).ConnectValue(value => this.Enabled = value);
             base.InitializeComponent(core);
         }
 

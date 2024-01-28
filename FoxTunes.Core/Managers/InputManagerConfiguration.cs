@@ -34,27 +34,24 @@ namespace FoxTunes
                     new TextConfigurationElement(STOP_ELEMENT, "Stop")
                         .WithValue("MediaStop")
             );
-            StandardComponents.Instance.Configuration.GetElement(
-                SECTION,
-                ENABLED_ELEMENT
-            ).ConnectValue<bool>(enabled => UpdateConfiguration(enabled));
+            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLED_ELEMENT).ConnectValue(enabled => UpdateConfiguration(enabled));
         }
 
         private static void UpdateConfiguration(bool enabled)
         {
             if (enabled)
             {
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, PLAY_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, PREVIOUS_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, NEXT_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, STOP_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, PLAY_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, PREVIOUS_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, NEXT_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, STOP_ELEMENT).Show();
             }
             else
             {
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, PLAY_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, PREVIOUS_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, NEXT_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, STOP_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, PLAY_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, PREVIOUS_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, NEXT_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, STOP_ELEMENT).Hide();
             }
         }
     }

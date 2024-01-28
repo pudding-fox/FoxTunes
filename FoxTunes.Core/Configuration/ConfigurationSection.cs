@@ -86,5 +86,13 @@ namespace FoxTunes
         {
             return this.Elements.FirstOrDefault(element => string.Equals(element.Id, elementId, StringComparison.OrdinalIgnoreCase));
         }
+
+        public void Reset()
+        {
+            foreach (var element in this.Elements)
+            {
+                element.Reset();
+            }
+        }
     }
 }

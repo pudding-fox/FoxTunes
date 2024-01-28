@@ -77,7 +77,7 @@ namespace FoxTunes.ViewModel
             this.Configuration.GetElement<TextConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.PLAYLIST_SCRIPT_ELEMENT
-            ).ConnectValue<string>(async value => await this.SetScript(value));
+            ).ConnectValue(async value => await this.SetScript(value));
             var task = this.Refresh();
         }
 

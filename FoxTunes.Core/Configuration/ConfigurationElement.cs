@@ -127,8 +127,6 @@ namespace FoxTunes
             return this;
         }
 
-        public abstract ConfigurationElement ConnectValue<T>(Action<T> action);
-
         public void Update(ConfigurationElement element)
         {
             this.Name = element.Name;
@@ -156,12 +154,75 @@ namespace FoxTunes
             this.IsHidden = false;
             return this;
         }
+
+        public abstract void Reset();
+    }
+
+    [Serializable]
+    public abstract class ConfigurationElement<T> : ConfigurationElement
+    {
+        protected ConfigurationElement(string id, string name = null, string description = null, string path = null) : base(id, name, description, path)
+        {
+
+        }
+
+        public T DefaultValue { get; private set; }
+
+        private T _Value { get; set; }
+
+        public T Value
+        {
+            get
+            {
+                return this._Value;
+            }
+            set
+            {
+                if (this.DefaultValue == null || this.DefaultValue.Equals(default(T)))
+                {
+                    this.DefaultValue = value;
+                }
+                this._Value = value;
+                this.OnValueChanged();
+            }
+        }
+
+        protected virtual void OnValueChanged()
+        {
+            if (this.ValueChanged != null)
+            {
+                this.ValueChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Value");
+        }
+
+        [field: NonSerialized]
+        public event EventHandler ValueChanged;
+
+        public ConfigurationElement<T> WithValue(T value)
+        {
+            this.Value = value;
+            return this;
+        }
+
+        public ConfigurationElement<T> ConnectValue(Action<T> action)
+        {
+            action(this.Value);
+            this.ValueChanged += (sender, e) => action(this.Value);
+            return this;
+        }
+
+        public override void Reset()
+        {
+            this.Value = this.DefaultValue;
+        }
     }
 
     [Flags]
     public enum ConfigurationElementFlags : byte
     {
         None = 0,
-        MultiLine = 1
+        MultiLine = 1,
+        Slider = 2
     }
 }

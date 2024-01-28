@@ -89,15 +89,15 @@ namespace FoxTunes
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassCdStreamProviderBehaviourConfiguration.SECTION,
                 BassCdStreamProviderBehaviourConfiguration.DRIVE_ELEMENT
-            ).ConnectValue<string>(value => this.CdDrive = BassCdStreamProviderBehaviourConfiguration.GetDrive(value));
+            ).ConnectValue(value => this.CdDrive = BassCdStreamProviderBehaviourConfiguration.GetDrive(value));
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassCdStreamProviderBehaviourConfiguration.SECTION,
                 BassCdStreamProviderBehaviourConfiguration.LOOKUP_ELEMENT
-            ).ConnectValue<bool>(value => this.CdLookup = value);
+            ).ConnectValue(value => this.CdLookup = value);
             this.Configuration.GetElement<TextConfigurationElement>(
                 BassCdStreamProviderBehaviourConfiguration.SECTION,
                 BassCdStreamProviderBehaviourConfiguration.LOOKUP_HOST_ELEMENT
-            ).ConnectValue<string>(value => this.CdLookupHost = value);
+            ).ConnectValue(value => this.CdLookupHost = value);
             base.InitializeComponent(core);
         }
 

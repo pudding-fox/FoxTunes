@@ -62,7 +62,7 @@ namespace FoxTunes
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 ExecutionStateBehaviourConfiguration.SECTION,
                 ExecutionStateBehaviourConfiguration.SLEEP_ELEMENT
-            ).ConnectValue<string>(value => this.ExecutionState = ExecutionStateBehaviourConfiguration.GetExecutionState(value));
+            ).ConnectValue(value => this.ExecutionState = ExecutionStateBehaviourConfiguration.GetExecutionState(value));
             base.InitializeComponent(core);
         }
 

@@ -112,7 +112,7 @@ namespace FoxTunes
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 Log4NetLoggerConfiguration.SECTION,
                 Log4NetLoggerConfiguration.DEFAULT_APPENDER_ELEMENT
-            ).ConnectValue<bool>(value =>
+            ).ConnectValue(value =>
             {
                 if (value)
                 {

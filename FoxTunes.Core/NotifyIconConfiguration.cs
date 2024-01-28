@@ -22,20 +22,20 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(CLOSE_TO_TRAY_ELEMENT, "Close To Tray").WithValue(false)
             );
-            StandardComponents.Instance.Configuration.GetElement(SECTION, ENABLED_ELEMENT).ConnectValue<bool>(mode => UpdateConfiguration(mode));
+            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLED_ELEMENT).ConnectValue(mode => UpdateConfiguration(mode));
         }
 
         private static void UpdateConfiguration(bool mode)
         {
             if (mode)
             {
-                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, MINIMIZE_TO_TRAY_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, CLOSE_TO_TRAY_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, MINIMIZE_TO_TRAY_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, CLOSE_TO_TRAY_ELEMENT).Show();
             }
             else
             {
-                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, MINIMIZE_TO_TRAY_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, CLOSE_TO_TRAY_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, MINIMIZE_TO_TRAY_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, CLOSE_TO_TRAY_ELEMENT).Hide();
             }
         }
     }

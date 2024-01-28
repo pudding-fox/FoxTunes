@@ -39,27 +39,29 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, "Output")
-                .WithElement(new SelectionConfigurationElement(RATE_ELEMENT, "Rate", path: "Advanced")
-                    .WithOption(new SelectionConfigurationOption(RATE_044100_OPTION, "44100"), true)
-                    .WithOption(new SelectionConfigurationOption(RATE_048000_OPTION, "48000"))
-                    .WithOption(new SelectionConfigurationOption(RATE_088200_OPTION, "88200"))
-                    .WithOption(new SelectionConfigurationOption(RATE_096000_OPTION, "96000"))
-                    .WithOption(new SelectionConfigurationOption(RATE_176400_OPTION, "176400"))
-                    .WithOption(new SelectionConfigurationOption(RATE_192000_OPTION, "192000"))
-                    .WithOption(new SelectionConfigurationOption(RATE_352800_OPTION, "352800"))
-                    .WithOption(new SelectionConfigurationOption(RATE_384000_OPTION, "384000")))
-                .WithElement(new SelectionConfigurationElement(DEPTH_ELEMENT, "Depth", path: "Advanced")
-                    .WithOption(new SelectionConfigurationOption(DEPTH_16_OPTION, "16bit"), true)
-                    .WithOption(new SelectionConfigurationOption(DEPTH_32_OPTION, "32bit floating point")))
+                .WithElement(new SelectionConfigurationElement(RATE_ELEMENT, "Rate", path: "Advanced").WithOptions(GetRateOptions()))
+                .WithElement(new SelectionConfigurationElement(DEPTH_ELEMENT, "Depth", path: "Advanced").WithOptions(GetDepthOptions()))
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, "Mode"))
                 .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, "Enforce Rate", path: "Advanced").WithValue(false))
                 .WithElement(new BooleanConfigurationElement(PLAY_FROM_RAM_ELEMENT, "Play From Memory", path: "Advanced").WithValue(false)
             );
         }
 
-        public static int GetRate(string value)
+        public static IEnumerable<SelectionConfigurationOption> GetRateOptions()
         {
-            switch (value)
+            yield return new SelectionConfigurationOption(RATE_044100_OPTION, "44100");
+            yield return new SelectionConfigurationOption(RATE_048000_OPTION, "48000");
+            yield return new SelectionConfigurationOption(RATE_088200_OPTION, "88200");
+            yield return new SelectionConfigurationOption(RATE_096000_OPTION, "96000");
+            yield return new SelectionConfigurationOption(RATE_176400_OPTION, "176400");
+            yield return new SelectionConfigurationOption(RATE_192000_OPTION, "192000");
+            yield return new SelectionConfigurationOption(RATE_352800_OPTION, "352800");
+            yield return new SelectionConfigurationOption(RATE_384000_OPTION, "384000");
+        }
+
+        public static int GetRate(SelectionConfigurationOption option)
+        {
+            switch (option.Id)
             {
                 default:
                 case RATE_044100_OPTION:
@@ -81,9 +83,15 @@ namespace FoxTunes
             }
         }
 
-        public static bool GetFloat(string value)
+        public static IEnumerable<SelectionConfigurationOption> GetDepthOptions()
         {
-            switch (value)
+            yield return new SelectionConfigurationOption(DEPTH_16_OPTION, "16bit");
+            yield return new SelectionConfigurationOption(DEPTH_32_OPTION, "32bit floating point");
+        }
+
+        public static bool GetFloat(SelectionConfigurationOption option)
+        {
+            switch (option.Id)
             {
                 default:
                 case DEPTH_16_OPTION:

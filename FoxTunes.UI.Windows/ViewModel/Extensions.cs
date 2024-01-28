@@ -32,6 +32,11 @@ namespace FoxTunes.ViewModel
         private static bool TryGetKey(string phrase, out int modifiers, out int keys)
         {
             modifiers = 0;
+            if (string.IsNullOrEmpty(phrase))
+            {
+                keys = default(int);
+                return false;
+            }
             var key = Key.None;
             var sequence = phrase.Split(new[] { "+" }, StringSplitOptions.RemoveEmptyEntries).Select(element => element.Trim());
             foreach (var element in sequence)

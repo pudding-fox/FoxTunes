@@ -65,7 +65,7 @@ namespace FoxTunes
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.THEME_ELEMENT
-            ).ConnectValue<string>(async value => await this.SetTheme(WindowsUserInterfaceConfiguration.GetTheme(value)));
+            ).ConnectValue(async value => await this.SetTheme(WindowsUserInterfaceConfiguration.GetTheme(value)));
             base.InitializeComponent(core);
         }
     }

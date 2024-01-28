@@ -25,7 +25,7 @@ namespace FoxTunes
 
         public BooleanConfigurationElement ShowPlaylist { get; private set; }
 
-        public TextConfigurationElement ScalingFactor { get; private set; }
+        public DoubleConfigurationElement ScalingFactor { get; private set; }
 
         protected virtual Task Enable()
         {
@@ -72,7 +72,7 @@ namespace FoxTunes
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.TOPMOST_ELEMENT
             );
-            this.Topmost.ConnectValue<bool>(value =>
+            this.Topmost.ConnectValue(value =>
             {
                 if (Windows.IsMiniWindowCreated)
                 {
@@ -84,7 +84,7 @@ namespace FoxTunes
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT
             );
-            this.Enabled.ConnectValue<bool>(async value =>
+            this.Enabled.ConnectValue(async value =>
             {
                 if (value)
                 {
@@ -111,11 +111,11 @@ namespace FoxTunes
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.SHOW_PLAYLIST_ELEMENT
             );
-            this.ScalingFactor = this.Configuration.GetElement<TextConfigurationElement>(
+            this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
-            this.ScalingFactor.ConnectValue<string>(value =>
+            this.ScalingFactor.ConnectValue(value =>
             {
                 if (this.IsInitialized && Windows.IsMiniWindowCreated && Windows.MiniWindow.SizeToContent == SizeToContent.WidthAndHeight)
                 {

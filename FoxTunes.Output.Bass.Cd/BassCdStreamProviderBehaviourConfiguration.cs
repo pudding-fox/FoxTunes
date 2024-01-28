@@ -21,37 +21,32 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION, "CD")
                 .WithElement(new SelectionConfigurationElement(DRIVE_ELEMENT, "Drive")
-                    .WithOptions(() => GetDrives()))
+                    .WithOptions(GetDrives()))
                 .WithElement(new BooleanConfigurationElement(LOOKUP_ELEMENT, "Lookup Tags")
                     .WithValue(true))
                 .WithElement(new TextConfigurationElement(LOOKUP_HOST_ELEMENT, "Host")
                     .WithValue(BassCd.CDDBServer));
-            StandardComponents.Instance.Configuration.GetElement(SECTION, LOOKUP_ELEMENT).ConnectValue<bool>(value => UpdateConfiguration(value));
+            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, LOOKUP_ELEMENT).ConnectValue(value => UpdateConfiguration(value));
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetDrives()
         {
-            for (var a = 0; a < BassCd.DriveCount; a++)
+            for (int a = 0, b = BassCd.DriveCount; a < b; a++)
             {
                 var cdInfo = default(CDInfo);
                 BassUtils.OK(BassCd.GetInfo(a, out cdInfo));
                 LogManager.Logger.Write(typeof(BassCdStreamProviderBehaviourConfiguration), LogLevel.Debug, "CD Drive: {0} => {1} => {2}", a, cdInfo.Name, cdInfo.Manufacturer);
-                var option = new SelectionConfigurationOption(cdInfo.Name, string.Format("{0} ({1}:\\)", cdInfo.Name, cdInfo.DriveLetter), cdInfo.Name);
-                if (a == 0)
-                {
-                    option.Default();
-                }
-                yield return option;
+                yield return new SelectionConfigurationOption(cdInfo.Name, string.Format("{0} ({1}:\\)", cdInfo.Name, cdInfo.DriveLetter), cdInfo.Name);
             }
         }
 
-        public static int GetDrive(string value)
+        public static int GetDrive(SelectionConfigurationOption option)
         {
-            for (var a = 0; a < BassCd.DriveCount; a++)
+            for (int a = 0, b = BassCd.DriveCount; a < b; a++)
             {
                 var cdInfo = default(CDInfo);
                 BassUtils.OK(BassCd.GetInfo(a, out cdInfo));
-                if (string.Equals(cdInfo.Name, value, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(cdInfo.Name, option.Id, StringComparison.OrdinalIgnoreCase))
                 {
                     return a;
                 }
@@ -63,11 +58,11 @@ namespace FoxTunes
         {
             if (cdda)
             {
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, LOOKUP_HOST_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, LOOKUP_HOST_ELEMENT).Show();
             }
             else
             {
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, LOOKUP_HOST_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement(SECTION, LOOKUP_HOST_ELEMENT).Hide();
             }
         }
     }

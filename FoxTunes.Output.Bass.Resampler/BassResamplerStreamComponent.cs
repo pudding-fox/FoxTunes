@@ -187,26 +187,26 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
-            this.Configuration.GetElement(
+            this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassResamplerStreamComponentConfiguration.QUALITY_ELEMENT
-            ).ConnectValue<string>(value => this.Quality = BassResamplerStreamComponentConfiguration.GetQuality(value));
-            this.Configuration.GetElement(
+            ).ConnectValue(value => this.Quality = BassResamplerStreamComponentConfiguration.GetQuality(value));
+            this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassResamplerStreamComponentConfiguration.PHASE_ELEMENT
-            ).ConnectValue<string>(value => this.Phase = BassResamplerStreamComponentConfiguration.GetPhase(value));
-            this.Configuration.GetElement(
+            ).ConnectValue(value => this.Phase = BassResamplerStreamComponentConfiguration.GetPhase(value));
+            this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassResamplerStreamComponentConfiguration.STEEP_FILTER_ELEMENT
-            ).ConnectValue<bool>(value => this.SteepFilter = value);
-            this.Configuration.GetElement(
+            ).ConnectValue(value => this.SteepFilter = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassResamplerStreamComponentConfiguration.ALLOW_ALIASING_ELEMENT
-            ).ConnectValue<bool>(value => this.AllowAliasing = value);
-            this.Configuration.GetElement(
+            ).ConnectValue(value => this.AllowAliasing = value);
+            this.Configuration.GetElement<IntegerConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassResamplerStreamComponentConfiguration.BUFFER_LENGTH_ELEMENT
-            ).ConnectValue<int>(value => this.BufferLength = value);
+            ).ConnectValue(value => this.BufferLength = value);
             base.InitializeComponent(core);
         }
 

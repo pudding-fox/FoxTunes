@@ -15,20 +15,20 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
                 .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.MODE_ELEMENT, "Mode")
-                    .WithOption(new SelectionConfigurationOption(MODE_DS_OPTION, "Direct Sound"), true))
+                    .WithOptions(new[] { new SelectionConfigurationOption(MODE_DS_OPTION, "Direct Sound").Default() }))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_DS_DEVICE, "Device", path: "Direct Sound")
-                    .WithOptions(() => GetDSDevices()));
+                    .WithOptions(GetDSDevices()));
         }
 
-        public static int GetDsDevice(string value)
+        public static int GetDsDevice(SelectionConfigurationOption option)
         {
-            if (!string.Equals(value, Bass.DefaultDevice.ToString()))
+            if (!string.Equals(option.Id, Bass.DefaultDevice.ToString()))
             {
                 for (int a = 0, b = Bass.DeviceCount; a < b; a++)
                 {
                     var deviceInfo = default(DeviceInfo);
                     BassUtils.OK(Bass.GetDeviceInfo(a, out deviceInfo));
-                    if (string.Equals(deviceInfo.Name, value, StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(deviceInfo.Name, option.Id, StringComparison.OrdinalIgnoreCase))
                     {
                         return a;
                     }
@@ -39,7 +39,7 @@ namespace FoxTunes
 
         private static IEnumerable<SelectionConfigurationOption> GetDSDevices()
         {
-            yield return new SelectionConfigurationOption(Bass.DefaultDevice.ToString(), "Default Device").Default();
+            yield return new SelectionConfigurationOption(Bass.DefaultDevice.ToString(), "Default Device");
             for (int a = 0, b = Bass.DeviceCount; a < b; a++)
             {
                 var deviceInfo = default(DeviceInfo);

@@ -15,9 +15,9 @@ namespace FoxTunes.ViewModel
 
         public IConfiguration Configuration { get; private set; }
 
-        private TextConfigurationElement _MarqueeInterval { get; set; }
+        private IntegerConfigurationElement _MarqueeInterval { get; set; }
 
-        public TextConfigurationElement MarqueeInterval
+        public IntegerConfigurationElement MarqueeInterval
         {
             get
             {
@@ -41,9 +41,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler MarqueeIntervalChanged;
 
-        private TextConfigurationElement _MarqueeStep { get; set; }
+        private DoubleConfigurationElement _MarqueeStep { get; set; }
 
-        public TextConfigurationElement MarqueeStep
+        public DoubleConfigurationElement MarqueeStep
         {
             get
             {
@@ -184,12 +184,12 @@ namespace FoxTunes.ViewModel
             this.Configuration.GetElement<TextConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.NOW_PLAYING_SCRIPT_ELEMENT
-            ).ConnectValue<string>(async value => await this.SetScript(value));
-            this.MarqueeInterval = this.Configuration.GetElement<TextConfigurationElement>(
+            ).ConnectValue(async value => await this.SetScript(value));
+            this.MarqueeInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.MARQUEE_INTERVAL_ELEMENT
             );
-            this.MarqueeStep = this.Configuration.GetElement<TextConfigurationElement>(
+            this.MarqueeStep = this.Configuration.GetElement<DoubleConfigurationElement>(
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.MARQUEE_STEP_ELEMENT
             );

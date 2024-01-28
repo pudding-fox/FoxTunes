@@ -231,19 +231,19 @@ namespace FoxTunes.ViewModel
                 this.Configuration.GetElement<TextConfigurationElement>(
                     InputManagerConfiguration.SECTION,
                     InputManagerConfiguration.PLAY_ELEMENT
-                ).ConnectValue<string>(value => this.PlayCommandBinding = value);
+                ).ConnectValue(value => this.PlayCommandBinding = value);
                 this.Configuration.GetElement<TextConfigurationElement>(
                     InputManagerConfiguration.SECTION,
                     InputManagerConfiguration.PREVIOUS_ELEMENT
-                ).ConnectValue<string>(value => this.PreviousCommandBinding = value);
+                ).ConnectValue(value => this.PreviousCommandBinding = value);
                 this.Configuration.GetElement<TextConfigurationElement>(
                     InputManagerConfiguration.SECTION,
                     InputManagerConfiguration.NEXT_ELEMENT
-                ).ConnectValue<string>(value => this.NextCommandBinding = value);
+                ).ConnectValue(value => this.NextCommandBinding = value);
                 this.Configuration.GetElement<TextConfigurationElement>(
                     InputManagerConfiguration.SECTION,
                     InputManagerConfiguration.STOP_ELEMENT
-                ).ConnectValue<string>(value => this.StopCommandBinding = value);
+                ).ConnectValue(value => this.StopCommandBinding = value);
             }
             base.InitializeComponent(core);
         }

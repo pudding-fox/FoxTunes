@@ -7,7 +7,7 @@ using System.Linq;
 namespace FoxTunes
 {
     [Serializable]
-    public class SelectionConfigurationElement : ConfigurationElement
+    public class SelectionConfigurationElement : ConfigurationElement<SelectionConfigurationOption>
     {
         public SelectionConfigurationElement(string id, string name = null, string description = null, string path = null)
             : base(id, name, description, path)
@@ -16,33 +16,6 @@ namespace FoxTunes
         }
 
         public ObservableCollection<SelectionConfigurationOption> Options { get; set; }
-
-        private SelectionConfigurationOption _SelectedOption { get; set; }
-
-        public SelectionConfigurationOption SelectedOption
-        {
-            get
-            {
-                return this._SelectedOption;
-            }
-            set
-            {
-                this._SelectedOption = value;
-                this.OnSelectedOptionChanged();
-            }
-        }
-
-        protected virtual void OnSelectedOptionChanged()
-        {
-            if (this.SelectedOptionChanged != null)
-            {
-                this.SelectedOptionChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("SelectedOption");
-        }
-
-        [field: NonSerialized]
-        public event EventHandler SelectedOptionChanged;
 
         private bool Contains(string id)
         {
@@ -62,56 +35,25 @@ namespace FoxTunes
             existing.Update(option);
         }
 
-        private void Remove(SelectionConfigurationOption option)
-        {
-            Logger.Write(this, LogLevel.Debug, "Removing configuration option: {0} => {1}", option.Id, option.Name);
-            var existing = this.GetOption(option.Id);
-            this.Options.Remove(existing);
-        }
-
-        public SelectionConfigurationOption GetOption(string optionId)
+        private SelectionConfigurationOption GetOption(string optionId)
         {
             return this.Options.FirstOrDefault(option => string.Equals(option.Id, optionId, StringComparison.OrdinalIgnoreCase));
         }
 
-        public SelectionConfigurationElement WithOption(SelectionConfigurationOption option, bool selected = false)
+        public SelectionConfigurationElement WithOptions(IEnumerable<SelectionConfigurationOption> options)
         {
-            this.Options.Add(option);
-            if (selected)
-            {
-                this.SelectedOption = option;
-            }
-            return this;
-        }
-
-        public SelectionConfigurationElement WithOptions(Func<IEnumerable<SelectionConfigurationOption>> options)
-        {
-            foreach (var option in options())
+            foreach (var option in options)
             {
                 this.Options.Add(option);
-                if (option.IsDefault && this.SelectedOption == null)
+                if (option.IsDefault && this.Value == null)
                 {
-                    this.SelectedOption = option;
+                    this.Value = option;
                 }
             }
-            return this;
-        }
-
-        public override ConfigurationElement ConnectValue<T>(Action<T> action)
-        {
-            var payload = new Action(() =>
+            if (this.Value == null)
             {
-                if (this.SelectedOption == null)
-                {
-                    action(default(T));
-                }
-                else
-                {
-                    action((T)Convert.ChangeType(this.SelectedOption.Id, typeof(T)));
-                }
-            });
-            payload();
-            this.SelectedOptionChanged += (sender, e) => payload();
+                this.Value = options.FirstOrDefault();
+            }
             return this;
         }
 
@@ -136,31 +78,28 @@ namespace FoxTunes
                 {
                     this.Add(option);
                 }
-                if (this.SelectedOption != null && string.Equals(this.SelectedOption.Id, option.Id, StringComparison.OrdinalIgnoreCase))
+                if (this.Value != null && string.Equals(this.Value.Id, option.Id, StringComparison.OrdinalIgnoreCase))
                 {
-                    this.SelectedOption.Update(option);
+                    this.Value.Update(option);
                 }
             }
-            //foreach (var option in this.Options.ToArray())
-            //{
-            //    if (!element.Contains(option.Id))
-            //    {
-            //        this.Remove(option);
-            //        if (this.SelectedOption != null && string.Equals(this.SelectedOption.Id, option.Id, StringComparison.OrdinalIgnoreCase))
-            //        {
-            //            this.SelectedOption = null;
-            //        }
-            //    }
-            //}
-            if (this.SelectedOption == null)
+            if (this.DefaultValue != null)
             {
-                if (element.SelectedOption != null)
+                var value = element.GetOption(this.DefaultValue.Id);
+                if (value != null)
                 {
-                    this.SelectedOption = element.SelectedOption;
+                    this.DefaultValue.Update(value);
+                }
+            }
+            if (this.Value == null)
+            {
+                if (element.Value != null)
+                {
+                    this.Value = element.Value;
                 }
                 else
                 {
-                    this.SelectedOption = this.Options.FirstOrDefault(option => option.IsDefault);
+                    this.Value = this.Options.FirstOrDefault(option => option.IsDefault);
                 }
             }
         }
