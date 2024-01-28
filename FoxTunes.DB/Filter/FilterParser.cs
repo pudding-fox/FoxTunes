@@ -10,25 +10,10 @@ namespace FoxTunes
     {
         public FilterParser()
         {
-            this.Providers = new HashSet<IFilterParserProvider>();
+            this.Providers = new List<IFilterParserProvider>();
         }
 
-        public HashSet<IFilterParserProvider> Providers { get; private set; }
-
-        public override void InitializeComponent(ICore core)
-        {
-            foreach (var provider in new IFilterParserProvider[]
-            {
-                new DefaultFilterParserProvider(),
-                new KeyValueFilterParserProvider(),
-                new RatingFilterParserProvider()
-            })
-            {
-                provider.InitializeComponent(core);
-                this.Register(provider);
-            }
-            base.InitializeComponent(core);
-        }
+        public IList<IFilterParserProvider> Providers { get; private set; }
 
         public void Register(IFilterParserProvider provider)
         {
@@ -37,14 +22,11 @@ namespace FoxTunes
 
         public bool TryParse(string filter, out IFilterParserResult result)
         {
-            var providers = this.Providers.OrderBy(
-                provider => provider.Priority
-            ).ToArray();
             var groups = new List<IFilterParserResultGroup>();
             while (!string.IsNullOrEmpty(filter))
             {
                 var success = default(bool);
-                foreach (var provider in providers)
+                foreach (var provider in this.Providers)
                 {
                     var group = default(IFilterParserResultGroup);
                     if (provider.TryParse(ref filter, out group))
@@ -88,16 +70,9 @@ namespace FoxTunes
             return FilterParserConfiguration.GetConfigurationSections();
         }
 
+        [Component("219DC49B-0916-4820-BDE2-9354A9586753", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
         public class DefaultFilterParserProvider : FilterParserProvider
         {
-            public override byte Priority
-            {
-                get
-                {
-                    return PRIORITY_LOW;
-                }
-            }
-
             public ILibraryHierarchyCache LibraryHierarchyCache { get; private set; }
 
             public IConfiguration Configuration { get; private set; }
@@ -139,8 +114,8 @@ namespace FoxTunes
             protected virtual IFilterParserResultGroup Parse(string filter)
             {
                 filter = string.Format(
-                    "{0}{1}{0}", 
-                    FilterParserResultEntry.UNBOUNDED_WILDCARD, 
+                    "{0}{1}{0}",
+                    FilterParserResultEntry.UNBOUNDED_WILDCARD,
                     filter.Trim()
                 );
                 var entries = this.SearchNames.Select(
@@ -150,6 +125,7 @@ namespace FoxTunes
             }
         }
 
+        [Component("E49288CB-3FDA-4AE3-862C-F2E0911EE1DD", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_NORMAL)]
         public class KeyValueFilterParserProvider : FilterParserProvider
         {
             const string ENTRY = "ENTRY";
@@ -177,14 +153,6 @@ namespace FoxTunes
             }
 
             public Regex Regex { get; private set; }
-
-            public override byte Priority
-            {
-                get
-                {
-                    return PRIORITY_NORMAL;
-                }
-            }
 
             public override bool TryParse(ref string filter, out IFilterParserResultGroup result)
             {
@@ -225,6 +193,7 @@ namespace FoxTunes
             }
         }
 
+        [Component("A14FFBBF-1985-45BA-8B9D-472B875A17FC", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
         public class RatingFilterParserProvider : FilterParserProvider
         {
             const string RATING = "RATING";
@@ -238,14 +207,6 @@ namespace FoxTunes
             }
 
             public Regex Regex { get; private set; }
-
-            public override byte Priority
-            {
-                get
-                {
-                    return PRIORITY_HIGH;
-                }
-            }
 
             public override bool TryParse(ref string filter, out IFilterParserResultGroup result)
             {

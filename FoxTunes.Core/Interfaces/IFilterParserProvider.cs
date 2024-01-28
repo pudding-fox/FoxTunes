@@ -1,9 +1,7 @@
 ﻿namespace FoxTunes.Interfaces
 {
-    public interface IFilterParserProvider : IBaseComponent
+    public interface IFilterParserProvider : IStandardComponent
     {
-        byte Priority { get; }
-
         bool TryParse(ref string filter, out IFilterParserResultGroup result);
     }
 }

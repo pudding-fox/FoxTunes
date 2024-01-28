@@ -3,15 +3,16 @@ using System.Text;
 
 namespace FoxTunes
 {
-    public abstract class FilterParserProvider : BaseComponent, IFilterParserProvider
+    public abstract class FilterParserProvider : StandardComponent, IFilterParserProvider
     {
-        public const byte PRIORITY_HIGH = 0;
+        public IFilterParser FilterParser { get; private set; }
 
-        public const byte PRIORITY_NORMAL = 100;
-
-        public const byte PRIORITY_LOW = 255;
-
-        public abstract byte Priority { get; }
+        public override void InitializeComponent(ICore core)
+        {
+            this.FilterParser = core.Components.FilterParser;
+            this.FilterParser.Register(this);
+            base.InitializeComponent(core);
+        }
 
         public abstract bool TryParse(ref string filter, out IFilterParserResultGroup result);
 
