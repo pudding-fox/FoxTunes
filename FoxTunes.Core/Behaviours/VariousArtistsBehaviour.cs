@@ -36,7 +36,7 @@ namespace FoxTunes.Behaviours
                 {
                     libraryItem.MetaDatas.Add(new MetaDataItem(CustomMetaData.VariousArtists) { NumericValue = 1 });
                 }
-                context.SaveChanges();
+                context.WithAutoDetectChanges(() => context.SaveChanges());
             }
         }
     }
