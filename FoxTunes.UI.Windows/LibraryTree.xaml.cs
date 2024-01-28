@@ -83,8 +83,8 @@ namespace FoxTunes
                 var node = stack.Pop();
                 if (!node.IsExpanded)
                 {
-                    await node.LoadChildrenAsync();
-                    await Windows.Invoke(() => node.IsExpanded = true);
+                    await node.LoadChildrenAsync().ConfigureAwait(false);
+                    await Windows.Invoke(() => node.IsExpanded = true).ConfigureAwait(false);
                 }
                 foreach (var child in node.Children)
                 {

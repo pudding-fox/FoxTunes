@@ -30,21 +30,21 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Building hierarchies");
-            await this.SetDescription("Preparing");
-            await this.SetIsIndeterminate(true);
-            await base.OnStarted();
+            await this.SetName("Building hierarchies").ConfigureAwait(false);
+            await this.SetDescription("Preparing").ConfigureAwait(false);
+            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            await base.OnStarted().ConfigureAwait(false);
         }
 
         protected override async Task OnRun()
         {
-            await this.BuildHierarchies(this.Status);
+            await this.BuildHierarchies(this.Status).ConfigureAwait(false);
         }
 
         protected override async Task OnCompleted()
         {
-            await base.OnCompleted();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
+            await base.OnCompleted().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated)).ConfigureAwait(false);
         }
     }
 }

@@ -63,9 +63,9 @@ namespace FoxTunes
 
             if (this.ReportProgress)
             {
-                await this.SetName("Populating library hierarchies");
-                await this.SetPosition(0);
-                await this.SetCount(libraryItems.Count());
+                await this.SetName("Populating library hierarchies").ConfigureAwait(false);
+                await this.SetPosition(0).ConfigureAwait(false);
+                await this.SetCount(libraryItems.Count()).ConfigureAwait(false);
                 if (this.Count <= 100)
                 {
                     this.Timer.Interval = FAST_INTERVAL;
@@ -85,7 +85,7 @@ namespace FoxTunes
             {
                 foreach (var libraryHierarchy in libraryHierarchies)
                 {
-                    await this.Populate(libraryItem, libraryHierarchy, libraryHierarchyLevels[libraryHierarchy]);
+                    await this.Populate(libraryItem, libraryHierarchy, libraryHierarchyLevels[libraryHierarchy]).ConfigureAwait(false);
                 }
 
                 if (this.ReportProgress)
@@ -93,7 +93,7 @@ namespace FoxTunes
                     this.Current = libraryItem.FileName;
                     Interlocked.Increment(ref this.position);
                 }
-            }, cancellationToken, this.ParallelOptions);
+            }, cancellationToken, this.ParallelOptions).ConfigureAwait(false);
         }
 
         private async Task Populate(LibraryItem libraryItem, LibraryHierarchy libraryHierarchy, LibraryHierarchyLevel[] libraryHierarchyLevels)
@@ -134,11 +134,11 @@ namespace FoxTunes
 #if NET40
             this.Semaphore.Wait();
 #else
-            await this.Semaphore.WaitAsync();
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
             try
             {
-                return await this.Writer.Write(libraryHierarchy, libraryItem.Id, parentId, value, isLeaf);
+                return await this.Writer.Write(libraryHierarchy, libraryItem.Id, parentId, value, isLeaf).ConfigureAwait(false);
             }
             finally
             {
@@ -208,12 +208,12 @@ namespace FoxTunes
                         break;
                 }
                 var eta = this.GetEta(count);
-                await this.SetName(string.Format("Populating library hierarchies: {0} remaining @ {1} items/s", eta, count));
+                await this.SetName(string.Format("Populating library hierarchies: {0} remaining @ {1} items/s", eta, count)).ConfigureAwait(false);
                 if (this.Current != null)
                 {
-                    await this.SetDescription(new FileInfo(this.Current).Name);
+                    await this.SetDescription(new FileInfo(this.Current).Name).ConfigureAwait(false);
                 }
-                await this.SetPosition(position);
+                await this.SetPosition(position).ConfigureAwait(false);
             }
             base.OnElapsed(sender, e);
         }

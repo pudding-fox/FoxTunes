@@ -44,14 +44,14 @@ namespace FoxTunes
 
         protected virtual async Task Monitor(Task task)
         {
-            await this.SetName("Converting files");
+            await this.SetName("Converting files").ConfigureAwait(false);
             while (!task.IsCompleted)
             {
                 if (this.CancellationToken.IsCancellationRequested)
                 {
                     Logger.Write(this, LogLevel.Debug, "Requesting cancellation from encoder.");
                     this.Encoder.Cancel();
-                    await this.SetName("Cancelling");
+                    await this.SetName("Cancelling").ConfigureAwait(false);
                     break;
                 }
                 this.Encoder.Update();
@@ -74,18 +74,18 @@ namespace FoxTunes
                 }
                 if (builder.Length > 0)
                 {
-                    await this.SetDescription(builder.ToString());
+                    await this.SetDescription(builder.ToString()).ConfigureAwait(false);
                 }
                 else
                 {
-                    await this.SetDescription("Waiting for encoder");
+                    await this.SetDescription("Waiting for encoder").ConfigureAwait(false);
                 }
-                await this.SetPosition(position);
-                await this.SetCount(count);
+                await this.SetPosition(position).ConfigureAwait(false);
+                await this.SetCount(count).ConfigureAwait(false);
 #if NET40
-                await TaskEx.Delay(INTERVAL);
+                await TaskEx.Delay(INTERVAL).ConfigureAwait(false);
 #else
-                await Task.Delay(INTERVAL);
+                await Task.Delay(INTERVAL).ConfigureAwait(false);
 #endif
             }
             while (!task.IsCompleted)
@@ -93,9 +93,9 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Waiting for encoder to complete.");
                 this.Encoder.Update();
 #if NET40
-                await TaskEx.Delay(INTERVAL);
+                await TaskEx.Delay(INTERVAL).ConfigureAwait(false);
 #else
-                await Task.Delay(INTERVAL);
+                await Task.Delay(INTERVAL).ConfigureAwait(false);
 #endif
             }
             var exceptions = new List<Exception>();

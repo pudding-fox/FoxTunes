@@ -81,14 +81,14 @@ namespace FoxTunes.Output.Bass.Tests
         [Test]
         public async Task CanPlayStream()
         {
-            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false);
-            await outputStream.Play();
+            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false).ConfigureAwait(false);
+            await outputStream.Play().ConfigureAwait(false);
             for (var a = 0; a <= 15; a++)
             {
 #if NET40
-                await TaskEx.Delay(1000);
+                await TaskEx.Delay(1000).ConfigureAwait(false);
 #else
-                await Task.Delay(1000);
+                await Task.Delay(1000).ConfigureAwait(false);
 #endif
                 if (outputStream.Position == outputStream.Length)
                 {
@@ -104,27 +104,27 @@ namespace FoxTunes.Output.Bass.Tests
         [Test]
         public async Task CanPauseAndResumeStream()
         {
-            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false);
-            await outputStream.Play();
+            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false).ConfigureAwait(false);
+            await outputStream.Play().ConfigureAwait(false);
 #if NET40
-            await TaskEx.Delay(1000);
+            await TaskEx.Delay(1000).ConfigureAwait(false);
 #else
-            await Task.Delay(1000);
+            await Task.Delay(1000).ConfigureAwait(false);
 #endif
             Assert.IsTrue(outputStream.Position > 0);
-            await outputStream.Pause();
+            await outputStream.Pause().ConfigureAwait(false);
             var position = outputStream.Position;
 #if NET40
-            await TaskEx.Delay(1000);
+            await TaskEx.Delay(1000).ConfigureAwait(false);
 #else
-            await Task.Delay(1000);
+            await Task.Delay(1000).ConfigureAwait(false);
 #endif
             Assert.AreEqual(position, outputStream.Position);
-            await outputStream.Resume();
+            await outputStream.Resume().ConfigureAwait(false);
 #if NET40
-            await TaskEx.Delay(1000);
+            await TaskEx.Delay(1000).ConfigureAwait(false);
 #else
-            await Task.Delay(1000);
+            await Task.Delay(1000).ConfigureAwait(false);
 #endif
             Assert.IsTrue(outputStream.Position > position);
         }
@@ -132,22 +132,22 @@ namespace FoxTunes.Output.Bass.Tests
         [Test]
         public async Task CanSeekStream()
         {
-            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false);
+            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false).ConfigureAwait(false);
             var quarter = outputStream.Length / 4;
             var half = outputStream.Length / 2;
             outputStream.Position = quarter;
-            await outputStream.Play();
+            await outputStream.Play().ConfigureAwait(false);
 #if NET40
-            await TaskEx.Delay(1000);
+            await TaskEx.Delay(1000).ConfigureAwait(false);
 #else
-            await Task.Delay(1000);
+            await Task.Delay(1000).ConfigureAwait(false);
 #endif
             Assert.IsTrue(outputStream.Position > quarter);
             outputStream.Position = half;
 #if NET40
-            await TaskEx.Delay(1000);
+            await TaskEx.Delay(1000).ConfigureAwait(false);
 #else
-            await Task.Delay(1000);
+            await Task.Delay(1000).ConfigureAwait(false);
 #endif
             Assert.IsTrue(outputStream.Position > half);
         }
@@ -157,16 +157,17 @@ namespace FoxTunes.Output.Bass.Tests
         {
             var outputStreams = new[]
             {
-                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[2], false),
+                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[2], false).ConfigureAwait(false),
                 await this.Core.Components.Output.Load(TestInfo.PlaylistItems[3], false)
+.ConfigureAwait(false)
             };
-            await outputStreams[0].Play();
-            await this.Core.Components.Output.Preempt(outputStreams[1]);
+            await outputStreams[0].Play().ConfigureAwait(false);
+            await this.Core.Components.Output.Preempt(outputStreams[1]).ConfigureAwait(false);
             outputStreams[0].Position = outputStreams[0].Length - 1000;
 #if NET40
-            await TaskEx.Delay(1000);
+            await TaskEx.Delay(1000).ConfigureAwait(false);
 #else
-            await Task.Delay(1000);
+            await Task.Delay(1000).ConfigureAwait(false);
 #endif
             Assert.AreEqual(outputStreams[0].Length, outputStreams[0].Position);
             Assert.IsTrue(outputStreams[1].Position > 0);
@@ -179,12 +180,12 @@ namespace FoxTunes.Output.Bass.Tests
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.PLAY_FROM_RAM_ELEMENT
             ).Value = true;
-            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[4], false);
-            await outputStream.Play();
+            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[4], false).ConfigureAwait(false);
+            await outputStream.Play().ConfigureAwait(false);
 #if NET40
-            await TaskEx.Delay(1000);
+            await TaskEx.Delay(1000).ConfigureAwait(false);
 #else
-            await Task.Delay(1000);
+            await Task.Delay(1000).ConfigureAwait(false);
 #endif
             Assert.IsTrue(outputStream.Position > 0);
             outputStream.Dispose();

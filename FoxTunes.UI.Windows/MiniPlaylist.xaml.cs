@@ -22,7 +22,7 @@ namespace FoxTunes
                 {
                     this.ListBox.ScrollIntoView(this.ListBox.SelectedItem);
                 }
-            });
+            }).ConfigureAwait(false);
         }
 
         protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)

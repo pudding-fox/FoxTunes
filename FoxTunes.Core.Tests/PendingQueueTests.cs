@@ -34,9 +34,9 @@ namespace FoxTunes
             };
             Parallel.For(0, 100, this.ParallelOptions, index => queue.Enqueue(index));
 #if NET40
-            await TaskEx.Delay(TimeSpan.FromSeconds(10));
+            await TaskEx.Delay(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
 #else
-            await Task.Delay(TimeSpan.FromSeconds(10));
+            await Task.Delay(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
 #endif
             Assert.AreEqual(1, count);
         }

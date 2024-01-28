@@ -45,7 +45,7 @@ namespace FoxTunes.ViewModel
             {
                 try
                 {
-                    await this.Func();
+                    await this.Func().ConfigureAwait(false);
                     this.OnPhase(CommandPhase.After, this.Tag, parameter);
                 }
                 catch (Exception e)
@@ -108,11 +108,11 @@ namespace FoxTunes.ViewModel
                 {
                     if (parameter is T)
                     {
-                        await this.Func((T)parameter);
+                        await this.Func((T)parameter).ConfigureAwait(false);
                     }
                     else
                     {
-                        await this.Func(default(T));
+                        await this.Func(default(T)).ConfigureAwait(false);
                     }
                     this.OnPhase(CommandPhase.After, this.Tag, parameter);
                 }

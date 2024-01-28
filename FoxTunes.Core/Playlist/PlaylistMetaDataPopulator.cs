@@ -18,8 +18,8 @@ namespace FoxTunes
             var query = this.Database
                .AsQueryable<PlaylistItem>(this.Database.Source(new DatabaseQueryComposer<PlaylistItem>(this.Database), this.Transaction))
                .Where(playlistItem => playlistItem.Status == playlistItemStatus && !playlistItem.MetaDatas.Any());
-            await this.Populate(query, cancellationToken);
-            await new PlaylistVariousArtistsPopulator(this.Database).Populate(playlistItemStatus, this.Transaction);
+            await this.Populate(query, cancellationToken).ConfigureAwait(false);
+            await new PlaylistVariousArtistsPopulator(this.Database).Populate(playlistItemStatus, this.Transaction).ConfigureAwait(false);
         }
     }
 }

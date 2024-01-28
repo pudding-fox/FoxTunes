@@ -32,7 +32,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.IsStartedChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("IsStarted");
         }

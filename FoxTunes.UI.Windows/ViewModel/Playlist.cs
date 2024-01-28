@@ -168,7 +168,7 @@ namespace FoxTunes.ViewModel
         {
             using (e.Defer())
             {
-                await this.RefreshColumns();
+                await this.RefreshColumns().ConfigureAwait(false);
             }
         }
 
@@ -190,14 +190,14 @@ namespace FoxTunes.ViewModel
 
         protected override async Task OnSignal(object sender, ISignal signal)
         {
-            await base.OnSignal(sender, signal);
+            await base.OnSignal(sender, signal).ConfigureAwait(false);
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    await this.RefreshColumns();
+                    await this.RefreshColumns().ConfigureAwait(false);
                     break;
                 case CommonSignals.PlaylistColumnsUpdated:
-                    await this.ReloadColumns();
+                    await this.ReloadColumns().ConfigureAwait(false);
                     break;
             }
         }
@@ -434,9 +434,9 @@ namespace FoxTunes.ViewModel
 
         public virtual async Task Refresh()
         {
-            await this.RefreshItems();
-            await this.RefreshSelectedItems();
-            await this.RefreshColumns();
+            await this.RefreshItems().ConfigureAwait(false);
+            await this.RefreshSelectedItems().ConfigureAwait(false);
+            await this.RefreshColumns().ConfigureAwait(false);
         }
 
         public virtual Task RefreshSelectedItems()
@@ -448,13 +448,13 @@ namespace FoxTunes.ViewModel
         {
             if (this.GridColumns == null || this.GridColumns.Count == 0)
             {
-                await this.ReloadColumns();
+                await this.ReloadColumns().ConfigureAwait(false);
             }
             if (this.GridColumns != null)
             {
                 foreach (var column in this.GridColumns)
                 {
-                    await this.RefreshColumn(column);
+                    await this.RefreshColumn(column).ConfigureAwait(false);
                 }
             }
         }

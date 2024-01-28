@@ -131,7 +131,7 @@ namespace FoxTunes
         {
             using (e.Defer())
             {
-                await this.OnEnding();
+                await this.OnEnding().ConfigureAwait(false);
             }
         }
 
@@ -139,7 +139,7 @@ namespace FoxTunes
         {
             using (e.Defer())
             {
-                await this.OnEnded();
+                await this.OnEnded().ConfigureAwait(false);
             }
         }
 

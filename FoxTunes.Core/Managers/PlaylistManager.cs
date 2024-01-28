@@ -55,7 +55,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.CanNavigateChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("CanNavigate");
         }
@@ -131,7 +131,7 @@ namespace FoxTunes
                                 query1.Output.CreateConstant(0)
                             )
                         );
-                    }), transaction);
+                    }), transaction).ConfigureAwait(false);
                 }
             }
         }
@@ -139,7 +139,7 @@ namespace FoxTunes
         public async Task Refresh()
         {
             Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
-            await this.SetCanNavigate(this.DatabaseFactory != null && await this.HasItems());
+            await this.SetCanNavigate(this.DatabaseFactory != null && await this.HasItems().ConfigureAwait(false)).ConfigureAwait(false);
             if (this.CanNavigate)
             {
                 Logger.Write(this, LogLevel.Debug, "Navigation is possible.");
@@ -151,14 +151,14 @@ namespace FoxTunes
                         using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                         {
                             var set = database.Set<PlaylistItem>(transaction);
-                            var playlistItem = await set.FindAsync(this.CurrentItem.Id);
+                            var playlistItem = await set.FindAsync(this.CurrentItem.Id).ConfigureAwait(false);
                             if (playlistItem != null && string.Equals(this.CurrentItem.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase))
                             {
-                                await this.SetCurrentItem(playlistItem);
+                                await this.SetCurrentItem(playlistItem).ConfigureAwait(false);
                             }
                             else
                             {
-                                await this.SetCurrentItem(null);
+                                await this.SetCurrentItem(null).ConfigureAwait(false);
                                 Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
                             }
                         }
@@ -178,7 +178,7 @@ namespace FoxTunes
             {
                 using (e.Defer())
                 {
-                    await this.SetCurrentItem(null);
+                    await this.SetCurrentItem(null).ConfigureAwait(false);
                 }
                 Logger.Write(this, LogLevel.Debug, "Playback manager output stream is empty. Cleared current playlist item.");
             }
@@ -186,7 +186,7 @@ namespace FoxTunes
             {
                 using (e.Defer())
                 {
-                    await this.SetCurrentItem(this.PlaybackManager.CurrentStream.PlaylistItem);
+                    await this.SetCurrentItem(this.PlaybackManager.CurrentStream.PlaylistItem).ConfigureAwait(false);
                 }
                 Logger.Write(this, LogLevel.Debug, "Updated current playlist item: {0} => {1}", this.CurrentItem.Id, this.CurrentItem.FileName);
             }
@@ -195,8 +195,8 @@ namespace FoxTunes
         public async Task Add(IEnumerable<string> paths, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Adding paths to playlist.");
-            var index = await this.GetInsertIndex();
-            await this.Insert(index, paths, clear);
+            var index = await this.GetInsertIndex().ConfigureAwait(false);
+            await this.Insert(index, paths, clear).ConfigureAwait(false);
         }
 
         public async Task Insert(int index, IEnumerable<string> paths, bool clear)
@@ -205,16 +205,16 @@ namespace FoxTunes
             using (var task = new AddPathsToPlaylistTask(index, paths, clear))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
         public async Task Add(LibraryHierarchyNode libraryHierarchyNode, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Adding library node to playlist.");
-            var index = await this.GetInsertIndex();
-            await this.Insert(index, libraryHierarchyNode, clear);
+            var index = await this.GetInsertIndex().ConfigureAwait(false);
+            await this.Insert(index, libraryHierarchyNode, clear).ConfigureAwait(false);
         }
 
         public async Task Insert(int index, LibraryHierarchyNode libraryHierarchyNode, bool clear)
@@ -223,16 +223,16 @@ namespace FoxTunes
             using (var task = new AddLibraryHierarchyNodeToPlaylistTask(index, libraryHierarchyNode, clear))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
         public async Task Add(IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Adding library nodes to playlist.");
-            var index = await this.GetInsertIndex();
-            await this.Insert(index, libraryHierarchyNodes, clear);
+            var index = await this.GetInsertIndex().ConfigureAwait(false);
+            await this.Insert(index, libraryHierarchyNodes, clear).ConfigureAwait(false);
         }
 
         public async Task Insert(int index, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
@@ -241,16 +241,16 @@ namespace FoxTunes
             using (var task = new AddLibraryHierarchyNodesToPlaylistTask(index, libraryHierarchyNodes, clear))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
         public async Task Move(IEnumerable<PlaylistItem> playlistItems)
         {
             Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items.");
-            var index = await this.GetInsertIndex();
-            await this.Move(index, playlistItems);
+            var index = await this.GetInsertIndex().ConfigureAwait(false);
+            await this.Move(index, playlistItems).ConfigureAwait(false);
         }
 
         public async Task Move(int index, IEnumerable<PlaylistItem> playlistItems)
@@ -259,8 +259,8 @@ namespace FoxTunes
             using (var task = new MovePlaylistItemsTask(index, playlistItems))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -269,8 +269,8 @@ namespace FoxTunes
             using (var task = new RemoveItemsFromPlaylistTask(playlistItems))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -286,8 +286,8 @@ namespace FoxTunes
                     using (var task = new RemoveItemsFromPlaylistTask(query.ToArray()))
                     {
                         task.InitializeComponent(this.Core);
-                        await this.OnBackgroundTask(task);
-                        await task.Run();
+                        await this.OnBackgroundTask(task).ConfigureAwait(false);
+                        await task.Run().ConfigureAwait(false);
                     }
                 }
             }
@@ -295,7 +295,7 @@ namespace FoxTunes
 
         public async Task<int> GetInsertIndex()
         {
-            var playlistItem = await this.NavigationStrategy.GetLastPlaylistItem();
+            var playlistItem = await this.NavigationStrategy.GetLastPlaylistItem().ConfigureAwait(false);
             if (playlistItem == null)
             {
                 return 0;
@@ -326,13 +326,13 @@ namespace FoxTunes
             try
             {
                 this.IsNavigating = true;
-                var playlistItem = await this.GetNext(true);
+                var playlistItem = await this.GetNext(true).ConfigureAwait(false);
                 if (playlistItem == null)
                 {
                     return;
                 }
                 Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-                await this.Play(playlistItem);
+                await this.Play(playlistItem).ConfigureAwait(false);
             }
             finally
             {
@@ -360,9 +360,9 @@ namespace FoxTunes
             try
             {
                 this.IsNavigating = true;
-                var playlistItem = await this.GetPrevious(true);
+                var playlistItem = await this.GetPrevious(true).ConfigureAwait(false);
                 Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-                await this.Play(playlistItem);
+                await this.Play(playlistItem).ConfigureAwait(false);
             }
             finally
             {
@@ -379,7 +379,7 @@ namespace FoxTunes
                     return await database.AsQueryable<PlaylistItem>(transaction)
                         .Where(playlistItem => playlistItem.Sequence == sequence)
                         .Take(1)
-                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault()).ConfigureAwait(false);
                 }
             }
         }
@@ -393,7 +393,7 @@ namespace FoxTunes
                     return await database.AsQueryable<PlaylistItem>(transaction)
                         .Where(playlistItem => playlistItem.FileName == fileName)
                         .Take(1)
-                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault()).ConfigureAwait(false);
                 }
             }
         }
@@ -403,34 +403,34 @@ namespace FoxTunes
             var exception = default(Exception);
             try
             {
-                await this.PlaybackManager.Load(playlistItem, true);
+                await this.PlaybackManager.Load(playlistItem, true).ConfigureAwait(false);
                 return;
             }
             catch (Exception e)
             {
                 exception = e;
             }
-            await this.OnError(exception);
+            await this.OnError(exception).ConfigureAwait(false);
         }
 
         public async Task Play(string fileName)
         {
-            var playlistItem = await this.Get(fileName);
+            var playlistItem = await this.Get(fileName).ConfigureAwait(false);
             if (playlistItem == null)
             {
                 return;
             }
-            await this.Play(playlistItem);
+            await this.Play(playlistItem).ConfigureAwait(false);
         }
 
         public async Task Play(int sequence)
         {
-            var playlistItem = await this.Get(sequence);
+            var playlistItem = await this.Get(sequence).ConfigureAwait(false);
             if (playlistItem == null)
             {
                 return;
             }
-            await this.Play(playlistItem);
+            await this.Play(playlistItem).ConfigureAwait(false);
         }
 
         public async Task Clear()
@@ -438,8 +438,8 @@ namespace FoxTunes
             using (var task = new ClearPlaylistTask())
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -465,7 +465,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.CurrentItemChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("CurrentItem");
         }

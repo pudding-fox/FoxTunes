@@ -427,7 +427,7 @@ namespace FoxTunes.ViewModel
         {
             using (e.Defer())
             {
-                await this.Refresh();
+                await this.Refresh().ConfigureAwait(false);
             }
         }
 

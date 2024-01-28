@@ -20,8 +20,8 @@ namespace FoxTunes
             using (var task = new RefreshLibraryMetaDataTask(libraryItems))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -30,8 +30,8 @@ namespace FoxTunes
             using (var task = new RefreshPlaylistMetaDataTask(playlistItems))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -40,8 +40,8 @@ namespace FoxTunes
             using (var task = new WriteLibraryMetaDataTask(libraryItems))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -50,8 +50,8 @@ namespace FoxTunes
             using (var task = new WritePlaylistMetaDataTask(playlistItems))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 

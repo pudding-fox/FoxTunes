@@ -199,7 +199,7 @@ namespace FoxTunes.ViewModel
                 {
                     new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
                 }));
-                await base.Reload();
+                await base.Reload().ConfigureAwait(false);
             }
             finally
             {

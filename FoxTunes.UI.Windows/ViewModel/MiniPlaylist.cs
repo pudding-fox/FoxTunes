@@ -58,7 +58,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual async Task OnScriptChanged()
         {
-            await this.Refresh();
+            await this.Refresh().ConfigureAwait(false);
             if (this.ScriptChanged != null)
             {
                 this.ScriptChanged(this, EventArgs.Empty);
@@ -77,21 +77,21 @@ namespace FoxTunes.ViewModel
             this.Configuration.GetElement<TextConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.PLAYLIST_SCRIPT_ELEMENT
-            ).ConnectValue(async value => await this.SetScript(value));
+            ).ConnectValue(async value => await this.SetScript(value).ConfigureAwait(false));
         }
 
         protected virtual async void OnCurrentItemChanged(object sender, AsyncEventArgs e)
         {
             using (e.Defer())
             {
-                await this.Refresh();
+                await this.Refresh().ConfigureAwait(false);
             }
         }
 
         public virtual async Task Refresh()
         {
-            await this.RefreshItems();
-            await this.RefreshSelectedItem();
+            await this.RefreshItems().ConfigureAwait(false);
+            await this.RefreshSelectedItem().ConfigureAwait(false);
         }
 
         public virtual Task RefreshSelectedItem()

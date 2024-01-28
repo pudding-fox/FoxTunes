@@ -92,18 +92,18 @@ namespace FoxTunes
             {
                 if (value)
                 {
-                    await this.Enable();
+                    await this.Enable().ConfigureAwait(false);
                 }
                 else
                 {
-                    await this.Disable();
+                    await this.Disable().ConfigureAwait(false);
                 }
                 if (this.IsInitialized)
                 {
 #if NET40
-                    await TaskEx.Run(() => this.Configuration.Save());
+                    await TaskEx.Run(() => this.Configuration.Save()).ConfigureAwait(false);
 #else
-                    await Task.Run(() => this.Configuration.Save());
+                    await Task.Run(() => this.Configuration.Save()).ConfigureAwait(false);
 #endif
                 }
             });

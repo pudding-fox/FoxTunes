@@ -44,9 +44,9 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Getting file list");
-            await this.SetIsIndeterminate(true);
-            await base.OnStarted();
+            await this.SetName("Getting file list").ConfigureAwait(false);
+            await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            await base.OnStarted().ConfigureAwait(false);
         }
 
         protected override async Task OnRun()
@@ -58,12 +58,12 @@ namespace FoxTunes
             }
             else
             {
-                roots = await this.GetRoots();
+                roots = await this.GetRoots().ConfigureAwait(false);
             }
-            await this.RescanLibrary();
-            await this.RemoveHierarchies(LibraryItemStatus.Remove);
-            await this.RemoveItems(LibraryItemStatus.Remove);
-            await this.AddPaths(roots, true);
+            await this.RescanLibrary().ConfigureAwait(false);
+            await this.RemoveHierarchies(LibraryItemStatus.Remove).ConfigureAwait(false);
+            await this.RemoveItems(LibraryItemStatus.Remove).ConfigureAwait(false);
+            await this.AddPaths(roots, true).ConfigureAwait(false);
         }
 
         protected virtual async Task RescanLibrary()
@@ -90,7 +90,7 @@ namespace FoxTunes
                 Monitor.Enter(set);
                 try
                 {
-                    await set.AddOrUpdateAsync(libraryItem);
+                    await set.AddOrUpdateAsync(libraryItem).ConfigureAwait(false);
                 }
                 finally
                 {
@@ -106,7 +106,7 @@ namespace FoxTunes
                         libraryUpdater.InitializeComponent(this.Core);
                         await this.WithSubTask(libraryUpdater,
                             async () => await libraryUpdater.Populate(cancellationToken)
-                        );
+.ConfigureAwait(false)).ConfigureAwait(false);
                     }
                     if (transaction.HasTransaction)
                     {
@@ -115,16 +115,16 @@ namespace FoxTunes
                 }
             }))
             {
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
             }
         }
 
         protected override async Task OnCompleted()
         {
-            await base.OnCompleted();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+            await base.OnCompleted().ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated)).ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated)).ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
         }
     }
 }

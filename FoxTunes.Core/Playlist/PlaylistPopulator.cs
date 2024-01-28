@@ -56,7 +56,7 @@ namespace FoxTunes
                                 return;
                             }
                             Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
-                            var success = await this.AddPlaylistItem(writer, fileName);
+                            var success = await this.AddPlaylistItem(writer, fileName).ConfigureAwait(false);
                             if (success && this.ReportProgress)
                             {
                                 this.Current = fileName;
@@ -66,7 +66,7 @@ namespace FoxTunes
                     else if (File.Exists(path))
                     {
                         Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", path);
-                        var success = await this.AddPlaylistItem(writer, path);
+                        var success = await this.AddPlaylistItem(writer, path).ConfigureAwait(false);
                         if (success && this.ReportProgress)
                         {
                             this.Current = path;
@@ -90,7 +90,7 @@ namespace FoxTunes
                 FileName = fileName,
                 Sequence = this.Sequence
             };
-            await writer.Write(playlistItem);
+            await writer.Write(playlistItem).ConfigureAwait(false);
             this.Offset++;
             return true;
         }
@@ -99,7 +99,7 @@ namespace FoxTunes
         {
             if (this.Current != null)
             {
-                await this.SetDescription(new FileInfo(this.Current).Name);
+                await this.SetDescription(new FileInfo(this.Current).Name).ConfigureAwait(false);
             }
             base.OnElapsed(sender, e);
         }

@@ -18,40 +18,41 @@ namespace FoxTunes
         [Test]
         public async Task CanAddFilesToPlaylist()
         {
-            await this.Core.Managers.Playlist.Clear();
+            await this.Core.Managers.Playlist.Clear().ConfigureAwait(false);
             await this.Core.Managers.Playlist.Add(new[]
             {
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
-            }, false);
+            }, false).ConfigureAwait(false);
             this.AssertPlaylistItems(
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
             );
-            await this.Core.Managers.Playlist.Clear();
+            await this.Core.Managers.Playlist.Clear().ConfigureAwait(false);
             this.AssertPlaylistItems();
         }
 
         [Test]
         public async Task CanRemoveItemsFromPlaylist()
         {
-            await this.Core.Managers.Playlist.Clear();
+            await this.Core.Managers.Playlist.Clear().ConfigureAwait(false);
             await this.Core.Managers.Playlist.Add(new[]
             {
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[1],
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
-            }, false);
+            }, false).ConfigureAwait(false);
             await this.Core.Managers.Playlist.Remove(
                 new[]
                 {
-                    await this.GetPlaylistItem(TestInfo.AudioFileNames[1]),
+                    await this.GetPlaylistItem(TestInfo.AudioFileNames[1]).ConfigureAwait(false),
                     await this.GetPlaylistItem(TestInfo.AudioFileNames[2])
+.ConfigureAwait(false)
                 }
-            );
+            ).ConfigureAwait(false);
             this.AssertPlaylistItems(
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[3]
@@ -61,13 +62,13 @@ namespace FoxTunes
         [Test]
         public async Task CanInsertFilesIntoPlaylist()
         {
-            await this.Core.Managers.Playlist.Clear();
+            await this.Core.Managers.Playlist.Clear().ConfigureAwait(false);
             await this.Core.Managers.Playlist.Add(new[]
             {
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
-            }, false);
+            }, false).ConfigureAwait(false);
             this.AssertPlaylistItems(
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[2],
@@ -76,33 +77,34 @@ namespace FoxTunes
             await this.Core.Managers.Playlist.Insert(1, new[]
             {
                 TestInfo.AudioFileNames[1]
-            }, false);
+            }, false).ConfigureAwait(false);
             this.AssertPlaylistItems(
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[1],
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
             );
-            await this.Core.Managers.Playlist.Clear();
+            await this.Core.Managers.Playlist.Clear().ConfigureAwait(false);
         }
 
         [Test]
         public async Task CanMoveItemsInPlaylist()
         {
-            await this.Core.Managers.Playlist.Clear();
+            await this.Core.Managers.Playlist.Clear().ConfigureAwait(false);
             await this.Core.Managers.Playlist.Add(new[]
             {
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[1],
                 TestInfo.AudioFileNames[2]
-            }, false);
+            }, false).ConfigureAwait(false);
             await this.Core.Managers.Playlist.Move(
                 0,
                 new[]
                 {
                     await this.GetPlaylistItem(TestInfo.AudioFileNames[2])
+.ConfigureAwait(false)
                 }
-            );
+            ).ConfigureAwait(false);
             this.AssertPlaylistItems(
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[0],
@@ -113,8 +115,9 @@ namespace FoxTunes
                 new[]
                 {
                     await this.GetPlaylistItem(TestInfo.AudioFileNames[2])
+.ConfigureAwait(false)
                 }
-            );
+            ).ConfigureAwait(false);
             this.AssertPlaylistItems(
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[1],
@@ -131,7 +134,7 @@ namespace FoxTunes
                     return await database.AsQueryable<PlaylistItem>(transaction)
                         .Where(playlistItem => playlistItem.FileName == fileName)
                         .Take(1)
-                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
+                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault()).ConfigureAwait(false);
                 }
             }
         }

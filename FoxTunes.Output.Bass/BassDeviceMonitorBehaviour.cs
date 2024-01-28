@@ -102,7 +102,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Restarting the output.");
             using (e.Defer())
             {
-                await this.Restart();
+                await this.Restart().ConfigureAwait(false);
             }
         }
 
@@ -149,8 +149,8 @@ namespace FoxTunes
             var exception = default(Exception);
             try
             {
-                await this.Output.Shutdown();
-                await this.Output.Start();
+                await this.Output.Shutdown().ConfigureAwait(false);
+                await this.Output.Start().ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -158,12 +158,12 @@ namespace FoxTunes
             }
             if (exception != null)
             {
-                await this.OnError(exception);
+                await this.OnError(exception).ConfigureAwait(false);
                 return;
             }
             if (playlistItem != null)
             {
-                await this.PlaylistManager.Play(playlistItem);
+                await this.PlaylistManager.Play(playlistItem).ConfigureAwait(false);
                 if (this.PlaybackManager.CurrentStream != null)
                 {
                     if (position > 0)
@@ -172,7 +172,7 @@ namespace FoxTunes
                     }
                     if (paused)
                     {
-                        await this.PlaybackManager.CurrentStream.Pause();
+                        await this.PlaybackManager.CurrentStream.Pause().ConfigureAwait(false);
                     }
                 }
             }

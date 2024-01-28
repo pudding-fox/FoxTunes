@@ -30,7 +30,7 @@ namespace FoxTunes
         protected override async Task OnRun()
         {
             var metaDataSource = this.MetaDataSourceFactory.Create();
-            await metaDataSource.SetMetaData(this.FileName, this.MetaDataItems);
+            await metaDataSource.SetMetaData(this.FileName, this.MetaDataItems).ConfigureAwait(false);
         }
     }
 }

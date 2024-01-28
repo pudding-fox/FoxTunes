@@ -300,11 +300,11 @@ namespace FoxTunes.ViewModel
 
         private async Task AddToPlaylist(IEnumerable<string> paths)
         {
-            var index = await this.PlaylistManager.GetInsertIndex();
-            await this.PlaylistManager.Add(paths, this.ResetPlaylist.Value);
+            var index = await this.PlaylistManager.GetInsertIndex().ConfigureAwait(false);
+            await this.PlaylistManager.Add(paths, this.ResetPlaylist.Value).ConfigureAwait(false);
             if (this.AutoPlay.Value)
             {
-                await this.PlaylistManager.Play(index);
+                await this.PlaylistManager.Play(index).ConfigureAwait(false);
             }
         }
 

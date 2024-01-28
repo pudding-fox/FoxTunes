@@ -19,7 +19,7 @@ namespace FoxTunes
                 using (var task = new Task001())
                 {
                     task.InitializeComponent(this.Core);
-                    await task.Run();
+                    await task.Run().ConfigureAwait(false);
                 }
             })).ToArray();
             Task.WaitAll(tasks);

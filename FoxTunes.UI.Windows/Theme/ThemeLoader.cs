@@ -18,9 +18,9 @@ namespace FoxTunes
 
         protected async Task SetTheme(ITheme value)
         {
-            await this.OnThemeChanging();
+            await this.OnThemeChanging().ConfigureAwait(false);
             this._Theme = value;
-            await this.OnThemeChanged();
+            await this.OnThemeChanged().ConfigureAwait(false);
         }
 
         protected virtual async Task OnThemeChanging()
@@ -33,7 +33,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.ThemeChanging(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanging("Theme");
         }
@@ -50,7 +50,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.ThemeChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("Theme");
         }
@@ -65,7 +65,7 @@ namespace FoxTunes
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.THEME_ELEMENT
-            ).ConnectValue(async value => await this.SetTheme(WindowsUserInterfaceConfiguration.GetTheme(value)));
+            ).ConnectValue(async value => await this.SetTheme(WindowsUserInterfaceConfiguration.GetTheme(value)).ConfigureAwait(false));
             base.InitializeComponent(core);
         }
     }

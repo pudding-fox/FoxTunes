@@ -33,8 +33,8 @@ namespace FoxTunes
         {
             if (this.ReportProgress)
             {
-                await this.SetName("Populating library");
-                await this.SetPosition(0);
+                await this.SetName("Populating library").ConfigureAwait(false);
+                await this.SetPosition(0).ConfigureAwait(false);
                 this.Timer.Interval = FAST_INTERVAL;
                 this.Timer.Start();
             }
@@ -51,7 +51,7 @@ namespace FoxTunes
                             {
                                 return;
                             }
-                            var success = await this.AddLibraryItem(writer, fileName);
+                            var success = await this.AddLibraryItem(writer, fileName).ConfigureAwait(false);
                             if (success && this.ReportProgress)
                             {
                                 this.Current = fileName;
@@ -61,7 +61,7 @@ namespace FoxTunes
                     }
                     else if (File.Exists(path))
                     {
-                        var success = await this.AddLibraryItem(writer, path);
+                        var success = await this.AddLibraryItem(writer, path).ConfigureAwait(false);
                         if (success && this.ReportProgress)
                         {
                             this.Current = path;
@@ -87,7 +87,7 @@ namespace FoxTunes
                 Status = LibraryItemStatus.Import
             };
             libraryItem.SetImportDate(DateTime.UtcNow);
-            await writer.Write(libraryItem);
+            await writer.Write(libraryItem).ConfigureAwait(false);
             return true;
         }
 
@@ -98,10 +98,10 @@ namespace FoxTunes
             {
                 //Interval is fixed at 100ms.
                 position *= 10;
-                await this.SetName(string.Format("Populating library: {0} items/s", this.CountMetric.Average(position)));
+                await this.SetName(string.Format("Populating library: {0} items/s", this.CountMetric.Average(position))).ConfigureAwait(false);
                 if (this.Current != null)
                 {
-                    await this.SetDescription(new FileInfo(this.Current).Name);
+                    await this.SetDescription(new FileInfo(this.Current).Name).ConfigureAwait(false);
                 }
             }
             base.OnElapsed(sender, e);

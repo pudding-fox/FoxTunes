@@ -59,7 +59,7 @@ namespace FoxTunes
 #if NET40
             this.Semaphore.Wait();
 #else
-            await this.Semaphore.WaitAsync();
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
             try
             {
@@ -68,7 +68,7 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Debug, "Using bass stream provider with priority {0}: {1}", provider.Priority, provider.GetType().Name);
                     for (var attempt = 0; attempt < CREATE_ATTEMPTS; attempt++)
                     {
-                        var channelHandle = await provider.CreateStream(playlistItem);
+                        var channelHandle = await provider.CreateStream(playlistItem).ConfigureAwait(false);
                         if (channelHandle != 0)
                         {
                             Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, channelHandle);
@@ -101,7 +101,7 @@ namespace FoxTunes
 #if NET40
             this.Semaphore.Wait();
 #else
-            await this.Semaphore.WaitAsync();
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
             try
             {
@@ -111,7 +111,7 @@ namespace FoxTunes
                     {
                         continue;
                     }
-                    var channelHandle = await provider.CreateStream(playlistItem, flags);
+                    var channelHandle = await provider.CreateStream(playlistItem, flags).ConfigureAwait(false);
                     if (channelHandle != 0)
                     {
                         return new BassStream(provider, channelHandle);

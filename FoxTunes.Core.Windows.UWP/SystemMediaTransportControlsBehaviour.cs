@@ -211,10 +211,10 @@ namespace FoxTunes
             if (playlistItem != null)
             {
                 //TODO: Bad .Result
-                var metaDataItem = await this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover);
+                var metaDataItem = await this.ArtworkProvider.Find(playlistItem, ArtworkType.FrontCover).ConfigureAwait(false);
                 if (metaDataItem != null && File.Exists(metaDataItem.Value))
                 {
-                    var stream = await this.GetThumbnail(metaDataItem.Value);
+                    var stream = await this.GetThumbnail(metaDataItem.Value).ConfigureAwait(false);
                     updater.Thumbnail = RandomAccessStreamReference.CreateFromStream(stream);
                 }
             }
@@ -228,9 +228,11 @@ namespace FoxTunes
             {
                 using (var memoryStream = new MemoryStream())
                 {
-                    await fileStream.CopyToAsync(memoryStream);
+                    await fileStream.CopyToAsync(memoryStream).ConfigureAwait(false);
                     var result = new InMemoryRandomAccessStream();
+#pragma warning disable ConfigureAwaitEnforcer
                     await result.WriteAsync(memoryStream.ToArray().AsBuffer());
+#pragma warning restore ConfigureAwaitEnforcer
                     return result;
                 }
             }

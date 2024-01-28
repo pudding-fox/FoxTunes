@@ -34,7 +34,7 @@ namespace FoxTunes
             {
                 this.UpdateCommand.Parameters["libraryHierarchyItemId"] = libraryHierarchyItemId;
                 this.UpdateCommand.Parameters["libraryItemId"] = libraryItemId;
-                await this.UpdateCommand.ExecuteNonQueryAsync();
+                await this.UpdateCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
             else
             {
@@ -45,7 +45,7 @@ namespace FoxTunes
                 this.AddCommand.Parameters["isLeaf"] = isLeaf;
                 if (isLeaf)
                 {
-                    await this.AddCommand.ExecuteNonQueryAsync();
+                    await this.AddCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
                 }
                 else
                 {
@@ -53,7 +53,7 @@ namespace FoxTunes
                         libraryHierarchy.Id,
                         parentId,
                         value,
-                        libraryHierarchyItemId = Converter.ChangeType<int>(await this.AddCommand.ExecuteScalarAsync())
+                        libraryHierarchyItemId = Converter.ChangeType<int>(await this.AddCommand.ExecuteScalarAsync().ConfigureAwait(false))
                     );
                 }
             }

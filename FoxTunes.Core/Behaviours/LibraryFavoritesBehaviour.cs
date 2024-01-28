@@ -54,7 +54,7 @@ namespace FoxTunes
             );
             this.ShowFavorites.ConnectValue(
                 async value => await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated, CommonSignalFlags.SOFT))
-            );
+.ConfigureAwait(false));
             base.InitializeComponent(core);
         }
 
@@ -90,16 +90,16 @@ namespace FoxTunes
                     var libraryHierarchyNode = this.LibraryManager.SelectedItem;
                     if (libraryHierarchyNode != null)
                     {
-                        var isFavorite = await this.LibraryManager.GetIsFavorite(libraryHierarchyNode);
+                        var isFavorite = await this.LibraryManager.GetIsFavorite(libraryHierarchyNode).ConfigureAwait(false);
                         if (isFavorite)
                         {
                             Logger.Write(this, LogLevel.Debug, "Marking tracks for library hierarchy node as favorite: {0} => {1}", libraryHierarchyNode.Id, libraryHierarchyNode.Value);
-                            await this.LibraryManager.SetIsFavorite(libraryHierarchyNode, false);
+                            await this.LibraryManager.SetIsFavorite(libraryHierarchyNode, false).ConfigureAwait(false);
                         }
                         else
                         {
                             Logger.Write(this, LogLevel.Debug, "Marking tracks for library hierarchy node as normal: {0} => {1}", libraryHierarchyNode.Id, libraryHierarchyNode.Value);
-                            await this.LibraryManager.SetIsFavorite(libraryHierarchyNode, true);
+                            await this.LibraryManager.SetIsFavorite(libraryHierarchyNode, true).ConfigureAwait(false);
                         }
                         Logger.Write(this, LogLevel.Debug, "Evicting associated library hierarchy cache entries.");
                         foreach (var key in this.LibraryHierarchyCache.Keys)
@@ -111,7 +111,7 @@ namespace FoxTunes
                         }
                         if (this.ShowFavorites.Value)
                         {
-                            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated, CommonSignalFlags.SOFT));
+                            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated, CommonSignalFlags.SOFT)).ConfigureAwait(false);
                         }
                     }
                     break;

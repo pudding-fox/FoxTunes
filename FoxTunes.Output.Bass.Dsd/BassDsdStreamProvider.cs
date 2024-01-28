@@ -62,13 +62,13 @@ namespace FoxTunes
 #if NET40
                 return base.CreateStream(playlistItem, flags);
 #else
-                return await base.CreateStream(playlistItem, flags);
+                return await base.CreateStream(playlistItem, flags).ConfigureAwait(false);
 #endif
             }
 #if NET40
             this.Semaphore.Wait();
 #else
-            await this.Semaphore.WaitAsync();
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
             try
             {

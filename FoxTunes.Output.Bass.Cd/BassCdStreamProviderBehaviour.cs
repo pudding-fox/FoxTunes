@@ -182,7 +182,7 @@ namespace FoxTunes
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
-                await task.Run();
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -278,8 +278,8 @@ namespace FoxTunes
                 {
                     throw new InvalidOperationException("A valid drive must be provided.");
                 }
-                await this.SetName("Opening CD");
-                await this.SetIsIndeterminate(true);
+                await this.SetName("Opening CD").ConfigureAwait(false);
+                await this.SetIsIndeterminate(true).ConfigureAwait(false);
                 try
                 {
                     if (!BassCd.IsReady(this.Drive))
@@ -289,14 +289,14 @@ namespace FoxTunes
                     using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                     {
                         //Always append for now.
-                        this.Sequence = await this.PlaylistManager.GetInsertIndex();
-                        await this.AddPlaylistItems();
-                        await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
-                        await this.AddOrUpdateMetaData();
-                        await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
+                        this.Sequence = await this.PlaylistManager.GetInsertIndex().ConfigureAwait(false);
+                        await this.AddPlaylistItems().ConfigureAwait(false);
+                        await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
+                        await this.AddOrUpdateMetaData().ConfigureAwait(false);
+                        await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);
                     }))
                     {
-                        await task.Run();
+                        await task.Run().ConfigureAwait(false);
                     }
                 }
                 finally
@@ -304,13 +304,13 @@ namespace FoxTunes
                     //Ignoring result on purpose.
                     BassCd.Release(this.Drive);
                 }
-                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
             }
 
             private async Task AddPlaylistItems()
             {
-                await this.SetName("Getting track list");
-                await this.SetIsIndeterminate(true);
+                await this.SetName("Getting track list").ConfigureAwait(false);
+                await this.SetIsIndeterminate(true).ConfigureAwait(false);
                 var info = default(CDInfo);
                 BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
                 var id = BassCd.GetID(this.Drive, CDID.CDPlayer);
@@ -335,7 +335,7 @@ namespace FoxTunes
                                 FileName = fileName,
                                 Sequence = this.Sequence + a
                             };
-                            await writer.Write(playlistItem);
+                            await writer.Write(playlistItem).ConfigureAwait(false);
                             this.Offset++;
                         }
                     }
@@ -357,10 +357,10 @@ namespace FoxTunes
                     {
                         foreach (var playlistItem in query)
                         {
-                            var metaData = await this.MetaDataSource.GetMetaData(playlistItem.FileName);
+                            var metaData = await this.MetaDataSource.GetMetaData(playlistItem.FileName).ConfigureAwait(false);
                             foreach (var metaDataItem in metaData)
                             {
-                                await writer.Write(playlistItem.Id, metaDataItem);
+                                await writer.Write(playlistItem.Id, metaDataItem).ConfigureAwait(false);
                             }
                         }
                     }
@@ -390,7 +390,7 @@ namespace FoxTunes
 
             private async Task<string> GetFileName(string fileName, int track)
             {
-                var metaDatas = await this.MetaDataSource.GetMetaData(fileName);
+                var metaDatas = await this.MetaDataSource.GetMetaData(fileName).ConfigureAwait(false);
                 var metaData = metaDatas.ToDictionary(
                     metaDataItem => metaDataItem.Name,
                     metaDataItem => metaDataItem.Value,

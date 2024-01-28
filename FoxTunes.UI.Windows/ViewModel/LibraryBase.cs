@@ -336,7 +336,7 @@ namespace FoxTunes.ViewModel
 
         private async Task AddToPlaylist(LibraryHierarchyNode libraryHierarchyNode, bool clear)
         {
-            await this.PlaylistManager.Add(libraryHierarchyNode, clear);
+            await this.PlaylistManager.Add(libraryHierarchyNode, clear).ConfigureAwait(false);
         }
 
         public ICommand DragEnterCommand

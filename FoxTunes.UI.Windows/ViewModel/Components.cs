@@ -65,12 +65,12 @@ namespace FoxTunes.ViewModel
             {
                 foreach (var innerException in (e.Exception as AggregateException).InnerExceptions)
                 {
-                    await this.Add(new ComponentError(component, e.Message, innerException));
+                    await this.Add(new ComponentError(component, e.Message, innerException)).ConfigureAwait(false);
                 }
             }
             else
             {
-                await this.Add(new ComponentError(component, e.Message, e.Exception));
+                await this.Add(new ComponentError(component, e.Message, e.Exception)).ConfigureAwait(false);
             }
         }
 
@@ -88,12 +88,12 @@ namespace FoxTunes.ViewModel
                 {
                     foreach (var innerException in (backgroundTask.Exception as AggregateException).InnerExceptions)
                     {
-                        await this.Add(new ComponentError(backgroundTask, innerException.Message, innerException));
+                        await this.Add(new ComponentError(backgroundTask, innerException.Message, innerException)).ConfigureAwait(false);
                     }
                 }
                 else
                 {
-                    await this.Add(new ComponentError(backgroundTask, backgroundTask.Exception.Message, backgroundTask.Exception));
+                    await this.Add(new ComponentError(backgroundTask, backgroundTask.Exception.Message, backgroundTask.Exception)).ConfigureAwait(false);
                 }
             }
         }

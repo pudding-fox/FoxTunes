@@ -117,7 +117,7 @@ namespace FoxTunes
             {
                 var e = new AsyncEventArgs();
                 this.CanNavigateChanged(this, e);
-                await e.Complete();
+                await e.Complete().ConfigureAwait(false);
             }
             this.OnPropertyChanged("CanNavigate");
         }
@@ -177,7 +177,7 @@ namespace FoxTunes
                                 query1.Output.CreateConstant(0)
                             )
                         );
-                    }), transaction);
+                    }), transaction).ConfigureAwait(false);
                 }
             }
         }
@@ -209,7 +209,7 @@ namespace FoxTunes
                 }
             }
             Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
-            await this.SetCanNavigate(this.DatabaseFactory != null && await this.HasItems());
+            await this.SetCanNavigate(this.DatabaseFactory != null && await this.HasItems().ConfigureAwait(false)).ConfigureAwait(false);
             if (this.CanNavigate)
             {
                 Logger.Write(this, LogLevel.Debug, "Navigation is possible.");
@@ -225,8 +225,8 @@ namespace FoxTunes
             using (var task = new AddPathsToLibraryTask(paths))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -235,8 +235,8 @@ namespace FoxTunes
             using (var task = new ClearLibraryTask(status))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -245,8 +245,8 @@ namespace FoxTunes
             using (var task = new RescanLibraryTask())
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -255,8 +255,8 @@ namespace FoxTunes
             using (var task = new RescanLibraryTask(roots, items))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -265,8 +265,8 @@ namespace FoxTunes
             using (var task = new UpdateLibraryTask(status))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task);
-                await task.Run();
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
             }
         }
 
@@ -284,7 +284,7 @@ namespace FoxTunes
                                 parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
                                 break;
                         }
-                    }, transaction);
+                    }, transaction).ConfigureAwait(false);
                 }
             }
         }
@@ -304,7 +304,7 @@ namespace FoxTunes
                                 parameters["isFavorite"] = isFavorite;
                                 break;
                         }
-                    }, transaction);
+                    }, transaction).ConfigureAwait(false);
                     transaction.Commit();
                 }
             }

@@ -73,7 +73,7 @@ namespace FoxTunes
             {
                 if (this.LibraryManager.SelectedItem != null && !LibraryHierarchyNode.Empty.Equals(this.LibraryManager.SelectedItem))
                 {
-                    await this.PlaylistManager.Add(this.LibraryManager.SelectedItem, true);
+                    await this.PlaylistManager.Add(this.LibraryManager.SelectedItem, true).ConfigureAwait(false);
                 }
             });
         }

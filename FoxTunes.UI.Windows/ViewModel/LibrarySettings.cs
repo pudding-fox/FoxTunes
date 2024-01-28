@@ -128,13 +128,13 @@ namespace FoxTunes.ViewModel
                         using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                         {
                             var libraryHierarchies = database.Set<LibraryHierarchy>(transaction);
-                            await libraryHierarchies.RemoveAsync(libraryHierarchies.Except(this.LibraryHierarchies.ItemsSource));
-                            await libraryHierarchies.AddOrUpdateAsync(this.LibraryHierarchies.ItemsSource);
+                            await libraryHierarchies.RemoveAsync(libraryHierarchies.Except(this.LibraryHierarchies.ItemsSource)).ConfigureAwait(false);
+                            await libraryHierarchies.AddOrUpdateAsync(this.LibraryHierarchies.ItemsSource).ConfigureAwait(false);
                             transaction.Commit();
                         }
                     }))
                     {
-                        await task.Run();
+                        await task.Run().ConfigureAwait(false);
                     }
                 }
                 {
@@ -147,7 +147,7 @@ namespace FoxTunes.ViewModel
             {
                 exception = e;
             }
-            await this.OnError("Save", exception);
+            await this.OnError("Save", exception).ConfigureAwait(false);
             throw exception;
         }
 
@@ -163,8 +163,8 @@ namespace FoxTunes.ViewModel
 
         public async Task Rebuild()
         {
-            await this.HierarchyManager.Clear(null);
-            await this.HierarchyManager.Build(null);
+            await this.HierarchyManager.Clear(null).ConfigureAwait(false);
+            await this.HierarchyManager.Build(null).ConfigureAwait(false);
         }
 
         public ICommand RescanCommand
@@ -194,8 +194,8 @@ namespace FoxTunes.ViewModel
 
         public async Task Clear()
         {
-            await this.HierarchyManager.Clear(null);
-            await this.LibraryManager.Clear(null);
+            await this.HierarchyManager.Clear(null).ConfigureAwait(false);
+            await this.LibraryManager.Clear(null).ConfigureAwait(false);
         }
 
         public ICommand CancelCommand
@@ -236,10 +236,10 @@ namespace FoxTunes.ViewModel
 #endif
                 }))
                 {
-                    await task.Run();
+                    await task.Run().ConfigureAwait(false);
                 }
             }
-            await this.Refresh();
+            await this.Refresh().ConfigureAwait(false);
         }
 
         public override void InitializeComponent(ICore core)
@@ -295,7 +295,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual async void OnActiveChanged(object sender, EventArgs e)
         {
-            await Windows.Invoke(() => this.OnIsSavingChanged());
+            await Windows.Invoke(() => this.OnIsSavingChanged()).ConfigureAwait(false);
         }
 
         protected virtual void OnSelectedValueChanged(object sender, EventArgs e)

@@ -78,12 +78,12 @@ namespace FoxTunes
                     {
                         continue;
                     }
-                    var metaDataItem = await this.ArtworkProvider.Find(fileName, type);
+                    var metaDataItem = await this.ArtworkProvider.Find(fileName, type).ConfigureAwait(false);
                     if (metaDataItem != null)
                     {
                         if (this.CopyImages.Value)
                         {
-                            metaDataItem.Value = await this.ImportImage(metaDataItem.Value, metaDataItem.Value, false);
+                            metaDataItem.Value = await this.ImportImage(metaDataItem.Value, metaDataItem.Value, false).ConfigureAwait(false);
                         }
                         result.Add(metaDataItem);
                     }
@@ -109,13 +109,13 @@ namespace FoxTunes
 #if NET40
                 Semaphore.Wait();
 #else
-                await Semaphore.WaitAsync();
+                await Semaphore.WaitAsync().ConfigureAwait(false);
 #endif
                 try
                 {
                     if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
                     {
-                        return await FileMetaDataStore.WriteAsync(prefix, id, fileName);
+                        return await FileMetaDataStore.WriteAsync(prefix, id, fileName).ConfigureAwait(false);
                     }
                 }
                 finally

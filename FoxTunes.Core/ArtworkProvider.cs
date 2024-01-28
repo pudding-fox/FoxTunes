@@ -115,7 +115,7 @@ namespace FoxTunes
             }
             if (exception != null)
             {
-                await this.OnError(exception);
+                await this.OnError(exception).ConfigureAwait(false);
             }
             return metaDataItem;
         }

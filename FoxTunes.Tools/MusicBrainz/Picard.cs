@@ -94,11 +94,11 @@ namespace FoxTunes
             {
                 return;
             }
-            await this.Open(libraryItems);
-            await this.MetaDataManager.Rescan(libraryItems);
-            await this.HierarchyManager.Clear(LibraryItemStatus.Import);
-            await this.HierarchyManager.Build(LibraryItemStatus.Import);
-            await this.LibraryManager.Set(LibraryItemStatus.None);
+            await this.Open(libraryItems).ConfigureAwait(false);
+            await this.MetaDataManager.Rescan(libraryItems).ConfigureAwait(false);
+            await this.HierarchyManager.Clear(LibraryItemStatus.Import).ConfigureAwait(false);
+            await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
+            await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
         }
 
         protected virtual async Task OpenPlaylist()
@@ -116,8 +116,8 @@ namespace FoxTunes
             {
                 return;
             }
-            await this.Open(playlistItems);
-            await this.MetaDataManager.Rescan(playlistItems);
+            await this.Open(playlistItems).ConfigureAwait(false);
+            await this.MetaDataManager.Rescan(playlistItems).ConfigureAwait(false);
         }
 
         protected virtual Task Open(IEnumerable<IFileData> items)

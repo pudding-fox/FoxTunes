@@ -22,9 +22,9 @@ namespace FoxTunes
                         break;
                     }
 #if NET40
-                    await TaskEx.Delay(100);
+                    await TaskEx.Delay(100).ConfigureAwait(false);
 #else
-                    await Task.Delay(100);
+                    await Task.Delay(100).ConfigureAwait(false);
 #endif
                 }
             });
@@ -37,16 +37,16 @@ namespace FoxTunes
                         break;
                     }
 #if NET40
-                    await TaskEx.Delay(100);
+                    await TaskEx.Delay(100).ConfigureAwait(false);
 #else
-                    await Task.Delay(100);
+                    await Task.Delay(100).ConfigureAwait(false);
 #endif
                 }
             });
 #if NET40
-            await TaskEx.WhenAll(task1.Run(), task2.Run());
+            await TaskEx.WhenAll(task1.Run(), task2.Run()).ConfigureAwait(false);
 #else
-            await Task.WhenAll(task1.Run(), task2.Run());
+            await Task.WhenAll(task1.Run(), task2.Run()).ConfigureAwait(false);
 #endif
             Assert.AreEqual(10, counter1 + counter2);
             Assert.Less(counter1, counter2);
