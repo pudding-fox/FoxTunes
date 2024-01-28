@@ -36,12 +36,12 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <ComboBox 
-            ItemsSource="{Binding Hierarchies, Mode=OneWay, Source={StaticResource ViewModel}}" 
+            ItemsSource="{Binding Hierarchies, Mode=OneWay, Source={StaticResource ViewModel}, IsAsync=True}" 
             SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"
             DisplayMemberPath="Name"
             Visibility="{Binding Hierarchies.Count, ConverterParameter=1, Converter={StaticResource IntegerToVisibilityConverter}, Mode=OneWay, Source={StaticResource ViewModel}}"/>
         <TreeView x:Name="TreeView" Grid.Row="1" Margin="0,2,0,2"
-                  ItemsSource="{Binding Items, Source={StaticResource ViewModel}}"
+                  ItemsSource="{Binding Items, Source={StaticResource ViewModel}, IsAsync=True}"
                   Windows:TreeViewExtensions.SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}"
                   Windows:TreeViewExtensions.RightButtonSelect="True"
                   Windows:TreeViewExtensions.DragSource="True"

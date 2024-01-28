@@ -19,7 +19,7 @@
         <Border>
             <ListBox 
                 Name="ListBox"
-                ItemsSource="{Binding Items, Source={StaticResource ViewModel}}" 
+                ItemsSource="{Binding Items, Source={StaticResource ViewModel}, IsAsync=True}" 
                 SelectedValue="{Binding SelectedItem, Source={StaticResource ViewModel}}" 
                 SelectionChanged="OnSelectionChanged" 
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
