@@ -177,36 +177,48 @@ namespace FoxTunes
 
         protected virtual void RefreshCurrentPlaylist()
         {
-            if (this.CurrentPlaylist != null)
+            var currentPlaylist = this.CurrentPlaylist;
+            if (currentPlaylist != null)
             {
-                this.CurrentPlaylist = this.PlaylistBrowser.GetPlaylists().FirstOrDefault(playlist => playlist.Id == this.CurrentPlaylist.Id);
-                if (this.CurrentPlaylist != null)
+                currentPlaylist = this.PlaylistBrowser.GetPlaylists().FirstOrDefault(playlist => playlist.Id == currentPlaylist.Id);
+                if (currentPlaylist != null)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Refreshed current playlist: {0} => {1}", this.CurrentPlaylist.Id, this.CurrentPlaylist.Name);
+                    Logger.Write(this, LogLevel.Debug, "Refreshed current playlist: {0} => {1}", currentPlaylist.Id, currentPlaylist.Name);
                 }
                 else
                 {
                     Logger.Write(this, LogLevel.Debug, "Failed to refresh current playlist, it was removed or disabled.");
                 }
             }
+            if (object.ReferenceEquals(this.CurrentPlaylist, currentPlaylist))
+            {
+                return;
+            }
+            this.CurrentPlaylist = currentPlaylist;
         }
 
         protected virtual void RefreshCurrentItem()
         {
-            if (this.CurrentItem != null)
+            var currentItem = this.CurrentItem;
+            if (currentItem != null)
             {
-                var playlist = this.PlaylistBrowser.GetPlaylist(this.CurrentItem);
+                var playlist = this.PlaylistBrowser.GetPlaylist(currentItem);
                 if (playlist != null)
                 {
-                    this.CurrentItem = this.PlaylistBrowser.GetItems(playlist).FirstOrDefault(
-                        playlistItem => playlistItem.Id == this.CurrentItem.Id && string.Equals(this.CurrentItem.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase)
+                    currentItem = this.PlaylistBrowser.GetItems(playlist).FirstOrDefault(
+                        playlistItem => playlistItem.Id == currentItem.Id && string.Equals(currentItem.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase)
                     );
                 }
+                if (currentItem == null)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
+                }
             }
-            if (this.CurrentItem == null)
+            if (object.ReferenceEquals(this.CurrentItem, currentItem))
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
+                return;
             }
+            this.CurrentItem = currentItem;
         }
 
         protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)

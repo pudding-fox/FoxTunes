@@ -112,13 +112,14 @@ namespace FoxTunes
         {
             global::FoxTunes.Windows.Invoke(() =>
             {
-                if (global::FoxTunes.Windows.ActiveWindow != null)
+                var window = global::FoxTunes.Windows.ActiveWindow;
+                if (window != null)
                 {
-                    if (global::FoxTunes.Windows.ActiveWindow.WindowState == WindowState.Minimized)
+                    if (window.WindowState == WindowState.Minimized)
                     {
-                        global::FoxTunes.Windows.ActiveWindow.WindowState = WindowState.Normal;
+                        window.WindowState = WindowState.Normal;
                     }
-                    global::FoxTunes.Windows.ActiveWindow.Activate();
+                    window.Activate();
                 }
             });
         }
