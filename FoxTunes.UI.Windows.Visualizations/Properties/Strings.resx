@@ -180,8 +180,17 @@
   <data name="PeakMeterConfiguration.ColorPalette" xml:space="preserve">
     <value>Color Palette</value>
   </data>
-  <data name="PeakMeterConfiguration.Hold" xml:space="preserve">
-    <value>Hold Duration</value>
+  <data name="PeakMeterConfiguration.Duration" xml:space="preserve">
+    <value>Duration</value>
+  </data>
+  <data name="PeakMeterConfiguration.Duration.High" xml:space="preserve">
+    <value>High</value>
+  </data>
+  <data name="PeakMeterConfiguration.Duration.Low" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="PeakMeterConfiguration.Duration.Medium" xml:space="preserve">
+    <value>Medium</value>
   </data>
   <data name="PeakMeterConfiguration.Path" xml:space="preserve">
     <value>Peak Meter</value>

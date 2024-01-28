@@ -250,11 +250,38 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Hold Duration.
+        ///   Looks up a localized string similar to Duration.
         /// </summary>
-        internal static string PeakMeterConfiguration_Hold {
+        internal static string PeakMeterConfiguration_Duration {
             get {
-                return ResourceManager.GetString("PeakMeterConfiguration.Hold", resourceCulture);
+                return ResourceManager.GetString("PeakMeterConfiguration.Duration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to High.
+        /// </summary>
+        internal static string PeakMeterConfiguration_Duration_High {
+            get {
+                return ResourceManager.GetString("PeakMeterConfiguration.Duration.High", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Low.
+        /// </summary>
+        internal static string PeakMeterConfiguration_Duration_Low {
+            get {
+                return ResourceManager.GetString("PeakMeterConfiguration.Duration.Low", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Medium.
+        /// </summary>
+        internal static string PeakMeterConfiguration_Duration_Medium {
+            get {
+                return ResourceManager.GetString("PeakMeterConfiguration.Duration.Medium", resourceCulture);
             }
         }
         
