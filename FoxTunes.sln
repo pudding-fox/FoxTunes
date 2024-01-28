@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Core", "FoxTunes.Core\FoxTunes.Core.csproj", "{62CD8F70-8415-4C15-B672-CB18475ABD7E}"
 EndProject
@@ -36,8 +36,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Logging", "FoxTunes.Logging\FoxTunes.Logging.csproj", "{AB1362C8-0754-496D-85E1-3C258FF250BF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Output.Bass", "FoxTunes.Output.ManagedBass\FoxTunes.Output.Bass.csproj", "{676F7DD1-BF13-4317-819F-9B5D85DF18B5}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FoxTunes.Output.Bass.Native", "FoxTunes.Output.Bass.Native\FoxTunes.Output.Bass.Native.vcxproj", "{1994D072-5098-4AD3-A84C-85AB8FBC9360}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -110,9 +108,6 @@ Global
 		{676F7DD1-BF13-4317-819F-9B5D85DF18B5}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{676F7DD1-BF13-4317-819F-9B5D85DF18B5}.Debug|Any CPU.Build.0 = Debug|x86
 		{676F7DD1-BF13-4317-819F-9B5D85DF18B5}.Release|Any CPU.ActiveCfg = Release|x86
-		{1994D072-5098-4AD3-A84C-85AB8FBC9360}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{1994D072-5098-4AD3-A84C-85AB8FBC9360}.Debug|Any CPU.Build.0 = Debug|Win32
-		{1994D072-5098-4AD3-A84C-85AB8FBC9360}.Release|Any CPU.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

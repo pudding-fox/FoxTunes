@@ -15,6 +15,10 @@ namespace FoxTunes
     {
         public ICore Core { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public BassOutputChannel OutputChannel { get; private set; }
+
         private int _Rate { get; set; }
 
         public int Rate
@@ -143,6 +147,23 @@ namespace FoxTunes
             }
         }
 
+
+        private bool _SoxResampler { get; set; }
+
+        public bool SoxResampler
+        {
+            get
+            {
+                return this._SoxResampler;
+            }
+            private set
+            {
+                this._SoxResampler = value;
+                Logger.Write(this, LogLevel.Debug, "Sox = {0}", this.SoxResampler);
+                this.Shutdown();
+            }
+        }
+
         public BassFlags Flags
         {
             get
@@ -155,8 +176,6 @@ namespace FoxTunes
                 return flags;
             }
         }
-
-        public BassMasterChannel MasterChannel { get; private set; }
 
         public void Start()
         {
@@ -179,9 +198,9 @@ namespace FoxTunes
                         this.StartWASAPI();
                         break;
                 }
-                this.MasterChannel = BassMasterChannelFactory.Instance.Create(this);
-                this.MasterChannel.InitializeComponent(this.Core);
-                this.MasterChannel.Error += this.MasterChannel_Error;
+                this.OutputChannel = new BassOutputChannel(this);
+                this.OutputChannel.InitializeComponent(this.Core);
+                this.OutputChannel.Error += this.OutputChannel_Error;
                 this.IsStarted = true;
                 Logger.Write(this, LogLevel.Debug, "Started BASS.");
             }
@@ -194,21 +213,21 @@ namespace FoxTunes
 
         private void StartDirectSound()
         {
-            BassUtils.OK(Bass.Configure(Configuration.UpdateThreads, 1));
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 1));
             BassUtils.OK(Bass.Init(this.DirectSoundDevice, this.Rate));
             Logger.Write(this, LogLevel.Debug, "BASS Initialized.");
         }
 
         private void StartASIO()
         {
-            BassUtils.OK(Bass.Configure(Configuration.UpdateThreads, 0));
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 0));
             BassUtils.OK(Bass.Init(Bass.NoSoundDevice));
             Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
         }
 
         private void StartWASAPI()
         {
-            BassUtils.OK(Bass.Configure(Configuration.UpdateThreads, 0));
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 0));
             BassUtils.OK(Bass.Init(Bass.NoSoundDevice));
             Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
         }
@@ -222,10 +241,10 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
             try
             {
-                if (this.MasterChannel != null)
+                if (this.OutputChannel != null)
                 {
-                    this.MasterChannel.Dispose();
-                    this.MasterChannel = null;
+                    this.OutputChannel.Dispose();
+                    this.OutputChannel = null;
                 }
                 Bass.Free();
                 Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
@@ -240,7 +259,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void MasterChannel_Error(object sender, ComponentOutputErrorEventArgs e)
+        protected virtual void OutputChannel_Error(object sender, ComponentOutputErrorEventArgs e)
         {
             this.Shutdown();
             this.OnError(e.Exception);
@@ -250,38 +269,43 @@ namespace FoxTunes
         {
             BassPluginLoader.Instance.Load();
             this.Core = core;
-            this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+            this.Configuration = core.Components.Configuration;
+            this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.MODE_ELEMENT
             ).ConnectValue<string>(value => this.Mode = BassOutputConfiguration.GetMode(value));
-            this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+            this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.ELEMENT_DS_DEVICE
             ).ConnectValue<string>(value => this.DirectSoundDevice = BassOutputConfiguration.GetDsDevice(value));
-            this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+            this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.ELEMENT_ASIO_DEVICE
             ).ConnectValue<string>(value => this.AsioDevice = BassOutputConfiguration.GetAsioDevice(value));
-            this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+            this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.ELEMENT_WASAPI_DEVICE
             ).ConnectValue<string>(value => this.WasapiDevice = BassOutputConfiguration.GetWasapiDevice(value));
-            this.Core.Components.Configuration.GetElement<BooleanConfigurationElement>(
+            this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.DSD_RAW_ELEMENT
             ).ConnectValue<bool>(value => this.DsdDirect = value);
-            this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+            this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.RATE_ELEMENT
             ).ConnectValue<string>(value => this.Rate = BassOutputConfiguration.GetRate(value));
-            this.Core.Components.Configuration.GetElement<BooleanConfigurationElement>(
+            this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.ENFORCE_RATE_ELEMENT
             ).ConnectValue<bool>(value => this.EnforceRate = value);
-            this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+            this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.DEPTH_ELEMENT
             ).ConnectValue<string>(value => this.Float = BassOutputConfiguration.GetFloat(value));
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.SOX_RESAMPLER_ELEMENT
+            ).ConnectValue<bool>(value => this.SoxResampler = value);
             base.InitializeComponent(core);
         }
 
@@ -345,17 +369,24 @@ namespace FoxTunes
         public override Task Preempt(IOutputStream stream)
         {
             var outputStream = stream as BassOutputStream;
-            if (this.IsStarted)
+            if (this.IsStarted && this.OutputChannel.IsStarted)
             {
-                Logger.Write(this, LogLevel.Debug, "Pre-empting playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
-                if (this.MasterChannel.GetSecondaryChannel() != outputStream.ChannelHandle)
+                if (this.OutputChannel.CanPlay(outputStream))
                 {
-                    this.MasterChannel.SetSecondaryChannel(outputStream.ChannelHandle);
+                    Logger.Write(this, LogLevel.Debug, "Pre-empting playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+                    if (!this.OutputChannel.Contains(outputStream))
+                    {
+                        this.OutputChannel.Enqueue(outputStream);
+                    }
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Debug, "Properties differ from current configuration, cannot pre-empt playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
                 }
             }
             else
             {
-                Logger.Write(this, LogLevel.Debug, "Not yet started, cannot pre-emp playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+                Logger.Write(this, LogLevel.Debug, "Not yet started, cannot pre-empt playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
             }
             return Task.CompletedTask;
         }

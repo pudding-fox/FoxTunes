@@ -32,6 +32,7 @@ namespace FoxTunes
             set
             {
                 Bass.ChannelSetPosition(this.ChannelHandle, value);
+                this.Output.OutputChannel.ClearBuffer(this);
                 if (value > this.NotificationSource.EndingPosition)
                 {
                     Logger.Write(this, LogLevel.Debug, "Channel {0} was manually seeked past the \"Ending\" sync, raising it manually.", this.ChannelHandle);
@@ -72,7 +73,7 @@ namespace FoxTunes
                 {
                     return false;
                 }
-                return this.Output.MasterChannel.IsPlaying;
+                return this.Output.OutputChannel.IsPlaying;
             }
         }
 
@@ -84,7 +85,7 @@ namespace FoxTunes
                 {
                     return false;
                 }
-                return this.Output.MasterChannel.IsPaused;
+                return this.Output.OutputChannel.IsPaused;
             }
         }
 
@@ -96,7 +97,7 @@ namespace FoxTunes
                 {
                     return true;
                 }
-                return this.Output.MasterChannel.IsStopped;
+                return this.Output.OutputChannel.IsStopped;
             }
         }
 
@@ -141,14 +142,7 @@ namespace FoxTunes
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            if (this.Output.MasterChannel.GetPrimaryChannel() != this.ChannelHandle)
-            {
-                this.Output.MasterChannel.SetPrimaryChannel(this.ChannelHandle);
-            }
-            if (!this.Output.MasterChannel.IsPlaying)
-            {
-                this.Output.MasterChannel.Play();
-            }
+            this.Output.OutputChannel.Play(this, true);
             this.EmitState();
             this.OnPlayed(true);
         }
@@ -159,7 +153,7 @@ namespace FoxTunes
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.MasterChannel.Pause();
+            this.Output.OutputChannel.Pause();
             this.EmitState();
             this.OnPaused();
         }
@@ -170,7 +164,7 @@ namespace FoxTunes
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.MasterChannel.Resume();
+            this.Output.OutputChannel.Resume();
             this.EmitState();
             this.OnResumed();
         }
@@ -181,7 +175,7 @@ namespace FoxTunes
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.MasterChannel.Stop();
+            this.Output.OutputChannel.Stop();
             this.EmitState();
             this.OnStopped(true);
         }
@@ -194,19 +188,9 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            if (this.Output.IsStarted)
+            if (this.Output.IsStarted && this.Output.OutputChannel.Contains(this))
             {
-                if (this.Output.MasterChannel.GetPrimaryChannel() == this.ChannelHandle)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Disposing primary channel, stopping master: {0}", this.ChannelHandle);
-                    this.Stop();
-                    this.Output.MasterChannel.SetPrimaryChannel(0);
-                }
-                if (this.Output.MasterChannel.GetSecondaryChannel() == this.ChannelHandle)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Disposing secondary channel: {0}", this.ChannelHandle);
-                    this.Output.MasterChannel.SetSecondaryChannel(0);
-                }
+                this.Output.OutputChannel.Remove(this);
             }
             Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
             this.ChannelHandle = 0;
