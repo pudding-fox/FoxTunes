@@ -239,53 +239,37 @@ namespace FoxTunes
             }
         }
 
-        public async Task Render(WaveFormRendererData data)
+        public Task Render(WaveFormRendererData data)
         {
-            var bitmap = default(WriteableBitmap);
-            var success = default(bool);
-            var info = default(WaveFormRenderInfo);
-
-            await Windows.Invoke(() =>
+            return Windows.Invoke(() =>
             {
-                bitmap = this.Bitmap;
+                var bitmap = this.Bitmap;
                 if (bitmap == null)
                 {
                     return;
                 }
 
-                success = bitmap.TryLock(LockTimeout);
-                if (!success)
+                if (!bitmap.TryLock(LockTimeout))
                 {
                     return;
                 }
-                info = GetRenderInfo(bitmap, data);
-            }).ConfigureAwait(false);
-
-            if (!success)
-            {
-                //No bitmap or failed to establish lock.
-                return;
-            }
-
-            Monitor.Enter(this.SyncRoot);
-            try
-            {
-                Render(ref info, data);
-            }
-            catch (Exception e)
-            {
-                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render wave form: {0}", e.Message);
-            }
-            finally
-            {
-                Monitor.Exit(this.SyncRoot);
-            }
-
-            await Windows.Invoke(() =>
-            {
+                var info = GetRenderInfo(bitmap, data);
+                Monitor.Enter(this.SyncRoot);
+                try
+                {
+                    Render(ref info, data);
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render wave form: {0}", e.Message);
+                }
+                finally
+                {
+                    Monitor.Exit(this.SyncRoot);
+                }
                 bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
-            }).ConfigureAwait(false);
+            });
         }
 
         public void Update()

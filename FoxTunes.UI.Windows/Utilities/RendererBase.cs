@@ -207,7 +207,7 @@ namespace FoxTunes
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
-            var task = this.CreateBitmap(false);
+            var task = this.CreateBitmap();
             base.OnRenderSizeChanged(sizeInfo);
         }
 
@@ -216,9 +216,10 @@ namespace FoxTunes
             drawingContext.DrawRectangle(this.Background, null, new Rect(0, 0, this.ActualWidth, this.ActualHeight));
         }
 
-        protected virtual Task CreateBitmap(bool force)
+        protected virtual async Task<bool> CreateBitmap()
         {
-            return Windows.Invoke(() =>
+            var result = default(bool);
+            await Windows.Invoke(() =>
             {
                 var width = default(int);
                 var height = default(int);
@@ -226,11 +227,12 @@ namespace FoxTunes
                 {
                     return;
                 }
-                if (this.Bitmap != null && !force)
+                var bitmap = this.Bitmap;
+                if (bitmap != null)
                 {
-                    if (this.Bitmap.PixelWidth == width && this.Bitmap.PixelHeight == height)
+                    if (bitmap.PixelWidth == width && bitmap.PixelHeight == height)
                     {
-                        //Nothing to do.
+                        this.ClearBitmap(bitmap);
                         return;
                     }
                 }
@@ -242,7 +244,9 @@ namespace FoxTunes
                     width,
                     height
                 );
-            });
+                result = true;
+            }).ConfigureAwait(false);
+            return result;
         }
 
         protected virtual WriteableBitmap CreateBitmap(int width, int height)
@@ -305,11 +309,12 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                if (this.Bitmap == null)
+                var bitmap = this.Bitmap;
+                if (bitmap == null)
                 {
                     return;
                 }
-                this.CreateData(this.Bitmap.PixelWidth, this.Bitmap.PixelHeight);
+                this.CreateData(bitmap.PixelWidth, bitmap.PixelHeight);
             });
         }
 

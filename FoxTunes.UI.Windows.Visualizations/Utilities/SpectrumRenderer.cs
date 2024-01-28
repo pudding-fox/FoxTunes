@@ -73,22 +73,22 @@ namespace FoxTunes
                 this.CutOff.ValueChanged += this.OnValueChanged;
                 this.PreAmp.ValueChanged += this.OnValueChanged;
                 this.FFTSize.ValueChanged += this.OnValueChanged;
-                var task = this.CreateBitmap(true);
+                var task = this.CreateBitmap();
             }
             base.OnConfigurationChanged();
         }
 
-        protected virtual void OnValueChanged(object sender, EventArgs e)
+        protected virtual async void OnValueChanged(object sender, EventArgs e)
         {
             if (object.ReferenceEquals(sender, this.Bars))
             {
                 //Changing bars requires full refresh.
-                var task = this.CreateBitmap(true);
+                if (await this.CreateBitmap().ConfigureAwait(false))
+                {
+                    return;
+                }
             }
-            else
-            {
-                var task = this.CreateData();
-            }
+            await this.CreateData().ConfigureAwait(false);
         }
 
         protected override bool CreateData(int width, int height)
@@ -179,60 +179,46 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task Render(SpectrumRendererData data)
+        protected virtual Task Render(SpectrumRendererData data)
         {
-            var bitmap = default(WriteableBitmap);
-            var success = default(bool);
-            var info = default(SpectrumRenderInfo);
-
-            await Windows.Invoke(() =>
+            return Windows.Invoke(() =>
             {
-                bitmap = this.Bitmap;
+                var bitmap = this.Bitmap;
                 if (bitmap == null)
                 {
+                    this.Restart();
                     return;
                 }
 
-                success = bitmap.TryLock(LockTimeout);
+                if (!bitmap.TryLock(LockTimeout))
+                {
+                    this.Restart();
+                    return;
+                }
+                var success = default(bool);
+                var info = GetRenderInfo(bitmap, data);
+                try
+                {
+                    Render(ref info, data); 
+                    success = true;
+                }
+                catch (Exception e)
+                {
+#if DEBUG
+                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum: {0}", e.Message);
+#else
+                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum, disabling: {0}", e.Message);
+                    success = false;
+#endif
+                }
+                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+                bitmap.Unlock();
                 if (!success)
                 {
                     return;
                 }
-                info = GetRenderInfo(bitmap, data);
-            }, DISPATCHER_PRIORITY).ConfigureAwait(false);
-
-            if (!success)
-            {
-                //Failed to establish lock.
                 this.Restart();
-                return;
-            }
-
-            try
-            {
-                Render(ref info, data);
-            }
-            catch (Exception e)
-            {
-#if DEBUG
-                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum: {0}", e.Message);
-#else
-                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum, disabling: {0}", e.Message);
-                success = false;
-#endif
-            }
-
-            await Windows.Invoke(() =>
-            {
-                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
-                bitmap.Unlock();
-            }, DISPATCHER_PRIORITY).ConfigureAwait(false);
-
-            if (!success)
-            {
-                return;
-            }
-            this.Restart();
+            }, DISPATCHER_PRIORITY);
         }
 
         protected override void OnElapsed(object sender, ElapsedEventArgs e)
