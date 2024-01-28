@@ -225,7 +225,7 @@ namespace FoxTunes
                         if (playlistItem != null)
                         {
                             var position = queue.IndexOf(playlistItem);
-                            if (position >= 0 && position - 1 < queue.Count)
+                            if (position > 0 && position - 1 < queue.Count)
                             {
                                 return queue[position + 1];
                             }
