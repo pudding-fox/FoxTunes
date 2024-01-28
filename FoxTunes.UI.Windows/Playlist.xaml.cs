@@ -41,32 +41,43 @@ namespace FoxTunes
 
         protected override void OnDrop(DragEventArgs e)
         {
-            var sequence = default(int);
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                if (this.TryGetInsertSequence(out sequence))
-                {
-                    this.Core.Managers.Playlist.Insert(sequence, paths);
-                }
-                else
-                {
-                    this.Core.Managers.Playlist.Add(paths);
-                }
+                this.AddToPlaylist(paths);
             }
             if (e.Data.GetDataPresent(typeof(ObservableCollection<LibraryItem>)))
             {
                 var items = e.Data.GetData(typeof(ObservableCollection<LibraryItem>)) as ObservableCollection<LibraryItem>;
-                if (this.TryGetInsertSequence(out sequence))
-                {
-                    this.Core.Managers.Playlist.Insert(sequence, items);
-                }
-                else
-                {
-                    this.Core.Managers.Playlist.Add(items);
-                }
+                this.AddToPlaylist(items);
             }
             base.OnDrop(e);
+        }
+
+        private void AddToPlaylist(IEnumerable<string> paths)
+        {
+            var sequence = default(int);
+            if (this.TryGetInsertSequence(out sequence))
+            {
+                this.Core.Managers.Playlist.Insert(sequence, paths);
+            }
+            else
+            {
+                this.Core.Managers.Playlist.Add(paths);
+            }
+        }
+
+        private void AddToPlaylist(IEnumerable<LibraryItem> libraryItems)
+        {
+            var sequence = default(int);
+            if (this.TryGetInsertSequence(out sequence))
+            {
+                this.Core.Managers.Playlist.Insert(sequence, libraryItems);
+            }
+            else
+            {
+                this.Core.Managers.Playlist.Add(libraryItems);
+            }
         }
 
         protected virtual bool TryGetInsertSequence(out int sequence)

@@ -6,7 +6,7 @@ namespace FoxTunes
 {
     public abstract class PlaylistTaskBase : BackgroundTask
     {
-        protected PlaylistTaskBase(string id, bool visible = true) : base(id, visible)
+        protected PlaylistTaskBase(string id) : base(id)
         {
         }
 

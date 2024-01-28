@@ -8,7 +8,7 @@ namespace FoxTunes
         public const string ID = "E6D893E8-EC80-4823-A66C-286DB69A48D1";
 
         public UnloadOutputStreamTask()
-            : base(ID, false)
+            : base(ID)
         {
 
         }

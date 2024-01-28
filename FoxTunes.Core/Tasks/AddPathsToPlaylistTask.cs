@@ -18,6 +18,14 @@ namespace FoxTunes
             this.Paths = paths;
         }
 
+        public override bool Visible
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public int Sequence { get; private set; }
 
         public IEnumerable<string> Paths { get; private set; }

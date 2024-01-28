@@ -9,7 +9,7 @@ namespace FoxTunes
         public const string ID = "E3E23677-DE0A-4291-8416-BC4A91856037";
 
         public LoadOutputStreamTask(PlaylistItem playlistItem, bool immediate)
-            : base(ID, immediate)
+            : base(ID)
         {
             this.PlaylistItem = playlistItem;
             this.Immediate = immediate;

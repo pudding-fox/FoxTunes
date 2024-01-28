@@ -5,8 +5,8 @@ namespace FoxTunes
 {
     public abstract class LibraryTaskBase : BackgroundTask
     {
-        protected LibraryTaskBase(string id, bool visible = true)
-            : base(id, visible)
+        protected LibraryTaskBase(string id)
+            : base(id)
         {
         }
 
