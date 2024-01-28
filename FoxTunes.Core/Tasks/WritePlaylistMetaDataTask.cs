@@ -73,12 +73,15 @@ namespace FoxTunes
                 await this.SetCount(this.PlaylistItems.Count()).ConfigureAwait(false);
             }
             await base.OnStarted().ConfigureAwait(false);
+            //We don't need a lock for this so not waiting for OnRun().
+            this.UpdatePlaylistCache();
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, this.Names)).ConfigureAwait(false);
         }
 
         protected override async Task OnRun()
         {
             var position = 0;
-            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
                 foreach (var playlistItem in this.PlaylistItems)
                 {
@@ -103,8 +106,6 @@ namespace FoxTunes
                         await LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Import).ConfigureAwait(false);
                     }
 
-                    this.UpdatePlaylistCache(playlistItem);
-
                     if (this.WriteToFiles)
                     {
                         if (!await this.MetaDataManager.Synchronize(new[] { playlistItem }, this.Names.ToArray()).ConfigureAwait(false))
@@ -121,29 +122,19 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void UpdatePlaylistCache(PlaylistItem playlistItem)
+        protected virtual void UpdatePlaylistCache()
         {
-            var cachedPlaylistItem = default(PlaylistItem);
-            if (this.PlaylistCache.TryGetItemById(playlistItem.Id, out cachedPlaylistItem))
+            foreach (var playlistItem in this.PlaylistItems)
             {
-                if (!object.ReferenceEquals(playlistItem, cachedPlaylistItem))
+                var cachedPlaylistItem = default(PlaylistItem);
+                if (this.PlaylistCache.TryGetItemById(playlistItem.Id, out cachedPlaylistItem))
                 {
-                    lock (playlistItem.MetaDatas)
+                    if (!object.ReferenceEquals(playlistItem, cachedPlaylistItem))
                     {
-                        lock (cachedPlaylistItem.MetaDatas)
-                        {
-                            cachedPlaylistItem.MetaDatas.Clear();
-                            cachedPlaylistItem.MetaDatas.AddRange(playlistItem.MetaDatas);
-                        }
+                        MetaDataItem.Update(playlistItem, cachedPlaylistItem);
                     }
                 }
             }
-        }
-
-        protected override async Task OnCompleted()
-        {
-            await base.OnCompleted().ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, this.Names)).ConfigureAwait(false);
         }
 
         private async Task WritePlaylistMetaData(PlaylistItem playlistItem)

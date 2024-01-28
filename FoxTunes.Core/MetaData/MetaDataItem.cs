@@ -1,5 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace FoxTunes
@@ -94,6 +97,51 @@ namespace FoxTunes
                     }
                 }
                 return false;
+            }
+        }
+
+        public static void Update(IFileData source, IFileData destination)
+        {
+            Update(source, new[] { destination });
+        }
+
+        public static void Update(IFileData source, IEnumerable<IFileData> destinations)
+        {
+            lock (source.MetaDatas)
+            {
+                var sourceMetaData = source.MetaDatas.ToDictionary(
+                    metaDataItem => metaDataItem.Name,
+                    StringComparer.OrdinalIgnoreCase
+                );
+                foreach (var destination in destinations)
+                {
+                    lock (destination.MetaDatas)
+                    {
+                        var destinationMetaData = destination.MetaDatas.ToDictionary(
+                            metaDataItem => metaDataItem.Name,
+                            StringComparer.OrdinalIgnoreCase
+                        );
+                        foreach (var sourceMetaDataItem in source.MetaDatas)
+                        {
+                            var destinationMetaDataItem = default(MetaDataItem);
+                            if (destinationMetaData.TryGetValue(sourceMetaDataItem.Name, out destinationMetaDataItem))
+                            {
+                                destinationMetaDataItem.Value = sourceMetaDataItem.Value;
+                            }
+                            else
+                            {
+                                destination.MetaDatas.Add(sourceMetaDataItem);
+                            }
+                        }
+                        foreach (var pair in destinationMetaData)
+                        {
+                            if (!sourceMetaData.ContainsKey(pair.Key))
+                            {
+                                destination.MetaDatas.Remove(pair.Value);
+                            }
+                        }
+                    }
+                }
             }
         }
 

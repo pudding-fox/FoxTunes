@@ -165,14 +165,6 @@ namespace FoxTunes
                     this.TreeView.RaiseEvent(new DragSourceInitializedEventArgs(DragSourceInitializedEvent, selectedItem));
                 }
             }
-
-            protected override void OnDisposing()
-            {
-                this.TreeView.PreviewMouseDown -= this.OnMouseDown;
-                this.TreeView.PreviewMouseUp -= this.OnMouseUp;
-                this.TreeView.MouseMove -= this.OnMouseMove;
-                base.OnDisposing();
-            }
         }
     }
 }

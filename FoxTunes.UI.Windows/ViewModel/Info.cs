@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
@@ -25,6 +26,8 @@ namespace FoxTunes.ViewModel
         const int BITS_PER_SAMPLE = 16;
 
         const int CHANNELS = 2;
+
+        public IPlaylistManager PlaylistManager { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -81,6 +84,32 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler FileNameChanged;
+
+        private IFileData _FileData { get; set; }
+
+        public IFileData FileData
+        {
+            get
+            {
+                return this._FileData;
+            }
+            set
+            {
+                this._FileData = value;
+                this.OnFileDataChanged();
+            }
+        }
+
+        protected virtual void OnFileDataChanged()
+        {
+            if (this.FileDataChanged != null)
+            {
+                this.FileDataChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("FileData");
+        }
+
+        public event EventHandler FileDataChanged;
 
         private string _Artist { get; set; }
 
@@ -414,6 +443,7 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
+            this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
@@ -437,7 +467,8 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.MetaDataUpdated:
-                    return this.Refresh();
+                    var names = signal.State as IEnumerable<string>;
+                    return this.Refresh(names);
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -446,14 +477,41 @@ namespace FoxTunes.ViewModel
 #endif
         }
 
+        protected virtual Task Refresh(IEnumerable<string> names)
+        {
+            if (names != null && names.Any())
+            {
+                if (!names.Intersect(new[]
+                {
+                    CommonMetaData.Artist,
+                    CommonMetaData.Performer,
+                    CommonMetaData.Album,
+                    CommonMetaData.Title,
+                    CommonMetaData.Genre,
+                    CommonMetaData.Year,
+                    CommonMetaData.Rating
+                }).Any())
+                {
+#if NET40
+                    return TaskEx.FromResult(false);
+#else
+                    return Task.CompletedTask;
+#endif
+                }
+            }
+            return this.Refresh();
+        }
+
         protected virtual Task Refresh()
         {
             var fileName = default(string);
+            var fileData = default(IFileData);
             var metaData = default(IDictionary<string, string>);
             var outputStream = this.PlaybackManager.CurrentStream;
             if (outputStream != null)
             {
                 fileName = outputStream.FileName;
+                fileData = outputStream.PlaylistItem;
                 lock (outputStream.PlaylistItem.MetaDatas)
                 {
                     metaData = outputStream.PlaylistItem.MetaDatas.ToDictionary(
@@ -468,6 +526,7 @@ namespace FoxTunes.ViewModel
                 if (metaData != null)
                 {
                     this.FileName = fileName;
+                    this.FileData = fileData;
                     this.Artist = metaData.GetValueOrDefault(CommonMetaData.Artist);
                     this.Performer = metaData.GetValueOrDefault(CommonMetaData.Performer);
                     this.Album = metaData.GetValueOrDefault(CommonMetaData.Album);
@@ -484,6 +543,7 @@ namespace FoxTunes.ViewModel
                 {
                     this.HasData = false;
                     this.FileName = fileName;
+                    this.FileData = fileData;
                     this.Artist = null;
                     this.Performer = null;
                     this.Album = null;
@@ -496,6 +556,27 @@ namespace FoxTunes.ViewModel
                     this.Bitrate = null;
                 }
             });
+        }
+
+        public ICommand UpdateRatingCommand
+        {
+            get
+            {
+                return CommandFactory.Instance.CreateCommand<RatingEventArgs>(this.OnUpdateRating);
+            }
+        }
+
+        protected virtual Task OnUpdateRating(RatingEventArgs e)
+        {
+            if (e.FileData is PlaylistItem playlistItem)
+            {
+                return this.PlaylistManager.SetRating(new[] { playlistItem }, e.Value);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         protected override Freezable CreateInstanceCore()

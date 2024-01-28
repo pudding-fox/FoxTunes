@@ -1,6 +1,8 @@
 ﻿using FoxDb;
 using FoxTunes.Interfaces;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Markup;
@@ -9,9 +11,32 @@ namespace FoxTunes
 {
     [Component("C0B2450C-DEDA-4D8B-8A32-5EA733F1FD45", null, priority: ComponentAttribute.PRIORITY_LOW)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    [UIPlaylistColumnProvider("C0B2450C-DEDA-4D8B-8A32-5EA733F1FD45", "Playback State")]
     public class PlaybackStateBehaviour : StandardBehaviour, IUIPlaylistColumnProvider, IDatabaseInitializer
     {
+        public string Id
+        {
+            get
+            {
+                return typeof(PlaybackStateBehaviour).AssemblyQualifiedName;
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return "Playback State";
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                return null;
+            }
+        }
+
         public DataTemplate CellTemplate
         {
             get
@@ -20,6 +45,14 @@ namespace FoxTunes
                 {
                     return (DataTemplate)XamlReader.Load(stream);
                 }
+            }
+        }
+
+        public IEnumerable<string> MetaData
+        {
+            get
+            {
+                return Enumerable.Empty<string>();
             }
         }
 
@@ -37,7 +70,7 @@ namespace FoxTunes
                     Name = "Playing",
                     Type = PlaylistColumnType.Plugin,
                     Sequence = 0,
-                    Plugin = typeof(PlaybackStateBehaviour).AssemblyQualifiedName,
+                    Plugin = this.Id,
                     Enabled = true
                 });
                 transaction.Commit();

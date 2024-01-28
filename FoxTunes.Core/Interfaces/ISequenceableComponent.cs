@@ -2,6 +2,6 @@
 {
     public interface ISequenceableComponent : IBaseComponent
     {
-        int Sequence { get; }
+        int Sequence { get; set; }
     }
 }

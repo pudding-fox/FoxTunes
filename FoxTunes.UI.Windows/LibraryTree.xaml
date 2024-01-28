@@ -50,6 +50,7 @@
                   Windows:TreeViewExtensions.DragSourceInitialized="DragSourceInitialized"
                   Windows:TreeViewExtensions.AutoExpand="True"
                   VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.VirtualizationMode="Recycling"
                   IsTextSearchEnabled="True"
                   TextSearch.TextPath="Value">
             <Interactivity:Interaction.Triggers>

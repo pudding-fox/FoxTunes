@@ -1,21 +1,42 @@
 ﻿using FoxDb;
 using FoxTunes.Interfaces;
-using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Markup;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     [Component("2681C239-1291-4018-ACED-4933CC395FF6", null, priority: ComponentAttribute.PRIORITY_LOW)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    [UIPlaylistColumnProvider("2681C239-1291-4018-ACED-4933CC395FF6", "Rating Stars")]
-    public class RatingBehaviour : StandardBehaviour, IUIPlaylistColumnProvider, IDatabaseInitializer, IDisposable
+    public class RatingBehaviour : StandardBehaviour, IUIPlaylistColumnProvider, IDatabaseInitializer
     {
+        public string Id
+        {
+            get
+            {
+                return typeof(RatingBehaviour).AssemblyQualifiedName;
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return "Rating Stars";
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                return null;
+            }
+        }
+
         public DataTemplate CellTemplate
         {
             get
@@ -27,11 +48,13 @@ namespace FoxTunes
             }
         }
 
-        public IPlaylistManager PlaylistManager { get; private set; }
-
-        public IMetaDataManager MetaDataManager { get; private set; }
-
-        public ISignalEmitter SignalEmitter { get; private set; }
+        public IEnumerable<string> MetaData
+        {
+            get
+            {
+                return Enumerable.Empty<string>();
+            }
+        }
 
         public void InitializeDatabase(IDatabaseComponent database, DatabaseInitializeType type)
         {
@@ -46,85 +69,11 @@ namespace FoxTunes
                 {
                     Name = "Rating",
                     Type = PlaylistColumnType.Plugin,
-                    Sequence = 100,
-                    Plugin = typeof(RatingBehaviour).AssemblyQualifiedName,
+                    Sequence = 13,
+                    Plugin = this.Id,
                     Enabled = false
                 });
                 transaction.Commit();
-            }
-        }
-
-        public override void InitializeComponent(ICore core)
-        {
-            global::FoxTunes.ViewModel.Rating.ValueChanged += this.OnRatingChanged;
-            this.PlaylistManager = core.Managers.Playlist;
-            this.MetaDataManager = core.Managers.MetaData;
-            this.SignalEmitter = core.Components.SignalEmitter;
-            base.InitializeComponent(core);
-        }
-
-        protected virtual void OnRatingChanged(object sender, global::FoxTunes.ViewModel.RatingChangedEventArgs e)
-        {
-            var playlistItem = e.FileData as PlaylistItem;
-            if (playlistItem == null)
-            {
-                return;
-            }
-            var playlistItems = this.PlaylistManager.SelectedItems;
-            if (playlistItems == null || !playlistItems.Contains(playlistItem))
-            {
-                this.SetRating(new[] { playlistItem }, e.Value);
-            }
-            else
-            {
-                this.SetRating(playlistItems.ToArray(), e.Value);
-            }
-        }
-
-        protected virtual void SetRating(IEnumerable<PlaylistItem> playlistItems, byte rating)
-        {
-#if NET40
-            var task = TaskEx.Run(
-#else
-            var task = Task.Run(
-#endif
-                () => this.PlaylistManager.SetRating(playlistItems, rating)
-            );
-        }
-
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
-            global::FoxTunes.ViewModel.Rating.ValueChanged -= this.OnRatingChanged;
-        }
-
-        ~RatingBehaviour()
-        {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            try
-            {
-                this.Dispose(true);
-            }
-            catch
-            {
-                //Nothing can be done, never throw on GC thread.
             }
         }
     }

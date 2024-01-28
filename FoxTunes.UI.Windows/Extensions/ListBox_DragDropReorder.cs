@@ -171,15 +171,6 @@ namespace FoxTunes
                 }
                 e.Effects = effects;
             }
-
-            protected override void OnDisposing()
-            {
-                this.ListBox.PreviewMouseDown -= this.OnMouseDown;
-                this.ListBox.PreviewMouseUp -= this.OnMouseUp;
-                this.ListBox.MouseMove -= this.OnMouseMove;
-                this.ListBox.DragOver -= this.OnDragOver;
-                base.OnDisposing();
-            }
         }
     }
 }

@@ -192,6 +192,10 @@ namespace FoxTunes
         {
             var collection = this.ItemsSource as ICollection<T>;
             var item = this.ItemFactory();
+            if (item is ISequenceableComponent sequenceable)
+            {
+                sequenceable.Sequence = this.ItemsSource.Count();
+            }
             collection.Add(item);
             this.Refresh();
             this.SelectedValue = item;

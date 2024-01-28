@@ -127,7 +127,7 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
                         <Label Grid.Column="0">Plugin</Label>
-                        <ComboBox Grid.Column="1" Grid.Row="1" SelectedValue="{Binding Plugin}" ItemsSource="{Binding PlaylistColumnProviders, Source={StaticResource ViewModel}}" DisplayMemberPath="Name" SelectedValuePath="Type.AssemblyQualifiedName"></ComboBox>
+                        <ComboBox Grid.Column="1" Grid.Row="1" SelectedValue="{Binding Plugin}" ItemsSource="{Binding PlaylistColumnProviders, Source={StaticResource ViewModel}}" DisplayMemberPath="Name" SelectedValuePath="Id"></ComboBox>
                     </Grid>
                 </Grid>
             </Grid>

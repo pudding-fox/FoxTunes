@@ -209,7 +209,7 @@ namespace FoxTunes.ViewModel
         public async Task Reset()
         {
             var core = default(ICore);
-            await Windows.Invoke(() => core = this.Core);
+            await Windows.Invoke(() => core = this.Core).ConfigureAwait(false);
             using (var database = this.DatabaseFactory.Create())
             {
                 using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
@@ -243,7 +243,6 @@ namespace FoxTunes.ViewModel
                         return database.Set<LibraryHierarchyLevel>().Create().With(libraryHierarchyLevel =>
                         {
                             libraryHierarchyLevel.Script = "'New'";
-                            libraryHierarchyLevel.Sequence = this.LibraryHierarchyLevels.ItemsSource.Count();
                         });
                     }
                 },
@@ -263,7 +262,7 @@ namespace FoxTunes.ViewModel
                         return database.Set<LibraryHierarchy>().Create().With(libraryHierarchy =>
                         {
                             libraryHierarchy.Name = "New";
-                            libraryHierarchy.Sequence = this.LibraryHierarchies.ItemsSource.Count();
+                            libraryHierarchy.Type = LibraryHierarchyType.Script;
                         });
                     }
                 },

@@ -245,16 +245,6 @@ namespace FoxTunes
                 }
                 this.Adorner.InvalidateVisual();
             }
-
-            protected override void OnDisposing()
-            {
-                this.ListView.DragEnter -= this.OnDragEnter;
-                this.ListView.DragOver -= this.OnDragOver;
-                this.ListView.Drop -= this.OnDrop;
-                this.ListView.DragLeave -= this.OnDragLeave;
-                this.ListView.QueryContinueDrag -= this.OnQueryContinueDrag;
-                base.OnDisposing();
-            }
         }
 
         private class DropInsertAdorner : Adorner

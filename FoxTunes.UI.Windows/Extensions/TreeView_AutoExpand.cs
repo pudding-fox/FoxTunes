@@ -105,20 +105,6 @@ namespace FoxTunes
                     }
                 }
             }
-
-            protected override void OnDisposing()
-            {
-                if (this.TreeView != null)
-                {
-                    BindingHelper.RemoveHandler(
-                        this.TreeView,
-                        ItemsControl.ItemsSourceProperty,
-                        typeof(ListView),
-                        this.OnItemsSourceChanged
-                    );
-                }
-                base.OnDisposing();
-            }
         }
     }
 }
