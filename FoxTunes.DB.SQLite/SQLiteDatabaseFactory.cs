@@ -10,9 +10,16 @@ namespace FoxTunes
 {
     [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     [ComponentPreference(ComponentPreferenceAttribute.DEFAULT)]
-    [Component("13A75018-8A24-413D-A731-C558C8FAF08F", ComponentSlots.Database)]
+    [Component(ID, ComponentSlots.Database)]
     public class SQLiteDatabaseFactory : DatabaseFactory
     {
+        const string ID = "13A75018-8A24-413D-A731-C558C8FAF08F";
+
+        public SQLiteDatabaseFactory() : base(ID, string.Format(Strings.SQLiteDatabaseFactory_Name, SQLiteConnection.SQLiteVersion))
+        {
+
+        }
+
         public override DatabaseFactoryFlags Flags
         {
             get

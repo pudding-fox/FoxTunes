@@ -38,7 +38,7 @@ namespace FoxTunes
             {
                 var builder = new StringBuilder();
                 builder.Append(this.Name);
-                builder.Append(string.Format(" v{0}", Bass.Version));
+                builder.Append(string.Format(" {0}", Bass.Version));
                 var cpu = Bass.CPUUsage;
                 if (cpu > 0)
                 {

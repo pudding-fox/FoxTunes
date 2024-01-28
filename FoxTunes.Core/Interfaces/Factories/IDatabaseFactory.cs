@@ -4,6 +4,12 @@ namespace FoxTunes.Interfaces
 {
     public interface IDatabaseFactory : IStandardFactory
     {
+        string Id { get; }
+
+        string Name { get; }
+
+        string Description { get; }
+
         DatabaseFactoryFlags Flags { get; }
 
         DatabaseTestResult Test();

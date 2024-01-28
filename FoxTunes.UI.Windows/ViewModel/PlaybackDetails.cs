@@ -37,6 +37,8 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler DescriptionChanged;
 
+        public IDatabaseFactory DatabaseFactory { get; private set; }
+
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
         public IOutput Output { get; private set; }
@@ -44,6 +46,7 @@ namespace FoxTunes.ViewModel
         protected override void InitializeComponent(ICore core)
         {
             PlaybackStateNotifier.Notify += this.OnNotify;
+            this.DatabaseFactory = core.Factories.Database;
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
             this.Output = core.Components.Output;
             base.InitializeComponent(core);
@@ -65,6 +68,17 @@ namespace FoxTunes.ViewModel
         {
             var builder = new StringBuilder();
             builder.AppendLine(string.Format("{0} {1}", Publication.Product, Publication.Version));
+            if (this.DatabaseFactory != null)
+            {
+                if (!string.IsNullOrEmpty(this.DatabaseFactory.Description))
+                {
+                    builder.AppendLine(this.DatabaseFactory.Description);
+                }
+                else if (!string.IsNullOrEmpty(this.DatabaseFactory.Name))
+                {
+                    builder.AppendLine(this.DatabaseFactory.Name);
+                }
+            }
             if (this.ScriptingRuntime != null)
             {
                 if (!string.IsNullOrEmpty(this.ScriptingRuntime.Description))
@@ -73,7 +87,6 @@ namespace FoxTunes.ViewModel
                 }
                 else if (!string.IsNullOrEmpty(this.ScriptingRuntime.Name))
                 {
-                    builder.Append("JS: ");
                     builder.AppendLine(this.ScriptingRuntime.Name);
                 }
             }

@@ -7,6 +7,19 @@ namespace FoxTunes
 {
     public abstract class DatabaseFactory : StandardFactory, IDatabaseFactory
     {
+        protected DatabaseFactory(string id, string name = null, string description = null)
+        {
+            this.Id = id;
+            this.Name = name;
+            this.Description = description;
+        }
+
+        public string Id { get; private set; }
+
+        public string Name { get; private set; }
+
+        public string Description { get; private set; }
+
         public ICore Core { get; private set; }
 
         public IConfig Config { get; private set; }
