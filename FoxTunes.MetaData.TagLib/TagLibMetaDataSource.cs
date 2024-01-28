@@ -300,13 +300,34 @@ namespace FoxTunes
                 isCompilation = xiphComment.IsCompilation;
             }
 
-            //Check MB release type.
-            if (string.Equals(tag.MusicBrainzReleaseType, "Compilation", StringComparison.OrdinalIgnoreCase))
+            //Check MB release type, it's innocuous so don't bother respecting READ_MUSICBRAINZ_TAGS.
+            if (string.Equals(tag.MusicBrainzReleaseType, MusicBrainzReleaseType.Compilation, StringComparison.OrdinalIgnoreCase))
             {
                 isCompilation = true;
             }
 
             return isCompilation;
+        }
+
+        protected virtual void IsCompilation(Tag tag, bool isCompilation)
+        {
+            if (tag is global::TagLib.Id3v2.Tag id3v2Tag)
+            {
+                id3v2Tag.IsCompilation = isCompilation;
+            }
+            else if (tag is global::TagLib.Mpeg4.AppleTag appleTag)
+            {
+                appleTag.IsCompilation = isCompilation;
+            }
+            else if (tag is global::TagLib.Ogg.XiphComment xiphComment)
+            {
+                xiphComment.IsCompilation = isCompilation;
+            }
+
+            if (this.MusicBrainz.Value)
+            {
+                tag.MusicBrainzReleaseType = MusicBrainzReleaseType.Compilation;
+            }
         }
 
         private void AddTags(IList<MetaDataItem> metaData, Tag tag)
@@ -706,6 +727,17 @@ namespace FoxTunes
                         tag.Year = 0;
                     }
                 }, this.ErrorHandler);
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.IsCompilation, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Try(() =>
+                {
+                    var isCompilation = default(bool);
+                    if (bool.TryParse(metaDataItem.Value, out isCompilation))
+                    {
+                        this.IsCompilation(tag, isCompilation);
+                    }
+                });
             }
         }
 
@@ -1396,6 +1428,11 @@ namespace FoxTunes
             }
 
             return RATING_5;
+        }
+
+        public static class MusicBrainzReleaseType
+        {
+            public const string Compilation = "Compilation";
         }
     }
 }
