@@ -188,6 +188,11 @@ ManagedBass.ReplayGain.dll
 bass_replay_gain.dll
 "
 
+CUE="
+FoxTunes.Output.Bass.Cue.dll
+bass_substream_handler.dll
+"
+
 MINIMAL="
 bass
 conf
@@ -200,6 +205,7 @@ wpf
 BUNDLED="
 asio
 cd
+cue
 dsd
 dts
 encoder
@@ -238,6 +244,7 @@ do
 	mkdir -p "./release/$target/Plugins/bass"
 	mkdir -p "./release/$target/Plugins/bass/addon"
 	mkdir -p "./release/$target/Plugins/cd"
+	mkdir -p "./release/$target/Plugins/cue"
 	mkdir -p "./release/$target/Plugins/conf"
 	mkdir -p "./release/$target/Plugins/dsd"
 	mkdir -p "./release/$target/Plugins/dts"
@@ -456,6 +463,14 @@ do
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/replaygain"
+    done
+	echo
+
+	echo "Creating plugin: cue"
+	for file in $CUE
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/cue"
     done
 	echo
 
