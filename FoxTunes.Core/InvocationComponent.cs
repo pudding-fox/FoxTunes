@@ -1,8 +1,9 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 
 namespace FoxTunes
 {
-    public class InvocationComponent : IInvocationComponent
+    public class InvocationComponent : BaseComponent, IInvocationComponent
     {
         public const string CATEGORY_GLOBAL = "75AF5307-7530-471E-8CE0-503D9AC4E430";
 
@@ -34,16 +35,40 @@ namespace FoxTunes
             this.Attributes = attributes;
         }
 
-        public string Category { get; private set; }
+        public string Category { get; }
 
-        public string Id { get; private set; }
+        public string Id { get; }
 
-        public string Name { get; private set; }
+        public string Name { get; }
 
-        public string Description { get; private set; }
+        public string Description { get; }
 
-        public string Path { get; private set; }
+        public string Path { get; }
 
-        public byte Attributes { get; private set; }
+        private byte _Attributes { get; set; }
+
+        public byte Attributes
+        {
+            get
+            {
+                return this._Attributes;
+            }
+            set
+            {
+                this._Attributes = value;
+                this.OnAttributesChanged();
+            }
+        }
+
+        protected virtual void OnAttributesChanged()
+        {
+            if (this.AttributesChanged != null)
+            {
+                this.AttributesChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Attributes");
+        }
+
+        public event EventHandler AttributesChanged;
     }
 }

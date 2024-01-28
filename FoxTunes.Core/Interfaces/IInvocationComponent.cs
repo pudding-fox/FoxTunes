@@ -1,6 +1,8 @@
-﻿namespace FoxTunes.Interfaces
+﻿using System;
+
+namespace FoxTunes.Interfaces
 {
-    public interface IInvocationComponent
+    public interface IInvocationComponent : IBaseComponent
     {
         string Category { get; }
 
@@ -12,6 +14,8 @@
 
         string Path { get; }
 
-        byte Attributes { get; }
+        byte Attributes { get; set; }
+
+        event EventHandler AttributesChanged;
     }
 }

@@ -38,6 +38,25 @@ namespace FoxTunes
         {
             switch (signal.Name)
             {
+                case CommonSignals.MetaDataUpdated:
+                    var names = signal.State as IEnumerable<string>;
+                    if (names == null || !names.Any())
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Meta data was updated, resetting cache.");
+                        this.Reset();
+                    }
+                    else
+                    {
+                        var keys = this.Keys.Where(
+                            key => !string.IsNullOrEmpty(key.MetaDataItemName) && names.Contains(key.MetaDataItemName, true)
+                        );
+                        foreach (var key in keys)
+                        {
+                            Logger.Write(this, LogLevel.Debug, "Meta data \"{0}\" was updated, evicting.", key.MetaDataItemName);
+                            this.Evict(key);
+                        }
+                    }
+                    break;
                 case CommonSignals.HierarchiesUpdated:
                     if (!object.Equals(signal.State, CommonSignalFlags.SOFT))
                     {

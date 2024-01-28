@@ -4,6 +4,6 @@ namespace FoxTunes.Interfaces
 {
     public interface IMetaDataBrowser : IStandardComponent
     {
-        IEnumerable<MetaDataItem> GetMetaDatas(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType);
+        IEnumerable<MetaDataItem> GetMetaDatas(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType? metaDataItemType, string metaDataItemName);
     }
 }

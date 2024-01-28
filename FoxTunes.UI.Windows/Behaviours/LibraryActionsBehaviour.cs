@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +19,8 @@ namespace FoxTunes
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IMetaDataBrowser MetaDataBrowser { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public BooleanConfigurationElement Popularimeter { get; private set; }
@@ -26,6 +29,7 @@ namespace FoxTunes
         {
             this.PlaylistManager = core.Managers.Playlist;
             this.LibraryManager = core.Managers.Library;
+            this.MetaDataBrowser = core.Components.MetaDataBrowser;
             this.Configuration = core.Components.Configuration;
             this.Popularimeter = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
@@ -42,15 +46,24 @@ namespace FoxTunes
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REPLACE_PLAYLIST, "Replace Playlist");
                 if (this.Popularimeter.Value)
                 {
+                    var invocationComponents = new Dictionary<byte, InvocationComponent>();
                     for (var a = 0; a <= 5; a++)
                     {
-                        yield return new InvocationComponent(
-                            InvocationComponent.CATEGORY_LIBRARY, SET_RATING,
-                            string.Format("{0} Stars", a),
-                            path: "Set Rating", attributes:
-                            InvocationComponent.ATTRIBUTE_SEPARATOR
+                        var invocationComponent = new InvocationComponent(
+                            InvocationComponent.CATEGORY_LIBRARY,
+                            SET_RATING,
+                            a == 0 ? "None" : string.Format("{0} Stars", a),
+                            path: "Set Rating",
+                            attributes: InvocationComponent.ATTRIBUTE_SEPARATOR
                         );
+                        invocationComponents.Add((byte)a, invocationComponent);
+                        yield return invocationComponent;
                     }
+#if NET40
+                    var task = TaskEx.Run(() => this.GetRating(this.LibraryManager.SelectedItem, invocationComponents));
+#else
+                    var task = Task.Run(() => this.GetRating(this.LibraryManager.SelectedItem, invocationComponents));
+#endif
                 }
             }
         }
@@ -86,10 +99,47 @@ namespace FoxTunes
             return this.PlaylistManager.Add(this.LibraryManager.SelectedItem, clear);
         }
 
+        protected virtual void GetRating(LibraryHierarchyNode libraryHierarchyNode, Dictionary<byte, InvocationComponent> invocationComponents)
+        {
+            Logger.Write(this, LogLevel.Debug, "Determining rating for library hierarchy node: {0}", libraryHierarchyNode.Id);
+            var rating = default(byte);
+            var ratings = this.MetaDataBrowser.GetMetaDatas(libraryHierarchyNode, MetaDataItemType.Tag, CommonMetaData.Rating).ToArray();
+            switch (ratings.Length)
+            {
+                case 0:
+                    Logger.Write(this, LogLevel.Debug, "Library hierarchy node {0} tracks have no rating.", libraryHierarchyNode.Id);
+                    rating = 0;
+                    break;
+                case 1:
+                    if (!byte.TryParse(ratings[0].Value, out rating))
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Library hierarchy node {0} tracks have rating \"{1}\" which is in an unknown format.", libraryHierarchyNode.Id, rating);
+                        return;
+                    }
+                    Logger.Write(this, LogLevel.Debug, "Library hierarchy node {0} tracks have rating {1}.", libraryHierarchyNode.Id, rating);
+                    break;
+                default:
+                    Logger.Write(this, LogLevel.Debug, "Library hierarchy node {0} tracks have multiple ratings.", libraryHierarchyNode.Id);
+                    return;
+            }
+            foreach (var key in invocationComponents.Keys)
+            {
+                var invocationComponent = invocationComponents[key];
+                if (key == rating)
+                {
+                    invocationComponent.Attributes = (byte)(invocationComponent.Attributes | InvocationComponent.ATTRIBUTE_SELECTED);
+                }
+            }
+        }
+
         private Task SetRating(string name)
         {
             var rating = default(byte);
-            if (string.IsNullOrEmpty(name) || !byte.TryParse(name.Split(' ').FirstOrDefault(), out rating))
+            if (string.Equals(name, "None", StringComparison.OrdinalIgnoreCase))
+            {
+                rating = 0;
+            }
+            else if (string.IsNullOrEmpty(name) || !byte.TryParse(name.Split(' ').FirstOrDefault(), out rating))
             {
 #if NET40
                 return TaskEx.FromResult(false);
