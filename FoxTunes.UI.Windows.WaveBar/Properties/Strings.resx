@@ -150,4 +150,13 @@
   <data name="WaveFormStreamPosition.Name" xml:space="preserve">
     <value>Wave Form Seekbar</value>
   </data>
+  <data name="BandedWaveFormStreamPosition.Name" xml:space="preserve">
+    <value>Wave Form Seekbar (Three Band)</value>
+  </data>
+  <data name="BandedWaveFormStreamPositionConfiguration.ColorPalette" xml:space="preserve">
+    <value>Color Palette</value>
+  </data>
+  <data name="BandedWaveFormStreamPositionConfiguration.Section" xml:space="preserve">
+    <value>Wave Form (Three Band)</value>
+  </data>
 </root>

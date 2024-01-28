@@ -61,6 +61,33 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wave Form Seekbar (Three Band).
+        /// </summary>
+        internal static string BandedWaveFormStreamPosition_Name {
+            get {
+                return ResourceManager.GetString("BandedWaveFormStreamPosition.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Color Palette.
+        /// </summary>
+        internal static string BandedWaveFormStreamPositionConfiguration_ColorPalette {
+            get {
+                return ResourceManager.GetString("BandedWaveFormStreamPositionConfiguration.ColorPalette", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wave Form (Three Band).
+        /// </summary>
+        internal static string BandedWaveFormStreamPositionConfiguration_Section {
+            get {
+                return ResourceManager.GetString("BandedWaveFormStreamPositionConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Advanced.
         /// </summary>
         internal static string General_Advanced {
@@ -84,6 +111,24 @@ namespace FoxTunes {
         internal static string WaveFormCacheConfiguration_Cleanup {
             get {
                 return ResourceManager.GetString("WaveFormCacheConfiguration.Cleanup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resolution.
+        /// </summary>
+        internal static string WaveFormGeneratorConfiguration_Resolution {
+            get {
+                return ResourceManager.GetString("WaveFormGeneratorConfiguration.Resolution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wave Form Seekbar.
+        /// </summary>
+        internal static string WaveFormStreamPosition_Name {
+            get {
+                return ResourceManager.GetString("WaveFormStreamPosition.Name", resourceCulture);
             }
         }
         
@@ -124,15 +169,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Resolution.
-        /// </summary>
-        internal static string WaveFormGeneratorConfiguration_Resolution {
-            get {
-                return ResourceManager.GetString("WaveFormGeneratorConfiguration.Resolution", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to RMS.
         /// </summary>
         internal static string WaveFormStreamPositionConfiguration_RMS {
@@ -147,15 +183,6 @@ namespace FoxTunes {
         internal static string WaveFormStreamPositionConfiguration_Section {
             get {
                 return ResourceManager.GetString("WaveFormStreamPositionConfiguration.Section", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wave Form Seekbar.
-        /// </summary>
-        internal static string WaveFormStreamPosition_Name {
-            get {
-                return ResourceManager.GetString("WaveFormStreamPosition.Name", resourceCulture);
             }
         }
     }

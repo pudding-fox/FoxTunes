@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
-using ManagedBass.Mix;
 using System;
 using System.Collections.Generic;
 
@@ -14,6 +13,14 @@ namespace FoxTunes
         }
 
         public IBassOutputStream OutputStream { get; private set; }
+
+        IOutputStream IOutputStreamDataSource.Stream
+        {
+            get
+            {
+                return this.OutputStream;
+            }
+        }
 
         public bool GetFormat(out int rate, out int channels, out OutputStreamFormat format)
         {
@@ -87,14 +94,14 @@ namespace FoxTunes
         {
             var channelHandle = this.OutputStream.Stream.ChannelHandle;
             var length = BassStreamOutput.GetFFTLength(fftSize, individual);
-            return BassMix.ChannelGetData(channelHandle, buffer, unchecked((int)length));
+            return Bass.ChannelGetData(channelHandle, buffer, unchecked((int)length));
         }
 
         public int GetData(float[] buffer, int fftSize, out TimeSpan duration, bool individual = false)
         {
             var channelHandle = this.OutputStream.Stream.ChannelHandle;
             var length = BassStreamOutput.GetFFTLength(fftSize, individual);
-            var bytes = BassMix.ChannelGetData(channelHandle, buffer, unchecked((int)length));
+            var bytes = Bass.ChannelGetData(channelHandle, buffer, unchecked((int)length));
             duration = TimeSpan.FromSeconds(Bass.ChannelBytes2Seconds(channelHandle, bytes));
             return bytes;
         }

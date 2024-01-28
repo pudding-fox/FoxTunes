@@ -5,6 +5,8 @@ namespace FoxTunes.Interfaces
 {
     public interface IOutputStreamDataSource
     {
+        IOutputStream Stream { get; }
+
         bool GetFormat(out int rate, out int channels, out OutputStreamFormat format);
 
         bool GetChannelMap(out IDictionary<int, OutputChannel> channels);
