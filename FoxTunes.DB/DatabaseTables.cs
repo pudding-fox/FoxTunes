@@ -30,6 +30,8 @@ namespace FoxTunes
 
         public ITableConfig LibraryHierarchyNode { get; private set; }
 
+        public ITableConfig MetaDataProvider { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.MetaDataItem = this.Database.Config.Table<MetaDataItem>();
@@ -40,6 +42,7 @@ namespace FoxTunes
             this.LibraryHierarchy = this.Database.Config.Table<LibraryHierarchy>();
             this.LibraryHierarchyLevel = this.Database.Config.Table<LibraryHierarchyLevel>();
             this.LibraryHierarchyNode = this.Database.Config.Table<LibraryHierarchyNode>();
+            this.MetaDataProvider = this.Database.Config.Table<MetaDataProvider>();
             base.InitializeComponent(core);
         }
     }

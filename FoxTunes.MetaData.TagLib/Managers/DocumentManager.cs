@@ -9,6 +9,8 @@ namespace FoxTunes
 {
     public static class DocumentManager
     {
+        const string PREFIX = "document";
+
         const string MIME_TYPE_JSON = "application/json";
 
         static readonly Regex Base64 = new Regex("^([a-z0-9+/]{4})*([a-z0-9+/]{3}=|[a-z0-9+/]{2}==)?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -43,9 +45,11 @@ namespace FoxTunes
                     {
                         if (string.Equals(picture.MimeType, MIME_TYPE_JSON, StringComparison.OrdinalIgnoreCase))
                         {
-                            metaDatas.Add(new MetaDataItem(picture.Description, MetaDataItemType.Document)
+                            var name = string.Concat(PREFIX, ":", picture.Description);
+                            var value = string.Concat(MIME_TYPE_JSON, ":", ReadJsonDocument(picture.Data.Data));
+                            metaDatas.Add(new MetaDataItem(name, MetaDataItemType.Document)
                             {
-                                Value = string.Concat(MIME_TYPE_JSON, ":", ReadJsonDocument(picture.Data.Data))
+                                Value = value
                             });
                         }
                     }

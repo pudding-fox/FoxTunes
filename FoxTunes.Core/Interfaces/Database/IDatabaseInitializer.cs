@@ -15,6 +15,7 @@ namespace FoxTunes.Interfaces
         None = 0,
         Library = 1,
         Playlist = 2,
-        All = Library | Playlist
+        MetaData = 4,
+        All = Library | Playlist | MetaData
     }
 }

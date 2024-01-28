@@ -35,8 +35,6 @@ namespace FoxTunes
 
         public event EventHandler StateChanged;
 
-        public ICore Core { get; private set; }
-
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IPlaylistCache PlaylistCache { get; private set; }
@@ -51,7 +49,6 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Core = core;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistCache = core.Components.PlaylistCache;
             this.DatabaseFactory = core.Factories.Database;

@@ -57,6 +57,14 @@ namespace FoxTunes
             }
         }
 
+        public IMetaDataProviderManager MetaDataProvider
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IMetaDataProviderManager>();
+            }
+        }
+
         public IFileActionHandlerManager FileActionHandler
         {
             get

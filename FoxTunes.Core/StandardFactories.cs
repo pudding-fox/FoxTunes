@@ -20,6 +20,14 @@ namespace FoxTunes
             }
         }
 
+        public IMetaDataDecoratorFactory MetaDataDecorator
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IMetaDataDecoratorFactory>();
+            }
+        }
+
         public static readonly IStandardFactories Instance = new StandardFactories();
     }
 }

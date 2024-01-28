@@ -85,3 +85,11 @@ CREATE TABLE [LibraryHierarchyItem_LibraryItem] (
 	[LibraryHierarchyItem_Id] INTEGER NOT NULL REFERENCES LibraryHierarchyItems([Id]),
 	[LibraryItem_Id] INTEGER NOT NULL REFERENCES LibraryItems([Id])
 );
+
+CREATE TABLE [MetaDataProviders] (
+	[Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL,
+	[Name] nvarchar(4000) NOT NULL,
+	[Type] bigint NOT NULL,
+	[Script] nvarchar(max) NULL,
+	[Enabled] bit NOT NULL
+);

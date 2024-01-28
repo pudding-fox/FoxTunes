@@ -129,6 +129,14 @@ namespace FoxTunes
             }
         }
 
+        public IMetaDataProviderCache MetaDataProviderCache
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IMetaDataProviderCache>();
+            }
+        }
+
         public IMetaDataSynchronizer MetaDataSynchronizer
         {
             get

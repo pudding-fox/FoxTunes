@@ -5,5 +5,7 @@
         IDatabaseFactory Database { get; }
 
         IMetaDataSourceFactory MetaDataSource { get; }
+
+        IMetaDataDecoratorFactory MetaDataDecorator { get; }
     }
 }

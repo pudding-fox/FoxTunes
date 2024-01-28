@@ -135,6 +135,10 @@ namespace FoxTunes
                 {
                     lock (SyncRoot)
                     {
+                        if (this.Timer == null)
+                        {
+                            return;
+                        }
                         switch (this.Timer.Interval)
                         {
                             case NORMAL_INTERVAL:
