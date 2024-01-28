@@ -225,4 +225,7 @@
   <data name="MinidiscBehaviour.EncoderMissing" xml:space="preserve">
     <value>The encoder component was not found, only WAV 16/44.1 is supported.</value>
   </data>
+  <data name="MinidiscBehaviour.UnsupportedCompression" xml:space="preserve">
+    <value>Compression is not supported on this platform, atracdenc.exe requires at least 6.0.</value>
+  </data>
 </root>
