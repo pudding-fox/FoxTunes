@@ -1,6 +1,6 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.IO;
-using System.Net.Cache;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -8,31 +8,55 @@ namespace FoxTunes
 {
     public static class ImageLoader
     {
+        public static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         public static ImageSource Load(string fileName, int decodePixelWidth, int decodePixelHeight)
         {
-            using (var stream = File.OpenRead(fileName))
+            try
             {
-                return Load(stream, decodePixelWidth, decodePixelHeight);
+                using (var stream = File.OpenRead(fileName))
+                {
+                    return Load(stream, decodePixelWidth, decodePixelHeight);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Write(typeof(ImageLoader), LogLevel.Warn, "Failed to load image: {0}", e.Message);
+                return null;
             }
         }
 
         public static ImageSource Load(Stream stream, int decodePixelWidth, int decodePixelHeight)
         {
-            var source = new BitmapImage();
-            source.BeginInit();
-            source.CacheOption = BitmapCacheOption.OnLoad;
-            source.StreamSource = stream;
-            if (decodePixelWidth != 0)
+            try
             {
-                source.DecodePixelWidth = decodePixelWidth;
+                var source = new BitmapImage();
+                source.BeginInit();
+                source.CacheOption = BitmapCacheOption.OnLoad;
+                source.StreamSource = stream;
+                if (decodePixelWidth != 0)
+                {
+                    source.DecodePixelWidth = decodePixelWidth;
+                }
+                else if (decodePixelHeight != 0)
+                {
+                    source.DecodePixelHeight = decodePixelHeight;
+                }
+                source.EndInit();
+                source.Freeze();
+                return source;
             }
-            else if (decodePixelHeight != 0)
+            catch (Exception e)
             {
-                source.DecodePixelHeight = decodePixelHeight;
+                Logger.Write(typeof(ImageLoader), LogLevel.Warn, "Failed to load image: {0}", e.Message);
+                return null;
             }
-            source.EndInit();
-            source.Freeze();
-            return source;
         }
     }
 }

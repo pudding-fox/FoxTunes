@@ -105,6 +105,11 @@ namespace FoxTunes
                 return;
             }
             var source = ImageLoader.Load(fileName, decodePixelWidth, decodePixelHeight);
+            if (source == null)
+            {
+                //Image failed to load, nothing can be done.
+                return;
+            }
             var region = this.GetRegion(context, position, count, decodePixelWidth, decodePixelHeight);
             if (region.Width != region.Height)
             {
