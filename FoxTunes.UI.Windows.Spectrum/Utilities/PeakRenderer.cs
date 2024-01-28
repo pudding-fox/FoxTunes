@@ -469,10 +469,10 @@ namespace FoxTunes
                 switch (this.Format)
                 {
                     case OutputStreamFormat.Short:
-                        this.SampleCount = this.Renderer.Output.GetData(this.Samples16);
+                        this.SampleCount = this.Renderer.Output.GetData(this.Samples16) / sizeof(short);
                         break;
                     case OutputStreamFormat.Float:
-                        this.SampleCount = this.Renderer.Output.GetData(this.Samples32);
+                        this.SampleCount = this.Renderer.Output.GetData(this.Samples32) / sizeof(float);
                         break;
                 }
                 return this.Rate > 0 && this.Channels > 0 && this.SampleCount > 0;

@@ -435,14 +435,14 @@ namespace FoxTunes
             }
             if (data.Rms != null && data.CrestPoints != null)
             {
-                UpdateCrestPointsFast(data.Values, data.Rms, data.CrestPoints, data.Height);
+                UpdateCrestPointsFast(data.Values, data.Rms, data.CrestPoints, data.Width, data.Height);
             }
         }
 
-        private static void UpdateCrestPointsFast(float[] values, float[] rms, Int32Point[] elements, int height)
+        private static void UpdateCrestPointsFast(float[] values, float[] rms, Int32Point[] elements, int width, int height)
         {
             height = height - 1;
-            var step = height / values.Length;
+            var step = width / values.Length;
             var offset = default(float);
             for (var a = 0; a < values.Length; a++)
             {
