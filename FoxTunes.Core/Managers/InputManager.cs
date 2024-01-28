@@ -38,14 +38,6 @@ namespace FoxTunes
 
         const int VK_RWIN = 0x5C;
 
-        public ConcurrentDictionary<Tuple<int, int, int>, Action> Registrations { get; private set; }
-
-        public IntPtr Hook { get; private set; }
-
-        public KeyboardProc Callback { get; private set; }
-
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
         public InputManager()
         {
             this.Registrations = new ConcurrentDictionary<Tuple<int, int, int>, Action>();
@@ -66,6 +58,41 @@ namespace FoxTunes
                 }
                 return CallNextHookEx(this.Hook, code, input, ref keys);
             };
+        }
+
+        public ConcurrentDictionary<Tuple<int, int, int>, Action> Registrations { get; private set; }
+
+        public IntPtr Hook { get; private set; }
+
+        public KeyboardProc Callback { get; private set; }
+
+        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
+
+        public bool _Enabled { get; private set; }
+
+        public bool Enabled
+        {
+            get
+            {
+                return this._Enabled;
+            }
+            set
+            {
+                this._Enabled = value;
+                this.OnEnabledChanged();
+            }
+        }
+
+        protected virtual void OnEnabledChanged()
+        {
+            if (this.Enabled)
+            {
+                this.Enable();
+            }
+            else
+            {
+                this.Disable();
+            }
         }
 
         protected virtual int GetModifiers()
@@ -99,15 +126,6 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.BackgroundTaskRunner = core.Components.BackgroundTaskRunner;
-            this.Hook = SetHook(this.Callback);
-            if (this.Hook != IntPtr.Zero)
-            {
-                Logger.Write(this, LogLevel.Debug, "Added keyboard hook, global keyboard shortcuts are enabled.");
-            }
-            else
-            {
-                Logger.Write(this, LogLevel.Warn, "Failed to add keyboard hook, global keyboard shortcuts are disabled.");
-            }
             base.InitializeComponent(core);
         }
 
@@ -141,13 +159,35 @@ namespace FoxTunes
             );
         }
 
-        protected override void OnDisposing()
+        protected virtual void Enable()
+        {
+            if (this.Hook == IntPtr.Zero)
+            {
+                this.Hook = SetHook(this.Callback);
+                if (this.Hook != IntPtr.Zero)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Added keyboard hook, global keyboard shortcuts are enabled.");
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to add keyboard hook, global keyboard shortcuts are disabled.");
+                }
+            }
+        }
+
+        protected virtual void Disable()
         {
             if (this.Hook != IntPtr.Zero)
             {
                 UnhookWindowsHookEx(this.Hook);
                 this.Hook = IntPtr.Zero;
+                Logger.Write(this, LogLevel.Debug, "Removed keyboard hook, global keyboard shortcuts are disabled.");
             }
+        }
+
+        protected override void OnDisposing()
+        {
+            this.Disable();
             base.OnDisposing();
         }
 
