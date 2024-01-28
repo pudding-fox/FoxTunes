@@ -10,7 +10,7 @@ namespace FoxTunes
     {
         public const int POSITION_INDETERMINATE = -1;
 
-        protected BassStreamInput(BassFlags flags) : base(flags)
+        protected BassStreamInput(IBassStreamPipeline pipeline, BassFlags flags) : base(pipeline, flags)
         {
 
         }

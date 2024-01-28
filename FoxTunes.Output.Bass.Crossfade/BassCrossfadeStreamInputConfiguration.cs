@@ -44,38 +44,43 @@ namespace FoxTunes
 
         public const string STOP_ELEMENT = "EEEIB80E-222F-4A0A-8C83-AE8D03C3F479";
 
+        public const string BUFFER_ELEMENT = "FFFF3EF8-AFA9-4870-A4F3-30CE4600750F";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(INPUT_ELEMENT)
                     .WithOptions(new[] { new SelectionConfigurationOption(INPUT_CROSSFADE_OPTION, Strings.BassCrossfadeStreamInput_Name) }))
-                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, "Mode", path: "Fading")
+                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.BassCrossfadeStreamInputConfiguration_Mode, path: Strings.BassCrossfadeStreamInputConfiguration_Path)
                     .WithOptions(GetModeOptions())
                     .DependsOn(SECTION, INPUT_ELEMENT, INPUT_CROSSFADE_OPTION))
-                .WithElement(new IntegerConfigurationElement(PERIOD_IN_ELEMENT, "Fade In Period", path: "Fading")
+                .WithElement(new IntegerConfigurationElement(PERIOD_IN_ELEMENT, Strings.BassCrossfadeStreamInputConfiguration_PeriodIn, path: Strings.BassCrossfadeStreamInputConfiguration_Path)
                     .WithValue(100)
                     .WithValidationRule(new IntegerValidationRule(0, 5000, step: 100))
                     .DependsOn(SECTION, INPUT_ELEMENT, INPUT_CROSSFADE_OPTION))
-                .WithElement(new IntegerConfigurationElement(PERIOD_OUT_ELEMENT, "Fade Out Period", path: "Fading")
+                .WithElement(new IntegerConfigurationElement(PERIOD_OUT_ELEMENT, Strings.BassCrossfadeStreamInputConfiguration_PeriodOut, path: Strings.BassCrossfadeStreamInputConfiguration_Path)
                     .WithValue(100)
                     .WithValidationRule(new IntegerValidationRule(0, 5000, step: 100))
                     .DependsOn(SECTION, INPUT_ELEMENT, INPUT_CROSSFADE_OPTION))
-                .WithElement(new SelectionConfigurationElement(TYPE_IN_ELEMENT, "Fade In Curve", path: "Fading")
+                .WithElement(new SelectionConfigurationElement(TYPE_IN_ELEMENT, Strings.BassCrossfadeStreamInputConfiguration_TypeIn, path: Strings.BassCrossfadeStreamInputConfiguration_Path)
                     .WithOptions(GetTypeOptions(TYPE_OUT_QUAD_OPTION))
                     .DependsOn(SECTION, INPUT_ELEMENT, INPUT_CROSSFADE_OPTION))
-                .WithElement(new SelectionConfigurationElement(TYPE_OUT_ELEMENT, "Fade Out Curve", path: "Fading")
+                .WithElement(new SelectionConfigurationElement(TYPE_OUT_ELEMENT, Strings.BassCrossfadeStreamInputConfiguration_TypeOut, path: Strings.BassCrossfadeStreamInputConfiguration_Path)
                     .WithOptions(GetTypeOptions(TYPE_OUT_QUAD_OPTION))
                     .DependsOn(SECTION, INPUT_ELEMENT, INPUT_CROSSFADE_OPTION))
-                .WithElement(new BooleanConfigurationElement(MIX_ELEMENT, "Crossfade", path: "Fading")
+                .WithElement(new BooleanConfigurationElement(MIX_ELEMENT, Strings.BassCrossfadeStreamInputConfiguration_Mix, path: Strings.BassCrossfadeStreamInputConfiguration_Path)
                     .WithValue(false)
                     .DependsOn(SECTION, INPUT_ELEMENT, INPUT_CROSSFADE_OPTION))
-                .WithElement(new BooleanConfigurationElement(START_ELEMENT, "Start", path: "Fading")
+                .WithElement(new BooleanConfigurationElement(START_ELEMENT, Strings.BassCrossfadeStreamInputConfiguration_Start, path: Strings.BassCrossfadeStreamInputConfiguration_Path)
                     .WithValue(false)
                     .DependsOn(SECTION, INPUT_ELEMENT, INPUT_CROSSFADE_OPTION))
-                .WithElement(new BooleanConfigurationElement(PAUSE_RESUME_ELEMENT, "Pause/Resume", path: "Fading")
+                .WithElement(new BooleanConfigurationElement(PAUSE_RESUME_ELEMENT, Strings.BassCrossfadeStreamInputConfiguration_PauseResume, path: Strings.BassCrossfadeStreamInputConfiguration_Path)
                     .WithValue(false)
                     .DependsOn(SECTION, INPUT_ELEMENT, INPUT_CROSSFADE_OPTION))
-                .WithElement(new BooleanConfigurationElement(STOP_ELEMENT, "Stop", path: "Fading")
+                .WithElement(new BooleanConfigurationElement(STOP_ELEMENT, Strings.BassCrossfadeStreamInputConfiguration_Stop, path: Strings.BassCrossfadeStreamInputConfiguration_Path)
+                    .WithValue(false)
+                    .DependsOn(SECTION, INPUT_ELEMENT, INPUT_CROSSFADE_OPTION))
+                .WithElement(new BooleanConfigurationElement(BUFFER_ELEMENT, Strings.BassCrossfadeStreamInputConfiguration_Buffer, path: Strings.BassCrossfadeStreamInputConfiguration_Path_Advanced)
                     .WithValue(false)
                     .DependsOn(SECTION, INPUT_ELEMENT, INPUT_CROSSFADE_OPTION)
             );
@@ -83,8 +88,8 @@ namespace FoxTunes
 
         private static IEnumerable<SelectionConfigurationOption> GetModeOptions()
         {
-            yield return new SelectionConfigurationOption(MODE_ALWAYS_OPTION, "Always");
-            yield return new SelectionConfigurationOption(MODE_MANUAL_OPTION, "Manual").Default();
+            yield return new SelectionConfigurationOption(MODE_ALWAYS_OPTION, Strings.BassCrossfadeStreamInputConfiguration_Mode_Always);
+            yield return new SelectionConfigurationOption(MODE_MANUAL_OPTION, Strings.BassCrossfadeStreamInputConfiguration_Mode_Manual).Default();
         }
 
         public static BassCrossfadeMode GetMode(SelectionConfigurationOption option)

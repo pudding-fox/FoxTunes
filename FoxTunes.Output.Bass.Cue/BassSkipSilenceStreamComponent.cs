@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     public class BassSkipSilenceStreamComponent : BassStreamComponent
     {
-        public BassSkipSilenceStreamComponent(BassSkipSilenceStreamAdvisorBehaviour behaviour, BassFlags flags) : base(flags)
+        public BassSkipSilenceStreamComponent(BassSkipSilenceStreamAdvisorBehaviour behaviour, IBassStreamPipeline pipeline, BassFlags flags) : base(pipeline, flags)
         {
             this.Behaviour = behaviour;
         }

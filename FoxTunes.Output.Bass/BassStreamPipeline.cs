@@ -9,11 +9,9 @@ namespace FoxTunes
     {
         public static readonly object SyncRoot = new object();
 
-        public BassStreamPipeline(IBassStreamInput input, IEnumerable<IBassStreamComponent> components, IBassStreamOutput output)
+        public BassStreamPipeline()
         {
-            this.Input = input;
-            this.Components = components;
-            this.Output = output;
+            this.Components = Enumerable.Empty<IBassStreamComponent>();
         }
 
         public IBassStreamInput Input { get; private set; }
@@ -26,12 +24,18 @@ namespace FoxTunes
         {
             get
             {
-                yield return this.Input;
+                if (this.Input != null)
+                {
+                    yield return this.Input;
+                }
                 foreach (var component in this.Components)
                 {
                     yield return component;
                 }
-                yield return this.Output;
+                if (this.Output != null)
+                {
+                    yield return this.Output;
+                }
             }
         }
 
@@ -67,6 +71,13 @@ namespace FoxTunes
             }
         }
 
+        public void InitializeComponent(IBassStreamInput input, IEnumerable<IBassStreamComponent> components, IBassStreamOutput output)
+        {
+            this.Input = input;
+            this.Components = components;
+            this.Output = output;
+        }
+
         public void Connect(BassOutputStream stream)
         {
             var previous = (IBassStreamComponent)this.Input;
@@ -88,47 +99,47 @@ namespace FoxTunes
             this.All.ForEach(component => component.ClearBuffer());
         }
 
-        public void PreviewPlay(IBassStreamPipeline pipeline)
+        public void PreviewPlay()
         {
-            this.Controllable.ForEach(component => component.PreviewPlay(pipeline));
+            this.Controllable.ForEach(component => component.PreviewPlay());
         }
 
-        public void PreviewPause(IBassStreamPipeline pipeline)
+        public void PreviewPause()
         {
-            this.Controllable.Reverse().ForEach(component => component.PreviewPause(pipeline));
+            this.Controllable.Reverse().ForEach(component => component.PreviewPause());
         }
 
-        public void PreviewResume(IBassStreamPipeline pipeline)
+        public void PreviewResume()
         {
-            this.Controllable.ForEach(component => component.PreviewResume(pipeline));
+            this.Controllable.ForEach(component => component.PreviewResume());
         }
 
-        public void PreviewStop(IBassStreamPipeline pipeline)
+        public void PreviewStop()
         {
-            this.Controllable.Reverse().ForEach(component => component.PreviewStop(pipeline));
+            this.Controllable.Reverse().ForEach(component => component.PreviewStop());
         }
 
         public void Play()
         {
-            this.PreviewPlay(this);
+            this.PreviewPlay();
             this.Controllable.ForEach(component => component.Play());
         }
 
         public void Pause()
         {
-            this.PreviewPause(this);
+            this.PreviewPause();
             this.Controllable.Reverse().ForEach(component => component.Pause());
         }
 
         public void Resume()
         {
-            this.PreviewResume(this);
+            this.PreviewResume();
             this.Controllable.ForEach(component => component.Resume());
         }
 
         public void Stop()
         {
-            this.PreviewStop(this);
+            this.PreviewStop();
             this.Controllable.Reverse().ForEach(component => component.Stop());
         }
 

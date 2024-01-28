@@ -77,5 +77,131 @@ namespace FoxTunes {
                 return ResourceManager.GetString("BassCrossfadeStreamInputBehaviour.Unsupported", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Buffer.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_Buffer {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.Buffer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Crossfade.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_Mix {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.Mix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mode.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_Mode {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.Mode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Always.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_Mode_Always {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.Mode.Always", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manual.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_Mode_Manual {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.Mode.Manual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fading.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_Path {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fading\Advanced.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_Path_Advanced {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.Path.Advanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause/Resume.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_PauseResume {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.PauseResume", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fade In Period.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_PeriodIn {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.PeriodIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fade Out Period.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_PeriodOut {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.PeriodOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_Start {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.Start", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_Stop {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.Stop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Face In Curve.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_TypeIn {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.TypeIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fade Out Curve.
+        /// </summary>
+        internal static string BassCrossfadeStreamInputConfiguration_TypeOut {
+            get {
+                return ResourceManager.GetString("BassCrossfadeStreamInputConfiguration.TypeOut", resourceCulture);
+            }
+        }
     }
 }

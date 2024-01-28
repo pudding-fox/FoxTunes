@@ -39,29 +39,19 @@ namespace FoxTunes
 
         public IBassStreamPipeline CreatePipeline(BassOutputStream stream)
         {
-            var input = default(IBassStreamInput);
-            var components = default(IEnumerable<IBassStreamComponent>);
-            var output = default(IBassStreamOutput);
-            this.CreatePipeline(stream, out input, out components, out output);
-            var pipeline = new BassStreamPipeline(
-                input,
-                components,
-                output
-            );
+            var pipeline = new BassStreamPipeline();
+            this.CreatePipeline(pipeline, stream);
             try
             {
                 pipeline.Connect(stream);
                 if (Logger.IsDebugEnabled(this))
                 {
-                    if (components.Any())
-                    {
-                        Logger.Write(
-                            this,
-                            LogLevel.Debug,
-                            "Connected pipeline: {0}",
-                            string.Join(" => ", pipeline.All.Select(component => string.Format("\"{0}\"", component.GetType().Name)))
-                        );
-                    }
+                    Logger.Write(
+                        this,
+                        LogLevel.Debug,
+                        "Connected pipeline: {0}",
+                        string.Join(" => ", pipeline.All.Select(component => string.Format("\"{0}\"", component.GetType().Name)))
+                    );
                 }
             }
             catch (Exception e)
@@ -73,21 +63,19 @@ namespace FoxTunes
             return pipeline;
         }
 
-        protected virtual void CreatePipeline(BassOutputStream stream, out IBassStreamInput input, out IEnumerable<IBassStreamComponent> components, out IBassStreamOutput output)
+        protected virtual void CreatePipeline(IBassStreamPipeline pipeline, BassOutputStream stream)
         {
-            var e = new CreatingPipelineEventArgs(this.QueryPipeline(), stream);
+            var e = new CreatingPipelineEventArgs(pipeline, this.QueryPipeline(), stream);
             this.OnCreatingPipeline(e);
-            input = e.Input;
-            components = e.Components;
-            output = e.Output;
-            if (input == null)
+            if (e.Input == null)
             {
                 throw new NotImplementedException("Failed to locate a suitable pipeline input.");
             }
-            if (output == null)
+            if (e.Output == null)
             {
                 throw new NotImplementedException("Failed to locate a suitable pipeline output.");
             }
+            pipeline.InitializeComponent(e.Input, e.Components, e.Output);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     public class BassOutputTempoStreamComponent : BassStreamComponent
     {
-        public BassOutputTempoStreamComponent(BassOutputTempoStreamComponentBehaviour behaviour, BassFlags flags) : base(flags)
+        public BassOutputTempoStreamComponent(BassOutputTempoStreamComponentBehaviour behaviour, IBassStreamPipeline pipeline, BassFlags flags) : base(pipeline, flags)
         {
             this.Behaviour = behaviour;
         }

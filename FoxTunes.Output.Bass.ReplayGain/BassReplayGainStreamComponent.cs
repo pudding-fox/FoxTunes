@@ -6,7 +6,7 @@ namespace FoxTunes
 {
     public class BassReplayGainStreamComponent : BassStreamComponent
     {
-        public BassReplayGainStreamComponent(BassReplayGainBehaviour behaviour, BassFlags flags) : base(flags)
+        public BassReplayGainStreamComponent(BassReplayGainBehaviour behaviour, IBassStreamPipeline pipeline, BassFlags flags) : base(pipeline, flags)
         {
             this.Behaviour = behaviour;
         }

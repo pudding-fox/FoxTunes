@@ -9,7 +9,7 @@ namespace FoxTunes
 {
     public abstract class BassStreamOutput : BassStreamComponent, IBassStreamOutput
     {
-        protected BassStreamOutput(BassFlags flags) : base(flags)
+        protected BassStreamOutput(IBassStreamPipeline pipeline, BassFlags flags) : base(pipeline, flags)
         {
 
         }
@@ -64,28 +64,28 @@ namespace FoxTunes
 
         public abstract bool CheckFormat(int rate, int channels);
 
-        public abstract bool IsPlaying { get;  }
+        public abstract bool IsPlaying { get; }
 
-        public abstract bool IsPaused { get;  }
+        public abstract bool IsPaused { get; }
 
-        public abstract bool IsStopped { get;  }
+        public abstract bool IsStopped { get; }
 
-        public virtual void PreviewPlay(IBassStreamPipeline pipeline)
+        public virtual void PreviewPlay()
         {
             //Nothing to do.
         }
 
-        public virtual void PreviewPause(IBassStreamPipeline pipeline)
+        public virtual void PreviewPause()
         {
             //Nothing to do.
         }
 
-        public virtual void PreviewResume(IBassStreamPipeline pipeline)
+        public virtual void PreviewResume()
         {
             //Nothing to do.
         }
 
-        public virtual void PreviewStop(IBassStreamPipeline pipeline)
+        public virtual void PreviewStop()
         {
             //Nothing to do.
         }

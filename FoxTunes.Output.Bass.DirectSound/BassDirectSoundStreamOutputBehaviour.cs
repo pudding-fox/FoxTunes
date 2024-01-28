@@ -134,7 +134,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var output = new BassDirectSoundStreamOutput(this, e.Stream.Flags);
+            var output = new BassDirectSoundStreamOutput(this, e.Pipeline, e.Stream.Flags);
             output.InitializeComponent(this.Core);
             e.Output = output;
         }

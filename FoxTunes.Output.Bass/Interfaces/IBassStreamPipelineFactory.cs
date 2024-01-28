@@ -36,11 +36,14 @@ namespace FoxTunes.Interfaces
             this.Components = new List<IBassStreamComponent>();
         }
 
-        public CreatingPipelineEventArgs(IBassStreamPipelineQueryResult query, BassOutputStream stream) : this()
+        public CreatingPipelineEventArgs(IBassStreamPipeline pipeline, IBassStreamPipelineQueryResult query, BassOutputStream stream) : this()
         {
+            this.Pipeline = pipeline;
             this.Query = query;
             this.Stream = stream;
         }
+
+        public IBassStreamPipeline Pipeline { get; private set; }
 
         public IBassStreamPipelineQueryResult Query { get; private set; }
 

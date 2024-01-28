@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     public class BassParametricEqualizerStreamComponent : BassStreamComponent
     {
-        public BassParametricEqualizerStreamComponent(BassParametricEqualizerStreamComponentBehaviour behaviour, BassFlags flags) : base(flags)
+        public BassParametricEqualizerStreamComponent(BassParametricEqualizerStreamComponentBehaviour behaviour, IBassStreamPipeline pipeline, BassFlags flags) : base(pipeline, flags)
         {
             this.Behaviour = behaviour;
         }

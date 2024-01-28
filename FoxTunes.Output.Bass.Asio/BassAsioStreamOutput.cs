@@ -10,13 +10,12 @@ namespace FoxTunes
 {
     public class BassAsioStreamOutput : BassStreamOutput
     {
-        protected BassAsioStreamOutput(BassFlags flags) : base(flags)
+        protected BassAsioStreamOutput(IBassStreamPipeline pipeline, BassFlags flags) : base(pipeline, flags)
         {
             this.MixerChannelHandles = new HashSet<int>();
         }
 
-        public BassAsioStreamOutput(BassAsioStreamOutputBehaviour behaviour, BassFlags flags)
-            : this(flags)
+        public BassAsioStreamOutput(BassAsioStreamOutputBehaviour behaviour, IBassStreamPipeline pipeline, BassFlags flags) : this(pipeline, flags)
         {
             this.Behaviour = behaviour;
         }
