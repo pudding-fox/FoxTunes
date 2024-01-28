@@ -396,5 +396,14 @@ namespace FoxTunes
             }
             return null;
         }
+
+        public static string Replace(this string subject, IEnumerable<char> oldChars, char newChar)
+        {
+            foreach (var oldChar in oldChars)
+            {
+                subject = subject.Replace(oldChar, newChar);
+            }
+            return subject;
+        }
     }
 }
