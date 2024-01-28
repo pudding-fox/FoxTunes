@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace FoxTunes
 {
@@ -40,7 +39,7 @@ namespace FoxTunes
                     .WithOptions(GetLevelOptions())
                     .DependsOn(SECTION, ENABLED_ELEMENT))
                 .WithElement(new CommandConfigurationElement(OPEN_ELEMENT, Strings.LoggingBehaviourConfiguration_Open)
-                    .WithHandler(() => Process.Start(LogManager.FileName))
+                    .WithAsyncHandler(LogManager.Open)
                     .DependsOn(SECTION, ENABLED_ELEMENT));
         }
 

@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -48,6 +49,28 @@ namespace FoxTunes
             });
             this.Invoked += handler;
             return this;
+        }
+
+        public CommandConfigurationElement WithAsyncHandler(Action action)
+        {
+            return this.WithHandler(() =>
+            {
+#if NET40
+                var task = TaskEx.Run(() =>
+#else
+                var task = Task.Run(() =>
+#endif
+                {
+                    try
+                    {
+                        action();
+                    }
+                    catch
+                    {
+                        //Nothing can be done, never throw on background thread.
+                    }
+                });
+            });
         }
 
         public override void InitializeComponent()
