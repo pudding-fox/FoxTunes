@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 
@@ -59,6 +60,7 @@ namespace FoxTunes
             public AllowsTransparencyBehaviour(Window window) : this()
             {
                 this.Window = window;
+                this.Window.Loaded += this.OnLoaded;
                 if (this.ThemeLoader != null)
                 {
                     this.ThemeLoader.ThemeChanged += this.OnThemeChanged;
@@ -71,6 +73,15 @@ namespace FoxTunes
             public IUserInterface UserInterface { get; private set; }
 
             public Window Window { get; private set; }
+
+            protected virtual void OnLoaded(object sender, RoutedEventArgs e)
+            {
+                if (!this.Window.AllowsTransparency)
+                {
+                    return;
+                }
+                this.EnableBlur();
+            }
 
             protected virtual void OnThemeChanged(object sender, EventArgs e)
             {
@@ -91,13 +102,75 @@ namespace FoxTunes
                 }
             }
 
+            protected virtual void EnableBlur()
+            {
+                var windowHelper = new WindowInteropHelper(this.Window);
+                var accent = new AccentPolicy()
+                {
+                    AccentState = AccentState.ACCENT_ENABLE_BLURBEHIND
+                };
+                var accentStructSize = Marshal.SizeOf(accent);
+                var accentPtr = Marshal.AllocHGlobal(accentStructSize);
+                try
+                {
+                    Marshal.StructureToPtr(accent, accentPtr, false);
+                    var data = new WindowCompositionAttributeData();
+                    data.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
+                    data.SizeOfData = accentStructSize;
+                    data.Data = accentPtr;
+                    SetWindowCompositionAttribute(windowHelper.Handle, ref data);
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(accentPtr);
+                }
+            }
+
             protected override void OnDisposing()
             {
+                if (this.Window != null)
+                {
+                    this.Window.Loaded -= this.OnLoaded;
+                }
                 if (this.ThemeLoader != null)
                 {
                     this.ThemeLoader.ThemeChanged -= this.OnThemeChanged;
                 }
                 base.OnDisposing();
+            }
+
+            [DllImport("user32.dll")]
+            public static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
+
+            public enum AccentState
+            {
+                ACCENT_DISABLED = 1,
+                ACCENT_ENABLE_GRADIENT = 0,
+                ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
+                ACCENT_ENABLE_BLURBEHIND = 3,
+                ACCENT_INVALID_STATE = 4
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct AccentPolicy
+            {
+                public AccentState AccentState;
+                public int AccentFlags;
+                public int GradientColor;
+                public int AnimationId;
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct WindowCompositionAttributeData
+            {
+                public WindowCompositionAttribute Attribute;
+                public IntPtr Data;
+                public int SizeOfData;
+            }
+
+            public enum WindowCompositionAttribute
+            {
+                WCA_ACCENT_POLICY = 19
             }
         }
     }
