@@ -1,5 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
@@ -9,7 +8,7 @@ namespace FoxTunes
     [Component(ID)]
     [WindowsUserInterfaceDependency]
     [ComponentPreference(ReleaseType.Default)]
-    public class AdamantineTheme : ThemeBase, IConfigurableComponent
+    public class AdamantineTheme : ThemeBase
     {
         public const string ID = "06464CF4-118F-47EA-9597-303D305EF847";
 
@@ -17,19 +16,6 @@ namespace FoxTunes
             : base(ID, Strings.AdamantineTheme_Name, Strings.AdamantineTheme_Description, GetColorPalettes())
         {
 
-        }
-
-        public override void InitializeComponent(ICore core)
-        {
-            base.InitializeComponent(core);
-            this.ConnectSetting(
-                AdamantineThemeConfiguration.SECTION,
-                AdamantineThemeConfiguration.LIST_ROW_SHADING,
-                () => new ResourceDictionary()
-                {
-                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/Adamantine_ListRowShading.xaml", UriKind.Relative)
-                }
-            );
         }
 
         public override int CornerRadius
@@ -72,11 +58,6 @@ namespace FoxTunes
                     Resources.Transparent_White
                 ),
             };
-        }
-
-        public IEnumerable<ConfigurationSection> GetConfigurationSections()
-        {
-            return AdamantineThemeConfiguration.GetConfigurationSections();
         }
     }
 }
