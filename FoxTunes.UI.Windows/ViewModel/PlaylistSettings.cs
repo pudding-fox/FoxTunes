@@ -66,6 +66,37 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler PlaylistColumnsChanged = delegate { };
 
+        public ICommand NewCommand
+        {
+            get
+            {
+                return new Command(
+                    () =>
+                    {
+                        var playlistColumn = new PlaylistColumn();
+                        this.PlaylistColumns.Add(playlistColumn);
+                        this.SelectedPlaylistColumn = playlistColumn;
+                    },
+                    () => this.PlaylistColumns != null
+                );
+            }
+        }
+
+        public ICommand DeleteCommand
+        {
+            get
+            {
+                return new Command(
+                    () =>
+                    {
+                        this.PlaylistColumns.Remove(this.SelectedPlaylistColumn);
+                        this.SelectedPlaylistColumn = this.PlaylistColumns.FirstOrDefault();
+                    },
+                    () => this.PlaylistColumns != null && this.SelectedPlaylistColumn != null
+                );
+            }
+        }
+
         public ICommand SaveCommand
         {
             get
@@ -76,15 +107,21 @@ namespace FoxTunes.ViewModel
 
         public void Save()
         {
-            using (var transaction = this.Database.BeginTransaction())
+            try
             {
-                var playlistColumns = this.Database.Set<PlaylistColumn>(transaction);
-                playlistColumns.Remove(playlistColumns.Except(this.PlaylistColumns));
-                playlistColumns.AddOrUpdate(this.PlaylistColumns);
-                transaction.Commit();
+                using (var transaction = this.Database.BeginTransaction())
+                {
+                    var playlistColumns = this.Database.Set<PlaylistColumn>(transaction);
+                    playlistColumns.Remove(playlistColumns.Except(this.PlaylistColumns));
+                    playlistColumns.AddOrUpdate(this.PlaylistColumns);
+                    transaction.Commit();
+                }
+                this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
             }
-            this.Refresh();
-            this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated));
+            catch (Exception e)
+            {
+                this.OnError("Save", e);
+            }
         }
 
         protected override void OnCoreChanged()
@@ -98,6 +135,7 @@ namespace FoxTunes.ViewModel
         protected virtual void Refresh()
         {
             this.PlaylistColumns = new ObservableCollection<PlaylistColumn>(this.Database.Sets.PlaylistColumn);
+            this.SelectedPlaylistColumn = this.PlaylistColumns.FirstOrDefault();
         }
 
         protected override Freezable CreateInstanceCore()

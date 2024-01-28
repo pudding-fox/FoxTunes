@@ -30,6 +30,7 @@ namespace FoxTunes.ViewModel
                     (component as IBackgroundTaskSource).BackgroundTask += this.OnBackgroundTask;
                 }
             });
+            ViewModelBase.Error += this.OnError;
             base.OnCoreChanged();
         }
 
