@@ -166,21 +166,25 @@ AS
                     "Items\".\"IsLeaf\"\r\n\tJOIN \"LibraryHierarchy\" AS \"LibraryHierarchy_Copy\" ON \"Library" +
                     "Hierarchy_Copy\".\"LibraryHierarchy_Id\" = \"LibraryHierarchyItems_Copy\".\"LibraryHie" +
                     "rarchy_Id\"\r\n\t\tAND \"LibraryHierarchy_Copy\".\"LibraryHierarchyLevel_Id\" = \r\n\t\t(\r\n\t\t" +
-                    "\tSELECT MAX(\"Id\") \r\n\t\t\tFROM \"LibraryHierarchyLevels\" \r\n\t\t\tWHERE \"Id\" < \"LibraryH" +
-                    "ierarchy\".\"LibraryHierarchyLevel_Id\"\r\n\t\t)\r\n\t\tAND \"LibraryHierarchy_Copy\".\"Librar" +
-                    "yItem_Id\" = \"LibraryHierarchy\".\"LibraryItem_Id\"\r\n\t\tAND \"LibraryHierarchy_Copy\".\"" +
-                    "DisplayValue\" = \"LibraryHierarchyItems_Copy\".\"DisplayValue\"\r\n\t\tAND \"LibraryHiera" +
-                    "rchy_Copy\".\"SortValue\" = \"LibraryHierarchyItems_Copy\".\"SortValue\"\r\n\t\tAND \"Librar" +
-                    "yHierarchy_Copy\".\"IsLeaf\" = \"LibraryHierarchyItems_Copy\".\"IsLeaf\"\r\n);\r\n\r\nDELETE " +
-                    "FROM \"LibraryHierarchyItem_LibraryItem\";\r\n\r\nINSERT INTO \"LibraryHierarchyItem_Li" +
-                    "braryItem\" (\"LibraryHierarchyItem_Id\", \"LibraryItem_Id\")\r\nSELECT \"LibraryHierarc" +
-                    "hyItems\".\"Id\", \"LibraryHierarchy\".\"LibraryItem_Id\"\r\nFROM \"LibraryHierarchyItems\"" +
-                    "\r\n\tJOIN \"LibraryHierarchy\" ON \"LibraryHierarchy\".\"LibraryHierarchy_Id\" \r\n\t\tAND \"" +
-                    "LibraryHierarchy\".\"LibraryHierarchyLevel_Id\" = \"LibraryHierarchyItems\".\"LibraryH" +
-                    "ierarchyLevel_Id\"\r\n\t\tAND \"LibraryHierarchy\".\"DisplayValue\" = \"LibraryHierarchyIt" +
-                    "ems\".\"DisplayValue\"\r\n\t\tAND \"LibraryHierarchy\".\"SortValue\" = \"LibraryHierarchyIte" +
-                    "ms\".\"SortValue\"\r\n\t\tAND \"LibraryHierarchy\".\"IsLeaf\" = \"LibraryHierarchyItems\".\"Is" +
-                    "Leaf\";\r\n\r\nDROP TABLE \"LibraryHierarchy\";");
+                    "\tSELECT MAX(\"LibraryHierarchyLevels\".\"Id\") \r\n\t\t\tFROM \"LibraryHierarchyLevels\" \r\n" +
+                    "\t\t\t\tJOIN \"LibraryHierarchy_LibraryHierarchyLevel\" ON \"LibraryHierarchyLevels\".\"I" +
+                    "d\" = \"LibraryHierarchy_LibraryHierarchyLevel\".\"LibraryHierarchyLevel_Id\"\r\n\t\t\tWHE" +
+                    "RE \"LibraryHierarchyLevels\".\"Id\" < \"LibraryHierarchy\".\"LibraryHierarchyLevel_Id\"" +
+                    " AND \"LibraryHierarchy_LibraryHierarchyLevel\".\"LibraryHierarchy_Id\" = \"LibraryHi" +
+                    "erarchy\".\"LibraryHierarchy_Id\" \r\n\t\t)\r\n\t\tAND \"LibraryHierarchy_Copy\".\"LibraryItem" +
+                    "_Id\" = \"LibraryHierarchy\".\"LibraryItem_Id\"\r\n\t\tAND \"LibraryHierarchy_Copy\".\"Displ" +
+                    "ayValue\" = \"LibraryHierarchyItems_Copy\".\"DisplayValue\"\r\n\t\tAND \"LibraryHierarchy_" +
+                    "Copy\".\"SortValue\" = \"LibraryHierarchyItems_Copy\".\"SortValue\"\r\n\t\tAND \"LibraryHier" +
+                    "archy_Copy\".\"IsLeaf\" = \"LibraryHierarchyItems_Copy\".\"IsLeaf\"\r\n);\r\n\r\nDELETE FROM " +
+                    "\"LibraryHierarchyItem_LibraryItem\";\r\n\r\nINSERT INTO \"LibraryHierarchyItem_Library" +
+                    "Item\" (\"LibraryHierarchyItem_Id\", \"LibraryItem_Id\")\r\nSELECT \"LibraryHierarchyIte" +
+                    "ms\".\"Id\", \"LibraryHierarchy\".\"LibraryItem_Id\"\r\nFROM \"LibraryHierarchyItems\"\r\n\tJO" +
+                    "IN \"LibraryHierarchy\" ON \"LibraryHierarchy\".\"LibraryHierarchy_Id\" \r\n\t\tAND \"Libra" +
+                    "ryHierarchy\".\"LibraryHierarchyLevel_Id\" = \"LibraryHierarchyItems\".\"LibraryHierar" +
+                    "chyLevel_Id\"\r\n\t\tAND \"LibraryHierarchy\".\"DisplayValue\" = \"LibraryHierarchyItems\"." +
+                    "\"DisplayValue\"\r\n\t\tAND \"LibraryHierarchy\".\"SortValue\" = \"LibraryHierarchyItems\".\"" +
+                    "SortValue\"\r\n\t\tAND \"LibraryHierarchy\".\"IsLeaf\" = \"LibraryHierarchyItems\".\"IsLeaf\"" +
+                    ";\r\n\r\nDROP TABLE \"LibraryHierarchy\";");
             return this.GenerationEnvironment.ToString();
         }
     }
