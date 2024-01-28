@@ -79,6 +79,25 @@ namespace FoxTunes.ViewModel.Config
 
         public event EventHandler IsMultilineChanged;
 
+        public bool IsSecret
+        {
+            get
+            {
+                return this.Element != null && this.Element.Flags.HasFlag(ConfigurationElementFlags.Secret);
+            }
+        }
+
+        protected virtual void OnIsSecretChanged()
+        {
+            if (this.IsSecretChanged != null)
+            {
+                this.IsSecretChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsSecret");
+        }
+
+        public event EventHandler IsSecretChanged;
+
         public ICommand BrowseCommand
         {
             get

@@ -380,6 +380,7 @@ namespace FoxTunes
         None = 0,
         MultiLine = 1,
         FileName = 2,
-        FolderName = 4
+        FolderName = 4,
+        Secret = 8
     }
 }

@@ -13,6 +13,8 @@ namespace FoxTunes
 
         public static readonly string Version = GetVersion();
 
+        public static readonly string HomePage = "https://github.com/Raimusoft/FoxTunes";
+
         private static string GetVersion()
         {
             var version = typeof(Publication).Assembly.GetName().Version;

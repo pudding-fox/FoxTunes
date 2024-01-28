@@ -107,6 +107,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.Archiv
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Release", "FoxTunes.Release\FoxTunes.Release.csproj", "{BA29D2C8-1787-4AAC-B50F-1D4CD4074B6F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.MetaData.Discogs", "FoxTunes.MetaData.Discogs\FoxTunes.MetaData.Discogs.csproj", "{1B3AD4FC-EEBB-430C-9A63-A3ED79AA5543}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.MetaData.Discogs.Tests", "FoxTunes.MetaData.Discogs.Tests\FoxTunes.MetaData.Discogs.Tests.csproj", "{C74CCEF7-C3EA-4954-B480-1836BFFDD0B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -531,6 +535,22 @@ Global
 		{BA29D2C8-1787-4AAC-B50F-1D4CD4074B6F}.Release|x64.Build.0 = Release|Any CPU
 		{BA29D2C8-1787-4AAC-B50F-1D4CD4074B6F}.Release|x86.ActiveCfg = Release|Any CPU
 		{BA29D2C8-1787-4AAC-B50F-1D4CD4074B6F}.Release|x86.Build.0 = Release|Any CPU
+		{1B3AD4FC-EEBB-430C-9A63-A3ED79AA5543}.Debug|x64.ActiveCfg = Debug|x64
+		{1B3AD4FC-EEBB-430C-9A63-A3ED79AA5543}.Debug|x64.Build.0 = Debug|x64
+		{1B3AD4FC-EEBB-430C-9A63-A3ED79AA5543}.Debug|x86.ActiveCfg = Debug|x86
+		{1B3AD4FC-EEBB-430C-9A63-A3ED79AA5543}.Debug|x86.Build.0 = Debug|x86
+		{1B3AD4FC-EEBB-430C-9A63-A3ED79AA5543}.Release|x64.ActiveCfg = Release|x64
+		{1B3AD4FC-EEBB-430C-9A63-A3ED79AA5543}.Release|x64.Build.0 = Release|x64
+		{1B3AD4FC-EEBB-430C-9A63-A3ED79AA5543}.Release|x86.ActiveCfg = Release|x86
+		{1B3AD4FC-EEBB-430C-9A63-A3ED79AA5543}.Release|x86.Build.0 = Release|x86
+		{C74CCEF7-C3EA-4954-B480-1836BFFDD0B6}.Debug|x64.ActiveCfg = Debug|x64
+		{C74CCEF7-C3EA-4954-B480-1836BFFDD0B6}.Debug|x64.Build.0 = Debug|x64
+		{C74CCEF7-C3EA-4954-B480-1836BFFDD0B6}.Debug|x86.ActiveCfg = Debug|x86
+		{C74CCEF7-C3EA-4954-B480-1836BFFDD0B6}.Debug|x86.Build.0 = Debug|x86
+		{C74CCEF7-C3EA-4954-B480-1836BFFDD0B6}.Release|x64.ActiveCfg = Release|x64
+		{C74CCEF7-C3EA-4954-B480-1836BFFDD0B6}.Release|x64.Build.0 = Release|x64
+		{C74CCEF7-C3EA-4954-B480-1836BFFDD0B6}.Release|x86.ActiveCfg = Release|x86
+		{C74CCEF7-C3EA-4954-B480-1836BFFDD0B6}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
