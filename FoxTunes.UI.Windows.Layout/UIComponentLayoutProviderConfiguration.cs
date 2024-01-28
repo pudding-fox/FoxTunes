@@ -7,7 +7,7 @@ namespace FoxTunes
     {
         public const string ID = "BBBB083C-3C19-4AAC-97C7-565AF8F83115";
 
-        public const string MAIN = "90732E4B-657B-45C2-B365-8FD69498D7C2";
+        public const string MAIN = "AAAAE4B-657B-45C2-B365-8FD69498D7C2";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -15,8 +15,12 @@ namespace FoxTunes
                 .WithElement(
                     new SelectionConfigurationElement(WindowsUserInterfaceConfiguration.LAYOUT_ELEMENT, "Layout").WithOptions(GetLayoutOptions()))
                 .WithElement(
-                    new TextConfigurationElement(MAIN).WithValue(Resources.Main).Hide()
+                    new TextConfigurationElement(MAIN, "Main Layout", path: "Advanced\\Layouts").WithValue(Resources.Main)
             );
+            ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.LAYOUT_ELEMENT
+            ).ConnectValue(value => UpdateConfiguration(value));
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetLayoutOptions()
@@ -28,6 +32,25 @@ namespace FoxTunes
                 option.Default();
             }
             yield return option;
+        }
+
+        private static void UpdateConfiguration(SelectionConfigurationOption value)
+        {
+            switch (value.Id)
+            {
+                case ID:
+                    ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement(
+                        WindowsUserInterfaceConfiguration.SECTION,
+                        MAIN
+                    ).Show();
+                    break;
+                default:
+                    ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement(
+                        WindowsUserInterfaceConfiguration.SECTION,
+                        MAIN
+                    ).Hide();
+                    break;
+            }
         }
     }
 }

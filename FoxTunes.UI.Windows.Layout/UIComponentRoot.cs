@@ -44,6 +44,7 @@ namespace FoxTunes
         public UIComponentRoot()
         {
             var container = new UIComponentContainer();
+            //TODO: Should we create this binding now or on Loaded?
             container.SetBinding(
                 UIComponentContainer.ComponentProperty,
                 new Binding()
