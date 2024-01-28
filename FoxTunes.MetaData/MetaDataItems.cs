@@ -5,14 +5,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public abstract class MetaDataItems : BaseComponent, IMetaDataItems
+    public class MetaDataItems : BaseComponent, IMetaDataItems
     {
-        protected MetaDataItems()
+        public MetaDataItems()
         {
             this.Items = new ObservableCollection<IMetaDataItem>();
             this.Items.CollectionChanged += (sender, e) => this.CollectionChanged(this, e);

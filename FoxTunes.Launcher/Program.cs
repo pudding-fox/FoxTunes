@@ -13,7 +13,7 @@ namespace FoxTunes.Launcher
         private static readonly Type[] References = new[]
         {
             typeof(Configuration),
-            typeof(SqliteDatabase),
+            typeof(SQLiteDatabase),
             typeof(CSCoreOutput),
             typeof(TagLibMetaDataSource),
             typeof(WindowsUserInterface)

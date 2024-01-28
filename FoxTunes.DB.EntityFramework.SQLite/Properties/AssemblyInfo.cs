@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("FoxTunes.DB.Sqlite")]
+[assembly: AssemblyTitle("FoxTunes.DB.EntityFramework.SQLite")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("FoxTunes.DB.Sqlite")]
+[assembly: AssemblyProduct("FoxTunes.DB.EntityFramework.SQLite")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("148bf786-cd9f-4031-9ac3-f88157a4f024")]
+[assembly: Guid("2fb15f79-7414-4a08-abfc-f4a2d990a097")]
 
 // Version information for an assembly consists of the following four values:
 //

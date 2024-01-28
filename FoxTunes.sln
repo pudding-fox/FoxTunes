@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Launcher", "FoxTun
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.UI.Windows", "FoxTunes.UI.Windows\FoxTunes.UI.Windows.csproj", "{610985F5-26AE-42B5-9733-61EBBAB36E0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.DB.Sqlite", "FoxTunes.DB.Sqlite\FoxTunes.DB.Sqlite.csproj", "{A07D1C38-CF7B-4EB0-88CA-A87374B980FC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.DB", "FoxTunes.DB\FoxTunes.DB.csproj", "{64ED8F47-C8A1-4D23-943D-1C0F74D39D9D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.UI", "FoxTunes.UI\FoxTunes.UI.csproj", "{DBD01AF8-68F0-402C-8175-4583C0F44066}"
@@ -26,6 +24,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.MetaData.TagLib", "FoxTunes.MetaData.TagLib\FoxTunes.MetaData.TagLib.csproj", "{1BCB836B-688F-4183-8702-EFF08440CC8A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Output.CSCore", "FoxTunes.Output.CSCore\FoxTunes.Output.CSCore.csproj", "{30AFD731-FD4C-426C-9566-38186FA6AFA1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.DB.EntityFramework", "FoxTunes.DB.EntityFramework\FoxTunes.DB.EntityFramework.csproj", "{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.DB.EntityFramework.SQLite", "FoxTunes.DB.EntityFramework.SQLite\FoxTunes.DB.EntityFramework.SQLite.csproj", "{AFF37A81-F152-44E6-9686-95BF34C6487C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,10 +51,6 @@ Global
 		{610985F5-26AE-42B5-9733-61EBBAB36E0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{610985F5-26AE-42B5-9733-61EBBAB36E0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{610985F5-26AE-42B5-9733-61EBBAB36E0A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A07D1C38-CF7B-4EB0-88CA-A87374B980FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A07D1C38-CF7B-4EB0-88CA-A87374B980FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A07D1C38-CF7B-4EB0-88CA-A87374B980FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A07D1C38-CF7B-4EB0-88CA-A87374B980FC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{64ED8F47-C8A1-4D23-943D-1C0F74D39D9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{64ED8F47-C8A1-4D23-943D-1C0F74D39D9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64ED8F47-C8A1-4D23-943D-1C0F74D39D9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -81,6 +79,14 @@ Global
 		{30AFD731-FD4C-426C-9566-38186FA6AFA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30AFD731-FD4C-426C-9566-38186FA6AFA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30AFD731-FD4C-426C-9566-38186FA6AFA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
