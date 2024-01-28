@@ -15,6 +15,60 @@ namespace FoxTunes.ViewModel
 {
     public class Playlist : PlaylistBase
     {
+        public IConfiguration Configuration { get; private set; }
+
+        private bool _GroupingEnabled { get; set; }
+
+        public bool GroupingEnabled
+        {
+            get
+            {
+                return this._GroupingEnabled;
+            }
+            set
+            {
+                this._GroupingEnabled = value;
+                this.OnGroupingEnabledChanged();
+            }
+        }
+
+        protected virtual void OnGroupingEnabledChanged()
+        {
+            if (this.GroupingEnabledChanged != null)
+            {
+                this.GroupingEnabledChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("GroupingEnabled");
+        }
+
+        public event EventHandler GroupingEnabledChanged;
+
+        private string _GroupingScript { get; set; }
+
+        public string GroupingScript
+        {
+            get
+            {
+                return this._GroupingScript;
+            }
+            set
+            {
+                this._GroupingScript = value;
+                this.OnGroupingScriptChanged();
+            }
+        }
+
+        protected virtual void OnGroupingScriptChanged()
+        {
+            if (this.GroupingScriptChanged != null)
+            {
+                this.GroupingScriptChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("GroupingScript");
+        }
+
+        public event EventHandler GroupingScriptChanged;
+
         public PlaylistGridViewColumnFactory GridViewColumnFactory { get; private set; }
 
         public IList SelectedItems
@@ -161,6 +215,19 @@ namespace FoxTunes.ViewModel
             this.GridViewColumnFactory = new PlaylistGridViewColumnFactory(this.PlaybackManager, this.ScriptingRuntime);
             this.GridViewColumnFactory.PositionChanged += this.OnColumnChanged;
             this.GridViewColumnFactory.WidthChanged += this.OnColumnChanged;
+            this.Configuration = core.Components.Configuration;
+#if NET40
+            //ListView grouping is too slow under net40 due to lack of virtualization.
+#else
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                PlaylistBehaviourConfiguration.SECTION,
+                PlaylistGroupingBehaviourConfiguration.GROUP_ENABLED_ELEMENT
+            ).ConnectValue(value => this.GroupingEnabled = value);
+            this.Configuration.GetElement<TextConfigurationElement>(
+                PlaylistBehaviourConfiguration.SECTION,
+                PlaylistGroupingBehaviourConfiguration.GROUP_SCRIPT_ELEMENT
+            ).ConnectValue(value => this.GroupingScript = value);
+#endif
             var task = this.Refresh();
         }
 

@@ -28,5 +28,11 @@ namespace FoxTunes
             var descriptor = DependencyPropertyDescriptor.FromProperty(property, targetType);
             descriptor.AddValueChanged(target, handler);
         }
+
+        public static void RemoveHandler(DependencyObject target, DependencyProperty property, Type targetType, EventHandler handler)
+        {
+            var descriptor = DependencyPropertyDescriptor.FromProperty(property, targetType);
+            descriptor.RemoveValueChanged(target, handler);
+        }
     }
 }

@@ -35,6 +35,9 @@
                   Windows:ListViewExtensions.DropInsertOffset="{Binding InsertOffset, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.DragSource="True"
                   Windows:ListViewExtensions.DragSourceInitialized="DragSourceInitialized"
+                  Windows:ListViewExtensions.GroupStyle="{Binding GroupingEnabled, Source={StaticResource ViewModel}}"
+                  Windows:ListViewExtensions.GroupScript="{Binding GroupingScript, Source={StaticResource ViewModel}}"
+                  VirtualizingStackPanel.IsVirtualizing="True"
                   SelectionChanged="OnSelectionChanged">
             <ListView.InputBindings>
                 <KeyBinding Key="Delete" Command="{Binding RemovePlaylistItemsCommand, Source={StaticResource ViewModel}}"></KeyBinding>
@@ -53,6 +56,19 @@
             <ListView.View>
                 <GridView Windows:GridViewExtensions.ColumnsSource="{Binding GridColumns, Source={StaticResource ViewModel}}"></GridView>
             </ListView.View>
+            <Windows:ListViewExtensions.GroupHeaderTemplate>
+                <DataTemplate DataType="{x:Type CollectionViewGroup}">
+                    <Grid HorizontalAlignment="Stretch" Margin="4" IsHitTestVisible="True" Background="Transparent" MouseDown="OnGroupHeaderMouseDown">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Name}" Foreground="{DynamicResource TextBrush}" FontSize="16" Margin="0,-2,10,0"></TextBlock>
+                        <!--<Rectangle Grid.Column="1" Fill="{DynamicResource TextBrush}" Height="1" VerticalAlignment="Center" />-->
+                        <Separator Grid.Column="1"></Separator>
+                    </Grid>
+                </DataTemplate>
+            </Windows:ListViewExtensions.GroupHeaderTemplate>
         </ListView>
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Add to playlist by dropping files here." IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">
             <TextBlock.Style>
