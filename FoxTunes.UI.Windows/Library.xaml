@@ -3,17 +3,44 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" AllowDrop="True">
+    <UserControl.Resources>
+        <ViewModel:Library x:Key="ViewModel" Core="{Binding}">
+            <ViewModel:Library.Hierarchies>
+                <ViewModel:LibraryHierarchy Name="Artist/Album/Title">
+                    <ViewModel:LibraryHierarchy.Levels>
+                        <ViewModel:LibraryHierarchyLevel Script="tag.firstartist||&quot;No Artist&quot;"></ViewModel:LibraryHierarchyLevel>
+                        <ViewModel:LibraryHierarchyLevel Script="tag.album||&quot;No Album&quot;"></ViewModel:LibraryHierarchyLevel>
+                        <ViewModel:LibraryHierarchyLevel Script="(function(){if(tag.title){var parts=[];if(tag.track){parts.push(tag.track);}parts.push(tag.title);return parts.join(&quot; - &quot;);}return item.FileName;})()"></ViewModel:LibraryHierarchyLevel>
+                    </ViewModel:LibraryHierarchy.Levels>
+                </ViewModel:LibraryHierarchy>
+            </ViewModel:Library.Hierarchies>
+        </ViewModel:Library>
+        <ViewModel:LibraryHierarchyProvider x:Key="HierarchyProvider" Core="{Binding}" Hierarchy="{Binding Source={StaticResource ViewModel}, Path=SelectedHierarchy}"></ViewModel:LibraryHierarchyProvider>
+    </UserControl.Resources>
     <Grid>
-        <TextBlock RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform/>
-                    <RotateTransform Angle="45"/>
-                    <TranslateTransform/>
-                </TransformGroup>
-            </TextBlock.RenderTransform>Library</TextBlock>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock>View Mode:</TextBlock>
+        <ComboBox Grid.Column="1" ItemsSource="{Binding Hierarchies, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}" SelectedIndex="0" DisplayMemberPath="Name"></ComboBox>
+        <TreeView Grid.ColumnSpan="2" Grid.Row="1" ItemsSource="{Binding Items, Source={StaticResource HierarchyProvider}}">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type ViewModel:LibraryNode}" ItemsSource="{Binding Items}">
+                    <TextBlock Text="{Binding Header}"></TextBlock>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+        <TextBlock Grid.Row="2">Filter:</TextBlock>
+        <TextBox Grid.Column="1" Grid.Row="2"></TextBox>
     </Grid>
 </UserControl>

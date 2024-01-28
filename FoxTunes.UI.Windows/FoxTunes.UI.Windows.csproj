@@ -76,6 +76,12 @@
     <Compile Include="Theme\IThemeLoader.cs" />
     <Compile Include="Theme\ThemeBase.cs" />
     <Compile Include="Theme\ThemeLoader.cs" />
+    <Compile Include="Utilities\LibraryItemScriptRunner.cs" />
+    <Compile Include="ViewModel\Library.cs" />
+    <Compile Include="ViewModel\LibraryHierarchy.cs" />
+    <Compile Include="ViewModel\LibraryHierarchyLevel.cs" />
+    <Compile Include="ViewModel\LibraryHierarchyProvider.cs" />
+    <Compile Include="ViewModel\LibraryNode.cs" />
     <Compile Include="WindowsUserInterfaceConfiguration.cs" />
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
     <Compile Include="ViewModel\Command.cs" />

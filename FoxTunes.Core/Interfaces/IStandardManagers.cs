@@ -5,5 +5,7 @@
         IPlaybackManager Playback { get; }
 
         IPlaylistManager Playlist { get; }
+
+        ILibraryManager Library { get; }
     }
 }

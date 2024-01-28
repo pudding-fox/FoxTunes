@@ -25,6 +25,14 @@ namespace FoxTunes
             }
         }
 
+        public ILibraryManager Library
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<ILibraryManager>();
+            }
+        }
+
         public static readonly IStandardManagers Instance = new StandardManagers();
     }
 }

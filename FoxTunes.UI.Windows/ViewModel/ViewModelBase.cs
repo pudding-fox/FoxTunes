@@ -7,11 +7,20 @@ namespace FoxTunes.ViewModel
 {
     public abstract class ViewModelBase : Freezable, INotifyPropertyChanged
     {
-        public static readonly DependencyProperty CoreProperty = DependencyProperty.Register("Core", typeof(ICore), typeof(ViewModelBase), new PropertyMetadata(new PropertyChangedCallback(OnCoreChanged)));
+        public static readonly DependencyProperty CoreProperty = DependencyProperty.Register(
+            "Core",
+            typeof(ICore),
+            typeof(ViewModelBase),
+            new PropertyMetadata(new PropertyChangedCallback(OnCoreChanged))
+        );
 
         public static void OnCoreChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var viewModel = sender as ViewModelBase;
+            if (viewModel == null)
+            {
+                return;
+            }
             viewModel.OnCoreChanged();
         }
 

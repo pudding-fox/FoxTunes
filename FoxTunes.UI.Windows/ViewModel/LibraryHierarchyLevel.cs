@@ -4,34 +4,8 @@ using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public class PlaylistColumn : ViewModelBase
+    public class LibraryHierarchyLevel : ViewModelBase
     {
-        private string _Header { get; set; }
-
-        public string Header
-        {
-            get
-            {
-                return this._Header;
-            }
-            set
-            {
-                this._Header = value;
-                this.OnHeaderChanged();
-            }
-        }
-
-        protected virtual void OnHeaderChanged()
-        {
-            if (this.HeaderChanged != null)
-            {
-                this.HeaderChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Header");
-        }
-
-        public event EventHandler HeaderChanged = delegate { };
-
         private string _Script { get; set; }
 
         [EditorAttribute("System.ComponentModel.Design.MultilineStringEditor, System.Design", "System.Drawing.Design.UITypeEditor")]
@@ -61,7 +35,7 @@ namespace FoxTunes.ViewModel
 
         protected override Freezable CreateInstanceCore()
         {
-            return new PlaylistColumn();
+            return new LibraryHierarchyLevel();
         }
     }
 }

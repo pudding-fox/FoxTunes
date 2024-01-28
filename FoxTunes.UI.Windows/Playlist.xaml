@@ -9,7 +9,7 @@
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              x:Class="FoxTunes.Playlist" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
         <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}">
             <ViewModel:Playlist.PlaylistColumns>
@@ -22,10 +22,7 @@
         </ViewModel:Playlist>
     </UserControl.Resources>
     <Grid>
-        <ListView ItemsSource="{Binding Components.Playlist.Items}" Extensions:ListViewExtensions.SelectedItems="{Binding Source={StaticResource ViewModel}, Path=SelectedItems}"
-                AllowDrop="True" 
-                DragEnter="ListBox_DragEnter" DragLeave="ListBox_DragLeave" 
-                DragOver="ListBox_DragOver" Drop="ListBox_Drop">
+        <ListView ItemsSource="{Binding Components.Playlist.Items}" Extensions:ListViewExtensions.SelectedItems="{Binding Source={StaticResource ViewModel}, Path=SelectedItems}">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="MouseDoubleClick">
                     <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=PlaySelectedItemCommand}" CommandParameter="{Binding Managers.Playback}"></Interactivity:InvokeCommandAction>

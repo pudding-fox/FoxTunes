@@ -4,44 +4,38 @@ using System.Collections.Generic;
 
 namespace FoxTunes.Utilities
 {
-    public class LibraryItemScriptRunner
+    public class PlaylistItemScriptRunner
     {
-        public LibraryItemScriptRunner(IScriptingContext scriptingContext, LibraryItem libraryItem, string script)
+        public PlaylistItemScriptRunner(IScriptingContext scriptingContext, PlaylistItem playlistItem, string script)
         {
             this.ScriptingContext = scriptingContext;
-            this.LibraryItem = libraryItem;
+            this.PlaylistItem = playlistItem;
             this.Script = script;
         }
 
         public IScriptingContext ScriptingContext { get; private set; }
 
-        public LibraryItem LibraryItem { get; private set; }
+        public PlaylistItem PlaylistItem { get; private set; }
 
         public string Script { get; private set; }
 
         public void Prepare()
         {
             var metaData = new Dictionary<string, object>();
-            foreach (var item in this.LibraryItem.MetaDatas)
+            foreach (var item in this.PlaylistItem.MetaDatas)
             {
                 metaData.Add(item.Name.ToLower(), item.Value);
             }
 
             var properties = new Dictionary<string, object>();
-            foreach (var item in this.LibraryItem.Properties)
+            foreach (var item in this.PlaylistItem.Properties)
             {
                 properties.Add(item.Name.ToLower(), item.Value);
             }
-            var statistics = new Dictionary<string, object>();
-            foreach (var item in this.LibraryItem.Statistics)
-            {
-                statistics.Add(item.Name.ToLower(), item.Value);
-            }
             this.ScriptingContext.SetValue("playing", StandardManagers.Instance.Playback.CurrentStream);
-            this.ScriptingContext.SetValue("item", this.LibraryItem);
+            this.ScriptingContext.SetValue("item", this.PlaylistItem);
             this.ScriptingContext.SetValue("tag", metaData);
-            this.ScriptingContext.SetValue("prop", properties);
-            this.ScriptingContext.SetValue("stat", statistics);
+            this.ScriptingContext.SetValue("stat", properties);
         }
 
         public object Run()
