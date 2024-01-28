@@ -13,8 +13,6 @@ namespace FoxTunes
     {
         public const string ID = "EA40EA65-6F49-48A6-9469-DD5FC2E36EC0";
 
-        public readonly object SyncRoot = new object();
-
         public MetaDataPopulator(IDatabaseComponent database, IDatabaseQuery query, bool reportProgress, ITransactionSource transaction)
             : base(reportProgress)
         {

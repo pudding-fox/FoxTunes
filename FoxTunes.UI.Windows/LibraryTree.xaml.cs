@@ -24,15 +24,15 @@ namespace FoxTunes
         protected virtual void DragSourceInitialized(object sender, TreeViewExtensions.DragSourceInitializedEventArgs e)
         {
             var viewModel = this.FindResource<global::FoxTunes.ViewModel.LibraryTree>("ViewModel");
-            if (viewModel != null)
+            if (viewModel != null && viewModel.ShowCursorAdorners)
             {
                 if (!viewModel.SelectedItem.IsMetaDatasLoaded)
                 {
                     viewModel.SelectedItem.LoadMetaDatas();
                 }
                 this.MouseCursorAdorner.DataContext = viewModel.SelectedItem;
+                this.MouseCursorAdorner.Show();
             }
-            this.MouseCursorAdorner.Show();
             try
             {
                 DragDrop.DoDragDrop(
@@ -43,7 +43,10 @@ namespace FoxTunes
             }
             finally
             {
-                this.MouseCursorAdorner.Hide();
+                if (this.MouseCursorAdorner.IsVisible)
+                {
+                    this.MouseCursorAdorner.Hide();
+                }
             }
         }
 

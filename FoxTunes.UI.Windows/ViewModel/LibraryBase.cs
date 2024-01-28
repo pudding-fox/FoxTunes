@@ -172,6 +172,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SearchIntervalChanged;
 
+        private bool _ShowCursorAdorners { get; set; }
+
+        public virtual bool ShowCursorAdorners
+        {
+            get
+            {
+                return this._ShowCursorAdorners;
+            }
+            set
+            {
+                this._ShowCursorAdorners = value;
+                this.OnShowCursorAdornersChanged();
+            }
+        }
+
+        protected virtual void OnShowCursorAdornersChanged()
+        {
+            if (this.ShowCursorAdornersChanged != null)
+            {
+                this.ShowCursorAdornersChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowCursorAdorners");
+        }
+
+        public event EventHandler ShowCursorAdornersChanged;
+
         public virtual void Refresh()
         {
             this.OnItemsChanged();
@@ -213,6 +239,10 @@ namespace FoxTunes.ViewModel
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.SEARCH_INTERVAL_ELEMENT
             ).ConnectValue(value => this.SearchInterval = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.SHOW_CURSOR_ADORNERS
+            ).ConnectValue(value => this.ShowCursorAdorners = value);
             //TODO: Bad .Wait().
             this.Reload().Wait();
             base.InitializeComponent(core);
@@ -289,10 +319,32 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnDragEnter(DragEventArgs e)
         {
+            this.UpdateDragDropEffects(e);
+        }
+
+        public ICommand DragOverCommand
+        {
+            get
+            {
+                return new Command<DragEventArgs>(this.OnDragOver);
+            }
+        }
+
+        protected virtual void OnDragOver(DragEventArgs e)
+        {
+            this.UpdateDragDropEffects(e);
+        }
+
+        protected virtual void UpdateDragDropEffects(DragEventArgs e)
+        {
             var effects = DragDropEffects.None;
             try
             {
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    effects = DragDropEffects.Copy;
+                }
+                if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
                 {
                     effects = DragDropEffects.Copy;
                 }

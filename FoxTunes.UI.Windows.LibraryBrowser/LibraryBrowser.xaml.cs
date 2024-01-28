@@ -80,13 +80,16 @@ namespace FoxTunes
                 {
                     return;
                 }
-                if (!viewModel.SelectedItem.IsMetaDatasLoaded)
+                if (viewModel.ShowCursorAdorners)
                 {
-                    viewModel.SelectedItem.LoadMetaDatas();
+                    if (!viewModel.SelectedItem.IsMetaDatasLoaded)
+                    {
+                        viewModel.SelectedItem.LoadMetaDatas();
+                    }
+                    this.MouseCursorAdorner.DataContext = viewModel.SelectedItem;
+                    this.MouseCursorAdorner.Show();
                 }
-                this.MouseCursorAdorner.DataContext = viewModel.SelectedItem;
             }
-            this.MouseCursorAdorner.Show();
             try
             {
                 DragDrop.DoDragDrop(
@@ -97,7 +100,10 @@ namespace FoxTunes
             }
             finally
             {
-                this.MouseCursorAdorner.Hide();
+                if (this.MouseCursorAdorner.IsVisible)
+                {
+                    this.MouseCursorAdorner.Hide();
+                }
             }
         }
 

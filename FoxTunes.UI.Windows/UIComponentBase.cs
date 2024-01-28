@@ -73,7 +73,10 @@ namespace FoxTunes
 
         protected UIComponentBase()
         {
-            LayoutManager.Instance.ConnectComponentValid(this);
+            if (LayoutManager.Instance != null)
+            {
+                LayoutManager.Instance.ConnectComponentValid(this);
+            }
         }
 
         public bool IsComponentEnabled
