@@ -26,7 +26,7 @@ namespace FoxTunes
                     .WithValue(Resources.TrackName)
                     .DependsOn(SECTION, ENABLED))
                 .WithElement(new CommandConfigurationElement(CLEANUP, Strings.MinidiscBehaviourConfiguration_Cleanup)
-                    .WithHandler(() => MinidiscBehaviour.Cleanup())
+                    .WithHandler(() => MinidiscTrackFactory.Cleanup())
                     .DependsOn(SECTION, ENABLED)
             );
         }
