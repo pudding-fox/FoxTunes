@@ -159,6 +159,7 @@ namespace FoxTunes
             if (!BassWasapiDevice.Info.SupportedRates.Contains(this.Output.Rate))
             {
                 Logger.Write(this, LogLevel.Error, "The output rate {0} is not supported by the device.", this.Output.Rate);
+                BassWasapiDevice.Free();
                 throw new NotImplementedException(string.Format("The output rate {0} is not supported by the device.", this.Output.Rate));
             }
         }

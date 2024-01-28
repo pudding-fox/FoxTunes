@@ -7,19 +7,6 @@ namespace FoxTunes
 {
     public static class BassDirectSoundDevice
     {
-        public static int[] RATES = new[]
-        {
-            //PCM
-            44100,
-            48000,
-            88200,
-            96000,
-            176400,
-            192000,
-            352800,
-            384000
-        };
-
         static BassDirectSoundDevice()
         {
             Devices = new Dictionary<int, BassDirectSoundDeviceInfo>();
@@ -50,7 +37,7 @@ namespace FoxTunes
                 Bass.Info.SampleRate,
                 0,
                 Bass.Info.SpeakerCount,
-                RATES.Where(rate => rate >= Bass.Info.MinSampleRate && rate <= Bass.Info.MaxSampleRate).ToArray()
+                OutputRate.GetRates(Bass.Info.MinSampleRate, Bass.Info.MaxSampleRate)
             );
             LogManager.Logger.Write(typeof(BassDirectSoundDevice), LogLevel.Debug, "Detected DS device: {0} => Name => {1}, Inputs => {2}, Outputs = {3}, Rate = {4}", Device, Info.Name, Info.Inputs, Info.Outputs, Info.Rate);
             LogManager.Logger.Write(typeof(BassDirectSoundDevice), LogLevel.Debug, "Detected DS device: {0} => Rates => {1}", Device, string.Join(", ", Info.SupportedRates));

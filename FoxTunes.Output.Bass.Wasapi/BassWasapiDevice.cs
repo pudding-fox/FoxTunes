@@ -25,28 +25,6 @@ namespace FoxTunes
 
         public const int SECONDARY_CHANNEL = 1;
 
-        public static int[] RATES = new[]
-        {
-            //PCM
-            44100,
-            48000,
-            88200,
-            96000,
-            176400,
-            192000,
-            352800,
-            384000,
-            //DSD - There are variations of each, for some reason.
-            2822400, //DSD64,
-            3072000, //DSD64
-            5644800, //DSD128
-            6144000,  //DSD128
-            11289600, //DSD256
-            12288000, //DSD256
-            22579200, //DSD512
-            24576000, //DSD512
-        };
-
         static BassWasapiDevice()
         {
             Devices = new Dictionary<int, BassWasapiDeviceInfo>();
@@ -133,7 +111,7 @@ namespace FoxTunes
         private static IDictionary<int, WasapiFormat> GetSupportedFormats(int device, WasapiInitFlags flags)
         {
             var supportedFormats = new Dictionary<int, WasapiFormat>();
-            foreach (var rate in RATES)
+            foreach (var rate in OutputRate.PCM)
             {
                 var format = BassWasapi.CheckFormat(device, rate, BassWasapi.Info.Channels, flags);
                 if (format == WasapiFormat.Unknown)

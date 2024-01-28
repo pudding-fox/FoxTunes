@@ -12,28 +12,6 @@ namespace FoxTunes
 
         public const int SECONDARY_CHANNEL = 1;
 
-        public static int[] RATES = new[]
-        {
-            //PCM
-            44100,
-            48000,
-            88200,
-            96000,
-            176400,
-            192000,
-            352800,
-            384000,
-            //DSD - There are variations of each, for some reason.
-            2822400, //DSD64,
-            3072000, //DSD64
-            5644800, //DSD128
-            6144000,  //DSD128
-            11289600, //DSD256
-            12288000, //DSD256
-            22579200, //DSD512
-            24576000, //DSD512
-        };
-
         static BassAsioDevice()
         {
             Devices = new Dictionary<int, BassAsioDeviceInfo>();
@@ -78,7 +56,10 @@ namespace FoxTunes
         private static IEnumerable<int> GetSupportedRates()
         {
             //TODO: I'm not sure if we should be setting DSD mode before querying DSD rates.
-            return RATES.Where(rate => BassAsio.CheckRate(rate)).ToArray();
+            return Enumerable.Concat(
+                OutputRate.PCM,
+                OutputRate.DSD
+            ).Where(rate => BassAsio.CheckRate(rate)).ToArray();
         }
 
         public static void Free()

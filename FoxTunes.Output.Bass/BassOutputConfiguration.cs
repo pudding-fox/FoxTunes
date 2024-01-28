@@ -8,22 +8,6 @@ namespace FoxTunes
 
         public const string RATE_ELEMENT = "AAAAA558-F1ED-41B1-A3DC-95158E01003C";
 
-        public const string RATE_044100_OPTION = "BBBB6570-DDC5-4455-96F2-1D2625EAEC0C";
-
-        public const string RATE_048000_OPTION = "CCCCC885-E3F5-425E-9699-5EDE705B9720";
-
-        public const string RATE_088200_OPTION = "DDDDCEDF-7A76-499F-A60B-25B9C6B1BE52";
-
-        public const string RATE_096000_OPTION = "EEEE7382-7F31-4971-9605-FB2B23EA8954";
-
-        public const string RATE_176400_OPTION = "FFFFFBF1-A5D4-4B9F-AD08-2E6E70DEBBCF";
-
-        public const string RATE_192000_OPTION = "GGGGBE95-307B-4B80-B8DA-40798889945B";
-
-        public const string RATE_352800_OPTION = "HHHHFC05-A7A3-4B5B-A3BD-CA27625DF3D5";
-
-        public const string RATE_384000_OPTION = "IIIIBAC3-FFF3-43D7-A126-F5E2049FE97C";
-
         public const string ENFORCE_RATE_ELEMENT = "JJJJ5B16-1B49-4C50-A8CF-BE3A6CCD4A87";
 
         public const string DEPTH_ELEMENT = "KKKKA2A6-DCA0-4E27-9812-498BB2A2C4BC";
@@ -52,38 +36,20 @@ namespace FoxTunes
 
         public static IEnumerable<SelectionConfigurationOption> GetRateOptions()
         {
-            yield return new SelectionConfigurationOption(RATE_044100_OPTION, "44100");
-            yield return new SelectionConfigurationOption(RATE_048000_OPTION, "48000");
-            yield return new SelectionConfigurationOption(RATE_088200_OPTION, "88200");
-            yield return new SelectionConfigurationOption(RATE_096000_OPTION, "96000");
-            yield return new SelectionConfigurationOption(RATE_176400_OPTION, "176400");
-            yield return new SelectionConfigurationOption(RATE_192000_OPTION, "192000");
-            yield return new SelectionConfigurationOption(RATE_352800_OPTION, "352800");
-            yield return new SelectionConfigurationOption(RATE_384000_OPTION, "384000");
+            foreach (var rate in OutputRate.PCM)
+            {
+                yield return new SelectionConfigurationOption(rate.ToString(), rate.ToString());
+            }
         }
 
         public static int GetRate(SelectionConfigurationOption option)
         {
-            switch (option.Id)
+            var rate = default(int);
+            if (int.TryParse(option.Id, out rate))
             {
-                default:
-                case RATE_044100_OPTION:
-                    return 44100;
-                case RATE_048000_OPTION:
-                    return 48000;
-                case RATE_088200_OPTION:
-                    return 88200;
-                case RATE_096000_OPTION:
-                    return 96000;
-                case RATE_176400_OPTION:
-                    return 176400;
-                case RATE_192000_OPTION:
-                    return 192000;
-                case RATE_352800_OPTION:
-                    return 352800;
-                case RATE_384000_OPTION:
-                    return 384000;
+                return rate;
             }
+            return OutputRate.PCM_44100;
         }
 
         public static IEnumerable<SelectionConfigurationOption> GetDepthOptions()
