@@ -194,25 +194,27 @@ namespace FoxTunes
         public static SnapDirection IsSnapped(Rectangle from, Rectangle to)
         {
             var result = SnapDirection.None;
-            if (from.Left == to.Right)
+            if (from.Bottom >= to.Top && from.Top <= to.Bottom)
             {
-                result |= SnapDirection.Left;
-                Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped left.");
+                if (from.Left == to.Right || from.Left == to.Left)
+                {
+                    result |= SnapDirection.Left;
+                }
+                if (from.Right == to.Left || from.Right == to.Right)
+                {
+                    result |= SnapDirection.Right;
+                }
             }
-            if (from.Right == to.Left)
+            if (from.Right >= to.Left && from.Left <= to.Right)
             {
-                result |= SnapDirection.Right;
-                Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped right.");
-            }
-            if (from.Top == to.Bottom)
-            {
-                result |= SnapDirection.Top;
-                Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped top.");
-            }
-            if (from.Bottom == to.Top)
-            {
-                result |= SnapDirection.Bottom;
-                Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped bottom.");
+                if (from.Top == to.Bottom || from.Top == to.Top)
+                {
+                    result |= SnapDirection.Top;
+                }
+                if (from.Bottom == to.Top || from.Bottom == to.Bottom)
+                {
+                    result |= SnapDirection.Bottom;
+                }
             }
             return result;
         }
