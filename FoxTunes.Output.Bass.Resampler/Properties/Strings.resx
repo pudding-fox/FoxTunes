@@ -123,17 +123,20 @@
   <data name="BassResamplerStreamComponentConfiguration.AllowAliasing" xml:space="preserve">
     <value>Allow Aliasing</value>
   </data>
-  <data name="BassResamplerStreamComponentConfiguration.BufferLength" xml:space="preserve">
-    <value>Buffer Length</value>
-  </data>
   <data name="BassResamplerStreamComponentConfiguration.Enabled" xml:space="preserve">
     <value>Enabled</value>
+  </data>
+  <data name="BassResamplerStreamComponentConfiguration.InputBufferLength" xml:space="preserve">
+    <value>Input Buffer Length</value>
   </data>
   <data name="BassResamplerStreamComponentConfiguration.Path" xml:space="preserve">
     <value>Resampler</value>
   </data>
   <data name="BassResamplerStreamComponentConfiguration.Phase" xml:space="preserve">
     <value>Phase</value>
+  </data>
+  <data name="BassResamplerStreamComponentConfiguration.PlaybackBufferLength" xml:space="preserve">
+    <value>Playback Buffer Length</value>
   </data>
   <data name="BassResamplerStreamComponentConfiguration.Quality" xml:space="preserve">
     <value>Quality</value>
