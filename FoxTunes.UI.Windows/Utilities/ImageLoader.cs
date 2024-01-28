@@ -99,7 +99,10 @@ namespace FoxTunes
                         }
                     }
                     source.EndInit();
-                    source.Freeze();
+                    if (source.CanFreeze)
+                    {
+                        source.Freeze();
+                    }
                 }
                 return source;
             }
@@ -138,7 +141,10 @@ namespace FoxTunes
                         source.DecodePixelHeight = height;
                     }
                     source.EndInit();
-                    source.Freeze();
+                    if (source.CanFreeze)
+                    {
+                        source.Freeze();
+                    }
                 }
                 return source;
             }

@@ -162,4 +162,7 @@
   <data name="MiniPlayerKeyBindingsBehaviourConfiguration.Toggle" xml:space="preserve">
     <value>Toggle Mini Player</value>
   </data>
+  <data name="MiniPlaylist.Empty" xml:space="preserve">
+    <value>Drop files anywhere.</value>
+  </data>
 </root>

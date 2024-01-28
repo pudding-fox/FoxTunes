@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace FoxTunes.ViewModel
@@ -47,6 +46,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnPlaylistChanged()
         {
+            this.CurrentPlaylist = this.Playlist;
             this.Dispatch(this.Refresh);
             if (this.PlaylistChanged != null)
             {
@@ -57,10 +57,11 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler PlaylistChanged;
 
-        protected override async Task<Playlist> GetPlaylist()
+        public Playlist CurrentPlaylist { get; private set; }
+
+        protected override Playlist GetPlaylist()
         {
-            var playlist = default(Playlist);
-            await Windows.Invoke(() => playlist = this.Playlist).ConfigureAwait(false);
+            var playlist = this.CurrentPlaylist;
             return playlist;
         }
 
