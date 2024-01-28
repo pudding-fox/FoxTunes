@@ -83,20 +83,5 @@ namespace FoxTunes {
                 return ResourceManager.GetString("Database", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SELECT TOP 5 &quot;MetaDataItems&quot;.&quot;Value&quot;
-        ///FROM &quot;LibraryHierarchyItems&quot;
-        ///	JOIN &quot;LibraryHierarchyItem_LibraryItem&quot; ON &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryHierarchyItem_Id&quot;
-        ///	JOIN &quot;LibraryItem_MetaDataItem&quot; ON &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryItem_Id&quot; = &quot;LibraryItem_MetaDataItem&quot;.&quot;LibraryItem_Id&quot;
-        ///	JOIN &quot;MetaDataItems&quot; ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot;
-        ///WHERE &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = @libraryHierarchyItemId 
-        ///	AND (@type &amp; &quot; [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string GetLibraryHierarchyMetaData {
-            get {
-                return ResourceManager.GetString("GetLibraryHierarchyMetaData", resourceCulture);
-            }
-        }
     }
 }

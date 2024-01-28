@@ -103,7 +103,7 @@ namespace FoxTunes
             }
         }
 
-        public abstract IDatabaseQuery GetLibraryHierarchyMetaData { get; }
+        public abstract IDatabaseQuery GetLibraryHierarchyMetaData(string filter);
 
         public IDatabaseQuery GetLibraryHierarchyNodes(string filter)
         {

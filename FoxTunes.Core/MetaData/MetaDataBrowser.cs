@@ -1,5 +1,4 @@
-﻿#pragma warning disable 612, 618
-using FoxDb.Interfaces;
+﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.Collections.Generic;
 
@@ -9,18 +8,21 @@ namespace FoxTunes
     {
         public IMetaDataCache MetaDataCache { get; private set; }
 
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.MetaDataCache = core.Components.MetaDataCache;
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.DatabaseFactory = core.Factories.Database;
             base.InitializeComponent(core);
         }
 
         public IEnumerable<MetaDataItem> GetMetaDatas(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType)
         {
-            var key = new MetaDataCacheKey(libraryHierarchyNode, metaDataItemType);
+            var key = new MetaDataCacheKey(libraryHierarchyNode, metaDataItemType, this.LibraryHierarchyBrowser.Filter);
             return this.MetaDataCache.GetMetaDatas(key, () => this.GetMetaDatasCore(libraryHierarchyNode, metaDataItemType));
         }
 
@@ -31,7 +33,7 @@ namespace FoxTunes
             {
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    using (var reader = database.ExecuteReader(database.Queries.GetLibraryHierarchyMetaData, (parameters, phase) =>
+                    using (var reader = database.ExecuteReader(database.Queries.GetLibraryHierarchyMetaData(this.LibraryHierarchyBrowser.Filter), (parameters, phase) =>
                     {
                         switch (phase)
                         {
