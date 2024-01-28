@@ -70,9 +70,25 @@ namespace FoxTunes {
         ///          &lt;UIComponentConfiguration Component=&quot;3E899F79-380C-4EF7-8570-4B4E3B3467CB&quot;&gt;
         ///            &lt;UIComponentConfiguration  [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string Main {
+        internal static string Main_1 {
             get {
-                return ResourceManager.GetString("Main", resourceCulture);
+                return ResourceManager.GetString("Main_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;Windows-1252&quot;?&gt;
+        ///&lt;FoxTunes&gt;
+        ///  &lt;UIComponentConfiguration Component=&quot;3E899F79-380C-4EF7-8570-4B4E3B3467CB&quot;&gt;
+        ///    &lt;UIComponentConfiguration Component=&quot;3451DAA4-C643-4CB2-8105-B441F0277559&quot;&gt;
+        ///      &lt;UIComponentConfiguration Component=&quot;18E98420-F039-4504-A116-3D0F26BEAAD5&quot;&gt;
+        ///        &lt;UIComponentConfiguration Component=&quot;3E899F79-380C-4EF7-8570-4B4E3B3467CB&quot;&gt;
+        ///          &lt;UIComponentConfiguration Component=&quot;3E899F79-380C-4EF7-8570-4B4E3B3467CB&quot;&gt;
+        ///            &lt;UIComponentConfiguration  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Main_2 {
+            get {
+                return ResourceManager.GetString("Main_2", resourceCulture);
             }
         }
     }
