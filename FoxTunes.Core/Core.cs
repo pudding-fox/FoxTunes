@@ -44,6 +44,18 @@ namespace FoxTunes
                 this.LoadManagers();
                 this.LoadBehaviours();
                 this.LoadConfiguration();
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Debug, "Failed to load the core, we will crash soon: {0}", e.Message);
+                throw;
+            }
+        }
+
+        public void Initialize()
+        {
+            try
+            {
                 this.InitializeComponents();
             }
             catch (Exception e)

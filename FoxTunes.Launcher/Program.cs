@@ -38,6 +38,20 @@ namespace FoxTunes.Launcher
                         {
                             throw new InvalidOperationException("One or more required components were not loaded.");
                         }
+                        if (!core.Factories.Database.Test())
+                        {
+                            core.Components.UserInterface.Warn("The database was not found, attempting to initialize it.");
+                            core.Factories.Database.Initialize();
+                            if (!core.Factories.Database.Test())
+                            {
+                                throw new InvalidOperationException("Failed to initialize the database.");
+                            }
+                            using (var database = core.Factories.Database.Create())
+                            {
+                                core.CreateDefaultData(database);
+                            }
+                        }
+                        core.Initialize();
                         server.Message += (sender, e) =>
                         {
                             core.Components.UserInterface.Run(e.Message);

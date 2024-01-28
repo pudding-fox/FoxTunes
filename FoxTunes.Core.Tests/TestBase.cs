@@ -54,6 +54,15 @@ namespace FoxTunes
         {
             this.Core = new TestCore();
             this.Core.Load();
+            if (!this.Core.Factories.Database.Test())
+            {
+                this.Core.Factories.Database.Initialize();
+                using (var database = this.Core.Factories.Database.Create())
+                {
+                    this.Core.CreateDefaultData(database);
+                }
+            }
+            this.Core.Initialize();
         }
 
         [TearDown]

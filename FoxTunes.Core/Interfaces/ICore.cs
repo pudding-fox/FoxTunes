@@ -13,6 +13,8 @@ namespace FoxTunes.Interfaces
 
         void Load();
 
+        void Initialize();
+
         void CreateDefaultData(IDatabase database);
     }
 }
