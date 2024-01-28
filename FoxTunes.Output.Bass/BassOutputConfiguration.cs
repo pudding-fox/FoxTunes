@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace FoxTunes
@@ -33,6 +34,10 @@ namespace FoxTunes
 
         public const string DEVICE_MONITOR_ELEMENT = "RRRRDF0E-CC69-41E2-B149-DBCDDC2622EA";
 
+        public const string UPDATE_PERIOD_ELEMENT = "SSSSE2CC-4971-4A32-8637-28026559A2C5";
+
+        public const string UPDATE_THREADS_ELEMENT = "TTTT5DC2-19FE-4988-AD9C-8327B10A4763";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.BassOutputConfiguration_Section)
@@ -46,7 +51,9 @@ namespace FoxTunes
                 .WithElement(new BooleanConfigurationElement(VOLUME_ENABLED_ELEMENT, Strings.BassOutputConfiguration_Volume, path: Strings.General_Advanced).WithValue(false))
                 .WithElement(new DoubleConfigurationElement(VOLUME_ELEMENT, Strings.BassOutputConfiguration_VolumeLevel, path: Strings.General_Advanced).WithValue(1).WithValidationRule(new DoubleValidationRule(0, 1, 0.01)).DependsOn(SECTION, VOLUME_ENABLED_ELEMENT))
                 .WithElement(new IntegerConfigurationElement(RESAMPLE_QUALITY_ELEMENT, Strings.BassOutputConfiguration_ResampleQuality, path: Strings.General_Advanced).WithValue(2).WithValidationRule(new IntegerValidationRule(1, 10)))
-                .WithElement(new BooleanConfigurationElement(DEVICE_MONITOR_ELEMENT, Strings.BassOutputConfiguration_DeviceMonitor, path: Strings.General_Advanced).WithValue(Publication.ReleaseType == ReleaseType.Default)
+                .WithElement(new BooleanConfigurationElement(DEVICE_MONITOR_ELEMENT, Strings.BassOutputConfiguration_DeviceMonitor, path: Strings.General_Advanced).WithValue(Publication.ReleaseType == ReleaseType.Default))
+                .WithElement(new IntegerConfigurationElement(UPDATE_PERIOD_ELEMENT, Strings.BassOutputConfiguration_UpdatePeriod, path: Strings.General_Advanced).WithValue(100).WithValidationRule(new IntegerValidationRule(5, 100)))
+                .WithElement(new IntegerConfigurationElement(UPDATE_THREADS_ELEMENT, Strings.BassOutputConfiguration_UpdateThreads, path: Strings.General_Advanced).WithValue(1).WithValidationRule(new IntegerValidationRule(1, Environment.ProcessorCount))
             );
         }
 

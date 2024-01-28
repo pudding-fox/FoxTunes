@@ -126,6 +126,38 @@ namespace FoxTunes
             }
         }
 
+        private int _UpdatePeriod { get; set; }
+
+        public int UpdatePeriod
+        {
+            get
+            {
+                return this._UpdatePeriod;
+            }
+            set
+            {
+                this._UpdatePeriod = value;
+                Logger.Write(this, LogLevel.Debug, "UpdatePeriod = {0}", this.UpdatePeriod);
+                var task = this.Shutdown();
+            }
+        }
+
+        private int _UpdateThreads { get; set; }
+
+        public int UpdateThreads
+        {
+            get
+            {
+                return this._UpdateThreads;
+            }
+            set
+            {
+                this._UpdateThreads = value;
+                Logger.Write(this, LogLevel.Debug, "UpdateThreads = {0}", this.UpdateThreads);
+                var task = this.Shutdown();
+            }
+        }
+
         private int _BufferLength { get; set; }
 
         public int BufferLength
@@ -325,6 +357,14 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.DEPTH_ELEMENT
             ).ConnectValue(value => this.Float = BassOutputConfiguration.GetFloat(value));
+            this.Configuration.GetElement<IntegerConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassOutputConfiguration.UPDATE_PERIOD_ELEMENT
+            ).ConnectValue(value => this.UpdatePeriod = value);
+            this.Configuration.GetElement<IntegerConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassOutputConfiguration.UPDATE_THREADS_ELEMENT
+            ).ConnectValue(value => this.UpdateThreads = value);
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.BUFFER_LENGTH_ELEMENT

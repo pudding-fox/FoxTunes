@@ -187,6 +187,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Update Period.
+        /// </summary>
+        internal static string BassOutputConfiguration_UpdatePeriod {
+            get {
+                return ResourceManager.GetString("BassOutputConfiguration.UpdatePeriod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update Threads.
+        /// </summary>
+        internal static string BassOutputConfiguration_UpdateThreads {
+            get {
+                return ResourceManager.GetString("BassOutputConfiguration.UpdateThreads", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Software Volume Level.
         /// </summary>
         internal static string BassOutputConfiguration_Volume {

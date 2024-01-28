@@ -159,6 +159,12 @@
   <data name="BassOutputConfiguration.Section" xml:space="preserve">
     <value>Output</value>
   </data>
+  <data name="BassOutputConfiguration.UpdatePeriod" xml:space="preserve">
+    <value>Update Period</value>
+  </data>
+  <data name="BassOutputConfiguration.UpdateThreads" xml:space="preserve">
+    <value>Update Threads</value>
+  </data>
   <data name="BassOutputConfiguration.Volume" xml:space="preserve">
     <value>Software Volume Level</value>
   </data>
