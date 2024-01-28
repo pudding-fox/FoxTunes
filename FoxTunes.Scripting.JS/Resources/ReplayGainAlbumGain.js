@@ -3,9 +3,9 @@
     if (!gain) {
         return gain;
     }
-    var parsed = parseFloat(gain);
+    var parsed = NumberHelper.parseFloat(gain);
     if (isNaN(parsed)) {
         return gain;
     }
-    return (parsed > 0 ? "+" : "") + parsed.toFixed(2) + "dB";
+    return (parsed > 0 ? "+" : "") + NumberHelper.toFixed(parsed, 2) + "dB";
 })()

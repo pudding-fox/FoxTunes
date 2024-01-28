@@ -20,6 +20,7 @@ namespace FoxTunes
             this.Context.Run(Resources.utils);
             this.Context.SetParameter("Publication", new Publication());
             this.Context.SetParameter("DateHelper", new DateHelper());
+            this.Context.SetParameter("NumberHelper", new NumberHelper());
             base.InitializeComponent(core);
         }
 
