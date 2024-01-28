@@ -13,13 +13,16 @@ namespace FoxTunes
         {
         }
 
-        public override IDatabaseQuery SequencePlaylistItems(IEnumerable<string> metaDataNames)
+        public override IDatabaseQuery SequencePlaylistItems
         {
-            var playlistSequenceBuilder = new PlaylistSequenceBuilder(this.Database, metaDataNames);
-            return this.Database.QueryFactory.Create(
-                playlistSequenceBuilder.TransformText(),
-                new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-            );
+            get
+            {
+                var playlistSequenceBuilder = new PlaylistSequenceBuilder(this.Database);
+                return this.Database.QueryFactory.Create(
+                    playlistSequenceBuilder.TransformText(),
+                    new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+                );
+            }
         }
 
         public override IDatabaseQuery GetLibraryHierarchyMetaData

@@ -149,7 +149,6 @@ namespace FoxTunes
         {
             using (var database = this.DatabaseFactory.Create())
             {
-                var query = default(IDatabaseQuery);
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
                     var items = database.ExecuteEnumerator<LibraryItem>(database.Queries.GetLibraryItems, (parameters, phase) =>

@@ -235,10 +235,9 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Sequencing playlist items.");
             await this.SetIsIndeterminate(true).ConfigureAwait(false);
-            var metaDataNames = this.MetaDataBrowser.GetMetaDataNames();
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                await this.Database.ExecuteAsync(this.Database.Queries.SequencePlaylistItems(metaDataNames), (parameters, phase) =>
+                await this.Database.ExecuteAsync(this.Database.Queries.SequencePlaylistItems, (parameters, phase) =>
                 {
                     switch (phase)
                     {

@@ -1,5 +1,4 @@
 ﻿using FoxDb.Interfaces;
-using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
@@ -35,7 +34,7 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery RemovePlaylistItems { get; }
 
-        IDatabaseQuery SequencePlaylistItems(IEnumerable<string> metaDataNames);
+        IDatabaseQuery SequencePlaylistItems { get; }
 
         IDatabaseQuery UpdateLibraryHierarchyNode { get; }
 
