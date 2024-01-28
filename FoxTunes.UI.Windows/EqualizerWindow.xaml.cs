@@ -28,13 +28,10 @@ namespace FoxTunes
                     this.Left = global::FoxTunes.Properties.Settings.Default.EqualizerWindowBounds.Left;
                     this.Top = global::FoxTunes.Properties.Settings.Default.EqualizerWindowBounds.Top;
                 }
-                this.Width = global::FoxTunes.Properties.Settings.Default.EqualizerWindowBounds.Width;
-                this.Height = global::FoxTunes.Properties.Settings.Default.EqualizerWindowBounds.Height;
             }
-            else
+            if (double.IsNaN(this.Left) || double.IsNaN(this.Top))
             {
-                this.Width = 800;
-                this.Height = 600;
+                this.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             }
             this.InitializeComponent();
         }

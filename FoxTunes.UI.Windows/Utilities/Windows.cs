@@ -185,7 +185,7 @@ namespace FoxTunes
 
         private static void OnSettingsWindowClosed(object sender, EventArgs e)
         {
-            _SettingsWindow = new Lazy<Window>(() => new SettingsWindow());
+            _SettingsWindow = new Lazy<Window>(() => new SettingsWindow() { Owner = ActiveWindow });
             if (SettingsWindowClosed == null)
             {
                 return;
@@ -239,7 +239,7 @@ namespace FoxTunes
 
         private static void OnEqualizerWindowClosed(object sender, EventArgs e)
         {
-            _EqualizerWindow = new Lazy<Window>(() => new EqualizerWindow());
+            _EqualizerWindow = new Lazy<Window>(() => new EqualizerWindow() { Owner = ActiveWindow });
             if (EqualizerWindowClosed == null)
             {
                 return;
@@ -343,8 +343,8 @@ namespace FoxTunes
         {
             _MainWindow = new Lazy<Window>(() => new MainWindow());
             _MiniWindow = new Lazy<Window>(() => new MiniWindow());
-            _SettingsWindow = new Lazy<Window>(() => new SettingsWindow());
-            _EqualizerWindow = new Lazy<Window>(() => new EqualizerWindow());
+            _SettingsWindow = new Lazy<Window>(() => new SettingsWindow() { Owner = ActiveWindow });
+            _EqualizerWindow = new Lazy<Window>(() => new EqualizerWindow() { Owner = ActiveWindow });
         }
 
         public static Task Invoke(Action action)

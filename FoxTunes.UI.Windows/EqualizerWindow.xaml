@@ -10,7 +10,6 @@
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
         Title="Equalizer" 
         WindowStyle="None" 
-        WindowStartupLocation="CenterScreen"
         AllowsTransparency="True" 
         Topmost="True"
         Background="Transparent" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
