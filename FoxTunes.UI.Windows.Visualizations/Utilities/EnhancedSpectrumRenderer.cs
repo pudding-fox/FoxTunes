@@ -3,7 +3,6 @@ using System;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
-using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -93,7 +92,7 @@ namespace FoxTunes
                 this.ShowPeaks.Value,
                 this.ShowRms.Value,
                 this.ShowCrestFactor.Value,
-                EnhancedSpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors)
+                this.ShowRms.Value ? this.Colors : EnhancedSpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors)
             );
             return true;
         }
