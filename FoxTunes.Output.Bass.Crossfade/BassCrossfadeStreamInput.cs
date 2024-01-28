@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    public class BassCrossfadeStreamInput : BassStreamInput
+    public class BassCrossfadeStreamInput : BassStreamInput, IBassStreamControllable
     {
         public BassCrossfadeStreamInput(BassCrossfadeStreamInputBehaviour behaviour, BassOutputStream stream)
         {
@@ -164,5 +164,63 @@ namespace FoxTunes
                 Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
             }
         }
+
+        #region IBassStreamControllable
+
+        public void PreviewPlay()
+        {
+            //The begin/end seek hooks don't block so this doesn't really work.
+            //if (this.Behaviour.PauseSeek)
+            //{
+            //    BassCrossfade.StreamFadeIn();
+            //}
+        }
+
+        public void PreviewPause()
+        {
+            if (this.Behaviour.PauseSeek)
+            {
+                BassCrossfade.StreamFadeOut();
+            }
+        }
+
+        public void PreviewResume()
+        {
+            if (this.Behaviour.PauseSeek)
+            {
+                BassCrossfade.StreamFadeIn();
+            }
+        }
+
+        public void PreviewStop()
+        {
+            //The begin/end seek hooks don't block so this doesn't really work.
+            //if (this.Behaviour.PauseSeek)
+            //{
+            //    BassCrossfade.StreamFadeOut();
+            //}
+        }
+
+        public void Play()
+        {
+            //Nothing to do.
+        }
+
+        public void Pause()
+        {
+            //Nothing to do.
+        }
+
+        public void Resume()
+        {
+            //Nothing to do.
+        }
+
+        public void Stop()
+        {
+            //Nothing to do.
+        }
+
+        #endregion
     }
 }
