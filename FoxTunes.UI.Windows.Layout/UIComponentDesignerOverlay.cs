@@ -176,8 +176,8 @@ namespace FoxTunes
                 {
                     if (!this.Container.Configuration.Component.IsEmpty)
                     {
-                        components.Add(new InvocableComponentWrapper(this.Container, this.Container.Configuration.Component.Name));
-                        if (this.Container.Content is IInvocableComponent component)
+                        components.Add(new InvocableComponentWrapper(this.Container, string.Format(Strings.UIComponentDesignerOverlay_Path_Child, this.Container.Configuration.Component.Name)));
+                        if (!(this.Container.Content is UIComponentPanel) && this.Container.Content is IInvocableComponent component)
                         {
                             components.Add(new InvocableComponentWrapper(component, this.Container.Configuration.Component.Name));
                         }
@@ -191,7 +191,8 @@ namespace FoxTunes
                 this.ContextMenu = new Menu()
                 {
                     Components = new ObservableCollection<IInvocableComponent>(components),
-                    Source = this.Container
+                    Source = this.Container,
+                    ExplicitOrdering = true
                 };
                 this.ContextMenu.Opened += this.OnOpened;
                 this.ContextMenu.Closed += this.OnClosed;

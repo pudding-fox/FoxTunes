@@ -120,6 +120,33 @@ namespace FoxTunes.ViewModel
             menu.OnMenuVisibleChanged();
         }
 
+        public static readonly DependencyProperty ExplicitOrderingProperty = DependencyProperty.Register(
+            "ExplicitOrdering",
+            typeof(bool),
+            typeof(Menu),
+            new PropertyMetadata(new PropertyChangedCallback(OnExplicitOrderingChanged))
+        );
+
+        public static bool GetExplicitOrdering(Menu source)
+        {
+            return (bool)source.GetValue(ExplicitOrderingProperty);
+        }
+
+        public static void SetExplicitOrdering(Menu source, bool value)
+        {
+            source.SetValue(ExplicitOrderingProperty, value);
+        }
+
+        public static void OnExplicitOrderingChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var menu = sender as Menu;
+            if (menu == null)
+            {
+                return;
+            }
+            menu.OnExplicitOrderingChanged();
+        }
+
         public Menu()
         {
             this.Items = new ObservableCollection<MenuItem>();
@@ -220,6 +247,29 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler MenuVisibleChanged;
+
+        public bool ExplicitOrdering
+        {
+            get
+            {
+                return (bool)this.GetValue(ExplicitOrderingProperty);
+            }
+            set
+            {
+                this.SetValue(ExplicitOrderingProperty, value);
+            }
+        }
+
+        protected virtual void OnExplicitOrderingChanged()
+        {
+            if (this.ExplicitOrderingChanged != null)
+            {
+                this.ExplicitOrderingChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ExplicitOrdering");
+        }
+
+        public event EventHandler ExplicitOrderingChanged;
 
         public ObservableCollection<MenuItem> Items { get; set; }
 
@@ -351,7 +401,12 @@ namespace FoxTunes.ViewModel
                 item.Dispose();
             }
             this.Items.Clear();
-            foreach (var item in this.SortItems(this.GetItems()))
+            var items = this.GetItems();
+            if (!this.ExplicitOrdering)
+            {
+                items = this.SortItems(items);
+            }
+            foreach (var item in items)
             {
                 if (item.Separator && this.Items.Count > 0)
                 {

@@ -304,7 +304,16 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parent: {0}.
+        ///   Looks up a localized string similar to Layout\{0}.
+        /// </summary>
+        internal static string UIComponentDesignerOverlay_Path_Child {
+            get {
+                return ResourceManager.GetString("UIComponentDesignerOverlay.Path.Child", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layout\{0} (Container).
         /// </summary>
         internal static string UIComponentDesignerOverlay_Path_Parent {
             get {

@@ -198,8 +198,11 @@
   <data name="UIComponentContainer.Wrap" xml:space="preserve">
     <value>Wrap</value>
   </data>
+  <data name="UIComponentDesignerOverlay.Path.Child" xml:space="preserve">
+    <value>Layout\{0}</value>
+  </data>
   <data name="UIComponentDesignerOverlay.Path.Parent" xml:space="preserve">
-    <value>Parent: {0}</value>
+    <value>Layout\{0} (Container)</value>
   </data>
   <data name="UIComponentDockContainer.Collapse" xml:space="preserve">
     <value>Collapsable</value>

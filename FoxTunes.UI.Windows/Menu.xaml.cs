@@ -98,5 +98,33 @@ namespace FoxTunes
                 this.SetValue(SourceProperty, value);
             }
         }
+
+        public static readonly DependencyProperty ExplicitOrderingProperty = DependencyProperty.Register(
+           "ExplicitOrdering",
+           typeof(bool),
+           typeof(Menu)
+       );
+
+        public static bool GetExplicitOrdering(Menu source)
+        {
+            return (bool)source.GetValue(ExplicitOrderingProperty);
+        }
+
+        public static void SetExplicitOrdering(Menu source, bool value)
+        {
+            source.SetValue(ExplicitOrderingProperty, value);
+        }
+
+        public bool ExplicitOrdering
+        {
+            get
+            {
+                return (bool)this.GetValue(ExplicitOrderingProperty);
+            }
+            set
+            {
+                this.SetValue(ExplicitOrderingProperty, value);
+            }
+        }
     }
 }
