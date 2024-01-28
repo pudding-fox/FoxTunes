@@ -68,10 +68,12 @@ namespace FoxTunes.ViewModel
 
         protected virtual async void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
         {
-            using (e.Defer())
-            {
-                await this.Refresh().ConfigureAwait(false);
-            }
+            //Critical: Don't block in this event handler, it causes a deadlock.
+#if NET40
+            var task = TaskEx.Run(() => this.Refresh());
+#else
+            var task = Task.Run(() => this.Refresh());
+#endif
         }
 
         public Task Refresh()

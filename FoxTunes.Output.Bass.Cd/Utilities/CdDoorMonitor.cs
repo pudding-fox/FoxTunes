@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass.Cd;
 using System;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace FoxTunes
@@ -57,6 +58,16 @@ namespace FoxTunes
         }
 
         protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
+        {
+            //Critical: Don't block in this event handler, it causes a deadlock.
+#if NET40
+            var task = TaskEx.Run(() => this.Refresh());
+#else
+            var task = Task.Run(() => this.Refresh());
+#endif
+        }
+
+        protected virtual void Refresh()
         {
             var drive = default(int);
             if (this.GetDrive(out drive))
