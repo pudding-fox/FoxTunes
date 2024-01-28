@@ -25,5 +25,11 @@ namespace FoxTunes.Interfaces
         event EventHandler Started;
 
         event EventHandler Completed;
+
+        Exception Exception { get; }
+
+        event EventHandler ExceptionChanged;
+
+        event EventHandler Faulted;
     }
 }

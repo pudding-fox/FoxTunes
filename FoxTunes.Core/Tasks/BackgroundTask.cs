@@ -137,8 +137,16 @@ namespace FoxTunes
             this.BackgroundTaskRunner.Run(() =>
             {
                 this.OnStarted();
-                this.OnRun();
-                this.OnCompleted();
+                try
+                {
+                    this.OnRun();
+                    this.OnCompleted();
+                }
+                catch (Exception e)
+                {
+                    this.Exception = e;
+                    this.OnFaulted();
+                }
             });
         }
 
@@ -165,6 +173,46 @@ namespace FoxTunes
         }
 
         public event EventHandler Completed = delegate { };
+
+        private Exception _Exception { get; set; }
+
+        public Exception Exception
+        {
+            get
+            {
+                return this._Exception;
+            }
+            protected set
+            {
+                this._Exception = value;
+                this.OnExceptionChanged();
+            }
+        }
+
+        protected virtual void OnExceptionChanged()
+        {
+            this.ForegroundTaskRunner.Run(() =>
+            {
+                if (this.ExceptionChanged != null)
+                {
+                    this.ExceptionChanged(this, EventArgs.Empty);
+                }
+                this.OnPropertyChanged("Exception");
+            });
+        }
+
+        public event EventHandler ExceptionChanged = delegate { };
+
+        protected virtual void OnFaulted()
+        {
+            if (this.Faulted == null)
+            {
+                return;
+            }
+            this.ForegroundTaskRunner.Run(() => this.Faulted(this, EventArgs.Empty));
+        }
+
+        public event EventHandler Faulted = delegate { };
 
         public override void InitializeComponent(ICore core)
         {
