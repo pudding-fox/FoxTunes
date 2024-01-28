@@ -43,6 +43,8 @@ namespace FoxTunes
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
+        public PlaylistNavigationStrategyFactory PlaylistNavigationStrategyFactory { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public PlaylistNavigationStrategy NavigationStrategy { get; private set; }
@@ -53,22 +55,12 @@ namespace FoxTunes
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistCache = core.Components.PlaylistCache;
             this.DatabaseFactory = core.Factories.Database;
+            this.PlaylistNavigationStrategyFactory = ComponentRegistry.Instance.GetComponent<PlaylistNavigationStrategyFactory>();
             this.Configuration = core.Components.Configuration;
-            this.Configuration.GetElement<BooleanConfigurationElement>(
+            this.Configuration.GetElement<SelectionConfigurationElement>(
                 PlaylistBehaviourConfiguration.SECTION,
-                PlaylistBehaviourConfiguration.SHUFFLE_ELEMENT
-            ).ConnectValue(value =>
-            {
-                if (value)
-                {
-                    this.NavigationStrategy = new ShufflePlaylistNavigationStrategy();
-                }
-                else
-                {
-                    this.NavigationStrategy = new StandardPlaylistNavigationStrategy();
-                }
-                this.NavigationStrategy.InitializeComponent(this.Core);
-            });
+                PlaylistBehaviourConfiguration.ORDER_ELEMENT
+            ).ConnectValue(option => this.NavigationStrategy = this.PlaylistNavigationStrategyFactory.Create(option.Id));
             base.InitializeComponent(core);
         }
 

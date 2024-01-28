@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,18 +8,16 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class PlaylistBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
-        public const string SHUFFLE = "AAAA";
-
         public IConfiguration Configuration { get; private set; }
 
-        public BooleanConfigurationElement Shuffle { get; private set; }
+        public SelectionConfigurationElement Order { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
-            this.Shuffle = this.Configuration.GetElement<BooleanConfigurationElement>(
+            this.Order = this.Configuration.GetElement<SelectionConfigurationElement>(
                 PlaylistBehaviourConfiguration.SECTION,
-                PlaylistBehaviourConfiguration.SHUFFLE_ELEMENT
+                PlaylistBehaviourConfiguration.ORDER_ELEMENT
             );
             base.InitializeComponent(core);
         }
@@ -27,7 +26,16 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYBACK, SHUFFLE, "Shuffle", attributes: this.Shuffle.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
+                foreach (var option in this.Order.Options)
+                {
+                    yield return new InvocationComponent(
+                        InvocationComponent.CATEGORY_PLAYBACK,
+                        option.Id,
+                        option.Name,
+                        path: "Order",
+                        attributes: string.Equals(option.Id, this.Order.Value.Id, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    );
+                }
             }
         }
 
@@ -35,8 +43,11 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
-                case SHUFFLE:
-                    this.Shuffle.Toggle();
+                case PlaylistBehaviourConfiguration.ORDER_DEFAULT_OPTION:
+                case PlaylistBehaviourConfiguration.ORDER_SHUFFLE_TRACKS:
+                case PlaylistBehaviourConfiguration.ORDER_SHUFFLE_ALBUMS:
+                case PlaylistBehaviourConfiguration.ORDER_SHUFFLE_ARTISTS:
+                    this.Order.Value = this.Order.GetOption(component.Id);
                     this.Configuration.Save();
                     break;
             }

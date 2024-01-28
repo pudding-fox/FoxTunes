@@ -14,7 +14,7 @@
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYBACK}}"></Windows:Menu>
     </UserControl.ContextMenu>
-    <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding Enabled.Value, Source={StaticResource ViewModel}}">
+    <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding Enabled, Source={StaticResource ViewModel}}">
         <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Width="20" Height="20">
             <Canvas Width="20" Height="20">
                 <Path Fill="{DynamicResource TextBrush}">

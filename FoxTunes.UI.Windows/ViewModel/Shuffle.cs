@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Windows;
+using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
@@ -8,18 +9,36 @@ namespace FoxTunes.ViewModel
     {
         public IConfiguration Configuration { get; private set; }
 
-        private BooleanConfigurationElement _Enabled { get; set; }
+        public SelectionConfigurationElement Order { get; private set; }
 
-        public BooleanConfigurationElement Enabled
+        public bool Enabled
         {
             get
             {
-                return this._Enabled;
+                if (this.Order == null)
+                {
+                    return false;
+                }
+                if (string.Equals(this.Order.Value.Id, PlaylistBehaviourConfiguration.ORDER_DEFAULT_OPTION, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+                return true;
             }
             set
             {
-                this._Enabled = value;
-                this.OnEnabledChanged();
+                if (this.Order == null)
+                {
+                    return;
+                }
+                if (value)
+                {
+                    this.Order.Value = this.Order.GetOption(PlaylistBehaviourConfiguration.ORDER_SHUFFLE_TRACKS);
+                }
+                else
+                {
+                    this.Order.Value = this.Order.GetOption(PlaylistBehaviourConfiguration.ORDER_DEFAULT_OPTION);
+                }
             }
         }
 
@@ -37,16 +56,32 @@ namespace FoxTunes.ViewModel
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = this.Core.Components.Configuration;
-            this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
+            this.Order = this.Configuration.GetElement<SelectionConfigurationElement>(
                 PlaylistBehaviourConfiguration.SECTION,
-                PlaylistBehaviourConfiguration.SHUFFLE_ELEMENT
+                PlaylistBehaviourConfiguration.ORDER_ELEMENT
             );
+            this.Order.ValueChanged += this.OnValueChanged;
+            this.OnEnabledChanged();
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnValueChanged(object sender, EventArgs e)
+        {
+            var task = Windows.Invoke(this.OnEnabledChanged);
         }
 
         protected override Freezable CreateInstanceCore()
         {
             return new Shuffle();
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.Order != null)
+            {
+                this.Order.ValueChanged -= this.OnValueChanged;
+            }
+            base.OnDisposing();
         }
     }
 }
