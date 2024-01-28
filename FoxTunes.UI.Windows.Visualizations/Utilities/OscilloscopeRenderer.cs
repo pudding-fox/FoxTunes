@@ -59,7 +59,6 @@ namespace FoxTunes
                 return false;
             }
             this.RendererData = Create(
-                this.OutputDataSource,
                 width,
                 height,
                 OscilloscopeConfiguration.GetWindow(this.Window.Value),
@@ -454,11 +453,10 @@ namespace FoxTunes
             }
         }
 
-        public static OscilloscopeRendererData Create(IOutputDataSource outputDataSource, int width, int height, TimeSpan window, TimeSpan duration, OscilloscopeRendererMode mode)
+        public static OscilloscopeRendererData Create(int width, int height, TimeSpan window, TimeSpan duration, OscilloscopeRendererMode mode)
         {
             var data = new OscilloscopeRendererData()
             {
-                OutputDataSource = outputDataSource,
                 Width = width,
                 Height = height,
                 Interval = window,
@@ -478,8 +476,6 @@ namespace FoxTunes
                     Flags = VisualizationDataHistoryFlags.Average
                 };
             }
-
-            public IOutputDataSource OutputDataSource;
 
             public int Width;
 

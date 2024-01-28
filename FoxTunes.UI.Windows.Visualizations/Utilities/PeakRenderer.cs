@@ -1,5 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Channels;
 using System.Threading.Tasks;
 using System.Timers;
@@ -118,29 +121,148 @@ namespace FoxTunes
             {
                 return false;
             }
-            var colors = this.ShowRms.Value ? this.Colors : PeakMeterConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors);
-            if (this.Orientation == Orientation.Horizontal && colors.Length > 1)
-            {
-                Array.Reverse(colors);
-            }
+            var colors = PeakMeterConfiguration.GetColorPalette(this.ColorPalette.Value, this.Colors);
             this.RendererData = Create(
                 this,
                 width,
                 height,
-                colors,
+                this.GetColorPalettes(this.ColorPalette.Value, this.ShowPeaks.Value, this.ShowRms.Value, this.Colors, this.Orientation),
                 this.Orientation
             );
             return true;
         }
 
+        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showPeak, bool showRms, Color[] colors, Orientation orientation)
+        {
+            var palettes = PeakMeterConfiguration.GetColorPalette(value, colors);
+            //Switch the default colors to the VALUE palette if one was provided.
+            colors = palettes.GetOrAdd(
+                PeakMeterConfiguration.COLOR_PALETTE_VALUE,
+                () => GetDefaultColors(PeakMeterConfiguration.COLOR_PALETTE_VALUE, showRms, colors)
+            );
+            palettes.GetOrAdd(
+                PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND,
+                () => GetDefaultColors(PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND, showRms, colors)
+            );
+            if (showPeak)
+            {
+                palettes.GetOrAdd(
+                    PeakMeterConfiguration.COLOR_PALETTE_PEAK,
+                    () => GetDefaultColors(PeakMeterConfiguration.COLOR_PALETTE_PEAK, showRms, colors)
+                );
+            }
+            if (showRms)
+            {
+                palettes.GetOrAdd(
+                    PeakMeterConfiguration.COLOR_PALETTE_RMS,
+                    () => GetDefaultColors(PeakMeterConfiguration.COLOR_PALETTE_RMS, showRms, colors)
+                );
+            }
+            return palettes.ToDictionary(
+                pair => pair.Key,
+                pair =>
+                {
+                    var flags = 0;
+                    if (pair.Value.Length > 1)
+                    {
+                        if (string.Equals(pair.Key, PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND, StringComparison.OrdinalIgnoreCase))
+                        {
+                            flags |= BitmapHelper.COLOR_FROM_Y;
+                        }
+                        else
+                        {
+                            if (orientation == Orientation.Horizontal)
+                            {
+                                flags |= BitmapHelper.COLOR_FROM_X;
+                            }
+                            else if (orientation == Orientation.Vertical)
+                            {
+                                flags |= BitmapHelper.COLOR_FROM_Y;
+                            }
+                        }
+                    }
+                    if (showPeak || showRms)
+                    {
+                        if (!string.Equals(pair.Key, PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND, StringComparison.OrdinalIgnoreCase))
+                        {
+                            flags |= BitmapHelper.ALPHA_BLENDING;
+                        }
+                    }
+                    return BitmapHelper.GetOrCreatePalette(flags, pair.Value);
+                },
+                StringComparer.OrdinalIgnoreCase
+            );
+        }
+
+        private static Color[] GetDefaultColors(string name, bool showRms, Color[] colors)
+        {
+            switch (name)
+            {
+                case PeakMeterConfiguration.COLOR_PALETTE_PEAK:
+                    return new[]
+                    {
+                        colors.FirstOrDefault()
+                    };
+                case PeakMeterConfiguration.COLOR_PALETTE_RMS:
+                    return colors.WithAlpha(-50);
+                case PeakMeterConfiguration.COLOR_PALETTE_VALUE:
+                    if (showRms)
+                    {
+                        return colors.WithAlpha(-25);
+                    }
+                    else
+                    {
+                        return colors;
+                    }
+                case PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND:
+                    return new[]
+                    {
+                        global::System.Windows.Media.Colors.Black
+                    };
+            }
+            throw new NotImplementedException();
+        }
+
+        protected override WriteableBitmap CreateBitmap(int width, int height)
+        {
+            var bitmap = base.CreateBitmap(width, height);
+            this.ClearBitmap(bitmap);
+            return bitmap;
+        }
+
+        protected override void ClearBitmap(WriteableBitmap bitmap)
+        {
+            if (!bitmap.TryLock(LockTimeout))
+            {
+                return;
+            }
+            try
+            {
+                var info = default(BitmapHelper.RenderInfo);
+                var data = this.RendererData;
+                if (data != null)
+                {
+                    info = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND]);
+                }
+                else
+                {
+                    var palettes = this.GetColorPalettes(this.ColorPalette.Value, false, false, this.Colors, this.Orientation);
+                    info = BitmapHelper.CreateRenderInfo(bitmap, palettes[PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND]);
+                }
+                BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);
+                bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+            }
+            finally
+            {
+                bitmap.Unlock();
+            }
+        }
+
         protected virtual async Task Render(PeakRendererData data)
         {
-            const byte SHADE = 30;
-
             var bitmap = default(WriteableBitmap);
             var success = default(bool);
-            var valueRenderInfo = default(BitmapHelper.RenderInfo);
-            var rmsRenderInfo = default(BitmapHelper.RenderInfo);
+            var info = default(PeakRenderInfo);
 
             await Windows.Invoke(() =>
             {
@@ -155,27 +277,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                if (data.RmsElements != null)
-                {
-                    var colors = data.Colors[0].ToPair(SHADE);
-                    valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[0]));
-                    rmsRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[1]));
-                }
-                else
-                {
-                    var flags = default(int);
-                    switch (this.Orientation)
-                    {
-                        default:
-                        case Orientation.Horizontal:
-                            flags = BitmapHelper.COLOR_FROM_X;
-                            break;
-                        case Orientation.Vertical:
-                            flags = BitmapHelper.COLOR_FROM_Y;
-                            break;
-                    }
-                    valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(flags, data.Colors));
-                }
+                info = GetRenderInfo(bitmap, data);
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
             if (!success)
@@ -187,7 +289,7 @@ namespace FoxTunes
 
             try
             {
-                Render(valueRenderInfo, rmsRenderInfo, data);
+                Render(ref info, data);
             }
             catch (Exception e)
             {
@@ -272,14 +374,36 @@ namespace FoxTunes
             base.OnDisposing();
         }
 
-        private static void Render(BitmapHelper.RenderInfo valueRenderInfo, BitmapHelper.RenderInfo rmsRenderInfo, PeakRendererData data)
+        private static PeakRenderInfo GetRenderInfo(WriteableBitmap bitmap, PeakRendererData data)
         {
-            var valueElements = data.ValueElements;
-            var rmsElements = data.RmsElements;
-            var peakElements = data.PeakElements;
-            var orientation = data.Orientation;
+            var info = new PeakRenderInfo()
+            {
+                Background = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND])
+            };
+            if (data.PeakElements != null)
+            {
+                info.Peak = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_PEAK]);
+            }
+            if (data.RmsElements != null)
+            {
+                info.Rms = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_RMS]);
+            }
+            if (data.ValueElements != null)
+            {
+                info.Value = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_VALUE]);
+            }
+            return info;
+        }
 
-            BitmapHelper.Clear(ref valueRenderInfo);
+        private static void Render(ref PeakRenderInfo info, PeakRendererData data)
+        {
+            if (info.Background.Width != data.Width || info.Background.Height != data.Height)
+            {
+                //Bitmap does not match data.
+                return;
+            }
+
+            BitmapHelper.DrawRectangle(ref info.Background, 0, 0, data.Width, data.Height);
 
             if (data.SampleCount == 0)
             {
@@ -287,59 +411,17 @@ namespace FoxTunes
                 return;
             }
 
-            if (valueRenderInfo.Width != data.Width || valueRenderInfo.Height != data.Height)
+            if (data.PeakElements != null)
             {
-                //Bitmap does not match data.
-                return;
+                BitmapHelper.DrawRectangles(ref info.Peak, data.PeakElements, data.PeakElements.Length);
             }
-
-            BitmapHelper.DrawRectangles(ref valueRenderInfo, valueElements, valueElements.Length);
-            if (rmsElements != null)
+            if (data.RmsElements != null)
             {
-                BitmapHelper.DrawRectangles(ref rmsRenderInfo, rmsElements, rmsElements.Length);
+                BitmapHelper.DrawRectangles(ref info.Rms, data.RmsElements, data.RmsElements.Length);
             }
-
-            if (peakElements != null)
+            if (data.ValueElements != null)
             {
-                for (var a = 0; a < valueElements.Length; a++)
-                {
-                    if (orientation == Orientation.Horizontal)
-                    {
-                        var min = valueElements[a].Width;
-                        if (rmsElements != null)
-                        {
-                            min = Math.Min(min, rmsElements[a].Width);
-                        }
-                        if (peakElements[a].X > min)
-                        {
-                            BitmapHelper.DrawRectangle(
-                                ref valueRenderInfo,
-                                peakElements[a].X,
-                                peakElements[a].Y,
-                                peakElements[a].Width,
-                                peakElements[a].Height
-                            );
-                        }
-                    }
-                    else if (orientation == Orientation.Vertical)
-                    {
-                        var max = valueElements[a].Y;
-                        if (rmsElements != null)
-                        {
-                            max = Math.Max(max, rmsElements[a].Y);
-                        }
-                        if (peakElements[a].Y < max)
-                        {
-                            BitmapHelper.DrawRectangle(
-                                ref valueRenderInfo,
-                                peakElements[a].X,
-                                peakElements[a].Y,
-                                peakElements[a].Width,
-                                peakElements[a].Height
-                            );
-                        }
-                    }
-                }
+                BitmapHelper.DrawRectangles(ref info.Value, data.ValueElements, data.ValueElements.Length);
             }
         }
 
@@ -422,7 +504,7 @@ namespace FoxTunes
                     }
                     else if (data.Orientation == Orientation.Vertical)
                     {
-                        data.Peaks[a] = Math.Max(data.ValueElements[a].Y, data.RmsElements[a].Y);
+                        data.Peaks[a] = Math.Min(data.ValueElements[a].Y, data.RmsElements[a].Y);
                     }
                 }
             }
@@ -449,7 +531,7 @@ namespace FoxTunes
             UpdateElementsSmooth(data.Peaks, data.PeakElements, data.Holds, data.Width, data.Height, MARGIN, holdInterval, duration, data.Orientation);
         }
 
-        public static PeakRendererData Create(PeakRenderer renderer, int width, int height, Color[] colors, Orientation orientation)
+        public static PeakRendererData Create(PeakRenderer renderer, int width, int height, IDictionary<string, IntPtr> colors, Orientation orientation)
         {
             var data = new PeakRendererData()
             {
@@ -472,7 +554,7 @@ namespace FoxTunes
 
             public int Height;
 
-            public Color[] Colors;
+            public IDictionary<string, IntPtr> Colors;
 
             public Orientation Orientation;
 
@@ -520,6 +602,18 @@ namespace FoxTunes
                 }
                 return peaks;
             }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct PeakRenderInfo
+        {
+            public BitmapHelper.RenderInfo Peak;
+
+            public BitmapHelper.RenderInfo Rms;
+
+            public BitmapHelper.RenderInfo Value;
+
+            public BitmapHelper.RenderInfo Background;
         }
     }
 }

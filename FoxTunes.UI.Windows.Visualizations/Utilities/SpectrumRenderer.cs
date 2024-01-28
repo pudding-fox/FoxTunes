@@ -95,7 +95,6 @@ namespace FoxTunes
                 return false;
             }
             this.RendererData = Create(
-                this.OutputDataSource,
                 width,
                 height,
                 SpectrumConfiguration.GetBars(this.Bars.Value),
@@ -350,7 +349,7 @@ namespace FoxTunes
             UpdateElementsSmooth(data.Peaks, data.PeakElements, data.Holds, data.Width, data.Height, data.Margin, holdInterval, duration, Orientation.Vertical);
         }
 
-        public static SpectrumRendererData Create(IOutputDataSource outputDataSource, int width, int height, int count, int fftSize, bool showPeaks, Color[] colors, int cutOff, float preAmp)
+        public static SpectrumRendererData Create(int width, int height, int count, int fftSize, bool showPeaks, Color[] colors, int cutOff, float preAmp)
         {
             if (count > width)
             {
@@ -361,13 +360,11 @@ namespace FoxTunes
             var margin = width > (count * MARGIN_MIN) ? MARGIN_ONE : MARGIN_ZERO;
             var data = new SpectrumRendererData()
             {
-                OutputDataSource = outputDataSource,
                 Width = width,
                 Height = height,
                 Margin = margin,
                 Count = count,
                 FFTSize = fftSize,
-                Samples = outputDataSource.GetBuffer(fftSize),
                 Values = new float[count],
                 Colors = colors,
                 CutOff = cutOff,
@@ -395,8 +392,6 @@ namespace FoxTunes
 
         public class SpectrumRendererData : FFTVisualizationData
         {
-            public IOutputDataSource OutputDataSource;
-
             public int FFTRange;
 
             public float[] Values;
