@@ -8,7 +8,7 @@ using System.Linq;
 namespace FoxTunes
 {
     [Table(Name = "LibraryHierarchyItems")]
-    public class LibraryHierarchyNode : BaseComponent
+    public class LibraryHierarchyNode : BaseComponent, ISelectable, IExpandable
     {
         const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Image;
 

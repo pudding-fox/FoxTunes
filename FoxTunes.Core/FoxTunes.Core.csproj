@@ -58,6 +58,8 @@
     <Compile Include="Interfaces\Database\IDatabaseFactory.cs" />
     <Compile Include="Interfaces\Factories\IMessageSinkFactory.cs" />
     <Compile Include="Interfaces\IArtworkProvider.cs" />
+    <Compile Include="Interfaces\ISelectable.cs" />
+    <Compile Include="Interfaces\IExpandable.cs" />
     <Compile Include="Interfaces\IInvocableComponent.cs" />
     <Compile Include="Interfaces\IInvocationComponent.cs" />
     <Compile Include="Interfaces\Database\IDatabaseComponent.cs" />

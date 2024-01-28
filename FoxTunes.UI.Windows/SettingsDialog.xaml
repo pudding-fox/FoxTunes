@@ -27,19 +27,12 @@
                         ItemsSource="{Binding Sections, Source={StaticResource ViewModel}}" 
                         Windows:TreeViewExtensions.SelectedItem="{Binding SelectedSection, Source={StaticResource ViewModel}}"
                         Windows:TreeViewExtensions.RightButtonSelect="True">
-                    <TreeView.Resources>
-                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"></Setter>
-                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"></Setter>
-                            <!-- System -->
-                            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                            <Setter Property="Background" Value="Transparent" />
-                            <Setter Property="Padding" Value="1,0,0,0" />
-                            <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
-                            <Setter Property="VerticalContentAlignment" Value="Top"></Setter>
-                            <Setter Property="Template" Value="{DynamicResource TreeViewItemTemplate}"></Setter>
+                    <TreeView.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="TreeViewItem.IsSelected" Value="{Binding IsSelected}"></Setter>
+                            <Setter Property="TreeViewItem.IsExpanded" Value="{Binding IsExpanded}"></Setter>
                         </Style>
-                    </TreeView.Resources>
+                    </TreeView.ItemContainerStyle>
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                             <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"/>
