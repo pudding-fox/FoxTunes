@@ -1,9 +1,11 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -11,8 +13,6 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ImageResizer : StandardComponent, IDisposable
     {
-        const int TIMEOUT = 1000;
-
         private static readonly string PREFIX = typeof(ImageResizer).Name;
 
         private static readonly KeyLock<string> KeyLock = new KeyLock<string>();
@@ -30,10 +30,15 @@ namespace FoxTunes
         {
             switch (signal.Name)
             {
-                case CommonSignals.HierarchiesUpdated:
-                    if (!object.Equals(signal.State, CommonSignalFlags.SOFT))
+                case CommonSignals.MetaDataUpdated:
+                    var names = signal.State as IEnumerable<string>;
+                    if (names == null || !names.Any())
                     {
-                        this.Dispatch(new Action(this.Clear));
+                        this.Dispatch(this.Clear);
+                    }
+                    else if (names.Contains(CommonImageTypes.FrontCover, true))
+                    {
+                        this.Dispatch(this.Clear);
                     }
                     break;
             }

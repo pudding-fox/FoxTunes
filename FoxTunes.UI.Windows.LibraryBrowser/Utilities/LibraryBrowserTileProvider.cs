@@ -13,8 +13,6 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class LibraryBrowserTileProvider : StandardComponent, IDisposable
     {
-        const int TIMEOUT = 1000;
-
         const double DPIX = 96;
 
         const double DPIY = 96;
