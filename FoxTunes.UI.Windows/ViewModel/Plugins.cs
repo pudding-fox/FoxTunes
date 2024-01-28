@@ -41,8 +41,9 @@ namespace FoxTunes.ViewModel
         {
             foreach (var plugin in this.Items)
             {
-                if (plugin.SelectedComponent == null)
+                if (plugin.Components.Count <= 1 || plugin.SelectedComponent == null)
                 {
+                    //Slot is not ambiguous.
                     continue;
                 }
                 ComponentResolver.Instance.Add(plugin.Id, plugin.SelectedComponent.Id);
