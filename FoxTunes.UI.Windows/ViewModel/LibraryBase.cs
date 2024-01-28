@@ -224,6 +224,97 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowCursorAdornersChanged;
 
+        public string StatusMessage
+        {
+            get
+            {
+                var isUpdating = global::FoxTunes.BackgroundTask.Active
+                    .OfType<LibraryTaskBase>()
+                    .Any();
+                if (isUpdating)
+                {
+                    return "Updating...";
+                }
+                if (this.LibraryHierarchyBrowser != null)
+                {
+                    switch (this.LibraryHierarchyBrowser.State)
+                    {
+                        case LibraryHierarchyBrowserState.Loading:
+                            return "Loading...";
+                    }
+                }
+                if (this.LibraryManager != null)
+                {
+                    if (!this.LibraryManager.CanNavigate)
+                    {
+                        return "Add to collection by dropping files here.";
+                    }
+                }
+                return null;
+            }
+        }
+
+        protected virtual void OnStatusMessageChanged()
+        {
+            if (this.StatusMessageChanged != null)
+            {
+                this.StatusMessageChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("StatusMessage");
+        }
+
+        public event EventHandler StatusMessageChanged;
+
+        public bool HasStatusMessage
+        {
+            get
+            {
+                var isUpdating = global::FoxTunes.BackgroundTask.Active
+                    .OfType<LibraryTaskBase>()
+                    .Any();
+                if (isUpdating)
+                {
+                    return true;
+                }
+                if (this.LibraryHierarchyBrowser != null)
+                {
+                    switch (this.LibraryHierarchyBrowser.State)
+                    {
+                        case LibraryHierarchyBrowserState.Loading:
+                            return true;
+                    }
+                }
+                if (this.LibraryManager != null)
+                {
+                    if (!this.LibraryManager.CanNavigate)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        protected virtual void OnHasStatusMessageChanged()
+        {
+            if (this.HasStatusMessageChanged != null)
+            {
+                this.HasStatusMessageChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("HasStatusMessage");
+        }
+
+        public event EventHandler HasStatusMessageChanged;
+
+        protected virtual Task RefreshStatus()
+        {
+            return Windows.Invoke(() =>
+            {
+                this.OnStatusMessageChanged();
+                this.OnHasStatusMessageChanged();
+            });
+        }
+
         public virtual Task Refresh()
         {
             return Windows.Invoke(() =>
@@ -254,6 +345,7 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
+            global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
             this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
             this.LibraryHierarchyBrowser.FilterChanged += this.OnFilterChanged;
             this.PlaylistManager = this.Core.Managers.Playlist;
@@ -263,6 +355,7 @@ namespace FoxTunes.ViewModel
             this.LibraryManager = this.Core.Managers.Library;
             this.LibraryManager.SelectedHierarchyChanged += this.OnSelectedHierarchyChanged;
             this.LibraryManager.SelectedItemChanged += this.OnSelectedItemChanged;
+            this.LibraryManager.CanNavigateChanged += this.OnCanNavigateChanged;
             this.Configuration = this.Core.Components.Configuration;
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 SearchBehaviourConfiguration.SECTION,
@@ -278,7 +371,18 @@ namespace FoxTunes.ViewModel
             ).ConnectValue(value => this.ShowCursorAdorners = value);
             //TODO: Bad .Wait().
             this.Reload().Wait();
+            this.RefreshStatus().Wait();
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnActiveChanged(object sender, EventArgs e)
+        {
+            var task = this.RefreshStatus();
+        }
+
+        protected virtual void OnStateChanged(object sender, EventArgs e)
+        {
+            var task = this.RefreshStatus();
         }
 
         protected virtual void OnFilterChanged(object sender, EventArgs e)
@@ -310,6 +414,11 @@ namespace FoxTunes.ViewModel
         protected virtual void OnSelectedItemChanged(object sender, EventArgs e)
         {
             this.OnSelectedItemChanged();
+        }
+
+        protected virtual void OnCanNavigateChanged(object sender, AsyncEventArgs e)
+        {
+            var task = this.RefreshStatus();
         }
 
         protected virtual Task OnSignal(object sender, ISignal signal)
@@ -460,6 +569,7 @@ namespace FoxTunes.ViewModel
 
         protected override void Dispose(bool disposing)
         {
+            global::FoxTunes.BackgroundTask.ActiveChanged -= this.OnActiveChanged;
             if (this.LibraryHierarchyBrowser != null)
             {
                 this.LibraryHierarchyBrowser.FilterChanged -= this.OnFilterChanged;

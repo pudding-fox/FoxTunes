@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
     public interface IPlaylistBrowser : IStandardComponent
     {
+        PlaylistBrowserState State { get; }
+
+        event EventHandler StateChanged;
+
         IEnumerable<PlaylistItem> GetItems();
 
         Task<PlaylistItem> Get(int sequence);
@@ -19,5 +21,11 @@ namespace FoxTunes.Interfaces
         Task<PlaylistItem> GetPrevious(bool navigate);
 
         Task<int> GetInsertIndex();
+    }
+
+    public enum PlaylistBrowserState : byte
+    {
+        None,
+        Loading
     }
 }

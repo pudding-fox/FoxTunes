@@ -43,15 +43,96 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ItemsChanged;
 
+        public string StatusMessage
+        {
+            get
+            {
+                if (this.PlaylistBrowser != null)
+                {
+                    switch (this.PlaylistBrowser.State)
+                    {
+                        case PlaylistBrowserState.Loading:
+                            return "Loading...";
+                    }
+                }
+                if (this.PlaylistManager != null)
+                {
+                    if (!this.PlaylistManager.CanNavigate)
+                    {
+                        return "Add to playlist by dropping files here.";
+                    }
+                }
+                return null;
+            }
+        }
+
+        protected virtual void OnStatusMessageChanged()
+        {
+            if (this.StatusMessageChanged != null)
+            {
+                this.StatusMessageChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("StatusMessage");
+        }
+
+        public event EventHandler StatusMessageChanged;
+
+        public bool HasStatusMessage
+        {
+            get
+            {
+                if (this.PlaylistBrowser != null)
+                {
+                    switch (this.PlaylistBrowser.State)
+                    {
+                        case PlaylistBrowserState.Loading:
+                            return true;
+                    }
+                }
+                if (this.PlaylistManager != null)
+                {
+                    if (!this.PlaylistManager.CanNavigate)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        protected virtual void OnHasStatusMessageChanged()
+        {
+            if (this.HasStatusMessageChanged != null)
+            {
+                this.HasStatusMessageChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("HasStatusMessage");
+        }
+
+        public event EventHandler HasStatusMessageChanged;
+
+        protected virtual Task RefreshStatus()
+        {
+            return Windows.Invoke(() =>
+            {
+                this.OnStatusMessageChanged();
+                this.OnHasStatusMessageChanged();
+            });
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.DatabaseFactory = this.Core.Factories.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.PlaylistBrowser = this.Core.Components.PlaylistBrowser;
+            this.PlaylistBrowser.StateChanged += this.OnStateChanged;
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
             this.PlaylistManager = this.Core.Managers.Playlist;
+            this.PlaylistManager.CanNavigateChanged += this.OnCanNavigateChanged;
             this.PlaybackManager = this.Core.Managers.Playback;
+            //TODO: Bad .Wait().
+            this.RefreshStatus().Wait();
             base.InitializeComponent(core);
         }
 
@@ -67,6 +148,16 @@ namespace FoxTunes.ViewModel
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        protected virtual void OnStateChanged(object sender, EventArgs e)
+        {
+            var task = this.RefreshStatus();
+        }
+
+        protected virtual void OnCanNavigateChanged(object sender, AsyncEventArgs e)
+        {
+            var task = this.RefreshStatus();
         }
 
         protected virtual Task RefreshItems()

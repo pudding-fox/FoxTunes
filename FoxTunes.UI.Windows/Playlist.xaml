@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:Interfaces="clr-namespace:FoxTunes.Interfaces;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
@@ -12,6 +13,7 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True" IsVisibleChanged="OnIsVisibleChanged">
     <UserControl.Resources>
         <ViewModel:Playlist x:Key="ViewModel" Core="{Binding}"></ViewModel:Playlist>
+        <ViewModel:HasFlagConverter x:Key="HasFlagConverter"></ViewModel:HasFlagConverter>
     </UserControl.Resources>
     <Interactivity:Interaction.Triggers>
         <Interactivity:EventTrigger EventName="DragEnter">
@@ -64,18 +66,17 @@
                             <ColumnDefinition></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding Name}" Foreground="{DynamicResource TextBrush}" FontSize="16" Margin="0,-2,10,0"></TextBlock>
-                        <!--<Rectangle Grid.Column="1" Fill="{DynamicResource TextBrush}" Height="1" VerticalAlignment="Center" />-->
                         <Separator Grid.Column="1"></Separator>
                     </Grid>
                 </DataTemplate>
             </Windows:ListViewExtensions.GroupHeaderTemplate>
         </ListView>
-        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Add to playlist by dropping files here." IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding StatusMessage, Mode=OneWay, Source={StaticResource ViewModel}}" IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Managers.Playlist.CanNavigate, Mode=OneWay}" Value="False">
+                        <DataTrigger Binding="{Binding HasStatusMessage, Mode=OneWay, Source={StaticResource ViewModel}}" Value="True">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>

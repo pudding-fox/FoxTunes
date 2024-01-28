@@ -1,5 +1,6 @@
 ﻿using FoxDb;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +10,32 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class PlaylistBrowser : StandardComponent, IPlaylistBrowser
     {
+        private PlaylistBrowserState _State { get; set; }
+
+        public PlaylistBrowserState State
+        {
+            get
+            {
+                return this._State;
+            }
+            set
+            {
+                this._State = value;
+                this.OnStateChanged();
+            }
+        }
+
+        protected virtual void OnStateChanged()
+        {
+            if (this.StateChanged != null)
+            {
+                this.StateChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("State");
+        }
+
+        public event EventHandler StateChanged;
+
         public ICore Core { get; private set; }
 
         public IPlaylistCache PlaylistCache { get; private set; }
@@ -50,17 +77,25 @@ namespace FoxTunes
 
         private IEnumerable<PlaylistItem> GetItemsCore()
         {
-            using (var database = this.DatabaseFactory.Create())
+            this.State |= PlaylistBrowserState.Loading;
+            try
             {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                using (var database = this.DatabaseFactory.Create())
                 {
-                    var sequence = database.AsQueryable<PlaylistItem>(transaction)
-                        .OrderBy(playlistItem => playlistItem.Sequence);
-                    foreach (var element in sequence)
+                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                     {
-                        yield return element;
+                        var sequence = database.AsQueryable<PlaylistItem>(transaction)
+                            .OrderBy(playlistItem => playlistItem.Sequence);
+                        foreach (var element in sequence)
+                        {
+                            yield return element;
+                        }
                     }
                 }
+            }
+            finally
+            {
+                this.State &= ~PlaylistBrowserState.Loading;
             }
         }
 
