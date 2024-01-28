@@ -262,11 +262,28 @@ namespace FoxTunes
             Grid.SetRow(this.BottomContainer, 2);
 
             this.TopContainer.SetBinding(
+                FrameworkElement.DataContextProperty,
+                new Binding()
+                {
+                    Source = this,
+                    Path = new PropertyPath(nameof(this.DataContext))
+                }
+            );
+            this.TopContainer.SetBinding(
                 UIComponentContainer.ComponentProperty,
                 new Binding()
                 {
                     Source = this,
                     Path = new PropertyPath(nameof(this.TopComponent))
+                }
+            );
+
+            this.BottomContainer.SetBinding(
+                FrameworkElement.DataContextProperty,
+                new Binding()
+                {
+                    Source = this,
+                    Path = new PropertyPath(nameof(this.DataContext))
                 }
             );
             this.BottomContainer.SetBinding(
@@ -686,7 +703,6 @@ namespace FoxTunes
 
         public event EventHandler SplitterDirectionChanged;
 
-
         public bool CollapseTop
         {
             get
@@ -754,26 +770,26 @@ namespace FoxTunes
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     FREEZE_TOP,
-                    "Freeze Top", attributes:
-                    string.Equals(this.SplitterDirection, DirectionTop, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    "Freeze Top",
+                    attributes: string.Equals(this.SplitterDirection, DirectionTop, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     FREEZE_BOTTOM,
-                    "Freeze Bottom", attributes:
-                    string.Equals(this.SplitterDirection, DirectionBottom, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    "Freeze Bottom",
+                    attributes: string.Equals(this.SplitterDirection, DirectionBottom, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     COLLAPSE_TOP,
-                    "Collapsable Top", attributes:
-                    (byte)((this.CollapseTop ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
+                    "Collapsable Top",
+                    attributes: (byte)((this.CollapseTop ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     COLLAPSE_BOTTOM,
-                    "Collapsable Bottom", attributes:
-                    this.CollapseBottom ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    "Collapsable Bottom",
+                    attributes: this.CollapseBottom ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
             }
         }

@@ -13,19 +13,37 @@
              d:DesignHeight="300" d:DesignWidth="600" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <DockPanel>
         <LocalWindows:UIComponentContainer 
+            x:Name="DockContainer"
             DockPanel.Dock="{Binding DockLocation, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentDockContainer}}}"
-            Component="{Binding DockComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentDockContainer}}}"
-            MinHeight="30">
+            Component="{Binding DockComponent, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentDockContainer}}}">
             <LocalWindows:UIComponentContainer.Style>
                 <Style TargetType="{x:Type LocalWindows:UIComponentContainer}">
                     <Setter Property="Margin" Value="0"></Setter>
                     <Style.Triggers>
                         <Trigger Property="DockPanel.Dock" Value="Top">
+                            <Setter Property="MinHeight" Value="30"></Setter>
                             <Setter Property="Margin" Value="0,0,0,2"></Setter>
                         </Trigger>
                         <Trigger Property="DockPanel.Dock" Value="Bottom">
+                            <Setter Property="MinHeight" Value="30"></Setter>
                             <Setter Property="Margin" Value="0,2,0,0"></Setter>
                         </Trigger>
+                        <Trigger Property="DockPanel.Dock" Value="Left">
+                            <Setter Property="MinWidth" Value="30"></Setter>
+                            <Setter Property="Margin" Value="0,0,2,0"></Setter>
+                        </Trigger>
+                        <Trigger Property="DockPanel.Dock" Value="Right">
+                            <Setter Property="MinWidth" Value="30"></Setter>
+                            <Setter Property="Margin" Value="2,0,0,0"></Setter>
+                        </Trigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Collapse, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentDockContainer}}}" Value="True"></Condition>
+                                <Condition Binding="{Binding DockEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentDockContainer}}}" Value="False"></Condition>
+                                <Condition Binding="{Binding IsInDesignMode, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:UIComponentDockContainer}}}" Value="False"></Condition>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed"></Setter>
+                        </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
             </LocalWindows:UIComponentContainer.Style>
