@@ -10,11 +10,6 @@ namespace FoxTunes.ViewModel
 {
     public class ToolWindowManager : ViewModelBase
     {
-        public ToolWindowManager()
-        {
-            this.Windows = new ObservableCollection<ToolWindow>();
-        }
-
         public ToolWindowBehaviour Behaviour { get; private set; }
 
         private ObservableCollection<ToolWindow> _Windows { get; set; }
@@ -69,11 +64,12 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SelectedWindowChanged;
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             this.Behaviour = ComponentRegistry.Instance.GetComponent<ToolWindowBehaviour>();
             this.Behaviour.Loaded += this.OnLoaded;
             this.Behaviour.Unloaded += this.OnUnloaded;
+            this.Windows = new ObservableCollection<ToolWindow>();
             var task = this.Refresh();
             base.InitializeComponent(core);
         }
@@ -101,7 +97,6 @@ namespace FoxTunes.ViewModel
                 this.Windows.AddRange(this.Behaviour.Windows.Keys.Select(configuration =>
                 {
                     var window = new ToolWindow();
-                    window.Core = this.Core;
                     window.Configuration = configuration;
                     return window;
                 }));
@@ -132,7 +127,6 @@ namespace FoxTunes.ViewModel
             {
                 if (value)
                 {
-                    ToolWindowBehaviour.ToolWindowManagerWindow.DataContext = this.Core;
                     ToolWindowBehaviour.ToolWindowManagerWindow.Show();
                 }
                 else if (ToolWindowBehaviour.IsToolWindowManagerWindowCreated)

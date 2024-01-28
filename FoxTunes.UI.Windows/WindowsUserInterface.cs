@@ -74,12 +74,10 @@ namespace FoxTunes
         {
             if (global::FoxTunes.Windows.IsMiniWindowCreated)
             {
-                global::FoxTunes.Windows.MiniWindow.DataContext = this.Core;
                 this.Application.Run(global::FoxTunes.Windows.MiniWindow);
             }
             else
             {
-                global::FoxTunes.Windows.MainWindow.DataContext = this.Core;
                 this.Application.Run(global::FoxTunes.Windows.MainWindow);
             }
             return global::FoxTunes.Windows.Shutdown();

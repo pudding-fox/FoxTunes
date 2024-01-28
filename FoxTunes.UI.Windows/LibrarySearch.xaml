@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <ViewModel:LibrarySearch x:Key="ViewModel" Core="{Binding}"></ViewModel:LibrarySearch>
+        <ViewModel:LibrarySearch x:Key="ViewModel"></ViewModel:LibrarySearch>
     </UserControl.Resources>
     <Windows:SearchBox 
            SearchText="{Binding Filter, Source={StaticResource ViewModel}, UpdateSourceTrigger=PropertyChanged}"

@@ -12,7 +12,7 @@
              MinWidth="200"
              MinHeight="200">
     <UserControl.Resources>
-        <LocalViewModel:Lyrics x:Key="ViewModel" Core="{Binding}"></LocalViewModel:Lyrics>
+        <LocalViewModel:Lyrics x:Key="ViewModel"></LocalViewModel:Lyrics>
     </UserControl.Resources>
     <Windows:UIComponentBase.IsComponentEnabled>
         <Binding Path="HasData" Source="{StaticResource ViewModel}"/>

@@ -16,6 +16,8 @@
 
         ISignalEmitter SignalEmitter { get; }
 
+        IErrorEmitter ErrorEmitter { get; }
+
         ILibraryBrowser LibraryBrowser { get; }
 
         ILibraryCache LibraryCache { get; }

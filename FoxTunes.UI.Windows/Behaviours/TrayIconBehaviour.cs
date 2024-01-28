@@ -71,8 +71,6 @@ namespace FoxTunes
             };
         }
 
-        public ICore Core { get; private set; }
-
         public INotifyIcon NotifyIcon { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -110,8 +108,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Core = core;
-            this.NotifyIcon = ComponentRegistry.Instance.GetComponent<NotifyIcon>();
+            this.NotifyIcon = ComponentRegistry.Instance.GetComponent<INotifyIcon>();
             this.Configuration = core.Components.Configuration;
             if (this.Configuration.GetSection(NotifyIconConfiguration.SECTION) != null)
             {
@@ -186,11 +183,6 @@ namespace FoxTunes
                 var y = default(int);
                 MouseHelper.GetPosition(out x, out y);
                 DpiHelper.TransformPosition(ref x, ref y);
-
-                if (!object.ReferenceEquals(Menu.DataContext, this.Core))
-                {
-                    Menu.DataContext = this.Core;
-                }
 
                 Menu.HorizontalOffset = x;
                 Menu.VerticalOffset = y;

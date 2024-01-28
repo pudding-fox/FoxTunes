@@ -169,37 +169,6 @@ namespace FoxTunes.Mpeg4
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual Task OnError(string message)
-        {
-            return this.OnError(new Exception(message));
-        }
-
-        protected virtual Task OnError(Exception exception)
-        {
-            return this.OnError(exception.Message, exception);
-        }
-
-        protected virtual Task OnError(string message, Exception exception)
-        {
-            return this.OnError(this, new ComponentErrorEventArgs(message, exception));
-        }
-
-        protected virtual Task OnError(object sender, ComponentErrorEventArgs e)
-        {
-            Logger.Write(this, LogLevel.Error, e.Message);
-            if (this.Error == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            return this.Error(sender, e);
-        }
-
-        public event ComponentErrorEventHandler Error;
-
         #endregion
     }
 }

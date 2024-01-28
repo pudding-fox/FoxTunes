@@ -86,12 +86,7 @@ namespace FoxTunes
             var descending = default(bool);
             if (object.ReferenceEquals(this.SortColumn, playlistColumn))
             {
-                this.SortColumn = null;
                 descending = true;
-            }
-            else
-            {
-                this.SortColumn = playlistColumn;
             }
             var changes = await this.PlaylistManager.Sort(playlist, playlistColumn, descending).ConfigureAwait(false);
             if (changes == 0)
@@ -103,6 +98,10 @@ namespace FoxTunes
                 {
                     Logger.Write(this, LogLevel.Debug, "Playlist was already sorted, all values are equal.");
                 }
+            }
+            if (!descending)
+            {
+                this.SortColumn = playlistColumn;
             }
         }
 

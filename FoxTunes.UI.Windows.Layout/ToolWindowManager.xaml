@@ -8,9 +8,9 @@
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="600" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+             d:DesignHeight="300" d:DesignWidth="600">
     <UserControl.Resources>
-        <ViewModel:ToolWindowManager x:Key="ViewModel" Core="{Binding}"></ViewModel:ToolWindowManager>
+        <ViewModel:ToolWindowManager x:Key="ViewModel"></ViewModel:ToolWindowManager>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>

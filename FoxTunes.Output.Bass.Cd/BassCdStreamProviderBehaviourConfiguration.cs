@@ -21,7 +21,7 @@ namespace FoxTunes
                     .WithValue(true)
                     .DependsOn(SECTION, ENABLED_ELEMENT))
                 .WithElement(new TextConfigurationElement(LOOKUP_HOST_ELEMENT, "Host")
-                    .WithValue(BassCd.CDDBServer)
+                    .WithValue(BassCd.CDDBServer ?? "freedb.freedb.org")
                     .DependsOn(SECTION, ENABLED_ELEMENT).DependsOn(SECTION, LOOKUP_ELEMENT));
         }
     }

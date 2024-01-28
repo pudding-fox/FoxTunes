@@ -94,13 +94,9 @@ namespace FoxTunes.ViewModel
 
         public IOutputEffects Effects { get; private set; }
 
-        protected override void OnCoreChanged()
+        protected override void InitializeComponent(ICore core)
         {
-            if (this.Core == null)
-            {
-                return;
-            }
-            this.Effects = this.Core.Components.OutputEffects;
+            this.Effects = core.Components.OutputEffects;
             if (this.Effects.Volume != null)
             {
                 this.Effects.Volume.AvailableChanged += this.OnAvailableChanged;
@@ -109,7 +105,7 @@ namespace FoxTunes.ViewModel
             }
             //TODO: Bad .Wait().
             this.Refresh().Wait();
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
 
         protected virtual void OnAvailableChanged(object sender, EventArgs e)

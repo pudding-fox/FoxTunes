@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <ViewModel:LibrarySelector x:Key="ViewModel" Core="{Binding}"></ViewModel:LibrarySelector>
+        <ViewModel:LibrarySelector x:Key="ViewModel"></ViewModel:LibrarySelector>
         <ViewModel:IntegerToBooleanConverter x:Key="IntegerToBooleanConverter"></ViewModel:IntegerToBooleanConverter>
     </UserControl.Resources>
     <Windows:UIComponentBase.IsComponentEnabled>

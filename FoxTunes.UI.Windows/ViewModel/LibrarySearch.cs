@@ -99,13 +99,13 @@ namespace FoxTunes.ViewModel
 
         private IConfiguration Configuration { get; set; }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
-            this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.LibraryHierarchyBrowser.FilterChanged += this.OnFilterChanged;
-            this.LibraryManager = this.Core.Managers.Library;
-            this.PlaylistManager = this.Core.Managers.Playlist;
-            this.Configuration = this.Core.Components.Configuration;
+            this.LibraryManager = core.Managers.Library;
+            this.PlaylistManager = core.Managers.Playlist;
+            this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 SearchBehaviourConfiguration.SECTION,
                 SearchBehaviourConfiguration.SEARCH_INTERVAL_ELEMENT

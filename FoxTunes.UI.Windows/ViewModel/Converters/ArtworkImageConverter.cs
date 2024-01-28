@@ -162,7 +162,7 @@ namespace FoxTunes.ViewModel
 
         public ArtworkBrushFactory ArtworkBrushFactory { get; private set; }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             this.ArtworkBrushFactory = new ArtworkBrushFactory();
             this.ArtworkBrushFactory.InitializeComponent(core);

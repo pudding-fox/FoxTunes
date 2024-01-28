@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -15,7 +14,6 @@ namespace FoxTunes
             this.Input = input;
             this.Components = components;
             this.Output = output;
-            this.All.ForEach(component => component.Error += this.OnComponentError);
         }
 
         public IBassStreamInput Input { get; private set; }
@@ -118,11 +116,6 @@ namespace FoxTunes
             this.Controllable.Reverse().ForEach(component => component.Stop());
         }
 
-        protected virtual Task OnComponentError(object sender, ComponentErrorEventArgs e)
-        {
-            return this.OnError(e.Message, e.Exception);
-        }
-
         public bool IsDisposed { get; private set; }
 
         public void Dispose()
@@ -139,7 +132,6 @@ namespace FoxTunes
             }
             this.All.ForEach(component =>
             {
-                component.Error -= this.OnComponentError;
                 try
                 {
                     component.Dispose();

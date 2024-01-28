@@ -41,10 +41,6 @@ namespace FoxTunes
                 {
                     Windows.MainWindow.Hide();
                 }
-                if (Windows.MiniWindow.DataContext == null)
-                {
-                    Windows.MiniWindow.DataContext = this.Core;
-                }
                 Windows.MiniWindow.Topmost = this.Topmost.Value;
                 Windows.MiniWindow.Show();
                 Windows.MiniWindow.BringToFront();
@@ -60,10 +56,6 @@ namespace FoxTunes
                 if (Windows.IsMiniWindowCreated)
                 {
                     Windows.MiniWindow.Hide();
-                }
-                if (Windows.MainWindow.DataContext == null)
-                {
-                    Windows.MainWindow.DataContext = this.Core;
                 }
                 Windows.MainWindow.Show();
                 Windows.MainWindow.BringToFront();

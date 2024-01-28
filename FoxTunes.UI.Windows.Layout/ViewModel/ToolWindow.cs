@@ -342,11 +342,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ConfigurationChanged;
 
-        public override void InitializeComponent(ICore core)
-        {
-            base.InitializeComponent(core);
-        }
-
         protected override Freezable CreateInstanceCore()
         {
             return new ToolWindow();

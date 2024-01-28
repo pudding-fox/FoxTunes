@@ -11,7 +11,7 @@
         Title="{x:Static ViewModel:StringResources.SettingsWindow_Title}"
         Windows:ButtonExtensions.CommandExecuted="OnCommandExecuted">
     <Windows:WindowBase.Resources>
-        <ViewModel:Settings x:Key="ViewModel" Core="{Binding}"></ViewModel:Settings>
+        <ViewModel:Settings x:Key="ViewModel"></ViewModel:Settings>
     </Windows:WindowBase.Resources>
     <TabControl>
         <TabItem Header="General">

@@ -88,7 +88,6 @@ namespace FoxTunes
                 await global::FoxTunes.Windows.Invoke(() =>
                 {
                     window = new ToolWindow();
-                    window.DataContext = this.Core;
                     window.Configuration = config;
                     window.ShowActivated = false;
                     //Don't set owner as it causes an "always on top" type of behaviour.
@@ -345,7 +344,6 @@ namespace FoxTunes
             {
                 if (!IsToolWindowManagerWindowCreated)
                 {
-                    ToolWindowManagerWindow.DataContext = this.Core;
                     ToolWindowManagerWindow.Show();
                 }
             });

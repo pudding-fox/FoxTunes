@@ -7,9 +7,9 @@
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="600" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+             d:DesignHeight="300" d:DesignWidth="600">
     <UserControl.Resources>
-        <ViewModel:PlaylistConfig x:Key="ViewModel" Core="{Binding}" Playlist="{Binding Playlist, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:PlaylistConfigDialog}}}"></ViewModel:PlaylistConfig>
+        <ViewModel:PlaylistConfig x:Key="ViewModel" Playlist="{Binding Playlist, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:PlaylistConfigDialog}}}"></ViewModel:PlaylistConfig>
     </UserControl.Resources>
     <ContentControl>
         <ContentControl.Resources>

@@ -9,7 +9,7 @@
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" MinWidth="404" MinHeight="144">
     <Windows:UIComponentBase.Resources>
-        <ViewModel:Equalizer x:Key="ViewModel" Core="{Binding}"></ViewModel:Equalizer>
+        <ViewModel:Equalizer x:Key="ViewModel"></ViewModel:Equalizer>
     </Windows:UIComponentBase.Resources>
     <Grid IsEnabled="{Binding Available, Mode=OneWay, Source={StaticResource ViewModel}}">
         <Grid.RowDefinitions>

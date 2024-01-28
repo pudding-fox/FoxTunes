@@ -181,10 +181,10 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
-            this.PlaylistManager = this.Core.Managers.Playlist;
-            this.PlaybackManager = this.Core.Managers.Playback;
+            this.PlaylistManager = core.Managers.Playlist;
+            this.PlaybackManager = core.Managers.Playback;
             base.InitializeComponent(core);
         }
 

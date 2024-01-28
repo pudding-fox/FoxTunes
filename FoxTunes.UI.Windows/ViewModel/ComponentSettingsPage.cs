@@ -10,7 +10,7 @@ namespace FoxTunes.ViewModel
 {
     public class ComponentSettingsPage : ViewModelBase, ISelectable, IExpandable
     {
-        private ComponentSettingsPage()
+        private ComponentSettingsPage() : base(false)
         {
             this.Elements = new ObservableCollection<ConfigurationElement>();
             this.Children = new ObservableCollection<ComponentSettingsPage>();
@@ -20,17 +20,20 @@ namespace FoxTunes.ViewModel
         protected ComponentSettingsPage(string name) : this()
         {
             this.Name = name;
+            this.InitializeComponent(Core.Instance);
         }
 
-        public ComponentSettingsPage(string name, IEnumerable<ConfigurationElement> elements) : this(name)
+        public ComponentSettingsPage(string name, IEnumerable<ConfigurationElement> elements) : this()
         {
+            this.Name = name;
             elements = elements //Always put "Advanced" settings last.
-                .OrderBy(element => string.IsNullOrEmpty(element.Path) || element.Path.Contains("Advanced", true))
+                .OrderBy(element => string.IsNullOrEmpty(element.Path) || element.Path.Contains(Strings.General_Advanced, true))
                 .ThenBy(element => element.Id);
             foreach (var element in elements)
             {
                 this.AddElement(element);
             }
+            this.InitializeComponent(Core.Instance);
         }
 
         public string Name { get; private set; }
@@ -152,7 +155,7 @@ namespace FoxTunes.ViewModel
             return page;
         }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             foreach (var element in this.Elements)
             {
@@ -186,14 +189,20 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            foreach (var element in this.Elements)
+            if (this.Elements != null)
             {
-                element.IsHiddenChanged -= this.OnIsHiddenChanged;
+                foreach (var element in this.Elements)
+                {
+                    element.IsHiddenChanged -= this.OnIsHiddenChanged;
+                }
             }
-            foreach (var child in this.Children)
+            if (this.Children != null)
             {
-                child.Dispose();
-                child.IsVisibleChanged -= this.OnIsVisibleChanged;
+                foreach (var child in this.Children)
+                {
+                    child.IsVisibleChanged -= this.OnIsVisibleChanged;
+                    child.Dispose();
+                }
             }
             base.OnDisposing();
         }

@@ -167,13 +167,13 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler LengthChanged;
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
-            this.PlaybackManager = this.Core.Managers.Playback;
-            this.OnDemandMetaDataProvider = this.Core.Components.OnDemandMetaDataProvider;
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.PlaybackManager = core.Managers.Playback;
+            this.OnDemandMetaDataProvider = core.Components.OnDemandMetaDataProvider;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.Configuration = this.Core.Components.Configuration;
+            this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.READ_LYRICS_TAGS

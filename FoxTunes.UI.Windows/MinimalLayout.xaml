@@ -7,7 +7,7 @@
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"                              
              xmlns:Windows="clr-namespace:FoxTunes" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+             d:DesignHeight="300" d:DesignWidth="300">
     <Windows:UIComponentBase.Resources>
         <ViewModel:GridLengthConverter x:Key="GridLengthConverter"></ViewModel:GridLengthConverter>
     </Windows:UIComponentBase.Resources>

@@ -258,8 +258,10 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler HasMultipleValuesChanged;
 
-        public override void InitializeComponent(ICore core)
+        public void SetValue()
         {
+            this.Value = null;
+            this.OriginalValue = null;
             foreach (var key in this.MetaDataItems.Keys)
             {
                 var metaDataItem = default(MetaDataItem);
@@ -286,7 +288,6 @@ namespace FoxTunes.ViewModel
                 }
             }
             this.OriginalValue = this.Value;
-            base.InitializeComponent(core);
         }
 
         public IEnumerable<IFileData> GetSources()

@@ -174,14 +174,14 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler IsBufferingChanged;
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
-            this.PlaybackManager = this.Core.Managers.Playback;
+            this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
-            this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
+            this.ScriptingRuntime = core.Components.ScriptingRuntime;
             this.ScriptingContext = this.ScriptingRuntime.CreateContext();
-            this.Configuration = this.Core.Components.Configuration;
+            this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<TextConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.NOW_PLAYING_SCRIPT_ELEMENT

@@ -137,13 +137,9 @@ namespace FoxTunes.ViewModel
 
         public IOutputEffects Effects { get; private set; }
 
-        protected override void OnCoreChanged()
+        protected override void InitializeComponent(ICore core)
         {
-            if (this.Core == null)
-            {
-                return;
-            }
-            this.Effects = this.Core.Components.OutputEffects;
+            this.Effects = core.Components.OutputEffects;
             if (this.Effects.Equalizer != null)
             {
                 this.Effects.Equalizer.AvailableChanged += this.OnAvailableChanged;
@@ -158,7 +154,7 @@ namespace FoxTunes.ViewModel
             }
             //TODO: Bad .Wait().
             this.Refresh().Wait();
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
 
         protected virtual void OnEqualizerWindowCreated(object sender, EventArgs e)
@@ -218,7 +214,6 @@ namespace FoxTunes.ViewModel
             {
                 if (value)
                 {
-                    Windows.EqualizerWindow.DataContext = this.Core;
                     Windows.EqualizerWindow.Show();
                 }
                 else if (Windows.IsEqualizerWindowCreated)
@@ -269,10 +264,7 @@ namespace FoxTunes.ViewModel
             {
                 foreach (var band in this.Effects.Equalizer.Bands)
                 {
-                    yield return new EqualizerBand(band)
-                    {
-                        Core = this.Core
-                    };
+                    yield return new EqualizerBand(band);
                 }
             }
         }

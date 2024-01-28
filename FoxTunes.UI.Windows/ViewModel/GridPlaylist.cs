@@ -183,7 +183,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler GridColumnsChanged;
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             base.InitializeComponent(core);
             this.PlaylistManager.SelectedItemsChanged += this.OnSelectedItemsChanged;

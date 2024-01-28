@@ -242,9 +242,12 @@ namespace FoxTunes
 
             public ICore Core { get; private set; }
 
+            public IErrorEmitter ErrorEmitter { get; private set; }
+
             public override void InitializeComponent(ICore core)
             {
                 this.Core = core;
+                this.ErrorEmitter = core.Components.ErrorEmitter;
                 base.InitializeComponent(core);
             }
 
@@ -299,7 +302,7 @@ namespace FoxTunes
                 catch (Exception e)
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to copy tags from \"{0}\" to \"{1}\": {2}", encoderItem.InputFileName, encoderItem.OutputFileName, e.Message);
-                    await this.OnError(e).ConfigureAwait(false);
+                    await this.ErrorEmitter.Send(e).ConfigureAwait(false);
                 }
             }
 

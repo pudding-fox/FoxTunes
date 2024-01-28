@@ -9,7 +9,7 @@
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}"
              MinWidth="80">
     <UserControl.Resources>
-        <ViewModel:Volume x:Key="ViewModel" Core="{Binding}"></ViewModel:Volume>
+        <ViewModel:Volume x:Key="ViewModel"></ViewModel:Volume>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <UserControl.Visibility>

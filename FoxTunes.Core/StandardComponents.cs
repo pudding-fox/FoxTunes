@@ -65,6 +65,14 @@ namespace FoxTunes
             }
         }
 
+        public IErrorEmitter ErrorEmitter
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IErrorEmitter>();
+            }
+        }
+
         public ILibraryBrowser LibraryBrowser
         {
             get

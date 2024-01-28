@@ -163,7 +163,6 @@ namespace FoxTunes
             {
                 if (!Windows.IsPlaylistManagerWindowCreated)
                 {
-                    Windows.PlaylistManagerWindow.DataContext = this.Core;
                     Windows.PlaylistManagerWindow.Show();
                 }
             });

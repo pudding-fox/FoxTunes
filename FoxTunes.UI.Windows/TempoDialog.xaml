@@ -9,7 +9,7 @@
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <Windows:UIComponentBase.Resources>
-        <ViewModel:Tempo x:Key="ViewModel" Core="{Binding}"></ViewModel:Tempo>
+        <ViewModel:Tempo x:Key="ViewModel"></ViewModel:Tempo>
     </Windows:UIComponentBase.Resources>
     <Grid IsEnabled="{Binding Available, Mode=OneWay, Source={StaticResource ViewModel}}">
         <Grid.RowDefinitions>

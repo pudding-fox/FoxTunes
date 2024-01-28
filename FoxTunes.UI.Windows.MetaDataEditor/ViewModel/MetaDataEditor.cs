@@ -127,7 +127,7 @@ namespace FoxTunes.ViewModel
 
         public IHierarchyManager HierarchyManager { get; private set; }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             this.MetaDataManager = core.Managers.MetaData;
             this.HierarchyManager = core.Managers.Hierarchy;
@@ -158,8 +158,7 @@ namespace FoxTunes.ViewModel
             {
                 foreach (var metaDataEntry in result[key])
                 {
-                    //TODO: Can't access this.Core on another thread.
-                    metaDataEntry.InitializeComponent(null);
+                    metaDataEntry.SetValue();
                 }
             }
             return result;

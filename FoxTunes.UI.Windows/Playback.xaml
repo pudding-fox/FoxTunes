@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
-        <ViewModel:Playback x:Key="ViewModel" Core="{Binding}"></ViewModel:Playback>
+        <ViewModel:Playback x:Key="ViewModel"></ViewModel:Playback>
     </UserControl.Resources>
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYBACK}}"></Windows:Menu>

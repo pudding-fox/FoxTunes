@@ -8,9 +8,9 @@
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
-             AllowDrop="True" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+             AllowDrop="True">
     <UserControl.Resources>
-        <ViewModel:Mini x:Key="ViewModel" Core="{Binding}"></ViewModel:Mini>
+        <ViewModel:Mini x:Key="ViewModel"></ViewModel:Mini>
         <Style x:Key="ArtworkStyle" TargetType="{x:Type Windows:Artwork}">
             <Setter Property="Visibility" Value="Visible"></Setter>
             <Style.Triggers>

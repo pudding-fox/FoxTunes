@@ -7,9 +7,9 @@
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Windows="clr-namespace:FoxTunes" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+             d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
-        <ViewModel:ArtworkImageConverter x:Key="ArtworkImageConverter" Core="{Binding}" Width="100" Height="100"></ViewModel:ArtworkImageConverter>
+        <ViewModel:ArtworkImageConverter x:Key="ArtworkImageConverter" Width="100" Height="100"></ViewModel:ArtworkImageConverter>
         <SolidColorBrush x:Key="Transparent" Color="Transparent"></SolidColorBrush>
     </UserControl.Resources>
     <ItemsControl ItemsSource="{Binding FileData.MetaDatas, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:ArtworkStack}}}">

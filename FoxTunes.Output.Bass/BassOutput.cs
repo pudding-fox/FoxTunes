@@ -75,6 +75,8 @@ namespace FoxTunes
 
         public IBassStreamPipelineManager PipelineManager { get; private set; }
 
+        public IErrorEmitter ErrorEmitter { get; private set; }
+
         private int _Rate { get; set; }
 
         public int Rate
@@ -285,7 +287,7 @@ namespace FoxTunes
                 await this.SetIsStarted(false).ConfigureAwait(false);
                 if (exception != null)
                 {
-                    await this.OnError(exception).ConfigureAwait(false);
+                    await this.ErrorEmitter.Send(exception).ConfigureAwait(false);
                 }
             }
         }
@@ -344,20 +346,13 @@ namespace FoxTunes
             this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
             this.PipelineManager = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineManager>();
             this.PipelineManager.Created += this.OnPipelineManagerCreated;
-            this.PipelineManager.Error += this.OnPipelineManagerError;
+            this.ErrorEmitter = core.Components.ErrorEmitter;
             base.InitializeComponent(core);
         }
 
         protected virtual void OnPipelineManagerCreated(object sender, EventArgs e)
         {
             this.OnCanGetDataChanged();
-        }
-
-        protected virtual Task OnPipelineManagerError(object sender, ComponentErrorEventArgs e)
-        {
-            //This usually means that the device buffer was lost.
-            //Nothing can be done.
-            return this.ShutdownCore(true);
         }
 
         public override IEnumerable<string> SupportedExtensions
@@ -715,7 +710,6 @@ namespace FoxTunes
             if (this.PipelineManager != null)
             {
                 this.PipelineManager.Created -= this.OnPipelineManagerCreated;
-                this.PipelineManager.Error -= this.OnPipelineManagerError;
             }
         }
 

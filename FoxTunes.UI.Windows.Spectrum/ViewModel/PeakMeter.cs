@@ -77,7 +77,7 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ChannelsChanged;
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
             this.Output.CanGetDataChanged += this.OnCanGetDataChanged;

@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.ComponentModel;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -98,33 +97,5 @@ namespace FoxTunes
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual Task OnError(string message, Exception exception)
-        {
-            Logger.Write(this, LogLevel.Error, message, exception);
-            if (Error == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            return Error(this, new ComponentErrorEventArgs(message, exception));
-        }
-
-        event ComponentErrorEventHandler IBaseComponent.Error
-        {
-            add
-            {
-                Error += value;
-            }
-            remove
-            {
-                Error -= value;
-            }
-        }
-
-        public static event ComponentErrorEventHandler Error;
     }
 }

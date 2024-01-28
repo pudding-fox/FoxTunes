@@ -9,7 +9,7 @@
         x:Class="FoxTunes.ReportWindow"
         mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <Window.Resources>
-        <ViewModel:Report x:Key="ViewModel" Core="{Binding}"></ViewModel:Report>
+        <ViewModel:Report x:Key="ViewModel"></ViewModel:Report>
     </Window.Resources>
     <Window.Title>
         <Binding Mode="OneWay" Path="Source.Title" Source="{StaticResource ViewModel}"/>

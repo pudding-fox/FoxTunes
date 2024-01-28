@@ -69,13 +69,13 @@ namespace FoxTunes.ViewModel
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
             this.ArtworkProvider = ComponentRegistry.Instance.GetComponent<IArtworkProvider>();
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
-            this.LibraryBrowser = this.Core.Components.LibraryBrowser;
-            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.LibraryBrowser = core.Components.LibraryBrowser;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Dispatch(this.Refresh);
             base.InitializeComponent(core);

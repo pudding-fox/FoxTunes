@@ -10,8 +10,6 @@ namespace FoxTunes
     {
         public const string EDIT_METADATA = "LLLL";
 
-        public ICore Core { get; private set; }
-
         public ILibraryManager LibraryManager { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
@@ -20,7 +18,6 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Core = core;
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
@@ -121,7 +118,6 @@ namespace FoxTunes
             {
                 var window = new MetaDataEditorWindow()
                 {
-                    DataContext = this.Core,
                     ShowActivated = true,
                     Owner = Windows.ActiveWindow,
                 };

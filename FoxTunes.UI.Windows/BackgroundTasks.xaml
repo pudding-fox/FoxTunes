@@ -7,10 +7,10 @@
              xmlns:Windows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="300" d:DesignWidth="300"
              Width="250">
     <Windows:UIComponentBase.Resources>
-        <ViewModel:BackgroundTasks x:Key="ViewModel" Core="{Binding}"></ViewModel:BackgroundTasks>
+        <ViewModel:BackgroundTasks x:Key="ViewModel"></ViewModel:BackgroundTasks>
     </Windows:UIComponentBase.Resources>
     <Border Background="{DynamicResource NormalBrush}" 
                     BorderBrush="{DynamicResource NormalBorderBrush}" 

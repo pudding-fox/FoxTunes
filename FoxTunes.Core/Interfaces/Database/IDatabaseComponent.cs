@@ -3,7 +3,7 @@ using System.Data;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IDatabaseComponent : IDatabase, IBaseComponent
+    public interface IDatabaseComponent : IDatabase, IBaseComponent, IInitializable
     {
         IsolationLevel PreferredIsolationLevel { get; }
 

@@ -100,10 +100,6 @@ namespace FoxTunes.ViewModel
                 return;
             }
             this.Config = PlaylistConfigFactory.Create(this.Playlist);
-            if (this.Config != null)
-            {
-                this.Config.InitializeComponent(this.Core);
-            }
         }
 
         protected virtual void OnTypeChanged(object sender, EventArgs e)

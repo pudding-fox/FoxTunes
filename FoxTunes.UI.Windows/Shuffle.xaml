@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
-        <ViewModel:Shuffle x:Key="ViewModel" Core="{Binding}"></ViewModel:Shuffle>
+        <ViewModel:Shuffle x:Key="ViewModel"></ViewModel:Shuffle>
     </UserControl.Resources>
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYBACK}}"></Windows:Menu>

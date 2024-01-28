@@ -1,31 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace FoxTunes.Interfaces
+﻿namespace FoxTunes.Interfaces
 {
-    public interface IBaseComponent : IObservable
+    public interface IBaseComponent
     {
-        void InitializeComponent(ICore core);
 
-        event ComponentErrorEventHandler Error;
-    }
-
-    public delegate Task ComponentErrorEventHandler(object sender, ComponentErrorEventArgs e);
-
-    public class ComponentErrorEventArgs : EventArgs
-    {
-        public ComponentErrorEventArgs(Exception exception) : this(exception.Message, exception)
-        {
-        }
-
-        public ComponentErrorEventArgs(string message, Exception exception)
-        {
-            this.Message = message;
-            this.Exception = exception;
-        }
-
-        public string Message { get; private set; }
-
-        public Exception Exception { get; private set; }
     }
 }

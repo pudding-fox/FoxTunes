@@ -325,13 +325,9 @@ namespace FoxTunes.ViewModel
 
         public IOutputEffects Effects { get; private set; }
 
-        protected override void OnCoreChanged()
+        protected override void InitializeComponent(ICore core)
         {
-            if (this.Core == null)
-            {
-                return;
-            }
-            this.Effects = this.Core.Components.OutputEffects;
+            this.Effects = core.Components.OutputEffects;
             if (this.Effects.Tempo != null)
             {
                 this.Effects.Tempo.AvailableChanged += this.OnAvailableChanged;
@@ -342,7 +338,7 @@ namespace FoxTunes.ViewModel
             }
             //TODO: Bad .Wait().
             this.Refresh().Wait();
-            base.OnCoreChanged();
+            base.InitializeComponent(core);
         }
 
         protected virtual void OnTempoWindowCreated(object sender, EventArgs e)
@@ -408,7 +404,6 @@ namespace FoxTunes.ViewModel
             {
                 if (value)
                 {
-                    Windows.TempoWindow.DataContext = this.Core;
                     Windows.TempoWindow.Show();
                 }
                 else if (Windows.IsTempoWindowCreated)

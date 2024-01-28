@@ -6,16 +6,6 @@ namespace FoxTunes.ViewModel
 {
     public class WindowBase : ViewModelBase
     {
-        public WindowBase()
-        {
-            //Normally we would bind this property to the DataContext but this doesn't seem to be possible with ControlTemplates.
-            var windowsUserInterface = ComponentRegistry.Instance.GetComponent<WindowsUserInterface>();
-            if (windowsUserInterface != null)
-            {
-                this.Core = windowsUserInterface.Core;
-            }
-        }
-
         public IConfiguration Configuration { get; private set; }
 
         private DoubleConfigurationElement _ScalingFactor { get; set; }
@@ -44,9 +34,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ScalingFactorChanged;
 
-        public override void InitializeComponent(ICore core)
+        protected override void InitializeComponent(ICore core)
         {
-            this.Configuration = this.Core.Components.Configuration;
+            this.Configuration = core.Components.Configuration;
             this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT

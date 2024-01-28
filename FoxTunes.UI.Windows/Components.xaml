@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" IsVisibleChanged="OnIsVisibleChanged">
     <UserControl.Resources>
-        <ViewModel:Components x:Key="ViewModel" Core="{Binding}"/>
+        <ViewModel:Components x:Key="ViewModel"/>
     </UserControl.Resources>
     <Popup PlacementTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" 
 		Placement="Center" 

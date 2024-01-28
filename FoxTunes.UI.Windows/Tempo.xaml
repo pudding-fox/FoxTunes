@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
-        <ViewModel:Tempo x:Key="ViewModel" Core="{Binding}"></ViewModel:Tempo>
+        <ViewModel:Tempo x:Key="ViewModel"></ViewModel:Tempo>
     </UserControl.Resources>
     <UserControl.IsEnabled>
         <Binding Mode="OneWay" Path="Available" Source="{StaticResource ViewModel}"/>
