@@ -171,7 +171,17 @@ namespace FoxTunes
             if (Categories.HasFlag(MetaDataCategory.Standard))
             {
                 this.Try(() => this.AddTag(metaData, CommonMetaData.Album, tag.Album), this.ErrorHandler);
-                this.Try(() => this.AddTag(metaData, CommonMetaData.Artist, tag.FirstAlbumArtist), this.ErrorHandler);
+                this.Try(() =>
+                {
+                    if (!string.IsNullOrEmpty(tag.FirstAlbumArtist))
+                    {
+                        this.AddTag(metaData, CommonMetaData.Artist, tag.FirstAlbumArtist);
+                    }
+                    else if (!string.IsNullOrEmpty(tag.FirstPerformer))
+                    {
+                        this.AddTag(metaData, CommonMetaData.Artist, tag.FirstPerformer);
+                    }
+                }, this.ErrorHandler);
                 this.Try(() => this.AddTag(metaData, CommonMetaData.Composer, tag.FirstComposer), this.ErrorHandler);
                 this.Try(() => this.AddTag(metaData, CommonMetaData.Conductor, tag.Conductor), this.ErrorHandler);
                 this.Try(() => this.AddTag(metaData, CommonMetaData.Disc, tag.Disc.ToString()), this.ErrorHandler);
