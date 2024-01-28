@@ -15,10 +15,10 @@
         <Slider VerticalAlignment="Center" IsMoveToPointEnabled="True" Value="{Binding CurrentStream.Position, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}" ToolTip="{Binding CurrentStream.Description, Mode=OneWay, Source={StaticResource ViewModel}}">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="PreviewMouseDown">
-                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=BeginSeekCommand}" CommandParameter="{Binding Managers.Playback}"></Interactivity:InvokeCommandAction>
+                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=BeginSeekCommand}"></Interactivity:InvokeCommandAction>
                 </Interactivity:EventTrigger>
                 <Interactivity:EventTrigger EventName="PreviewMouseUp">
-                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=EndSeekCommand}" CommandParameter="{Binding Managers.Playback}"></Interactivity:InvokeCommandAction>
+                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=EndSeekCommand}"></Interactivity:InvokeCommandAction>
                 </Interactivity:EventTrigger>
             </Interactivity:Interaction.Triggers>
         </Slider>
