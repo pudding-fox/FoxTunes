@@ -1,4 +1,4 @@
-﻿<Window
+﻿<Windows:WindowBase
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,14 +6,9 @@
         xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
         xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
         xmlns:LocalWindows="clr-namespace:FoxTunes"
-        xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
         xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
         x:Class="FoxTunes.ToolWindow"
-        mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
-        WindowStartupLocation="CenterOwner"    
-        WindowStyle="None" 
-        AllowsTransparency="True" 
-        Background="Transparent">
+        mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <Window.Resources>
         <LocalViewModel:ToolWindow x:Key="ViewModel" Core="{Binding}"></LocalViewModel:ToolWindow>
     </Window.Resources>
@@ -36,17 +31,5 @@
         <!-- This seems to produce a binding warning but I don't know why. The FallbackValue doesn't seem to help. -->
         <Binding Path="Title" Source="{StaticResource ViewModel}" Mode="OneWay" FallbackValue="Tool Window"/>
     </Window.Title>
-    <Grid Background="{DynamicResource NormalBrush}">
-        <Grid.LayoutTransform>
-            <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
-        </Grid.LayoutTransform>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-        </Grid.RowDefinitions>
-        <Windows:Titlebar></Windows:Titlebar>
-        <LocalWindows:UIComponentRoot x:Name="Root" Grid.Row="1" Margin="4,0,4,4" Component="{Binding Component, Source={StaticResource ViewModel}}"></LocalWindows:UIComponentRoot>
-        <Rectangle Grid.RowSpan="3" Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
-    </Grid>
-</Window>
+    <LocalWindows:UIComponentRoot x:Name="Root" Grid.Row="1" Component="{Binding Component, Source={StaticResource ViewModel}}"></LocalWindows:UIComponentRoot>
+</Windows:WindowBase>

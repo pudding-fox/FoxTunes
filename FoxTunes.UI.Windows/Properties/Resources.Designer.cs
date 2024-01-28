@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -165,12 +165,29 @@ namespace FoxTunes {
         ///    xmlns:Windows=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows&quot;
         ///    xmlns:ViewModel=&quot;clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows&quot;
         ///    DataType=&quot;{x:Type Core:PlaylistItem}&quot;&gt;
-        ///    &lt;Windows:Rating Height=&quot;15&quot;&gt;&lt;/Windows:Rating&gt;
-        ///&lt;/DataTemplate&gt;.
+        ///    &lt;Windows:Rating Height=&quot;15&quot; FileData=&quot;{Binding}&quot;  Windows:RatingExtensions.UpdatePlaylistItems [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Rating {
             get {
                 return ResourceManager.GetString("Rating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;ControlTemplate
+        ///    xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        ///    xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+        ///    xmlns:Core=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.Core&quot; 
+        ///    xmlns:Windows=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows&quot;
+        ///    xmlns:ViewModel=&quot;clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows&quot;
+        ///    TargetType=&quot;{x:Type Window}&quot;&gt;
+        ///    &lt;Grid Background=&quot;{DynamicResource NormalBrush}&quot;&gt;
+        ///        &lt;Grid.LayoutTransform&gt;
+        ///            &lt;Scale [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string WindowBase {
+            get {
+                return ResourceManager.GetString("WindowBase", resourceCulture);
             }
         }
     }

@@ -12,32 +12,6 @@ namespace FoxTunes.ViewModel
     {
         public ToolWindowBehaviour Behaviour { get; private set; }
 
-        private DoubleConfigurationElement _ScalingFactor { get; set; }
-
-        public DoubleConfigurationElement ScalingFactor
-        {
-            get
-            {
-                return this._ScalingFactor;
-            }
-            set
-            {
-                this._ScalingFactor = value;
-                this.OnScalingFactorChanged();
-            }
-        }
-
-        protected virtual void OnScalingFactorChanged()
-        {
-            if (this.ScalingFactorChanged != null)
-            {
-                this.ScalingFactorChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ScalingFactor");
-        }
-
-        public event EventHandler ScalingFactorChanged;
-
         public IEnumerable<ToolWindowConfiguration> Windows
         {
             get

@@ -9,7 +9,7 @@ using System.Windows.Markup;
 
 namespace FoxTunes
 {
-    [Component("2681C239-1291-4018-ACED-4933CC395FF6", null, priority: ComponentAttribute.PRIORITY_LOW)]
+    [Component("2681C239-1291-4018-ACED-4933CC395FF6", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class RatingBehaviour : StandardBehaviour, IUIPlaylistColumnProvider, IDatabaseInitializer
     {

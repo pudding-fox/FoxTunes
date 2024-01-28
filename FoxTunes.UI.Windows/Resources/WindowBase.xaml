@@ -1,0 +1,23 @@
+<ControlTemplate
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+    xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows"
+    xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
+    TargetType="{x:Type Window}">
+    <ControlTemplate.Resources>
+        <ViewModel:WindowBase x:Key="ViewModel" Core="{Binding}"></ViewModel:WindowBase>
+    </ControlTemplate.Resources>
+    <Grid Background="{DynamicResource NormalBrush}">
+        <Grid.LayoutTransform>
+            <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
+        </Grid.LayoutTransform>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Windows:Titlebar></Windows:Titlebar>
+        <ContentPresenter Grid.Row="1" Margin="2,0,2,2"></ContentPresenter>
+        <Rectangle Grid.RowSpan="2"  Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
+    </Grid>
+</ControlTemplate>

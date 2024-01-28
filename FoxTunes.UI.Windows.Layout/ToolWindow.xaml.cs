@@ -1,25 +1,12 @@
-﻿using System.Windows;
-
-#if NET40
-using Microsoft.Windows.Shell;
-#else
-using System.Windows.Shell;
-#endif
-
-namespace FoxTunes
+﻿namespace FoxTunes
 {
     /// <summary>
     /// Interaction logic for ToolWindow.xaml
     /// </summary>
-    public partial class ToolWindow : Window
+    public partial class ToolWindow : WindowBase
     {
         public ToolWindow()
         {
-            this.SetValue(WindowChrome.WindowChromeProperty, new WindowChrome()
-            {
-                CaptionHeight = 30,
-                ResizeBorderThickness = new Thickness(5)
-            });
             this.InitializeComponent();
         }
 

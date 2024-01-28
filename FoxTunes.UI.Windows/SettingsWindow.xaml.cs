@@ -1,26 +1,15 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 
-#if NET40
-using Microsoft.Windows.Shell;
-#else
-using System.Windows.Shell;
-#endif
-
 namespace FoxTunes
 {
     /// <summary>
     /// Interaction logic for SettingsWindow.xaml
     /// </summary>
-    public partial class SettingsWindow : Window
+    public partial class SettingsWindow : WindowBase
     {
         public SettingsWindow()
         {
-            this.SetValue(WindowChrome.WindowChromeProperty, new WindowChrome()
-            {
-                CaptionHeight = 30,
-                ResizeBorderThickness = new Thickness(5)
-            });
             if (!global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.IsEmpty())
             {
                 if (ScreenHelper.WindowBoundsVisible(global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds))

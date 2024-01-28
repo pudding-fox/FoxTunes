@@ -10,7 +10,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <Windows:UIComponentBase.Resources>
-        <ViewModel:Main x:Key="ViewModel" Core="{Binding}"></ViewModel:Main>
         <ViewModel:GridLengthConverter x:Key="GridLengthConverter"></ViewModel:GridLengthConverter>
     </Windows:UIComponentBase.Resources>
     <DockPanel>
@@ -39,22 +38,7 @@
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0">
-                <ContentControl DockPanel.Dock="Top">
-                    <ContentControl.Style>
-                        <Style TargetType="{x:Type ContentControl}">
-                            <Setter Property="Content" Value="{x:Null}"></Setter>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ShowLibrarySelector, Source={StaticResource ViewModel}}" Value="True">
-                                    <Setter Property="Content">
-                                        <Setter.Value>
-                                            <Windows:LibrarySelector></Windows:LibrarySelector>
-                                        </Setter.Value>
-                                    </Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ContentControl.Style>
-                </ContentControl>
+                <Windows:LibrarySelector DockPanel.Dock="Top"></Windows:LibrarySelector>
                 <Windows:LibrarySearch DockPanel.Dock="Bottom"></Windows:LibrarySearch>
                 <Windows:LibraryTree></Windows:LibraryTree>
             </DockPanel>

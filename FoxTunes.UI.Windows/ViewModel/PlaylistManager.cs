@@ -18,34 +18,6 @@ namespace FoxTunes.ViewModel
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
-        public IConfiguration Configuration { get; private set; }
-
-        private DoubleConfigurationElement _ScalingFactor { get; set; }
-
-        public DoubleConfigurationElement ScalingFactor
-        {
-            get
-            {
-                return this._ScalingFactor;
-            }
-            set
-            {
-                this._ScalingFactor = value;
-                this.OnScalingFactorChanged();
-            }
-        }
-
-        protected virtual void OnScalingFactorChanged()
-        {
-            if (this.ScalingFactorChanged != null)
-            {
-                this.ScalingFactorChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ScalingFactor");
-        }
-
-        public event EventHandler ScalingFactorChanged;
-
         private CollectionManager<Playlist> _Playlists { get; set; }
 
         public CollectionManager<Playlist> Playlists
@@ -73,11 +45,6 @@ namespace FoxTunes.ViewModel
             this.PlaylistBrowser = this.Core.Components.PlaylistBrowser;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.Configuration = this.Core.Components.Configuration;
-            this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
-              WindowsUserInterfaceConfiguration.SECTION,
-              WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
-            );
             this.Playlists = new CollectionManager<Playlist>()
             {
                 ItemFactory = () => new Playlist()
