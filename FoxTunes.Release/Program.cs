@@ -415,9 +415,10 @@ namespace FoxTunes
                     "cue",
                     new PackageElement[]
                     {
-                        "bass_substream.dll",
                         "FoxTunes.Output.Bass.Cue.dll",
-                        "ManagedBass.Substream.dll"
+                        "ManagedBass.Substream.dll",
+                        new PackageElement("x86/bass_substream.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
+                        new PackageElement("x64/bass_substream.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
                     },
                     PackageFlags.Default
                 ),
