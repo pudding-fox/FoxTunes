@@ -131,7 +131,7 @@ namespace FoxTunes
                     return new[]
                     {
                         this.Track.Name,
-                        this.Track.Time.ToString(),
+                        this.Track.Time.ToString(@"mm\:ss"),
                         Enum.GetName(typeof(Compression), this.Track.Compression),
                         string.IsNullOrEmpty(this.Track.Location) ? Strings.MinidiscReport_None : Strings.MinidiscReport_Add
                     };

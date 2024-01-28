@@ -163,7 +163,15 @@ namespace FoxTunes
 
         public async Task<bool> WriteDisc(IDevice device, IActions actions)
         {
-            if (!this.UserInterface.Confirm(Strings.MinidiscBehaviour_ConfirmWriteDisc))
+            var percentUsed = actions.UpdatedDisc.GetCapacity().PercentUsed;
+            if (percentUsed > 100)
+            {
+                if (!this.UserInterface.Confirm(string.Format(Strings.MinidiscBehaviour_ConfirmWriteDiscWithoutCapacity, percentUsed)))
+                {
+                    return false;
+                }
+            }
+            else if (!this.UserInterface.Confirm(Strings.MinidiscBehaviour_ConfirmWriteDisc))
             {
                 return false;
             }
