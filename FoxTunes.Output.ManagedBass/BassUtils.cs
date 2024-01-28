@@ -11,6 +11,24 @@ namespace FoxTunes
             "mp1", "mp2", "mp3", "ogg", "wav", "aif"
         });
 
+        public static int GetDeviceNumber(int device)
+        {
+            if (device != Bass.DefaultDevice)
+            {
+                return device;
+            }
+            for (var a = 0; a < Bass.DeviceCount; a++)
+            {
+                var deviceInfo = default(DeviceInfo);
+                BassUtils.OK(Bass.GetDeviceInfo(a, out deviceInfo));
+                if (deviceInfo.IsDefault)
+                {
+                    return a;
+                }
+            }
+            throw new BassException(Errors.Device);
+        }
+
         public static IEnumerable<string> GetInputFormats()
         {
             foreach (var format in BUILT_IN_FORMATS)
@@ -146,12 +164,14 @@ namespace FoxTunes
 
     public class BassException : Exception
     {
-        public BassException(Errors error) : this(Enum.GetName(typeof(Errors), error), error)
+        public BassException(Errors error)
+            : this(Enum.GetName(typeof(Errors), error), error)
         {
 
         }
 
-        public BassException(string message, Errors error) : base(message)
+        public BassException(string message, Errors error)
+            : base(message)
         {
             this.Error = error;
         }

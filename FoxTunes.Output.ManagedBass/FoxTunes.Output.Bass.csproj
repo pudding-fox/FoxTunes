@@ -28,7 +28,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ManagedBass, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ManagedBass.2.0.4\lib\net45\ManagedBass.dll</HintPath>
+      <HintPath>..\packages\ManagedBass.2.0.0\lib\net45\ManagedBass.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -50,6 +50,7 @@
     <Compile Include="BassUtils.cs" />
     <Compile Include="BassStreamComponent.cs" />
     <Compile Include="BassStreamInput.cs" />
+    <Compile Include="BassDeviceMonitorBehaviour.cs" />
     <Compile Include="Interfaces\IBassStreamControllable.cs" />
     <Compile Include="Interfaces\IBassStreamOutput.cs" />
     <Compile Include="Interfaces\IBassOutput.cs" />

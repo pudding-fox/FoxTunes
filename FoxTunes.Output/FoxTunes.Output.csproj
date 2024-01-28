@@ -30,6 +30,13 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeviceEnumerator.cs" />
+    <Compile Include="IMMDevice.cs" />
+    <Compile Include="IMMDeviceCollection.cs" />
+    <Compile Include="IMMDeviceEnumerator.cs" />
+    <Compile Include="IMMNotificationClient.cs" />
+    <Compile Include="IPropertyStore.cs" />
+    <Compile Include="NotificationClient.cs" />
     <Compile Include="Output.cs" />
     <Compile Include="OutputStreamException.cs" />
     <Compile Include="OutputException.cs" />

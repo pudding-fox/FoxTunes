@@ -11,6 +11,8 @@ namespace FoxTunes
     [Component("E0318CB1-57A0-4DC3-AA8D-F6E100F86190", ComponentSlots.Output)]
     public class BassOutput : Output, IBassOutput
     {
+        const int LOCK_TIMEOUT = 10000;
+
         static BassOutput()
         {
             BassPluginLoader.Instance.Load();
@@ -107,39 +109,42 @@ namespace FoxTunes
             }
         }
 
-        public void Start()
+        public override Task Start()
         {
-            if (this.IsStarted)
+            return this.PerformCritical(LOCK_TIMEOUT, async () =>
             {
-                this.Shutdown();
-            }
-            var exception = default(Exception);
-            for (var a = 1; a <= START_ATTEMPTS; a++)
-            {
-                Logger.Write(this, LogLevel.Debug, "Starting BASS, attempt: {0}", a);
-                try
+                if (this.IsStarted)
                 {
-                    this.OnInit();
-                    this.IsStarted = true;
-                    break;
+                    await this.Shutdown();
                 }
-                catch (Exception e)
+                var exception = default(Exception);
+                for (var a = 1; a <= START_ATTEMPTS; a++)
                 {
-                    exception = e;
-                    this.Shutdown(true);
-                    Logger.Write(this, LogLevel.Warn, "Failed to start BASS: {0}", e.Message);
+                    Logger.Write(this, LogLevel.Debug, "Starting BASS, attempt: {0}", a);
+                    try
+                    {
+                        this.OnInit();
+                        this.IsStarted = true;
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        exception = e;
+                        Logger.Write(this, LogLevel.Warn, "Failed to start BASS: {0}", e.Message);
+                    }
+                    await this.Shutdown(true);
+                    Thread.Sleep(START_ATTEMPT_INTERVAL);
                 }
-                Thread.Sleep(START_ATTEMPT_INTERVAL);
-            }
-            if (this.IsStarted)
-            {
-                Logger.Write(this, LogLevel.Debug, "Started BASS.");
-                return;
-            }
-            else if (exception != null)
-            {
-                throw exception;
-            }
+                if (this.IsStarted)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Started BASS.");
+                    return;
+                }
+                else if (exception != null)
+                {
+                    throw exception;
+                }
+            });
         }
 
         public override Task Shutdown()
@@ -149,26 +154,33 @@ namespace FoxTunes
 
         protected virtual Task Shutdown(bool force)
         {
-            if (force || this.IsStarted)
+            return this.PerformCritical(LOCK_TIMEOUT, async () =>
             {
-                Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
-                try
+                if (force || this.IsStarted)
                 {
-                    this.FreePipeline();
-                    this.OnFree();
-                    Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
+                    var exception = default(Exception);
+                    Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
+                    try
+                    {
+                        this.FreePipeline();
+                        this.OnFree();
+                        Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Write(this, LogLevel.Error, "Failed to stop BASS: {0}", e.Message);
+                        exception = e;
+                    }
+                    finally
+                    {
+                        this.IsStarted = false;
+                    }
+                    if (exception != null)
+                    {
+                        await this.OnError(exception);
+                    }
                 }
-                catch (Exception e)
-                {
-                    Logger.Write(this, LogLevel.Error, "Failed to stop BASS: {0}", e.Message);
-                    this.OnError(e);
-                }
-                finally
-                {
-                    this.IsStarted = false;
-                }
-            }
-            return Task.CompletedTask;
+            });
         }
 
         protected virtual void OnInit()
@@ -222,21 +234,21 @@ namespace FoxTunes
                 .Contains(fileName.GetExtension(), true);
         }
 
-        public override Task<IOutputStream> Load(PlaylistItem playlistItem, bool immidiate)
+        public override async Task<IOutputStream> Load(PlaylistItem playlistItem, bool immidiate)
         {
             if (!this.IsStarted)
             {
-                this.Start();
+                await this.Start();
             }
             Logger.Write(this, LogLevel.Debug, "Loading stream: {0} => {1}", playlistItem.Id, playlistItem.FileName);
             var channelHandle = default(int);
             if (!this.StreamFactory.CreateStream(playlistItem, immidiate, out channelHandle))
             {
-                return Task.FromResult<IOutputStream>(null);
+                return null;
             }
             var outputStream = new BassOutputStream(this, playlistItem, channelHandle);
             outputStream.InitializeComponent(this.Core);
-            return Task.FromResult<IOutputStream>(outputStream);
+            return outputStream;
         }
 
         public void FreeStream(int channelHandle)

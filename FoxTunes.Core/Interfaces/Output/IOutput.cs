@@ -13,6 +13,8 @@ namespace FoxTunes.Interfaces
 
         event EventHandler IsStartedChanged;
 
+        Task Start();
+
         bool IsSupported(string fileName);
 
         Task<IOutputStream> Load(PlaylistItem playlistItem, bool immidiate);

@@ -186,7 +186,7 @@ namespace FoxTunes
                 throw BassOutputStreamException.StaleStream;
             }
             this.Output.GetOrCreatePipeline(this).Play();
-            this.EmitState();
+            this.ForegroundTaskRunner.RunAsync(() => this.EmitState());
             this.OnPlayed(true);
         }
 
@@ -197,7 +197,7 @@ namespace FoxTunes
                 throw BassOutputStreamException.StaleStream;
             }
             this.Output.GetOrCreatePipeline(this).Pause();
-            this.EmitState();
+            this.ForegroundTaskRunner.RunAsync(() => this.EmitState());
             this.OnPaused();
         }
 
@@ -208,7 +208,7 @@ namespace FoxTunes
                 throw BassOutputStreamException.StaleStream;
             }
             this.Output.GetOrCreatePipeline(this).Resume();
-            this.EmitState();
+            this.ForegroundTaskRunner.RunAsync(() => this.EmitState());
             this.OnResumed();
         }
 
@@ -218,14 +218,17 @@ namespace FoxTunes
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.GetOrCreatePipeline(this).Stop();
-            this.EmitState();
+            if (this.Output.Pipeline != null)
+            {
+                this.Output.Pipeline.Stop();
+            }
+            this.ForegroundTaskRunner.RunAsync(() => this.EmitState());
             this.OnStopped(true);
         }
 
         protected virtual void ChannelSyncEnd(int handle, int channel, int data, IntPtr user)
         {
-            this.EmitState();
+            this.ForegroundTaskRunner.RunAsync(() => this.EmitState());
             this.OnStopped(false);
         }
 

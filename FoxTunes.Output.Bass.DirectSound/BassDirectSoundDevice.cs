@@ -29,13 +29,22 @@ namespace FoxTunes
 
         public static int Device { get; private set; }
 
+        public static bool IsDefaultDevice
+        {
+            get
+            {
+                return Device == Bass.DefaultDevice;
+            }
+        }
+
         public static bool IsInitialized { get; private set; }
 
-        public static void Init()
+        public static void Init(int device)
         {
             IsInitialized = true;
+            Device = device;
             var info = default(DeviceInfo);
-            BassUtils.OK(Bass.GetDeviceInfo(Device, out info));
+            BassUtils.OK(Bass.GetDeviceInfo(BassUtils.GetDeviceNumber(Device), out info));
             Devices[Device] = new BassDirectSoundDeviceInfo(
                 info.Name,
                 Bass.Info.SampleRate,
