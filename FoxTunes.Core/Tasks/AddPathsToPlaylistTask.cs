@@ -66,7 +66,7 @@ namespace FoxTunes
             using (var command = databaseContext.Connection.CreateCommand(this.Database.CoreSQL.AddPlaylistItem, new[] { "sequence", "directoryName", "fileName", "status" }, out parameters))
             {
                 command.Transaction = transaction;
-                var count = 1;
+                var count = 0;
                 var addPlaylistItem = new Action<string>(fileName =>
                 {
                     if (!this.PlaybackManager.IsSupported(fileName))
