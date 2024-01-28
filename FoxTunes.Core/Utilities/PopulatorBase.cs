@@ -35,6 +35,10 @@ namespace FoxTunes
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
+            if (this.Timer == null)
+            {
+                return;
+            }
             this.Timer.Start();
         }
 
