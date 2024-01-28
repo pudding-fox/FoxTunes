@@ -10,7 +10,7 @@ namespace FoxTunes
     {
         public Menu()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         public static readonly DependencyProperty CategoryProperty = DependencyProperty.Register(
