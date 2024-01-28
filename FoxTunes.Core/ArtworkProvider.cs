@@ -139,9 +139,11 @@ namespace FoxTunes
         {
             var fileName = await this.OnDemandMetaDataProvider.GetMetaData(
                 fileData,
-                Enum.GetName(typeof(ArtworkType), type),
-                MetaDataItemType.Image,
-                false
+                new OnDemandMetaDataRequest(
+                    Enum.GetName(typeof(ArtworkType), type),
+                    MetaDataItemType.Image,
+                    false
+                )
             ).ConfigureAwait(false);
             if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName))
             {

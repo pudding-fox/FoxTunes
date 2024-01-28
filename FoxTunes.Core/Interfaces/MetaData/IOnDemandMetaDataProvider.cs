@@ -7,14 +7,14 @@ namespace FoxTunes.Interfaces
     {
         bool IsSourceEnabled(string name, MetaDataItemType type);
 
-        Task<string> GetMetaData(IFileData fileData, string name, MetaDataItemType type, bool notify, object state = null);
+        Task<string> GetMetaData(IFileData fileData, OnDemandMetaDataRequest request);
 
-        Task<IEnumerable<string>> GetMetaData(IEnumerable<IFileData> fileDatas, string name, MetaDataItemType type, bool notify, object state = null);
+        Task<IEnumerable<string>> GetMetaData(IEnumerable<IFileData> fileDatas, OnDemandMetaDataRequest request);
 
-        string GetCurrentMetaData(IFileData fileData, string name, MetaDataItemType type);
+        string GetCurrentMetaData(IFileData fileData, OnDemandMetaDataRequest request);
 
-        IDictionary<IFileData, string> GetCurrentMetaData(IEnumerable<IFileData> fileDatas, string name, MetaDataItemType type);
+        IDictionary<IFileData, string> GetCurrentMetaData(IEnumerable<IFileData> fileDatas, OnDemandMetaDataRequest request);
 
-        Task SetMetaData(string name, OnDemandMetaDataValues result, MetaDataItemType type, bool notify);
+        Task SetMetaData(OnDemandMetaDataRequest request, OnDemandMetaDataValues result);
     }
 }

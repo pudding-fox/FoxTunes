@@ -14,6 +14,8 @@ namespace FoxTunes
 
         public const string DiscogsRelease = "__FT_DiscogsRelease";
 
+        public const string LyricsRelease = "__FT_LyricsRelease";
+
         public static IDictionary<string, string> Lookup = GetLookup();
 
         private static IDictionary<string, string> GetLookup()

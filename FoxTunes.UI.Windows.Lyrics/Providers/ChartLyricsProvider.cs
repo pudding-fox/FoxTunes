@@ -43,6 +43,14 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        public override string None
+        {
+            get
+            {
+                return "none (" + this.Name + ", " + Publication.Version + ")";
+            }
+        }
+
         public override async Task<LyricsResult> Lookup(IFileData fileData)
         {
             Logger.Write(this, LogLevel.Debug, "Getting track information for file \"{0}\"..", fileData.FileName);

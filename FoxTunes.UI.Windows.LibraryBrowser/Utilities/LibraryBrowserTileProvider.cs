@@ -116,7 +116,14 @@ namespace FoxTunes
                     if (libraryItems.Any())
                     {
                         //TODO: Bad .Result
-                        fileNames = this.OnDemandMetaDataProvider.GetMetaData(libraryItems, FRONT_COVER, MetaDataItemType.Image, false).Result.ToArray();
+                        fileNames = this.OnDemandMetaDataProvider.GetMetaData(
+                            libraryItems, 
+                            new OnDemandMetaDataRequest(
+                                FRONT_COVER, 
+                                MetaDataItemType.Image, 
+                                false
+                            )
+                        ).Result.ToArray();
                     }
                 }
             }

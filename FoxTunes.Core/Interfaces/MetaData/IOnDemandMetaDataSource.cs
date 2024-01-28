@@ -11,9 +11,28 @@ namespace FoxTunes.Interfaces
 
         MetaDataItemType Type { get; }
 
-        bool CanGetValue(IFileData fileData);
+        bool CanGetValue(IFileData fileData, OnDemandMetaDataRequest request);
 
-        Task<OnDemandMetaDataValues> GetValues(IEnumerable<IFileData> fileDatas, object state = null);
+        Task<OnDemandMetaDataValues> GetValues(IEnumerable<IFileData> fileDatas, OnDemandMetaDataRequest request);
+    }
+
+    public class OnDemandMetaDataRequest
+    {
+        public OnDemandMetaDataRequest(string name, MetaDataItemType type, bool user, object state = null)
+        {
+            this.Name = name;
+            this.Type = type;
+            this.User = user;
+            this.State = state;
+        }
+
+        public string Name { get; private set; }
+
+        public MetaDataItemType Type { get; private set; }
+
+        public bool User { get; private set; }
+
+        public object State { get; private set; }
     }
 
     public class OnDemandMetaDataValues

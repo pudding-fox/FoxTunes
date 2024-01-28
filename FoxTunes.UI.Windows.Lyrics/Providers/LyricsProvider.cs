@@ -26,6 +26,8 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        public abstract string None { get; }
+
         public abstract Task<LyricsResult> Lookup(IFileData fileData);
     }
 }
