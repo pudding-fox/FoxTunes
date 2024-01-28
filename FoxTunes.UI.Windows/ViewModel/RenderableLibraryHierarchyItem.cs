@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -17,6 +18,7 @@ namespace FoxTunes.ViewModel
             this.Id = libraryHierarchyItem.Id;
             this.DisplayValue = libraryHierarchyItem.DisplayValue;
             this.SortValue = libraryHierarchyItem.SortValue;
+            this.IsLeaf = libraryHierarchyItem.IsLeaf;
             this.Database = database;
         }
 
@@ -26,10 +28,19 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                var query = this.Database.GetMemberQuery<LibraryHierarchyItem, LibraryHierarchyItem>(this.LibraryHierarchyItem, _ => _.Children);
-                return new ObservableCollection<LibraryHierarchyItem>(query.ToArray().Select(
-                    libraryHierarchyItem => new RenderableLibraryHierarchyItem(libraryHierarchyItem, this.Database)
-                ));
+                var sequence = default(IEnumerable<LibraryHierarchyItem>);
+                if (this.IsLeaf)
+                {
+                    sequence = Enumerable.Empty<LibraryHierarchyItem>();
+                }
+                else
+                {
+                    var query = this.Database
+                        .GetMemberQuery<LibraryHierarchyItem, LibraryHierarchyItem>(this.LibraryHierarchyItem, _ => _.Children)
+                        .ToArray(); //We have to switch to object query as the following projection is not supported.
+                    sequence = query.Select(libraryHierarchyItem => new RenderableLibraryHierarchyItem(libraryHierarchyItem, this.Database));
+                }
+                return new ObservableCollection<LibraryHierarchyItem>(sequence);
             }
         }
 
