@@ -13,50 +13,24 @@ namespace FoxTunes
 
         }
 
-        public void Enable()
+        public void EnableExecution()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += this.OnAssemblyResolve;
+        }
+
+        public void EnableReflectionOnly()
         {
             AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += this.OnReflectionOnlyAssemblyResolve;
         }
 
-        public void Disable()
+        public void DisableExecution()
         {
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= this.OnReflectionOnlyAssemblyResolve;
+            AppDomain.CurrentDomain.AssemblyResolve -= this.OnAssemblyResolve;
         }
 
-        public string Resolve(string directoryName, string name)
+        public void DisableReflectionOnly()
         {
-            foreach (var fileName in this.GetFiles(directoryName))
-            {
-                var assemblyName = default(AssemblyName);
-                try
-                {
-                    assemblyName = AssemblyName.GetAssemblyName(fileName);
-                }
-                catch
-                {
-                    continue;
-                }
-                if (!string.Equals(assemblyName.FullName, name, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-                return fileName;
-            }
-            //I'm not sure why but some platforms end up here for framework assemblies
-            //like System.Runtime. I'm not sure how else to get the location.
-            try
-            {
-                var assembly = Assembly.Load(name);
-                if (File.Exists(assembly.Location))
-                {
-                    return assembly.Location;
-                }
-            }
-            catch
-            {
-                //Nothing to do.
-            }
-            throw new AssemblyResolverException(string.Format("Failed to resolve assembly {0}.", name));
+            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= this.OnReflectionOnlyAssemblyResolve;
         }
 
         public IEnumerable<string> GetFiles(string directoryName)
@@ -76,6 +50,16 @@ namespace FoxTunes
             }
         }
 
+        protected virtual Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var fileName = default(string);
+            if (this.TryResolve(ComponentScanner.Instance.Location, args.Name, false, out fileName))
+            {
+                return Assembly.LoadFrom(fileName);
+            }
+            return null;
+        }
+
         protected virtual Assembly OnReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
         {
             try
@@ -87,24 +71,73 @@ namespace FoxTunes
                 //Nothing to do.
             }
             var directoryName = default(string);
-            if (File.Exists(args.RequestingAssembly.Location))
+            //If the requesting assembly can be determined then begin looking there.
+            if (args.RequestingAssembly != null && File.Exists(args.RequestingAssembly.Location))
             {
                 directoryName = Path.GetDirectoryName(args.RequestingAssembly.Location);
             }
-            var fileName = this.Resolve(directoryName, args.Name);
-            var assembly = AssemblyRegistry.Instance.GetOrLoadReflectionAssembly(fileName);
-            foreach (var reference in assembly.GetReferencedAssemblies())
+            else
             {
+                directoryName = ComponentScanner.Instance.Location;
+            }
+            var fileName = default(string);
+            if (this.TryResolve(directoryName, args.Name, true, out fileName))
+            {
+                var assembly = AssemblyRegistry.Instance.GetOrLoadReflectionAssembly(fileName);
+                //Load immidiate references.
+                foreach (var reference in assembly.GetReferencedAssemblies())
+                {
+                    try
+                    {
+                        Assembly.ReflectionOnlyLoad(reference.FullName);
+                    }
+                    catch
+                    {
+                        //Nothing to do.
+                    }
+                }
+                return assembly;
+            }
+            //Failed to resolve, perhaps somebody else will succeed.
+            return null;
+        }
+
+        protected virtual bool TryResolve(string directoryName, string name, bool tryLoad, out string result)
+        {
+            foreach (var fileName in this.GetFiles(directoryName))
+            {
+                var assemblyName = AssemblyRegistry.Instance.GetAssemblyName(fileName);
+                if (assemblyName == null)
+                {
+                    continue;
+                }
+                if (!string.Equals(assemblyName.FullName, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                result = fileName;
+                return true;
+            }
+            if (tryLoad)
+            {
+                //I'm not sure why but some platforms end up here for framework assemblies
+                //like System.Runtime. I'm not sure how else to get the location.
                 try
                 {
-                    Assembly.ReflectionOnlyLoad(reference.FullName);
+                    var assembly = Assembly.Load(name);
+                    if (File.Exists(assembly.Location))
+                    {
+                        result = assembly.Location;
+                        return true;
+                    }
                 }
                 catch
                 {
                     //Nothing to do.
                 }
             }
-            return assembly;
+            result = default(string);
+            return false;
         }
 
         public static readonly IAssemblyResolver Instance = new AssemblyResolver();

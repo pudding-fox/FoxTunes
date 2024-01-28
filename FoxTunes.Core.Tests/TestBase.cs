@@ -12,7 +12,7 @@ namespace FoxTunes
 
         static TestBase()
         {
-            AssemblyResolver.Instance.Enable();
+            AssemblyResolver.Instance.EnableReflectionOnly();
         }
 
         public static string Unique

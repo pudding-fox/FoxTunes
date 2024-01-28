@@ -2,10 +2,12 @@
 {
     public interface IAssemblyResolver
     {
-        void Enable();
+        void EnableExecution();
 
-        void Disable();
+        void EnableReflectionOnly();
 
-        string Resolve(string directoryName, string name);
+        void DisableExecution();
+
+        void DisableReflectionOnly();
     }
 }

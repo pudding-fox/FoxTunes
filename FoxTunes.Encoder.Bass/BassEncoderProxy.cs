@@ -78,8 +78,7 @@ namespace FoxTunes
                 {
                     if (this.Process.StandardInput.BaseStream != null && this.Process.StandardInput.BaseStream.CanWrite)
                     {
-                        var formatter = new BinaryFormatter();
-                        formatter.Serialize(this.Process.StandardInput.BaseStream, value);
+                        Serializer.Instance.Write(this.Process.StandardInput.BaseStream, value);
                         this.Process.StandardInput.Flush();
                     }
                 }
@@ -98,8 +97,7 @@ namespace FoxTunes
                 {
                     if (this.Process.StandardOutput.BaseStream != null && this.Process.StandardOutput.BaseStream.CanRead)
                     {
-                        var formatter = new BinaryFormatter();
-                        var value = formatter.Deserialize(this.Process.StandardOutput.BaseStream);
+                        var value = Serializer.Instance.Read(this.Process.StandardOutput.BaseStream);
                         return value;
                     }
                 }

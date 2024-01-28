@@ -11,7 +11,7 @@ namespace FoxTunes.Launcher
 
         static Program()
         {
-            AssemblyResolver.Instance.Enable();
+            AssemblyResolver.Instance.EnableReflectionOnly();
         }
 
         [STAThread]

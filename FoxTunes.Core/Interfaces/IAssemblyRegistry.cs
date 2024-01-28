@@ -10,6 +10,8 @@ namespace FoxTunes.Interfaces
 
         IEnumerable<Assembly> ExecutableAssemblies { get; }
 
+        AssemblyName GetAssemblyName(string fileName);
+
         Assembly GetOrLoadReflectionAssembly(string fileName);
 
         Assembly GetOrLoadExecutableAssembly(string fileName);

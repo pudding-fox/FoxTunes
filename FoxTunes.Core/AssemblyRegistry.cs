@@ -10,9 +10,12 @@ namespace FoxTunes
     {
         private AssemblyRegistry()
         {
-            this._ReflectionAssemblies = new ConcurrentDictionary<string, Assembly>();
-            this._ExecutableAssemblies = new ConcurrentDictionary<string, Assembly>();
+            this._AssemblyNames = new ConcurrentDictionary<string, AssemblyName>(StringComparer.OrdinalIgnoreCase);
+            this._ReflectionAssemblies = new ConcurrentDictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
+            this._ExecutableAssemblies = new ConcurrentDictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
         }
+
+        private ConcurrentDictionary<string, AssemblyName> _AssemblyNames { get; set; }
 
         private ConcurrentDictionary<string, Assembly> _ReflectionAssemblies { get; set; }
 
@@ -32,6 +35,25 @@ namespace FoxTunes
             {
                 return this._ExecutableAssemblies.Values;
             }
+        }
+
+        public AssemblyName GetAssemblyName(string fileName)
+        {
+            var assemblyName = default(AssemblyName);
+            if (this._AssemblyNames.TryGetValue(fileName, out assemblyName))
+            {
+                return assemblyName;
+            }
+            try
+            {
+                assemblyName = AssemblyName.GetAssemblyName(fileName);
+            }
+            catch
+            {
+                //Not a managed assembly.
+            }
+            this._AssemblyNames.TryAdd(fileName, assemblyName);
+            return assemblyName;
         }
 
         public Assembly GetOrLoadReflectionAssembly(string fileName)

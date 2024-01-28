@@ -38,14 +38,9 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Scanning for components of type: {0}", interfaceType.Name);
             foreach (var fileName in this.FileNames)
             {
-                var assemblyName = default(AssemblyName);
-                try
+                var assemblyName = AssemblyRegistry.Instance.GetAssemblyName(fileName);
+                if (assemblyName == null)
                 {
-                    assemblyName = AssemblyName.GetAssemblyName(fileName);
-                }
-                catch
-                {
-                    //Not a .NET assembly.
                     continue;
                 }
                 var assembly = default(Assembly);

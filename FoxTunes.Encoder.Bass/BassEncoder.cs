@@ -362,6 +362,10 @@ namespace FoxTunes
 
         protected virtual Process CreateProcess(EncoderItem encoderItem, IBassStream stream, string executable, string directory, string arguments, bool redirectStandardInput, bool redirectStandardOutput, bool redirectStandardError)
         {
+            if (!File.Exists(executable))
+            {
+                throw new InvalidOperationException(string.Format("A required utility was not found: {0}", executable));
+            }
             var processStartInfo = new ProcessStartInfo()
             {
                 FileName = executable,

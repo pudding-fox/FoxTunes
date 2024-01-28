@@ -129,7 +129,7 @@ FoxTunes.UI.Windows.MetaDataEditor.dll
 "
 
 ENCODER="
-FoxTunes.Encoder.Bass.dll
+FoxTunes.Encoder.Bass.exe
 "
 
 ENCODERS="
