@@ -1,11 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -165,7 +162,7 @@ namespace FoxTunes
                 this.ShowPeaks.Value,
                 this.HighCut.Value
             );
-            this.Viewbox = new Rect(0, 0, this.GetActualWidth(), this.GetActualHeight());
+            this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), this.Bitmap.PixelHeight);
         }
 
         protected virtual Task RefreshBitmap()
@@ -301,18 +298,13 @@ namespace FoxTunes
             }
         }
 
-        protected virtual double GetActualWidth()
+        protected virtual double GetPixelWidth()
         {
             if (this.RendererData == null)
             {
                 return 1;
             }
             return this.RendererData.Count * this.RendererData.Step;
-        }
-
-        protected virtual double GetActualHeight()
-        {
-            return this.Height;
         }
 
         protected override Freezable CreateInstanceCore()

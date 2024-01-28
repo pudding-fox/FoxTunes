@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -104,7 +103,7 @@ namespace FoxTunes
             await Windows.Invoke(() =>
             {
                 this.RendererData = Create(this.GeneratorData, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight);
-                this.Viewbox = new Rect(0, 0, this.GetActualWidth(), this.GetActualHeight());
+                this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), this.Bitmap.PixelHeight);
             }).ConfigureAwait(false);
 
             this.Update();
@@ -130,7 +129,7 @@ namespace FoxTunes
             else
             {
                 this.RendererData = Create(this.GeneratorData, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight);
-                this.Viewbox = new Rect(0, 0, this.GetActualWidth(), this.GetActualHeight());
+                this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), this.Bitmap.PixelHeight);
             }
         }
 
@@ -239,22 +238,13 @@ namespace FoxTunes
             var task = this.Render();
         }
 
-        protected virtual double GetActualWidth()
+        protected virtual double GetPixelWidth()
         {
             if (this.GeneratorData == null || this.RendererData == null)
             {
                 return 1;
             }
             return this.GeneratorData.Capacity / this.RendererData.ValuesPerElement;
-        }
-
-        protected virtual double GetActualHeight()
-        {
-            if (this.RendererData == null)
-            {
-                return 1;
-            }
-            return this.Height;
         }
 
         protected override Freezable CreateInstanceCore()
