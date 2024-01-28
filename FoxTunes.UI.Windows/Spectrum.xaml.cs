@@ -25,6 +25,8 @@ namespace FoxTunes
 
         public static readonly BooleanConfigurationElement Smooth;
 
+        public static readonly IntegerConfigurationElement SmoothFactor;
+
         public static readonly IntegerConfigurationElement HoldInterval;
 
         public static readonly IntegerConfigurationElement UpdateInterval;
@@ -55,6 +57,10 @@ namespace FoxTunes
             Smooth = configuration.GetElement<BooleanConfigurationElement>(
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.SMOOTH_ELEMENT
+            );
+            SmoothFactor = configuration.GetElement<IntegerConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.SMOOTH_FACTOR_ELEMENT
             );
             HoldInterval = configuration.GetElement<IntegerConfigurationElement>(
                 SpectrumBehaviourConfiguration.SECTION,
@@ -276,7 +282,8 @@ namespace FoxTunes
                             //We want a value kind of like the actual update interval but not too far off.
                             Duration = Math.Min(Convert.ToInt32(duration.TotalMilliseconds), UpdateInterval.Value * 100),
                             HoldInterval = HoldInterval.Value,
-                            UpdateInterval = UpdateInterval.Value
+                            UpdateInterval = UpdateInterval.Value,
+                            Smoothing = SmoothFactor.Value
                         };
                         if (Smooth == null || !Smooth.Value)
                         {
@@ -360,7 +367,7 @@ namespace FoxTunes
 
             private static void UpdateSmooth(SpectrumData data)
             {
-                var fast = data.Height / 10;
+                var fast = (float)data.Height / data.Smoothing;
                 for (int a = 0, b = 0; a < data.ElementCount; a++)
                 {
                     var sample = 0f;
@@ -401,6 +408,7 @@ namespace FoxTunes
                             else
                             {
                                 var distance = (float)difference / barHeight;
+                                //TODO: We should use some kind of easing function.
                                 //var increment = distance * distance * distance;
                                 //var increment = 1 - Math.Pow(1 - distance, 5);
                                 var increment = distance;
@@ -496,6 +504,8 @@ namespace FoxTunes
                 public int HoldInterval;
 
                 public int Duration;
+
+                public int Smoothing;
             }
         }
     }

@@ -41,6 +41,8 @@ namespace FoxTunes
 
         public const string SMOOTH_ELEMENT = "DEEEFBF0-AA25-456E-B759-AF94F6E9C371";
 
+        public const string SMOOTH_FACTOR_ELEMENT = "EDDD7A0-CA10-41F4-ACA0-3EA1C2CD87CB";
+
         public const string HOLD_ELEMENT = "EEEE64D9-FF15-49FB-BDF4-706958576FFC";
 
         public const string INTERVAL_ELEMENT = "FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438";
@@ -56,6 +58,7 @@ namespace FoxTunes
                 .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, "Peak Hold", path: "Advanced").WithValue(1000).WithValidationRule(new IntegerValidationRule(500, 5000)).DependsOn(SECTION, PEAKS_ELEMENT))
                 .WithElement(new BooleanConfigurationElement(HIGH_CUT_ELEMENT, "High Cut", path: "Advanced").WithValue(true))
                 .WithElement(new BooleanConfigurationElement(SMOOTH_ELEMENT, "Smooth", path: "Advanced"))
+                .WithElement(new IntegerConfigurationElement(SMOOTH_FACTOR_ELEMENT, "Smooth Factor", path: "Advanced").WithValue(10).WithValidationRule(new IntegerValidationRule(1, 100)).DependsOn(SECTION, SMOOTH_ELEMENT))
                 .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, "Interval", path: "Advanced").WithValidationRule(new IntegerValidationRule(1, 100))
             );
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(
