@@ -118,61 +118,7 @@ namespace FoxTunes
             }
             return (Size)matrix.Transform(new Vector(width, height));
         }
-
-        public static void Disconnect(this FrameworkElement element)
-        {
-            var parent = element.Parent;
-            if (parent == null)
-            {
-                return;
-            }
-            else if (parent is ContentControl)
-            {
-                (parent as ContentControl).Content = null;
-            }
-            else if (parent is Panel)
-            {
-                (parent as Panel).Children.Remove(element);
-            }
-        }
-
-        public static T GetVisualChild<T>(this FrameworkElement parent) where T : FrameworkElement
-        {
-            var stack = new Stack<DependencyObject>();
-            stack.Push(parent);
-            while (stack.Count > 0)
-            {
-                var current = stack.Pop();
-                if (current is T)
-                {
-                    return current as T;
-                }
-                for (int a = 0, b = VisualTreeHelper.GetChildrenCount(current); a < b; a++)
-                {
-                    stack.Push(VisualTreeHelper.GetChild(current, a));
-                }
-            }
-            return default(T);
-        }
-
-        public static void ForEachVisualChild<T>(this FrameworkElement parent, Action<T> action) where T : FrameworkElement
-        {
-            var stack = new Stack<DependencyObject>();
-            stack.Push(parent);
-            while (stack.Count > 0)
-            {
-                var current = stack.Pop();
-                if (current is T)
-                {
-                    action(current as T);
-                }
-                for (int a = 0, b = VisualTreeHelper.GetChildrenCount(current); a < b; a++)
-                {
-                    stack.Push(VisualTreeHelper.GetChild(current, a));
-                }
-            }
-        }
-
+    
         public static bool IsMouseOver(this FrameworkElement element)
         {
             var x = default(int);
