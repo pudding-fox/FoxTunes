@@ -11,8 +11,7 @@ AS
 	FROM "LibraryItems"
 		JOIN "LibraryItem_MetaDataItem" ON "LibraryItems"."Id" = "LibraryItem_MetaDataItem"."LibraryItem_Id"
 		JOIN "MetaDataItems" ON "MetaDataItems"."Id" = "LibraryItem_MetaDataItem"."MetaDataItem_Id"
-	WHERE NOT EXISTS(SELECT * FROM "LibraryHierarchyItem_LibraryItem" WHERE "LibraryHierarchyItem_LibraryItem"."LibraryItem_Id" = "LibraryItems"."Id")
-	ORDER BY "LibraryItems"."Id"
+	WHERE @status IS NULL OR "LibraryItems"."Status" = @status
 )
 ,
 "HorizontalMetaData"
@@ -30,15 +29,5 @@ AS
 #>
 )
 
-SELECT "LibraryHierarchyLevels"."LibraryHierarchy_Id" AS "LibraryHierarchy_Id", "LibraryHierarchyLevels"."Id" AS "LibraryHierarchyLevel_Id", "HorizontalMetaData"."Id" AS "LibraryItem_Id", "HorizontalMetaData"."FileName", "LibraryHierarchyLevels"."Script"
-<#
-	for(var index = 0; index < this.MetaDataNames.Length; index++)
-	{
-		#>,"Key_<#= index #>", "Value_<#= index #>_Value"<#
-	}
-#>
-	, CASE WHEN "LibraryHierarchyLevels"."Id" = "LibraryHierarchyLevelLeaf"."LibraryHierarchyLevel_Id" THEN 1 ELSE 0 END AS "IsLeaf"
-FROM "LibraryHierarchyLevels"
-	JOIN "LibraryHierarchyLevelLeaf" 
-		ON "LibraryHierarchyLevelLeaf"."LibraryHierarchy_Id" = "LibraryHierarchyLevels"."LibraryHierarchy_Id" 
-	CROSS JOIN "HorizontalMetaData";
+SELECT *
+FROM "HorizontalMetaData";

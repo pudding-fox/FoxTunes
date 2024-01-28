@@ -41,18 +41,13 @@ namespace FoxTunes
             }
         }
 
-        public override IDatabaseQuery BeginBuildLibraryHierarchies
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(Resources.BeginBuildLibraryHierarchies);
-            }
-        }
-
         public override IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames)
         {
             var libraryHierarchyBuilder = new LibraryHierarchyBuilder(this.Database, metaDataNames);
-            return this.Database.QueryFactory.Create(libraryHierarchyBuilder.TransformText());
+            return this.Database.QueryFactory.Create(
+                libraryHierarchyBuilder.TransformText(),
+                new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+            );
         }
 
         public override IDatabaseQuery GetLibraryHierarchyNodesWithFilter

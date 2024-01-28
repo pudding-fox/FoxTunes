@@ -32,12 +32,11 @@ namespace FoxTunes.Templates
 WITH ""VerticalMetaData""
 AS
 (
-	SELECT ""LibraryItems"".""Id"", ""LibraryItems"".""FileName"", ""MetaDataItems"".""Name"", ""MetaDataItems"".""Value""
+	SELECT ""LibraryItems"".""Id"", ""LibraryItems"".""FileName"", ""MetaDataItems"".""Name"", ""MetaDataItems"".""Value"" 
 	FROM ""LibraryItems""
 		JOIN ""LibraryItem_MetaDataItem"" ON ""LibraryItems"".""Id"" = ""LibraryItem_MetaDataItem"".""LibraryItem_Id""
 		JOIN ""MetaDataItems"" ON ""MetaDataItems"".""Id"" = ""LibraryItem_MetaDataItem"".""MetaDataItem_Id""
-	WHERE NOT EXISTS(SELECT * FROM ""LibraryHierarchyItem_LibraryItem"" WHERE ""LibraryHierarchyItem_LibraryItem"".""LibraryItem_Id"" = ""LibraryItems"".""Id"")
-	ORDER BY ""LibraryItems"".""Id""
+	WHERE @status IS NULL OR ""LibraryItems"".""Status"" = @status
 )
 ,
 ""HorizontalMetaData""
@@ -45,7 +44,7 @@ AS
 (
 ");
             
-            #line 31 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
+            #line 20 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(new PivotViewBuilder(
 		this.Database,
 		"VerticalMetaData", 
@@ -57,48 +56,7 @@ AS
             
             #line default
             #line hidden
-            this.Write(@"
-)
-
-SELECT ""LibraryHierarchyLevels"".""LibraryHierarchy_Id"" AS ""LibraryHierarchy_Id"", ""LibraryHierarchyLevels"".""Id"" AS ""LibraryHierarchyLevel_Id"", ""HorizontalMetaData"".""Id"" AS ""LibraryItem_Id"", ""HorizontalMetaData"".""FileName"", ""LibraryHierarchyLevels"".""Script""
-");
-            
-            #line 44 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
-
-	for(var index = 0; index < this.MetaDataNames.Length; index++)
-	{
-		
-            
-            #line default
-            #line hidden
-            this.Write(",\"Key_");
-            
-            #line 47 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(index));
-            
-            #line default
-            #line hidden
-            this.Write("\", \"Value_");
-            
-            #line 47 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(index));
-            
-            #line default
-            #line hidden
-            this.Write("_Value\"");
-            
-            #line 47 "C:\Source\FoxTunes\FoxTunes.DB.SQLite\Templates\LibraryHierarchyBuilder.tt"
-
-	}
-
-            
-            #line default
-            #line hidden
-            this.Write(@"	, ""LibraryHierarchyLevels"".""Id"" = ""LibraryHierarchyLevelLeaf"".""LibraryHierarchyLevel_Id"" AS ""IsLeaf""
-FROM ""LibraryHierarchyLevels""
-	JOIN ""LibraryHierarchyLevelLeaf"" 
-		ON ""LibraryHierarchyLevelLeaf"".""LibraryHierarchy_Id"" = ""LibraryHierarchyLevels"".""LibraryHierarchy_Id"" 
-	JOIN ""HorizontalMetaData"";");
+            this.Write("\r\n)\r\n\r\nSELECT *\r\nFROM \"HorizontalMetaData\";");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -330,7 +288,7 @@ FROM ""LibraryHierarchyLevels""
             {
                 get
                 {
-                    return this.formatProviderField;
+                    return this.formatProviderField ;
                 }
                 set
                 {
