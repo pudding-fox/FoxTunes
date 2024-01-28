@@ -27,6 +27,7 @@ namespace FoxTunes
         public BassDtsStreamProvider()
         {
             BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
+            BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_dts.dll"));
             BassPluginLoader.AddExtensions(EXTENSIONS);
         }
 
