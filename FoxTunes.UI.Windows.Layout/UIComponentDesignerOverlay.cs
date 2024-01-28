@@ -13,10 +13,6 @@ namespace FoxTunes
 {
     public class UIComponentDesignerOverlay : BaseComponent, IDisposable
     {
-        public static readonly LayoutDesignerBehaviour Behaviour = ComponentRegistry.Instance.GetComponent<LayoutDesignerBehaviour>();
-
-        public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
-
         public static UIComponentContainer Container { get; private set; }
 
         public UIComponentDesignerOverlay(UIComponentRoot root)
@@ -268,7 +264,7 @@ namespace FoxTunes
 
             public Task Exit()
             {
-                return Windows.Invoke(() => Behaviour.IsDesigning = false);
+                return Windows.Invoke(() => LayoutDesignerBehaviour.Instance.IsDesigning = false);
             }
 
 

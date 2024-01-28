@@ -65,5 +65,21 @@
                 return Strings.LayoutEditor_Cancel;
             }
         }
+
+        public static string LayoutTreeWindow_Title
+        {
+            get
+            {
+                return Strings.LayoutTreeWindow_Title;
+            }
+        }
+
+        public static string ToolWindowManagerWindow_Title
+        {
+            get
+            {
+                return Strings.ToolWindowManagerWindow_Title;
+            }
+        }
     }
 }

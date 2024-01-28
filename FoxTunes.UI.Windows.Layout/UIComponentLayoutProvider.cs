@@ -38,8 +38,6 @@ namespace FoxTunes
             }
         }
 
-        public LayoutDesignerBehaviour LayoutDesignerBehaviour { get; private set; }
-
         public IConfiguration Configuration { get; private set; }
 
         public TextConfigurationElement Main { get; private set; }
@@ -73,8 +71,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             global::FoxTunes.Windows.ShuttingDown += this.OnShuttingDown;
-            this.LayoutDesignerBehaviour = ComponentRegistry.Instance.GetComponent<LayoutDesignerBehaviour>();
-            this.LayoutDesignerBehaviour.IsDesigningChanged += this.OnIsDesigningChanged;
+            LayoutDesignerBehaviour.Instance.IsDesigningChanged += this.OnIsDesigningChanged;
             this.Configuration = core.Components.Configuration;
             this.Main = this.Configuration.GetElement<TextConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
@@ -92,7 +89,7 @@ namespace FoxTunes
 
         protected virtual void OnIsDesigningChanged(object sender, EventArgs e)
         {
-            if (this.LayoutDesignerBehaviour.IsDesigning)
+            if (LayoutDesignerBehaviour.Instance.IsDesigning)
             {
                 return;
             }
@@ -196,6 +193,7 @@ namespace FoxTunes
         protected virtual void OnDisposing()
         {
             global::FoxTunes.Windows.ShuttingDown -= this.OnShuttingDown;
+            LayoutDesignerBehaviour.Instance.IsDesigningChanged -= this.OnIsDesigningChanged;
         }
 
         ~UIComponentLayoutProvider()

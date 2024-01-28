@@ -3,11 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-             xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
-             xmlns:LocalWindows="clr-namespace:FoxTunes"
-             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
              xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
@@ -15,7 +11,24 @@
     <UserControl.Resources>
         <LocalViewModel:LayoutTree x:Key="ViewModel"></LocalViewModel:LayoutTree>
     </UserControl.Resources>
-    <TreeView>
-
+    <TreeView
+            ItemsSource="{Binding Configurations, Source={StaticResource ViewModel}}"
+            Windows:TreeViewExtensions.SelectedItem="{Binding SelectedConfiguration, Source={StaticResource ViewModel}}"
+            Windows:TreeViewExtensions.RightButtonSelect="True">
+        <Interactivity:Interaction.Triggers>
+            <Interactivity:EventTrigger EventName="MouseRightButtonDown">
+                <Interactivity:InvokeCommandAction Command="{Binding ShowDesignerOverlayCommand, Source={StaticResource ViewModel}}" />
+            </Interactivity:EventTrigger>
+        </Interactivity:Interaction.Triggers>
+        <Windows:TreeViewExtensions.ItemContainerStyle>
+            <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                <Setter Property="IsExpanded" Value="True"></Setter>
+            </Style>
+        </Windows:TreeViewExtensions.ItemContainerStyle>
+        <TreeView.ItemTemplate>
+            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                <TextBlock Text="{Binding Component.Name, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"/>
+            </HierarchicalDataTemplate>
+        </TreeView.ItemTemplate>
     </TreeView>
 </UserControl>

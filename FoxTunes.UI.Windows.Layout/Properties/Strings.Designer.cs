@@ -97,6 +97,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Editing Layout.
+        /// </summary>
+        internal static string LayoutDesignerBehaviourTask_Name {
+            get {
+                return ResourceManager.GetString("LayoutDesignerBehaviourTask.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         internal static string LayoutEditor_Cancel {
@@ -111,6 +120,15 @@ namespace FoxTunes {
         internal static string LayoutEditor_Save {
             get {
                 return ResourceManager.GetString("LayoutEditor.Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layout Tree.
+        /// </summary>
+        internal static string LayoutTreeWindow_Title {
+            get {
+                return ResourceManager.GetString("LayoutTreeWindow.Title", resourceCulture);
             }
         }
         
@@ -201,6 +219,15 @@ namespace FoxTunes {
         internal static string ToolWindowManager_Title {
             get {
                 return ResourceManager.GetString("ToolWindowManager.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dialog Manager.
+        /// </summary>
+        internal static string ToolWindowManagerWindow_Title {
+            get {
+                return ResourceManager.GetString("ToolWindowManagerWindow.Title", resourceCulture);
             }
         }
         

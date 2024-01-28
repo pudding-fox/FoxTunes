@@ -60,11 +60,13 @@ namespace FoxTunes
 
             protected virtual void OnPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
             {
-                var item = (e.OriginalSource as DependencyObject).FindAncestor<TreeViewItem>();
-                if (item != null)
+                if (e.OriginalSource is DependencyObject dependencyObject)
                 {
-                    item.Focus();
-                    e.Handled = true;
+                    var item = dependencyObject.FindAncestor<TreeViewItem>();
+                    if (item != null)
+                    {
+                        item.Focus();
+                    }
                 }
             }
 

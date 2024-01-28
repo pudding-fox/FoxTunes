@@ -129,11 +129,17 @@
   <data name="LayoutDesignerBehaviour.Path" xml:space="preserve">
     <value>Layout</value>
   </data>
+  <data name="LayoutDesignerBehaviourTask.Name" xml:space="preserve">
+    <value>Editing Layout</value>
+  </data>
   <data name="LayoutEditor.Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
   <data name="LayoutEditor.Save" xml:space="preserve">
     <value>Save</value>
+  </data>
+  <data name="LayoutTreeWindow.Title" xml:space="preserve">
+    <value>Layout Tree</value>
   </data>
   <data name="ToolWindowBehaviour.Manage" xml:space="preserve">
     <value>Manage</value>
@@ -164,6 +170,9 @@
   </data>
   <data name="ToolWindowManager.Title" xml:space="preserve">
     <value>Title</value>
+  </data>
+  <data name="ToolWindowManagerWindow.Title" xml:space="preserve">
+    <value>Dialog Manager</value>
   </data>
   <data name="UIComponentContainer.Clear" xml:space="preserve">
     <value>Clear</value>

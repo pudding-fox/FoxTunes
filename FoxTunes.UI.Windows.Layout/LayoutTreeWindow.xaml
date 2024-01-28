@@ -8,6 +8,6 @@
         xmlns:LocalWindows="clr-namespace:FoxTunes"
         x:Class="FoxTunes.LayoutTreeWindow"
         mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
-        Title="Window Manager">
+        Title="{x:Static LocalWindows:StringResources.LayoutTreeWindow_Title}">
     <LocalWindows:LayoutTree></LocalWindows:LayoutTree>
 </Windows:WindowBase>
