@@ -38,7 +38,7 @@
             SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"
             DisplayMemberPath="Name"
             Visibility="{Binding IsSlave, Converter={StaticResource NegavingBooleanToVisibilityConverter}, Source={StaticResource ViewModel}}"/>
-        <ItemsControl Grid.Row="1" ItemsSource="{Binding Frames, Source={StaticResource ViewModel}}" >
+        <ItemsControl Name="ItemsControl" Grid.Row="1" ItemsSource="{Binding Frames, Source={StaticResource ViewModel}}" >
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid></Grid>
@@ -47,12 +47,15 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <ListBox 
+                        Name="ListBox"
                         Margin="0,2,0,2" 
                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                         ItemsSource="{Binding Items}" 
                         SelectedValue="{Binding SelectedItem, Source={StaticResource ViewModel}}"
                         IsVisibleChanged="OnIsVisibleChanged"
                         SelectionChanged="OnSelectionChanged"
+                        Loaded="OnLoaded"
+                        Unloaded="OnUnloaded"
                         Windows:ListBoxExtensions.DragSource="True"
                         Windows:ListBoxExtensions.DragSourceInitialized="DragSourceInitialized"
                         Windows:ListBoxExtensions.TrackItemVisibility="True"

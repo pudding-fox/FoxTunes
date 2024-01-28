@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace FoxTunes
 {
@@ -34,6 +36,39 @@ namespace FoxTunes
                 return;
             }
             listBox.ScrollIntoView(listBox.SelectedItem);
+        }
+
+        protected virtual void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            this.FixFocus();
+        }
+
+        protected virtual void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            this.FixFocus();
+        }
+
+        protected virtual void FixFocus()
+        {
+            if (!this.IsKeyboardFocusWithin)
+            {
+                return;
+            }
+            Keyboard.ClearFocus();
+            var container = this.ItemsControl.ItemContainerGenerator.ContainerFromIndex(this.ItemsControl.Items.Count - 1) as ContentPresenter;
+            var listBox = container.ContentTemplate.FindName("ListBox", container) as ListBox;
+            this.FixFocus(listBox);
+        }
+
+        protected virtual void FixFocus(ListBox listBox)
+        {
+            var index = listBox.SelectedIndex;
+            if (index == -1)
+            {
+                index = 1;
+            }
+            var container = listBox.ItemContainerGenerator.ContainerFromIndex(index) as ListBoxItem;
+            Keyboard.Focus(container);
         }
 
         protected virtual void DragSourceInitialized(object sender, ListBoxExtensions.DragSourceInitializedEventArgs e)
