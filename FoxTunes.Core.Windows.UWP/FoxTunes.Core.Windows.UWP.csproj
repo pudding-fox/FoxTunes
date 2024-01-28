@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net461</TargetFrameworks>
+    <AssemblyName>FoxTunes.Core.Windows.UWP</AssemblyName>
+    <OutputPath>..\distribution\</OutputPath>
+    <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
+    <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Runtime.WindowsRuntime">
+      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETCore\v4.5\System.Runtime.WindowsRuntime.dll</HintPath>
+    </Reference>
+    <Reference Include="Windows">
+      <HintPath>C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.17763.0\Windows.winmd</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
+  </ItemGroup>
+
+</Project>

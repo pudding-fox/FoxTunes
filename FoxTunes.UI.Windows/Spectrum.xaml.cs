@@ -188,5 +188,16 @@ namespace FoxTunes
                 this.Elements[a, 1] = this.Dimentions[1] - this.Elements[a, 3];
             }
         }
+
+        ~Spectrum()
+        {
+            if (this.Timer != null)
+            {
+                this.Timer.Stop();
+                this.Timer.Elapsed -= this.OnElapsed;
+                this.Timer.Dispose();
+                this.Timer = null;
+            }
+        }
     }
 }
