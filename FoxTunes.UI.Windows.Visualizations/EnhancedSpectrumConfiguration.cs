@@ -44,7 +44,7 @@ namespace FoxTunes
 
         public const string DURATION_ELEMENT = "FFFF965B-101C-4A09-9A9A-91BAB17575E6";
 
-        public const int DURATION_MIN = 0;
+        public const int DURATION_MIN = 16;
 
         public const int DURATION_MAX = 64;
 
