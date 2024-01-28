@@ -59,11 +59,22 @@ namespace FoxTunes
 
         public async Task Refresh()
         {
+            var cancel = default(bool);
             var libraryHierarchyNode = default(LibraryHierarchyNode);
             await Windows.Invoke(() =>
             {
+                if (this.Background != null)
+                {
+                    cancel = true;
+                    return;
+                }
                 libraryHierarchyNode = this.DataContext as LibraryHierarchyNode;
             }).ConfigureAwait(false);
+            if (cancel)
+            {
+                //Already loaded.
+                return;
+            }
             if (libraryHierarchyNode == null)
             {
                 //Very rare.
