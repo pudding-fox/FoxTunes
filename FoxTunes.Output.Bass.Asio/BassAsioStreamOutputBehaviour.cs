@@ -3,11 +3,14 @@ using ManagedBass;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassAsioStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class BassAsioStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IDisposable
     {
+        public const string SETTINGS = "AAAA";
+
         public IBassOutput Output { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -164,6 +167,35 @@ namespace FoxTunes
             }
             this.OnInitDevice();
             e.Output = new BassAsioStreamOutput(this, e.Stream);
+        }
+
+        public IEnumerable<IInvocationComponent> Invocations
+        {
+            get
+            {
+                if (BassAsioDevice.IsInitialized && BassAsioDevice.Info != null)
+                {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, SETTINGS, "ASIO");
+                }
+            }
+        }
+
+        public Task InvokeAsync(IInvocationComponent component)
+        {
+            switch (component.Id)
+            {
+                case SETTINGS:
+                    if (BassAsioDevice.IsInitialized && BassAsioDevice.Info != null)
+                    {
+                        BassAsioDevice.Info.ControlPanel();
+                    }
+                    break;
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
