@@ -10,7 +10,7 @@ using System.Windows.Threading;
 namespace FoxTunes
 {
     [Component("B889313D-4F21-4794-8D16-C2FAE6A7B305", ComponentSlots.UserInterface, priority: ComponentAttribute.PRIORITY_LOW)]
-    public class WindowsUserInterface : UserInterface, IConfigurableComponent
+    public class WindowsUserInterface : UserInterface, IConfigurableComponent, IDisposable
     {
         public static readonly Type[] References = new[]
         {
@@ -22,15 +22,9 @@ namespace FoxTunes
             this.Application = new Application();
             this.Application.DispatcherUnhandledException += this.OnApplicationDispatcherUnhandledException;
             this.Queue = new PendingQueue<string>(TimeSpan.FromMilliseconds(100));
-            this.Queue.Complete += async (sender, e) =>
-            {
-                using (e.Defer())
-                {
-                    await this.OnOpen(e.Sequence).ConfigureAwait(false);
-                }
-            };
-            Windows.MainWindowCreated += (sender, e) => this.OnWindowCreated(Windows.MainWindow.GetHandle());
-            Windows.MiniWindowCreated += (sender, e) => this.OnWindowCreated(Windows.MiniWindow.GetHandle());
+            this.Queue.Complete += this.OnComplete;
+            Windows.MainWindowCreated += this.OnWindowCreated;
+            Windows.MiniWindowCreated += this.OnWindowCreated;
         }
 
         private Application _Application { get; set; }
@@ -65,13 +59,16 @@ namespace FoxTunes
 
         public IOutput Output { get; private set; }
 
-        public IPlaylistManager Playlist { get; private set; }
+        public IPlaylistBrowser PlaylistBrowser { get; private set; }
+
+        public IPlaylistManager PlaylistManager { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.Output = core.Components.Output;
-            this.Playlist = core.Managers.Playlist;
+            this.PlaylistBrowser = core.Components.PlaylistBrowser;
+            this.PlaylistManager = core.Managers.Playlist;
             base.InitializeComponent(core);
         }
 
@@ -128,11 +125,19 @@ namespace FoxTunes
             MessageBox.Show("Restart is required.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
+        protected virtual async void OnComplete(object sender, PendingQueueEventArgs<string> e)
+        {
+            using (e.Defer())
+            {
+                await this.OnOpen(e.Sequence).ConfigureAwait(false);
+            }
+        }
+
         protected virtual async Task OnOpen(IEnumerable<string> paths)
         {
-            var index = await this.Playlist.GetInsertIndex().ConfigureAwait(false);
-            await this.Playlist.Add(paths, false).ConfigureAwait(false);
-            await this.Playlist.Play(index).ConfigureAwait(false);
+            var index = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
+            await this.PlaylistManager.Add(paths, false).ConfigureAwait(false);
+            await this.PlaylistManager.Play(index).ConfigureAwait(false);
         }
 
         protected virtual void OnApplicationDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -140,9 +145,60 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Fatal, e.Exception.Message, e);
         }
 
+        protected virtual void OnWindowCreated(object sender, EventArgs e)
+        {
+            var window = sender as Window;
+            if (window == null)
+            {
+                return;
+            }
+            this.OnWindowCreated(window.GetHandle());
+        }
+
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return WindowsUserInterfaceConfiguration.GetConfigurationSections();
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Queue != null)
+            {
+                this.Queue.Complete -= this.OnComplete;
+            }
+            Windows.MainWindowCreated -= this.OnWindowCreated;
+            Windows.MiniWindowCreated -= this.OnWindowCreated;
+        }
+
+        ~WindowsUserInterface()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }

@@ -260,13 +260,13 @@ namespace FoxTunes
 
             public string CdLookupHost { get; private set; }
 
-            public IPlaylistManager PlaylistManager { get; private set; }
+            public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
             public IMetaDataSource MetaDataSource { get; private set; }
 
             public override void InitializeComponent(ICore core)
             {
-                this.PlaylistManager = core.Managers.Playlist;
+                this.PlaylistBrowser = core.Components.PlaylistBrowser;
                 this.MetaDataSource = new BassCdMetaDataSource(this.GetStrategy());
                 this.MetaDataSource.InitializeComponent(this.Core);
                 base.InitializeComponent(core);
@@ -289,7 +289,7 @@ namespace FoxTunes
                     using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                     {
                         //Always append for now.
-                        this.Sequence = await this.PlaylistManager.GetInsertIndex().ConfigureAwait(false);
+                        this.Sequence = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
                         await this.AddPlaylistItems().ConfigureAwait(false);
                         await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
                         await this.AddOrUpdateMetaData().ConfigureAwait(false);

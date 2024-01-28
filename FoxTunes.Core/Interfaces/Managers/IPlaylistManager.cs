@@ -37,16 +37,6 @@ namespace FoxTunes.Interfaces
 
         event AsyncEventHandler CanNavigateChanged;
 
-        Task<PlaylistItem> Get(int sequence);
-
-        Task<PlaylistItem> Get(string fileName);
-
-        Task<PlaylistItem> GetNext(bool navigate);
-
-        Task<PlaylistItem> GetPrevious(bool navigate);
-
-        Task<int> GetInsertIndex();
-
         Task Next();
 
         Task Previous();

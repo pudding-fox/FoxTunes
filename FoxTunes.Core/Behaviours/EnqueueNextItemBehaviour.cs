@@ -7,7 +7,7 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class EnqueueNextItemBehaviour : StandardBehaviour, IDisposable
     {
-        public IPlaylistManager PlaylistManager { get; private set; }
+        public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -15,7 +15,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.PlaylistManager = core.Managers.Playlist;
+            this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.PlaybackManager = core.Managers.Playback;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
@@ -38,7 +38,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var playlistItem = await this.PlaylistManager.GetNext(false).ConfigureAwait(false);
+            var playlistItem = await this.PlaylistBrowser.GetNext(false).ConfigureAwait(false);
             if (playlistItem == null)
             {
                 return;

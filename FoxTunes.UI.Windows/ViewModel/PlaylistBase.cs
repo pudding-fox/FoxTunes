@@ -1,15 +1,15 @@
-﻿using FoxDb;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes.ViewModel
 {
     public abstract class PlaylistBase : ViewModelBase
     {
+        public IPlaylistBrowser PlaylistBrowser { get; private set; }
+
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
@@ -20,31 +20,15 @@ namespace FoxTunes.ViewModel
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
-        public IEnumerable Items
+        public IEnumerable<PlaylistItem> Items
         {
             get
             {
-                return new ObservableCollection<PlaylistItem>(this.GetItems());
-            }
-        }
-
-        protected virtual IEnumerable<PlaylistItem> GetItems()
-        {
-            if (this.DatabaseFactory != null)
-            {
-                using (var database = this.DatabaseFactory.Create())
+                if (this.PlaylistBrowser == null)
                 {
-                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                    {
-                        var set = database.Set<PlaylistItem>(transaction);
-                        set.Fetch.Sort.Expressions.Clear();
-                        set.Fetch.Sort.AddColumn(set.Table.GetColumn(ColumnConfig.By("Sequence", ColumnFlags.None)));
-                        foreach (var element in set)
-                        {
-                            yield return element;
-                        }
-                    }
+                    return Enumerable.Empty<PlaylistItem>();
                 }
+                return this.PlaylistBrowser.GetItems();
             }
         }
 
@@ -64,6 +48,7 @@ namespace FoxTunes.ViewModel
             this.DatabaseFactory = this.Core.Factories.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.PlaylistBrowser = this.Core.Components.PlaylistBrowser;
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;

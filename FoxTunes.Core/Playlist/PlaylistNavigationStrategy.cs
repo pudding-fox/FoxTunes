@@ -9,6 +9,8 @@ namespace FoxTunes
 {
     public abstract class PlaylistNavigationStrategy : BaseComponent
     {
+        public IPlaylistBrowser PlaylistBrowser { get; private set; }
+
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
@@ -19,8 +21,9 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.DatabaseFactory = core.Factories.Database;
+            this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.PlaylistManager = core.Managers.Playlist;
+            this.DatabaseFactory = core.Factories.Database;
             base.InitializeComponent(core);
         }
 
@@ -211,7 +214,7 @@ namespace FoxTunes
             Monitor.Enter(SyncRoot);
             try
             {
-                var playlistItem = await this.PlaylistManager.Get(this.Sequences[this.Position]).ConfigureAwait(false);
+                var playlistItem = await this.PlaylistBrowser.Get(this.Sequences[this.Position]).ConfigureAwait(false);
                 if (navigate)
                 {
                     this.NavigateNext();
@@ -250,7 +253,7 @@ namespace FoxTunes
                     this.NavigatePrevious();
                     this.NavigatePrevious();
                 }
-                var playlistItem = await this.PlaylistManager.Get(this.Sequences[this.Position]).ConfigureAwait(false);
+                var playlistItem = await this.PlaylistBrowser.Get(this.Sequences[this.Position]).ConfigureAwait(false);
                 if (navigate)
                 {
                     this.NavigateNext();
