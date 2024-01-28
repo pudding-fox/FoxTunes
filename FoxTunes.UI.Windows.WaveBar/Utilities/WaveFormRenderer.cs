@@ -58,7 +58,10 @@ namespace FoxTunes
             if (generatorData != null)
             {
                 generatorData.Updated -= this.OnUpdated;
-                generatorData.CancellationToken.Cancel();
+                if (generatorData.CancellationToken != null)
+                {
+                    generatorData.CancellationToken.Cancel();
+                }
             }
 
             await this.Clear().ConfigureAwait(false);

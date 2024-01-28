@@ -8,8 +8,19 @@ namespace FoxTunes
     {
         private static readonly string PREFIX = typeof(WaveFormCache).Name;
 
+        private static readonly BooleanConfigurationElement Enabled = ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
+            WaveBarBehaviourConfiguration.SECTION,
+            WaveBarBehaviourConfiguration.CACHE_ELEMENT
+        );
+
         public static bool TryLoad(IOutputStream stream, int resolution, out WaveFormGenerator.WaveFormGeneratorData data)
         {
+            if (!Enabled.Value)
+            {
+                data = null;
+                return false;
+            }
+
             var id = GetId(stream, resolution);
             var fileName = default(string);
             if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
@@ -38,6 +49,11 @@ namespace FoxTunes
 
         public static void Save(IOutputStream stream, WaveFormGenerator.WaveFormGeneratorData data)
         {
+            if (!Enabled.Value)
+            {
+                return;
+            }
+
             var id = GetId(stream, data.Resolution);
             Save(id, data);
         }
