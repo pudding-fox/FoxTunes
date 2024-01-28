@@ -17,8 +17,6 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames);
 
-        IDatabaseQuery CleanupLibraryHierarchyNodes { get; }
-
         IDatabaseQuery ClearLibraryMetaDataItems { get; }
 
         IDatabaseQuery ClearPlaylistMetaDataItems { get; }

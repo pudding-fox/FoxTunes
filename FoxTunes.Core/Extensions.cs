@@ -300,5 +300,41 @@ namespace FoxTunes
                 sequence[c] = b;
             }
         }
+
+        public static string Replace(this string value, IEnumerable<string> oldValues, string newValue, bool ignoreCase, bool once)
+        {
+            foreach (var oldValue in oldValues)
+            {
+                var success = default(bool);
+                value = value.Replace(oldValue, newValue, ignoreCase, out success);
+                if (success && once)
+                {
+                    break;
+                }
+            }
+            return value;
+        }
+
+        public static string Replace(this string value, string oldValue, string newValue, bool ignoreCase, out bool success)
+        {
+            var index = default(int);
+            if (ignoreCase)
+            {
+                index = value.IndexOf(oldValue, StringComparison.OrdinalIgnoreCase);
+            }
+            else
+            {
+                index = value.IndexOf(oldValue);
+            }
+            if (success = (index != -1))
+            {
+                var offset = index + oldValue.Length;
+                return
+                    value.Substring(0, index) +
+                    newValue +
+                    value.Substring(offset, value.Length - offset);
+            }
+            return value;
+        }
     }
 }

@@ -152,29 +152,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WITH 
-        ///PopulatedNodes AS
-        ///(
-        ///	SELECT [LibraryHierarchyItems].[Id], [LibraryHierarchyItems].[Value]
-        ///	FROM [LibraryHierarchyItems]
-        ///		JOIN [LibraryHierarchyItems] Children
-        ///			ON [LibraryHierarchyItems].[Id] = Children.[Parent_Id]
-        ///	GROUP BY [LibraryHierarchyItems].[Id], [LibraryHierarchyItems].[Value]
-        ///	HAVING COUNT(Children.[Id]) &gt; 1
-        ///),
-        ///
-        ///DefunctNodes(Id, Parent_Id, Value) AS
-        ///(
-        ///	SELECT [LibraryHierarchyItems].[Id], [LibraryHierarchyItems].[Parent_Id], [LibraryHierarchyItems].[Value]
-        ///	FROM [LibraryHier [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string CleanupLibraryHierarchyNodes {
-            get {
-                return ResourceManager.GetString("CleanupLibraryHierarchyNodes", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to DELETE FROM &quot;LibraryItem_MetaDataItem&quot;
         ///WHERE &quot;Id&quot; IN
         ///(
