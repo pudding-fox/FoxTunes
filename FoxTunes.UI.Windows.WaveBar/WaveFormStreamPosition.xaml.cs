@@ -123,13 +123,9 @@ namespace FoxTunes
 
         protected override Task ShowSettings()
         {
-            return this.UserInterface.ShowSettings(
+            return this.ShowSettings(
                 Strings.WaveFormStreamPositionConfiguration_Section,
-                this.GetConfiguration(),
-                new[]
-                {
-                    WaveFormStreamPositionConfiguration.SECTION
-                }
+                WaveFormStreamPositionConfiguration.SECTION
             );
         }
 

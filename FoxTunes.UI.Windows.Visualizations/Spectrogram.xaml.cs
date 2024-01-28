@@ -137,13 +137,9 @@ namespace FoxTunes
 
         protected override Task ShowSettings()
         {
-            return this.UserInterface.ShowSettings(
+            return this.ShowSettings(
                 Strings.SpectrogramConfiguration_Path,
-                this.GetConfiguration(),
-                new[]
-                {
-                    SpectrogramConfiguration.SECTION
-                }
+                SpectrogramConfiguration.SECTION
             );
         }
 

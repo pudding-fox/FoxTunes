@@ -149,13 +149,9 @@ namespace FoxTunes
 
         protected override Task ShowSettings()
         {
-            return this.UserInterface.ShowSettings(
+            return this.ShowSettings(
                 Strings.PeakMeterConfiguration_Path,
-                this.GetConfiguration(),
-                new[]
-                {
-                    PeakMeterConfiguration.SECTION
-                }
+                PeakMeterConfiguration.SECTION
             );
         }
 

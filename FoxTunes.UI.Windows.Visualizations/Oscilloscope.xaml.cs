@@ -126,13 +126,9 @@ namespace FoxTunes
 
         protected override Task ShowSettings()
         {
-            return this.UserInterface.ShowSettings(
+            return this.ShowSettings(
                 Strings.OscilloscopeConfiguration_Path,
-                this.GetConfiguration(),
-                new[]
-                {
-                    OscilloscopeConfiguration.SECTION
-                }
+                OscilloscopeConfiguration.SECTION
             );
         }
 
