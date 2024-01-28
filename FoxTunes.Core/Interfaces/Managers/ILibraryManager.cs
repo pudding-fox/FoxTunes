@@ -27,6 +27,8 @@ namespace FoxTunes.Interfaces
         Task Clear(LibraryItemStatus? status);
 
         Task SetRating(LibraryHierarchyNode libraryHierarchyNode, byte rating);
+
+        Task SetRating(IEnumerable<LibraryItem> libraryItems, byte rating);
     }
 
     [Flags]

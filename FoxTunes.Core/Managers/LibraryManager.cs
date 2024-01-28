@@ -124,9 +124,11 @@ namespace FoxTunes
         {
             switch (signal.Name)
             {
-                case CommonSignals.LibraryUpdated:
                 case CommonSignals.HierarchiesUpdated:
-                    this.Refresh();
+                    if (!object.Equals(signal.State, CommonSignalFlags.SOFT))
+                    {
+                        this.Refresh();
+                    }
                     break;
             }
 #if NET40
@@ -220,6 +222,16 @@ namespace FoxTunes
         public async Task SetRating(LibraryHierarchyNode libraryHierarchyNode, byte rating)
         {
             using (var task = new UpdateLibraryRatingTask(libraryHierarchyNode, rating))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
+            }
+        }
+
+        public async Task SetRating(IEnumerable<LibraryItem> libraryItems, byte rating)
+        {
+            using (var task = new UpdateLibraryRatingTask(libraryItems, rating))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);

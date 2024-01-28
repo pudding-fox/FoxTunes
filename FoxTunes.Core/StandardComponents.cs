@@ -65,6 +65,22 @@ namespace FoxTunes
             }
         }
 
+        public ILibraryBrowser LibraryBrowser
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<ILibraryBrowser>();
+            }
+        }
+
+        public ILibraryCache LibraryCache
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<ILibraryCache>();
+            }
+        }
+
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser
         {
             get

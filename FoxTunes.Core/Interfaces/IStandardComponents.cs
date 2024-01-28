@@ -16,6 +16,10 @@
 
         ISignalEmitter SignalEmitter { get; }
 
+        ILibraryBrowser LibraryBrowser { get; }
+
+        ILibraryCache LibraryCache { get; }
+
         ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; }
 
         ILibraryHierarchyCache LibraryHierarchyCache { get; }

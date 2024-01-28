@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,7 +16,15 @@ namespace FoxTunes
             this.Rating = rating;
         }
 
+        public UpdateLibraryRatingTask(IEnumerable<LibraryItem> libraryItems, byte rating) : base(ID)
+        {
+            this.LibraryItems = libraryItems;
+            this.Rating = rating;
+        }
+
         public LibraryHierarchyNode LibraryHierarchyNode { get; private set; }
+
+        public IEnumerable<LibraryItem> LibraryItems { get; private set; }
 
         public byte Rating { get; private set; }
 
@@ -35,11 +44,24 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
-            var libraryItems = this.LibraryHierarchyBrowser.GetItems(
-                this.LibraryHierarchyNode,
-                true
-            ).ToArray();
+            var libraryItems = default(IEnumerable<LibraryItem>);
+            if (this.LibraryHierarchyNode != null)
+            {
+                //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
+                libraryItems = this.LibraryHierarchyBrowser.GetItems(
+                    this.LibraryHierarchyNode,
+                    true
+                ).ToArray();
+            }
+            else if (this.LibraryItems != null)
+            {
+                libraryItems = this.LibraryItems;
+            }
+            else
+            {
+                //Nothing to do.
+                return;
+            }
             foreach (var libraryItem in libraryItems)
             {
                 lock (libraryItem.MetaDatas)
