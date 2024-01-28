@@ -105,7 +105,7 @@ namespace FoxTunes
             }
             await this.Open(libraryItems).ConfigureAwait(false);
             await this.MetaDataManager.Rescan(libraryItems).ConfigureAwait(false);
-            await this.HierarchyManager.Clear(LibraryItemStatus.Import).ConfigureAwait(false);
+            await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
             await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
             await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
         }
@@ -127,6 +127,12 @@ namespace FoxTunes
             }
             await this.Open(playlistItems).ConfigureAwait(false);
             await this.MetaDataManager.Rescan(playlistItems).ConfigureAwait(false);
+            if (playlistItems.Any(playlistItem => playlistItem.LibraryItem_Id.HasValue))
+            {
+                await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
+                await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
+                await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
+            }
         }
 
         protected virtual Task Open(IEnumerable<IFileData> items)
