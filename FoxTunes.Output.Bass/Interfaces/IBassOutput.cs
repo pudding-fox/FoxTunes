@@ -12,6 +12,8 @@ namespace FoxTunes.Interfaces
 
         bool PlayFromMemory { get; }
 
+        int BufferLength { get; }
+
         event EventHandler Init;
 
         event EventHandler Free;

@@ -122,6 +122,7 @@ namespace FoxTunes
                 return;
             }
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 0));
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.PlaybackBufferLength, this.Output.BufferLength));
             BassUtils.OK(Bass.Init(Bass.NoSoundDevice));
             this.IsInitialized = true;
             Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");

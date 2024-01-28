@@ -79,7 +79,7 @@ namespace FoxTunes
             {
                 return;
             }
-            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 1));
+            this.OnConfigure();
             BassUtils.OK(Bass.Init(this.DirectSoundDevice, this.Output.Rate));
             this.IsInitialized = true;
             Logger.Write(this, LogLevel.Debug, "BASS Initialized.");
@@ -113,6 +113,18 @@ namespace FoxTunes
                 return;
             }
             BassDirectSoundDevice.Free();
+        }
+
+        protected virtual void OnConfigure()
+        {
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 1));
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.PlaybackBufferLength, this.GetBufferLength()));
+        }
+
+        protected virtual int GetBufferLength()
+        {
+            var updatePeriod = Bass.GetConfig(global::ManagedBass.Configuration.UpdatePeriod);
+            return updatePeriod + this.Output.BufferLength;
         }
 
         protected virtual void OnQueryingPipeline(object sender, QueryingPipelineEventArgs e)

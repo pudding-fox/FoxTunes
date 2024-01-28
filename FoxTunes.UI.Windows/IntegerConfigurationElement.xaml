@@ -13,9 +13,13 @@
     </UserControl.Resources>
     <Slider
         Name="Slider"  
-        Value="{Binding Value}" 
+        Value="{Binding Value, UpdateSourceTrigger=Explicit}" 
         Minimum="{Binding MinValue, Mode=OneWay, Source={StaticResource ViewModel}}" 
         Maximum="{Binding MaxValue, Mode=OneWay, Source={StaticResource ViewModel}}" 
         ToolTip="{Binding Value}"
+        SmallChange="{Binding SmallChange, Mode=OneWay, Source={StaticResource ViewModel}}"
+        LargeChange="{Binding LargeChange, Mode=OneWay, Source={StaticResource ViewModel}}"
+        TickFrequency="1"
+        KeyUp="OnKeyUp"
         Thumb.DragCompleted="OnDragCompleted"/>
 </UserControl>

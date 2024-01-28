@@ -93,7 +93,7 @@ namespace FoxTunes
 
         public static IEnumerable<T> Enumerate<T>(this IEnumerable<T> sequence)
         {
-            foreach (var element in sequence);
+            foreach (var element in sequence) ;
             return sequence;
         }
 
@@ -219,6 +219,30 @@ namespace FoxTunes
         {
             var value = default(TValue);
             return dictionary.TryRemove(key, out value);
+        }
+
+        public static int ToNearestPower(this int value)
+        {
+            var result = value;
+            var power = 10;
+            var a = 0;
+
+            while ((result /= power) >= power)
+            {
+                a++;
+            }
+
+            if (value % (int)(Math.Pow(power, a + 1) + 0.5) != 0)
+            {
+                result++;
+            }
+
+            for (; a >= 0; a--)
+            {
+                result *= power;
+            }
+
+            return result;
         }
     }
 }
