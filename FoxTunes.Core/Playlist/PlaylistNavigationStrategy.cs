@@ -167,12 +167,13 @@ namespace FoxTunes
 
     public class ShufflePlaylistNavigationStrategy : PlaylistNavigationStrategy
     {
-        public static readonly object SyncRoot = new object();
-
         public ShufflePlaylistNavigationStrategy()
         {
+            this.Semaphore = new SemaphoreSlim(1, 1);
             this.Sequences = new List<int>();
         }
+
+        public SemaphoreSlim Semaphore { get; private set; }
 
         public IList<int> Sequences { get; private set; }
 
@@ -205,7 +206,11 @@ namespace FoxTunes
 
         public async Task Refresh()
         {
-            Monitor.Enter(SyncRoot);
+#if NET40
+            this.Semaphore.Wait();
+#else
+            await this.Semaphore.WaitAsync();
+#endif
             try
             {
                 this.Position = 0;
@@ -235,13 +240,17 @@ namespace FoxTunes
             }
             finally
             {
-                Monitor.Exit(SyncRoot);
+                this.Semaphore.Release();
             }
         }
 
         public override async Task<PlaylistItem> GetNext(bool navigate)
         {
-            Monitor.Enter(SyncRoot);
+#if NET40
+            this.Semaphore.Wait();
+#else
+            await this.Semaphore.WaitAsync();
+#endif
             try
             {
                 if (this.Sequences.Count == 0)
@@ -257,23 +266,23 @@ namespace FoxTunes
             }
             finally
             {
-                Monitor.Exit(SyncRoot);
+                this.Semaphore.Release();
             }
         }
 
-        public override Task<PlaylistItem> GetNext(PlaylistItem playlistItem)
+        public override async Task<PlaylistItem> GetNext(PlaylistItem playlistItem)
         {
-            Monitor.Enter(SyncRoot);
+#if NET40
+            this.Semaphore.Wait();
+#else
+            await this.Semaphore.WaitAsync();
+#endif
             try
             {
                 var position = this.Sequences.IndexOf(playlistItem.Sequence);
                 if (position < 0)
                 {
-#if NET40
-                    return TaskEx.FromResult(default(PlaylistItem));
-#else
-                    return Task.FromResult(default(PlaylistItem));
-#endif
+                    return null;
                 }
                 if (position >= this.Sequences.Count - 1)
                 {
@@ -283,11 +292,11 @@ namespace FoxTunes
                 {
                     position++;
                 }
-                return this.PlaylistBrowser.Get(this.Sequences[position]);
+                return await this.PlaylistBrowser.Get(this.Sequences[position]);
             }
             finally
             {
-                Monitor.Exit(SyncRoot);
+                this.Semaphore.Release();
             }
         }
 
@@ -305,7 +314,11 @@ namespace FoxTunes
 
         public override async Task<PlaylistItem> GetPrevious(bool navigate)
         {
-            Monitor.Enter(SyncRoot);
+#if NET40
+            this.Semaphore.Wait();
+#else
+            await this.Semaphore.WaitAsync();
+#endif
             try
             {
                 if (this.Sequences.Count == 0)
@@ -326,23 +339,23 @@ namespace FoxTunes
             }
             finally
             {
-                Monitor.Exit(SyncRoot);
+                this.Semaphore.Release();
             }
         }
 
-        public override Task<PlaylistItem> GetPrevious(PlaylistItem playlistItem)
+        public override async Task<PlaylistItem> GetPrevious(PlaylistItem playlistItem)
         {
-            Monitor.Enter(SyncRoot);
+#if NET40
+            this.Semaphore.Wait();
+#else
+            await this.Semaphore.WaitAsync();
+#endif
             try
             {
                 var position = this.Sequences.IndexOf(playlistItem.Sequence);
                 if (position < 0)
                 {
-#if NET40
-                    return TaskEx.FromResult(default(PlaylistItem));
-#else
-                    return Task.FromResult(default(PlaylistItem));
-#endif
+                    return null;
                 }
                 if (position > 0)
                 {
@@ -352,11 +365,11 @@ namespace FoxTunes
                 {
                     position--;
                 }
-                return this.PlaylistBrowser.Get(this.Sequences[position]);
+                return await this.PlaylistBrowser.Get(this.Sequences[position]);
             }
             finally
             {
-                Monitor.Exit(SyncRoot);
+                this.Semaphore.Release();
             }
         }
 
