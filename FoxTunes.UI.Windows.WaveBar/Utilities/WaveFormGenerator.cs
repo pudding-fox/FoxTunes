@@ -80,6 +80,7 @@ namespace FoxTunes
             if (data.CancellationToken.IsCancellationRequested)
             {
                 Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Wave form generation for file \"{0}\" was cancelled.", stream.FileName);
+                this.Cache.Remove(stream, data.Resolution);
                 return;
             }
 
