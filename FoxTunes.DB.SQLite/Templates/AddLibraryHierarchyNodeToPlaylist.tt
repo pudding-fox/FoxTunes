@@ -37,8 +37,8 @@ AS
 #>
 )
 
-INSERT INTO "PlaylistItems" ("LibraryItem_Id", "Sequence", "DirectoryName", "FileName", "Status", "Flags") 
-SELECT "LibraryItems"."Id", @sequence + ROW_NUMBER() OVER
+INSERT INTO "PlaylistItems" ("Playlist_Id", "LibraryItem_Id", "Sequence", "DirectoryName", "FileName", "Status", "Flags") 
+SELECT @playlistId, "LibraryItems"."Id", @sequence + ROW_NUMBER() OVER
 (
 	ORDER BY
 		CASE 

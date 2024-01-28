@@ -150,7 +150,8 @@ namespace FoxTunes
         {
             try
             {
-                var index = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
+                var playlist = this.PlaylistManager.SelectedPlaylist;
+                var index = await this.PlaylistBrowser.GetInsertIndex(playlist).ConfigureAwait(false);
                 var handlers = new Dictionary<IFileActionHandler, IList<string>>();
                 foreach (var element in sequence)
                 {
@@ -162,7 +163,7 @@ namespace FoxTunes
                 }
                 if (this.OpenMode == CommandLineParser.OpenMode.Play)
                 {
-                    await this.PlaylistManager.Play(index).ConfigureAwait(false);
+                    await this.PlaylistManager.Play(playlist, index).ConfigureAwait(false);
                 }
             }
             finally

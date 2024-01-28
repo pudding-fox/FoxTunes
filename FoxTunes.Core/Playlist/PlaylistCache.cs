@@ -1,19 +1,22 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class PlaylistCache : StandardComponent, IPlaylistCache, IDisposable
     {
-        public Lazy<PlaylistItem[]> Items { get; private set; }
+        public Playlist[] Playlists { get; private set; }
 
-        public Lazy<IDictionary<int, PlaylistItem>> ItemsById { get; private set; }
+        public ConcurrentDictionary<Playlist, PlaylistItem[]> Items { get; private set; }
 
-        public Lazy<IDictionary<int, IList<PlaylistItem>>> ItemsByLibraryId { get; private set; }
+        public ConcurrentDictionary<Playlist, IDictionary<int, PlaylistItem>> ItemsById { get; private set; }
+
+        public ConcurrentDictionary<Playlist, IDictionary<int, PlaylistItem[]>> ItemsByLibraryId { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -33,6 +36,10 @@ namespace FoxTunes
         {
             switch (signal.Name)
             {
+                case CommonSignals.PlaylistsUpdated:
+                    Logger.Write(this, LogLevel.Debug, "Playlists were updated, resetting cache.");
+                    this.Reset();
+                    break;
                 case CommonSignals.PlaylistUpdated:
                     Logger.Write(this, LogLevel.Debug, "Playlist was updated, resetting cache.");
                     this.Reset();
@@ -45,70 +52,97 @@ namespace FoxTunes
 #endif
         }
 
-        public bool TryGetItemById(int id, out PlaylistItem playlistItem)
+        public Playlist[] GetPlaylists(Func<IEnumerable<Playlist>> factory)
         {
-            if (this.Items == null || !this.Items.IsValueCreated)
+            if (this.Playlists == null)
             {
-                playlistItem = null;
-                return false;
+                this.Playlists = factory().ToArray();
             }
-            if (this.ItemsById == null)
-            {
-                this.ItemsById = new Lazy<IDictionary<int, PlaylistItem>>(() => this.Items.Value.ToDictionary(item => item.Id));
-            }
-            return this.ItemsById.Value.TryGetValue(id, out playlistItem);
+            return this.Playlists;
         }
 
-        public bool TryGetItemsByLibraryId(int id, out IEnumerable<PlaylistItem> playlistItems)
+        public PlaylistItem[] GetItems(Playlist playlist, Func<IEnumerable<PlaylistItem>> factory)
         {
-            if (this.Items == null || !this.Items.IsValueCreated)
+            return this.Items.GetOrAdd(
+                playlist,
+                key => factory().ToArray()
+            );
+        }
+
+        public bool TryGetItemById(int id, out PlaylistItem result)
+        {
+            if (this.Playlists != null)
             {
-                playlistItems = null;
-                return false;
-            }
-            var value = default(IList<PlaylistItem>);
-            if (this.ItemsByLibraryId == null)
-            {
-                this.ItemsByLibraryId = new Lazy<IDictionary<int, IList<PlaylistItem>>>(() =>
+                foreach (var playlist in this.Playlists)
                 {
-                    var result = new Dictionary<int, IList<PlaylistItem>>();
-                    foreach (var playlistItem in this.Items.Value)
+                    var sequence = default(IDictionary<int, PlaylistItem>);
+                    if (!this.ItemsById.TryGetValue(playlist, out sequence))
                     {
-                        if (!playlistItem.LibraryItem_Id.HasValue)
+                        var playlistItems = default(PlaylistItem[]);
+                        if (!this.Items.TryGetValue(playlist, out playlistItems))
                         {
                             continue;
                         }
-                        result.GetOrAdd(
-                            playlistItem.LibraryItem_Id.Value,
-                            key => new List<PlaylistItem>()
-                        ).Add(playlistItem);
+                        sequence = this.ItemsById.GetOrAdd(
+                            playlist,
+                            key => playlistItems.ToDictionary(playlistItem => playlistItem.Id)
+                        );
                     }
-                    return result;
-                });
+                    if (sequence.TryGetValue(id, out result))
+                    {
+                        return true;
+                    }
+                }
             }
-            if (this.ItemsByLibraryId.Value.TryGetValue(id, out value))
-            {
-                playlistItems = value;
-                return true;
-            }
-            playlistItems = null;
+            result = null;
             return false;
         }
 
-        public PlaylistItem[] GetItems(Func<IEnumerable<PlaylistItem>> factory)
+        public bool TryGetItemsByLibraryId(int id, out PlaylistItem[] result)
         {
-            if (this.Items == null)
+            if (this.Playlists != null)
             {
-                this.Items = new Lazy<PlaylistItem[]>(() => factory().ToArray());
+                foreach (var playlist in this.Playlists)
+                {
+                    var sequence = default(IDictionary<int, PlaylistItem[]>);
+                    if (!this.ItemsByLibraryId.TryGetValue(playlist, out sequence))
+                    {
+                        var playlistItems = default(PlaylistItem[]);
+                        if (!this.Items.TryGetValue(playlist, out playlistItems))
+                        {
+                            continue;
+                        }
+                        sequence = this.ItemsByLibraryId.GetOrAdd(
+                            playlist,
+                            key => this.GetItemsByLibraryId(playlistItems)
+                        );
+                    }
+                    if (sequence.TryGetValue(id, out result))
+                    {
+                        return true;
+                    }
+                }
             }
-            return this.Items.Value;
+            result = null;
+            return false;
+        }
+
+        protected virtual IDictionary<int, PlaylistItem[]> GetItemsByLibraryId(PlaylistItem[] playlistItems)
+        {
+            var query =
+                from playlistItem in playlistItems
+                where playlistItem.LibraryItem_Id.HasValue
+                group playlistItem by playlistItem.LibraryItem_Id.Value into grouping
+                select grouping;
+            return query.ToDictionary(group => group.Key, group => group.ToArray());
         }
 
         public void Reset()
         {
-            this.Items = null;
-            this.ItemsById = null;
-            this.ItemsByLibraryId = null;
+            this.Playlists = null;
+            this.Items = new ConcurrentDictionary<Playlist, PlaylistItem[]>();
+            this.ItemsById = new ConcurrentDictionary<Playlist, IDictionary<int, PlaylistItem>>();
+            this.ItemsByLibraryId = new ConcurrentDictionary<Playlist, IDictionary<int, PlaylistItem[]>>();
         }
 
         public bool IsDisposed { get; private set; }

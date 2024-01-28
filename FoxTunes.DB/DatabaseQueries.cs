@@ -206,6 +206,7 @@ namespace FoxTunes
             {
                 return this.Database.QueryFactory.Create(
                     Resources.RemovePlaylistItems,
+                    new DatabaseQueryParameter("playlistId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
                     new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }

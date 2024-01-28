@@ -64,7 +64,7 @@ namespace FoxTunes
             var playlistItem = outputStream.PlaylistItem;
             for (var position = 0; position < this.Count.Value; position++)
             {
-                playlistItem = await this.PlaylistBrowser.GetNext(playlistItem).ConfigureAwait(false);
+                playlistItem = await this.PlaylistBrowser.GetNextItem(playlistItem).ConfigureAwait(false);
                 if (playlistItem == null)
                 {
                     return;

@@ -101,7 +101,11 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            return this.PlaylistManager.Add(this.LibraryManager.SelectedItem, clear);
+            return this.PlaylistManager.Add(
+                this.PlaylistManager.SelectedPlaylist,
+                this.LibraryManager.SelectedItem,
+                clear
+            );
         }
 
         protected virtual async Task GetRating(LibraryHierarchyNode libraryHierarchyNode, Dictionary<byte, InvocationComponent> invocationComponents)

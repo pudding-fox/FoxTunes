@@ -20,6 +20,8 @@ namespace FoxTunes
 
         public ICore Core { get; private set; }
 
+        public IPlaylistManager PlaylistManager { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public IBassOutput Output { get; private set; }
@@ -94,6 +96,7 @@ namespace FoxTunes
             this.Output = core.Components.Output as IBassOutput;
             this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
+            this.PlaylistManager = core.Managers.Playlist;
             this.DoorMonitor = ComponentRegistry.Instance.GetComponent<CdDoorMonitor>();
             this.DoorMonitor.StateChanged += this.OnStateChanged;
             this.Configuration = core.Components.Configuration;
@@ -185,9 +188,14 @@ namespace FoxTunes
 #endif
         }
 
-        public async Task OpenCd()
+        public Task OpenCd()
         {
-            using (var task = new AddCdToPlaylistTask(this.CdDrive, this.CdLookup, this.CdLookupHost))
+            return this.OpenCd(this.PlaylistManager.SelectedPlaylist);
+        }
+
+        public async Task OpenCd(Playlist playlist)
+        {
+            using (var task = new AddCdToPlaylistTask(playlist, this.CdDrive, this.CdLookup, this.CdLookupHost))
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
@@ -248,7 +256,7 @@ namespace FoxTunes
 
         private class AddCdToPlaylistTask : PlaylistTaskBase
         {
-            public AddCdToPlaylistTask(int drive, bool cdLookup, string cdLookupHost)
+            public AddCdToPlaylistTask(Playlist playlist, int drive, bool cdLookup, string cdLookupHost) : base(playlist)
             {
                 this.Drive = drive;
                 this.CdLookup = cdLookup;
@@ -269,12 +277,15 @@ namespace FoxTunes
 
             public string CdLookupHost { get; private set; }
 
+            public IPlaylistManager PlaylistManager { get; private set; }
+
             public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
             public IMetaDataSource MetaDataSource { get; private set; }
 
             public override void InitializeComponent(ICore core)
             {
+                this.PlaylistManager = core.Managers.Playlist;
                 this.PlaylistBrowser = core.Components.PlaylistBrowser;
                 this.MetaDataSource = new BassCdMetaDataSource(this.GetStrategy());
                 this.MetaDataSource.InitializeComponent(this.Core);
@@ -297,7 +308,7 @@ namespace FoxTunes
                     using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                     {
                         //Always append for now.
-                        this.Sequence = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
+                        this.Sequence = await this.PlaylistBrowser.GetInsertIndex(this.PlaylistManager.SelectedPlaylist).ConfigureAwait(false);
                         await this.AddPlaylistItems().ConfigureAwait(false);
                         await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
                         await this.AddOrUpdateMetaData().ConfigureAwait(false);

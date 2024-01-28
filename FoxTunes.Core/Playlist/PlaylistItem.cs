@@ -12,6 +12,8 @@ namespace FoxTunes
 
         }
 
+        public int Playlist_Id { get; set; }
+
         public int? LibraryItem_Id { get; set; }
 
         public int Sequence { get; set; }

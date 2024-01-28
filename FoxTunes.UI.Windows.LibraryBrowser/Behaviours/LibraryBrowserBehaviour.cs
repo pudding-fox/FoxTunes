@@ -47,8 +47,7 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.HierarchiesUpdated:
-                    this.Debouncer.Exec(() => this.Dispatch(this.RefreshImages));
-                    break;
+                    return this.RefreshImages();
             }
 #if NET40
             return TaskEx.FromResult(false);

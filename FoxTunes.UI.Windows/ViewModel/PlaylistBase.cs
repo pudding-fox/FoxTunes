@@ -183,9 +183,11 @@ namespace FoxTunes.ViewModel
             this.Dispatch(this.RefreshStatus);
         }
 
-        protected virtual async Task RefreshItems()
+        protected abstract Task RefreshItems();
+
+        protected virtual async Task RefreshItems(Playlist playlist)
         {
-            var items = this.PlaylistBrowser.GetItems();
+            var items = this.PlaylistBrowser.GetItems(playlist);
             if (this.Items == null)
             {
                 await Windows.Invoke(() => this.Items = new PlaylistItemCollection(items)).ConfigureAwait(false);

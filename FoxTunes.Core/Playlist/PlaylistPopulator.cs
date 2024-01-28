@@ -32,7 +32,7 @@ namespace FoxTunes
 
         public string Current { get; private set; }
 
-        public async Task Populate(IEnumerable<string> paths, CancellationToken cancellationToken)
+        public async Task Populate(Playlist playlist, IEnumerable<string> paths, CancellationToken cancellationToken)
         {
             if (this.ReportProgress)
             {
@@ -62,7 +62,7 @@ namespace FoxTunes
                                 return;
                             }
                             Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
-                            var success = await this.AddPlaylistItem(writer, fileName).ConfigureAwait(false);
+                            var success = await this.AddPlaylistItem(playlist, writer, fileName).ConfigureAwait(false);
                             if (success && this.ReportProgress)
                             {
                                 this.Current = fileName;
@@ -72,7 +72,7 @@ namespace FoxTunes
                     else if (File.Exists(path))
                     {
                         Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", path);
-                        var success = await this.AddPlaylistItem(writer, path).ConfigureAwait(false);
+                        var success = await this.AddPlaylistItem(playlist, writer, path).ConfigureAwait(false);
                         if (success && this.ReportProgress)
                         {
                             this.Current = path;
@@ -82,7 +82,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task<bool> AddPlaylistItem(PlaylistWriter writer, string fileName)
+        protected virtual async Task<bool> AddPlaylistItem(Playlist playlist, PlaylistWriter writer, string fileName)
         {
             try
             {
@@ -94,6 +94,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Trace, "Adding file to playlist: {0}", fileName);
                 var playlistItem = new PlaylistItem()
                 {
+                    Playlist_Id = playlist.Id,
                     DirectoryName = Path.GetDirectoryName(fileName),
                     FileName = fileName,
                     Sequence = this.Sequence,

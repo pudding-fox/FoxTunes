@@ -18,8 +18,8 @@ namespace FoxTunes
         [Test]
         public async Task CanAddFilesToPlaylist()
         {
-            await this.Core.Managers.Playlist.Clear().ConfigureAwait(false);
-            await this.Core.Managers.Playlist.Add(new[]
+            await this.Core.Managers.Playlist.Clear(this.Core.Managers.Playlist.SelectedPlaylist).ConfigureAwait(false);
+            await this.Core.Managers.Playlist.Add(this.Core.Managers.Playlist.SelectedPlaylist, new[]
             {
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[2],
@@ -30,29 +30,26 @@ namespace FoxTunes
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
             );
-            await this.Core.Managers.Playlist.Clear().ConfigureAwait(false);
+            await this.Core.Managers.Playlist.Clear(this.Core.Managers.Playlist.SelectedPlaylist).ConfigureAwait(false);
             this.AssertPlaylistItems();
         }
 
         [Test]
         public async Task CanRemoveItemsFromPlaylist()
         {
-            await this.Core.Managers.Playlist.Clear().ConfigureAwait(false);
-            await this.Core.Managers.Playlist.Add(new[]
+            await this.Core.Managers.Playlist.Clear(this.Core.Managers.Playlist.SelectedPlaylist).ConfigureAwait(false);
+            await this.Core.Managers.Playlist.Add(this.Core.Managers.Playlist.SelectedPlaylist, new[]
             {
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[1],
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
             }, false).ConfigureAwait(false);
-            await this.Core.Managers.Playlist.Remove(
-                new[]
-                {
-                    await this.GetPlaylistItem(TestInfo.AudioFileNames[1]).ConfigureAwait(false),
-                    await this.GetPlaylistItem(TestInfo.AudioFileNames[2])
-.ConfigureAwait(false)
-                }
-            ).ConfigureAwait(false);
+            await this.Core.Managers.Playlist.Remove(this.Core.Managers.Playlist.SelectedPlaylist, new[]
+            {
+                await this.GetPlaylistItem(TestInfo.AudioFileNames[1]).ConfigureAwait(false),
+                await this.GetPlaylistItem(TestInfo.AudioFileNames[2]).ConfigureAwait(false)
+            }).ConfigureAwait(false);
             this.AssertPlaylistItems(
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[3]
@@ -62,8 +59,8 @@ namespace FoxTunes
         [Test]
         public async Task CanInsertFilesIntoPlaylist()
         {
-            await this.Core.Managers.Playlist.Clear().ConfigureAwait(false);
-            await this.Core.Managers.Playlist.Add(new[]
+            await this.Core.Managers.Playlist.Clear(this.Core.Managers.Playlist.SelectedPlaylist).ConfigureAwait(false);
+            await this.Core.Managers.Playlist.Add(this.Core.Managers.Playlist.SelectedPlaylist, new[]
             {
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[2],
@@ -74,7 +71,7 @@ namespace FoxTunes
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
             );
-            await this.Core.Managers.Playlist.Insert(1, new[]
+            await this.Core.Managers.Playlist.Insert(this.Core.Managers.Playlist.SelectedPlaylist, 1, new[]
             {
                 TestInfo.AudioFileNames[1]
             }, false).ConfigureAwait(false);
@@ -84,20 +81,21 @@ namespace FoxTunes
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
             );
-            await this.Core.Managers.Playlist.Clear().ConfigureAwait(false);
+            await this.Core.Managers.Playlist.Clear(this.Core.Managers.Playlist.SelectedPlaylist).ConfigureAwait(false);
         }
 
         [Test]
         public async Task CanMoveItemsInPlaylist()
         {
-            await this.Core.Managers.Playlist.Clear().ConfigureAwait(false);
-            await this.Core.Managers.Playlist.Add(new[]
+            await this.Core.Managers.Playlist.Clear(this.Core.Managers.Playlist.SelectedPlaylist).ConfigureAwait(false);
+            await this.Core.Managers.Playlist.Add(this.Core.Managers.Playlist.SelectedPlaylist, new[]
             {
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[1],
                 TestInfo.AudioFileNames[2]
             }, false).ConfigureAwait(false);
             await this.Core.Managers.Playlist.Move(
+                this.Core.Managers.Playlist.SelectedPlaylist,
                 0,
                 new[]
                 {
@@ -111,11 +109,11 @@ namespace FoxTunes
                 TestInfo.AudioFileNames[1]
             );
             await this.Core.Managers.Playlist.Move(
+                this.Core.Managers.Playlist.SelectedPlaylist,
                 2,
                 new[]
                 {
-                    await this.GetPlaylistItem(TestInfo.AudioFileNames[2])
-.ConfigureAwait(false)
+                    await this.GetPlaylistItem(TestInfo.AudioFileNames[2]).ConfigureAwait(false)
                 }
             ).ConfigureAwait(false);
             this.AssertPlaylistItems(

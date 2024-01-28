@@ -25,7 +25,8 @@ AS
 		LEFT OUTER JOIN "MetaDataItems" 
 			ON "MetaDataItems"."Id" = "PlaylistItem_MetaDataItem"."MetaDataItem_Id"
                     OR "MetaDataItems"."Id" = "LibraryItem_MetaDataItem"."MetaDataItem_Id"
-	WHERE "PlaylistItems"."Status" = @status
+	WHERE "PlaylistItems"."Playlist_Id" = @playlistId 
+		AND "PlaylistItems"."Status" = @status
 )
 ,
 "HorizontalMetaData"
@@ -66,4 +67,5 @@ SET "Sequence" = "Sequence" +
 	FROM "PlaylistItemsRowNumber"
 	WHERE "PlaylistItemsRowNumber"."Id" = "PlaylistItems"."Id"
 )
-WHERE "Status" = @status;
+WHERE "PlaylistItems"."Playlist_Id" = @playlistId 
+	AND "PlaylistItems"."Status" = @status;

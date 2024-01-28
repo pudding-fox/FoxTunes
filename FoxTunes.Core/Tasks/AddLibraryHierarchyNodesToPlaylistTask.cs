@@ -8,8 +8,8 @@ namespace FoxTunes
 {
     public class AddLibraryHierarchyNodesToPlaylistTask : PlaylistTaskBase
     {
-        public AddLibraryHierarchyNodesToPlaylistTask(int sequence, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
-            : base(sequence)
+        public AddLibraryHierarchyNodesToPlaylistTask(Playlist playlist, int sequence, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
+            : base(playlist, sequence)
         {
             this.LibraryHierarchyNodes = libraryHierarchyNodes;
             this.Clear = clear;

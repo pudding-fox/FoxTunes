@@ -3,8 +3,10 @@ WHERE [PlaylistItem_Id] IN
 (
 	SELECT [Id]
 	FROM [PlaylistItems]
-	WHERE [Status] = @status
+	WHERE [Playlist_Id] = @playlistId 
+		AND [Status] = @status
 );
 
 DELETE FROM [PlaylistItems]
-WHERE [Status] = @status
+WHERE [Playlist_Id] = @playlistId 
+	AND [Status] = @status

@@ -13,12 +13,15 @@ namespace FoxTunes
     {
         public const string ID = "4403475F-D67C-4ED8-BF1F-68D22F28066F";
 
-        protected PlaylistTaskBase(int sequence = 0)
+        protected PlaylistTaskBase(Playlist playlist, int sequence = 0)
             : base(ID)
         {
+            this.Playlist = playlist;
             this.Sequence = sequence;
             this.Warnings = new Dictionary<PlaylistItem, IList<string>>();
         }
+
+        public Playlist Playlist { get; private set; }
 
         public int Sequence { get; protected set; }
 
@@ -52,6 +55,44 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        protected virtual async Task AddPlaylist()
+        {
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+            {
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+                {
+                    var set = this.Database.Set<Playlist>(transaction);
+                    await set.AddAsync(this.Playlist).ConfigureAwait(false);
+                    if (transaction.HasTransaction)
+                    {
+                        transaction.Commit();
+                    }
+                }
+            }))
+            {
+                await task.Run().ConfigureAwait(false);
+            }
+        }
+
+        protected virtual async Task RemovePlaylist()
+        {
+            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
+            {
+                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+                {
+                    var set = this.Database.Set<Playlist>(transaction);
+                    await set.RemoveAsync(this.Playlist).ConfigureAwait(false);
+                    if (transaction.HasTransaction)
+                    {
+                        transaction.Commit();
+                    }
+                }
+            }))
+            {
+                await task.Run().ConfigureAwait(false);
+            }
+        }
+
         protected virtual async Task AddPaths(IEnumerable<string> paths)
         {
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
@@ -79,7 +120,7 @@ namespace FoxTunes
                 {
                     playlistPopulator.InitializeComponent(this.Core);
                     await this.WithSubTask(playlistPopulator,
-                        () => playlistPopulator.Populate(paths, cancellationToken)
+                        () => playlistPopulator.Populate(this.Playlist, paths, cancellationToken)
                     ).ConfigureAwait(false);
                     this.Offset = playlistPopulator.Offset;
                 }
@@ -179,6 +220,7 @@ namespace FoxTunes
                         switch (phase)
                         {
                             case DatabaseParameterPhase.Fetch:
+                                parameters["playlistId"] = this.Playlist.Id;
                                 parameters["status"] = status;
                                 break;
                         }
@@ -202,6 +244,7 @@ namespace FoxTunes
                 by
             );
             var query = this.Database.QueryFactory.Build();
+            var playlistId = this.Database.Tables.PlaylistItem.Column("Playlist_Id");
             var sequence = this.Database.Tables.PlaylistItem.Column("Sequence");
             var status = this.Database.Tables.PlaylistItem.Column("Status");
             query.Update.SetTable(this.Database.Tables.PlaylistItem);
@@ -211,6 +254,7 @@ namespace FoxTunes
                 expression.Operator = expression.CreateOperator(QueryOperator.Plus);
                 expression.Right = expression.CreateParameter("offset", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None);
             });
+            query.Filter.AddColumn(playlistId);
             query.Filter.AddColumn(status);
             query.Filter.AddColumn(sequence).With(expression =>
             {
@@ -224,6 +268,7 @@ namespace FoxTunes
                     switch (phase)
                     {
                         case DatabaseParameterPhase.Fetch:
+                            parameters["playlistId"] = this.Playlist.Id;
                             parameters["status"] = PlaylistItemStatus.None;
                             parameters["sequence"] = at;
                             parameters["offset"] = by;
@@ -244,6 +289,7 @@ namespace FoxTunes
                     switch (phase)
                     {
                         case DatabaseParameterPhase.Fetch:
+                            parameters["playlistId"] = this.Playlist.Id;
                             parameters["status"] = PlaylistItemStatus.Import;
                             break;
                     }
@@ -257,6 +303,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Setting playlist status: {0}", Enum.GetName(typeof(LibraryItemStatus), LibraryItemStatus.None));
             var query = this.Database.QueryFactory.Build();
             query.Update.SetTable(this.Database.Tables.PlaylistItem);
+            query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Playlist_Id"));
             query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
@@ -265,6 +312,7 @@ namespace FoxTunes
                     switch (phase)
                     {
                         case DatabaseParameterPhase.Fetch:
+                            parameters["playlistId"] = this.Playlist.Id;
                             parameters["status"] = status;
                             break;
                     }

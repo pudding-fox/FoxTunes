@@ -6,6 +6,8 @@
 
         public const string HierarchiesUpdated = "HierarchiesUpdated";
 
+        public const string PlaylistsUpdated = "PlaylistsUpdated";
+
         public const string PlaylistUpdated = "PlaylistUpdated";
 
         public const string PlaylistColumnsUpdated = "PlaylistColumnsUpdated";

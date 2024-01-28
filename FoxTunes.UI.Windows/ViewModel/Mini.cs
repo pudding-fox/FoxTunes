@@ -297,12 +297,22 @@ namespace FoxTunes.ViewModel
                     play = true;
                     break;
             }
-            var index = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
-            await this.PlaylistManager.Add(paths, clear).ConfigureAwait(false);
+            var playlist = this.GetPlaylist();
+            var index = await this.PlaylistBrowser.GetInsertIndex(playlist).ConfigureAwait(false);
+            await this.PlaylistManager.Add(playlist, paths, clear).ConfigureAwait(false);
             if (play)
             {
-                await this.PlaylistManager.Play(index).ConfigureAwait(false);
+                await this.PlaylistManager.Play(playlist, index).ConfigureAwait(false);
             }
+        }
+
+        public Playlist GetPlaylist()
+        {
+            if (this.PlaylistManager.CurrentPlaylist != null)
+            {
+                return this.PlaylistManager.CurrentPlaylist;
+            }
+            return this.PlaylistManager.SelectedPlaylist;
         }
 
         public override void InitializeComponent(ICore core)

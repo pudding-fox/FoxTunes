@@ -4,8 +4,8 @@ namespace FoxTunes
 {
     public class ClearPlaylistTask : PlaylistTaskBase
     {
-        public ClearPlaylistTask()
-            : base()
+        public ClearPlaylistTask(Playlist playlist)
+            : base(playlist)
         {
 
         }

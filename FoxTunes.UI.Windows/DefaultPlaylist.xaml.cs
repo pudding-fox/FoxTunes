@@ -1,7 +1,6 @@
-﻿using FoxDb;
+﻿using System;
 using System.Collections;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -10,12 +9,39 @@ using System.Windows.Input;
 namespace FoxTunes
 {
     /// <summary>
-    /// Interaction logic for Playlist.xaml
+    /// Interaction logic for DefaultPlaylist.xaml
     /// </summary>
     [UIComponent("12023E31-CB53-4F9C-8A5B-A0593706F37E", UIComponentSlots.BOTTOM_CENTER, "Playlist")]
-    public partial class Playlist : UIComponentBase
+    public partial class DefaultPlaylist : UIComponentBase
     {
-        public Playlist()
+        public static readonly DependencyProperty PlaylistProperty = DependencyProperty.Register(
+            "Playlist",
+            typeof(Playlist),
+            typeof(DefaultPlaylist),
+            new PropertyMetadata(new PropertyChangedCallback(OnPlaylistChanged))
+        );
+
+        public static Playlist GetPlaylist(DefaultPlaylist source)
+        {
+            return (Playlist)source.GetValue(PlaylistProperty);
+        }
+
+        public static void SetPlaylist(DefaultPlaylist source, Playlist value)
+        {
+            source.SetValue(PlaylistProperty, value);
+        }
+
+        public static void OnPlaylistChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var defaultPlaylist = sender as DefaultPlaylist;
+            if (defaultPlaylist == null)
+            {
+                return;
+            }
+            defaultPlaylist.OnPlaylistChanged();
+        }
+
+        public DefaultPlaylist()
         {
             this.InitializeComponent();
 #if NET40
@@ -26,6 +52,29 @@ namespace FoxTunes
 #endif
             this.IsVisibleChanged += this.OnIsVisibleChanged;
         }
+
+        public Playlist Playlist
+        {
+            get
+            {
+                return this.GetValue(PlaylistProperty) as Playlist;
+            }
+            set
+            {
+                this.SetValue(PlaylistProperty, value);
+            }
+        }
+
+        protected virtual void OnPlaylistChanged()
+        {
+            if (this.PlaylistChanged != null)
+            {
+                this.PlaylistChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Playlist");
+        }
+
+        public event EventHandler PlaylistChanged;
 
         protected virtual void DragSourceInitialized(object sender, ListViewExtensions.DragSourceInitializedEventArgs e)
         {

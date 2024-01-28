@@ -9,21 +9,25 @@ namespace FoxTunes.Interfaces
 
         event EventHandler StateChanged;
 
-        PlaylistItem[] GetItems();
+        Playlist[] GetPlaylists();
 
-        Task<PlaylistItem> Get(int sequence);
+        Playlist GetPlaylist(PlaylistItem playlistItem);
 
-        Task<PlaylistItem> Get(string fileName);
+        PlaylistItem[] GetItems(Playlist playlist);
 
-        Task<PlaylistItem> GetNext(bool navigate);
+        Task<PlaylistItem> GetItem(Playlist playlist, int sequence);
 
-        Task<PlaylistItem> GetNext(PlaylistItem playlistItem);
+        Task<PlaylistItem> GetItem(Playlist playlist, string fileName);
 
-        Task<PlaylistItem> GetPrevious(bool navigate);
+        Task<PlaylistItem> GetNextItem(Playlist playlist, bool navigate);
 
-        Task<PlaylistItem> GetPrevious(PlaylistItem playlistItem);
+        Task<PlaylistItem> GetNextItem(PlaylistItem playlistItem);
 
-        Task<int> GetInsertIndex();
+        Task<PlaylistItem> GetPreviousItem(Playlist playlist, bool navigate);
+
+        Task<PlaylistItem> GetPreviousItem(PlaylistItem playlistItem);
+
+        Task<int> GetInsertIndex(Playlist playlist);
     }
 
     public enum PlaylistBrowserState : byte
