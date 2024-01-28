@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
@@ -561,6 +563,70 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        public static async Task<bool> ShowDialog<T>(ICore core, string title) where T : new()
+        {
+            var result = default(bool);
+            await Invoke(() =>
+            {
+                var content = new T();
+                var window = new DialogWindow<T>(content)
+                {
+                    Owner = ActiveWindow,
+                    DataContext = core,
+                    Topmost = true,
+                    Title = title
+                };
+                result = window.ShowDialog().GetValueOrDefault();
+            }).ConfigureAwait(false);
+            return result;
+        }
+
+        private class DialogWindow<T> : WindowBase
+        {
+            private DialogWindow()
+            {
+                if (!global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.IsEmpty())
+                {
+                    if (ScreenHelper.WindowBoundsVisible(global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds))
+                    {
+                        this.Left = global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.Left;
+                        this.Top = global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.Top;
+                    }
+                    this.Width = global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.Width;
+                    this.Height = global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds.Height;
+                }
+                else
+                {
+                    this.Width = 800;
+                    this.Height = 600;
+                }
+                if (double.IsNaN(this.Left) || double.IsNaN(this.Top))
+                {
+                    this.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                }
+            }
+
+            public DialogWindow(T content) : this()
+            {
+                this.Content = content;
+            }
+
+            public override string Id
+            {
+                get
+                {
+                    return "3AA74E66-005F-4772-99BE-31C18C317D23";
+                }
+            }
+
+            protected override void OnClosing(CancelEventArgs e)
+            {
+                global::FoxTunes.Properties.Settings.Default.SettingsWindowBounds = this.RestoreBounds;
+                global::FoxTunes.Properties.Settings.Default.Save();
+                base.OnClosing(e);
+            }
         }
     }
 }

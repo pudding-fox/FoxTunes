@@ -124,6 +124,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string General_Settings {
+            get {
+                return ResourceManager.GetString("General.Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Next.
         /// </summary>
         public static string KeyBindingsBehaviourConfiguration_Next {

@@ -342,7 +342,7 @@ namespace FoxTunes
         {
             for (var a = 0; a < count; a++)
             {
-                samples32[a] = samples16[a] / short.MaxValue;
+                samples32[a] = (float)samples16[a] / short.MaxValue;
             }
         }
 
