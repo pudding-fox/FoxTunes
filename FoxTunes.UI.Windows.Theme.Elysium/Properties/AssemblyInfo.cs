@@ -1,15 +1,15 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Windows;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("FoxTunes.Launcher")]
+[assembly: AssemblyTitle("FoxTunes.UI.Windows.Theme.Elysium")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("FoxTunes.Launcher")]
+[assembly: AssemblyProduct("FoxTunes.UI.Windows.Theme.Elysium")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Windows;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("7c1f6c12-c2c8-4cb1-ad1e-fe13c0ffc982")]
+[assembly: Guid("3dc26de5-60fb-487f-b8c6-97a2003a7e72")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -34,8 +34,3 @@ using System.Windows;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-
-[assembly: ThemeInfo(
-    ResourceDictionaryLocation.ExternalAssembly,
-    ResourceDictionaryLocation.ExternalAssembly
-)]

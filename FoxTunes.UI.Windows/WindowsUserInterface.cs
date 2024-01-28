@@ -1,5 +1,7 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.Theme;
 using System;
+using System.Windows;
 
 namespace FoxTunes
 {
@@ -11,18 +13,23 @@ namespace FoxTunes
             typeof(global::System.Windows.Interactivity.Interaction)
         };
 
-        private Main Main { get; set; }
+        public ICore Core { get; private set; }
+
+        public IThemeLoader ThemeLoader { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.Main = new Main();
-            this.Main.DataContext = core;
+            this.Core = core;
+            this.ThemeLoader = new ThemeLoader();
+            this.ThemeLoader.InitializeComponent(core);
             base.InitializeComponent(core);
         }
 
         public override void Show()
         {
-            this.Main.ShowDialog();
+            var application = new Application();
+            this.ThemeLoader.Apply(application);
+            application.Run(new Main() { DataContext = this.Core });
         }
     }
 }
