@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,17 +18,14 @@ namespace FoxTunes
             this.Command = new ThreadLocal<PlaylistSequencePopulatorCommand>(true);
         }
 
-        public PlaylistSequencePopulator(IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction, bool reportProgress)
+        public PlaylistSequencePopulator(IDatabase database, IDbTransaction transaction, bool reportProgress)
             : this(reportProgress)
         {
             this.Database = database;
-            this.DatabaseContext = databaseContext;
             this.Transaction = transaction;
         }
 
         public IDatabase Database { get; private set; }
-
-        public IDatabaseContext DatabaseContext { get; private set; }
 
         public IDbTransaction Transaction { get; private set; }
 
@@ -47,10 +43,10 @@ namespace FoxTunes
         {
             if (this.ReportProgress)
             {
-                this.Name = "Populating library hierarchies";
+                this.Name = "Populating playlist sequencies";
                 this.Position = 0;
                 this.Count = (
-                    this.DatabaseContext.GetQuery<LibraryHierarchyLevel>().Detach().Count() * this.DatabaseContext.GetQuery<LibraryItem>().Detach().Count()
+                    this.Database.GetSet<LibraryHierarchyLevel>().Count * this.Database.GetSet<LibraryItem>().Count
                 );
             }
 
@@ -130,7 +126,7 @@ namespace FoxTunes
             {
                 return this.Command.Value;
             }
-            return this.Command.Value = new PlaylistSequencePopulatorCommand(this.ScriptingRuntime, this.Database, this.DatabaseContext, this.Transaction);
+            return this.Command.Value = new PlaylistSequencePopulatorCommand(this.ScriptingRuntime, this.Database, this.Transaction);
         }
 
         protected override void OnDisposing()
@@ -145,13 +141,12 @@ namespace FoxTunes
 
         private class PlaylistSequencePopulatorCommand : BaseComponent
         {
-            public PlaylistSequencePopulatorCommand(IScriptingRuntime scriptingRuntime, IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction)
+            public PlaylistSequencePopulatorCommand(IScriptingRuntime scriptingRuntime, IDatabase database, IDbTransaction transaction)
             {
                 this.ScriptingContext = scriptingRuntime.CreateContext();
                 var parameters = default(IDbParameterCollection);
-                this.Command = databaseContext.Connection.CreateCommand(
-                    database.CoreSQL.AddPlaylistSequenceRecord,
-                    new[] { "playlistItemId", "value1", "value2", "value3", "value4", "value5", "value6", "value7", "value8", "value9", "value10" },
+                this.Command = database.CreateCommand(
+                    database.Queries.AddPlaylistSequenceRecord,
                     out parameters
                 );
                 this.Command.Transaction = transaction;

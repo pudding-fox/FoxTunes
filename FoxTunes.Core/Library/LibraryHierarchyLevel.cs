@@ -9,6 +9,8 @@ namespace FoxTunes
 
         }
 
+        public int LibraryHierarchyId { get; set; }
+
         private string _DisplayScript { get; set; }
 
         public string DisplayScript

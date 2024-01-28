@@ -25,26 +25,23 @@ namespace FoxTunes
 
         protected override Task OnRun()
         {
-            using (var databaseContext = this.DataManager.CreateWriteContext())
+            using (var transaction = this.Database.BeginTransaction())
             {
-                using (var transaction = databaseContext.Connection.BeginTransaction())
-                {
-                    this.AddPlaylistItems(databaseContext, transaction);
-                    this.ShiftItems(databaseContext, transaction);
-                    this.AddOrUpdateMetaDataFromLibrary(databaseContext, transaction);
-                    this.SequenceItems(databaseContext, transaction);
-                    this.SetPlaylistItemsStatus(databaseContext, transaction);
-                    transaction.Commit();
-                }
+                this.AddPlaylistItems(transaction);
+                this.ShiftItems(transaction);
+                this.AddOrUpdateMetaDataFromLibrary(transaction);
+                this.SequenceItems(transaction);
+                this.SetPlaylistItemsStatus(transaction);
+                transaction.Commit();
             }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
             return Task.CompletedTask;
         }
 
-        private void AddPlaylistItems(IDatabaseContext databaseContext, IDbTransaction transaction)
+        private void AddPlaylistItems(IDbTransaction transaction)
         {
             var parameters = default(IDbParameterCollection);
-            using (var command = databaseContext.Connection.CreateCommand(this.Database.CoreSQL.AddLibraryHierarchyNodeToPlaylist, new[] { "libraryHierarchyItemId", "sequence", "status" }, out parameters))
+            using (var command = this.Database.CreateCommand(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, out parameters))
             {
                 command.Transaction = transaction;
                 parameters["libraryHierarchyItemId"] = this.LibraryHierarchyNode.Id;

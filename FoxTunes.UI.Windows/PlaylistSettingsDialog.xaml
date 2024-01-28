@@ -19,7 +19,7 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <TextBlock>Playlist Settings</TextBlock>
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Columns, Mode=OneWay, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedPlaylistColumn, Converter={StaticResource DataGridSelectedItemConverter}, Source={StaticResource ViewModel}}" MinHeight="300" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Margin="0,7,0,0">
+        <DataGrid Grid.Row="1" ItemsSource="{Binding PlaylistColumns, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedPlaylistColumn, Converter={StaticResource DataGridSelectedItemConverter}, Source={StaticResource ViewModel}}" MinHeight="300" AutoGenerateColumns="False" IsSynchronizedWithCurrentItem="True" Margin="0,7,0,0">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="CellEditEnding">
                     <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=UpdateCommand}"></Interactivity:InvokeCommandAction>

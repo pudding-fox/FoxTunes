@@ -2,6 +2,10 @@
 {
     public interface IDbParameterCollection
     {
-        object this[string parameterName] { get; set; }
+        int Count { get; }
+
+        bool Contains(string name);
+
+        object this[string name] { get; set; }
     }
 }

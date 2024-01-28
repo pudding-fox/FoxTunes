@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
-        <ViewModel:LibraryHierarchies x:Key="ViewModel" Core="{Binding}"></ViewModel:LibraryHierarchies>
+        <ViewModel:LibraryHierarchySettings x:Key="ViewModel" Core="{Binding}"></ViewModel:LibraryHierarchySettings>
         <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
             <Setter Property="Width" Value="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"></Setter>
             <Setter Property="FontSize" Value="20"></Setter>

@@ -39,19 +39,19 @@
     <Compile Include="Behaviours\PreemptNextItemBehaviour.cs" />
     <Compile Include="Behaviours\VariousArtistsBehaviour.cs" />
     <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
-    <Compile Include="Behaviours\EnqueueNextItemBehaviour.cs" />
     <Compile Include="Configuration\BooleanConfigurationElement.cs" />
-    <Compile Include="Interfaces\Database\ICoreSQL.cs" />
-    <Compile Include="Interfaces\Database\IDatabaseContext.cs" />
+    <Compile Include="DB\RecordEnumerator.cs" />
+    <Compile Include="DB\RecordPersister.cs" />
+    <Compile Include="Interfaces\Database\IDatabaseQueries.cs" />
+    <Compile Include="Interfaces\Database\IDatabaseQuery.cs" />
+    <Compile Include="Interfaces\ICountable.cs" />
     <Compile Include="Interfaces\IDbParameterCollection.cs" />
     <Compile Include="Interfaces\IFileData.cs" />
     <Compile Include="Interfaces\IReportsProgress.cs" />
-    <Compile Include="Interfaces\IRootDataQueries.cs" />
-    <Compile Include="Interfaces\IRootDataSets.cs" />
+    <Compile Include="Interfaces\Database\IDatabaseSets.cs" />
     <Compile Include="Interfaces\Library\ILibraryHierarchyBrowser.cs" />
     <Compile Include="Interfaces\Logging\ILogEmitter.cs" />
     <Compile Include="Interfaces\Logging\ILogger.cs" />
-    <Compile Include="Interfaces\Managers\IDataManager.cs" />
     <Compile Include="Interfaces\Managers\IHierarchyManager.cs" />
     <Compile Include="Interfaces\Output\IOutputStreamQueue.cs" />
     <Compile Include="Interfaces\Scripting\ICoreScripts.cs" />
@@ -60,19 +60,17 @@
     <Compile Include="Interfaces\Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="Library\LibraryHierarchy.cs" />
     <Compile Include="Library\LibraryHierarchyBrowser.cs" />
-    <Compile Include="Library\LibraryHierarchyItem.cs" />
+    <Compile Include="Library\LibraryHierarchyInfo.cs" />
     <Compile Include="Library\LibraryHierarchyLevel.cs" />
     <Compile Include="Library\LibraryHierarchyNode.cs" />
     <Compile Include="LogManager.cs" />
-    <Compile Include="Managers\DataManager.cs" />
     <Compile Include="Managers\HierarchyManager.cs" />
     <Compile Include="MetaData\CommonImageTypes.cs" />
     <Compile Include="MetaData\CustomMetaData.cs" />
     <Compile Include="MetaData\FileMetaDataStore.cs" />
+    <Compile Include="MetaData\MetaDataInfo.cs" />
     <Compile Include="Playlist\PlaylistColumn.cs" />
     <Compile Include="Interfaces\Signal\ISignalEmitter.cs" />
-    <Compile Include="RootDataQueries.cs" />
-    <Compile Include="RootDataSets.cs" />
     <Compile Include="Scripting\ScriptingException.cs" />
     <Compile Include="Signal\CommonSignals.cs" />
     <Compile Include="Signal\Signal.cs" />
@@ -98,7 +96,6 @@
     <Compile Include="Configuration\ConfigurationSection.cs" />
     <Compile Include="Configuration\SelectionConfigurationElement.cs" />
     <Compile Include="Configuration\SelectionConfigurationOption.cs" />
-    <Compile Include="Interfaces\Database\IDatabaseQuery.cs" />
     <Compile Include="Interfaces\Factories\IMetaDataSourceFactory.cs" />
     <Compile Include="Interfaces\IBaseFactory.cs" />
     <Compile Include="Interfaces\IBaseLoader.cs" />
@@ -109,7 +106,6 @@
     <Compile Include="Interfaces\MetaData\IMetaDataSource.cs" />
     <Compile Include="Interfaces\Scripting\IScriptingContext.cs" />
     <Compile Include="Interfaces\Scripting\IScriptingRuntime.cs" />
-    <Compile Include="Library\LibraryMetaDataSource.cs" />
     <Compile Include="ManagerLoader.cs" />
     <Compile Include="BehaviourLoader.cs" />
     <Compile Include="Behaviours\PlayNextItemBehaviour.cs" />
@@ -173,42 +169,9 @@
     <Compile Include="Utilities\PlaylistSequencePopulator.cs" />
     <Compile Include="Utilities\PopulatorBase.cs" />
     <Compile Include="Utilities\Sample.cs" />
-    <Compile Include="Utilities\SQL.cs" />
-    <Compile Include="Utilities\Templates\LibraryHierarchyBuilder.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>LibraryHierarchyBuilder.tt</DependentUpon>
-    </Compile>
     <Compile Include="Tasks\StopOutputStreamTask.cs" />
-    <Compile Include="Utilities\Templates\LibraryHierarchyBuilder_Logic.cs" />
-    <Compile Include="Utilities\Templates\PivotViewBuilder.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>PivotViewBuilder.tt</DependentUpon>
-    </Compile>
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
-    <Compile Include="Utilities\Templates\PivotViewBuilder_Logic.cs" />
-    <Compile Include="Utilities\Templates\PlaylistSequenceBuilder.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>PlaylistSequenceBuilder.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Utilities\Templates\PlaylistSequenceBuilder_Logic.cs" />
     <Compile Include="Utilities\TwoWayConcurrentDictionary.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Utilities\Templates\LibraryHierarchyBuilder.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>LibraryHierarchyBuilder.cs</LastGenOutput>
-    </Content>
-    <Content Include="Utilities\Templates\PivotViewBuilder.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>PivotViewBuilder.cs</LastGenOutput>
-    </Content>
-    <Content Include="Utilities\Templates\PlaylistSequenceBuilder.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>PlaylistSequenceBuilder.cs</LastGenOutput>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

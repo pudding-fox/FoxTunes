@@ -14,7 +14,7 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <TextBlock VerticalAlignment="Center" Padding="0,0,7,0" ><Run Text="View Mode:"/></TextBlock>
-        <ComboBox Grid.Column="1" ItemsSource="{Binding Managers.Data.ReadContext.Queries.LibraryHierarchy}" SelectedValue="{Binding SelectedLibraryHierarchy, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:LibraryViewMode}}}" DisplayMemberPath="Name"/>
+        <ComboBox Grid.Column="1" ItemsSource="{Binding Components.Database.Sets.LibraryHierarchy}" SelectedValue="{Binding SelectedLibraryHierarchy, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:LibraryViewMode}}}" DisplayMemberPath="Name"/>
         <Windows:LibraryHierarchies Grid.Column="2"></Windows:LibraryHierarchies>
     </Grid>
 </UserControl>

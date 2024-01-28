@@ -19,22 +19,19 @@ namespace FoxTunes
             this.Command = new ThreadLocal<MetaDataPopulatorCommand>(true);
         }
 
-        public MetaDataPopulator(IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction, string prefix, bool reportProgress)
+        public MetaDataPopulator(IDatabase database, IDbTransaction transaction, IDatabaseQuery query, bool reportProgress)
             : this(reportProgress)
         {
             this.Database = database;
-            this.DatabaseContext = databaseContext;
             this.Transaction = transaction;
-            this.Prefix = prefix;
+            this.Query = query;
         }
 
         public IDatabase Database { get; private set; }
 
-        public IDatabaseContext DatabaseContext { get; private set; }
-
         public IDbTransaction Transaction { get; private set; }
 
-        public string Prefix { get; private set; }
+        public IDatabaseQuery Query { get; private set; }
 
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
 
@@ -54,7 +51,14 @@ namespace FoxTunes
             {
                 this.Name = "Populating meta data";
                 this.Position = 0;
-                this.Count = fileDatas.Count();
+                if (fileDatas is ICountable)
+                {
+                    this.Count = (fileDatas as ICountable).Count;
+                }
+                else
+                {
+                    this.Count = fileDatas.Count();
+                }
             }
 
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
@@ -62,7 +66,7 @@ namespace FoxTunes
 
             Parallel.ForEach(fileDatas, this.ParallelOptions, fileData =>
             {
-                Logger.Write(this, LogLevel.Debug, "Populating meta data for file data: {0} => {1}", fileData.Id, fileData.FileName);
+                Logger.Write(this, LogLevel.Debug, "Populating meta data for file: {0} => {1}", fileData.Id, fileData.FileName);
 
                 var command = this.GetOrAddCommands();
                 var metaDataSource = this.MetaDataSourceFactory.Create(fileData.FileName);
@@ -100,7 +104,7 @@ namespace FoxTunes
             {
                 return this.Command.Value;
             }
-            return this.Command.Value = new MetaDataPopulatorCommand(this.Database, this.DatabaseContext, this.Transaction, this.Prefix);
+            return this.Command.Value = new MetaDataPopulatorCommand(this.Database, this.Transaction, this.Query);
         }
 
         protected override void OnDisposing()
@@ -115,20 +119,11 @@ namespace FoxTunes
 
         private class MetaDataPopulatorCommand : BaseComponent
         {
-            public MetaDataPopulatorCommand(IDatabase database, IDatabaseContext databaseContext, IDbTransaction transaction, string prefix)
+            public MetaDataPopulatorCommand(IDatabase database, IDbTransaction transaction, IDatabaseQuery query)
             {
-                Logger.Write(this, LogLevel.Debug, "Creating meta data populator command set.");
-
-                var metaDataParameters = default(IDbParameterCollection);
-
-                this.Command = databaseContext.Connection.CreateCommand(
-                    string.Format(database.CoreSQL.AddMetaDataItems, prefix),
-                    new[] { "itemId", "name", "type", "numericValue", "textValue", "fileValue" },
-                    out metaDataParameters
-                );
-
-                this.Command.Transaction = transaction;
-                this.Parameters = metaDataParameters;
+                var parameters = default(IDbParameterCollection);
+                this.Command = database.CreateCommand(query, out parameters, transaction);
+                this.Parameters = parameters;
             }
 
             public IDbCommand Command { get; private set; }

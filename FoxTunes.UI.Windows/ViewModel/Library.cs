@@ -18,8 +18,6 @@ namespace FoxTunes.ViewModel
 
         public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
 
-        public IDataManager DataManager { get; private set; }
-
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
@@ -55,7 +53,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.DataManager == null || this.SelectedHierarchy == null)
+                if (this.LibraryHierarchyBrowser == null || this.SelectedHierarchy == null)
                 {
                     return null;
                 }
@@ -113,10 +111,10 @@ namespace FoxTunes.ViewModel
 
         public virtual void Refresh(bool deep)
         {
-            if (this.DataManager != null && this.SelectedHierarchy != null && deep)
-            {
-                this.SelectedHierarchy = this.DataManager.ReadContext.Sets.LibraryHierarchy.Find(this.SelectedHierarchy.Id);
-            }
+            //if (this.DataManager != null && this.SelectedHierarchy != null && deep)
+            //{
+            //    this.SelectedHierarchy = this.DataManager.ReadContext.Sets.LibraryHierarchy.Find(this.SelectedHierarchy.Id);
+            //}
             this.OnItemsChanged();
         }
 
@@ -129,7 +127,6 @@ namespace FoxTunes.ViewModel
         protected override void OnCoreChanged()
         {
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
-            this.DataManager = this.Core.Managers.Data;
             this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
             this.LibraryHierarchyBrowser.FilterChanged += this.OnFilterChanged;
             this.SignalEmitter = this.Core.Components.SignalEmitter;

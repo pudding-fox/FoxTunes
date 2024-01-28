@@ -114,7 +114,7 @@
     <Compile Include="ViewModel\Library.cs" />
     <Compile Include="ViewModel\LibraryBrowser.cs" />
     <Compile Include="ViewModel\LibraryTree.cs" />
-    <Compile Include="ViewModel\LibraryHierarchies.cs" />
+    <Compile Include="ViewModel\LibraryHierarchySettings.cs" />
     <Compile Include="ViewModel\Log.cs" />
     <Compile Include="ViewModel\Main.cs" />
     <Compile Include="ViewModel\PlaylistSettings.cs" />

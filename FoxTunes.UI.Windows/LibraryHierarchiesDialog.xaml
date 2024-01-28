@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core}">
     <UserControl.Resources>
-        <ViewModel:LibraryHierarchies x:Key="ViewModel" Core="{Binding}"></ViewModel:LibraryHierarchies>
+        <ViewModel:LibraryHierarchySettings x:Key="ViewModel" Core="{Binding}"></ViewModel:LibraryHierarchySettings>
     </UserControl.Resources>
     <Grid MinWidth="200" MinHeight="200">
         <Grid.RowDefinitions>
@@ -18,7 +18,7 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <TextBlock>Library View Modes</TextBlock>
-        <TabControl Grid.Row="1" ItemsSource="{Binding DatabaseContext.Queries.LibraryHierarchy, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}" DisplayMemberPath="Name" Margin="0,7,0,0">
+        <TabControl Grid.Row="1" ItemsSource="{Binding LibraryHierarchies, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedLibraryHierarchy, Source={StaticResource ViewModel}}" DisplayMemberPath="Name" Margin="0,7,0,0">
             <TabControl.ContentTemplate>
                 <DataTemplate>
                     <Grid Margin="7">
@@ -33,11 +33,6 @@
                         <Label>Name</Label>
                         <TextBox Grid.Column="1" Text="{Binding Name}" Padding="0,0,7,0"></TextBox>
                         <DataGrid Grid.Row="1" Grid.ColumnSpan="2" ItemsSource="{Binding Levels}" SelectedItem="{Binding SelectedHierarchyLevel, Source={StaticResource ViewModel}}" MinHeight="300" AutoGenerateColumns="False" Margin="0,7,0,0">
-                            <Interactivity:Interaction.Triggers>
-                                <Interactivity:EventTrigger EventName="CellEditEnding">
-                                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=UpdateCommand}"></Interactivity:InvokeCommandAction>
-                                </Interactivity:EventTrigger>
-                            </Interactivity:Interaction.Triggers>
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Script" Binding="{Binding DisplayScript}"></DataGridTextColumn>
                             </DataGrid.Columns>

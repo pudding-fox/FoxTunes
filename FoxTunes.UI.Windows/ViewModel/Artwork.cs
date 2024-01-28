@@ -7,8 +7,6 @@ namespace FoxTunes.ViewModel
 {
     public class Artwork : ViewModelBase
     {
-        public IDataManager DataManager { get; private set; }
-
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -59,7 +57,6 @@ namespace FoxTunes.ViewModel
 
         protected override void OnCoreChanged()
         {
-            this.DataManager = this.Core.Managers.Data;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaylistManager.CurrentItemChanged += (sender, e) => this.Refresh();
             base.OnCoreChanged();

@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
-using FoxTunes.Utilities.Templates;
+using System;
 using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -36,35 +35,27 @@ namespace FoxTunes
             this.Name = "Building hierarchies";
             this.Description = "Preparing";
             this.IsIndeterminate = true;
-            using (var databaseContext = this.DataManager.CreateWriteContext())
+            using (var transaction = this.Database.BeginTransaction())
             {
-                using (var transaction = databaseContext.Connection.BeginTransaction())
+                var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
+                using (var command = this.Database.CreateCommand(this.Database.Queries.LibraryHierarchyBuilder(metaDataNames), transaction))
                 {
-                    var metaDataNames =
-                        from metaDataItem in databaseContext.GetQuery<MetaDataItem>().Detach()
-                        group metaDataItem by metaDataItem.Name into name
-                        select name.Key;
-                    var libraryHierarchyBuilder = new LibraryHierarchyBuilder(metaDataNames);
-                    using (var command = databaseContext.Connection.CreateCommand(libraryHierarchyBuilder.TransformText()))
+                    using (var reader = EnumerableDataReader.Create(command.ExecuteReader()))
                     {
-                        command.Transaction = transaction;
-                        using (var reader = EnumerableDataReader.Create(command.ExecuteReader()))
-                        {
-                            this.AddHiearchies(databaseContext, transaction, reader);
-                            this.Description = "Finalizing";
-                            this.IsIndeterminate = true;
-                        }
+                        this.AddHiearchies(transaction, reader);
+                        this.Description = "Finalizing";
+                        this.IsIndeterminate = true;
                     }
-                    transaction.Commit();
                 }
+                transaction.Commit();
             }
             this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
             return Task.CompletedTask;
         }
 
-        private void AddHiearchies(IDatabaseContext databaseContext, IDbTransaction transaction, EnumerableDataReader reader)
+        private void AddHiearchies(IDbTransaction transaction, EnumerableDataReader reader)
         {
-            using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, databaseContext, transaction, true))
+            using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, transaction, true))
             {
                 libraryHierarchyPopulator.InitializeComponent(this.Core);
                 libraryHierarchyPopulator.NameChanged += (sender, e) => this.Name = libraryHierarchyPopulator.Name;

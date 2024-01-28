@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1599399A-2873-46F5-96CD-56768AFC967E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FoxTunes</RootNamespace>
+    <AssemblyName>FoxTunes.DB.SQLite</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\distribution\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.106.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.106.0\lib\net46\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SQLiteSchema.cs" />
+    <Compile Include="SQLiteSyntax.cs" />
+    <Compile Include="SQLiteDatabase.cs" />
+    <Compile Include="SQLiteDatabaseQueries.cs" />
+    <Compile Include="Templates\Update.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Update.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\Insert_Logic.cs" />
+    <Compile Include="Templates\Update_Logic.cs" />
+    <Compile Include="Templates\Count.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Count.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\Delete.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Delete.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\Delete_Logic.cs" />
+    <Compile Include="Templates\Find_Logic.cs" />
+    <Compile Include="Templates\Count_Logic.cs" />
+    <Compile Include="Templates\Find.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Find.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\GetTableInfo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GetTableInfo.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\GetTableInfo_Logic.cs" />
+    <Compile Include="Templates\Insert.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Insert.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\LibraryHierarchyBuilder.cs">
+      <DependentUpon>LibraryHierarchyBuilder.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Templates\LibraryHierarchyBuilder_Logic.cs" />
+    <Compile Include="Templates\PivotViewBuilder.cs">
+      <DependentUpon>PivotViewBuilder.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Templates\PivotViewBuilder_Logic.cs" />
+    <Compile Include="Templates\PlaylistSequenceBuilder.cs">
+      <DependentUpon>PlaylistSequenceBuilder.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Templates\PlaylistSequenceBuilder_Logic.cs" />
+    <Compile Include="Templates\Select.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Select.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\Select_Logic.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj">
+      <Project>{62cd8f70-8415-4c15-b672-cb18475abd7e}</Project>
+      <Name>FoxTunes.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FoxTunes.DB\FoxTunes.DB.csproj">
+      <Project>{64ed8f47-c8a1-4d23-943d-1c0f74d39d9d}</Project>
+      <Name>FoxTunes.DB</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Resources\AddLibraryHierarchyNodeToPlaylist.sql" />
+    <None Include="Resources\AddLibraryHierarchyRecord.sql" />
+    <None Include="Resources\AddLibraryItem.sql" />
+    <None Include="Resources\AddPlaylistItem.sql" />
+    <None Include="Resources\AddPlaylistSequenceRecord.sql" />
+    <None Include="Resources\ClearPlaylist.sql" />
+    <None Include="Resources\CopyMetaDataItems.sql" />
+    <None Include="Resources\Database.sql" />
+    <None Include="Resources\GetLibraryHierarchyMetaDataItems.sql" />
+    <None Include="Resources\GetLibraryHierarchyNodes.sql" />
+    <None Include="Resources\GetLibraryHierarchyNodesWithFilter.sql" />
+    <None Include="Resources\SetLibraryItemStatus.sql" />
+    <None Include="Resources\SetPlaylistItemStatus.sql" />
+    <None Include="Resources\ShiftPlaylistItems.sql" />
+    <None Include="Resources\VariousArtists.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\GetLibraryItems.sql" />
+    <None Include="Resources\GetPreviousPlaylistItem.sql" />
+    <None Include="Resources\GetNextPlaylistItem.sql" />
+    <None Include="Resources\GetPlaylistMetaDataItems.sql" />
+    <Content Include="Templates\Update.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>Update.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\Delete.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>Delete.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\Find.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>Find.cs</LastGenOutput>
+    </Content>
+    <None Include="Resources\GetMetaDataNames.sql" />
+    <None Include="Resources\AddLibraryMetaDataItems.sql" />
+    <None Include="Resources\GetPlaylistItemsWithoutMetaData.sql" />
+    <None Include="Resources\AddPlaylistMetaDataItems.sql" />
+    <None Include="Resources\GetFirstPlaylistItem.sql" />
+    <None Include="Resources\GetLastPlaylistItem.sql" />
+    <Content Include="Templates\Count.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>Count.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\GetTableInfo.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>GetTableInfo.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\Insert.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>Insert.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\LibraryHierarchyBuilder.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>LibraryHierarchyBuilder.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\PivotViewBuilder.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PivotViewBuilder.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\PlaylistSequenceBuilder.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PlaylistSequenceBuilder.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\Select.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>Select.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.106.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.106.0\build\net46\System.Data.SQLite.Core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.106.0\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.106.0\build\net46\System.Data.SQLite.Core.targets'))" />
+  </Target>
+</Project>

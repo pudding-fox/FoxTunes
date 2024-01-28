@@ -13,8 +13,6 @@ namespace FoxTunes
 
         public IDatabase Database { get; private set; }
 
-        public IDataManager DataManager { get; private set; }
-
         private string _Filter { get; set; }
 
         public string Filter
@@ -45,93 +43,39 @@ namespace FoxTunes
         {
             this.Core = core;
             this.Database = core.Components.Database;
-            this.DataManager = core.Managers.Data;
             base.InitializeComponent(core);
         }
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy)
         {
-            using (var command = this.GetCommand(libraryHierarchy.Id))
-            {
-                return this.GetNodes(command).ToArray();
-            }
+            return this.GetNodes(libraryHierarchy.Id);
         }
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyNode libraryHierarchyNode)
         {
-            using (var command = this.GetCommand(libraryHierarchyNode.LibraryHierarchyId, libraryHierarchyNode.Id))
-            {
-                return this.GetNodes(command).ToArray();
-            }
+            return this.GetNodes(libraryHierarchyNode.LibraryHierarchyId, libraryHierarchyNode.Id);
         }
 
-        private IDbCommand GetCommand(int libraryHierarchyId, int? libraryHierarchyItemId = null)
+        protected virtual IEnumerable<LibraryHierarchyNode> GetNodes(int libraryHierarchyId, int? libraryHierarchyItemId = null)
         {
-            var command = default(IDbCommand);
-            var parameters = default(IDbParameterCollection);
+            var query = default(IDatabaseQuery);
             if (string.IsNullOrEmpty(this.Filter))
             {
-                command = this.DataManager.ReadContext.Connection.CreateCommand(this.Database.CoreSQL.GetLibraryHierarchyNodes, new[] { "libraryHierarchyId", "libraryHierarchyItemId" }, out parameters);
+                query = this.Database.Queries.GetLibraryHierarchyNodes;
             }
             else
             {
-                command = this.DataManager.ReadContext.Connection.CreateCommand(this.Database.CoreSQL.GetLibraryHierarchyNodesWithFilter, new[] { "libraryHierarchyId", "libraryHierarchyItemId", "filter" }, out parameters);
-                parameters["filter"] = this.GetFilter();
+                query = this.Database.Queries.GetLibraryHierarchyNodesWithFilter;
             }
-            parameters["libraryHierarchyId"] = libraryHierarchyId;
-            parameters["libraryHierarchyItemId"] = libraryHierarchyItemId.HasValue ? (object)libraryHierarchyItemId.Value : DBNull.Value;
-            return command;
-        }
-
-        private IEnumerable<LibraryHierarchyNode> GetNodes(IDbCommand command)
-        {
-            using (var reader = command.ExecuteReader())
+            return new RecordEnumerator<LibraryHierarchyNode>(this.Core, this.Database, query, parameters =>
             {
-                while (reader.Read())
+                parameters["libraryHierarchyId"] = libraryHierarchyId;
+                parameters["libraryHierarchyItemId"] = libraryHierarchyItemId.HasValue ? (object)libraryHierarchyItemId.Value : DBNull.Value;
+                if (parameters.Contains("filter"))
                 {
-                    var id = reader.GetInt32(0);
-                    var libraryHierarchyId = reader.GetInt32(1);
-                    var value = reader.GetString(2);
-                    var isLeaf = reader.GetBoolean(3);
-                    var libraryHierarchyNode = new LibraryHierarchyNode(id, libraryHierarchyId, value, isLeaf);
-                    libraryHierarchyNode.InitializeComponent(this.Core);
-                    yield return libraryHierarchyNode;
+                    parameters["filter"] = this.GetFilter();
                 }
-            }
-        }
-
-        public IEnumerable<MetaDataItem> GetMetaData(LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType)
-        {
-            var parameters = default(IDbParameterCollection);
-            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(this.Database.CoreSQL.GetLibraryHierarchyMetaDataItems, new[] { "libraryHierarchyItemId", "type" }, out parameters))
-            {
-                parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
-                parameters["type"] = metaDataItemType;
-                return this.GetMetaData(command).ToArray();
-            }
-        }
-
-        private IEnumerable<MetaDataItem> GetMetaData(IDbCommand command)
-        {
-            using (var reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    var name = reader.GetString(0);
-                    var type = reader.GetValue<MetaDataItemType>(1);
-                    var numericValue = reader.IsDBNull(2) ? null : reader.GetValue<int?>(2);
-                    var textValue = reader.IsDBNull(3) ? null : reader.GetString(3);
-                    var fileValue = reader.IsDBNull(4) ? null : reader.GetString(4);
-                    var metaDataItem = new MetaDataItem(name, type)
-                    {
-                        NumericValue = numericValue,
-                        TextValue = textValue,
-                        FileValue = fileValue
-                    };
-                    metaDataItem.InitializeComponent(this.Core);
-                    yield return metaDataItem;
-                }
-            }
+            });
         }
 
         private string GetFilter()

@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using FoxTunes.Interfaces;
+using System.Linq;
 
 namespace FoxTunes
 {
-    public class LibraryHierarchy : PersistableComponent, IEquatable<LibraryHierarchy>
+    public class LibraryHierarchy : PersistableComponent
     {
         public LibraryHierarchy()
         {
-            this.Levels = new ObservableCollection<LibraryHierarchyLevel>();
+
         }
+
+        public ICore Core { get; private set; }
+
+        public IDatabase Database { get; private set; }
 
         private string _Name { get; set; }
 
@@ -36,51 +42,51 @@ namespace FoxTunes
 
         public event EventHandler NameChanged = delegate { };
 
-        public ObservableCollection<LibraryHierarchyLevel> Levels { get; set; }
+        private ObservableCollection<LibraryHierarchyLevel> _Levels { get; set; }
 
-        public bool Equals(LibraryHierarchy other)
+        public ObservableCollection<LibraryHierarchyLevel> Levels
         {
-            if (other == null)
+            get
             {
-                return false;
+                if (this._Levels == null)
+                {
+                    this.LoadLevels();
+                }
+                return this._Levels;
             }
-            if (object.ReferenceEquals(this, other))
+            set
             {
-                return true;
+                this._Levels = value;
+                this.OnLevelsChanged();
             }
-            return this.Id == other.Id;
         }
 
-        public override bool Equals(object obj)
+        protected virtual void OnLevelsChanged()
         {
-            return this.Equals(obj as LibraryHierarchy);
+            if (this.LevelsChanged != null)
+            {
+                this.LevelsChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Levels");
         }
 
-        public override int GetHashCode()
+        public event EventHandler LevelsChanged = delegate { };
+
+        public override void InitializeComponent(ICore core)
         {
-            return this.Id.GetHashCode();
+            this.Core = core;
+            this.Database = core.Components.Database;
+            base.InitializeComponent(core);
         }
 
-        public static bool operator ==(LibraryHierarchy a, LibraryHierarchy b)
+        public void LoadLevels()
         {
-            if ((object)a == null && (object)b == null)
+            if (this.Database == null)
             {
-                return true;
+                this.Levels = new ObservableCollection<LibraryHierarchyLevel>();
+                return;
             }
-            if ((object)a == null || (object)b == null)
-            {
-                return false;
-            }
-            if (object.ReferenceEquals((object)a, (object)b))
-            {
-                return true;
-            }
-            return a.Equals(b);
-        }
-
-        public static bool operator !=(LibraryHierarchy a, LibraryHierarchy b)
-        {
-            return !(a == b);
+            this.Levels = new ObservableCollection<LibraryHierarchyLevel>(LibraryHierarchyInfo.GetLevels(this.Core, this.Database, this));
         }
     }
 }
