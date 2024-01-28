@@ -21,6 +21,15 @@
                 <DataTemplate>
                     <GroupBox Header="{Binding Name}" Padding="0,7,0,0">
                         <ItemsControl ItemsSource="{Binding Elements}">
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="{x:Type ContentPresenter}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsHidden}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="0,0,0,5">
@@ -32,7 +41,17 @@
                                         <ContentControl Grid.Column="1" Content="{Binding}">
                                             <ContentControl.Resources>
                                                 <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
-                                                    <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding SelectedOption}" DisplayMemberPath="Name"></ComboBox>
+                                                    <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding SelectedOption}" DisplayMemberPath="Name">
+                                                        <ComboBox.ItemContainerStyle>
+                                                            <Style TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsHidden}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </ComboBox.ItemContainerStyle>
+                                                    </ComboBox>
                                                 </DataTemplate>
                                                 <DataTemplate DataType="{x:Type Core:BooleanConfigurationElement}">
                                                     <CheckBox IsChecked="{Binding Value}"></CheckBox>

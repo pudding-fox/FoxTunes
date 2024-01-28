@@ -3,13 +3,14 @@
 namespace FoxTunes
 {
     [Serializable]
-    public class SelectionConfigurationOption : IEquatable<SelectionConfigurationOption>
+    public class SelectionConfigurationOption : BaseComponent, IEquatable<SelectionConfigurationOption>
     {
         public SelectionConfigurationOption(string id, string name = null, string description = null)
         {
             this.Id = id;
             this.Name = name;
             this.Description = description;
+            this.IsHidden = false;
         }
 
         public string Id { get; private set; }
@@ -17,6 +18,60 @@ namespace FoxTunes
         public string Name { get; private set; }
 
         public string Description { get; private set; }
+
+        private bool _IsHidden { get; set; }
+
+        public bool IsHidden
+        {
+            get
+            {
+                return this._IsHidden;
+            }
+            set
+            {
+                this._IsHidden = value;
+                this.OnIsHiddenChanged();
+            }
+        }
+
+        protected virtual void OnIsHiddenChanged()
+        {
+            if (this.IsHiddenChanged != null)
+            {
+                this.IsHiddenChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsHidden");
+        }
+
+        [field: NonSerialized]
+        public event EventHandler IsHiddenChanged = delegate { };
+
+        public bool IsDefault { get; private set; }
+
+        public void Update(SelectionConfigurationOption option)
+        {
+            this.Name = option.Name;
+            this.Description = option.Description;
+            this.IsHidden = false;
+        }
+
+        public SelectionConfigurationOption Hide()
+        {
+            this.IsHidden = true;
+            return this;
+        }
+
+        public SelectionConfigurationOption Show()
+        {
+            this.IsHidden = false;
+            return this;
+        }
+
+        public SelectionConfigurationOption Default()
+        {
+            this.IsDefault = true;
+            return this;
+        }
 
         public bool Equals(SelectionConfigurationOption other)
         {

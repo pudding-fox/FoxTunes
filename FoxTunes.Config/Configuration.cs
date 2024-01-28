@@ -25,11 +25,32 @@ namespace FoxTunes
 
         public void RegisterSection(ConfigurationSection section)
         {
-            if (this.GetSection(section.Id) != null)
+            if (this.Contains(section.Id))
             {
-                return;
+                this.Update(section);
             }
+            else
+            {
+                this.Add(section);
+            }
+        }
+
+        private bool Contains(string id)
+        {
+            return this.GetSection(id) != null;
+        }
+
+        private void Add(ConfigurationSection section)
+        {
+            Logger.Write(this, LogLevel.Debug, "Adding configuration section: {0} => {1}", section.Id, section.Name);
             this.Sections.Add(section);
+        }
+
+        private void Update(ConfigurationSection section)
+        {
+            Logger.Write(this, LogLevel.Debug, "Updating configuration section: {0} => {1}", section.Id, section.Name);
+            var existing = this.GetSection(section.Id);
+            existing.Update(section);
         }
 
         public void Load()
@@ -71,12 +92,17 @@ namespace FoxTunes
 
         public T GetElement<T>(string sectionId, string elementId) where T : ConfigurationElement
         {
+            return this.GetElement(sectionId, elementId) as T;
+        }
+
+        public ConfigurationElement GetElement(string sectionId, string elementId)
+        {
             var section = this.GetSection(sectionId);
             if (section == null)
             {
-                return default(T);
+                return default(ConfigurationElement);
             }
-            return section.Elements.FirstOrDefault(element => string.Equals(element.Id, elementId, StringComparison.OrdinalIgnoreCase)) as T;
+            return section.GetElement(elementId);
         }
     }
 }
