@@ -27,6 +27,8 @@ namespace FoxTunes
             Windows.MiniWindowCreated += this.OnWindowCreated;
         }
 
+        public CommandLineParser.OpenMode OpenMode { get; private set; }
+
         private Application _Application { get; set; }
 
         public Application Application
@@ -88,24 +90,18 @@ namespace FoxTunes
 
         public override void Run(string message)
         {
-            var regex = new Regex(@"((?:[a-zA-Z]\:(\\|\/)|file\:\/\/|\\\\|\.(\/|\\))([^\\\/\:\*\?\<\>\""\|]+(\\|\/){0,1})+)");
-            var matches = regex.Matches(message);
-            for (var a = 0; a < matches.Count; a++)
+            var mode = default(CommandLineParser.OpenMode);
+            var paths = default(IEnumerable<string>);
+            if (!CommandLineParser.TryParse(message, out paths, out mode))
             {
-                var match = matches[a];
-                if (!match.Success)
+                return;
+            }
+            this.OpenMode = mode;
+            foreach (var path in paths)
+            {
+                if (Directory.Exists(path) || this.Output.IsSupported(path))
                 {
-                    continue;
-                }
-                var path = match.Value;
-                if (string.IsNullOrEmpty(path))
-                {
-                    continue;
-                }
-                path = path.Trim();
-                if ((File.Exists(path) && this.Output.IsSupported(path)) || Directory.Exists(path))
-                {
-                    var task = this.Queue.Enqueue(path);
+                    this.Queue.Enqueue(path);
                 }
             }
         }
@@ -125,19 +121,26 @@ namespace FoxTunes
             MessageBox.Show("Restart is required.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
-        protected virtual async void OnComplete(object sender, PendingQueueEventArgs<string> e)
+        protected virtual void OnComplete(object sender, PendingQueueEventArgs<string> e)
         {
-            using (e.Defer())
-            {
-                await this.OnOpen(e.Sequence).ConfigureAwait(false);
-            }
+            var task = this.OnOpen(e.Sequence);
         }
 
         protected virtual async Task OnOpen(IEnumerable<string> paths)
         {
-            var index = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
-            await this.PlaylistManager.Add(paths, false).ConfigureAwait(false);
-            await this.PlaylistManager.Play(index).ConfigureAwait(false);
+            try
+            {
+                var index = await this.PlaylistBrowser.GetInsertIndex().ConfigureAwait(false);
+                await this.PlaylistManager.Add(paths, false).ConfigureAwait(false);
+                if (this.OpenMode == CommandLineParser.OpenMode.Play)
+                {
+                    await this.PlaylistManager.Play(index).ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                this.OpenMode = CommandLineParser.OpenMode.Default;
+            }
         }
 
         protected virtual void OnApplicationDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

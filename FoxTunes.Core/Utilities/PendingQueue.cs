@@ -1,117 +1,70 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Timers;
 
 namespace FoxTunes
 {
-    public class PendingQueue<T> : IEnumerable<T>
+    public class PendingQueue<T>
     {
-        private volatile bool Completing = false;
+        public static readonly object SyncRoot = new object();
 
         private PendingQueue()
         {
             this.Queue = new Queue<T>();
-            this.Semaphore = new SemaphoreSlim(1, 1);
         }
 
         public PendingQueue(int timeout)
             : this()
         {
-            this.Timeout = timeout;
+            this.Timer = new Timer(timeout);
+            this.Timer.AutoReset = false;
+            this.Timer.Elapsed += this.OnElapsed;
         }
+
 
         public PendingQueue(TimeSpan timeout)
             : this(Convert.ToInt32(timeout.TotalMilliseconds))
         {
 
         }
+        public Timer Timer { get; private set; }
 
         public Queue<T> Queue { get; private set; }
 
-        public SemaphoreSlim Semaphore { get; private set; }
-
-        public int Timeout { get; private set; }
-
-        public async Task Enqueue(T value)
+        public void Enqueue(T value)
         {
-#if NET40
-            Semaphore.Wait();
-#else
-            await Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
-            try
+            lock (SyncRoot)
             {
                 this.Queue.Enqueue(value);
+                this.Timer.Stop();
+                this.Timer.Start();
             }
-            finally
-            {
-                this.Semaphore.Release();
-            }
-            await this.BeginComplete().ConfigureAwait(false);
         }
 
-        protected async Task BeginComplete()
+        protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
-#if NET40
-            await TaskEx.Delay(this.Timeout).ConfigureAwait(false);
-#else
-            await Task.Delay(this.Timeout).ConfigureAwait(false);
-#endif
-            if (this.Completing)
+            lock (SyncRoot)
             {
-                return;
+                this.OnComplete();
             }
-            this.Completing = true;
-#if NET40
-            Semaphore.Wait();
-#else
-            await Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
-            try
-            {
-                await this.OnComplete().ConfigureAwait(false);
-                this.Queue.Clear();
-            }
-            finally
-            {
-                this.Semaphore.Release();
-            }
-            this.Completing = false;
         }
 
-        protected virtual Task OnComplete()
+        protected virtual void OnComplete()
         {
-            if (this.Complete == null)
+            if (this.Complete != null)
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                var e = new PendingQueueEventArgs<T>(this.Queue.ToArray());
+                this.Complete(this, e);
             }
-            var e = new PendingQueueEventArgs<T>(this);
-            this.Complete(this, e);
-            return e.Complete();
+            this.Queue.Clear();
         }
 
         public event PendingQueueEventHandler<T> Complete;
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return this.Queue.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
     }
 
     public delegate void PendingQueueEventHandler<T>(object sender, PendingQueueEventArgs<T> e);
 
-    public class PendingQueueEventArgs<T> : AsyncEventArgs
+    public class PendingQueueEventArgs<T> : EventArgs
     {
         public PendingQueueEventArgs(IEnumerable<T> sequence)
         {
