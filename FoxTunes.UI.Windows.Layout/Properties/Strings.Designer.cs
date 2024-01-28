@@ -223,6 +223,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Replace.
+        /// </summary>
+        internal static string UIComponentContainer_Replace {
+            get {
+                return ResourceManager.GetString("UIComponentContainer.Replace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Collapsable.
         /// </summary>
         internal static string UIComponentDockContainer_Collapse {

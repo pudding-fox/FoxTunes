@@ -171,6 +171,9 @@
   <data name="UIComponentContainer.Exit" xml:space="preserve">
     <value>Done</value>
   </data>
+  <data name="UIComponentContainer.Replace" xml:space="preserve">
+    <value>Replace</value>
+  </data>
   <data name="UIComponentDockContainer.Collapse" xml:space="preserve">
     <value>Collapsable</value>
   </data>
