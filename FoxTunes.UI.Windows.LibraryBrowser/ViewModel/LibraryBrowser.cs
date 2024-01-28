@@ -169,22 +169,42 @@ namespace FoxTunes.ViewModel
 #endif
         }
 
+        public bool IsRefreshing { get; private set; }
+
         public override void Refresh()
         {
-            this.Synchronize(new List<LibraryBrowserFrame>(new[]
+            this.IsRefreshing = true;
+            try
             {
-                new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-            }));
-            this.OnItemsChanged();
+                this.Synchronize(new List<LibraryBrowserFrame>(new[]
+                {
+                    new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
+                }));
+                this.OnItemsChanged();
+            }
+            finally
+            {
+                this.IsRefreshing = false;
+            }
         }
 
-        public override Task Reload()
+        public bool IsReloading { get; private set; }
+
+        public override async Task Reload()
         {
-            this.Synchronize(new List<LibraryBrowserFrame>(new[]
+            this.IsReloading = true;
+            try
             {
-                new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-            }));
-            return base.Reload();
+                this.Synchronize(new List<LibraryBrowserFrame>(new[]
+                {
+                    new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
+                }));
+                await base.Reload();
+            }
+            finally
+            {
+                this.IsReloading = false;
+            }
         }
 
         protected virtual void OnActiveComponentsChanged(object sender, EventArgs e)
@@ -252,19 +272,25 @@ namespace FoxTunes.ViewModel
             this.Down(this.SelectedItem);
         }
 
-        private void Down(LibraryHierarchyNode libraryHierarchyNode)
+        private bool Down(LibraryHierarchyNode libraryHierarchyNode)
         {
-            this.Down(libraryHierarchyNode, this.Frames);
+            return this.Down(libraryHierarchyNode, this.Frames);
         }
 
-        private void Down(LibraryHierarchyNode libraryHierarchyNode, IList<LibraryBrowserFrame> frames)
+        private bool Down(LibraryHierarchyNode libraryHierarchyNode, IList<LibraryBrowserFrame> frames)
         {
+            var libraryHierarchyNodes = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchyNode);
+            if (!libraryHierarchyNodes.Any())
+            {
+                return false;
+            }
             frames.Add(
                 new LibraryBrowserFrame(
                     libraryHierarchyNode,
-                    new[] { LibraryHierarchyNode.Empty }.Concat(this.LibraryHierarchyBrowser.GetNodes(libraryHierarchyNode))
+                    new[] { LibraryHierarchyNode.Empty }.Concat(libraryHierarchyNodes)
                 )
             );
+            return true;
         }
 
         private void Synchronize()
@@ -293,7 +319,10 @@ namespace FoxTunes.ViewModel
                 libraryHierarchyNode = stack.Pop();
                 if (position >= frames.Count)
                 {
-                    this.Down(libraryHierarchyNode, frames);
+                    if (!this.Down(libraryHierarchyNode, frames))
+                    {
+                        break;
+                    }
                 }
                 else
                 {
@@ -304,7 +333,10 @@ namespace FoxTunes.ViewModel
                         {
                             frames.RemoveAt(frames.Count - 1);
                         }
-                        this.Down(libraryHierarchyNode, frames);
+                        if (!this.Down(libraryHierarchyNode, frames))
+                        {
+                            break;
+                        }
                     }
                 }
                 position++;
