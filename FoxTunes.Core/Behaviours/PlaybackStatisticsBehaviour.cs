@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class PlaybackStatisticsBehaviour : StandardBehaviour, IDisposable
+    public class PlaybackStatisticsBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public PlaybackStatisticsBehaviour()
         {
@@ -24,6 +24,8 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
+        public BooleanConfigurationElement Enabled { get; private set; }
+
         public SelectionConfigurationElement Write { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -33,14 +35,11 @@ namespace FoxTunes
             this.Output = core.Components.Output;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
             this.Configuration = core.Components.Configuration;
-            this.Write = this.Configuration.GetElement<SelectionConfigurationElement>(
-                MetaDataBehaviourConfiguration.SECTION,
-                MetaDataBehaviourConfiguration.WRITE_ELEMENT
+            this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
+                PlaybackStatisticsBehaviourConfiguration.SECTION,
+                PlaybackStatisticsBehaviourConfiguration.ENABLED
             );
-            this.Configuration.GetElement<BooleanConfigurationElement>(
-                MetaDataBehaviourConfiguration.SECTION,
-                MetaDataBehaviourConfiguration.READ_POPULARIMETER_TAGS
-            ).ConnectValue(value =>
+            this.Enabled.ConnectValue(value =>
             {
                 if (value)
                 {
@@ -51,6 +50,10 @@ namespace FoxTunes
                     this.Disable();
                 }
             });
+            this.Write = this.Configuration.GetElement<SelectionConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.WRITE_ELEMENT
+            );
             base.InitializeComponent(core);
         }
 
@@ -162,6 +165,11 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Error, "Failed to update play count for file \"{0}\": {1}", playlistItem.FileName, e.Message);
             }
+        }
+
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return PlaybackStatisticsBehaviourConfiguration.GetConfigurationSections();
         }
 
         public bool IsDisposed { get; private set; }
