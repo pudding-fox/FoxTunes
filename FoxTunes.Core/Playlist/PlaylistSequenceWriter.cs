@@ -3,7 +3,6 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Data;
 
 namespace FoxTunes
 {
@@ -11,16 +10,12 @@ namespace FoxTunes
     {
         public PlaylistSequenceWriter(IDatabaseComponent database, ITransactionSource transaction, IScriptingRuntime runtime)
         {
-            var parameters = default(IDatabaseParameters);
-            this.Command = CreateCommand(database, transaction, out parameters);
-            this.Parameters = parameters;
+            this.Command = CreateCommand(database, transaction);
             this.Runtime = runtime;
             this.Context = runtime.CreateContext();
         }
 
-        public IDbCommand Command { get; private set; }
-
-        public IDatabaseParameters Parameters { get; private set; }
+        public IDatabaseCommand Command { get; private set; }
 
         public IScriptingRuntime Runtime { get; private set; }
 
@@ -28,7 +23,7 @@ namespace FoxTunes
 
         public void Write(IDatabaseReaderRecord record)
         {
-            this.Parameters["playlistItemId"] = record["PlaylistItem_Id"];
+            this.Command.Parameters["playlistItemId"] = record["PlaylistItem_Id"];
 
             var values = this.ExecuteScript(record);
             for (var a = 0; a < 9; a++)
@@ -42,7 +37,7 @@ namespace FoxTunes
                 {
                     value = DBNull.Value;
                 }
-                this.Parameters[string.Format("value{0}", a + 1)] = value;
+                this.Command.Parameters[string.Format("value{0}", a + 1)] = value;
             }
 
             this.Command.ExecuteNonQuery();
@@ -83,11 +78,11 @@ namespace FoxTunes
             base.OnDisposing();
         }
 
-        private static IDbCommand CreateCommand(IDatabaseComponent database, ITransactionSource transaction, out IDatabaseParameters parameters)
+        private static IDatabaseCommand CreateCommand(IDatabaseComponent database, ITransactionSource transaction)
         {
             return database.CreateCommand(
                 database.Queries.AddPlaylistSequenceRecord,
-                out parameters,
+                DatabaseCommandFlags.NoCache,
                 transaction
             );
         }

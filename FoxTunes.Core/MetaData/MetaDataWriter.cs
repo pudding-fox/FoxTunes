@@ -1,6 +1,5 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
-using System.Data;
 
 namespace FoxTunes
 {
@@ -8,23 +7,19 @@ namespace FoxTunes
     {
         public MetaDataWriter(IDatabase database, ITransactionSource transaction, IDatabaseQuery query)
         {
-            var parameters = default(IDatabaseParameters);
-            this.Command = CreateCommand(database, transaction, query, out parameters);
-            this.Parameters = parameters;
+            this.Command = CreateCommand(database, transaction, query);
         }
 
-        public IDbCommand Command { get; private set; }
-
-        public IDatabaseParameters Parameters { get; private set; }
+        public IDatabaseCommand Command { get; private set; }
 
         public void Write(int itemId, MetaDataItem metaDataItem)
         {
-            this.Parameters["itemId"] = itemId;
-            this.Parameters["name"] = metaDataItem.Name;
-            this.Parameters["type"] = metaDataItem.Type;
-            this.Parameters["numericValue"] = metaDataItem.NumericValue;
-            this.Parameters["textValue"] = metaDataItem.TextValue;
-            this.Parameters["fileValue"] = metaDataItem.FileValue;
+            this.Command.Parameters["itemId"] = itemId;
+            this.Command.Parameters["name"] = metaDataItem.Name;
+            this.Command.Parameters["type"] = metaDataItem.Type;
+            this.Command.Parameters["numericValue"] = metaDataItem.NumericValue;
+            this.Command.Parameters["textValue"] = metaDataItem.TextValue;
+            this.Command.Parameters["fileValue"] = metaDataItem.FileValue;
             this.Command.ExecuteNonQuery();
         }
 
@@ -34,9 +29,9 @@ namespace FoxTunes
             base.OnDisposing();
         }
 
-        private static IDbCommand CreateCommand(IDatabase database, ITransactionSource transaction, IDatabaseQuery query, out IDatabaseParameters parameters)
+        private static IDatabaseCommand CreateCommand(IDatabase database, ITransactionSource transaction, IDatabaseQuery query)
         {
-            return database.CreateCommand(query, out parameters, transaction);
+            return database.CreateCommand(query, DatabaseCommandFlags.NoCache, transaction);
         }
     }
 }

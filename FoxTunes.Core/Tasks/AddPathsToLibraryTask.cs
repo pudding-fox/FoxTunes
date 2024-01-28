@@ -13,8 +13,6 @@ namespace FoxTunes
     {
         public const string ID = "972222C8-8F6E-44CF-8EBE-DA4FCFD7CD80";
 
-        //public const int SAVE_INTERVAL = 1000;
-
         public AddPathsToLibraryTask(IEnumerable<string> paths)
             : base(ID)
         {
@@ -61,8 +59,6 @@ namespace FoxTunes
         {
             this.Name = "Getting file list";
             this.IsIndeterminate = true;
-            //var batch = 0;
-            var parameters = default(IDatabaseParameters);
             var query = this.Database.QueryFactory.Build();
             query.Add.AddColumn(this.Database.Tables.LibraryItem.Column("DirectoryName"));
             query.Add.AddColumn(this.Database.Tables.LibraryItem.Column("FileName"));
@@ -87,25 +83,18 @@ namespace FoxTunes
                     )
                 )
             );
-            using (var command = this.Database.CreateCommand(query.Build(), out parameters))
+            using (var command = this.Database.CreateCommand(query.Build(), transaction))
             {
-                transaction.Bind(command);
                 var addLibraryItem = new Action<string>(fileName =>
                 {
                     if (!this.PlaybackManager.IsSupported(fileName))
                     {
                         return;
                     }
-                    parameters["directoryName"] = Path.GetDirectoryName(fileName);
-                    parameters["fileName"] = fileName;
-                    parameters["status"] = LibraryItemStatus.Import;
+                    command.Parameters["directoryName"] = Path.GetDirectoryName(fileName);
+                    command.Parameters["fileName"] = fileName;
+                    command.Parameters["status"] = LibraryItemStatus.Import;
                     command.ExecuteNonQuery();
-                    //if (batch++ >= SAVE_INTERVAL)
-                    //{
-                    //    transaction.Commit();
-                    //    transaction.Bind(command);
-                    //    batch = 0;
-                    //}
                 });
                 foreach (var path in this.Paths)
                 {
