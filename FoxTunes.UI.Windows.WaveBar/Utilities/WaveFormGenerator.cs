@@ -90,7 +90,7 @@ namespace FoxTunes
                     default:
                         throw new NotImplementedException();
                 }
-                if (duplicated.ActualPosition < duplicated.Length)
+                if (data.Position < data.Capacity)
                 {
                     Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Wave form generation for file \"{0}\" failed to complete.", stream.FileName);
                     this.Cache.Remove(stream, data.Resolution);

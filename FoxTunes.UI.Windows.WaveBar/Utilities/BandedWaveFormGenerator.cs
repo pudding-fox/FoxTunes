@@ -103,7 +103,7 @@ namespace FoxTunes
 
                 Populate(dataSource, dataTransformer, data);
 
-                if (duplicated.ActualPosition < duplicated.Length)
+                if (data.Position < data.Capacity)
                 {
                     Logger.Write(this, LogLevel.Debug, "Wave form generation for file \"{0}\" failed to complete.", stream.FileName);
                     this.Cache.Remove(stream, data.Resolution);
