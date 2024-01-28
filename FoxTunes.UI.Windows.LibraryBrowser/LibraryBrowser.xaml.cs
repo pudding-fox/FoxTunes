@@ -89,7 +89,8 @@ namespace FoxTunes
                 {
                     return;
                 }
-                if (viewModel.ShowCursorAdorners)
+                //Only show adorners when hosted in main window.
+                if (this.IsHostedIn<MainWindow>() && viewModel.ShowCursorAdorners)
                 {
                     this.MouseCursorAdorner.Show();
                 }

@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using FoxTunes.Interfaces;
+using System;
 
 namespace FoxTunes
 {
@@ -20,17 +20,13 @@ namespace FoxTunes
 
         public UIComponentBase CreateControl(UIComponentConfiguration configuration)
         {
-            var parent = this.GetComponentType(configuration.Component);
-            var children = configuration.Children.Select(
-                child => this.CreateControl(child)
-            ).ToArray();
-            return this.CreateControl(parent, children);
-        }
-
-        protected virtual UIComponentBase CreateControl(Type type, UIComponentBase[] children)
-        {
-            //TODO: Handle children.
-            return ComponentActivator.Instance.Activate<UIComponentBase>(type);
+            var type = this.GetComponentType(configuration.Component);
+            var component = ComponentActivator.Instance.Activate<UIComponentBase>(type);
+            if (component is IUIComponentPanel panel)
+            {
+                panel.Component = configuration;
+            }
+            return component;
         }
 
         protected virtual Type GetComponentType(string id)

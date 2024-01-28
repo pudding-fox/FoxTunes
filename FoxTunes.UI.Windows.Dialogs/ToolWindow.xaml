@@ -15,7 +15,7 @@
         AllowsTransparency="True" 
         Background="Transparent">
     <Window.Resources>
-        <LocalViewModel:Tool x:Key="ViewModel" Core="{Binding}"></LocalViewModel:Tool>
+        <LocalViewModel:ToolWindow x:Key="ViewModel" Core="{Binding}"></LocalViewModel:ToolWindow>
     </Window.Resources>
     <Window.Topmost>
         <Binding Path="AlwaysOnTop" Source="{StaticResource ViewModel}"/>
@@ -45,7 +45,7 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Windows:Titlebar></Windows:Titlebar>
-        <LocalWindows:Tool x:Name="Tool" Grid.Row="1" Margin="4"></LocalWindows:Tool>
+        <LocalWindows:UIComponentContainer Grid.Row="1" Margin="4" Component="{Binding Component, Source={StaticResource ViewModel}}"></LocalWindows:UIComponentContainer>
         <Rectangle Grid.RowSpan="3" Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
     </Grid>
 </Window>

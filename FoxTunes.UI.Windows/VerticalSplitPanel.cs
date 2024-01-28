@@ -6,10 +6,7 @@ using System.Windows.Data;
 
 namespace FoxTunes
 {
-    /// <summary>
-    /// Interaction logic for VerticalSplitPanel.xaml
-    /// </summary>
-    public partial class VerticalSplitPanel : UserControl
+    public partial class VerticalSplitPanel : ContentControl
     {
         public static readonly DependencyProperty ControlType1Property = DependencyProperty.Register(
             "ControlType1",
@@ -94,7 +91,6 @@ namespace FoxTunes
 
         public VerticalSplitPanel()
         {
-            this.InitializeComponent();
             this.DataContextChanged += this.OnDataContextChanged;
             this.RefreshLayout();
         }

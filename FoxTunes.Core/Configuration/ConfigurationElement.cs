@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
@@ -216,6 +217,7 @@ namespace FoxTunes
             {
                 if (this.DefaultValue == null)
                 {
+                    Logger.Write(this, LogLevel.Trace, "Setting default value for configuration element \"{0}\": {1}", this.Name, value);
                     this.DefaultValue = value;
                 }
                 if (object.Equals(this.Value, value))

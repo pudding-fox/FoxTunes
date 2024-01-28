@@ -25,7 +25,7 @@ namespace FoxTunes
             "Component",
             typeof(UIComponentConfiguration),
             typeof(UIComponentSelector),
-            new FrameworkPropertyMetadata(null, new PropertyChangedCallback(OnComponentChanged))
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnComponentChanged))
         );
 
         public static UIComponentConfiguration GetComponent(UIComponentSelector source)
@@ -71,6 +71,7 @@ namespace FoxTunes
             this.TextBlock.HorizontalAlignment = HorizontalAlignment.Left;
             this.TextBlock.VerticalAlignment = VerticalAlignment.Center;
             this.TextBlock.Margin = new Thickness(8, 0, 40, 0);
+            this.TextBlock.IsHitTestVisible = false;
             this.TextBlock.SetResourceReference(
                 TextBlock.ForegroundProperty,
                 "TextBrush"
@@ -98,13 +99,13 @@ namespace FoxTunes
 
         protected virtual void OnComponentChanged()
         {
-            if (this.Component != null)
+            if (this.Component == null || string.IsNullOrEmpty(this.Component.Component))
             {
-                this.TextBlock.Visibility = Visibility.Collapsed;
+                this.TextBlock.Visibility = Visibility.Visible;
             }
             else
             {
-                this.TextBlock.Visibility = Visibility.Visible;
+                this.TextBlock.Visibility = Visibility.Collapsed;
             }
             if (this.ComponentChanged != null)
             {

@@ -28,20 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Tool.xaml" />
-    <None Remove="ToolWindow.xaml" />
-    <None Remove="ToolWindowManager.xaml" />
-    <None Remove="ToolWindowManagerWindow.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Tool.xaml" />
-    <UpToDateCheckInput Remove="ToolWindow.xaml" />
-    <UpToDateCheckInput Remove="ToolWindowManager.xaml" />
-    <UpToDateCheckInput Remove="ToolWindowManagerWindow.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
 
@@ -59,21 +45,6 @@
 
   <ItemGroup>
     <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Tool.xaml.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
-    </Compile>
-    <Compile Update="ToolWindow.xaml.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
-    </Compile>
-    <Compile Update="ToolWindowManager.xaml.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
-    </Compile>
-    <Compile Update="ToolWindowManagerWindow.xaml.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
-    </Compile>
   </ItemGroup>
 
   <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />

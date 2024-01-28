@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Security.Permissions;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -51,7 +49,7 @@ namespace FoxTunes
             {
                 try
                 {
-                    var configs = this.Configuration.LoadValue<ToolWindowConfiguration[]>(this.Element.Value);
+                    var configs = Serializer.LoadValue<ToolWindowConfiguration[]>(this.Element.Value);
                     foreach (var config in configs)
                     {
                         await this.Load(config).ConfigureAwait(false);
@@ -77,7 +75,6 @@ namespace FoxTunes
                     window.Closed += this.OnClosed;
                 }).ConfigureAwait(false);
                 this.Windows[config] = window;
-                config.PropertyChanged += this.OnConfigPropertyChanged;
                 return window;
             }
             catch (Exception e)
@@ -120,7 +117,6 @@ namespace FoxTunes
 
         protected virtual void Unload(ToolWindowConfiguration config)
         {
-            config.PropertyChanged -= this.OnConfigPropertyChanged;
             if (!this.Windows.Remove(config))
             {
                 return;
@@ -136,7 +132,7 @@ namespace FoxTunes
             }
             try
             {
-                this.Element.Value = this.Configuration.SaveValue(this.Windows.Keys.ToArray());
+                this.Element.Value = Serializer.SaveValue(this.Windows.Keys.ToArray());
                 this.Configuration.Save();
             }
             catch (Exception e)
@@ -153,11 +149,6 @@ namespace FoxTunes
                 return;
             }
             this.Unload(window.Configuration);
-        }
-
-        protected virtual void OnConfigPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            this.Debouncer.Exec(this.Save);
         }
 
         public override void InitializeComponent(ICore core)
@@ -245,12 +236,16 @@ namespace FoxTunes
 
         public Task Shutdown()
         {
-            if (IsToolWindowManagerWindowCreated)
+            if (this.Windows.Count > 0)
             {
-                ToolWindowManagerWindow.Close();
+                this.Save();
             }
             return global::FoxTunes.Windows.Invoke(() =>
             {
+                if (IsToolWindowManagerWindowCreated)
+                {
+                    ToolWindowManagerWindow.Close();
+                }
                 foreach (var window in this.Windows.Values)
                 {
                     window.Closed -= this.OnClosed;
@@ -271,7 +266,7 @@ namespace FoxTunes
                 await this.Load(config).ConfigureAwait(false);
             }
             await this.Show().ConfigureAwait(false);
-            this.Save();
+            this.Debouncer.Exec(this.Save);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -379,8 +374,7 @@ namespace FoxTunes
         }
     }
 
-    [Serializable]
-    public class ToolWindowConfiguration : BaseComponent, ISerializable
+    public class ToolWindowConfiguration
     {
         public ToolWindowConfiguration()
         {
@@ -621,35 +615,15 @@ namespace FoxTunes
 
         public event EventHandler AlwaysOnTopChanged;
 
-        #region ISerializable
-
-        protected ToolWindowConfiguration(SerializationInfo info, StreamingContext context)
+        protected virtual void OnPropertyChanged(string propertyName)
         {
-            this.Title = info.GetString(nameof(this.Title));
-            this.Left = info.GetInt32(nameof(this.Left));
-            this.Top = info.GetInt32(nameof(this.Top));
-            this.Width = info.GetInt32(nameof(this.Width));
-            this.Height = info.GetInt32(nameof(this.Height));
-            this.Component = (UIComponentConfiguration)info.GetValue(nameof(this.Component), typeof(UIComponentConfiguration));
-            this.ShowWithMainWindow = info.GetBoolean(nameof(this.ShowWithMainWindow));
-            this.ShowWithMiniWindow = info.GetBoolean(nameof(this.ShowWithMiniWindow));
-            this.AlwaysOnTop = info.GetBoolean(nameof(this.AlwaysOnTop));
+            if (this.PropertyChanged == null)
+            {
+                return;
+            }
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(nameof(this.Title), this.Title);
-            info.AddValue(nameof(this.Left), this.Left);
-            info.AddValue(nameof(this.Top), this.Top);
-            info.AddValue(nameof(this.Width), this.Width);
-            info.AddValue(nameof(this.Height), this.Height);
-            info.AddValue(nameof(this.Component), this.Component);
-            info.AddValue(nameof(this.ShowWithMainWindow), this.ShowWithMainWindow);
-            info.AddValue(nameof(this.ShowWithMiniWindow), this.ShowWithMiniWindow);
-            info.AddValue(nameof(this.AlwaysOnTop), this.AlwaysOnTop);
-        }
-
-        #endregion
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

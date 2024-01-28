@@ -79,6 +79,16 @@ namespace FoxTunes
             }
         }
 
+        protected virtual bool IsHostedIn<T>() where T : Window
+        {
+            var window = Window.GetWindow(this);
+            if (window == null)
+            {
+                return false;
+            }
+            return typeof(T).IsAssignableFrom(window.GetType());
+        }
+
         public bool IsComponentEnabled
         {
             get
