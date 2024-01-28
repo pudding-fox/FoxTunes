@@ -31,6 +31,8 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
             }
         }
 
@@ -70,6 +72,10 @@ namespace FoxTunes
 
         protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
         {
+            if (!this.Enabled)
+            {
+                return;
+            }
             if (BassUtils.GetChannelDsdRaw(e.Stream.ChannelHandle))
             {
                 //Cannot apply effects to DSD.
