@@ -1,17 +1,16 @@
-﻿using System;
+﻿using FoxDb;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
 
 namespace FoxTunes
 {
     public class PlaylistCollection : ObservableCollection<Playlist>
     {
-        private const string COUNT = "Count";
-
-        private const string INDEXER = "Item[]";
-
         public readonly object SyncRoot = new object();
 
         public PlaylistCollection(IEnumerable<Playlist> playlists) : base(playlists)
@@ -19,47 +18,36 @@ namespace FoxTunes
 
         }
 
-        public bool IsSuspended { get; private set; }
-
-        public Action Update(Playlist[] playlists)
+        public void Update(Playlist[] playlists)
         {
             lock (this.SyncRoot)
             {
-                this.IsSuspended = true;
-                try
+                for (var position = this.Count - 1; position >= 0; position--)
                 {
-                    this.Clear();
-                    this.AddRange(playlists);
+                    if (!playlists.Contains(this[position]))
+                    {
+                        this.RemoveAt(position);
+                    }
                 }
-                finally
+                for (var position = 0; position < playlists.Length; position++)
                 {
-                    this.IsSuspended = false;
+                    var index = this.IndexOf(playlists[position]);
+                    if (index == -1)
+                    {
+                        this.Insert(position, playlists[position]);
+                    }
+                    else
+                    {
+                        if (index != position)
+                        {
+                            var playlist = this[index];
+                            this.RemoveAt(index);
+                            this.Insert(position, playlist);
+                        }
+                        this[index].Name = playlists[position].Name;
+                    }
                 }
             }
-            return () =>
-            {
-                this.OnPropertyChanged(new PropertyChangedEventArgs(COUNT));
-                this.OnPropertyChanged(new PropertyChangedEventArgs(INDEXER));
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-            };
-        }
-
-        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-        {
-            if (this.IsSuspended)
-            {
-                return;
-            }
-            base.OnCollectionChanged(e);
-        }
-
-        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
-        {
-            if (this.IsSuspended)
-            {
-                return;
-            }
-            base.OnPropertyChanged(e);
         }
     }
 }

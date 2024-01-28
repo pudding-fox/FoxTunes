@@ -82,7 +82,7 @@ namespace FoxTunes.ViewModel
             }
             else
             {
-                return Windows.Invoke(this.Items.Update(playlists));
+                return Windows.Invoke(() => this.Items.Update(playlists));
             }
         }
 
