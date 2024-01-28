@@ -22,6 +22,8 @@ namespace FoxTunes.ViewModel
 
         public IScriptingContext ScriptingContext { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
         private PlaylistItem _SelectedItem { get; set; }
 
         public PlaylistItem SelectedItem
@@ -89,6 +91,7 @@ namespace FoxTunes.ViewModel
             this.PlaylistManager.CurrentPlaylistChanged += this.OnCurrentPlaylistChanged;
             this.PlaylistManager.SelectedPlaylistChanged += this.OnSelectedPlaylistChanged;
             this.PlaylistManager.CurrentItemChanged += this.OnCurrentItemChanged;
+            this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<TextConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.PLAYLIST_SCRIPT_ELEMENT

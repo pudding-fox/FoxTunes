@@ -45,36 +45,6 @@ namespace FoxTunes.ViewModel
 
         public IErrorEmitter ErrorEmitter { get; private set; }
 
-        public IConfiguration Configuration { get; private set; }
-
-        public const int MAX_UNVIRTUALIZED_ITEMS = 1000;
-
-        private bool _IsVirtualizing { get; set; }
-
-        public bool IsVirtualizing
-        {
-            get
-            {
-                return this._IsVirtualizing;
-            }
-            set
-            {
-                this._IsVirtualizing = value;
-                this.OnIsVirtualizingChanged();
-            }
-        }
-
-        protected virtual void OnIsVirtualizingChanged()
-        {
-            if (this.IsVirtualizingChanged != null)
-            {
-                this.IsVirtualizingChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("IsVirtualizing");
-        }
-
-        public event EventHandler IsVirtualizingChanged;
-
         private PlaylistItemCollection _Items { get; set; }
 
         public PlaylistItemCollection Items
@@ -208,11 +178,6 @@ namespace FoxTunes.ViewModel
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaybackManager = core.Managers.Playback;
             this.ErrorEmitter = core.Components.ErrorEmitter;
-            this.Configuration = core.Components.Configuration;
-            this.Configuration.GetElement<BooleanConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                WindowsUserInterfaceConfiguration.VIRTUAL_LISTS_ELEMENT
-            ).ConnectValue(value => this.IsVirtualizing = value);
             //TODO: Bad .Wait().
             this.RefreshStatus().Wait();
             base.InitializeComponent(core);
@@ -271,11 +236,6 @@ namespace FoxTunes.ViewModel
                 return;
             }
             var items = this.PlaylistBrowser.GetItems(playlist);
-            if (!this.IsVirtualizing && items.Length > MAX_UNVIRTUALIZED_ITEMS)
-            {
-                await this.ErrorEmitter.Send(this, string.Format(Strings.PlaylistBase_UnvirtualizedTooLarge, items.Length, MAX_UNVIRTUALIZED_ITEMS));
-                items = items.Take(MAX_UNVIRTUALIZED_ITEMS).ToArray();
-            }
             if (this.Items == null)
             {
                 await Windows.Invoke(() => this.Items = new PlaylistItemCollection(items)).ConfigureAwait(false);

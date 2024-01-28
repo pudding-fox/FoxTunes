@@ -180,34 +180,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowCursorAdornersChanged;
 
-        public const int MAX_UNVIRTUALIZED_ITEMS = 1000;
-
-        private bool _IsVirtualizing { get; set; }
-
-        public bool IsVirtualizing
-        {
-            get
-            {
-                return this._IsVirtualizing;
-            }
-            set
-            {
-                this._IsVirtualizing = value;
-                this.OnIsVirtualizingChanged();
-            }
-        }
-
-        protected virtual void OnIsVirtualizingChanged()
-        {
-            if (this.IsVirtualizingChanged != null)
-            {
-                this.IsVirtualizingChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("IsVirtualizing");
-        }
-
-        public event EventHandler IsVirtualizingChanged;
-
         private string _StatusMessage { get; set; }
 
         public virtual string StatusMessage
@@ -295,11 +267,6 @@ namespace FoxTunes.ViewModel
                 return;
             }
             var items = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy);
-            if (!this.IsVirtualizing && items.Length > MAX_UNVIRTUALIZED_ITEMS)
-            {
-                await this.ErrorEmitter.Send(this, string.Format(Strings.LibraryBase_UnvirtualizedTooLarge, items.Length, MAX_UNVIRTUALIZED_ITEMS));
-                items = items.Take(MAX_UNVIRTUALIZED_ITEMS).ToArray();
-            }
             if (this.Items == null)
             {
                 await Windows.Invoke(() => this.Items = new LibraryHierarchyNodeCollection(items)).ConfigureAwait(false);
@@ -336,10 +303,6 @@ namespace FoxTunes.ViewModel
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.SHOW_CURSOR_ADORNERS_ELEMENT
             ).ConnectValue(value => this.ShowCursorAdorners = value);
-            this.Configuration.GetElement<BooleanConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                WindowsUserInterfaceConfiguration.VIRTUAL_LISTS_ELEMENT
-            ).ConnectValue(value => this.IsVirtualizing = value);
             this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }

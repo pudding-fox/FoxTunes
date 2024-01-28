@@ -19,8 +19,6 @@ namespace FoxTunes
 
         public const string SHOW_CURSOR_ADORNERS_ELEMENT = "NNNN7E23-A1E4-4BB6-9291-B553F4F7AD12";
 
-        public const string VIRTUAL_LISTS_ELEMENT = "MMMM474D-7915-45E5-9265-85C406343CA8";
-
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.WindowsUserInterfaceConfiguration_Section)
@@ -33,9 +31,7 @@ namespace FoxTunes
                 .WithElement(
                     new DoubleConfigurationElement(MARQUEE_STEP_ELEMENT, Strings.WindowsUserInterfaceConfiguration_MarqueeStep, path: Strings.General_Advanced).WithValue(0.80).WithValidationRule(new DoubleValidationRule(0.80, 10, 0.4)))
                 .WithElement(
-                    new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Cursors, path: Strings.General_Advanced).WithValue(Publication.ReleaseType == ReleaseType.Default))
-                .WithElement(
-                    new BooleanConfigurationElement(VIRTUAL_LISTS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_VirtualLists, path: Strings.General_Advanced).WithValue(true)
+                    new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Cursors, path: Strings.General_Advanced).WithValue(Publication.ReleaseType == ReleaseType.Default)
             );
         }
 
