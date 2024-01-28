@@ -12,6 +12,8 @@ namespace FoxTunes
 
         public const string ENFORCE_RATE_ELEMENT = "JJJJ5B16-1B49-4C50-A8CF-BE3A6CCD4A87";
 
+        public const string RESAMPLE_QUALITY_ELEMENT = "JJKKF36D-41BC-462F-8F8F-C3E6BD5A4661";
+
         public const string DEPTH_ELEMENT = "KKKKA2A6-DCA0-4E27-9812-498BB2A2C4BC";
 
         public const string DEPTH_16_OPTION = "LLLL8466-7582-4B1C-8687-7AB75D636CD8";
@@ -41,7 +43,8 @@ namespace FoxTunes
                 .WithElement(new BooleanConfigurationElement(PLAY_FROM_RAM_ELEMENT, "Play From Memory", path: "Advanced").WithValue(false))
                 .WithElement(new IntegerConfigurationElement(BUFFER_LENGTH_ELEMENT, "Buffer Length", path: "Advanced").WithValue(500).WithValidationRule(new IntegerValidationRule(10, 5000)))
                 .WithElement(new BooleanConfigurationElement(VOLUME_ENABLED_ELEMENT, "Software Volume Control", path: "Advanced").WithValue(false))
-                .WithElement(new DoubleConfigurationElement(VOLUME_ELEMENT, "Software Volume Level", path: "Advanced").WithValue(1).WithValidationRule(new DoubleValidationRule(0, 1, 0.01)).DependsOn(SECTION, VOLUME_ENABLED_ELEMENT)
+                .WithElement(new DoubleConfigurationElement(VOLUME_ELEMENT, "Software Volume Level", path: "Advanced").WithValue(1).WithValidationRule(new DoubleValidationRule(0, 1, 0.01)).DependsOn(SECTION, VOLUME_ENABLED_ELEMENT))
+                .WithElement(new IntegerConfigurationElement(RESAMPLE_QUALITY_ELEMENT, "Resampling Quality", path: "Advanced").WithValue(2).WithValidationRule(new IntegerValidationRule(1, 10))
             );
         }
 

@@ -2,6 +2,7 @@
 using ManagedBass;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace FoxTunes
 {
@@ -86,6 +87,7 @@ namespace FoxTunes
             this.IsInitialized = true;
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 1));
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.PlaybackBufferLength, this.GetBufferLength()));
+            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.SRCQuality, this.Output.ResamplingQuality));
             BassUtils.OK(Bass.Init(this.DirectSoundDevice, this.Output.Rate));
             Logger.Write(this, LogLevel.Debug, "BASS Initialized.");
         }

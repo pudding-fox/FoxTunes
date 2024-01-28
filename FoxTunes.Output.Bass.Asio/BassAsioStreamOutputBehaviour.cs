@@ -131,6 +131,7 @@ namespace FoxTunes
             this.IsInitialized = true;
             BassAsioUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 0));
             BassAsioUtils.OK(Bass.Configure(global::ManagedBass.Configuration.PlaybackBufferLength, this.Output.BufferLength));
+            BassAsioUtils.OK(Bass.Configure(global::ManagedBass.Configuration.SRCQuality, this.Output.ResamplingQuality));
             BassAsioUtils.OK(Bass.Init(Bass.NoSoundDevice));
             //Always detect device for now.
             //if (BassAsioDevice.Info != null && BassAsioDevice.Info.Device != this.AsioDevice)

@@ -44,6 +44,11 @@ namespace FoxTunes
                 var builder = new StringBuilder();
                 builder.Append(this.Name);
                 builder.Append(string.Format(" v{0}", Bass.Version));
+                var cpu = Bass.CPUUsage;
+                if (cpu > 0)
+                {
+                    builder.Append(string.Format(" CPU {0:0.00}%", cpu));
+                }
                 this.PipelineManager.WithPipeline(pipeline =>
                 {
                     if (pipeline != null)
@@ -153,6 +158,23 @@ namespace FoxTunes
             {
                 this._BufferLength = value;
                 Logger.Write(this, LogLevel.Debug, "BufferLength = {0}", this.BufferLength);
+                //TODO: Bad .Wait().
+                this.Shutdown().Wait();
+            }
+        }
+
+        private int _ResamplingQuality { get; set; }
+
+        public int ResamplingQuality
+        {
+            get
+            {
+                return this._ResamplingQuality;
+            }
+            set
+            {
+                this._ResamplingQuality = value;
+                Logger.Write(this, LogLevel.Debug, "ResamplingQuality = {0}", this.ResamplingQuality);
                 //TODO: Bad .Wait().
                 this.Shutdown().Wait();
             }
@@ -317,6 +339,10 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.BUFFER_LENGTH_ELEMENT
             ).ConnectValue(value => this.BufferLength = value);
+            this.Configuration.GetElement<IntegerConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassOutputConfiguration.RESAMPLE_QUALITY_ELEMENT
+            ).ConnectValue(value => this.ResamplingQuality = value);
             this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
             this.PipelineManager = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineManager>();
             this.PipelineManager.Error += this.OnPipelineManagerError;
