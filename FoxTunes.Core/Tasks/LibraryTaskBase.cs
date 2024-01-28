@@ -142,9 +142,6 @@ namespace FoxTunes
 
         protected virtual async Task AddLibraryItems(IEnumerable<string> paths, CancellationToken cancellationToken)
         {
-            //We don't know how many files we're about to enumerate.
-            this.IsIndeterminate = true;
-
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 using (var libraryPopulator = new LibraryPopulator(this.Database, this.PlaybackManager, this.Visible, transaction))
@@ -195,7 +192,8 @@ namespace FoxTunes
                     else
                     {
                         this.Name = "Finalizing";
-                        this.IsIndeterminate = true;
+                        this.Position = 0;
+                        this.Count = 0;
                     }
                     transaction.Commit();
                 }

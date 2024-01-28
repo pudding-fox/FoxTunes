@@ -19,9 +19,5 @@ namespace FoxTunes.Interfaces
         int Count { get; }
 
         event EventHandler CountChanged;
-
-        bool IsIndeterminate { get; }
-
-        event EventHandler IsIndeterminateChanged;
     }
 }

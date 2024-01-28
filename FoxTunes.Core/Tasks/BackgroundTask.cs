@@ -202,32 +202,6 @@ namespace FoxTunes
 
         public event EventHandler CountChanged;
 
-        protected bool _IsIndeterminate { get; set; }
-
-        public bool IsIndeterminate
-        {
-            get
-            {
-                return this._IsIndeterminate;
-            }
-            protected set
-            {
-                this._IsIndeterminate = value;
-                this.OnIsIndeterminateChanged();
-            }
-        }
-
-        protected virtual void OnIsIndeterminateChanged()
-        {
-            if (this.IsIndeterminateChanged != null)
-            {
-                this.IsIndeterminateChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("IsIndeterminate");
-        }
-
-        public event EventHandler IsIndeterminateChanged;
-
         public override void InitializeComponent(ICore core)
         {
             lock (Instances)
@@ -375,12 +349,10 @@ namespace FoxTunes
             var descriptionChanged = new EventHandler((sender, e) => this.Description = task.Description);
             var positionChanged = new EventHandler((sender, e) => this.Position = task.Position);
             var countChanged = new EventHandler((sender, e) => this.Count = task.Count);
-            var isIndeterminateChanged = new EventHandler((sender, e) => this.IsIndeterminate = task.IsIndeterminate);
             task.NameChanged += nameChanged;
             task.DescriptionChanged += descriptionChanged;
             task.PositionChanged += positionChanged;
             task.CountChanged += countChanged;
-            task.IsIndeterminateChanged += isIndeterminateChanged;
             try
             {
                 await func().ConfigureAwait(false);
@@ -391,7 +363,6 @@ namespace FoxTunes
                 task.DescriptionChanged -= descriptionChanged;
                 task.PositionChanged -= positionChanged;
                 task.CountChanged -= countChanged;
-                task.IsIndeterminateChanged -= isIndeterminateChanged;
             }
         }
 
