@@ -11,16 +11,22 @@ namespace FoxTunes
 {
     public static class WebRequestFactory
     {
-#if DISABLE_CERTIFICATE_VALIDATION
+
         static WebRequestFactory()
         {
+#if NET40
+            //At some point the default SecurityProtocol on net40 was broken.
+            const SecurityProtocolType TLS12 = (SecurityProtocolType)0x00000C00;
+            ServicePointManager.SecurityProtocol = TLS12;
+#endif
+#if DISABLE_CERTIFICATE_VALIDATION
 #if NET40
             ServicePointManager.ServerCertificateValidationCallback += OnServerCertificateValidationCallback;
 #else
             //Handled by HttpWebRequest.ServerCertificateValidationCallback
 #endif
-        }
 #endif
+        }
 
         public static HttpWebRequest Create(string url)
         {
