@@ -8,9 +8,9 @@ namespace FoxTunes
     /// </summary>
     public partial class Chart : UserControl
     {
-        public Size MinSizeForXAxis = new Size(300, 150);
+        public Size MinSizeForXAxis = new Size(150, 300);
 
-        public Size MinSizeForYAxis = new Size(150, 300);
+        public Size MinSizeForYAxis = new Size(300, 150);
 
         public static readonly DependencyProperty XAxisContentProperty = DependencyProperty.Register(
             "XAxisContent",

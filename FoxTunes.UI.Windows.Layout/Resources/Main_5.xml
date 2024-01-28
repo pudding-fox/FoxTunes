@@ -32,15 +32,13 @@
                 <UIComponentConfiguration Component="66C8A9E7-0891-48DD-8086-E40F72D4D030" />
                 <UIComponentConfiguration Component="18E98420-F039-4504-A116-3D0F26BEAAD5">
                   <UIComponentConfiguration Component="F8231616-9D5E-45C8-BD72-506FC5FC9C95">
-                    <MetaDataEntry Name="Configuration_BBBBFFA3-8F13-4838-9429-69C5E208963D" Value="False" />
+                    <MetaDataEntry Name="Configuration_CCCC0961-0743-4761-B27D-3ACEFA6EAC3C" Value="True" />
                   </UIComponentConfiguration>
-                  <UIComponentConfiguration Component="381328C3-C2CE-4FDA-AC92-71A15C3FC387">
+                  <UIComponentConfiguration Component="9A696BBC-F6AB-4180-8661-353A79253AA9">
                     <MetaDataEntry Name="Configuration_AABBF573-83D3-498E-BEF8-F1DB5A329B9D" Value="GGGG5E28-CC67-43F2-8778-61570785C766" />
-                    <MetaDataEntry Name="Configuration_BBBBDCF0-8B24-4321-B7BE-74DADE59D4FA" Value="False" />
-                    <MetaDataEntry Name="Configuration_DDDEE2B6A-188E-4FF4-A277-37D140D49C45" Value="False" />
                     <MetaDataEntry Name="Configuration_AAAA0663-7CBF-4EE4-99C8-A0A096D4E876" Value="DDDD058E-7B9C-4101-992A-709B87756991" />
                   </UIComponentConfiguration>
-                  <MetaDataEntry Name="SplitterDistance" Value="110" />
+                  <MetaDataEntry Name="SplitterDistance" Value="150" />
                   <MetaDataEntry Name="SplitterDirection" Value="Left" />
                 </UIComponentConfiguration>
                 <MetaDataEntry Name="SplitterDistance" Value="360" />
@@ -62,7 +60,6 @@
           </UIComponentConfiguration>
           <MetaDataEntry Name="SplitterDistance" Value="220" />
           <MetaDataEntry Name="SplitterDirection" Value="Bottom" />
-          <MetaDataEntry Name="DockLocation" Value="Top" />
         </UIComponentConfiguration>
         <UIComponentConfiguration Component="C1BD2AF7-ACF8-4710-99A3-AB5F34C46A90">
           <UIComponentConfiguration Component="26A6EFC8-E2A5-4157-AAF7-6E7A52516FCA" />
@@ -89,16 +86,12 @@
             <MetaDataEntry Name="Alignment" Value="Right" />
           </UIComponentConfiguration>
         </UIComponentConfiguration>
-        <MetaDataEntry Name="SplitterDistance" Value="220" />
-        <MetaDataEntry Name="SplitterDirection" Value="Bottom" />
         <MetaDataEntry Name="DockLocation" Value="Top" />
       </UIComponentConfiguration>
       <UIComponentConfiguration Component="CFF16494-CB86-4483-99C7-07E496FE894A">
         <MetaDataEntry Name="Configuration_BBBB78F3-B32F-4A8C-B566-9A8B39A896C7" Value="(function () {&#xD;&#xA;    if (!file) {&#xD;&#xA;        return version();&#xD;&#xA;    }&#xD;&#xA;    var parts = [];&#xD;&#xA;    if (tag.disccount != 1 &amp;&amp; tag.disc) {&#xD;&#xA;        parts.push(tag.disc);&#xD;&#xA;    }&#xD;&#xA;    if (tag.track) {&#xD;&#xA;        parts.push(zeropad2(tag.track, tag.trackcount, 2));&#xD;&#xA;    }&#xD;&#xA;    if (tag.artist) {&#xD;&#xA;        parts.push(tag.artist);&#xD;&#xA;    }&#xD;&#xA;    if (tag.album) {&#xD;&#xA;        parts.push(tag.album);&#xD;&#xA;    }&#xD;&#xA;    if (tag.title) {&#xD;&#xA;        parts.push(tag.title);&#xD;&#xA;    }&#xD;&#xA;    else {&#xD;&#xA;        parts.push(filename(file));&#xD;&#xA;    }&#xD;&#xA;    if (tag.performer &amp;&amp; tag.performer != tag.artist) {&#xD;&#xA;        parts.push(tag.performer);&#xD;&#xA;    }&#xD;&#xA;    parts.push((extension(file) || &quot;&quot;).toUpperCase());&#xD;&#xA;    parts.push(bitrate(property.audioSampleRate, property.bitsPerSample, property.audioChannels));&#xD;&#xA;    parts.push(samplerate(property.audioSampleRate));&#xD;&#xA;    parts.push(channeldescription(property.audioChannels));&#xD;&#xA;    return parts.join(&quot; - &quot;);&#xD;&#xA;})()" />
       </UIComponentConfiguration>
-      <MetaDataEntry Name="SplitterDistance" Value="220" />
       <MetaDataEntry Name="DockLocation" Value="Bottom" />
-      <MetaDataEntry Name="SplitterDirection" Value="Bottom" />
     </UIComponentConfiguration>
     <UIComponentConfiguration Component="EDC787A6-7B1E-4161-B2E1-843C58806D81">
       <MetaDataEntry Name="VerticalAlignment" Value="Bottom" />
