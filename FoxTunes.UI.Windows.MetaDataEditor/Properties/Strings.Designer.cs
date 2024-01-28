@@ -68,5 +68,23 @@ namespace FoxTunes {
                 return ResourceManager.GetString("MetaDataEditorBehaviour.Tag", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;Multiple Values&gt;.
+        /// </summary>
+        internal static string MetaDataEntry_MultipleValues {
+            get {
+                return ResourceManager.GetString("MetaDataEntry.MultipleValues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;No Value&gt;.
+        /// </summary>
+        internal static string MetaDataEntry_NoValue {
+            get {
+                return ResourceManager.GetString("MetaDataEntry.NoValue", resourceCulture);
+            }
+        }
     }
 }

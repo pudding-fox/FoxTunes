@@ -120,4 +120,10 @@
   <data name="MetaDataEditorBehaviour.Tag" xml:space="preserve">
     <value>Tag</value>
   </data>
+  <data name="MetaDataEntry.MultipleValues" xml:space="preserve">
+    <value>&lt;Multiple Values&gt;</value>
+  </data>
+  <data name="MetaDataEntry.NoValue" xml:space="preserve">
+    <value>&lt;No Value&gt;</value>
+  </data>
 </root>

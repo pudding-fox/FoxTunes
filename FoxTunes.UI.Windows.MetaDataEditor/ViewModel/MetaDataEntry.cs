@@ -26,10 +26,6 @@ namespace FoxTunes.ViewModel
 
         public static readonly string MyPictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
 
-        public static readonly string NoValue = "<No Value>";
-
-        public static readonly string MultipleValues = "<Multiple Values>";
-
         public static readonly ThemeLoader ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
 
         public static readonly ImageLoader ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
@@ -125,7 +121,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnValueChanged()
         {
-            if (string.Equals(this.Value, NoValue, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(this.Value, Strings.MetaDataEntry_NoValue, StringComparison.OrdinalIgnoreCase))
             {
                 this.HasValue = false;
             }
@@ -133,7 +129,7 @@ namespace FoxTunes.ViewModel
             {
                 this.HasValue = true;
             }
-            if (string.Equals(this.Value, MultipleValues, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(this.Value, Strings.MetaDataEntry_MultipleValues, StringComparison.OrdinalIgnoreCase))
             {
                 this.HasMultipleValues = true;
             }
@@ -260,8 +256,8 @@ namespace FoxTunes.ViewModel
 
         public void SetValue()
         {
-            this.Value = null;
-            this.OriginalValue = null;
+            this._Value = null;
+            this._HasValue = false;
             foreach (var key in this.MetaDataItems.Keys)
             {
                 var metaDataItem = default(MetaDataItem);
@@ -269,11 +265,11 @@ namespace FoxTunes.ViewModel
                 {
                     if (!this.HasValue)
                     {
-                        this.Value = NoValue;
+                        this.Value = Strings.MetaDataEntry_NoValue;
                     }
                     else
                     {
-                        this.Value = MultipleValues;
+                        this.Value = Strings.MetaDataEntry_MultipleValues;
                         break;
                     }
                 }
@@ -283,7 +279,7 @@ namespace FoxTunes.ViewModel
                 }
                 else if (!string.Equals(this.Value, metaDataItem.Value))
                 {
-                    this.Value = MultipleValues;
+                    this.Value = Strings.MetaDataEntry_MultipleValues;
                     break;
                 }
             }
@@ -503,7 +499,7 @@ namespace FoxTunes.ViewModel
 
         public void Clear()
         {
-            this.Value = NoValue;
+            this.Value = Strings.MetaDataEntry_NoValue;
         }
 
         protected override Freezable CreateInstanceCore()
