@@ -262,7 +262,7 @@ namespace FoxTunes
             public HighDefFilterParserProvider()
             {
                 this.Regex = new Regex(
-                    @"(?:(HD|high\-def))",
+                    @"(?:(?:^|\s+)(HD|high\-def)(?:$|\s+))",
                     RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture
                 );
             }
