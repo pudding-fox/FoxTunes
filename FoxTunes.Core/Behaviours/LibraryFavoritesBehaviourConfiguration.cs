@@ -29,7 +29,14 @@ namespace FoxTunes
             }
             else
             {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, SHOW_FAVORITES_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, SHOW_FAVORITES_ELEMENT).Do(element =>
+                {
+                    if (element.Value)
+                    {
+                        element.Toggle();
+                    }
+                    element.Hide();
+                });
             }
         }
     }

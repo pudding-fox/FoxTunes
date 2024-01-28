@@ -52,6 +52,9 @@ namespace FoxTunes
                 LibraryFavoritesBehaviourConfiguration.SECTION,
                 LibraryFavoritesBehaviourConfiguration.SHOW_FAVORITES_ELEMENT
             );
+            this.ShowFavorites.ConnectValue(
+                async value => await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated, CommonSignalFlags.SOFT))
+            );
             base.InitializeComponent(core);
         }
 
@@ -114,7 +117,6 @@ namespace FoxTunes
                     break;
                 case TOGGLE_SHOW_FAVORITES:
                     this.ShowFavorites.Toggle();
-                    await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated, CommonSignalFlags.SOFT));
                     this.Configuration.Save();
                     break;
             }
