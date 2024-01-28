@@ -9,6 +9,7 @@
     <UserControl.Resources>
         <ViewModel:Titlebar x:Key="ViewModel" Core="{Binding}" Window="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
         <ViewModel:WindowStateConverter x:Key="WindowStateConverter"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Width" Value="30"/>
             <Setter Property="Height" Value="25"/>
@@ -65,7 +66,11 @@
         </Rectangle>
         <TextBlock Grid.Column="1" Text="{Binding Title, Source={StaticResource ViewModel}}" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"></TextBlock>
         <Button Name="Minimize" Grid.Column="2" Command="{Binding MinimizeCommand, Mode=OneWay, Source={StaticResource ViewModel}}">&#x30;</Button>
-        <Button Name="MaximizeRestore" Grid.Column="3" Command="{Binding MaximizeRestoreCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{Binding WindowState, Converter={StaticResource WindowStateConverter}, Source={StaticResource ViewModel}}"></Button>
+        <Button Name="MaximizeRestore" Grid.Column="3" 
+                Command="{Binding MaximizeRestoreCommand, Mode=OneWay, Source={StaticResource ViewModel}}" 
+                Content="{Binding WindowState, Converter={StaticResource WindowStateConverter}, Source={StaticResource ViewModel}}"
+                Visibility="{Binding CanMaximizeRestore, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}">
+        </Button>
         <Button Name="Close" Grid.Column="4" Command="{Binding CloseCommand, Mode=OneWay, Source={StaticResource ViewModel}}">&#x72;</Button>
     </Grid>
 </UserControl>

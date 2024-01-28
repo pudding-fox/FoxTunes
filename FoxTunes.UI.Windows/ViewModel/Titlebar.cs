@@ -62,6 +62,7 @@ namespace FoxTunes.ViewModel
             }
             this.OnTitleChanged();
             this.OnWindowStateChanged();
+            this.OnCanMaximizeRestoreChanged();
             if (this.WindowChanged != null)
             {
                 this.WindowChanged(this, EventArgs.Empty);
@@ -158,7 +159,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(this.MaximizeRestore);
+                return new Command(this.MaximizeRestore, () => this.CanMaximizeRestore);
             }
         }
 
@@ -174,6 +175,29 @@ namespace FoxTunes.ViewModel
                     break;
             }
         }
+
+        public bool CanMaximizeRestore
+        {
+            get
+            {
+                if (this.Window != null)
+                {
+                    return this.Window.ResizeMode != ResizeMode.NoResize;
+                }
+                return true;
+            }
+        }
+
+        protected virtual void OnCanMaximizeRestoreChanged()
+        {
+            if (this.CanMaximizeRestoreChanged != null)
+            {
+                this.CanMaximizeRestoreChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("CanMaximizeRestore");
+        }
+
+        public event EventHandler CanMaximizeRestoreChanged;
 
         public ICommand CloseCommand
         {
