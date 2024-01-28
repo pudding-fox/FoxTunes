@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class ThemeLoader : StandardComponent
     {
         private Lazy<ITheme> _Theme { get; set; }

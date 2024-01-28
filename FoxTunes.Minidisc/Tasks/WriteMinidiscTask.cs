@@ -49,7 +49,10 @@ namespace FoxTunes
                     break;
             }
         }
+#pragma warning disable 0067
 
         public event StatusEventHandler Updated;
+
+#pragma warning restore 0067
     }
 }

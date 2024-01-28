@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class LyricsMetaDataSource : StandardComponent, IOnDemandMetaDataSource
     {
         public LyricsBehaviour Behaviour { get; private set; }

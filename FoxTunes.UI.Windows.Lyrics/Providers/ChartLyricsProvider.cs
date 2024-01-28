@@ -11,7 +11,7 @@ using System.Xml;
 namespace FoxTunes
 {
     [Component(ID, ComponentSlots.None)]
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class ChartLyricsProvider : LyricsProvider, IConfigurableComponent
     {
         public const string ID = "2C54A300-DD63-49BD-B709-DAE6F6C10018";

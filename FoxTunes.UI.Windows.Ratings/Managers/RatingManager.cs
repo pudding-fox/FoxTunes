@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class RatingManager : StandardManager, IBackgroundTaskSource
     {
         public IMetaDataManager MetaDataManager { get; private set; }

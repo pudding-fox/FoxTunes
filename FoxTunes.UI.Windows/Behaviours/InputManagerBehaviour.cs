@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class InputManagerBehaviour : StandardBehaviour, IDisposable
     {
         public InputManagerBehaviour()

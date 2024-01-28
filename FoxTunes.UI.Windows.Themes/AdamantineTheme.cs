@@ -7,7 +7,7 @@ using System.Windows;
 namespace FoxTunes
 {
     [Component(ID, ComponentSlots.None)]
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class AdamantineTheme : ThemeBase, IConfigurableComponent
     {
         public const string ID = "06464CF4-118F-47EA-9597-303D305EF847";

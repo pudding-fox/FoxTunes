@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class ImageResizer : StandardComponent, IDisposable
     {
         private static readonly string PREFIX = typeof(ImageResizer).Name;

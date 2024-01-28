@@ -1,4 +1,6 @@
 ﻿using NUnit.Framework;
+using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,6 +9,25 @@ namespace FoxTunes.Encoder.Bass.Tests
     [Explicit]
     public class BassEncoderTests : TestBase
     {
+        public string DirectoryName { get; private set; }
+
+        [SetUp]
+        public override void SetUp()
+        {
+            this.DirectoryName = Path.Combine(Path.GetTempPath(), string.Format("FT-{0}", DateTime.UtcNow.ToFileTimeUtc()));
+            base.SetUp();
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            if (Directory.Exists(this.DirectoryName))
+            {
+                Directory.Delete(this.DirectoryName, true);
+            }
+            base.TearDown();
+        }
+
         [Test]
         public async Task CanEncodePlaylistItems()
         {
@@ -16,15 +37,17 @@ namespace FoxTunes.Encoder.Bass.Tests
             var behaviour = ComponentRegistry.Instance.GetComponent<BassEncoderBehaviour>();
             foreach (var profile in profiles)
             {
-                await behaviour.Encode(TestInfo.PlaylistItems, profile, true).ConfigureAwait(false);
+                var encoderItems = await behaviour.Encode(
+                    TestInfo.PlaylistItems,
+                    new BassEncoderOutputPath.Fixed(this.DirectoryName),
+                    profile,
+                    true
+                ).ConfigureAwait(false);
+                foreach (var encoderItem in encoderItems)
+                {
+                    Assert.AreEqual(EncoderItemStatus.Complete, encoderItem.Status, "Encode with profile \"{0}\" failed: {1}", profile, string.Join(", ", encoderItem.Errors));
+                }
             }
-        }
-
-        [Test]
-        public async Task CanEncodePlaylistItems_PCM16()
-        {
-            var behaviour = ComponentRegistry.Instance.GetComponent<BassEncoderBehaviour>();
-            await behaviour.Encode(TestInfo.PlaylistItems, RawProfile.PCM16, true).ConfigureAwait(false);
         }
     }
 }

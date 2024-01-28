@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class WindowsFileSystemBrowser : StandardComponent, IFileSystemBrowser
     {
         public void Select(string fileName)

@@ -3,7 +3,7 @@ using System;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class DefaultLayoutProvider : UILayoutProviderBase
     {
         public const string ID = "BBBB4ED2-782D-4622-ADF4-AAE2B543E0F3";

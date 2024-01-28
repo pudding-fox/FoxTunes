@@ -73,4 +73,12 @@ namespace FoxTunes
             }
         }
     }
+
+    public enum BassEncoderOutputDestination : byte
+    {
+        None = 0,
+        Browse = 1,
+        Source = 2,
+        Specific = 3
+    }
 }

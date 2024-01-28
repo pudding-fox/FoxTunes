@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class WaveFormGenerator : StandardComponent
     {
         public WaveFormCache Cache { get; private set; }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class WindowTitleBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public IPlaybackManager PlaybackManager { get; private set; }

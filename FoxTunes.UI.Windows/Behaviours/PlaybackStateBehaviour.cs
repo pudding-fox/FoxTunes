@@ -11,7 +11,7 @@ using System.Windows.Markup;
 namespace FoxTunes
 {
     [Component(ID, null, priority: ComponentAttribute.PRIORITY_LOW)]
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class PlaybackStateBehaviour : StandardBehaviour, IUIPlaylistColumnProvider, IDatabaseInitializer
     {
         public const string ID = "C0B2450C-DEDA-4D8B-8A32-5EA733F1FD45";

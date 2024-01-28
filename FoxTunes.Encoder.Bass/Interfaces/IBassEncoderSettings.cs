@@ -1,18 +1,17 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 
 namespace FoxTunes
 {
-    public interface IBassEncoderSettings
+    public interface IBassEncoderSettings : IBaseComponent
     {
         string Name { get; }
-
-        string Executable { get; }
-
-        string Directory { get; }
 
         string Extension { get; }
 
         IBassEncoderFormat Format { get; }
+
+        BassEncoderSettingsFlags Flags { get; }
 
         void InitializeComponent(ICore core);
 
@@ -20,14 +19,13 @@ namespace FoxTunes
 
         int GetDepth(EncoderItem encoderItem, IBassStream stream);
 
-        string GetArguments(EncoderItem encoderItem, IBassStream stream);
+        int GetRate(EncoderItem encoderItem, IBassStream stream);
     }
 
-    public enum BassEncoderOutputDestination : byte
+    [Flags]
+    public enum BassEncoderSettingsFlags : byte
     {
-        None = 0,
-        Browse = 1,
-        Source = 2,
-        Specific = 3
+        None,
+        Internal = 1
     }
 }

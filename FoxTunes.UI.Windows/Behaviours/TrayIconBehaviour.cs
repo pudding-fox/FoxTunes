@@ -11,7 +11,7 @@ using System.Windows.Interop;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class TrayIconBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
     {
         public const string QUIT = "ZZZZ";

@@ -7,7 +7,7 @@ using System.Windows;
 namespace FoxTunes
 {
     [Component(ID, ComponentSlots.None)]
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     [ComponentRelease(ReleaseType.Default)]
     public class ExpressionDarkTheme : ThemeBase, IConfigurableComponent
     {

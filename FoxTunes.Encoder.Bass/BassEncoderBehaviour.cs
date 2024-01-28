@@ -36,9 +36,10 @@ namespace FoxTunes
             this.PlaylistManager = core.Managers.Playlist;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.ReportEmitter = core.Components.ReportEmitter;
-            this.Profiles = ComponentRegistry.Instance.GetComponents<IBassEncoderSettings>().Select(
-                settings => settings.Name
-            ).ToArray();
+            this.Profiles = ComponentRegistry.Instance.GetComponents<IBassEncoderSettings>()
+                .Where(settings => !settings.Flags.HasFlag(BassEncoderSettingsFlags.Internal))
+                .Select(settings => settings.Name)
+                .ToArray();
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassEncoderBehaviourConfiguration.SECTION,
@@ -149,9 +150,15 @@ namespace FoxTunes
             return this.Encode(playlistItems, profile, true);
         }
 
-        public async Task<EncoderItem[]> Encode(IFileData[] fileDatas, string profile, bool report)
+        public Task<EncoderItem[]> Encode(IFileData[] fileDatas, string profile, bool report)
         {
-            var factory = new EncoderItemFactory();
+            var outputPath = new BassEncoderOutputPath();
+            outputPath.InitializeComponent(this.Core);
+            return this.Encode(fileDatas, outputPath, profile, report);
+        }
+        public async Task<EncoderItem[]> Encode(IFileData[] fileDatas, IBassEncoderOutputPath outputPath, string profile, bool report)
+        {
+            var factory = new EncoderItemFactory(outputPath);
             factory.InitializeComponent(this.Core);
             var encoderItems = default(EncoderItem[]);
             try

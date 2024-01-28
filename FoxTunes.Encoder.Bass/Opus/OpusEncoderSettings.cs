@@ -6,14 +6,17 @@ using System.IO;
 
 namespace FoxTunes
 {
-    public class OpusEncoderSettings : BassEncoderSettings, IStandardComponent, IConfigurableComponent
+    public class OpusEncoderSettings : BassEncoderTool, IStandardComponent, IConfigurableComponent
     {
-        public OpusEncoderSettings()
+        public override string Executable
         {
-            var directory = Path.GetDirectoryName(
-                typeof(OpusEncoderSettings).Assembly.Location
-            );
-            this.Executable = Path.Combine(directory, "Encoders\\opusenc.exe");
+            get
+            {
+                var directory = Path.GetDirectoryName(
+                    typeof(OpusEncoderSettings).Assembly.Location
+                );
+                return Path.Combine(directory, "Encoders\\opusenc.exe");
+            }
         }
 
         public override string Name
@@ -36,7 +39,12 @@ namespace FoxTunes
         {
             get
             {
-                return new BassEncoderFormat(DEPTH_16);
+                return new BassEncoderFormat(
+                    DEPTH_16,
+                    OutputRate.PCM_32000,
+                    OutputRate.PCM_44100,
+                    OutputRate.PCM_48000
+                );
             }
         }
 

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class WindowSnappingBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public WindowSnappingBehaviour()

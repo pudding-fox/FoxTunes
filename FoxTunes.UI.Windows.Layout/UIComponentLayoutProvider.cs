@@ -8,7 +8,7 @@ using System.Windows.Data;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     [ComponentRelease(ReleaseType.Default)]
     public class UIComponentLayoutProvider : UILayoutProviderBase, IConfigurableComponent, IDisposable
     {

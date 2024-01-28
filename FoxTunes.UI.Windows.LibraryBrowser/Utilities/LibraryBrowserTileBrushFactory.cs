@@ -6,7 +6,7 @@ using System.Windows.Media;
 namespace FoxTunes
 {
     [Component("8080D985-D642-4189-901B-A84530A1F110", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class LibraryBrowserTileBrushFactory : StandardFactory
     {
         public LibraryBrowserTileBrushFactory()

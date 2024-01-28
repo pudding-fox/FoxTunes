@@ -10,7 +10,7 @@ using System.Windows.Media;
 namespace FoxTunes
 {
     [Component("AA3CF53F-5358-4AD5-A3E5-0F19B1A1F8B5", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class ArtworkBrushFactory : BaseComponent
     {
         public ArtworkBrushFactory()

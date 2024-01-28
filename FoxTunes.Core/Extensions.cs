@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace FoxTunes
@@ -55,8 +56,24 @@ namespace FoxTunes
             {
                 throw new NotImplementedException();
             }
-            var typeNames = type.GetCustomAttributesData().Select(attributeData => attributeData.Constructor.DeclaringType.FullName);
+            var typeNames = type.GetCustomAttributesData().GetTypeNames();
             return typeNames.Any(typeName => string.Equals(typeName, typeof(T).FullName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static IEnumerable<string> GetTypeNames(this IEnumerable<CustomAttributeData> attributes)
+        {
+            var typeNames = new List<string>();
+            var attributeTypeName = typeof(Attribute).FullName;
+            foreach (var attribute in attributes)
+            {
+                var type = attribute.Constructor.DeclaringType;
+                do
+                {
+                    typeNames.Add(type.FullName);
+                    type = type.BaseType;
+                } while (type != null && !string.Equals(type.FullName, attributeTypeName, StringComparison.OrdinalIgnoreCase));
+            }
+            return typeNames;
         }
 
         public static T GetCustomAttribute<T>(this Type type, bool inherit = false) where T : Attribute

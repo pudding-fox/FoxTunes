@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class PlaylistGroupingBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string TOGGLE_GROUPING = "MMMM";

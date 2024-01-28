@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class PeakMeterBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string CATEGORY = "F58AE444-E7F1-4D3D-9CE6-D1612892CF28";

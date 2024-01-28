@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class KeyBindingsBehaviour : StandardBehaviour, IDisposable, IConfigurableComponent
     {
         public const string SEARCH = "5125ACDE-CC68-4DFE-82B0-F96A0ED303B6";

@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class PlaylistGridViewColumnFactory : StandardComponent, IDisposable
     {
         static PlaylistGridViewColumnFactory()

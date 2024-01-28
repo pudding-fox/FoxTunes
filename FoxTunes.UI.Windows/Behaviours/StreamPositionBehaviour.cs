@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class StreamPositionBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public IConfiguration Configuration { get; private set; }

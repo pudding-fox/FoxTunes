@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class PlaylistColumnsBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
     {
         const string SETTINGS = "ZZZZ";

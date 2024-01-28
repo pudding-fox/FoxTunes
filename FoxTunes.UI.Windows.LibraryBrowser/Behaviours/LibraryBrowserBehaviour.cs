@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
+    [WindowsUserInterfaceDependency]
     public class LibraryBrowserBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         const int TIMEOUT = 1000;

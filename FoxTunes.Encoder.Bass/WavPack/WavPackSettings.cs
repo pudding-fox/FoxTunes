@@ -6,14 +6,17 @@ using System.IO;
 
 namespace FoxTunes
 {
-    public class WavPackEncoderSettings : BassEncoderSettings, IStandardComponent, IConfigurableComponent
+    public class WavPackEncoderSettings : BassEncoderTool, IStandardComponent, IConfigurableComponent
     {
-        public WavPackEncoderSettings()
+        public override string Executable
         {
-            var directory = Path.GetDirectoryName(
-                typeof(WavPackEncoderSettings).Assembly.Location
-            );
-            this.Executable = Path.Combine(directory, "Encoders\\wavpack.exe");
+            get
+            {
+                var directory = Path.GetDirectoryName(
+                    typeof(WavPackEncoderSettings).Assembly.Location
+                );
+                return Path.Combine(directory, "Encoders\\wavpack.exe");
+            }
         }
 
         public override string Name
@@ -36,7 +39,10 @@ namespace FoxTunes
         {
             get
             {
-                return new BassEncoderFormat(this.Depth);
+                return new BassEncoderFormat(
+                    this.Depth,
+                    OutputRate.PCM
+                );
             }
         }
 
