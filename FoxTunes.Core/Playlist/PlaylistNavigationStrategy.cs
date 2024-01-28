@@ -21,7 +21,7 @@ namespace FoxTunes
             {
                 return this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
             }
-            return this.PlaylistBrowser.GetPlaylist(playlistItem);
+            return this.PlaylistBrowser.GetPlaylist(playlistItem) ?? this.PlaylistManager.SelectedPlaylist;
         }
 
         public abstract PlaylistItem GetNext(PlaylistItem playlistItem);
@@ -42,6 +42,10 @@ namespace FoxTunes
         public override PlaylistItem GetNext(PlaylistItem playlistItem)
         {
             var playlist = this.GetPlaylist(playlistItem);
+            if (playlist == null)
+            {
+                return null;
+            }
             if (playlistItem == null)
             {
                 return this.PlaylistBrowser.GetFirstItem(playlist);
@@ -57,6 +61,10 @@ namespace FoxTunes
         public override PlaylistItem GetPrevious(PlaylistItem playlistItem)
         {
             var playlist = this.GetPlaylist(playlistItem);
+            if (playlist == null)
+            {
+                return null;
+            }
             if (playlistItem == null)
             {
                 return this.PlaylistBrowser.GetLastItem(playlist);
@@ -143,6 +151,10 @@ namespace FoxTunes
         public override PlaylistItem GetNext(PlaylistItem playlistItem)
         {
             var playlist = this.GetPlaylist(playlistItem);
+            if (playlist == null)
+            {
+                return null;
+            }
             if (this.Playlist == null || this.Playlist != playlist)
             {
                 this.Refresh(playlist);
@@ -175,6 +187,10 @@ namespace FoxTunes
         public override PlaylistItem GetPrevious(PlaylistItem playlistItem)
         {
             var playlist = this.GetPlaylist(playlistItem);
+            if (playlist == null)
+            {
+                return null;
+            }
             if (this.Playlist == null || this.Playlist != playlist)
             {
                 this.Refresh(playlist);
