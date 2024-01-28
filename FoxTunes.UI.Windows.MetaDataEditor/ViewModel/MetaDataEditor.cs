@@ -189,36 +189,34 @@ namespace FoxTunes.ViewModel
 #endif
         }
 
-        public Task EditLibrary()
+        public async Task EditLibrary()
         {
+            await this.Cancel();
             if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                return;
             }
             //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
             var libraryItems = this.LibraryHierarchyBrowser.GetItems(
                 this.LibraryManager.SelectedItem,
                 true
             ).ToArray();
-            return this.SetItems(
+            if (!libraryItems.Any())
+            {
+                return;
+            }
+            await this.SetItems(
                 this.GetItems(libraryItems),
                 libraryItems.Length
             );
         }
 
-        public Task EditPlaylist()
+        public async Task EditPlaylist()
         {
+            await this.Cancel();
             if (this.PlaylistManager == null || this.PlaylistManager.SelectedItems == null)
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                return;
             }
             //TODO: If the playlist contains duplicate tracks, will all be refreshed properly?
             var playlistItems = this.PlaylistManager.SelectedItems
@@ -227,13 +225,9 @@ namespace FoxTunes.ViewModel
                 .ToArray();
             if (!playlistItems.Any())
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                return;
             }
-            return this.SetItems(
+            await this.SetItems(
                 this.GetItems(playlistItems),
                 playlistItems.Length
             );
@@ -313,22 +307,25 @@ namespace FoxTunes.ViewModel
             await this.HierarchyManager.Clear(LibraryItemStatus.Import).ConfigureAwait(false);
             await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
             await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
-            this.Cancel();
+            await this.Cancel();
         }
 
         public ICommand CancelCommand
         {
             get
             {
-                return new Command(this.Cancel);
+                return CommandFactory.Instance.CreateCommand(this.Cancel);
             }
         }
 
-        public void Cancel()
+        public Task Cancel()
         {
-            this.Tags = new ObservableCollection<MetaDataEntry>();
-            this.Images = new ObservableCollection<MetaDataEntry>();
-            this.OnHasItemsChanged();
+            return Windows.Invoke(() =>
+            {
+                this.Tags = new ObservableCollection<MetaDataEntry>();
+                this.Images = new ObservableCollection<MetaDataEntry>();
+                this.OnHasItemsChanged();
+            });
         }
 
         protected override void OnDisposing()
