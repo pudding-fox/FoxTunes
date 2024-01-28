@@ -181,7 +181,7 @@ namespace FoxTunes
                 if (container != null && container.Component != null)
                 {
                     if (!container.Component.MetaData.TryGetValue(Alignment, out alignment))
-                    {                
+                    {
                         //Align left by default.
                         alignment = AlignLeft;
                     }
@@ -286,47 +286,51 @@ namespace FoxTunes
 
         public Task MoveLeft(UIComponentContainer container)
         {
-            return Windows.Invoke(() =>
-            {
-                for (var a = 0; a < this.Component.Children.Count; a++)
-                {
-                    if (!object.ReferenceEquals(this.Component.Children[a], container.Component))
-                    {
-                        continue;
-                    }
-                    if (a > 0)
-                    {
-                        this.Component.Children[a] = this.Component.Children[a - 1];
-                        this.Component.Children[a - 1] = container.Component;
-                        this.UpdateChildren();
-                    }
-                    return;
-                }
-                //TODO: Component was not found.
-                throw new NotImplementedException();
-            });
+            return this.Move(container, index => index - 1);
         }
 
         public Task MoveRight(UIComponentContainer container)
         {
+            return this.Move(container, index => index + 1);
+        }
+
+        protected virtual Task Move(UIComponentContainer container, Func<int, int> step)
+        {
             return Windows.Invoke(() =>
             {
+                var containerAlignment = default(string);
+                if (!container.Component.MetaData.TryGetValue(Alignment, out containerAlignment))
+                {
+                    //Align left by default.
+                    containerAlignment = AlignLeft;
+                }
                 for (var a = 0; a < this.Component.Children.Count; a++)
                 {
                     if (!object.ReferenceEquals(this.Component.Children[a], container.Component))
                     {
                         continue;
                     }
-                    if (this.Component.Children.Count - 1 > a)
+                    for (var b = step(a); b >= 0 && b < this.Component.Children.Count; b = step(b))
                     {
-                        this.Component.Children[a] = this.Component.Children[a + 1];
-                        this.Component.Children[a + 1] = container.Component;
+                        var childAlignment = default(string);
+                        if (!this.Component.Children[b].MetaData.TryGetValue(Alignment, out childAlignment))
+                        {
+                            //Align left by default.
+                            childAlignment = AlignLeft;
+                        }
+                        if (!string.Equals(containerAlignment, childAlignment, StringComparison.OrdinalIgnoreCase))
+                        {
+                            //Alignment differs.
+                            continue;
+                        }
+                        this.Component.Children[a] = this.Component.Children[b];
+                        this.Component.Children[b] = container.Component;
                         this.UpdateChildren();
+                        return;
                     }
+                    //TODO: Move is invalid.
                     return;
                 }
-                //TODO: Component was not found.
-                throw new NotImplementedException();
             });
         }
 
