@@ -8,13 +8,13 @@ namespace FoxTunes
     public class SQLiteDatabase : EntityFrameworkDatabase
     {
         private static readonly Type[] References = new[]
-        {            
+        {
             typeof(global::System.Data.SQLite.EF6.SQLiteProviderFactory),
             typeof(global::System.Data.SQLite.Linq.SQLiteProviderFactory)
         };
 
         private static readonly string DatabaseFileName = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            Path.GetDirectoryName(typeof(SQLiteDatabase).Assembly.Location),
             "Database.dat"
         );
 
@@ -26,13 +26,13 @@ namespace FoxTunes
         private static void StageInteropAssemblies()
         {
             var assemblies = new[]{
-                new 
+                new
                 {
                     DirectoryName = "x86",
                     FileName = "SQLite.Interop.dll",
                     Content = Resources.SQLite_Interop_x86
                 },
-                new 
+                new
                 {
                     DirectoryName = "x64",
                     FileName = "SQLite.Interop.dll",
@@ -70,7 +70,7 @@ namespace FoxTunes
         {
             if (!File.Exists(DatabaseFileName))
             {
-                File.WriteAllBytes(DatabaseFileName, Resources.Database);
+                throw new FileNotFoundException("Failed to locate the database.", DatabaseFileName);
             }
             return new SQLiteConnection(this.ConnectionString);
         }
