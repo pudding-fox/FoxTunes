@@ -76,6 +76,18 @@ namespace FoxTunes
             }
         }
 
+        public IDatabaseQuery UpdateLibraryHierarchyNode
+        {
+            get
+            {
+                return this.Database.QueryFactory.Create(
+                    Resources.UpdateLibraryHierarchyNode,
+                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("libraryItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+                );
+            }
+        }
+
         public IDatabaseQuery AddLibraryHierarchyNodeToPlaylist
         {
             get

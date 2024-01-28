@@ -46,8 +46,6 @@ namespace FoxTunes
         protected BackgroundTask(string id)
         {
             this.Id = id;
-            Instances.Add(new WeakReference(this));
-            OnActiveChanged();
         }
 
         public string Id { get; private set; }
@@ -238,6 +236,13 @@ namespace FoxTunes
         }
 
         public event AsyncEventHandler IsIndeterminateChanged;
+
+        public override void InitializeComponent(ICore core)
+        {
+            Instances.Add(new WeakReference(this));
+            OnActiveChanged();
+            base.InitializeComponent(core);
+        }
 
         public virtual async Task Run()
         {
