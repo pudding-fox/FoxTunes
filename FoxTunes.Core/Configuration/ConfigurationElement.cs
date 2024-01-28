@@ -275,8 +275,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                this._Value = value;
-                this.OnValueChanged();
+                this.SetValue(value);
             }
         }
 
@@ -290,6 +289,12 @@ namespace FoxTunes
         }
 
         public event EventHandler ValueChanged;
+
+        public void SetValue(T value)
+        {
+            this._Value = value;
+            this.OnValueChanged();
+        }
 
         public ConfigurationElement<T> WithValue(T value)
         {

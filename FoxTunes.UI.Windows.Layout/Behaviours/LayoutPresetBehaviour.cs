@@ -126,7 +126,8 @@ namespace FoxTunes.UI.Windows.Layout.Behaviours
 #endif
                 }
             }
-            this.MainPreset.Value = this.MainPreset.Options.FirstOrDefault(option => string.Equals(option.Name, name));
+            //Using SetValue so the ValueChanged event fires even if we're updating to the same selected preset.
+            this.MainPreset.SetValue(this.MainPreset.Options.FirstOrDefault(option => string.Equals(option.Name, name)));
 #if NET40
             return TaskEx.FromResult(false);
 #else
