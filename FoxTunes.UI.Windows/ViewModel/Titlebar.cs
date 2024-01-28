@@ -117,7 +117,10 @@ namespace FoxTunes.ViewModel
 
         public void Close()
         {
-            Windows.Shutdown();
+            if (Windows.IsMainWindowCreated)
+            {
+                Windows.MainWindow.Close();
+            }
         }
 
         protected virtual void OnMainWindowCreated(object sender, EventArgs e)
