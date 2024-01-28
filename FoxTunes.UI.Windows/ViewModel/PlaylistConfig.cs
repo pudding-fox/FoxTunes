@@ -49,19 +49,12 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual void OnPlaylistChanging()
-        {
-            if (this.Playlist != null)
-            {
-                this.Playlist.TypeChanged -= this.OnTypeChanged;
-            }
-        }
-
         protected virtual void OnPlaylistChanged()
         {
             this.Refresh();
             if (this.Playlist != null)
             {
+                this.Playlist.TypeChanged -= this.OnTypeChanged;
                 this.Playlist.TypeChanged += this.OnTypeChanged;
             }
             if (this.PlaylistChanged != null)
@@ -121,6 +114,15 @@ namespace FoxTunes.ViewModel
         protected override Freezable CreateInstanceCore()
         {
             return new PlaylistConfig();
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.Playlist != null)
+            {
+                this.Playlist.TypeChanged -= this.OnTypeChanged;
+            }
+            base.OnDisposing();
         }
     }
 }

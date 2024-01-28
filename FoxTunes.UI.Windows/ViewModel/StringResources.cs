@@ -357,5 +357,21 @@
                 return Strings.PlaylistConfigDialog_Count;
             }
         }
+
+        public static string PlaylistManager_Save
+        {
+            get
+            {
+                return Strings.PlaylistManager_Save;
+            }
+        }
+
+        public static string PlaylistManager_Cancel
+        {
+            get
+            {
+                return Strings.PlaylistManager_Cancel;
+            }
+        }
     }
 }

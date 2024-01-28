@@ -799,7 +799,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Count.
+        ///   Looks up a localized string similar to Tracks.
         /// </summary>
         internal static string PlaylistConfigDialog_Count {
             get {
@@ -849,6 +849,24 @@ namespace FoxTunes {
         internal static string PlaylistGroupingBehaviourConfiguration_Script {
             get {
                 return ResourceManager.GetString("PlaylistGroupingBehaviourConfiguration.Script", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        internal static string PlaylistManager_Cancel {
+            get {
+                return ResourceManager.GetString("PlaylistManager.Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        internal static string PlaylistManager_Save {
+            get {
+                return ResourceManager.GetString("PlaylistManager.Save", resourceCulture);
             }
         }
         

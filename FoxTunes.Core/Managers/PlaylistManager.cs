@@ -772,8 +772,8 @@ namespace FoxTunes
                     set.Add(new PlaylistColumn() { Name = "Track gain", Type = PlaylistColumnType.Tag, Sequence = 10, Tag = CommonMetaData.ReplayGainTrackGain, Format = CommonFormats.Decibel, Enabled = false });
                     set.Add(new PlaylistColumn() { Name = "Track peak", Type = PlaylistColumnType.Tag, Sequence = 11, Tag = CommonMetaData.ReplayGainTrackPeak, Format = CommonFormats.Float, Enabled = false });
                     set.Add(new PlaylistColumn() { Name = "Play count", Type = PlaylistColumnType.Tag, Sequence = 12, Tag = CommonStatistics.PlayCount, Format = CommonFormats.Integer, Enabled = false });
-                    set.Add(new PlaylistColumn() { Name = "Last played", Type = PlaylistColumnType.Tag, Sequence = 14, Tag = CommonStatistics.LastPlayed, Format = CommonFormats.TimeStamp, Enabled = false });
-                    set.Add(new PlaylistColumn() { Name = "Initial key", Type = PlaylistColumnType.Tag, Sequence = 15, Tag = CommonMetaData.InitialKey, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Last played", Type = PlaylistColumnType.Tag, Sequence = 13, Tag = CommonStatistics.LastPlayed, Format = CommonFormats.TimeStamp, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Initial key", Type = PlaylistColumnType.Tag, Sequence = 14, Tag = CommonMetaData.InitialKey, Enabled = false });
                 }
                 transaction.Commit();
             }

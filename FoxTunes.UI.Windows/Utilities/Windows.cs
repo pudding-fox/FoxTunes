@@ -623,6 +623,7 @@ namespace FoxTunes
                 {
                     this.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 }
+                this.InitializeComponent();
             }
 
             public DialogWindow(T content) : this()
@@ -635,6 +636,19 @@ namespace FoxTunes
                 get
                 {
                     return "3AA74E66-005F-4772-99BE-31C18C317D23";
+                }
+            }
+
+            protected virtual void InitializeComponent()
+            {
+                ButtonExtensions.AddCommandExecutedHandler(this, this.OnCommandExecuted);
+            }
+
+            protected virtual void OnCommandExecuted(object sender, ButtonExtensions.CommandExecutedEventArgs e)
+            {
+                if (string.Equals(e.Behaviour, ButtonExtensions.COMMAND_BEHAVIOUR_DISMISS, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.Close();
                 }
             }
 
