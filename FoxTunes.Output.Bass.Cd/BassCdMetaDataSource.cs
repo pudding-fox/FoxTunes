@@ -44,6 +44,11 @@ namespace FoxTunes
 #endif
         }
 
+        public Task<IEnumerable<MetaDataItem>> GetMetaData(IFileAbstraction fileAbstraction)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems, Func<MetaDataItem, bool> predicate)
         {
             throw new NotImplementedException();

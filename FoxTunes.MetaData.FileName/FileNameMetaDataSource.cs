@@ -102,6 +102,11 @@ namespace FoxTunes
             return result;
         }
 
+        public Task<IEnumerable<MetaDataItem>> GetMetaData(IFileAbstraction fileAbstraction)
+        {
+            throw new NotImplementedException();
+        }
+
         protected virtual MetaDataItem GetMetaData(string name, string value)
         {
             return new MetaDataItem(name, MetaDataItemType.Tag)
