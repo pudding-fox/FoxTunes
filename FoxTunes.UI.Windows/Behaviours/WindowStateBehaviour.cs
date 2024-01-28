@@ -83,12 +83,22 @@ namespace FoxTunes
 
             public void Enable()
             {
-                HwndSource.FromHwnd(this.Handle).AddHook(this.Hook);
+                var source = HwndSource.FromHwnd(this.Handle);
+                if (source == null)
+                {
+                    return;
+                }
+                source.AddHook(this.Hook);
             }
 
             public void Disable()
             {
-                HwndSource.FromHwnd(this.Handle).RemoveHook(this.Hook);
+                var source = HwndSource.FromHwnd(this.Handle);
+                if (source == null)
+                {
+                    return;
+                }
+                source.RemoveHook(this.Hook);
             }
 
             protected virtual IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
