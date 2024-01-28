@@ -69,6 +69,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Core.Windows", "Fo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.MetaData.FileName", "FoxTunes.MetaData.FileName\FoxTunes.MetaData.FileName.csproj", "{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.UI.Windows.LibraryBrowser", "FoxTunes.UI.Windows.LibraryBrowser\FoxTunes.UI.Windows.LibraryBrowser.csproj", "{1D1061F1-CD0E-4C2D-B2A5-880C741C3B56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -307,6 +309,14 @@ Global
 		{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{B7463FA4-37FD-46A6-BB2C-C985723D2D1E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1D1061F1-CD0E-4C2D-B2A5-880C741C3B56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D1061F1-CD0E-4C2D-B2A5-880C741C3B56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D1061F1-CD0E-4C2D-B2A5-880C741C3B56}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1D1061F1-CD0E-4C2D-B2A5-880C741C3B56}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1D1061F1-CD0E-4C2D-B2A5-880C741C3B56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D1061F1-CD0E-4C2D-B2A5-880C741C3B56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D1061F1-CD0E-4C2D-B2A5-880C741C3B56}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1D1061F1-CD0E-4C2D-B2A5-880C741C3B56}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
