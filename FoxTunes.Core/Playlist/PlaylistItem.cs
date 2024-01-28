@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace FoxTunes
 {
-    public class PlaylistItem : PersistableComponent
+    public class PlaylistItem : PersistableComponent, IMetaDataSource
     {
         public PlaylistItem()
         {

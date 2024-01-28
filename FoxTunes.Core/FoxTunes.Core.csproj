@@ -52,6 +52,8 @@
     <Compile Include="Library\LibraryHierarchyItem.cs" />
     <Compile Include="Library\LibraryHierarchyLevel.cs" />
     <Compile Include="LogManager.cs" />
+    <Compile Include="MetaData\EmbeddedImage.cs" />
+    <Compile Include="MetaData\FileMetaDataStore.cs" />
     <Compile Include="Tasks\AddPathsToLibraryTask.cs" />
     <Compile Include="Tasks\BackgroundTask.cs" />
     <Compile Include="BaseBehaviour.cs" />

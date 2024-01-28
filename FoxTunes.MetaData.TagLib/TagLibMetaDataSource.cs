@@ -1,7 +1,7 @@
 ﻿using FoxTunes.Interfaces;
-using FoxTunes.MetaData;
 using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using TagLib;
 
 namespace FoxTunes
@@ -84,7 +84,7 @@ namespace FoxTunes
             this.AddMetaData(CommonMetaData.MusicIpId, tag.MusicIpId);
             this.AddMetaData(CommonMetaData.Performers, tag.Performers);
             this.AddMetaData(CommonMetaData.PerformersSort, tag.PerformersSort);
-            this.AddMetaData(CommonMetaData.Pictures, tag.Pictures);
+            this.AddMetaData(CommonMetaData.Pictures, tag.Pictures).Wait();
             this.AddMetaData(CommonMetaData.Title, tag.Title);
             this.AddMetaData(CommonMetaData.TitleSort, tag.TitleSort);
             this.AddMetaData(CommonMetaData.Track, tag.Track);
@@ -92,9 +92,24 @@ namespace FoxTunes
             this.AddMetaData(CommonMetaData.Year, tag.Year);
         }
 
-        private void AddMetaData(string name, IPicture[] value)
+        private async Task AddMetaData(string name, IPicture[] values)
         {
-            //Nothing to do.
+            if (values == null)
+            {
+                return;
+            }
+            foreach (var value in values)
+            {
+                var embeddedImage = new EmbeddedImage(
+                    this.FileName,
+                    value.MimeType,
+                    Enum.GetName(typeof(PictureType), value.Type),
+                    value.Description
+                );
+                var id = await embeddedImage.Encode();
+                await FileMetaDataStore.Write(id, value.Data.Data);
+                this.MetaDatas.Add(new MetaDataItem(name) { FileValue = id });
+            }
         }
 
         private void AddMetaData(string name, uint? value)
