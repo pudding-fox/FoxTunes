@@ -4,7 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"                              
              xmlns:Windows="clr-namespace:FoxTunes" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" Loaded="OnLoaded" Unloaded="OnUnloaded">
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+    <Windows:SquareUIComponentBase.Resources>
+        <ViewModel:Artwork x:Key="ViewModel" Core="{Binding}" FileNameChanged="OnFileNameChanged"></ViewModel:Artwork>
+        <ViewModel:ArtworkImageConverter x:Key="ArtworkImageConverter" Core="{Binding}" Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Artwork}}}" Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Artwork}}}"></ViewModel:ArtworkImageConverter>
+        <SolidColorBrush x:Key="Transparent" Color="Transparent"></SolidColorBrush>
+    </Windows:SquareUIComponentBase.Resources>
+    <Rectangle DataContext="{Binding FileName, Converter={StaticResource ArtworkImageConverter}, Source={StaticResource ViewModel}}" Fill="{Binding Value, FallbackValue={StaticResource Transparent}}"></Rectangle>
 </Windows:SquareUIComponentBase>

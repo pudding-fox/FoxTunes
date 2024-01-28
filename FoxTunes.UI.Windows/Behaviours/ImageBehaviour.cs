@@ -11,8 +11,15 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
+            this.Configuration = core.Components.Configuration;
+            this.Configuration.GetElement<DoubleConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
+            ).ConnectValue(value => this.Dispatch(this.RefreshImages));
             this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }

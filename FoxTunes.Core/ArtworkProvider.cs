@@ -113,11 +113,11 @@ namespace FoxTunes
             return null;
         }
 
-        public string Find(PlaylistItem playlistItem, ArtworkType type)
+        public string Find(IFileData fileData, ArtworkType type)
         {
-            lock (playlistItem.MetaDatas)
+            lock (fileData.MetaDatas)
             {
-                var result = playlistItem.MetaDatas.FirstOrDefault(
+                var result = fileData.MetaDatas.FirstOrDefault(
                      metaDataItem =>
                          metaDataItem.Type == MetaDataItemType.Image &&
                          string.Equals(metaDataItem.Name, Enum.GetName(typeof(ArtworkType), type), StringComparison.OrdinalIgnoreCase) &&
@@ -128,7 +128,7 @@ namespace FoxTunes
                     return result.Value;
                 }
             }
-            return this.Find(playlistItem.FileName, type);
+            return this.Find(fileData.FileName, type);
         }
 
         public class Cache

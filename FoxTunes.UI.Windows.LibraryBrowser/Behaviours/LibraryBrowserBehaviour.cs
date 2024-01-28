@@ -25,8 +25,6 @@ namespace FoxTunes
 
         public IntegerConfigurationElement TileSize { get; private set; }
 
-        public DoubleConfigurationElement ScalingFactor { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.SignalEmitter = core.Components.SignalEmitter;
@@ -39,13 +37,8 @@ namespace FoxTunes
                 WindowsUserInterfaceConfiguration.SECTION,
                 LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_SIZE
             );
-            this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
-            );
             this.ImageMode.ValueChanged += this.OnValueChanged;
             this.TileSize.ValueChanged += this.OnValueChanged;
-            this.ScalingFactor.ValueChanged += this.OnValueChanged;
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
