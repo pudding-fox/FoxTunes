@@ -114,7 +114,12 @@ namespace FoxTunes
         {
             public static readonly IBassEncoderFactory EncoderFactory = ComponentRegistry.Instance.GetComponent<IBassEncoderFactory>();
 
-            public EncodePlaylistItemsTask(BassEncoderBehaviour behaviour, PlaylistItem[] playlistItems)
+            private EncodePlaylistItemsTask()
+            {
+                this.CancellationToken = new CancellationToken();
+            }
+
+            public EncodePlaylistItemsTask(BassEncoderBehaviour behaviour, PlaylistItem[] playlistItems) : this()
             {
                 this.Behaviour = behaviour;
                 this.PlaylistItems = playlistItems;
@@ -139,20 +144,13 @@ namespace FoxTunes
                 }
             }
 
+            public CancellationToken CancellationToken { get; private set; }
+
             public BassEncoderBehaviour Behaviour { get; private set; }
 
             public PlaylistItem[] PlaylistItems { get; private set; }
 
             public EncoderItem[] EncoderItems { get; private set; }
-
-            public IBassEncoder Encoder { get; private set; }
-
-            protected override Task OnStarted()
-            {
-                Logger.Write(this, LogLevel.Debug, "Creating encoder.");
-                this.Encoder = EncoderFactory.CreateEncoder();
-                return base.OnStarted();
-            }
 
             protected override async Task OnRun()
             {
@@ -165,10 +163,12 @@ namespace FoxTunes
 
             protected virtual async Task Encode()
             {
-                Logger.Write(this, LogLevel.Debug, "Starting encoder.");
+                Logger.Write(this, LogLevel.Debug, "Creating encoder.");
+                var encoder = EncoderFactory.CreateEncoder();
                 try
                 {
-                    using (var monitor = new BassEncoderMonitor(this.Encoder, this.Visible))
+                    Logger.Write(this, LogLevel.Debug, "Starting encoder.");
+                    using (var monitor = new BassEncoderMonitor(encoder, this.Visible, this.CancellationToken))
                     {
                         await this.WithSubTask(monitor,
                             async () => await monitor.Encode(this.EncoderItems)
@@ -177,9 +177,7 @@ namespace FoxTunes
                 }
                 finally
                 {
-                    var encoder = this.Encoder;
-                    this.Encoder = null;
-                    AppDomain.Unload(encoder.Domain);
+                    this.Unload(encoder.Domain);
                 }
                 Logger.Write(this, LogLevel.Debug, "Encoder completed successfully.");
             }
@@ -215,14 +213,30 @@ namespace FoxTunes
                 return this.EncoderItems.FirstOrDefault(encoderItem => string.Equals(encoderItem.InputFileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase));
             }
 
+            protected virtual void Unload(AppDomain domain)
+            {
+                const int ATTEMPTS = 5;
+                var name = domain.FriendlyName;
+                for (int a = 1; a <= ATTEMPTS; a++)
+                {
+                    try
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Attempting to unload app domain \"{0}\" attempt {1} of {2}. ", name, a, ATTEMPTS);
+                        AppDomain.Unload(domain);
+                        Logger.Write(this, LogLevel.Debug, "Successfully unloaded app domain \"{0}\".", name);
+                        return;
+                    }
+                    catch (CannotUnloadAppDomainException e)
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Failed to unloaded app domain \"{0}\": {1}", name, e.Message);
+                    }
+                }
+                Logger.Write(this, LogLevel.Error, "Failed to unloaded app domain \"{0}\".", name);
+            }
+
             protected override void OnCancellationRequested()
             {
-                var encoder = this.Encoder;
-                if (encoder != null)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Requesting cancellation from encoder.");
-                    encoder.Cancel();
-                }
+                this.CancellationToken.Cancel();
                 base.OnCancellationRequested();
             }
         }

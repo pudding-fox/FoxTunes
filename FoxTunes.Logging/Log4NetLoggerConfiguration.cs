@@ -10,7 +10,12 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(LoggingBehaviourConfiguration.SECTION, "Logging")
                 .WithElement(
-                    new BooleanConfigurationElement(DEFAULT_APPENDER_ELEMENT, "Default Appender (Log.txt)").WithValue(true)
+                    new BooleanConfigurationElement(DEFAULT_APPENDER_ELEMENT, "Default Appender (Log.txt)")
+#if DEBUG
+                        .WithValue(true)
+#else
+                        .WithValue(false)
+#endif
                 );
         }
     }

@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System.Diagnostics;
-using System.IO;
 
 namespace FoxTunes
 {
@@ -23,15 +22,23 @@ namespace FoxTunes
 
         public Process Process { get; }
 
-        public void CopyTo(ProcessWriter writer)
+        public void CopyTo(ProcessWriter writer, CancellationToken cancellationToken)
         {
             Logger.Write(this.GetType(), LogLevel.Debug, "Begin reading data from process {0} with {1} byte buffer.", this.Process.Id, BUFFER_SIZE);
             var length = default(int);
             var buffer = new byte[BUFFER_SIZE];
             while (!this.Process.HasExited)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
                 while ((length = this.Process.StandardOutput.BaseStream.Read(buffer, 0, BUFFER_SIZE)) > 0)
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
                     writer.Write(buffer, length);
                 }
             }
@@ -39,11 +46,9 @@ namespace FoxTunes
             writer.Close();
         }
 
-        public void CopyTo(Stream stream)
+        public void Close()
         {
-            Logger.Write(this.GetType(), LogLevel.Debug, "Begin reading data from process {0}.", this.Process.Id);
-            this.Process.StandardOutput.BaseStream.CopyTo(stream);
-            Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}.", this.Process.Id);
+            this.Process.StandardOutput.Close();
         }
     }
 }

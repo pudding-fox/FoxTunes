@@ -25,13 +25,17 @@ namespace FoxTunes
 
         public IBassStream Stream { get; private set; }
 
-        public void CopyTo(ProcessWriter writer)
+        public void CopyTo(ProcessWriter writer, CancellationToken cancellationToken)
         {
             Logger.Write(this.GetType(), LogLevel.Debug, "Begin reading data from channel {0} with {1} byte buffer.", this.Stream.ChannelHandle, BUFFER_SIZE);
             var length = default(int);
             var buffer = new byte[BUFFER_SIZE];
             while ((length = Bass.ChannelGetData(this.Stream.ChannelHandle, buffer, BUFFER_SIZE)) > 0)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
                 writer.Write(buffer, length);
                 this.Update();
             }
