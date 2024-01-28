@@ -47,8 +47,10 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public async Task Populate(IDatabaseReader reader, CancellationToken cancellationToken, ITransactionSource transaction = null)
+        public async Task Populate(LibraryItemStatus? status, CancellationToken cancellationToken, ITransactionSource transaction = null)
         {
+            var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction).ToArray();
+
             var libraryHierarchies = this.Database.Set<LibraryHierarchy>(transaction).ToArray();
             var libraryHierarchyLevels = libraryHierarchies.ToDictionary(
                 libraryHierarchy => libraryHierarchy,
@@ -59,41 +61,51 @@ namespace FoxTunes
             {
                 await this.SetName("Populating library hierarchies");
                 await this.SetPosition(0);
-                //TODO: Estimate count.
+                await this.SetCount(await this.GetCount(status, transaction));
             }
 
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
-
-            await AsyncParallel.ForEach(reader, async record =>
+            using (var reader = this.Database.ExecuteReader(this.Database.Queries.BuildLibraryHierarchies(metaDataNames), (parameters, phase) =>
             {
-                foreach (var libraryHierarchy in libraryHierarchies)
+                switch (phase)
                 {
-                    await this.Populate(record, libraryHierarchy, libraryHierarchyLevels[libraryHierarchy]);
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["status"] = status;
+                        break;
                 }
-
-                if (this.ReportProgress)
+            }, transaction))
+            {
+                await AsyncParallel.ForEach(reader, async record =>
                 {
-                    if (position % interval == 0)
+                    foreach (var libraryHierarchy in libraryHierarchies)
                     {
+                        await this.Populate(record, libraryHierarchy, libraryHierarchyLevels[libraryHierarchy]);
+                    }
+
+                    if (this.ReportProgress)
+                    {
+                        if (position % interval == 0)
+                        {
 #if NET40
-                        this.Semaphore.Wait();
+                            this.Semaphore.Wait();
 #else
-                        await this.Semaphore.WaitAsync();
+                            await this.Semaphore.WaitAsync();
 #endif
-                        try
-                        {
-                            await this.SetDescription(new FileInfo(record["FileName"] as string).Name);
-                            await this.SetPosition(position);
-                        }
-                        finally
-                        {
-                            this.Semaphore.Release();
+                            try
+                            {
+                                await this.SetDescription(new FileInfo(record["FileName"] as string).Name);
+                                await this.SetPosition(position);
+                            }
+                            finally
+                            {
+                                this.Semaphore.Release();
+                            }
                         }
                     }
-                }
-                Interlocked.Increment(ref position);
-            }, cancellationToken, this.ParallelOptions);
+                    Interlocked.Increment(ref position);
+                }, cancellationToken, this.ParallelOptions);
+            }
         }
 
         private async Task Populate(IDatabaseReaderRecord record, LibraryHierarchy libraryHierarchy, LibraryHierarchyLevel[] libraryHierarchyLevels)
@@ -121,6 +133,17 @@ namespace FoxTunes
             {
                 this.Semaphore.Release();
             }
+        }
+
+        private async Task<int> GetCount(LibraryItemStatus? status, ITransactionSource transaction)
+        {
+            if (status.HasValue)
+            {
+                var queryable = this.Database.AsQueryable<LibraryItem>();
+                return queryable.Count(libraryItem => libraryItem.Status == status.Value);
+            }
+            var set = this.Database.Set<LibraryItem>(transaction);
+            return await set.CountAsync;
         }
 
         private string ExecuteScript(IDatabaseReaderRecord record, string script)
