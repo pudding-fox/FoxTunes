@@ -2,11 +2,14 @@
 using System;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Threading;
 
 namespace FoxTunes
 {
     public abstract class EntityFrameworkDatabase : Database
     {
+        public readonly object SyncRoot = new object();
+
         protected DbContext DbContext { get; private set; }
 
         protected virtual DbModelBuilder CreateModelBuilder()
@@ -117,6 +120,27 @@ namespace FoxTunes
                 this.DbContext = this.CreateDbContext();
             }
             return new WrappedDbQuery<T>(this.DbContext, this.DbContext.Set<T>());
+        }
+
+        public override void Interlocked(Action action)
+        {
+            this.Interlocked(action, Timeout.InfiniteTimeSpan);
+        }
+
+        public override void Interlocked(Action action, TimeSpan timeout)
+        {
+            if (!Monitor.TryEnter(this.SyncRoot, timeout))
+            {
+                throw new TimeoutException(string.Format("Failed to enter critical section after {0}ms", timeout.TotalMilliseconds));
+            }
+            try
+            {
+                action();
+            }
+            finally
+            {
+                Monitor.Exit(this.SyncRoot);
+            }
         }
 
         public override int SaveChanges()

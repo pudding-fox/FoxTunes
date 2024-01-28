@@ -135,6 +135,7 @@
     <Compile Include="Tasks\AddLibraryItemsToPlaylistTask.cs" />
     <Compile Include="Tasks\AddPathsToPlaylistTask.cs" />
     <Compile Include="Tasks\BackgroundTaskRunner.cs" />
+    <Compile Include="Tasks\ClearPlaylistTask.cs" />
     <Compile Include="Tasks\IForegroundTaskRunner.cs" />
   </ItemGroup>
   <ItemGroup />

@@ -54,7 +54,7 @@ namespace FoxTunes
                 select this.PlaylistItemFactory.Create(libraryItem);
             foreach (var playlistItem in query)
             {
-                this.ForegroundTaskRunner.Run(() => this.Playlist.Set.Add(playlistItem));
+                this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.Set.Add(playlistItem)));
                 if (position % interval == 0)
                 {
                     this.SetDescription(Path.GetFileName(playlistItem.FileName));
@@ -67,7 +67,9 @@ namespace FoxTunes
 
         private void SaveChanges()
         {
-            this.ForegroundTaskRunner.Run(() => this.Database.SaveChanges());
+            this.SetName("Saving changes");
+            this.SetPosition(this.Count);
+            this.Database.Interlocked(() => this.Database.SaveChanges());
         }
     }
 }

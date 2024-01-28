@@ -12,6 +12,10 @@ namespace FoxTunes
 
         public abstract IDatabaseQuery<T> GetQuery<T>() where T : class;
 
+        public abstract void Interlocked(Action action);
+
+        public abstract void Interlocked(Action action, TimeSpan timeout);
+
         public abstract int SaveChanges();
 
         public override void InitializeComponent(ICore core)

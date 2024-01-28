@@ -81,7 +81,7 @@ namespace FoxTunes
                 select this.LibraryItemFactory.Create(fileName);
             foreach (var libraryItem in query)
             {
-                this.ForegroundTaskRunner.Run(() => this.Library.Set.Add(libraryItem));
+                this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Library.Set.Add(libraryItem)));
                 if (position % interval == 0)
                 {
                     this.SetDescription(Path.GetFileName(libraryItem.FileName));
@@ -94,7 +94,9 @@ namespace FoxTunes
 
         private void SaveChanges()
         {
-            this.ForegroundTaskRunner.Run(() => this.Database.SaveChanges());
+            this.SetName("Saving changes");
+            this.SetPosition(this.Count);
+            this.Database.Interlocked(() => this.Database.SaveChanges());
         }
     }
 }

@@ -8,6 +8,10 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery<T> GetQuery<T>() where T : class;
 
+        void Interlocked(Action action);
+
+        void Interlocked(Action action, TimeSpan timeout);
+
         int SaveChanges();
     }
 }

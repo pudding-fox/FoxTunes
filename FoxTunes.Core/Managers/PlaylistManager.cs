@@ -105,9 +105,14 @@ namespace FoxTunes.Managers
 
         public void Clear()
         {
-            this.Playlist.Set.Clear();
-            this.Database.SaveChanges();
-            this.OnUpdated();
+            var task = new ClearPlaylistTask();
+            task.InitializeComponent(this.Core);
+            task.Completed += (sender, e) =>
+            {
+                this.OnUpdated();
+            };
+            this.OnBackgroundTask(task);
+            task.Run();
         }
 
         protected virtual void UpdateCurrentItem()

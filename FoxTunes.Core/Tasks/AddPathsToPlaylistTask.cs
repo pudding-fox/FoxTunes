@@ -81,7 +81,7 @@ namespace FoxTunes
                 select this.PlaylistItemFactory.Create(fileName);
             foreach (var playlistItem in this.OrderBy(query))
             {
-                this.ForegroundTaskRunner.Run(() => this.Playlist.Set.Add(playlistItem));
+                this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.Set.Add(playlistItem)));
                 if (position % interval == 0)
                 {
                     this.SetDescription(Path.GetFileName(playlistItem.FileName));
@@ -94,7 +94,9 @@ namespace FoxTunes
 
         private void SaveChanges()
         {
-            this.ForegroundTaskRunner.Run(() => this.Database.SaveChanges());
+            this.SetName("Saving changes");
+            this.SetPosition(this.Count);
+            this.Database.Interlocked(() => this.Database.SaveChanges());
         }
 
         private IEnumerable<PlaylistItem> OrderBy(IEnumerable<PlaylistItem> playlistItems)
