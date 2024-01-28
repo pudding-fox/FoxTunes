@@ -86,6 +86,11 @@ CREATE INDEX [IDX_LibraryHierarchyLevels_LibraryHierarchy_Id] ON [LibraryHierarc
 	[LibraryHierarchy_Id]
 );
 
+CREATE INDEX [IDX_PlaylistItem_LibraryItem_Id_Status] ON [PlaylistItems](
+	[LibraryItem_Id],
+	[Status]
+);
+
 CREATE INDEX [IDX_PlaylistItem_MetaDataItem_PlaylistItem_Id] ON [PlaylistItem_MetaDataItem](
 	[PlaylistItem_Id]
 );
