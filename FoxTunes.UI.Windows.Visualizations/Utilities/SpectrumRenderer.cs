@@ -121,7 +121,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.CreatePalette(BitmapHelper.COLOR_FROM_Y, data.Colors));
+                info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(BitmapHelper.COLOR_FROM_Y, data.Colors));
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
             if (!success)

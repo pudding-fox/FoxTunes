@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -83,6 +84,34 @@ namespace FoxTunes
         public static IntPtr CreatePalette(int flags, params Int32Color[] colors)
         {
             return CreatePalette(colors, colors.Length, flags);
+        }
+
+        private static readonly ConcurrentDictionary<int, IntPtr> Palettes = new ConcurrentDictionary<int, IntPtr>();
+
+        public static IntPtr GetOrCreatePalette(int flags, params Color[] colors)
+        {
+            var key = flags;
+            unchecked
+            {
+                foreach (var color in colors)
+                {
+                    key += color.B + color.G + color.R + color.A;
+                }
+            }
+            return Palettes.GetOrAdd(key, () => CreatePalette(flags, colors));
+        }
+
+        public static IntPtr GetOrCreatePalette(int flags, params Int32Color[] colors)
+        {
+            var key = flags;
+            unchecked
+            {
+                foreach (var color in colors)
+                {
+                    key += color.Blue + color.Green + color.Red + color.Alpha;
+                }
+            }
+            return Palettes.GetOrAdd(key, () => CreatePalette(flags, colors));
         }
 
         [StructLayout(LayoutKind.Sequential)]

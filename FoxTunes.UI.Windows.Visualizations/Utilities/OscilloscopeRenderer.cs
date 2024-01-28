@@ -80,7 +80,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.CreatePalette(0, this.Color));
+                info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, this.Color));
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
             if (!success)
