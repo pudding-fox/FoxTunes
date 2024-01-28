@@ -15,6 +15,8 @@ namespace FoxTunes
 
         public const string SONGWRITER = "SONGWRITER";
 
+        public const string ISRC = "ISRC";
+
         public const string FILE = "FILE";
 
         public const string TRACK = "TRACK";
@@ -99,6 +101,9 @@ namespace FoxTunes
                     case PERFORMER:
                     case SONGWRITER:
                         this.OnParseTag(lines, ref position, files, trackTags);
+                        break;
+                    case ISRC:
+                        //TODO: Should we do something with this? International Standard Recording Code.
                         break;
                     case TRACK:
                         if (!string.IsNullOrEmpty(trackNumber) && !string.IsNullOrEmpty(trackType) && trackIndexes.Count > 0)
