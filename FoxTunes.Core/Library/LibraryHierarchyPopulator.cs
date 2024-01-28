@@ -80,33 +80,25 @@ namespace FoxTunes
                 this.Timer.Start();
             }
 
-            using (var reader = this.Database.ExecuteReader(this.Database.Queries.BuildLibraryHierarchies(metaDataNames), (parameters, phase) =>
-            {
-                switch (phase)
-                {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["status"] = status;
-                        break;
-                }
-            }, transaction))
-            {
-                await AsyncParallel.ForEach(reader, async record =>
-                {
-                    foreach (var libraryHierarchy in libraryHierarchies)
-                    {
-                        await this.Populate(record, libraryHierarchy, libraryHierarchyLevels[libraryHierarchy]);
-                    }
 
-                    if (this.ReportProgress)
-                    {
-                        this.Current = record["FileName"] as string;
-                        Interlocked.Increment(ref this.position);
-                    }
-                }, cancellationToken, this.ParallelOptions);
-            }
+            var set = this.Database.Set<LibraryItem>(this.Transaction);
+
+            await AsyncParallel.ForEach(set, async libraryItem =>
+            {
+                foreach (var libraryHierarchy in libraryHierarchies)
+                {
+                    await this.Populate(libraryItem, libraryHierarchy, libraryHierarchyLevels[libraryHierarchy]);
+                }
+
+                if (this.ReportProgress)
+                {
+                    this.Current = libraryItem.FileName;
+                    Interlocked.Increment(ref this.position);
+                }
+            }, cancellationToken, this.ParallelOptions);
         }
 
-        private async Task Populate(IDatabaseReaderRecord record, LibraryHierarchy libraryHierarchy, LibraryHierarchyLevel[] libraryHierarchyLevels)
+        private async Task Populate(LibraryItem libraryItem, LibraryHierarchy libraryHierarchy, LibraryHierarchyLevel[] libraryHierarchyLevels)
         {
             var parentId = default(int?);
             switch (libraryHierarchy.Type)
@@ -114,26 +106,32 @@ namespace FoxTunes
                 case LibraryHierarchyType.Script:
                     for (int a = 0, b = libraryHierarchyLevels.Length - 1; a <= b; a++)
                     {
-                        parentId = await this.Populate(record, libraryHierarchy, libraryHierarchyLevels[a], parentId, a == b);
+                        parentId = await this.Populate(libraryItem, libraryHierarchy, libraryHierarchyLevels[a], parentId, a == b);
                     }
                     break;
                 case LibraryHierarchyType.FileSystem:
-                    var pathSegments = this.GetPathSegments(record);
+                    var pathSegments = this.GetPathSegments(libraryItem.FileName);
                     for (int a = 0, b = pathSegments.Length - 1; a <= b; a++)
                     {
-                        parentId = await this.Populate(record, libraryHierarchy, pathSegments[a], parentId, a == b);
+                        parentId = await this.Populate(libraryItem, libraryHierarchy, pathSegments[a], parentId, a == b);
                     }
                     break;
             }
         }
 
-        private Task<int> Populate(IDatabaseReaderRecord record, LibraryHierarchy libraryHierarchy, LibraryHierarchyLevel libraryHierarchyLevel, int? parentId, bool isLeaf)
+        private Task<int> Populate(LibraryItem libraryItem, LibraryHierarchy libraryHierarchy, LibraryHierarchyLevel libraryHierarchyLevel, int? parentId, bool isLeaf)
         {
-            var value = this.ExecuteScript(record, libraryHierarchyLevel.Script);
-            return this.Populate(record, libraryHierarchy, value, parentId, isLeaf);
+            var runner = new LibraryItemScriptRunner(
+                this.GetOrAddContext(),
+                libraryItem,
+                libraryHierarchyLevel.Script
+            );
+            runner.Prepare();
+            var value = Convert.ToString(runner.Run());
+            return this.Populate(libraryItem, libraryHierarchy, value, parentId, isLeaf);
         }
 
-        private async Task<int> Populate(IDatabaseReaderRecord record, LibraryHierarchy libraryHierarchy, string value, int? parentId, bool isLeaf)
+        private async Task<int> Populate(LibraryItem libraryItem, LibraryHierarchy libraryHierarchy, string value, int? parentId, bool isLeaf)
         {
 #if NET40
             this.Semaphore.Wait();
@@ -142,7 +140,7 @@ namespace FoxTunes
 #endif
             try
             {
-                return await this.Writer.Write(libraryHierarchy, record.Get<int>("Id"), parentId, value, isLeaf);
+                return await this.Writer.Write(libraryHierarchy, libraryItem.Id, parentId, value, isLeaf);
             }
             finally
             {
@@ -175,44 +173,10 @@ namespace FoxTunes
             return await set.CountAsync;
         }
 
-        private string ExecuteScript(IDatabaseReaderRecord record, string script)
+        private string[] GetPathSegments(string fileName)
         {
-            if (string.IsNullOrEmpty(script))
-            {
-                return string.Empty;
-            }
-            var fileName = record.Get<string>("FileName");
-            var metaData = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            for (var a = 0; true; a++)
-            {
-                var keyName = string.Format("Key_{0}", a);
-                if (!record.Contains(keyName))
-                {
-                    break;
-                }
-                var key = record.Get<string>(keyName).ToLower();
-                var valueName = string.Format("Value_{0}_Value", a);
-                var value = record.Get<string>(valueName);
-                metaData.Add(key, value);
-            }
-            var context = this.GetOrAddContext();
-            context.SetValue("fileName", fileName);
-            context.SetValue("tag", metaData);
-            try
-            {
-                return Convert.ToString(context.Run(script));
-            }
-            catch (ScriptingException e)
-            {
-                return e.Message;
-            }
-        }
-
-        private string[] GetPathSegments(IDatabaseReaderRecord record)
-        {
-            var value = record.Get<string>("FileName");
             //This removes any matching library roots from the path.
-            var normalized = value.Replace(this.Roots.Value, string.Empty, true, true);
+            var normalized = fileName.Replace(this.Roots.Value, string.Empty, true, true);
             var segments = normalized.Split(
                 new[] { Path.DirectorySeparatorChar.ToString() },
                 StringSplitOptions.RemoveEmptyEntries

@@ -86,8 +86,6 @@ namespace FoxTunes
             }
         }
 
-        public abstract IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames);
-
         public IDatabaseQuery ClearLibraryMetaDataItems
         {
             get
