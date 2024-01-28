@@ -187,17 +187,15 @@ namespace FoxTunes
                 builder.Append(element.FileName);
                 if (this.Errors.TryGetValue(element, out errors))
                 {
-                    builder.Append(" -> Error");
+                    builder.AppendLine(" -> Error");
                     foreach (var error in errors)
                     {
-                        builder.Append(Environment.NewLine);
-                        builder.Append("\t");
-                        builder.Append(error);
+                        builder.AppendLine('\t' + error);
                     }
                 }
                 else
                 {
-                    builder.Append(" -> OK");
+                    builder.AppendLine(" -> OK");
                 }
                 return builder.ToString();
             }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -16,7 +17,10 @@ namespace FoxTunes
         protected LibraryTaskBase()
             : base(ID)
         {
+            this.Warnings = new Dictionary<LibraryItem, IList<string>>();
         }
+
+        public IDictionary<LibraryItem, IList<string>> Warnings { get; private set; }
 
         public ICore Core { get; private set; }
 
@@ -159,8 +163,8 @@ namespace FoxTunes
                 {
                     libraryPopulator.InitializeComponent(this.Core);
                     await this.WithSubTask(libraryPopulator,
-                        async () => await libraryPopulator.Populate(paths, cancellationToken)
-.ConfigureAwait(false)).ConfigureAwait(false);
+                         () => libraryPopulator.Populate(paths, cancellationToken)
+                    ).ConfigureAwait(false);
                 }
                 transaction.Commit();
             }
@@ -174,8 +178,15 @@ namespace FoxTunes
                 {
                     metaDataPopulator.InitializeComponent(this.Core);
                     await this.WithSubTask(metaDataPopulator,
-                        async () => await metaDataPopulator.Populate(LibraryItemStatus.Import, cancellationToken)
-.ConfigureAwait(false)).ConfigureAwait(false);
+                        () => metaDataPopulator.Populate(LibraryItemStatus.Import, cancellationToken)
+                    ).ConfigureAwait(false);
+                    foreach (var pair in metaDataPopulator.Warnings)
+                    {
+                        if (pair.Key is LibraryItem libraryItem)
+                        {
+                            this.Warnings.Add(libraryItem, pair.Value);
+                        }
+                    }
                 }
                 transaction.Commit();
             }
@@ -212,8 +223,8 @@ namespace FoxTunes
             {
                 libraryHierarchyPopulator.InitializeComponent(this.Core);
                 await this.WithSubTask(libraryHierarchyPopulator,
-                    async () => await libraryHierarchyPopulator.Populate(status, cancellationToken)
-.ConfigureAwait(false)).ConfigureAwait(false);
+                    () => libraryHierarchyPopulator.Populate(status, cancellationToken)
+                ).ConfigureAwait(false);
             }
         }
 

@@ -1,5 +1,7 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,6 +22,7 @@ namespace FoxTunes
             this.Transaction = transaction;
             this.Query = query;
             this.Writer = new MetaDataWriter(this.Database, this.Query, this.Transaction);
+            this.Warnings = new ConcurrentDictionary<IFileData, IList<string>>();
         }
 
         public IDatabaseComponent Database { get; private set; }
@@ -35,6 +38,8 @@ namespace FoxTunes
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
 
         private MetaDataWriter Writer { get; set; }
+
+        public ConcurrentDictionary<IFileData, IList<string>> Warnings { get; private set; }
 
         public override ParallelOptions ParallelOptions
         {
@@ -94,6 +99,11 @@ namespace FoxTunes
 
                 var metaData = await metaDataSource.GetMetaData(fileData.FileName).ConfigureAwait(false);
 
+                foreach (var warning in metaDataSource.GetWarnings(fileData.FileName))
+                {
+                    this.AddWarning(fileData, warning);
+                }
+
 #if NET40
                 this.Semaphore.Wait();
 #else
@@ -146,6 +156,11 @@ namespace FoxTunes
                 await this.SetPosition(this.position).ConfigureAwait(false);
             }
             base.OnElapsed(sender, e);
+        }
+
+        protected virtual void AddWarning<T>(T fileData, string warning) where T : IFileData
+        {
+            this.Warnings.GetOrAdd(fileData, key => new List<string>()).Add(warning);
         }
 
         protected override void OnDisposing()

@@ -17,11 +17,14 @@ namespace FoxTunes
             : base(ID)
         {
             this.Sequence = sequence;
+            this.Warnings = new Dictionary<PlaylistItem, IList<string>>();
         }
 
         public int Sequence { get; protected set; }
 
         public int Offset { get; protected set; }
+
+        public IDictionary<PlaylistItem, IList<string>> Warnings { get; private set; }
 
         public ICore Core { get; private set; }
 
@@ -81,8 +84,8 @@ namespace FoxTunes
                 {
                     playlistPopulator.InitializeComponent(this.Core);
                     await this.WithSubTask(playlistPopulator,
-                        async () => await playlistPopulator.Populate(paths, cancellationToken)
-.ConfigureAwait(false)).ConfigureAwait(false);
+                        () => playlistPopulator.Populate(paths, cancellationToken)
+                    ).ConfigureAwait(false);
                     this.Offset = playlistPopulator.Offset;
                 }
                 transaction.Commit();
@@ -97,8 +100,15 @@ namespace FoxTunes
                 {
                     metaDataPopulator.InitializeComponent(this.Core);
                     await this.WithSubTask(metaDataPopulator,
-                        async () => await metaDataPopulator.Populate(PlaylistItemStatus.Import, cancellationToken)
-.ConfigureAwait(false)).ConfigureAwait(false);
+                        () => metaDataPopulator.Populate(PlaylistItemStatus.Import, cancellationToken)
+                    ).ConfigureAwait(false);
+                    foreach (var pair in metaDataPopulator.Warnings)
+                    {
+                        if (pair.Key is PlaylistItem playlistItem)
+                        {
+                            this.Warnings.Add(playlistItem, pair.Value);
+                        }
+                    }
                 }
                 transaction.Commit();
             }

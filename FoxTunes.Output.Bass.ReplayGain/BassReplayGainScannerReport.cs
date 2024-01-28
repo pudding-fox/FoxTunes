@@ -43,15 +43,18 @@ namespace FoxTunes
         protected virtual string GetDescription(ScannerItem scannerItem)
         {
             var builder = new StringBuilder();
-            builder.AppendFormat("{0}", scannerItem.FileName);
+            builder.Append(scannerItem.FileName);
             if (scannerItem.Status != ScannerItemStatus.Complete && scannerItem.Errors.Any())
             {
-                builder.Append(Environment.NewLine);
+                builder.AppendLine(" -> Error");
                 foreach (var error in scannerItem.Errors)
                 {
-                    builder.Append("\t");
-                    builder.Append(error);
+                    builder.AppendLine('\t' + error);
                 }
+            }
+            else
+            {
+                builder.AppendLine(" -> OK");
             }
             return builder.ToString();
         }

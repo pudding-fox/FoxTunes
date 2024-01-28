@@ -6,6 +6,8 @@ namespace FoxTunes.Interfaces
 {
     public interface IMetaDataSource : IBaseComponent
     {
+        IEnumerable<string> GetWarnings(string fileName);
+
         Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName);
 
         Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems, Func<MetaDataItem, bool> predicate);

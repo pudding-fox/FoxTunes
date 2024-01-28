@@ -259,7 +259,7 @@ namespace FoxTunes
                         try
                         {
                             await this.WithSubTask(monitor,
-                                async () => await monitor.Encode().ConfigureAwait(false)
+                                () => monitor.Encode()
                             ).ConfigureAwait(false);
                         }
                         finally

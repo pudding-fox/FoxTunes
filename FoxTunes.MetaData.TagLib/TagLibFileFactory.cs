@@ -32,13 +32,6 @@ namespace FoxTunes
             {
                 file = File.Create(fileName);
             }
-            if (file.PossiblyCorrupt)
-            {
-                foreach (var reason in file.CorruptionReasons)
-                {
-                    Logger.Write(typeof(TagLibFileFactory), LogLevel.Debug, "Meta data corruption detected: {0} => {1}", fileName, reason);
-                }
-            }
             return file;
         }
 
