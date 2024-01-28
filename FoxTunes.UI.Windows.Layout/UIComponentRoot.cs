@@ -46,11 +46,11 @@ namespace FoxTunes
             var container = new UIComponentContainer();
             //TODO: Should we create this binding now or on Loaded?
             container.SetBinding(
-                UIComponentContainer.ComponentProperty,
+                UIComponentContainer.ConfigurationProperty,
                 new Binding()
                 {
                     Source = this,
-                    Path = new PropertyPath(nameof(this.Component))
+                    Path = new PropertyPath(nameof(this.Configuration))
                 }
             );
             this.Content = container;

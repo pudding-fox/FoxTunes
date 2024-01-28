@@ -28,24 +28,24 @@ namespace FoxTunes
             }
         }
 
-        public static readonly DependencyProperty ComponentProperty = DependencyProperty.Register(
-            "Component",
+        public static readonly DependencyProperty ConfigurationProperty = DependencyProperty.Register(
+            "Configuration",
             typeof(UIComponentConfiguration),
             typeof(UIComponentContainer),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnComponentChanged))
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnConfigurationChanged))
        );
 
-        public static UIComponentConfiguration GetComponent(UIComponentContainer source)
+        public static UIComponentConfiguration GetConfiguration(UIComponentContainer source)
         {
-            return (UIComponentConfiguration)source.GetValue(ComponentProperty);
+            return (UIComponentConfiguration)source.GetValue(ConfigurationProperty);
         }
 
-        public static void SetComponent(UIComponentContainer source, UIComponentConfiguration value)
+        public static void SetConfiguration(UIComponentContainer source, UIComponentConfiguration value)
         {
-            source.SetValue(ComponentProperty, value);
+            source.SetValue(ConfigurationProperty, value);
         }
 
-        public static void OnComponentChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        public static void OnConfigurationChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var componentContainer = sender as UIComponentContainer;
             if (componentContainer == null)
@@ -63,7 +63,7 @@ namespace FoxTunes
                     newComponent.MetaData.TryAdd(pair.Key, pair.Value);
                 }
             }
-            componentContainer.OnComponentChanged();
+            componentContainer.OnConfigurationChanged();
         }
 
         public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(
@@ -102,27 +102,27 @@ namespace FoxTunes
 
         public Rectangle Rectangle { get; private set; }
 
-        public UIComponentConfiguration Component
+        public UIComponentConfiguration Configuration
         {
             get
             {
-                return GetComponent(this);
+                return GetConfiguration(this);
             }
             set
             {
-                SetComponent(this, value);
+                SetConfiguration(this, value);
             }
         }
 
-        protected virtual void OnComponentChanged()
+        protected virtual void OnConfigurationChanged()
         {
-            if (this.ComponentChanged != null)
+            if (this.ConfigurationChanged != null)
             {
-                this.ComponentChanged(this, EventArgs.Empty);
+                this.ConfigurationChanged(this, EventArgs.Empty);
             }
         }
 
-        public event EventHandler ComponentChanged;
+        public event EventHandler ConfigurationChanged;
 
         public UIComponentBase Content
         {
@@ -163,7 +163,7 @@ namespace FoxTunes
                 ContentControl.ContentProperty,
                 new Binding()
                 {
-                    Path = new PropertyPath("Component"),
+                    Path = new PropertyPath("Configuration"),
                     Source = this,
                     Converter = this
                 }
@@ -223,7 +223,7 @@ namespace FoxTunes
                 new Binding()
                 {
                     Source = this,
-                    Path = new PropertyPath("Component")
+                    Path = new PropertyPath("Configuration")
                 }
             );
 
@@ -252,11 +252,11 @@ namespace FoxTunes
             get
             {
                 var attributes = InvocationComponent.ATTRIBUTE_SEPARATOR;
-                if (this.Component != null && this.Component.Component != null)
+                if (this.Configuration != null && this.Configuration.Component != null)
                 {
-                    foreach (var alternative in LayoutManager.Instance.GetComponents(this.Component.Component.Role))
+                    foreach (var alternative in LayoutManager.Instance.GetComponents(this.Configuration.Component.Role))
                     {
-                        if (string.Equals(this.Component.Component.Id, alternative.Id, StringComparison.OrdinalIgnoreCase))
+                        if (string.Equals(this.Configuration.Component.Id, alternative.Id, StringComparison.OrdinalIgnoreCase))
                         {
                             continue;
                         }
@@ -289,27 +289,27 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                if (this.Component == null || this.Component.Component == null)
+                if (this.Configuration == null || this.Configuration.Component == null)
                 {
                     return;
                 }
-                var component = LayoutManager.Instance.GetComponent(name, this.Component.Component.Role);
+                var component = LayoutManager.Instance.GetComponent(name, this.Configuration.Component.Role);
                 if (component == null)
                 {
                     return;
                 }
-                this.Component = Factory.CreateConfiguration(component);
+                this.Configuration = Factory.CreateConfiguration(component);
             });
         }
 
         public Task Clear()
         {
-            return Windows.Invoke(() => this.Component = new UIComponentConfiguration());
+            return Windows.Invoke(() => this.Configuration = new UIComponentConfiguration());
         }
 
         public IConfiguration GetConfiguration(IConfigurableComponent component)
         {
-            var configuration = new UIComponentConfigurationProvider(this.Component);
+            var configuration = new UIComponentConfigurationProvider(this.Configuration);
             configuration.InitializeComponent(Core.Instance);
             Logger.Write(this, LogLevel.Debug, "Registering configuration for component {0}.", component.GetType().Name);
             try

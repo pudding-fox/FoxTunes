@@ -19,5 +19,5 @@
         <!-- This seems to produce a binding warning but I don't know why. The FallbackValue doesn't seem to help. -->
         <Binding Path="Title" Source="{StaticResource ViewModel}" Mode="OneWay" FallbackValue="Tool Window"/>
     </Window.Title>
-    <LocalWindows:UIComponentRoot x:Name="Root" Grid.Row="1" Component="{Binding Component, Source={StaticResource ViewModel}}"></LocalWindows:UIComponentRoot>
+    <LocalWindows:UIComponentRoot x:Name="Root" Grid.Row="1" Configuration="{Binding Component, Source={StaticResource ViewModel}}"></LocalWindows:UIComponentRoot>
 </Windows:WindowBase>

@@ -4,6 +4,6 @@
     {
         bool IsInDesignMode { get; set; }
 
-        UIComponentConfiguration Component { get; set; }
+        UIComponentConfiguration Configuration { get; set; }
     }
 }

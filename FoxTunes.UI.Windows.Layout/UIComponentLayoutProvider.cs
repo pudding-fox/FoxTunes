@@ -125,7 +125,7 @@ namespace FoxTunes
                 case UILayoutTemplate.Main:
                     var root = new UIComponentRoot();
                     root.SetBinding(
-                        UIComponentPanel.ComponentProperty,
+                        UIComponentPanel.ConfigurationProperty,
                         new Binding()
                         {
                             Source = this,

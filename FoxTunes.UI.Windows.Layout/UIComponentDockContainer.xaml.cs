@@ -174,40 +174,40 @@ namespace FoxTunes
             );
         }
 
-        protected override void OnComponentChanged()
+        protected override void OnConfigurationChanged()
         {
-            if (this.Component != null)
+            if (this.Configuration != null)
             {
                 this.UpdateMetaData();
                 this.UpdateChildren();
             }
-            base.OnComponentChanged();
+            base.OnConfigurationChanged();
         }
 
         protected virtual void UpdateChildren()
         {
-            if (this.Component.Children == null)
+            if (this.Configuration.Children == null)
             {
-                this.Component.Children = new ObservableCollection<UIComponentConfiguration>()
+                this.Configuration.Children = new ObservableCollection<UIComponentConfiguration>()
                 {
                     new UIComponentConfiguration(),
                     new UIComponentConfiguration()
                 };
                 return;
             }
-            for (var a = this.Component.Children.Count; a < 2; a++)
+            for (var a = this.Configuration.Children.Count; a < 2; a++)
             {
-                this.Component.Children.Add(new UIComponentConfiguration());
+                this.Configuration.Children.Add(new UIComponentConfiguration());
             }
-            this.ContentComponent = this.Component.Children[0];
-            this.DockComponent = this.Component.Children[1];
+            this.ContentComponent = this.Configuration.Children[0];
+            this.DockComponent = this.Configuration.Children[1];
         }
 
         protected virtual void UpdateMetaData()
         {
             var dockLocation = default(string);
             var collapse = default(string);
-            if (this.Component.MetaData.TryGetValue(nameof(this.DockLocation), out dockLocation))
+            if (this.Configuration.MetaData.TryGetValue(nameof(this.DockLocation), out dockLocation))
             {
                 this.DockLocation = dockLocation;
             }
@@ -215,7 +215,7 @@ namespace FoxTunes
             {
                 this.DockLocation = Enum.GetName(typeof(Dock), Dock.Top);
             }
-            if (this.Component.MetaData.TryGetValue(nameof(this.Collapse), out collapse))
+            if (this.Configuration.MetaData.TryGetValue(nameof(this.Collapse), out collapse))
             {
                 this.Collapse = Convert.ToBoolean(collapse);
             }
@@ -239,9 +239,9 @@ namespace FoxTunes
 
         protected virtual void OnContentComponentChanged()
         {
-            if (this.Component != null && this.Component.Children.Count >= 1 && this.ContentComponent != null)
+            if (this.Configuration != null && this.Configuration.Children.Count >= 1 && this.ContentComponent != null)
             {
-                this.Component.Children[0] = this.ContentComponent;
+                this.Configuration.Children[0] = this.ContentComponent;
             }
             if (this.ContentComponentChanged != null)
             {
@@ -266,9 +266,9 @@ namespace FoxTunes
 
         protected virtual void OnDockComponentChanged()
         {
-            if (this.Component != null && this.Component.Children.Count >= 2 && this.DockComponent != null)
+            if (this.Configuration != null && this.Configuration.Children.Count >= 2 && this.DockComponent != null)
             {
-                this.Component.Children[1] = this.DockComponent;
+                this.Configuration.Children[1] = this.DockComponent;
             }
             if (this.DockComponentChanged != null)
             {
@@ -316,9 +316,9 @@ namespace FoxTunes
 
         protected virtual void OnDockLocationChanged()
         {
-            if (this.Component != null)
+            if (this.Configuration != null)
             {
-                this.Component.MetaData.AddOrUpdate(
+                this.Configuration.MetaData.AddOrUpdate(
                     nameof(this.DockLocation),
                     this.DockLocation
                 );
@@ -346,9 +346,9 @@ namespace FoxTunes
 
         protected virtual void OnCollapseChanged()
         {
-            if (this.Component != null)
+            if (this.Configuration != null)
             {
-                this.Component.MetaData.AddOrUpdate(
+                this.Configuration.MetaData.AddOrUpdate(
                     nameof(this.Collapse),
                     Convert.ToString(this.Collapse)
                 );
