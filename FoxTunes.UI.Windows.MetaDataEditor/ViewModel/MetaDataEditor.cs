@@ -24,7 +24,8 @@ namespace FoxTunes.ViewModel
             CommonMetaData.Title,
             CommonMetaData.Track,
             CommonMetaData.TrackCount,
-            CommonMetaData.Year
+            CommonMetaData.Year,
+            CommonMetaData.IsCompilation
         };
 
         private static readonly string[] IMAGES = new[]

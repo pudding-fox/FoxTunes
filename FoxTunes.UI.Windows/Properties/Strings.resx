@@ -216,6 +216,9 @@
   <data name="LibraryTree.Name" xml:space="preserve">
     <value>Library Tree</value>
   </data>
+  <data name="MetaDataName.IsCompilation" xml:space="preserve">
+    <value>Compilation</value>
+  </data>
   <data name="MinimalLayoutProvider.Description" xml:space="preserve">
     <value />
   </data>
