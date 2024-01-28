@@ -11,9 +11,9 @@ namespace FoxTunes
     {
         public const int LONG_INTERVAL = 1000;
 
-        public const int NORMAL_INTERVAL = 100;
+        public const int NORMAL_INTERVAL = 500;
 
-        public const int FAST_INTERVAL = 10;
+        public const int FAST_INTERVAL = 100;
 
         public static readonly object SyncRoot = new object();
 

@@ -131,6 +131,15 @@ namespace FoxTunes
             var count = this.position - this.Position;
             if (count != 0)
             {
+                switch (this.Timer.Interval)
+                {
+                    case NORMAL_INTERVAL:
+                        count *= 2;
+                        break;
+                    case FAST_INTERVAL:
+                        count *= 10;
+                        break;
+                }
                 var eta = this.GetEta(count);
                 await this.SetName(string.Format("Updating library: {0} remaining @ {1} items/s", eta, count));
                 if (this.Current != null)
