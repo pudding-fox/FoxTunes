@@ -1,11 +1,9 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -30,15 +28,12 @@ namespace FoxTunes
         {
             switch (signal.Name)
             {
-                case CommonSignals.MetaDataUpdated:
-                    var names = signal.State as IEnumerable<string>;
-                    if (names == null || !names.Any())
+                case CommonSignals.PluginInvocation:
+                    switch (signal.State as string)
                     {
-                        this.Dispatch(this.Clear);
-                    }
-                    else if (names.Contains(CommonImageTypes.FrontCover, true))
-                    {
-                        this.Dispatch(this.Clear);
+                        case ImageBehaviour.REFRESH_IMAGES:
+                            this.Clear();
+                            break;
                     }
                     break;
             }
