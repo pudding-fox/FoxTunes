@@ -2,12 +2,26 @@
 
 namespace FoxTunes.Interfaces
 {
-    public interface IOutputStreamQueue: IStandardComponent
+    public interface IOutputStreamQueue : IStandardComponent
     {
-        void Enqueue(IOutputStream outputStream);
+        bool IsQueued(PlaylistItem playlistItem);
 
-        event EventHandler Enqueued;
+        void Enqueue(IOutputStream outputStream, bool dequeue);
 
-        IOutputStream Dequeue();
+        void Dequeue(PlaylistItem playlistItem);
+
+        event OutputStreamQueueEventHandler Dequeued;
+    }
+
+    public delegate void OutputStreamQueueEventHandler(object sender, OutputStreamQueueEventArgs e);
+
+    public class OutputStreamQueueEventArgs : EventArgs
+    {
+        public OutputStreamQueueEventArgs(IOutputStream outputStream)
+        {
+            this.OutputStream = outputStream;
+        }
+
+        public IOutputStream OutputStream { get; private set; }
     }
 }

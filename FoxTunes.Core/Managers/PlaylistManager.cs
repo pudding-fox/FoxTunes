@@ -132,7 +132,7 @@ namespace FoxTunes.Managers
         private Task Play(PlaylistItem playlistItem)
         {
             return this.PlaybackManager
-                .Load(playlistItem)
+                .Load(playlistItem, true)
                 .ContinueWith(_ =>
                 {
                     if (this.PlaybackManager.CurrentStream.PlaylistItem != playlistItem)
