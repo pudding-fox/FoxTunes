@@ -48,7 +48,7 @@ namespace FoxTunes
             }
         }
 
-        private class RightButtonSelectBehaviour
+        private class RightButtonSelectBehaviour : UIBehaviour
         {
             public RightButtonSelectBehaviour(TreeView treeView)
             {
@@ -66,6 +66,12 @@ namespace FoxTunes
                     item.Focus();
                     e.Handled = true;
                 }
+            }
+
+            protected override void OnDisposing()
+            {
+                this.TreeView.PreviewMouseRightButtonDown -= this.OnPreviewMouseRightButtonDown;
+                base.OnDisposing();
             }
         }
     }

@@ -50,19 +50,25 @@ namespace FoxTunes
             }
         }
 
-        private class SelectedItemsBehaviour
+        private class SelectedItemsBehaviour : UIBehaviour
         {
             public SelectedItemsBehaviour(ListView listView)
             {
                 this.ListView = listView;
-                this.ListView.SelectionChanged += this.ListView_SelectionChanged;
+                this.ListView.SelectionChanged += this.OnSelectionChanged;
             }
 
             public ListView ListView { get; private set; }
 
-            protected virtual void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+            protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
             {
                 SetSelectedItems(this.ListView, this.ListView.SelectedItems);
+            }
+
+            protected override void OnDisposing()
+            {
+                this.ListView.SelectionChanged -= this.OnSelectionChanged;
+                base.OnDisposing();
             }
         }
     }

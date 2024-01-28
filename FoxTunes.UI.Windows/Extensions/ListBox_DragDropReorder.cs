@@ -66,7 +66,7 @@ namespace FoxTunes
             source.SetValue(DragDropReorderCommandProperty, value);
         }
 
-        private class DragDropReorderBehaviour
+        private class DragDropReorderBehaviour : UIBehaviour
         {
             public DragDropReorderBehaviour(ListBox listBox)
             {
@@ -90,11 +90,11 @@ namespace FoxTunes
                 {
                     return false;
                 }
-                if (Math.Abs(position.X - this.DragStartPosition.X) > SystemParameters.MinimumHorizontalDragDistance)
+                if (Math.Abs(position.X - this.DragStartPosition.X) > (SystemParameters.MinimumHorizontalDragDistance * 2))
                 {
                     return true;
                 }
-                if (Math.Abs(position.Y - this.DragStartPosition.Y) > SystemParameters.MinimumVerticalDragDistance)
+                if (Math.Abs(position.Y - this.DragStartPosition.Y) > (SystemParameters.MinimumVerticalDragDistance * 2))
                 {
                     return true;
                 }
@@ -169,6 +169,15 @@ namespace FoxTunes
                     }
                 }
                 e.Effects = effects;
+            }
+
+            protected override void OnDisposing()
+            {
+                this.ListBox.PreviewMouseDown -= this.OnMouseDown;
+                this.ListBox.PreviewMouseUp -= this.OnMouseUp;
+                this.ListBox.MouseMove -= this.OnMouseMove;
+                this.ListBox.DragOver -= this.OnDragOver;
+                base.OnDisposing();
             }
         }
     }

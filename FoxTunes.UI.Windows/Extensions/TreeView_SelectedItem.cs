@@ -39,17 +39,17 @@ namespace FoxTunes
             }
         }
 
-        private class SelectedItemBehaviour
+        private class SelectedItemBehaviour : UIBehaviour
         {
             public SelectedItemBehaviour(TreeView treeView)
             {
                 this.TreeView = treeView;
-                this.TreeView.SelectedItemChanged += this.TreeView_SelectedItemChanged;
+                this.TreeView.SelectedItemChanged += this.OnSelectedItemChanged;
             }
 
             public TreeView TreeView { get; private set; }
 
-            protected virtual void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+            protected virtual void OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
             {
                 SetSelectedItem(this.TreeView, this.TreeView.SelectedItem);
                 if (GetSelectedItem(this.TreeView) != this.TreeView.SelectedItem)
@@ -57,6 +57,12 @@ namespace FoxTunes
                     //TODO: Sometimes the value doesn't stick. Don't know why. Second attempt probably works.
                     SetSelectedItem(this.TreeView, this.TreeView.SelectedItem);
                 }
+            }
+
+            protected override void OnDisposing()
+            {
+                this.TreeView.SelectedItemChanged -= this.OnSelectedItemChanged;
+                base.OnDisposing();
             }
         }
     }
