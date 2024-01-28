@@ -118,8 +118,6 @@ namespace FoxTunes
                 .HasOptional(item => item.LibraryHierarchy);
             builder.Entity<LibraryHierarchyItem>()
                 .HasOptional(item => item.LibraryHierarchyLevel);
-            builder.Entity<LibraryHierarchyItem>()
-                 .HasOptional(item => item.LibraryItem);
         }
 
         protected virtual void MapMetaDataItem(DbModelBuilder builder)

@@ -51,12 +51,10 @@ namespace FoxTunes
         private void AddPlaylistItems(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
             var parameters = default(IDbParameterCollection);
-            using (var command = databaseContext.Connection.CreateCommand(Resources.AddLibraryHierarchyNodeToPlaylist, new[] { "libraryHierarchyId", "libraryHierarchyLevelId", "displayValue", "sequence", "status" }, out parameters))
+            using (var command = databaseContext.Connection.CreateCommand(Resources.AddLibraryHierarchyNodeToPlaylist, new[] { "libraryHierarchyItemId", "sequence", "status" }, out parameters))
             {
                 command.Transaction = transaction;
-                parameters["libraryHierarchyId"] = this.LibraryHierarchyNode.LibraryHierarchyId;
-                parameters["libraryHierarchyLevelId"] = this.LibraryHierarchyNode.LibraryHierarchyLevelId;
-                parameters["displayValue"] = this.LibraryHierarchyNode.Value;
+                parameters["libraryHierarchyItemId"] = this.LibraryHierarchyNode.Id;
                 parameters["sequence"] = this.Sequence;
                 parameters["status"] = PlaylistItemStatus.Import;
                 this.Offset = command.ExecuteNonQuery();

@@ -4,85 +4,117 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 
+CREATE TEMPORARY TABLE "LibraryHierarchy"
+AS
+	WITH "VerticalMetaData"
+	AS
+	(
+		SELECT "LibraryItems"."Id", "MetaDataItems"."Name", 
+			CASE 
+				WHEN "MetaDataItems"."NumericValue" IS NOT NULL THEN 'Numeric' 
+				WHEN "MetaDataItems"."TextValue" IS NOT NULL THEN 'Text' 
+				WHEN "MetaDataItems"."FileValue" IS NOT NULL THEN 'File' 
+			END AS "ValueType",
+				CASE 
+				WHEN "MetaDataItems"."NumericValue" IS NOT NULL THEN "MetaDataItems"."NumericValue"
+				WHEN "MetaDataItems"."TextValue" IS NOT NULL THEN "MetaDataItems"."TextValue" 
+				WHEN "MetaDataItems"."FileValue" IS NOT NULL THEN "MetaDataItems"."FileValue"
+			END AS "Value"
+		FROM "LibraryItems"
+			JOIN "LibraryItem_MetaDataItem" ON "LibraryItems"."Id" = "LibraryItem_MetaDataItem"."LibraryItem_Id"
+			JOIN "MetaDataItems" ON "MetaDataItems"."Id" = "LibraryItem_MetaDataItem"."MetaDataItem_Id"
+		ORDER BY "LibraryItems"."Id"
+	)
+	,
+	"HorizontalMetaData"
+	AS
+	(
+	<#= 
+		new PivotViewBuilder(
+			"VerticalMetaData", 
+			new[] { "Id" }, 
+			new[] { "Name" }, 
+			new[] { "ValueType", "Value" }, 
+			this.MetaDataNames
+		).TransformText() 
+	#>
+	)
+
+	SELECT "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchy_Id" AS "LibraryHierarchy_Id", "LibraryHierarchyLevels"."Id" AS "LibraryHierarchyLevel_Id", "HorizontalMetaData"."Id" AS "LibraryItem_Id",
+		EXECUTE_SCRIPT
+		(
+			"LibraryHierarchyLevels"."DisplayScript"
+	<#
+		for(var index = 0; index < this.MetaDataNames.Length; index++)
+		{
+			#>,"Key_<#= index #>", "Value_<#= index #>_Value"<#
+		}
+	#>
+		) AS DisplayValue,
+		EXECUTE_SCRIPT
+		(
+			"LibraryHierarchyLevels"."SortScript"
+	<#
+		for(var index = 0; index < this.MetaDataNames.Length; index++)
+		{
+			#>,"Key_<#= index #>", "Value_<#= index #>_Value"<#
+		}
+	#>
+		) AS SortValue,
+		CASE WHEN 
+			EXISTS
+			(
+				SELECT * 
+				FROM "LibraryHierarchy_LibraryHierarchyLevel" AS "LibraryHierarchy_LibraryHierarchyLevel_Copy" 
+				WHERE "LibraryHierarchy_LibraryHierarchyLevel_Copy"."LibraryHierarchy_Id" = "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchy_Id" 
+					AND "LibraryHierarchy_LibraryHierarchyLevel_Copy"."LibraryHierarchyLevel_Id" > "LibraryHierarchyLevels"."Id"
+			) THEN 0 
+			ELSE 1 
+		END AS "IsLeaf"
+	FROM "LibraryHierarchyLevels"
+		JOIN "LibraryHierarchy_LibraryHierarchyLevel" 
+			ON "LibraryHierarchyLevels"."Id" = "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchyLevel_Id"
+		JOIN "HorizontalMetaData";
+
 DELETE FROM "LibraryHierarchyItems";
 
-WITH "VerticalMetaData"
-AS
-(
-	SELECT "LibraryItems"."Id", "MetaDataItems"."Name", 
-		CASE 
-			WHEN "MetaDataItems"."NumericValue" IS NOT NULL THEN 'Numeric' 
-			WHEN "MetaDataItems"."TextValue" IS NOT NULL THEN 'Text' 
-			WHEN "MetaDataItems"."FileValue" IS NOT NULL THEN 'File' 
-		END AS "ValueType",
-			CASE 
-			WHEN "MetaDataItems"."NumericValue" IS NOT NULL THEN "MetaDataItems"."NumericValue"
-			WHEN "MetaDataItems"."TextValue" IS NOT NULL THEN "MetaDataItems"."TextValue" 
-			WHEN "MetaDataItems"."FileValue" IS NOT NULL THEN "MetaDataItems"."FileValue"
-		END AS "Value"
-	FROM "LibraryItems"
-		JOIN "LibraryItem_MetaDataItem" ON "LibraryItems"."Id" = "LibraryItem_MetaDataItem"."LibraryItem_Id"
-		JOIN "MetaDataItems" ON "MetaDataItems"."Id" = "LibraryItem_MetaDataItem"."MetaDataItem_Id"
-	ORDER BY "LibraryItems"."Id"
-)
-,
-"HorizontalMetaData"
-AS
-(
-<#= 
-    new PivotViewBuilder(
-        "VerticalMetaData", 
-        new[] { "Id" }, 
-        new[] { "Name" }, 
-        new[] { "ValueType", "Value" }, 
-        this.MetaDataNames
-    ).TransformText() 
-#>
-)
-
-INSERT INTO "LibraryHierarchyItems" ("LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "LibraryItem_Id", "DisplayValue", "SortValue", "IsLeaf")
-SELECT "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchy_Id", "LibraryHierarchyLevels"."Id" AS "LibraryHierarchyLevel_Id", "HorizontalMetaData"."Id" AS "LibraryItem_Id",
-	EXECUTE_SCRIPT
-    (
-        "LibraryHierarchyLevels"."DisplayScript"
-<#
-    for(var index = 0; index < this.MetaDataNames.Length; index++)
-    {
-        #>,"Key_<#= index #>", "Value_<#= index #>_Value"<#
-    }
-#>
-    ) AS DisplayScript,
-	EXECUTE_SCRIPT
-    (
-        "LibraryHierarchyLevels"."SortScript"
-<#
-    for(var index = 0; index < this.MetaDataNames.Length; index++)
-    {
-        #>,"Key_<#= index #>", "Value_<#= index #>_Value"<#
-    }
-#>
-    ) AS SortScript,
-	CASE WHEN 
-		EXISTS
-		(
-			SELECT * 
-			FROM "LibraryHierarchy_LibraryHierarchyLevel" AS "LibraryHierarchy_LibraryHierarchyLevel_Copy" 
-			WHERE "LibraryHierarchy_LibraryHierarchyLevel_Copy"."LibraryHierarchy_Id" = "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchy_Id" 
-				AND "LibraryHierarchy_LibraryHierarchyLevel_Copy"."LibraryHierarchyLevel_Id" > "LibraryHierarchyLevels"."Id"
-		) THEN 0 
-		ELSE 1 
-	END AS "IsLeaf"
-FROM "LibraryHierarchyLevels"
-	JOIN "LibraryHierarchy_LibraryHierarchyLevel" 
-		ON "LibraryHierarchyLevels"."Id" = "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchyLevel_Id"
-	JOIN "HorizontalMetaData";
+INSERT INTO "LibraryHierarchyItems" ("LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "DisplayValue", "SortValue", "IsLeaf")
+SELECT "LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "DisplayValue", "SortValue", "IsLeaf"
+FROM "LibraryHierarchy"
+GROUP BY "LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "DisplayValue", "SortValue", "IsLeaf";
 
 UPDATE "LibraryHierarchyItems"
 SET "Parent_Id" = 
 (
-  SELECT LibraryHierarchyItems_Copy."Id"
-  FROM "LibraryHierarchyItems" AS "LibraryHierarchyItems_Copy" 
-  WHERE "LibraryHierarchyItems_Copy"."LibraryHierarchy_Id" = "LibraryHierarchyItems"."LibraryHierarchy_Id" 
-        AND "LibraryHierarchyItems_Copy"."LibraryHierarchyLevel_Id" = ("LibraryHierarchyItems"."LibraryHierarchyLevel_Id" - 1) 
-        AND "LibraryHierarchyItems_Copy"."LibraryItem_Id" = "LibraryHierarchyItems"."LibraryItem_Id"
-)
+	SELECT "LibraryHierarchyItems_Copy"."Id"
+	FROM "LibraryHierarchyItems" AS "LibraryHierarchyItems_Copy"
+		JOIN "LibraryHierarchy" ON "LibraryHierarchy"."LibraryHierarchy_Id" = "LibraryHierarchyItems"."LibraryHierarchy_Id"
+		AND "LibraryHierarchy"."LibraryHierarchyLevel_Id" = "LibraryHierarchyItems"."LibraryHierarchyLevel_Id"
+		AND "LibraryHierarchy"."DisplayValue" = "LibraryHierarchyItems"."DisplayValue"
+		AND "LibraryHierarchy"."SortValue" = "LibraryHierarchyItems"."SortValue"
+		AND "LibraryHierarchy"."IsLeaf" = "LibraryHierarchyItems"."IsLeaf"
+	JOIN "LibraryHierarchy" AS "LibraryHierarchy_Copy" ON "LibraryHierarchy_Copy"."LibraryHierarchy_Id" = "LibraryHierarchyItems_Copy"."LibraryHierarchy_Id"
+		AND "LibraryHierarchy_Copy"."LibraryHierarchyLevel_Id" = 
+		(
+			SELECT MAX("Id") 
+			FROM "LibraryHierarchyLevels" 
+			WHERE "Id" < "LibraryHierarchy"."LibraryHierarchyLevel_Id"
+		)
+		AND "LibraryHierarchy_Copy"."LibraryItem_Id" = "LibraryHierarchy"."LibraryItem_Id"
+		AND "LibraryHierarchy_Copy"."DisplayValue" = "LibraryHierarchyItems_Copy"."DisplayValue"
+		AND "LibraryHierarchy_Copy"."SortValue" = "LibraryHierarchyItems_Copy"."SortValue"
+		AND "LibraryHierarchy_Copy"."IsLeaf" = "LibraryHierarchyItems_Copy"."IsLeaf"
+);
+
+DELETE FROM "LibraryHierarchyItem_LibraryItem";
+
+INSERT INTO "LibraryHierarchyItem_LibraryItem" ("LibraryHierarchyItem_Id", "LibraryItem_Id")
+SELECT "LibraryHierarchyItems"."Id", "LibraryHierarchy"."LibraryItem_Id"
+FROM "LibraryHierarchyItems"
+	JOIN "LibraryHierarchy" ON "LibraryHierarchy"."LibraryHierarchy_Id" 
+		AND "LibraryHierarchy"."LibraryHierarchyLevel_Id" = "LibraryHierarchyItems"."LibraryHierarchyLevel_Id"
+		AND "LibraryHierarchy"."DisplayValue" = "LibraryHierarchyItems"."DisplayValue"
+		AND "LibraryHierarchy"."SortValue" = "LibraryHierarchyItems"."SortValue"
+		AND "LibraryHierarchy"."IsLeaf" = "LibraryHierarchyItems"."IsLeaf";
+
+DROP TABLE "LibraryHierarchy";

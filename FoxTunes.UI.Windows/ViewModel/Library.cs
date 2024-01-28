@@ -8,6 +8,8 @@ namespace FoxTunes.ViewModel
 {
     public class Library : ViewModelBase
     {
+        const int EXPAND_ALL_LIMIT = 5;
+
         public Library()
         {
             this._Items = new Dictionary<LibraryHierarchy, ObservableCollection<LibraryHierarchyNode>>();
@@ -62,7 +64,7 @@ namespace FoxTunes.ViewModel
                 if (!this._Items.ContainsKey(this.SelectedHierarchy))
                 {
                     this._Items[this.SelectedHierarchy] = new ObservableCollection<LibraryHierarchyNode>(
-                        this.LibraryHierarchyBrowser.GetRootNodes(this.SelectedHierarchy)
+                        this.LibraryHierarchyBrowser.GetNodes(this.SelectedHierarchy)
                     );
                 }
                 return this._Items[this.SelectedHierarchy];
@@ -121,6 +123,27 @@ namespace FoxTunes.ViewModel
             this.OnItemsChanged();
         }
 
+        public void ExpandAll()
+        {
+            var stack = new Stack<LibraryHierarchyNode>(this.Items);
+            while (stack.Count > 0)
+            {
+                var node = stack.Pop();
+                if (!node.IsExpanded)
+                {
+                    node.IsExpanded = true;
+                }
+                foreach (var child in node.Children)
+                {
+                    if (child.IsLeaf)
+                    {
+                        continue;
+                    }
+                    stack.Push(child);
+                }
+            }
+        }
+
         protected override void OnCoreChanged()
         {
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
@@ -136,6 +159,10 @@ namespace FoxTunes.ViewModel
         protected virtual void OnFilterChanged(object sender, EventArgs e)
         {
             this.Reload();
+            if (!string.IsNullOrEmpty(this.LibraryHierarchyBrowser.Filter) && this.Items.Count <= EXPAND_ALL_LIMIT)
+            {
+                this.ExpandAll();
+            }
         }
 
         protected virtual void OnSignal(object sender, ISignal signal)
@@ -147,7 +174,7 @@ namespace FoxTunes.ViewModel
                     break;
             }
         }
-        
+
         protected override Freezable CreateInstanceCore()
         {
             return new Library();

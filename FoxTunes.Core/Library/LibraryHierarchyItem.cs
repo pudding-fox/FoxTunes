@@ -19,8 +19,6 @@
 
         public LibraryHierarchyLevel LibraryHierarchyLevel { get; set; }
 
-        public LibraryItem LibraryItem { get; private set; }
-
         public string DisplayValue { get; set; }
 
         public string SortValue { get; set; }

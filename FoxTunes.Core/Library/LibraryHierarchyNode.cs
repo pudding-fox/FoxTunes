@@ -1,6 +1,6 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.ObjectModel;
-using FoxTunes.Interfaces;
 
 namespace FoxTunes
 {
@@ -12,10 +12,9 @@ namespace FoxTunes
             this.MetaDatas = new ObservableCollection<MetaDataItem>();
         }
 
-        public LibraryHierarchyNode(int libraryHierarchyId, int libraryHierarchyLevelId, string value, bool isLeaf)
+        public LibraryHierarchyNode(int id, string value, bool isLeaf)
         {
-            this.LibraryHierarchyId = libraryHierarchyId;
-            this.LibraryHierarchyLevelId = libraryHierarchyLevelId;
+            this.Id = id;
             this.Value = value;
             if (this.IsLeaf = isLeaf)
             {
@@ -29,9 +28,7 @@ namespace FoxTunes
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
-        public int LibraryHierarchyId { get; private set; }
-
-        public int LibraryHierarchyLevelId { get; private set; }
+        public int Id { get; private set; }
 
         public string Value { get; private set; }
 
@@ -136,7 +133,7 @@ namespace FoxTunes
 
         protected virtual void OnIsExpandedChanged()
         {
-            if (this.IsExpanded && !this.IsLoaded)
+            if (this.IsExpanded && !this.IsLeaf && !this.IsLoaded)
             {
                 this.LoadChildren();
             }

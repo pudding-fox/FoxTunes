@@ -1,29 +1,21 @@
-﻿WITH RECURSIVE LibraryHierarchy("Root", "Id", "Parent_Id", "LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "DisplayValue", "IsLeaf")
+﻿WITH RECURSIVE LibraryHierarchy("Root", "Id", "Parent_Id", "DisplayValue")
 AS
 (
-	SELECT "LibraryHierarchyItems"."Id", "LibraryHierarchyItems"."Id", "LibraryHierarchyItems"."Parent_Id", "LibraryHierarchyItems"."LibraryHierarchy_Id", "LibraryHierarchyItems"."LibraryHierarchyLevel_Id", "LibraryHierarchyItems"."DisplayValue","LibraryHierarchyItems"."IsLeaf"
+	SELECT "Id", "Id", "Parent_Id", "DisplayValue"
 	FROM "LibraryHierarchyItems"
-		JOIN  "LibraryHierarchyItems" AS "LibraryHierarchyItems_Copy" ON "LibraryHierarchyItems"."Parent_Id" = "LibraryHierarchyItems_Copy"."Id"
-	WHERE "LibraryHierarchyItems"."LibraryHierarchy_Id" = @libraryHierarchyId 
-		AND "LibraryHierarchyItems_Copy"."LibraryHierarchy_Id" = @libraryHierarchyId 
-		AND "LibraryHierarchyItems_Copy"."LibraryHierarchyLevel_Id" = @libraryHierarchyLevelId 
-		AND "LibraryHierarchyItems_Copy"."DisplayValue" = @displayValue
 	UNION ALL 
-	SELECT "Root", "LibraryHierarchyItems"."Id", "LibraryHierarchyItems"."Parent_Id", "LibraryHierarchyItems"."LibraryHierarchy_Id", "LibraryHierarchyItems"."LibraryHierarchyLevel_Id", "LibraryHierarchyItems"."DisplayValue", "LibraryHierarchyItems"."IsLeaf"
+	SELECT "Root", "LibraryHierarchyItems"."Id", "LibraryHierarchyItems"."Parent_Id", "LibraryHierarchyItems"."DisplayValue"
 	FROM "LibraryHierarchyItems"
 		JOIN LibraryHierarchy ON "LibraryHierarchyItems"."Parent_Id" = LibraryHierarchy."Id"
 )
 
-SELECT "LibraryHierarchyItems"."LibraryHierarchy_Id", "LibraryHierarchyItems"."LibraryHierarchyLevel_Id", "LibraryHierarchyItems"."DisplayValue","LibraryHierarchyItems"."IsLeaf"
+SELECT "Id", "DisplayValue", "IsLeaf"
 FROM "LibraryHierarchyItems"
-	JOIN  "LibraryHierarchyItems" AS "LibraryHierarchyItems_Copy" ON "LibraryHierarchyItems"."Parent_Id" = "LibraryHierarchyItems_Copy"."Id"
-WHERE "LibraryHierarchyItems"."LibraryHierarchy_Id" = @libraryHierarchyId 
-	AND "LibraryHierarchyItems_Copy"."LibraryHierarchy_Id" = @libraryHierarchyId 
-	AND "LibraryHierarchyItems_Copy"."LibraryHierarchyLevel_Id" = @libraryHierarchyLevelId 
-	AND "LibraryHierarchyItems_Copy"."DisplayValue" = @displayValue
+WHERE (@libraryHierarchyId IS NULL OR "LibraryHierarchy_Id" = @libraryHierarchyId)
+	AND ((@libraryHierarchyItemId IS NULL AND "LibraryHierarchyItems"."Parent_Id" IS NULL) OR "LibraryHierarchyItems"."Parent_Id" = @libraryHierarchyItemId)
 	AND 
 	(
-		@filter IS NULL OR EXISTS
+		 "IsLeaf" = 1 OR @filter IS NULL OR EXISTS
 		(
 			SELECT * 
 			FROM LibraryHierarchy 
@@ -31,4 +23,4 @@ WHERE "LibraryHierarchyItems"."LibraryHierarchy_Id" = @libraryHierarchyId
 				AND "DisplayValue" LIKE @filter
 		)
 	)
-GROUP BY "LibraryHierarchyItems"."LibraryHierarchy_Id", "LibraryHierarchyItems"."LibraryHierarchyLevel_Id", "LibraryHierarchyItems"."DisplayValue", "LibraryHierarchyItems"."IsLeaf"
+ORDER BY "SortValue", "DisplayValue"
