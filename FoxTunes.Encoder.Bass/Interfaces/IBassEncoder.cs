@@ -1,12 +1,19 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace FoxTunes
 {
-    public interface IBassEncoder
+    public interface IBassEncoder : IBaseComponent, IDisposable
     {
-        AppDomain Domain { get; }
+        Process Process { get; }
 
-        void Encode(EncoderItem[] encoderItems);
+        IEnumerable<EncoderItem> EncoderItems { get; }
+
+        void Encode();
+
+        void Update();
 
         void Cancel();
     }

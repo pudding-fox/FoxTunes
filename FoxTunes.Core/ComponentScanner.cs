@@ -26,7 +26,10 @@ namespace FoxTunes
         {
             get
             {
-                return Directory.EnumerateFiles(this.Location, "FoxTunes*.dll", SearchOption.AllDirectories);
+                return Enumerable.Concat(
+                    Directory.EnumerateFiles(this.Location, "FoxTunes*.dll", SearchOption.AllDirectories),
+                    Directory.EnumerateFiles(this.Location, "FoxTunes*.exe", SearchOption.AllDirectories)
+                );
             }
         }
 

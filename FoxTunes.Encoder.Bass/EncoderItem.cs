@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Permissions;
 
 namespace FoxTunes
 {
-    public class EncoderItem : MarshalByRefObject
+    [Serializable]
+    public class EncoderItem : IEquatable<EncoderItem>
     {
         const int ERROR_CAPACITY = 10;
 
@@ -53,6 +53,41 @@ namespace FoxTunes
             }
         }
 
+        public virtual bool Equals(EncoderItem other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            if (object.ReferenceEquals(this, other))
+            {
+                return true;
+            }
+            if (!string.Equals(this.InputFileName, other.InputFileName, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as EncoderItem);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = default(int);
+            unchecked
+            {
+                if (!string.IsNullOrEmpty(this.InputFileName))
+                {
+                    hashCode += this.InputFileName.ToLower().GetHashCode();
+                }
+            }
+            return hashCode;
+        }
+
         public static EncoderItem FromPlaylistItem(PlaylistItem playlistItem)
         {
             var encoderItem = new EncoderItem()
@@ -70,11 +105,26 @@ namespace FoxTunes
             return encoderItem;
         }
 
-        [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.Infrastructure)]
-        public override object InitializeLifetimeService()
+        public static bool operator ==(EncoderItem a, EncoderItem b)
         {
-            //Disable the 5 minute lease default.
-            return null;
+            if ((object)a == null && (object)b == null)
+            {
+                return true;
+            }
+            if ((object)a == null || (object)b == null)
+            {
+                return false;
+            }
+            if (object.ReferenceEquals((object)a, (object)b))
+            {
+                return true;
+            }
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(EncoderItem a, EncoderItem b)
+        {
+            return !(a == b);
         }
     }
 

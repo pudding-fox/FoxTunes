@@ -166,8 +166,7 @@ namespace FoxTunes
             protected override async Task OnRun()
             {
                 Logger.Write(this, LogLevel.Debug, "Creating encoder.");
-                var encoder = EncoderFactory.CreateEncoder();
-                try
+                using (var encoder = EncoderFactory.CreateEncoder(this.EncoderItems))
                 {
                     Logger.Write(this, LogLevel.Debug, "Starting encoder.");
                     using (var monitor = new BassEncoderMonitor(encoder, this.Visible, this.CancellationToken))
@@ -176,7 +175,7 @@ namespace FoxTunes
                         try
                         {
                             await this.WithSubTask(monitor,
-                                async () => await monitor.Encode(this.EncoderItems)
+                                async () => await monitor.Encode()
                             );
                         }
                         finally
@@ -184,10 +183,6 @@ namespace FoxTunes
                             monitor.StatusChanged -= this.OnStatusChanged;
                         }
                     }
-                }
-                finally
-                {
-                    this.Unload(encoder.Domain);
                 }
                 Logger.Write(this, LogLevel.Debug, "Encoder completed successfully.");
             }

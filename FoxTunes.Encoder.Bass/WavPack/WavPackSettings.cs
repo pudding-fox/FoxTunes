@@ -84,7 +84,7 @@ namespace FoxTunes
         public override string GetArguments(EncoderItem encoderItem, IBassStream stream)
         {
             return string.Format(
-                "-i -q --raw-pcm={0} {1} -x{2} {3} - \"{4}\"",
+                "-i -q -y --raw-pcm={0} {1} -x{2} {3} - \"{4}\"",
                 this.GetFormat(encoderItem, stream),
                 this.GetCompression(),
                 this.Processing,
