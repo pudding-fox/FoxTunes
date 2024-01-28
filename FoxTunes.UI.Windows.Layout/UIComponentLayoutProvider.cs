@@ -214,6 +214,7 @@ namespace FoxTunes
                     return;
                 }
                 this.IsSaving = true;
+                Logger.Write(this, LogLevel.Debug, "Saving config.");
                 try
                 {
                     this.Main.Value = value;

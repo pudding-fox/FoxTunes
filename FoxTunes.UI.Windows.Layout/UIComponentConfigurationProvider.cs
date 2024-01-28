@@ -220,15 +220,44 @@ namespace FoxTunes
         public void Save(string profile)
         {
             this.OnSaving();
-            foreach (var element in this.Elements.Values)
+            Logger.Write(this, LogLevel.Debug, "Saving configuration.");
+            try
             {
-                if (!element.IsModified)
+                foreach (var element in this.Elements.Values)
                 {
-                    continue;
+                    var key = string.Concat(PREFIX, element.Id);
+                    if (!element.IsModified)
+                    {
+                        var value = default(string);
+                        if (this.Component.MetaData.TryRemove(key, out value))
+                        {
+                            Logger.Write(this, LogLevel.Debug, "Removing config: {0}", key);
+                        }
+                    }
+                    else
+                    {
+                        var value = element.GetPersistentValue();
+                        this.Component.MetaData.AddOrUpdate(key,
+                            (_key) =>
+                            {
+                                Logger.Write(this, LogLevel.Debug, "Adding config: {0}", key);
+                                return value;
+                            },
+                            (_key, _value) =>
+                            {
+                                if (!string.Equals(value, _value, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    Logger.Write(this, LogLevel.Debug, "Updating config: {0}", key);
+                                }
+                                return value;
+                            }
+                        );
+                    }
                 }
-                var key = string.Concat(PREFIX, element.Id);
-                var value = element.GetPersistentValue();
-                this.Component.MetaData.AddOrUpdate(key, value);
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
             }
             this.OnSaved();
         }
@@ -285,6 +314,8 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            //TODO: Sometimes, Dispose is called before OnSaving fires. Seems to happen more on faster systems.
+            this.Save();
             if (this.Configuration != null)
             {
                 this.Configuration.Saving -= this.OnSaving;
