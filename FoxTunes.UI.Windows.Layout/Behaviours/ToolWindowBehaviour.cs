@@ -455,6 +455,10 @@ namespace FoxTunes
             global::FoxTunes.LayoutManager.Instance.ProviderChanged -= this.OnProviderChanged;
             global::FoxTunes.Windows.ActiveWindowChanged -= this.OnActiveWindowChanged;
             global::FoxTunes.Windows.ShuttingDown -= this.OnShuttingDown;
+            if (this.LayoutDesignerBehaviour != null)
+            {
+                this.LayoutDesignerBehaviour.IsDesigningChanged -= this.OnIsDesigningChanged;
+            }
         }
 
         ~ToolWindowBehaviour()

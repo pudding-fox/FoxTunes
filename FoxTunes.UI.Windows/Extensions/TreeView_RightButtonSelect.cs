@@ -67,6 +67,15 @@ namespace FoxTunes
                     e.Handled = true;
                 }
             }
+
+            protected override void OnDisposing()
+            {
+                if (this.TreeView != null)
+                {
+                    this.TreeView.PreviewMouseRightButtonDown -= this.OnPreviewMouseRightButtonDown;
+                }
+                base.OnDisposing();
+            }
         }
     }
 }

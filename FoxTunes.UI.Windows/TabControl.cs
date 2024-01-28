@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Linq;
@@ -9,8 +10,16 @@ using System.Windows.Media;
 
 namespace FoxTunes
 {
-    public class TabControl : Control
+    public class TabControl : Control, IDisposable
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
             "ItemsSource",
             typeof(IEnumerable),
@@ -341,6 +350,49 @@ namespace FoxTunes
             if (tabItem != null && this._TabControl.SelectedItem != tabItem)
             {
                 this._TabControl.SelectedItem = tabItem;
+            }
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this._TabControl != null)
+            {
+                this._TabControl.SelectionChanged -= this.OnSelectionChanged;
+            }
+            if (this.ItemsSource is INotifyCollectionChanged collectionChanged)
+            {
+                collectionChanged.CollectionChanged -= this.OnCollectionChanged;
+            }
+        }
+
+        ~TabControl()
+        {
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
             }
         }
     }
