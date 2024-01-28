@@ -25,6 +25,14 @@ namespace FoxTunes
             }
         }
 
+        public override bool Cancellable
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public IEnumerable<PlaylistItem> PlaylistItems { get; private set; }
 
         public IDatabaseComponent Database { get; private set; }

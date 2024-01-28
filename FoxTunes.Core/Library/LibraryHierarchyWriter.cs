@@ -32,7 +32,7 @@ namespace FoxTunes
         public async Task<int> Write(LibraryHierarchy libraryHierarchy, int libraryItemId, int? parentId, string value, bool isLeaf)
         {
             var libraryHierarchyItemId = default(int);
-            if (this.Store.TryGetValue(libraryHierarchy.Id, parentId, value, out libraryHierarchyItemId))
+            if (!isLeaf && this.Store.TryGetValue(libraryHierarchy.Id, parentId, value, out libraryHierarchyItemId))
             {
                 this.UpdateCommand.Parameters["libraryHierarchyItemId"] = libraryHierarchyItemId;
                 this.UpdateCommand.Parameters["libraryItemId"] = libraryItemId;
