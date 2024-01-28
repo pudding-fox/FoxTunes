@@ -5,7 +5,7 @@ using System.Windows.Controls;
 
 namespace FoxTunes.Extensions
 {
-    public static class ListViewExtensions
+    public static partial class ListViewExtensions
     {
         private static readonly Dictionary<ListView, SelectedItemsBehaviour> SelectedItemsBehaviours = new Dictionary<ListView, SelectedItemsBehaviour>();
 

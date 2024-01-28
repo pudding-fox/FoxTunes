@@ -2,8 +2,8 @@
 {
     public interface IPlaylistItemFactory : IStandardFactory
     {
-        PlaylistItem Create(string fileName);
+        PlaylistItem Create(int sequence, string fileName);
 
-        PlaylistItem Create(LibraryItem libraryItem);
+        PlaylistItem Create(int sequence, LibraryItem libraryItem);
     }
 }

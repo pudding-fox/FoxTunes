@@ -149,6 +149,7 @@
     <Compile Include="Tasks\BackgroundTaskRunner.cs" />
     <Compile Include="Tasks\BuildLibraryHierarchiesTask.cs" />
     <Compile Include="Tasks\ClearPlaylistTask.cs" />
+    <Compile Include="Tasks\PlaylistTaskBase.cs" />
     <Compile Include="Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="Tasks\LoadOutputStreamTask.cs" />
     <Compile Include="Tasks\StopOutputStreamTask.cs" />

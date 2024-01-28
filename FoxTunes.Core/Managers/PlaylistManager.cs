@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FoxTunes.Managers
 {
@@ -45,17 +46,17 @@ namespace FoxTunes.Managers
             }
         }
 
-        public Task Add(IEnumerable<string> paths)
+        public Task Add(int sequence, IEnumerable<string> paths)
         {
-            var task = new AddPathsToPlaylistTask(paths);
+            var task = new AddPathsToPlaylistTask(sequence, paths);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
             return task.Run().ContinueWith(_ => this.OnUpdated());
         }
 
-        public Task Add(IEnumerable<LibraryItem> libraryItems)
+        public Task Add(int sequence, IEnumerable<LibraryItem> libraryItems)
         {
-            var task = new AddLibraryItemsToPlaylistTask(libraryItems);
+            var task = new AddLibraryItemsToPlaylistTask(sequence, libraryItems);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
             return task.Run().ContinueWith(_ => this.OnUpdated());
@@ -83,23 +84,23 @@ namespace FoxTunes.Managers
             try
             {
                 this.IsNavigating = true; ;
-                var index = default(int);
+                var sequence = default(int);
                 if (this.CurrentItem == null)
                 {
                     Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming first item.");
-                    index = 0;
+                    sequence = 0;
                 }
                 else
                 {
-                    index = this.Playlist.Set.IndexOf(this.CurrentItem) + 1;
-                    Logger.Write(this, LogLevel.Debug, "Next playlist item is index: {0}", index);
+                    sequence = this.CurrentItem.Sequence;
+                    Logger.Write(this, LogLevel.Debug, "Current playlist item is sequence: {0}", sequence);
                 }
-                if (index >= this.Playlist.Set.Count)
+                var playlistItem = this.GetNextPlaylistItem(sequence);
+                if (playlistItem == null)
                 {
-                    index = 0;
-                    Logger.Write(this, LogLevel.Debug, "Index was too large, wrapping around to first item.");
+                    playlistItem = this.GetFirstPlaylistItem();
+                    Logger.Write(this, LogLevel.Debug, "Sequence was too large, wrapping around to first item.");
                 }
-                var playlistItem = this.Playlist.Set[index];
                 Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                 await this.Play(playlistItem);
             }
@@ -120,23 +121,23 @@ namespace FoxTunes.Managers
             try
             {
                 this.IsNavigating = true; ;
-                var index = default(int);
+                var sequence = default(int);
                 if (this.CurrentItem == null)
                 {
                     Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming first item.");
-                    index = 0;
+                    sequence = 0;
                 }
                 else
                 {
-                    index = this.Playlist.Set.IndexOf(this.CurrentItem) - 1;
-                    Logger.Write(this, LogLevel.Debug, "Previous playlist item is index: {0}", index);
+                    sequence = this.CurrentItem.Sequence;
+                    Logger.Write(this, LogLevel.Debug, "Previous playlist item is sequence: {0}", sequence);
                 }
-                if (index < 0)
+                var playlistItem = this.GetPreviousPlaylistItem(sequence);
+                if (playlistItem == null)
                 {
-                    index = this.Playlist.Set.Count - 1;
-                    Logger.Write(this, LogLevel.Debug, "Index was too small, wrapping around to last item.");
+                    playlistItem = this.GetLastPlaylistItem();
+                    Logger.Write(this, LogLevel.Debug, "Sequence was too small, wrapping around to last item.");
                 }
-                var playlistItem = this.Playlist.Set[index];
                 Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                 await this.Play(playlistItem);
             }
@@ -144,6 +145,44 @@ namespace FoxTunes.Managers
             {
                 this.IsNavigating = false;
             }
+        }
+
+        protected virtual PlaylistItem GetFirstPlaylistItem()
+        {
+            var query =
+                from playlistItem in this.Playlist.Query
+                orderby playlistItem.Sequence
+                select playlistItem;
+            return query.FirstOrDefault();
+        }
+
+        protected virtual PlaylistItem GetLastPlaylistItem()
+        {
+            var query =
+                from playlistItem in this.Playlist.Query
+                orderby playlistItem.Sequence descending
+                select playlistItem;
+            return query.FirstOrDefault();
+        }
+
+        protected virtual PlaylistItem GetNextPlaylistItem(int sequence)
+        {
+            var query =
+                from playlistItem in this.Playlist.Query
+                orderby playlistItem.Sequence
+                where playlistItem.Sequence > sequence
+                select playlistItem;
+            return query.FirstOrDefault();
+        }
+
+        protected virtual PlaylistItem GetPreviousPlaylistItem(int sequence)
+        {
+            var query =
+                from playlistItem in this.Playlist.Query
+                orderby playlistItem.Sequence descending
+                where playlistItem.Sequence < sequence
+                select playlistItem;
+            return query.FirstOrDefault();
         }
 
         public async Task Play(PlaylistItem playlistItem)

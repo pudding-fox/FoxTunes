@@ -1,9 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FoxTunes.Behaviours
 {
@@ -42,14 +39,21 @@ namespace FoxTunes.Behaviours
         {
             this.BackgroundTaskRunner.Run(async () =>
             {
-                var index = this.Playlist.Set.IndexOf(this.PlaybackManager.CurrentStream.PlaylistItem) + 1;
-                for (var a = 0; a < ENQUEUE_COUNT && index < this.Playlist.Set.Count; a++, index++)
+                var sequence = this.PlaybackManager.CurrentStream.PlaylistItem.Sequence;
+                var query =
+                    from playlistItem in this.Playlist.Query
+                    orderby playlistItem.Sequence
+                    where playlistItem.Sequence > sequence
+                    select playlistItem;
+                Logger.Write(this, LogLevel.Debug, "Preemptively buffering {0} items.", ENQUEUE_COUNT);
+                foreach (var playlistItem in query.Take(ENQUEUE_COUNT))
                 {
-                    var playlistItem = this.Playlist.Set[index];
                     if (this.OutputStreamQueue.IsQueued(playlistItem))
                     {
+                        Logger.Write(this, LogLevel.Debug, "Playlist item already buffered: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                         continue;
                     }
+                    Logger.Write(this, LogLevel.Debug, "Preemptively buffering playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                     await this.PlaybackManager.Load(playlistItem, false);
                 }
             });

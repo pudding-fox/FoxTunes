@@ -53,8 +53,10 @@
     <Compile Include="BackgroundTasks.xaml.cs">
       <DependentUpon>BackgroundTasks.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Extensions\GridView.cs" />
-    <Compile Include="Extensions\ListView.cs" />
+    <Compile Include="Extensions\Extensions.cs" />
+    <Compile Include="Extensions\GridView_ColumnsSource.cs" />
+    <Compile Include="Extensions\ListView_DropInsert.cs" />
+    <Compile Include="Extensions\ListView_SelectedItems.cs" />
     <Compile Include="Integration\Explorer.cs" />
     <Compile Include="Library.xaml.cs">
       <DependentUpon>Library.xaml</DependentUpon>
