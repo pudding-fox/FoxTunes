@@ -14,6 +14,8 @@ namespace FoxTunes.ViewModel
     {
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
+        public IPlaylistBrowser PlaylistBrowser { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -68,6 +70,7 @@ namespace FoxTunes.ViewModel
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
             this.DatabaseFactory = this.Core.Factories.Database;
+            this.PlaylistBrowser = this.Core.Components.PlaylistBrowser;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = this.Core.Components.Configuration;
@@ -123,18 +126,27 @@ namespace FoxTunes.ViewModel
 
         protected virtual Task Refresh()
         {
-            return Windows.Invoke(() =>
+            var playlists = new List<Playlist>();
+            using (var database = this.DatabaseFactory.Create())
             {
-                using (var database = this.DatabaseFactory.Create())
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                    {
-                        this.Playlists.ItemsSource = new ObservableCollection<Playlist>(
-                            database.Set<Playlist>(transaction)
-                        );
-                    }
+                    playlists.AddRange(database.Set<Playlist>(transaction));
                 }
-            });
+            }
+            //Use the "live" playlist instances where possible.
+            var cached = this.PlaylistBrowser.GetPlaylists().ToDictionary(
+                playlist => playlist.Id
+            );
+            for (var a = 0; a < playlists.Count; a++)
+            {
+                var playlist = default(Playlist);
+                if (cached.TryGetValue(playlists[a].Id, out playlist))
+                {
+                    playlists[a] = playlist;
+                }
+            }
+            return Windows.Invoke(() => this.Playlists.ItemsSource = new ObservableCollection<Playlist>(playlists));
         }
 
         public bool PlaylistManagerVisible
