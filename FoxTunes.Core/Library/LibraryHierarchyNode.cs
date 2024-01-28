@@ -170,7 +170,9 @@ namespace FoxTunes
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            //We need a hash code for this type for performance reasons.
+            //base.GetHashCode() returns 0.
+            return this.Id.GetHashCode() * 29;
         }
 
         public override bool Equals(object obj)
