@@ -9,10 +9,21 @@ namespace FoxTunes
 {
     public class Log4NetLogEmitter : AppenderSkeleton, ILogEmitter
     {
+        public Log4NetLogEmitter()
+        {
+            this.Enabled = true;
+        }
+
+        public bool Enabled { get; set; }
+
         public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
 
         protected override void Append(LoggingEvent loggingEvent)
         {
+            if (!this.Enabled)
+            {
+                return;
+            }
             this.OnLogMessage(loggingEvent);
         }
 

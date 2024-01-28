@@ -37,11 +37,16 @@ namespace FoxTunes
         [field: NonSerialized]
         public event EventHandler ValueChanged = delegate { };
 
-
         public BooleanConfigurationElement WithValue(bool value)
         {
             this.Value = value;
             return this;
+        }
+
+        public override void ConnectValue<T>(Action<T> action)
+        {
+            action((T)Convert.ChangeType(this.Value, typeof(T)));
+            this.ValueChanged += (sender, e) => this.ConnectValue(action);
         }
     }
 }

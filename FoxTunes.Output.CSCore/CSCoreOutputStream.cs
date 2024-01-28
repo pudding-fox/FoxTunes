@@ -3,6 +3,7 @@ using CSCore.SoundOut;
 using CSCore.Streams;
 using FoxTunes.Interfaces;
 using System.Threading.Tasks;
+using System;
 
 namespace FoxTunes
 {
@@ -60,11 +61,75 @@ namespace FoxTunes
             }
         }
 
+        public override int BytesPerSample
+        {
+            get
+            {
+                return this.WaveFormat.BytesPerSample;
+            }
+        }
+
+        public override int ExtraSize
+        {
+            get
+            {
+                return this.WaveFormat.ExtraSize;
+            }
+        }
+
+        public override int BitsPerSample
+        {
+            get
+            {
+                return this.WaveFormat.BitsPerSample;
+            }
+        }
+
         public override int BlockAlign
         {
             get
             {
                 return this.WaveFormat.BlockAlign;
+            }
+        }
+
+        public override int BytesPerSecond
+        {
+            get
+            {
+                return this.WaveFormat.BytesPerSecond;
+            }
+        }
+
+        public override int SampleRate
+        {
+            get
+            {
+                return this.WaveFormat.SampleRate;
+            }
+        }
+
+        public override string Format
+        {
+            get
+            {
+                return Enum.GetName(typeof(AudioEncoding), this.WaveFormat.WaveFormatTag);
+            }
+        }
+
+        public override int BytesPerBlock
+        {
+            get
+            {
+                return this.WaveFormat.BytesPerBlock;
+            }
+        }
+
+        public override int Channels
+        {
+            get
+            {
+                return this.WaveFormat.Channels;
             }
         }
 
@@ -115,7 +180,9 @@ namespace FoxTunes
 
         public override void Play()
         {
+            Logger.Write(this, LogLevel.Debug, "Initializing sound out.");
             this.SoundOut.Initialize(this.NotificationSource.ToWaveSource());
+            Logger.Write(this, LogLevel.Debug, "Playing sound out.");
             this.SoundOut.Play();
             this.EmitState();
             this.OnPlayed(true);
@@ -123,6 +190,7 @@ namespace FoxTunes
 
         public override void Pause()
         {
+            Logger.Write(this, LogLevel.Debug, "Pausing sound out.");
             this.SoundOut.Pause();
             this.EmitState();
             this.OnPaused();
@@ -130,6 +198,7 @@ namespace FoxTunes
 
         public override void Resume()
         {
+            Logger.Write(this, LogLevel.Debug, "Resuming sound out.");
             this.SoundOut.Resume();
             this.EmitState();
             this.OnResumed();
@@ -137,6 +206,7 @@ namespace FoxTunes
 
         public override Task Stop()
         {
+            Logger.Write(this, LogLevel.Debug, "Stopping sound out.");
             this.StopRequested = true;
             this.SoundOut.Stop();
             this.EmitState();

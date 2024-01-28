@@ -4,6 +4,8 @@ namespace FoxTunes.Interfaces
 {
     public interface ILogEmitter : IStandardComponent
     {
+        bool Enabled{ get; set; }
+
         event LogMessageEventHandler LogMessage;
     }
 

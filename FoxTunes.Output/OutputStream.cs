@@ -44,7 +44,23 @@ namespace FoxTunes
 
         public abstract long Length { get; }
 
+        public abstract int BytesPerSample { get; }
+
+        public abstract int ExtraSize { get; }
+
+        public abstract int BitsPerSample { get; }
+
         public abstract int BlockAlign { get; }
+
+        public abstract int BytesPerSecond { get; }
+
+        public abstract int SampleRate { get; }
+
+        public abstract string Format { get; }
+
+        public abstract int BytesPerBlock { get; }
+
+        public abstract int Channels { get; }
 
         public abstract bool IsPlaying { get; }
 
@@ -136,6 +152,14 @@ namespace FoxTunes
         }
 
         public event StoppedEventHandler Stopped = delegate { };
+
+        public string Description
+        {
+            get
+            {
+                return string.Format("Length = {0},  BytesPerSample = {1},  ExtraSize = {2}, BitsPerSample = {3}, BlockAlign = {4}, BytesPerSecond = {5}, SampleRate = {6}, Format = {7}, BytesPerBlock = {8}, Channels = {9}", this.Length, this.BytesPerSample, this.ExtraSize, this.BitsPerSample, this.BlockAlign, this.BytesPerSecond, this.SampleRate, this.Format, this.BytesPerBlock, this.Channels);
+            }
+        }
 
         public abstract void Dispose();
     }

@@ -14,22 +14,33 @@ namespace FoxTunes
             typeof(global::System.Windows.Interactivity.Interaction)
         };
 
+        public Application Application { get; private set; }
+
         public ICore Core { get; private set; }
+
+        public ILogEmitter LogEmitter { get; private set; }
 
         public IThemeLoader ThemeLoader { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.LogEmitter = core.Components.LogEmitter;
             this.ThemeLoader = ComponentRegistry.Instance.GetComponent<IThemeLoader>();
             base.InitializeComponent(core);
         }
 
         public override void Show()
         {
-            var application = new Application();
-            this.ThemeLoader.Application = application;
-            application.Run(new Main() { DataContext = this.Core });
+            this.Application = new Application();
+            this.Application.Exit += this.OnApplicationExit;
+            this.ThemeLoader.Application = this.Application;
+            this.Application.Run(new Main() { DataContext = this.Core });
+        }
+
+        protected virtual void OnApplicationExit(object sender, ExitEventArgs e)
+        {
+            this.LogEmitter.Enabled = false;
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

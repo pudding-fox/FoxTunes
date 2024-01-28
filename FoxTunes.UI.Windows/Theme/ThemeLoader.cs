@@ -54,7 +54,6 @@ namespace FoxTunes.Theme
             this.Apply();
         }
 
-
         public ITheme Theme
         {
             get

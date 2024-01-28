@@ -154,8 +154,10 @@ namespace FoxTunes.Managers
                 {
                     if (this.PlaybackManager.CurrentStream.PlaylistItem != playlistItem)
                     {
+                        Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it was {2} => {3}", playlistItem.Id, playlistItem.FileName, this.PlaybackManager.CurrentStream.PlaylistItem.Id, this.PlaybackManager.CurrentStream.PlaylistItem.FileName);
                         return;
                     }
+                    Logger.Write(this, LogLevel.Debug, "Playing current output stream: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                     this.PlaybackManager.CurrentStream.Play();
                 });
         }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Data;
 
 namespace FoxTunes.ViewModel
 {
@@ -12,6 +13,9 @@ namespace FoxTunes.ViewModel
         public Log()
         {
             this.Messages = new ObservableCollection<LogMessage>();
+            this.FilteredMessages = new CollectionViewSource();
+            this.FilteredMessages.Source = this.Messages;
+            this.FilteredMessages.Filter += this.OnFilter;
         }
 
         public ILogEmitter LogEmitter { get; private set; }
@@ -21,6 +25,8 @@ namespace FoxTunes.ViewModel
         public BooleanConfigurationElement Element { get; private set; }
 
         public ObservableCollection<LogMessage> Messages { get; private set; }
+
+        public CollectionViewSource FilteredMessages { get; private set; }
 
         public bool LogVisible
         {
@@ -49,6 +55,47 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler LogVisibleChanged = delegate { };
+
+        private string _Filter { get; set; }
+
+        public string Filter
+        {
+            get
+            {
+                return this._Filter;
+            }
+            set
+            {
+                this._Filter = value;
+                this.OnFilterChanged();
+            }
+        }
+
+        protected virtual void OnFilterChanged()
+        {
+            if (this.FilterChanged != null)
+            {
+                this.FilterChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Filter");
+            this.FilteredMessages.View.Refresh();
+        }
+
+        public event EventHandler FilterChanged = delegate { };
+
+        protected virtual void OnFilter(object sender, FilterEventArgs e)
+        {
+            if (string.IsNullOrEmpty(this.Filter))
+            {
+                e.Accepted = true;
+                return;
+            }
+            var message = e.Item as LogMessage;
+            e.Accepted =
+                message.Name.Contains(this.Filter, true) ||
+                Enum.GetName(typeof(LogLevel), message.Level).Contains(this.Filter, true) ||
+                message.Message.Contains(this.Filter, true);
+        }
 
         protected override void OnCoreChanged()
         {

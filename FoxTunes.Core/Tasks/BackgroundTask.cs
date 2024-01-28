@@ -150,7 +150,7 @@ namespace FoxTunes
                         this.OnFaulted();
                         break;
                     default:
-                        Logger.Write(this, LogLevel.Error, "Background task succeeded.");
+                        Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
                         this.OnCompleted();
                         break;
                 }
