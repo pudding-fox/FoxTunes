@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Input;
 
 namespace FoxTunes
 {
@@ -16,12 +14,6 @@ namespace FoxTunes
         public DefaultPlaylist()
         {
             this.InitializeComponent();
-#if NET40
-            //VirtualizingStackPanel.IsVirtualizingWhenGrouping is not supported.
-            //The behaviour which requires this feature is disabled.
-#else
-            VirtualizingStackPanel.SetIsVirtualizingWhenGrouping(this.ListView, true);
-#endif
             this.IsVisibleChanged += this.OnIsVisibleChanged;
         }
 
@@ -79,25 +71,6 @@ namespace FoxTunes
                     return;
                 }
                 this.ListView.ScrollIntoView(this.ListView.SelectedItem);
-            }
-        }
-
-        protected virtual void OnGroupHeaderMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            var element = sender as FrameworkElement;
-            if (element == null)
-            {
-                return;
-            }
-            var group = element.DataContext as CollectionViewGroup;
-            if (group == null)
-            {
-                return;
-            }
-            this.ListView.SelectedItems.Clear();
-            foreach (var item in group.Items)
-            {
-                this.ListView.SelectedItems.Add(item);
             }
         }
     }
