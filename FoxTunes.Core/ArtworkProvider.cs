@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ArtworkProvider : StandardComponent, IArtworkProvider
     {
         const int CACHE_SIZE = 5120;

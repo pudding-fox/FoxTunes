@@ -127,8 +127,7 @@ namespace FoxTunes
             var count = this.position - this.Position;
             if (count != 0)
             {
-                var remaining = (this.Count - this.Position) / count;
-                var eta = this.GetEta(remaining);
+                var eta = this.GetEta(count);
                 await this.SetName(string.Format("Populating meta data: {0} remaining @ {1} items/s", eta, count));
                 if (this.Current != null)
                 {

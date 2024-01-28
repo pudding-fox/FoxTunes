@@ -15,6 +15,8 @@ namespace FoxTunes
 
         public const int FAST_INTERVAL = 10;
 
+        public static readonly object SyncRoot = new object();
+
         private PopulatorBase()
         {
             this.Semaphore = new SemaphoreSlim(1, 1);
@@ -25,21 +27,28 @@ namespace FoxTunes
             this.ReportProgress = reportProgress;
             if (this.ReportProgress)
             {
-                this.Timer = new global::System.Timers.Timer();
-                this.Timer.Interval = NORMAL_INTERVAL;
-                this.Timer.AutoReset = false;
-                this.Timer.Elapsed += this.OnElapsed;
-                this.Metric = new Metric(10);
+                lock (SyncRoot)
+                {
+                    this.Timer = new global::System.Timers.Timer();
+                    this.Timer.Interval = NORMAL_INTERVAL;
+                    this.Timer.AutoReset = false;
+                    this.Timer.Elapsed += this.OnElapsed;
+                }
+                this.CountMetric = new Metric(10);
+                this.SecondsMetric = new Metric(10);
             }
         }
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            if (this.Timer == null)
+            lock (SyncRoot)
             {
-                return;
+                if (this.Timer == null)
+                {
+                    return;
+                }
+                this.Timer.Start();
             }
-            this.Timer.Start();
         }
 
         public SemaphoreSlim Semaphore { get; private set; }
@@ -48,7 +57,9 @@ namespace FoxTunes
 
         public global::System.Timers.Timer Timer { get; private set; }
 
-        public Metric Metric { get; private set; }
+        public Metric CountMetric { get; private set; }
+
+        public Metric SecondsMetric { get; private set; }
 
         private string _Name { get; set; }
 
@@ -218,12 +229,15 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            if (this.Timer != null)
+            lock (SyncRoot)
             {
-                this.Timer.Stop();
-                this.Timer.Elapsed -= this.OnElapsed;
-                this.Timer.Dispose();
-                this.Timer = null;
+                if (this.Timer != null)
+                {
+                    this.Timer.Stop();
+                    this.Timer.Elapsed -= this.OnElapsed;
+                    this.Timer.Dispose();
+                    this.Timer = null;
+                }
             }
         }
 
@@ -240,9 +254,12 @@ namespace FoxTunes
             }
         }
 
-        public string GetEta(int seconds)
+        public string GetEta(int count)
         {
-            var time = TimeSpan.FromSeconds(this.Metric.Average(seconds));
+            var seconds = this.SecondsMetric.Next(
+                (this.Count - this.Position) / this.CountMetric.Average(count)
+            );
+            var time = TimeSpan.FromSeconds(seconds);
             var elements = new List<string>();
             if (time.Hours > 0)
             {
