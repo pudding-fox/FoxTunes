@@ -50,7 +50,7 @@ BUFFER* buffer_create(QWORD size) {
 	return buffer;
 }
 
-QWORD buffer_read_segment(BUFFER* buffer, QWORD position, QWORD length, DWORD* segment_position, QWORD* segment_offset, void* data) {
+QWORD buffer_read_segment(const BUFFER* buffer, QWORD position, QWORD length, DWORD* const segment_position, QWORD* segment_offset, void* data) {
 	QWORD remaining = length - position;
 	QWORD segment_remaining = BUFFER_BLOCK_SIZE - *segment_offset;
 	if (segment_remaining > remaining) {
@@ -74,7 +74,7 @@ QWORD buffer_read_segment(BUFFER* buffer, QWORD position, QWORD length, DWORD* s
 	}
 }
 
-void buffer_read(BUFFER* buffer, QWORD position, QWORD length, void* data) {
+void buffer_read(const BUFFER* buffer, QWORD position, QWORD length, void* data) {
 	DWORD segment_position = (DWORD)(position / BUFFER_BLOCK_SIZE);
 	QWORD segment_offset = position % BUFFER_BLOCK_SIZE;
 	for (position = 0; position < length; ) {
@@ -82,7 +82,7 @@ void buffer_read(BUFFER* buffer, QWORD position, QWORD length, void* data) {
 	}
 }
 
-QWORD buffer_write_segment(BUFFER* buffer, QWORD position, QWORD length, DWORD* segment_position, QWORD* segment_offset, void* data) {
+QWORD buffer_write_segment(const BUFFER* buffer, QWORD position, QWORD length, DWORD* const segment_position, QWORD* segment_offset, const void* data) {
 	QWORD remaining = length - position;
 	QWORD segment_remaining = BUFFER_BLOCK_SIZE - *segment_offset;
 	if (segment_remaining > remaining) {
@@ -106,7 +106,7 @@ QWORD buffer_write_segment(BUFFER* buffer, QWORD position, QWORD length, DWORD* 
 	}
 }
 
-void buffer_write(BUFFER* buffer, QWORD position, QWORD length, void* data) {
+void buffer_write(const BUFFER* buffer, QWORD position, QWORD length, const void* data) {
 	DWORD segment_position = (DWORD)(position / BUFFER_BLOCK_SIZE);
 	QWORD segment_offset = position % BUFFER_BLOCK_SIZE;
 	for (position = 0; position < length; ) {

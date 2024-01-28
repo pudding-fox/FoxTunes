@@ -17,9 +17,9 @@ typedef struct {
 
 BUFFER* buffer_create(QWORD size);
 
-void buffer_read(BUFFER* buffer, QWORD position, QWORD length, void* data);
+void buffer_read(const BUFFER* buffer, QWORD position, QWORD length, void* data);
 
-void buffer_write(BUFFER* buffer, QWORD position, QWORD length, void* data);
+void buffer_write(const BUFFER* buffer, QWORD position, QWORD length, const void* data);
 
 void buffer_free(BUFFER* buffer);
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "reader.h"
+#include "cache.h"
 
 QWORD get_file_length(FILE* file_handle) {
 	QWORD length;
@@ -21,7 +22,7 @@ QWORD get_file_length(FILE* file_handle) {
 	return length;
 }
 
-BOOL populate_file_buffer(FILE* file_handle, BUFFER* buffer) {
+BOOL populate_file_buffer(FILE* file_handle, const BUFFER* buffer) {
 	QWORD length;
 	QWORD position = 0;
 	void* file_buffer = malloc(BUFFER_BLOCK_SIZE);
@@ -53,14 +54,18 @@ BOOL populate_file_buffer(FILE* file_handle, BUFFER* buffer) {
 BUFFER* read_file_buffer(const wchar_t* file, QWORD offset, QWORD length) {
 	BUFFER* buffer;
 	QWORD file_length;
-	FILE* file_handle = _wfopen(file, L"rb");
+	FILE* file_handle;
+	if (cache_acquire(file, &buffer)) {
+		return buffer;
+	}
+	file_handle = _wfopen(file, L"rb");
 	if (!file_handle) {
 #if _DEBUG
 		char* error = strerror(errno);
 		printf("Error opening file: %s\n", error);
 #endif
 		return NULL;
-	}
+}
 	file_length = get_file_length(file_handle);
 	if (file_length == -1) {
 #if _DEBUG
@@ -78,5 +83,8 @@ BUFFER* read_file_buffer(const wchar_t* file, QWORD offset, QWORD length) {
 		}
 	}
 	fclose(file_handle);
+	if (buffer) {
+		cache_add(file, buffer);
+	}
 	return buffer;
 }
