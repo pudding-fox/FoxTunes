@@ -59,12 +59,13 @@ namespace FoxTunes
 
             var libraryHierarchies = this.GetHierarchies(transaction);
             var libraryHierarchyLevels = this.GetLevels(libraryHierarchies);
+            var libraryItems = this.GetItems(status, transaction);
 
             if (this.ReportProgress)
             {
                 await this.SetName("Populating library hierarchies");
                 await this.SetPosition(0);
-                await this.SetCount(await this.GetCount(status, transaction));
+                await this.SetCount(libraryItems.Count());
                 if (this.Count <= 100)
                 {
                     this.Timer.Interval = FAST_INTERVAL;
@@ -80,10 +81,7 @@ namespace FoxTunes
                 this.Timer.Start();
             }
 
-
-            var set = this.Database.Set<LibraryItem>(this.Transaction);
-
-            await AsyncParallel.ForEach(set, async libraryItem =>
+            await AsyncParallel.ForEach(libraryItems, async libraryItem =>
             {
                 foreach (var libraryHierarchy in libraryHierarchies)
                 {
@@ -162,15 +160,17 @@ namespace FoxTunes
             );
         }
 
-        private async Task<int> GetCount(LibraryItemStatus? status, ITransactionSource transaction)
+        private IQueryable<LibraryItem> GetItems(LibraryItemStatus? status, ITransactionSource transaction)
         {
-            if (status.HasValue)
+            var queryable = this.Database.AsQueryable<LibraryItem>(transaction);
+            if (!status.HasValue)
             {
-                var queryable = this.Database.AsQueryable<LibraryItem>(transaction);
-                return queryable.Count(libraryItem => libraryItem.Status == status.Value && libraryItem.MetaDatas.Any());
+                return queryable.Where(libraryItem => libraryItem.MetaDatas.Any());
             }
-            var set = this.Database.Set<LibraryItem>(transaction);
-            return await set.CountAsync;
+            else
+            {
+                return queryable.Where(libraryItem => libraryItem.Status == status.Value && libraryItem.MetaDatas.Any());
+            }
         }
 
         private string[] GetPathSegments(string fileName)
