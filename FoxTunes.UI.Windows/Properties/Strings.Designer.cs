@@ -1508,5 +1508,14 @@ namespace FoxTunes {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Theme", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Global Timer Interval.
+        /// </summary>
+        internal static string WindowsUserInterfaceConfiguration_TimerFrequency {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.TimerFrequency", resourceCulture);
+            }
+        }
     }
 }

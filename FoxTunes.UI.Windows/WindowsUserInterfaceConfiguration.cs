@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace FoxTunes
 {
@@ -19,6 +20,14 @@ namespace FoxTunes
 
         public const string SHOW_CURSOR_ADORNERS_ELEMENT = "NNNN7E23-A1E4-4BB6-9291-B553F4F7AD12";
 
+        public const string TIMER_FREQUENCY = "MMMMB95C-C67B-4D27-858A-225E2003503B";
+
+        public const int DEFAULT_TIMER_FREQUENCY = 200;
+
+        public const int MIN_TIMER_FREQUENCY = 10;
+
+        public const int MAX_TIMER_FREQUENCY = 1000;
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.WindowsUserInterfaceConfiguration_Section)
@@ -31,7 +40,9 @@ namespace FoxTunes
                 .WithElement(
                     new DoubleConfigurationElement(MARQUEE_STEP_ELEMENT, Strings.WindowsUserInterfaceConfiguration_MarqueeStep, path: Strings.General_Advanced).WithValue(0.80).WithValidationRule(new DoubleValidationRule(0.80, 10, 0.4)))
                 .WithElement(
-                    new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Cursors, path: Strings.General_Advanced).WithValue(Publication.ReleaseType == ReleaseType.Default)
+                    new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Cursors, path: Strings.General_Advanced).WithValue(Publication.ReleaseType == ReleaseType.Default))
+                .WithElement(
+                    new IntegerConfigurationElement(TIMER_FREQUENCY, Strings.WindowsUserInterfaceConfiguration_TimerFrequency, path: Strings.General_Advanced).WithValue(DEFAULT_TIMER_FREQUENCY).WithValidationRule(new IntegerValidationRule(MIN_TIMER_FREQUENCY, MAX_TIMER_FREQUENCY))
             );
         }
 

@@ -600,4 +600,7 @@
   <data name="WindowsUserInterfaceConfiguration.Theme" xml:space="preserve">
     <value>Theme</value>
   </data>
+  <data name="WindowsUserInterfaceConfiguration.TimerFrequency" xml:space="preserve">
+    <value>Global Timer Interval</value>
+  </data>
 </root>

@@ -13,6 +13,8 @@ namespace FoxTunes
 
         public static readonly IPlaybackManager PlaybackManager;
 
+        public static readonly IConfiguration Configuration;
+
         public static readonly DispatcherTimer Timer;
 
         private static bool _IsStarted { get; set; }
@@ -94,14 +96,18 @@ namespace FoxTunes
         {
             Output = ComponentRegistry.Instance.GetComponent<IOutput>();
             PlaybackManager = ComponentRegistry.Instance.GetComponent<IPlaybackManager>();
-            if (Output == null || PlaybackManager == null)
+            Configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
+            if (Output == null || PlaybackManager == null || Configuration == null)
             {
                 return;
             }
             Output.IsStartedChanged += OnIsStartedChanged;
             PlaybackManager.CurrentStreamChanged += OnCurrentStreamChanged;
             Timer = new DispatcherTimer(DispatcherPriority.Background);
-            Timer.Interval = UPDATE_INTERVAL;
+            Configuration.GetElement<IntegerConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.TIMER_FREQUENCY
+            ).ConnectValue(value => Timer.Interval = TimeSpan.FromMilliseconds(value));
             Timer.Start();
             Timer.Tick += OnTick;
         }
