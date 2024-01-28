@@ -39,31 +39,63 @@ namespace FoxTunes
             }
         }
 
-        public async Task Save(IEnumerable<LibraryItem> libraryItems, bool write, params string[] names)
+        public async Task Save(IEnumerable<LibraryItem> libraryItems, bool write, bool report, params string[] names)
         {
             using (var task = new WriteLibraryMetaDataTask(libraryItems, write, names))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
-                if (task.Errors.Count > 0)
+                if (report && task.Errors.Any())
                 {
-                    this.OnReport(task.LibraryItems, task.Errors);
+                    this.OnReport(libraryItems, task.Errors);
                 }
             }
         }
 
-        public async Task Save(IEnumerable<PlaylistItem> playlistItems, bool write, params string[] names)
+        public async Task Save(IEnumerable<PlaylistItem> playlistItems, bool write, bool report, params string[] names)
         {
             using (var task = new WritePlaylistMetaDataTask(playlistItems, names, write))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
-                if (task.Errors.Count > 0)
+                if (report && task.Errors.Any())
                 {
-                    this.OnReport(task.PlaylistItems, task.Errors);
+                    this.OnReport(playlistItems, task.Errors);
                 }
+            }
+        }
+
+        public async Task Synchronize()
+        {
+            using (var task = new SynchronizeMetaDataTask())
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
+            }
+        }
+
+        public async Task<bool> Synchronize(IEnumerable<LibraryItem> libraryItems, params string[] names)
+        {
+            using (var task = new SynchronizeLibraryMetaDataTask(libraryItems, names))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
+                return !task.Errors.Any();
+            }
+        }
+
+        public async Task<bool> Synchronize(IEnumerable<PlaylistItem> playlistItems, params string[] names)
+        {
+            using (var task = new SynchronizePlaylistMetaDataTask(playlistItems, names))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
+                return !task.Errors.Any();
             }
         }
 
@@ -84,14 +116,14 @@ namespace FoxTunes
 
         public event BackgroundTaskEventHandler BackgroundTask;
 
-        protected virtual void OnReport(IEnumerable<LibraryItem> libraryItems, IDictionary<LibraryItem, Exception> errors)
+        protected virtual void OnReport(IEnumerable<LibraryItem> libraryItems, IDictionary<LibraryItem, IList<string>> errors)
         {
             var report = new MetaDataManagerReport<LibraryItem>(libraryItems, errors);
             report.InitializeComponent(this.Core);
             this.OnReport(report);
         }
 
-        protected virtual void OnReport(IEnumerable<PlaylistItem> playlistItems, IDictionary<PlaylistItem, Exception> errors)
+        protected virtual void OnReport(IEnumerable<PlaylistItem> playlistItems, IDictionary<PlaylistItem, IList<string>> errors)
         {
             var report = new MetaDataManagerReport<PlaylistItem>(playlistItems, errors);
             report.InitializeComponent(this.Core);
@@ -117,7 +149,7 @@ namespace FoxTunes
 
         public class MetaDataManagerReport<T> : BaseComponent, IReport where T : IFileData
         {
-            public MetaDataManagerReport(IEnumerable<T> sequence, IDictionary<T, Exception> errors)
+            public MetaDataManagerReport(IEnumerable<T> sequence, IDictionary<T, IList<string>> errors)
             {
                 this.Sequence = sequence.ToDictionary(encoderItem => Guid.NewGuid());
                 this.Errors = errors;
@@ -125,7 +157,7 @@ namespace FoxTunes
 
             public IDictionary<Guid, T> Sequence { get; private set; }
 
-            public IDictionary<T, Exception> Errors { get; private set; }
+            public IDictionary<T, IList<string>> Errors { get; private set; }
 
             public string Title
             {
@@ -151,14 +183,17 @@ namespace FoxTunes
             protected virtual string GetDescription(T element)
             {
                 var builder = new StringBuilder();
-                var exception = default(Exception);
+                var errors = default(IList<string>);
                 builder.Append(element.FileName);
-                if (this.Errors.TryGetValue(element, out exception))
+                if (this.Errors.TryGetValue(element, out errors))
                 {
                     builder.Append(" -> Error");
-                    builder.Append(Environment.NewLine);
-                    builder.Append("\t");
-                    builder.Append(exception.Message);
+                    foreach (var error in errors)
+                    {
+                        builder.Append(Environment.NewLine);
+                        builder.Append("\t");
+                        builder.Append(error);
+                    }
                 }
                 else
                 {
@@ -213,7 +248,7 @@ namespace FoxTunes
 
             public class ReportRow : IReportRow
             {
-                public ReportRow(Guid id, T element, IDictionary<T, Exception> errors)
+                public ReportRow(Guid id, T element, IDictionary<T, IList<string>> errors)
                 {
                     this.Id = id;
                     this.Element = element;
@@ -224,7 +259,7 @@ namespace FoxTunes
 
                 public T Element { get; private set; }
 
-                public IDictionary<T, Exception> Errors { get; private set; }
+                public IDictionary<T, IList<string>> Errors { get; private set; }
 
                 public string[] Values
                 {

@@ -58,6 +58,7 @@ namespace FoxTunes
         None = 0,
         Import = 1,
         Update = 2,
-        Remove = 3
+        Remove = 3,
+        Export = 4
     }
 }

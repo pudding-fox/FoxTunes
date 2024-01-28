@@ -47,7 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ManagedBass.ReplayGain" Version="0.0.1"/>
+    <PackageReference Include="ManagedBass.ReplayGain" Version="0.1.0"/>
   </ItemGroup>
 
   <ItemGroup>

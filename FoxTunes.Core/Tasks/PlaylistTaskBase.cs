@@ -5,7 +5,6 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -272,9 +271,34 @@ namespace FoxTunes
             }
         }
 
+        public static async Task SetPlaylistItemStatus(IDatabaseComponent database, int playlistItemId, PlaylistItemStatus status)
+        {
+            var builder = database.QueryFactory.Build();
+            builder.Update.AddColumn(database.Tables.PlaylistItem.Column("Status"));
+            builder.Update.SetTable(database.Tables.PlaylistItem);
+            builder.Filter.AddColumn(database.Tables.PlaylistItem.Column("Id"));
+            using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+            {
+                await database.ExecuteAsync(builder, (parameters, phase) =>
+                {
+                    switch (phase)
+                    {
+                        case DatabaseParameterPhase.Fetch:
+                            parameters["status"] = status;
+                            parameters["id"] = playlistItemId;
+                            break;
+                    }
+                }, transaction).ConfigureAwait(false);
+                transaction.Commit();
+            }
+        }
+
         protected override void OnDisposing()
         {
-            this.Database.Dispose();
+            if (this.Database != null)
+            {
+                this.Database.Dispose();
+            }
             base.OnDisposing();
         }
     }

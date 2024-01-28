@@ -5,7 +5,6 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -276,7 +275,7 @@ namespace FoxTunes
         {
             using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
             {
-                await SetLibraryItemImportDate(database, libraryItem, importDate, transaction);
+                await SetLibraryItemImportDate(database, libraryItem, importDate, transaction).ConfigureAwait(false);
                 transaction.Commit();
             }
         }
@@ -302,7 +301,7 @@ namespace FoxTunes
                         );
                         break;
                 }
-            }, transaction);
+            }, transaction).ConfigureAwait(false);
             libraryItem.SetImportDate(importDate);
         }
 
@@ -330,7 +329,10 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            this.Database.Dispose();
+            if (this.Database != null)
+            {
+                this.Database.Dispose();
+            }
             base.OnDisposing();
         }
     }

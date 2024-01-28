@@ -123,12 +123,11 @@ namespace FoxTunes
 
         protected virtual bool FreeActiveStreams()
         {
-            var streams = BassOutputStream.ActiveStreams.Values.ToArray();
-            foreach (var stream in streams)
+            foreach (var pair in BassOutputStream.ActiveStreams)
             {
                 try
                 {
-                    stream.Dispose();
+                    pair.Value.Dispose();
                 }
                 catch
                 {

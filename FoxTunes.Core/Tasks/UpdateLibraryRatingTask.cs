@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class UpdateLibraryRatingTask : LibraryTaskBase
+    public class UpdateLibraryRatingTask : BackgroundTask
     {
-        public UpdateLibraryRatingTask(LibraryHierarchyNode libraryHierarchyNode, byte rating)
+        public const string ID = "0DA1A44E-0FEC-492B-9F57-92F402196792";
+
+        public UpdateLibraryRatingTask(LibraryHierarchyNode libraryHierarchyNode, byte rating) : base(ID)
         {
             this.LibraryHierarchyNode = libraryHierarchyNode;
             this.Rating = rating;
@@ -23,11 +25,14 @@ namespace FoxTunes
 
         public IPlaylistCache PlaylistCache { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.MetaDataManager = core.Managers.MetaData;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.PlaylistCache = core.Components.PlaylistCache;
+            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
 
@@ -58,7 +63,7 @@ namespace FoxTunes
                     refreshPlaylist = this.PlaylistCache.Contains(playlistItem => playlistItem.LibraryItem_Id == libraryItem.Id);
                 }
             }
-            await this.MetaDataManager.Save(libraryItems, true, CommonMetaData.Rating).ConfigureAwait(false);
+            await this.MetaDataManager.Save(libraryItems, true, false, CommonMetaData.Rating).ConfigureAwait(false);
             if (refreshPlaylist)
             {
                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);

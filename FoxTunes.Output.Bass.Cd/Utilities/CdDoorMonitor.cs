@@ -11,6 +11,8 @@ namespace FoxTunes
     {
         const int UPDATE_INTERVAL = 1000;
 
+        public static readonly object SyncRoot = new object();
+
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public Timer Timer { get; private set; }
@@ -19,7 +21,10 @@ namespace FoxTunes
         {
             get
             {
-                return this.Timer != null && this.Timer.Enabled;
+                lock (SyncRoot)
+                {
+                    return this.Timer != null && this.Timer.Enabled;
+                }
             }
         }
 
@@ -86,10 +91,13 @@ namespace FoxTunes
             {
                 return;
             }
-            this.Timer = new Timer();
-            this.Timer.Interval = UPDATE_INTERVAL;
-            this.Timer.Elapsed += this.OnElapsed;
-            this.Timer.Start();
+            lock (SyncRoot)
+            {
+                this.Timer = new Timer();
+                this.Timer.Interval = UPDATE_INTERVAL;
+                this.Timer.Elapsed += this.OnElapsed;
+                this.Timer.Start();
+            }
             Logger.Write(this, LogLevel.Debug, "Started monitoring CD door state.");
             this.UpdateState(false);
         }
@@ -100,10 +108,16 @@ namespace FoxTunes
             {
                 return;
             }
-            this.Timer.Stop();
-            this.Timer.Elapsed -= this.OnElapsed;
-            this.Timer.Dispose();
-            this.Timer = null;
+            lock (SyncRoot)
+            {
+                if (this.Timer != null)
+                {
+                    this.Timer.Stop();
+                    this.Timer.Elapsed -= this.OnElapsed;
+                    this.Timer.Dispose();
+                    this.Timer = null;
+                }
+            }
             Logger.Write(this, LogLevel.Debug, "Stopped monitoring CD door state.");
         }
 
