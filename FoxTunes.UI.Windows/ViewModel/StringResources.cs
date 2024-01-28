@@ -325,5 +325,37 @@
                 return Strings.MetaDataProvidersSettingsDialog_Reset;
             }
         }
+
+        public static string PlaylistConfigDialog_Expression
+        {
+            get
+            {
+                return Strings.PlaylistConfigDialog_Expression;
+            }
+        }
+
+        public static string PlaylistConfigDialog_MinRating
+        {
+            get
+            {
+                return Strings.PlaylistConfigDialog_MinRating;
+            }
+        }
+
+        public static string PlaylistConfigDialog_MinAge
+        {
+            get
+            {
+                return Strings.PlaylistConfigDialog_MinAge;
+            }
+        }
+
+        public static string PlaylistConfigDialog_Count
+        {
+            get
+            {
+                return Strings.PlaylistConfigDialog_Count;
+            }
+        }
     }
 }

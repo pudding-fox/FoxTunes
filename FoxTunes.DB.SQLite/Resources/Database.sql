@@ -24,7 +24,7 @@ CREATE TABLE [Playlists](
 	[Sequence] INTEGER NOT NULL,
 	[Name] TEXT NOT NULL COLLATE NOCASE,
 	[Type] bigint NOT NULL,
-	[Filter] TEXT NULL COLLATE NOCASE,
+	[Config] TEXT NULL COLLATE NOCASE,
 	[Enabled] bit NOT NULL);
 
 CREATE TABLE [PlaylistItems](

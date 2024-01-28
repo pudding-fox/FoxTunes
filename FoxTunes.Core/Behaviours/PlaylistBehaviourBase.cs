@@ -34,6 +34,11 @@ namespace FoxTunes
             return this.PlaylistBrowser.GetPlaylists().Where(this.Predicate);
         }
 
+        protected virtual PlaylistConfig GetConfig(Playlist playlist)
+        {
+            return new PlaylistConfig(playlist);
+        }
+
         protected virtual Task OnSignal(object sender, ISignal signal)
         {
             switch (signal.Name)

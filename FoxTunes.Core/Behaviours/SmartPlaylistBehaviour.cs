@@ -1,13 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
-    public class SmartPlaylistBehaviour : DynamicPlaylistBehaviour
+    public class SmartPlaylistBehaviour : PlaylistBehaviourBase
     {
+        public const string MinRating = "MinRating";
+
+        public const string MinAge = "MinAge";
+
+        public const string Count = "Count";
+
+        public const int DefaultMinRating = 4;
+
+        public const int DefaultMinAge = 30;
+
+        public const int DefaultCount = 16;
+
         public override Func<Playlist, bool> Predicate
         {
             get
@@ -16,41 +27,54 @@ namespace FoxTunes
             }
         }
 
-        protected virtual string GetFilter(Playlist playlist)
+        protected virtual void GetConfig(Playlist playlist, out string expression, out int count)
         {
-            var minRating = 4;
-            var maxLastPlayed = DateTimeHelper.ToString(DateTime.Now.AddDays(-30).Date);
-            return string.Format("rating>:{0} lastplayed<{1}", minRating, maxLastPlayed);
+            var config = this.GetConfig(playlist);
+            var minRating = default(int);
+            var minAge = default(int);
+            if (!int.TryParse(config.GetValueOrDefault(MinRating), out minRating))
+            {
+                minRating = DefaultMinRating;
+            }
+            if (!int.TryParse(config.GetValueOrDefault(MinAge), out minAge))
+            {
+                minAge = DefaultMinAge;
+            }
+            if (!int.TryParse(config.GetValueOrDefault(Count), out count))
+            {
+                count = DefaultCount;
+            }
+            expression = string.Format(
+                "rating>:{0} lastplayed<{1}",
+                minRating,
+                DateTimeHelper.ToShortString(DateTime.Now.AddDays(minAge * -1).Date)
+            );
         }
 
-        protected override async Task Refresh(IEnumerable<string> names)
+        public ICore Core { get; private set; }
+
+        public override void InitializeComponent(ICore core)
         {
-            foreach (var playlist in this.GetPlaylists())
-            {
-                if (names != null && names.Any())
-                {
-                    if (!this.FilterParser.AppliesTo(this.GetFilter(playlist), names))
-                    {
-                        return;
-                    }
-                }
-                await this.Refresh(playlist, false).ConfigureAwait(false);
-            }
+            this.Core = core;
+            base.InitializeComponent(core);
         }
 
         public override Task Refresh(Playlist playlist, bool force)
         {
-            return this.Refresh(playlist, this.GetFilter(playlist), force);
+            var expression = default(string);
+            var count = default(int);
+            this.GetConfig(playlist, out expression, out count);
+            return this.Refresh(playlist, expression, count, force);
         }
 
-        protected override async Task Refresh(Playlist playlist, string filter, bool force)
+        protected virtual async Task Refresh(Playlist playlist, string expression, int count, bool force)
         {
             if (!force)
             {
                 //Only refresh when user requests.
                 return;
             }
-            using (var task = new CreateSmartPlaylistTask(playlist, filter, "random", 16))
+            using (var task = new CreateSmartPlaylistTask(playlist, expression, "random", count))
             {
                 task.InitializeComponent(this.Core);
                 await task.Run().ConfigureAwait(false);
