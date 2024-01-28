@@ -7,12 +7,12 @@ namespace FoxTunes
 {
     public class ReportGridViewColumnFactory
     {
-        public ReportGridViewColumnFactory(IReport source)
+        public ReportGridViewColumnFactory(IReportComponent source)
         {
             this.Source = source;
         }
 
-        public IReport Source { get; private set; }
+        public IReportComponent Source { get; private set; }
 
         public GridViewColumn Create(int index)
         {

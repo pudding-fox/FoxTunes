@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -12,9 +11,9 @@ namespace FoxTunes.ViewModel
     {
         public ReportGridViewColumnFactory GridViewColumnFactory { get; private set; }
 
-        private IReport _Source { get; set; }
+        private IReportComponent _Source { get; set; }
 
-        public IReport Source
+        public IReportComponent Source
         {
             get
             {
@@ -64,9 +63,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler GridColumnsChanged;
 
-        private IReportRow _SelectedRow { get; set; }
+        private IReportComponentRow _SelectedRow { get; set; }
 
-        public IReportRow SelectedRow
+        public IReportComponentRow SelectedRow
         {
             get
             {
@@ -86,86 +85,86 @@ namespace FoxTunes.ViewModel
                 this.SelectedRowChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("SelectedRow");
+            this.OnRowActionCommandChanged();
         }
 
         public event EventHandler SelectedRowChanged;
 
-        public ICommand ActionCommand
+        public ICommand RowActionCommand
         {
             get
             {
-                return new Command(this.Action);
-            }
-        }
-
-        public void Action()
-        {
-            if (this.Source == null || this.SelectedRow == null)
-            {
-                return;
-            }
-            this.Source.Action(this.SelectedRow.Id);
-        }
-
-        public string ActionableDescription
-        {
-            get
-            {
-                if (this.Source is IActionable actionable)
+                if (this.SelectedRow == null)
                 {
-                    return actionable.Description;
+                    return CommandBase.Disabled;
+                }
+                return new AsyncCommand(this.SelectedRow.Action);
+            }
+        }
+
+        protected virtual void OnRowActionCommandChanged()
+        {
+            if (this.RowActionCommandChanged != null)
+            {
+                this.RowActionCommandChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("RowActionCommand");
+        }
+
+        public event EventHandler RowActionCommandChanged;
+
+        public string ActionName
+        {
+            get
+            {
+                if (this.Source != null && !string.IsNullOrEmpty(this.Source.ActionName))
+                {
+                    return this.Source.ActionName;
                 }
                 return Strings.Report_Close;
             }
         }
 
-        protected virtual void OnActionableDescriptionChanged()
+        protected virtual void OnActionNameChanged()
         {
-            if (this.ActionableDescriptionChanged != null)
+            if (this.ActionNameChanged != null)
             {
-                this.ActionableDescriptionChanged(this, EventArgs.Empty);
+                this.ActionNameChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("ActionableDescription");
+            this.OnPropertyChanged("ActionName");
         }
 
-        public event EventHandler ActionableDescriptionChanged;
+        public event EventHandler ActionNameChanged;
 
-        public ICommand ActionableCommand
+        public ICommand ActionCommand
         {
             get
             {
-                return new AsyncCommand(() =>
+                if (this.Source == null)
                 {
-                    if (this.Source is IActionable actionable)
-                    {
-                        return actionable.Task;
-                    }
-#if NET40
-                    return TaskEx.FromResult(false);
-#else
-                     return Task.CompletedTask;
-#endif
-                });
+                    return CommandBase.Disabled;
+                }
+                return new AsyncCommand(this.Source.Action);
             }
         }
 
-        protected virtual void OnActionableCommandChanged()
+        protected virtual void OnActionCommandChanged()
         {
-            if (this.ActionableCommandChanged != null)
+            if (this.ActionCommandChanged != null)
             {
-                this.ActionableCommandChanged(this, EventArgs.Empty);
+                this.ActionCommandChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("ActionableCommand");
+            this.OnPropertyChanged("ActionCommand");
         }
 
-        public event EventHandler ActionableCommandChanged;
+        public event EventHandler ActionCommandChanged;
 
         protected virtual void Refresh()
         {
             this.GridViewColumnFactory = new ReportGridViewColumnFactory(this.Source);
             this.OnGridColumnsChanged();
-            this.OnActionableDescriptionChanged();
-            this.OnActionableCommandChanged();
+            this.OnActionNameChanged();
+            this.OnActionCommandChanged();
         }
 
         protected override Freezable CreateInstanceCore()

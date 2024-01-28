@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IReport
+    public interface IReportComponent : IBaseComponent
     {
         string Title { get; }
 
@@ -11,15 +11,19 @@ namespace FoxTunes.Interfaces
 
         string[] Headers { get; }
 
-        IEnumerable<IReportRow> Rows { get; }
+        IEnumerable<IReportComponentRow> Rows { get; }
 
-        Action<Guid> Action { get; }
+        string ActionName { get; }
+
+        Task<bool> Action();
     }
 
-    public interface IReportRow
+    public interface IReportComponentRow : IBaseComponent
     {
-        Guid Id { get; }
-
         string[] Values { get; }
+
+        string ActionName { get; }
+
+        Task<bool> Action();
     }
 }

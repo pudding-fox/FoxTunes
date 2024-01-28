@@ -4,6 +4,6 @@ namespace FoxTunes.Interfaces
 {
     public interface IReportEmitter : IReportSource
     {
-        Task Send(IReport report);
+        Task Send(IReportComponent report);
     }
 }

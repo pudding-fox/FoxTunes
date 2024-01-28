@@ -336,7 +336,7 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
-        public class LibraryManagerReport : BaseComponent, IReport
+        public class LibraryManagerReport : ReportComponent
         {
             public LibraryManagerReport(IDictionary<LibraryItem, IList<string>> warnings)
             {
@@ -353,7 +353,7 @@ namespace FoxTunes
                 base.InitializeComponent(core);
             }
 
-            public string Title
+            public override string Title
             {
                 get
                 {
@@ -361,7 +361,7 @@ namespace FoxTunes
                 }
             }
 
-            public string Description
+            public override string Description
             {
                 get
                 {
@@ -380,7 +380,7 @@ namespace FoxTunes
                 }
             }
 
-            public string[] Headers
+            public override string[] Headers
             {
                 get
                 {
@@ -392,7 +392,7 @@ namespace FoxTunes
                 }
             }
 
-            public IEnumerable<IReportRow> Rows
+            public override IEnumerable<IReportComponentRow> Rows
             {
                 get
                 {
@@ -410,7 +410,7 @@ namespace FoxTunes
                 }
             }
 
-            protected virtual IReportRow GetRow(IDatabaseComponent database, LibraryRoot libraryRoot, ITransactionSource transaction)
+            protected virtual IReportComponentRow GetRow(IDatabaseComponent database, LibraryRoot libraryRoot, ITransactionSource transaction)
             {
                 var table = database.Tables.LibraryItem;
                 var builder = database.QueryFactory.Build();
@@ -423,23 +423,12 @@ namespace FoxTunes
                     binary.Right = binary.CreateConstant(libraryRoot.DirectoryName + "%");
                 });
                 var count = database.ExecuteScalar<long>(builder.Build(), transaction);
-                return new ReportRow(libraryRoot.DirectoryName, count);
+                return new LibraryManagerReportRow(libraryRoot.DirectoryName, count);
             }
 
-            public Action<Guid> Action
+            private class LibraryManagerReportRow : ReportComponentRow
             {
-                get
-                {
-                    return key =>
-                    {
-                        //Nothing to do.
-                    };
-                }
-            }
-
-            private class ReportRow : IReportRow
-            {
-                public ReportRow(string directoryName, long count)
+                public LibraryManagerReportRow(string directoryName, long count)
                 {
                     this.DirectoryName = directoryName;
                     this.Count = count;
@@ -449,15 +438,7 @@ namespace FoxTunes
 
                 public long Count { get; private set; }
 
-                public Guid Id
-                {
-                    get
-                    {
-                        return Guid.Empty;
-                    }
-                }
-
-                public string[] Values
+                public override string[] Values
                 {
                     get
                     {
