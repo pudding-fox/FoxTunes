@@ -521,13 +521,21 @@ namespace FoxTunes
 
             var data = generatorData.Data;
             var elements = rendererData.Elements;
+            var valuesPerElement = rendererData.ValuesPerElement;
 
             while (rendererData.Available < rendererData.Capacity)
             {
                 var valuePosition = rendererData.Available * rendererData.ValuesPerElement;
                 if ((valuePosition + rendererData.ValuesPerElement) > generatorData.Position)
                 {
-                    break;
+                    if (generatorData.Position <= generatorData.Capacity)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        valuesPerElement = generatorData.Capacity - valuePosition;
+                    }
                 }
 
                 var x = rendererData.Available;
@@ -537,7 +545,7 @@ namespace FoxTunes
 
                 var topValue = default(float);
                 var bottomValue = default(float);
-                for (var a = 0; a < rendererData.ValuesPerElement; a++)
+                for (var a = 0; a < valuesPerElement; a++)
                 {
                     for (var b = 0; b < generatorData.Channels; b++)
                     {
@@ -545,8 +553,8 @@ namespace FoxTunes
                         bottomValue += Math.Abs(data[valuePosition + a, b].Max);
                     }
                 }
-                topValue /= (rendererData.ValuesPerElement * generatorData.Channels);
-                bottomValue /= (rendererData.ValuesPerElement * generatorData.Channels);
+                topValue /= (valuesPerElement * generatorData.Channels);
+                bottomValue /= (valuesPerElement * generatorData.Channels);
 
                 topValue /= factor;
                 bottomValue /= factor;
@@ -572,13 +580,21 @@ namespace FoxTunes
 
             var data = generatorData.Data;
             var elements = rendererData.Elements;
+            var valuesPerElement = rendererData.ValuesPerElement;
 
             while (rendererData.Available < rendererData.Capacity)
             {
                 var valuePosition = rendererData.Available * rendererData.ValuesPerElement;
                 if ((valuePosition + rendererData.ValuesPerElement) > generatorData.Position)
                 {
-                    break;
+                    if (generatorData.Position <= generatorData.Capacity)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        valuesPerElement = generatorData.Capacity - valuePosition;
+                    }
                 }
 
                 var x = rendererData.Available;
@@ -594,13 +610,13 @@ namespace FoxTunes
 
                     var topValue = default(float);
                     var bottomValue = default(float);
-                    for (var a = 0; a < rendererData.ValuesPerElement; a++)
+                    for (var a = 0; a < valuesPerElement; a++)
                     {
                         topValue += Math.Abs(data[valuePosition + a, channel].Min);
                         bottomValue += Math.Abs(data[valuePosition + a, channel].Max);
                     }
-                    topValue /= (rendererData.ValuesPerElement * generatorData.Channels);
-                    bottomValue /= (rendererData.ValuesPerElement * generatorData.Channels);
+                    topValue /= (valuesPerElement * generatorData.Channels);
+                    bottomValue /= (valuesPerElement * generatorData.Channels);
 
                     topValue /= factor;
                     bottomValue /= factor;
@@ -661,11 +677,19 @@ namespace FoxTunes
 
         public static WaveFormRendererData Create(WaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height)
         {
+            var valuesPerElement = Convert.ToInt32(
+                Math.Ceiling(
+                    Math.Max(
+                        (float)generatorData.Capacity / width,
+                        1
+                    )
+                )
+            );
             return new WaveFormRendererData()
             {
                 Width = width,
                 Height = height,
-                ValuesPerElement = Convert.ToInt32(Math.Ceiling(Math.Max((float)generatorData.Capacity / width, 1))),
+                ValuesPerElement = valuesPerElement,
                 Elements = new Int32Rect[width, generatorData.Channels],
                 Channels = generatorData.Channels,
                 Position = 0,

@@ -22,9 +22,11 @@ namespace FoxTunes
 
         public static WaveFormGeneratorData Create(IOutputStream stream)
         {
-            var length = Convert.ToInt32(Math.Ceiling(
-                stream.GetDuration(stream.Length).TotalMilliseconds / Resolution.Value
-            ));
+            var length = Convert.ToInt32(
+                Math.Ceiling(
+                    stream.GetDuration(stream.Length).TotalMilliseconds / Resolution.Value
+                )
+            );
             return new WaveFormGeneratorData()
             {
                 Resolution = Resolution.Value,
@@ -57,6 +59,8 @@ namespace FoxTunes
                 return;
             }
 
+            data.Update();
+
             Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Wave form generated for file \"{0}\" with {1} elements: Peak = {2:0.00}", stream.FileName, data.Capacity, data.Peak);
 
             try
@@ -79,16 +83,13 @@ namespace FoxTunes
 
             do
             {
-#if DEBUG
-                if (data.Position >= data.Capacity)
-                {
-                    //TODO: Why?
-                    break;
-                }
-#endif
-
                 var length = stream.GetData(buffer) / sizeof(short);
                 if (length <= 0)
+                {
+                    break;
+                }
+
+                if (data.Position >= data.Capacity)
                 {
                     break;
                 }
@@ -131,8 +132,6 @@ namespace FoxTunes
                 }
 
             } while (!data.CancellationToken.IsCancellationRequested);
-
-            data.Update();
         }
 
         private static void PopulateFloat(IOutputStream stream, WaveFormGeneratorData data)
@@ -145,16 +144,13 @@ namespace FoxTunes
 
             do
             {
-#if DEBUG
-                if (data.Position >= data.Capacity)
-                {
-                    //TODO: Why?
-                    break;
-                }
-#endif
-
                 var length = stream.GetData(buffer) / sizeof(float);
                 if (length <= 0)
+                {
+                    break;
+                }
+
+                if (data.Position >= data.Capacity)
                 {
                     break;
                 }
@@ -198,8 +194,6 @@ namespace FoxTunes
                 }
 
             } while (!data.CancellationToken.IsCancellationRequested);
-
-            data.Update();
         }
 
         [Serializable]
