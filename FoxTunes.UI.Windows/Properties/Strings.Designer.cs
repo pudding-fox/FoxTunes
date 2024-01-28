@@ -250,6 +250,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Equalizer.
+        /// </summary>
+        internal static string KeyBindingsBehaviourConfiguration_Equalizer {
+            get {
+                return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.Equalizer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Next.
         /// </summary>
         internal static string KeyBindingsBehaviourConfiguration_Next {

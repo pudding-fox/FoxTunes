@@ -14,6 +14,8 @@ namespace FoxTunes
 
         public global::FoxTunes.ViewModel.Settings _Settings { get; private set; }
 
+        public global::FoxTunes.ViewModel.Equalizer _Equalizer { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -30,6 +32,9 @@ namespace FoxTunes
 
         public TextConfigurationElement Search { get; private set; }
 
+
+        public TextConfigurationElement Equalizer { get; private set; }
+
         public ICommand SearchCommand
         {
             get
@@ -45,6 +50,7 @@ namespace FoxTunes
         {
             this._Playback = new global::FoxTunes.ViewModel.Playback(false);
             this._Settings = new global::FoxTunes.ViewModel.Settings();
+            this._Equalizer = new global::FoxTunes.ViewModel.Equalizer();
             this.SignalEmitter = core.Components.SignalEmitter;
             this.Configuration = core.Components.Configuration;
             this.Play = this.Configuration.GetElement<TextConfigurationElement>(
@@ -70,6 +76,10 @@ namespace FoxTunes
             this.Search = this.Configuration.GetElement<TextConfigurationElement>(
                 DefaultKeyBindingsBehaviourConfiguration.SECTION,
                 DefaultKeyBindingsBehaviourConfiguration.SEARCH_ELEMENT
+            );
+            this.Equalizer = this.Configuration.GetElement<TextConfigurationElement>(
+                DefaultKeyBindingsBehaviourConfiguration.SECTION,
+                DefaultKeyBindingsBehaviourConfiguration.EQUALIZER_ELEMENT
             );
             if (this.Play != null)
             {
@@ -100,6 +110,11 @@ namespace FoxTunes
             {
                 this.Commands.Add(this.Search, this.SearchCommand);
                 this.Search.ValueChanged += this.OnValueChanged;
+            }
+            if (this.Equalizer != null)
+            {
+                this.Commands.Add(this.Equalizer, this._Equalizer.WindowState.ShowCommand);
+                this.Equalizer.ValueChanged += this.OnValueChanged;
             }
             base.InitializeComponent(core);
         }

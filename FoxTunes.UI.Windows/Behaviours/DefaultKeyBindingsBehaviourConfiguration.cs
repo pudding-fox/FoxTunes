@@ -18,6 +18,8 @@ namespace FoxTunes
 
         public const string SEARCH_ELEMENT = "GGGG6849-7DA9-4BA1-9A5A-548E3D9A1E25";
 
+        public const string EQUALIZER_ELEMENT = "HHHHFEB5-DD2D-4332-9C2A-F5EF41F71B40";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.KeyBindingsBehaviourConfiguration_Section)
@@ -38,7 +40,10 @@ namespace FoxTunes
                         .WithValue("Alt+S"))
                 .WithElement(
                     new TextConfigurationElement(SEARCH_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_Search)
-                        .WithValue("Alt+F")
+                        .WithValue("Alt+F"))
+                .WithElement(
+                    new TextConfigurationElement(EQUALIZER_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_Equalizer)
+                        .WithValue("Alt+E")
             );
         }
     }
