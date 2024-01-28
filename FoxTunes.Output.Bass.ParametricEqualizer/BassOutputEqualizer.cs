@@ -25,11 +25,17 @@ namespace FoxTunes
 
         public IEnumerable<IOutputEqualizerBand> Bands { get; private set; }
 
-        public IEnumerable<string> Presets { get; private set; }
+        public IEnumerable<string> Presets
+        {
+            get
+            {
+                return BassParametricEqualizerPreset.Presets;
+            }
+        }
 
         public void LoadPreset(string name)
         {
-            BassParametricEqualizerStreamComponentConfiguration.LoadPreset(name);
+            BassParametricEqualizerPreset.LoadPreset(name);
         }
 
         public ICore Core { get; private set; }
@@ -46,7 +52,6 @@ namespace FoxTunes
             );
             this.EnabledElement.ValueChanged += this.OnEnabledChanged;
             this.Bands = new List<IOutputEqualizerBand>(this.GetBands());
-            this.Presets = new List<string>(this.GetPresets());
         }
 
         protected virtual void OnEnabledChanged(object sender, EventArgs e)
@@ -63,13 +68,6 @@ namespace FoxTunes
                 band.InitializeComponent(this.Core);
                 yield return band;
             }
-        }
-
-        protected virtual IEnumerable<string> GetPresets()
-        {
-            return BassParametricEqualizerStreamComponentConfiguration.Presets.Select(
-                pair => pair.Value
-            );
         }
 
         public bool IsDisposed { get; private set; }
