@@ -39,7 +39,8 @@
                AllowsTransparency="True" 
                IsOpen="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}" 
                StaysOpen="True"
-               Width="600" Height="400">
+               Width="600" Height="400"
+               PreviewMouseDown="OnPreviewMouseDown">
             <Border Background="{DynamicResource NormalBrush}" 
                     BorderBrush="{DynamicResource NormalBorderBrush}" 
                     BorderThickness="1" 
