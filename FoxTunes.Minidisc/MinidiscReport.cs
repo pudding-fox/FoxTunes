@@ -133,7 +133,7 @@ namespace FoxTunes
                         this.Track.Name,
                         this.Track.Time.ToString(),
                         Enum.GetName(typeof(Compression), this.Track.Compression),
-                        "None"
+                        string.IsNullOrEmpty(this.Track.Location) ? Strings.MinidiscReport_None : Strings.MinidiscReport_Add
                     };
                 }
             }

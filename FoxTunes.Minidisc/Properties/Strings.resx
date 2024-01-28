@@ -147,6 +147,9 @@
   <data name="MinidiscReport.Action" xml:space="preserve">
     <value>Action</value>
   </data>
+  <data name="MinidiscReport.Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
   <data name="MinidiscReport.Close" xml:space="preserve">
     <value>Close</value>
   </data>
@@ -155,6 +158,9 @@
   </data>
   <data name="MinidiscReport.Name" xml:space="preserve">
     <value>Name</value>
+  </data>
+  <data name="MinidiscReport.None" xml:space="preserve">
+    <value>None</value>
   </data>
   <data name="MinidiscReport.Time" xml:space="preserve">
     <value>Time</value>
