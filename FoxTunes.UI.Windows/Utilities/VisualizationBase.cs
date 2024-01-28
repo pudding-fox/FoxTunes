@@ -13,9 +13,11 @@ namespace FoxTunes
         public VisualizationBase()
         {
             this.Timer = new global::System.Timers.Timer();
-            this.Timer.AutoReset = true;
+            this.Timer.AutoReset = false;
             this.Timer.Elapsed += this.OnElapsed;
         }
+
+        public bool Enabled { get; private set; }
 
         public int UpdateInterval
         {
@@ -37,12 +39,12 @@ namespace FoxTunes
 
         protected virtual void OnNotify(object sender, EventArgs e)
         {
-            if (PlaybackStateNotifier.IsPlaying && !this.Timer.Enabled)
+            if (PlaybackStateNotifier.IsPlaying && !this.Enabled)
             {
                 Logger.Write(this, LogLevel.Debug, "Playback was started, starting renderer.");
                 this.Start();
             }
-            else if (!PlaybackStateNotifier.IsPlaying && this.Timer.Enabled)
+            else if (!PlaybackStateNotifier.IsPlaying && this.Enabled)
             {
                 Logger.Write(this, LogLevel.Debug, "Playback was stopped, stopping renderer.");
                 this.Stop();
@@ -56,6 +58,7 @@ namespace FoxTunes
                 if (this.Timer != null)
                 {
                     this.Timer.Start();
+                    this.Enabled = true;
                 }
             }
         }
@@ -67,6 +70,7 @@ namespace FoxTunes
                 if (this.Timer != null)
                 {
                     this.Timer.Stop();
+                    this.Enabled = false;
                 }
             }
             if (!PlaybackStateNotifier.IsPlaying && !PlaybackStateNotifier.IsPaused)

@@ -88,6 +88,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Duration.
+        /// </summary>
+        internal static string OscilloscopeBehaviourConfiguration_Duration {
+            get {
+                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.Duration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mode.
         /// </summary>
         internal static string OscilloscopeBehaviourConfiguration_Mode {
@@ -117,9 +126,9 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Oscilloscope.
         /// </summary>
-        internal static string OscilloscopeBehaviourConfiguration_Section {
+        internal static string OscilloscopeBehaviourConfiguration_Path {
             get {
-                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.Section", resourceCulture);
+                return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.Path", resourceCulture);
             }
         }
         
@@ -153,9 +162,9 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Peak Meter.
         /// </summary>
-        internal static string PeakMeterBehaviourConfiguration_Section {
+        internal static string PeakMeterBehaviourConfiguration_Path {
             get {
-                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.Section", resourceCulture);
+                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.Path", resourceCulture);
             }
         }
         
@@ -205,6 +214,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Spectrum.
+        /// </summary>
+        internal static string SpectrumBehaviourConfiguration_Path {
+            get {
+                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Peaks.
         /// </summary>
         internal static string SpectrumBehaviourConfiguration_Peaks {
@@ -219,15 +237,6 @@ namespace FoxTunes {
         internal static string SpectrumBehaviourConfiguration_Rms {
             get {
                 return ResourceManager.GetString("SpectrumBehaviourConfiguration.Rms", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Spectrum.
-        /// </summary>
-        internal static string SpectrumBehaviourConfiguration_Section {
-            get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Section", resourceCulture);
             }
         }
     }

@@ -21,6 +21,9 @@
             Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Oscilloscope}}}" 
             Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Oscilloscope}}}"></LocalWindows:OscilloscopeRenderer>
     </UserControl.Resources>
+    <UserControl.ContextMenu>
+        <Windows:Menu Category="{Binding Source={x:Static LocalWindows:OscilloscopeBehaviour.CATEGORY}}"></Windows:Menu>
+    </UserControl.ContextMenu>
     <UserControl.Background>
         <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
     </UserControl.Background>
