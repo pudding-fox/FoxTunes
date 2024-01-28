@@ -5,7 +5,6 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Drawing.Design;
 using System.Threading.Tasks;
 
 namespace FoxTunes

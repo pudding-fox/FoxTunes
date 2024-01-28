@@ -298,7 +298,7 @@ namespace FoxTunes.ViewModel
                     break;
             }
             var playlist = this.GetPlaylist();
-            var index = await this.PlaylistBrowser.GetInsertIndex(playlist).ConfigureAwait(false);
+            var index = this.PlaylistBrowser.GetInsertIndex(playlist);
             await this.PlaylistManager.Add(playlist, paths, clear).ConfigureAwait(false);
             if (play)
             {

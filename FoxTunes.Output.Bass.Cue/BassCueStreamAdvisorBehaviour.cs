@@ -226,7 +226,7 @@ namespace FoxTunes
                 using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                 {
                     //Always append for now.
-                    this.Sequence = await this.PlaylistBrowser.GetInsertIndex(playlist).ConfigureAwait(false);
+                    this.Sequence = this.PlaylistBrowser.GetInsertIndex(playlist);
                     await this.AddPlaylistItems(playlistItems).ConfigureAwait(false);
                     await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
                     await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);

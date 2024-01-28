@@ -133,57 +133,49 @@ namespace FoxTunes
             }
         }
 
-        public virtual async Task<PlaylistItem> GetItem(Playlist playlist, int sequence)
+        public PlaylistItem GetItem(Playlist playlist, int sequence)
         {
-            using (var database = this.DatabaseFactory.Create())
+            var playlistItem = default(PlaylistItem);
+            if (!this.PlaylistCache.TryGetItemBySequence(playlist, sequence, out playlistItem))
             {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    return await database.AsQueryable<PlaylistItem>(transaction)
-                        .Where(playlistItem => playlistItem.Sequence == sequence)
-                        .Take(1)
-                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault()).ConfigureAwait(false);
-                }
+                return null;
             }
+            return playlistItem;
         }
 
-        public Task<PlaylistItem> GetNextItem(Playlist playlist)
+        public PlaylistItem GetFirstItem(Playlist playlist)
+        {
+            return this.GetItems(playlist).FirstOrDefault();
+        }
+
+        public PlaylistItem GetLastItem(Playlist playlist)
+        {
+            return this.GetItems(playlist).LastOrDefault();
+        }
+
+        public PlaylistItem GetNextItem(Playlist playlist)
         {
             return this.NavigationStrategy.GetNext(this.PlaylistManager.CurrentItem);
         }
 
-        public Task<PlaylistItem> GetNextItem(PlaylistItem playlistItem)
+        public PlaylistItem GetNextItem(PlaylistItem playlistItem)
         {
             return this.NavigationStrategy.GetNext(playlistItem);
         }
 
-        public Task<PlaylistItem> GetPreviousItem(Playlist playlist)
+        public PlaylistItem GetPreviousItem(Playlist playlist)
         {
             return this.NavigationStrategy.GetPrevious(this.PlaylistManager.CurrentItem);
         }
 
-        public Task<PlaylistItem> GetPreviousItem(PlaylistItem playlistItem)
+        public PlaylistItem GetPreviousItem(PlaylistItem playlistItem)
         {
             return this.NavigationStrategy.GetPrevious(playlistItem);
         }
 
-        public virtual async Task<PlaylistItem> GetItem(Playlist playlist, string fileName)
+        public int GetInsertIndex(Playlist playlist)
         {
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    return await database.AsQueryable<PlaylistItem>(transaction)
-                        .Where(playlistItem => playlistItem.FileName == fileName)
-                        .Take(1)
-                        .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault()).ConfigureAwait(false);
-                }
-            }
-        }
-
-        public async Task<int> GetInsertIndex(Playlist playlist)
-        {
-            var playlistItem = await this.NavigationStrategy.GetLastPlaylistItem(playlist).ConfigureAwait(false);
+            var playlistItem = this.GetLastItem(playlist);
             if (playlistItem == null)
             {
                 return 0;

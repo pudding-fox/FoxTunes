@@ -36,7 +36,12 @@ namespace FoxTunes
 
         private async Task PreemptItems()
         {
-            var playlistItem = await this.PlaylistBrowser.GetNextItem(this.PlaylistManager.CurrentPlaylist).ConfigureAwait(false);
+            var playlist = this.PlaylistManager.CurrentPlaylist;
+            if (playlist == null)
+            {
+                return;
+            }
+            var playlistItem = this.PlaylistBrowser.GetNextItem(playlist);
             if (playlistItem == null)
             {
                 return;
