@@ -18,7 +18,8 @@ namespace FoxTunes
     [Flags]
     public enum ColorPaletteRole : byte
     {
-        None,
-        Visualization
+        None = 0,
+        Visualization = 1,
+        WaveForm = 2
     }
 }
