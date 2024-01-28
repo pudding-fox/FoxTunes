@@ -13,7 +13,7 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <LocalViewModel:MetaDataEditor x:Key="ViewModel" Core="{Binding}"></LocalViewModel:MetaDataEditor>
-        <ViewModel:NegavingBooleanToVisibilityConverter x:Key="NegavingBooleanToVisibilityConverter"></ViewModel:NegavingBooleanToVisibilityConverter>
+        <ViewModel:NegatingBooleanToVisibilityConverter x:Key="NegatingBooleanToVisibilityConverter"></ViewModel:NegatingBooleanToVisibilityConverter>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Windows:UIComponentBase.IsComponentEnabled>

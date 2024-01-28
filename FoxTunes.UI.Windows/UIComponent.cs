@@ -12,6 +12,7 @@ namespace FoxTunes
             this.Slot = attribute.Slot;
             this.Name = attribute.Name;
             this.Description = attribute.Description;
+            this.Role = attribute.Role;
             this.Type = type;
         }
 
@@ -22,6 +23,8 @@ namespace FoxTunes
         public string Name { get; private set; }
 
         public string Description { get; private set; }
+
+        public UIComponentRole Role { get; private set; }
 
         public Type Type { get; private set; }
     }

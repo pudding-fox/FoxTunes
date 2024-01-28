@@ -23,6 +23,8 @@ namespace FoxTunes
 
         public const string BOTTOM_RIGHT_ELEMENT = "GGGGEC8-4D19-4E0F-9D65-44A15288B22A";
 
+        public const string PRIMARY_LIBRARY_VIEW = "GGII1A2C-E16D-449D-A0E7-262B49D28C7D";
+
         public const string UI_SCALING_ELEMENT = "IIIIFB85-BA70-4412-87BA-E4DC58AD9BA8";
 
         public const string MARQUEE_INTERVAL_ELEMENT = "JJJJ685A-4D15-4AE1-B7AD-3E5786CB8EDB";
@@ -51,6 +53,8 @@ namespace FoxTunes
                     new SelectionConfigurationElement(TOP_RIGHT_ELEMENT, "Top Right", path: "Layout").WithOptions(GetControlOptions(TOP_RIGHT_ELEMENT)))
                 .WithElement(
                     new SelectionConfigurationElement(BOTTOM_RIGHT_ELEMENT, "Bottom Right", path: "Layout").WithOptions(GetControlOptions(BOTTOM_RIGHT_ELEMENT)))
+                .WithElement(
+                    new SelectionConfigurationElement(PRIMARY_LIBRARY_VIEW, "Primary Library View", path: "Advanced").WithOptions(GetLibraryViews()))
                 .WithElement(
                     new DoubleConfigurationElement(UI_SCALING_ELEMENT, "Scaling Factor", path: "Advanced").WithValue(1.0).WithValidationRule(new DoubleValidationRule(1, 4, 0.4)))
                 .WithElement(
@@ -107,6 +111,29 @@ namespace FoxTunes
                 return LayoutManager.PLACEHOLDER;
             }
             return component.Type;
+        }
+
+        private static IEnumerable<SelectionConfigurationOption> GetLibraryViews()
+        {
+            yield return new SelectionConfigurationOption(UIComponent.PLACEHOLDER, "None");
+            foreach (var component in LayoutManager.Instance.Components)
+            {
+                if (component.Role != UIComponentRole.LibraryView)
+                {
+                    continue;
+                }
+                var option = new SelectionConfigurationOption(component.Id, component.Name, component.Description);
+                if (string.Equals(option.Id, LibraryTree.ID, StringComparison.OrdinalIgnoreCase))
+                {
+                    option.Default();
+                }
+                yield return option;
+            }
+        }
+
+        public static bool GetIsPrimaryView(SelectionConfigurationOption option, string id)
+        {
+            return string.Equals(option.Id, id, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

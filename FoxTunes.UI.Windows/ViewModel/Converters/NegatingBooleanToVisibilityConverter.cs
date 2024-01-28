@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace FoxTunes.ViewModel
 {
-    public class NegavingBooleanToVisibilityConverter : IValueConverter
+    public class NegatingBooleanToVisibilityConverter : IValueConverter
     {
         public static readonly BooleanToVisibilityConverter BooleanToVisibilityConverter = new BooleanToVisibilityConverter();
 
