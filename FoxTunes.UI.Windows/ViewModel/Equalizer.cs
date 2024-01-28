@@ -167,6 +167,10 @@ namespace FoxTunes.ViewModel
 
         protected override void OnCoreChanged()
         {
+            if (this.Core == null)
+            {
+                return;
+            }
             this.Effects = this.Core.Components.OutputEffects;
             if (this.Effects.Equalizer != null)
             {

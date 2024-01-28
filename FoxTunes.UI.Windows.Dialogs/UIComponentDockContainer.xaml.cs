@@ -1,6 +1,10 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace FoxTunes
 {
@@ -10,6 +14,10 @@ namespace FoxTunes
     [UIComponent("3E899F79-380C-4EF7-8570-4B4E3B3467CB", UIComponentSlots.NONE, "Dock", role: UIComponentRole.Hidden)]
     public partial class UIComponentDockContainer : UIComponentPanel
     {
+        const string DOCK_TOP = "AAAA";
+
+        const string DOCK_BOTTOM = "BBBB";
+
         public static readonly DependencyProperty ContentComponentProperty = DependencyProperty.Register(
             "ContentComponent",
             typeof(UIComponentConfiguration),
@@ -219,5 +227,31 @@ namespace FoxTunes
         }
 
         public event EventHandler DockLocationChanged;
+
+        public override IEnumerable<IInvocationComponent> Invocations
+        {
+            get
+            {
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, DOCK_TOP, "Dock Top");
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, DOCK_BOTTOM, "Dock Bottom");
+            }
+        }
+
+        public override Task InvokeAsync(IInvocationComponent component)
+        {
+            switch (component.Id)
+            {
+                case DOCK_TOP:
+                    return this.SetDockLocation(Enum.GetName(typeof(Dock), Dock.Top));
+                case DOCK_BOTTOM:
+                    return this.SetDockLocation(Enum.GetName(typeof(Dock), Dock.Bottom));
+            }
+            return base.InvokeAsync(component);
+        }
+
+        public Task SetDockLocation(string dockLocation)
+        {
+            return Windows.Invoke(() => this.DockLocation = dockLocation);
+        }
     }
 }

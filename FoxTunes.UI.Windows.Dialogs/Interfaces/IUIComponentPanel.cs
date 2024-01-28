@@ -1,6 +1,6 @@
 ﻿namespace FoxTunes.Interfaces
 {
-    public interface IUIComponentPanel : IUIComponent
+    public interface IUIComponentPanel : IInvocableComponent, IUIComponent
     {
         UIComponentConfiguration Component { get; set; }
     }

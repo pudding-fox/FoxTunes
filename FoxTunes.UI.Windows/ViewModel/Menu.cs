@@ -72,6 +72,12 @@ namespace FoxTunes.ViewModel
             this.Items = new ObservableCollection<MenuItem>();
         }
 
+        public Menu(IEnumerable<IInvocableComponent> components)
+        {
+            this.InvocableComponents = new ObservableCollection<IInvocableComponent>(components);
+            this.Items = new ObservableCollection<MenuItem>();
+        }
+
         public string Category
         {
             get
@@ -126,7 +132,7 @@ namespace FoxTunes.ViewModel
 
         public ObservableCollection<MenuItem> Items { get; set; }
 
-        protected virtual IEnumerable<MenuItem> GetItems()
+        public virtual IEnumerable<MenuItem> GetItems()
         {
             var items = new List<MenuItem>();
             foreach (var component in this.InvocableComponents)
