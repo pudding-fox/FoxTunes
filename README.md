@@ -1,8 +1,8 @@
 # FoxTunes
 A **portable, modular music player and converter** using the BASS framework for Windows XP/.../10/11.
 
-The main release is [FoxTunes-2.2.9-net461-x86.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.2.9/FoxTunes-2.2.9-net461-x86.zip) ([64 bit builds are available](https://github.com/Raimusoft/FoxTunes/releases)).  
-For additional plugins, download [FoxTunes-2.2.9-Plugins-net461-x86.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.2.9/FoxTunes-2.2.9-Plugins-net461-x86.zip) (extract and copy all files to the FoxTunes\lib directory).
+The main release is [FoxTunes-2.3.1-net462-x86.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.3.1/FoxTunes-2.3.1-net462-x86.zip) ([64 bit builds are available](https://github.com/Raimusoft/FoxTunes/releases)).  
+For additional plugins, download [FoxTunes-2.3.1-Plugins-net462-x86.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.3.1/FoxTunes-2.3.1-Plugins-net462-x86.zip) (extract and copy all files to the FoxTunes\lib directory).
 
 There is also a [Microsoft Store](https://www.microsoft.com/store/productId/9MWPJTXWTXLG) package.
 
