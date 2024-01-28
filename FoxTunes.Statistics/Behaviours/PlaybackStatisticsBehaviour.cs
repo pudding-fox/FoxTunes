@@ -19,9 +19,7 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public BooleanConfigurationElement MetaDataEnabled { get; private set; }
-
-        public BooleanConfigurationElement PlaybackStatisticsEnabled { get; private set; }
+        public BooleanConfigurationElement Enabled { get; private set; }
 
         public SelectionConfigurationElement Write { get; private set; }
 
@@ -30,16 +28,11 @@ namespace FoxTunes
             this.StatisticsManager = ComponentRegistry.Instance.GetComponent<StatisticsManager>();
             this.PlaybackManager = core.Managers.Playback;
             this.Configuration = core.Components.Configuration;
-            this.MetaDataEnabled = this.Configuration.GetElement<BooleanConfigurationElement>(
-                MetaDataBehaviourConfiguration.SECTION,
-                MetaDataBehaviourConfiguration.ENABLE_ELEMENT
-            );
-            this.MetaDataEnabled.ValueChanged += this.OnValueChanged;
-            this.PlaybackStatisticsEnabled = this.Configuration.GetElement<BooleanConfigurationElement>(
+            this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 PlaybackBehaviourConfiguration.SECTION,
                 PlaybackStatisticsBehaviourConfiguration.ENABLED
             );
-            this.PlaybackStatisticsEnabled.ValueChanged += this.OnValueChanged;
+            this.Enabled.ValueChanged += this.OnValueChanged;
             this.Write = this.Configuration.GetElement<SelectionConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.WRITE_ELEMENT
@@ -55,7 +48,7 @@ namespace FoxTunes
 
         protected virtual void Refresh()
         {
-            if (this.MetaDataEnabled.Value && this.PlaybackStatisticsEnabled.Value)
+            if (this.Enabled.Value)
             {
                 this.Enable();
             }
@@ -137,13 +130,9 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            if (this.MetaDataEnabled != null)
+            if (this.Enabled != null)
             {
-                this.MetaDataEnabled.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.PlaybackStatisticsEnabled != null)
-            {
-                this.PlaybackStatisticsEnabled.ValueChanged -= this.OnValueChanged;
+                this.Enabled.ValueChanged -= this.OnValueChanged;
             }
             this.Disable();
         }

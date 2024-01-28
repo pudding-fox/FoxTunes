@@ -18,20 +18,14 @@ namespace FoxTunes
 
         public global::System.Timers.Timer Timer { get; private set; }
 
-        public BooleanConfigurationElement MetaDataEnabled { get; private set; }
-
-        public BooleanConfigurationElement BackgroundEnabled { get; private set; }
+        public BooleanConfigurationElement Enabled { get; private set; }
 
         public SelectionConfigurationElement Write { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.MetaDataManager = core.Managers.MetaData;
-            this.MetaDataEnabled = core.Components.Configuration.GetElement<BooleanConfigurationElement>(
-                MetaDataBehaviourConfiguration.SECTION,
-                MetaDataBehaviourConfiguration.ENABLE_ELEMENT
-            );
-            this.BackgroundEnabled = core.Components.Configuration.GetElement<BooleanConfigurationElement>(
+            this.Enabled = core.Components.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.BACKGROUND_WRITE_ELEMENT
             );
@@ -39,8 +33,7 @@ namespace FoxTunes
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.WRITE_ELEMENT
             );
-            this.MetaDataEnabled.ValueChanged += this.OnValueChanged;
-            this.BackgroundEnabled.ValueChanged += this.OnValueChanged;
+            this.Enabled.ValueChanged += this.OnValueChanged;
             this.Write.ValueChanged += this.OnValueChanged;
             this.Refresh();
             base.InitializeComponent(core);
@@ -53,7 +46,7 @@ namespace FoxTunes
 
         private void Refresh()
         {
-            if (this.MetaDataEnabled.Value && this.BackgroundEnabled.Value && MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value) != WriteBehaviour.None)
+            if (this.Enabled.Value && MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value) != WriteBehaviour.None)
             {
                 this.Enable();
             }

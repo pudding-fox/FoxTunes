@@ -31,20 +31,7 @@ namespace FoxTunes
             this.LibraryManager = core.Managers.Library;
             this.Configuration = core.Components.Configuration;
             this.Monitor();
-            this.Configuration.GetElement<BooleanConfigurationElement>(
-                MetaDataBehaviourConfiguration.SECTION,
-                MetaDataBehaviourConfiguration.ENABLE_ELEMENT
-            ).ConnectValue(value =>
-            {
-                if (value)
-                {
-                    this.Enable();
-                }
-                else
-                {
-                    this.Disable();
-                }
-            });
+            this.Enable();
             base.InitializeComponent(core);
         }
 

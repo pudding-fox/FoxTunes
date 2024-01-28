@@ -59,10 +59,6 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            if (!this.MetaDataSourceFactory.Enabled)
-            {
-                throw new InvalidOperationException("Cannot add to library, meta data extraction is disabled.");
-            }
             await this.AddRoots(this.Roots).ConfigureAwait(false);
             await this.AddPaths(this.Paths).ConfigureAwait(false);
         }

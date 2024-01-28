@@ -126,9 +126,7 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public BooleanConfigurationElement MetaData { get; private set; }
-
-        public BooleanConfigurationElement Popularimeter { get; private set; }
+        public BooleanConfigurationElement Enabled { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -137,11 +135,7 @@ namespace FoxTunes
             this.RatingManager = ComponentRegistry.Instance.GetComponent<RatingManager>();
             this.MetaDataBrowser = core.Components.MetaDataBrowser;
             this.Configuration = core.Components.Configuration;
-            this.MetaData = this.Configuration.GetElement<BooleanConfigurationElement>(
-                MetaDataBehaviourConfiguration.SECTION,
-                MetaDataBehaviourConfiguration.ENABLE_ELEMENT
-            );
-            this.Popularimeter = this.Configuration.GetElement<BooleanConfigurationElement>(
+            this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                MetaDataBehaviourConfiguration.SECTION,
                MetaDataBehaviourConfiguration.READ_POPULARIMETER_TAGS
            );
@@ -152,7 +146,7 @@ namespace FoxTunes
         {
             get
             {
-                if (this.MetaData.Value && this.Popularimeter.Value)
+                if (this.Enabled.Value)
                 {
                     if (this.LibraryManager.SelectedItem != null)
                     {

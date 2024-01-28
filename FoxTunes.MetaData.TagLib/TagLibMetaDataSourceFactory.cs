@@ -6,6 +6,7 @@ namespace FoxTunes
     [Component("679D9459-BBCE-4D95-BB65-DD20C335719C", ComponentSlots.MetaData, @default: true)]
     public class TagLibMetaDataSourceFactory : MetaDataSourceFactory
     {
+
         public BooleanConfigurationElement Extended { get; private set; }
 
         public BooleanConfigurationElement MusicBrainz { get; private set; }
@@ -45,11 +46,6 @@ namespace FoxTunes
         {
             get
             {
-                if (!this.Enabled)
-                {
-                    yield break;
-                }
-
                 //Tags.
                 yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.Album, MetaDataItemType.Tag);
                 yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.Artist, MetaDataItemType.Tag);

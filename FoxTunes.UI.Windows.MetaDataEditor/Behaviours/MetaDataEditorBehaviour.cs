@@ -18,21 +18,12 @@ namespace FoxTunes
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
-        public IConfiguration Configuration { get; private set; }
-
-        public BooleanConfigurationElement MetaData { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
-            this.Configuration = core.Components.Configuration;
-            this.MetaData = this.Configuration.GetElement<BooleanConfigurationElement>(
-                MetaDataBehaviourConfiguration.SECTION,
-                MetaDataBehaviourConfiguration.ENABLE_ELEMENT
-            );
             base.InitializeComponent(core);
         }
 
@@ -40,16 +31,13 @@ namespace FoxTunes
         {
             get
             {
-                if (this.MetaData.Value)
+                if (this.LibraryManager.SelectedItem != null)
                 {
-                    if (this.LibraryManager.SelectedItem != null)
-                    {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, EDIT_METADATA, "Tag");
-                    }
-                    if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
-                    {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, EDIT_METADATA, "Tag");
-                    }
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, EDIT_METADATA, "Tag");
+                }
+                if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
+                {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, EDIT_METADATA, "Tag");
                 }
             }
         }
