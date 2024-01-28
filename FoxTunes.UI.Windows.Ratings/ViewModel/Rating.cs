@@ -217,18 +217,6 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnFileDataChanged()
         {
-            this.Bind();
-            if (this.FileDataChanged != null)
-            {
-                this.FileDataChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("FileData");
-        }
-
-        public event EventHandler FileDataChanged;
-
-        protected virtual void Bind()
-        {
             if (this.FileData == null)
             {
                 this.MetaDataItem = null;
@@ -237,18 +225,17 @@ namespace FoxTunes.ViewModel
             {
                 lock (this.FileData.MetaDatas)
                 {
-                    var metaDataItem = this.FileData.MetaDatas.FirstOrDefault(
-                        _metaDataItem => string.Equals(_metaDataItem.Name, CommonStatistics.Rating, StringComparison.OrdinalIgnoreCase)
-                    );
-                    if (metaDataItem == null)
-                    {
-                        metaDataItem = new MetaDataItem(CommonStatistics.Rating, MetaDataItemType.Tag);
-                        this.FileData.MetaDatas.Add(metaDataItem);
-                    }
-                    this.MetaDataItem = metaDataItem;
+                    this.MetaDataItem = this.FileData.GetOrAdd(CommonStatistics.Rating, MetaDataItemType.Tag);
                 }
             }
+            if (this.FileDataChanged != null)
+            {
+                this.FileDataChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("FileData");
         }
+
+        public event EventHandler FileDataChanged;
 
         protected virtual void Refresh()
         {

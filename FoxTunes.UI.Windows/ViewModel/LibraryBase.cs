@@ -224,34 +224,15 @@ namespace FoxTunes.ViewModel
             });
         }
 
-        public virtual async Task Refresh()
-        {
-            await this.RefreshItems().ConfigureAwait(false);
-            await Windows.Invoke(() =>
-            {
-                this.OnSelectedItemChanged();
-            }).ConfigureAwait(false);
-        }
-
-        protected virtual Task RefreshItems()
+        public virtual Task Refresh()
         {
             var task = new Func<Task>(async () =>
             {
-                var libraryHierarchy = this.LibraryManager.SelectedHierarchy;
-                if (libraryHierarchy == null || LibraryHierarchy.Empty.Equals(libraryHierarchy))
+                await this.RefreshItems().ConfigureAwait(false);
+                await Windows.Invoke(() =>
                 {
-                    return;
-                }
-                var items = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy);
-                if (this.Items == null)
-                {
-                    await Windows.Invoke(() => this.Items = new LibraryHierarchyNodeCollection(items)).ConfigureAwait(false);
-                }
-                else
-                {
-                    await Windows.Invoke(this.Items.Reset(items)).ConfigureAwait(false);
-                }
-                await this.RefreshStatus().ConfigureAwait(false);
+                    this.OnSelectedItemChanged();
+                }).ConfigureAwait(false);
             });
             if (this.IsInitialized && this.Items != null)
             {
@@ -261,6 +242,25 @@ namespace FoxTunes.ViewModel
             {
                 return task();
             }
+        }
+
+        protected virtual async Task RefreshItems()
+        {
+            var libraryHierarchy = this.LibraryManager.SelectedHierarchy;
+            if (libraryHierarchy == null || LibraryHierarchy.Empty.Equals(libraryHierarchy))
+            {
+                return;
+            }
+            var items = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy);
+            if (this.Items == null)
+            {
+                await Windows.Invoke(() => this.Items = new LibraryHierarchyNodeCollection(items)).ConfigureAwait(false);
+            }
+            else
+            {
+                await Windows.Invoke(this.Items.Reset(items)).ConfigureAwait(false);
+            }
+            await this.RefreshStatus().ConfigureAwait(false);
         }
 
         public virtual Task Reload()

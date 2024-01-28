@@ -170,25 +170,14 @@ namespace FoxTunes
             return this.Scan(playlistItems, mode);
         }
 
-        public async Task Scan(LibraryItem[] libraryItems, ReplayGainMode mode)
+        public async Task Scan(IFileData[] fileDatas, ReplayGainMode mode)
         {
-            using (var task = new ScanLibraryItemsTask(this, libraryItems, mode))
+            using (var task = new ScanTask(this, fileDatas, mode))
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
                 await task.Run().ConfigureAwait(false);
-                this.OnReport(libraryItems, task.ScannerItems);
-            }
-        }
-
-        public async Task Scan(PlaylistItem[] playlistItems, ReplayGainMode mode)
-        {
-            using (var task = new ScanPlaylistItemsTask(this, playlistItems, mode))
-            {
-                task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
-                await task.Run().ConfigureAwait(false);
-                this.OnReport(playlistItems, task.ScannerItems);
+                this.OnReport(fileDatas, task.ScannerItems);
             }
         }
 
@@ -240,7 +229,7 @@ namespace FoxTunes
             return this.Clear(playlistItems);
         }
 
-        public async Task Clear(LibraryItem[] libraryItems)
+        public async Task Clear(IFileData[] fileDatas)
         {
             var names = new[]
             {
@@ -249,11 +238,11 @@ namespace FoxTunes
                 CommonMetaData.ReplayGainTrackGain,
                 CommonMetaData.ReplayGainTrackPeak
             };
-            foreach (var libraryItem in libraryItems)
+            foreach (var fileData in fileDatas)
             {
-                lock (libraryItem.MetaDatas)
+                lock (fileData.MetaDatas)
                 {
-                    foreach (var metaDataItem in libraryItem.MetaDatas)
+                    foreach (var metaDataItem in fileData.MetaDatas)
                     {
                         if (!names.Contains(metaDataItem.Name, StringComparer.OrdinalIgnoreCase))
                         {
@@ -265,40 +254,7 @@ namespace FoxTunes
                 }
             }
             await this.MetaDataManager.Save(
-               libraryItems,
-               this.WriteTags.Value,
-               false,
-               names.ToArray()
-            ).ConfigureAwait(false);
-        }
-
-
-        public async Task Clear(PlaylistItem[] playlistItems)
-        {
-            var names = new[]
-            {
-                CommonMetaData.ReplayGainAlbumGain,
-                CommonMetaData.ReplayGainAlbumPeak,
-                CommonMetaData.ReplayGainTrackGain,
-                CommonMetaData.ReplayGainTrackPeak
-            };
-            foreach (var playlistItem in playlistItems)
-            {
-                lock (playlistItem.MetaDatas)
-                {
-                    foreach (var metaDataItem in playlistItem.MetaDatas)
-                    {
-                        if (!names.Contains(metaDataItem.Name, StringComparer.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-                        //This will be converted to NaN when written.
-                        metaDataItem.Value = string.Empty;
-                    }
-                }
-            }
-            await this.MetaDataManager.Save(
-               playlistItems,
+               fileDatas,
                this.WriteTags.Value,
                false,
                names.ToArray()
@@ -334,18 +290,18 @@ namespace FoxTunes
 
         public event ReportEventHandler Report;
 
-        private abstract class ScanTaskBase : BackgroundTask
+        private class ScanTask : BackgroundTask
         {
             public const string ID = "1112F788-99E4-4019-84D9-55B99BD2093E";
 
             public static readonly IBassReplayGainScannerFactory ScannerFactory = ComponentRegistry.Instance.GetComponent<IBassReplayGainScannerFactory>();
 
-            private ScanTaskBase() : base(ID)
+            private ScanTask() : base(ID)
             {
                 this.CancellationToken = new CancellationToken();
             }
 
-            public ScanTaskBase(BassReplayGainScannerBehaviour behaviour, IFileData[] fileDatas, ReplayGainMode mode) : this()
+            public ScanTask(BassReplayGainScannerBehaviour behaviour, IFileData[] fileDatas, ReplayGainMode mode) : this()
             {
                 this.Behaviour = behaviour;
                 this.FileDatas = fileDatas;
@@ -413,7 +369,7 @@ namespace FoxTunes
                 await this.WriteTags().ConfigureAwait(false);
             }
 
-            protected virtual Task<ISet<string>> WriteTags()
+            protected virtual async Task WriteTags()
             {
                 var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var scannerItem in this.ScannerItems)
@@ -472,11 +428,19 @@ namespace FoxTunes
                         }
                     }
                 }
-#if NET40
-                return TaskEx.FromResult<ISet<string>>(names);
-#else
-                return Task.FromResult<ISet<string>>(names);
-#endif
+                if (names.Any())
+                {
+                    var fileDatas = this.ScannerItems
+                        .Where(scannerItem => scannerItem.Status == ScannerItemStatus.Complete)
+                        .Select(scannerItem => this.GetFileData(scannerItem))
+                        .ToArray();
+                    await this.Behaviour.MetaDataManager.Save(
+                        fileDatas,
+                        this.Behaviour.WriteTags.Value,
+                        false,
+                        names.ToArray()
+                    ).ConfigureAwait(false);
+                }
             }
 
             protected virtual IFileData GetFileData(ScannerItem scannerItem)
@@ -488,102 +452,6 @@ namespace FoxTunes
             {
                 this.CancellationToken.Cancel();
                 base.OnCancellationRequested();
-            }
-        }
-
-        private class ScanLibraryItemsTask : ScanTaskBase
-        {
-            public ScanLibraryItemsTask(BassReplayGainScannerBehaviour behaviour, LibraryItem[] libraryItems, ReplayGainMode mode) : base(behaviour, libraryItems, mode)
-            {
-
-            }
-
-            public override bool Visible
-            {
-                get
-                {
-                    return true;
-                }
-            }
-
-            public override bool Cancellable
-            {
-                get
-                {
-                    return true;
-                }
-            }
-
-            public IPlaylistCache PlaylistCache { get; private set; }
-
-            public override void InitializeComponent(ICore core)
-            {
-                this.PlaylistCache = core.Components.PlaylistCache;
-                base.InitializeComponent(core);
-            }
-
-            protected override async Task<ISet<string>> WriteTags()
-            {
-                var names = await base.WriteTags().ConfigureAwait(false);
-                if (names.Any())
-                {
-                    var libraryItems = this.ScannerItems
-                        .Where(scannerItem => scannerItem.Status == ScannerItemStatus.Complete)
-                        .Select(scannerItem => this.GetFileData(scannerItem))
-                        .OfType<LibraryItem>()
-                        .ToArray();
-                    await this.Behaviour.MetaDataManager.Save(
-                        libraryItems,
-                        this.Behaviour.WriteTags.Value,
-                        false,
-                        names.ToArray()
-                    ).ConfigureAwait(false);
-                }
-                return names;
-            }
-        }
-
-        private class ScanPlaylistItemsTask : ScanTaskBase
-        {
-            public ScanPlaylistItemsTask(BassReplayGainScannerBehaviour behaviour, PlaylistItem[] playlistItems, ReplayGainMode mode) : base(behaviour, playlistItems, mode)
-            {
-
-            }
-
-            public override bool Visible
-            {
-                get
-                {
-                    return true;
-                }
-            }
-
-            public override bool Cancellable
-            {
-                get
-                {
-                    return true;
-                }
-            }
-
-            protected override async Task<ISet<string>> WriteTags()
-            {
-                var names = await base.WriteTags().ConfigureAwait(false);
-                if (names.Any())
-                {
-                    var playlistItems = this.ScannerItems
-                        .Where(scannerItem => scannerItem.Status == ScannerItemStatus.Complete)
-                        .Select(scannerItem => this.GetFileData(scannerItem))
-                        .OfType<PlaylistItem>()
-                        .ToArray();
-                    await this.Behaviour.MetaDataManager.Save(
-                        playlistItems,
-                        this.Behaviour.WriteTags.Value,
-                        false,
-                        names.ToArray()
-                    ).ConfigureAwait(false);
-                }
-                return names;
             }
         }
     }
