@@ -342,13 +342,13 @@ namespace FoxTunes
             {
                 default:
                 case BANDS_10_OPTION:
-                    return 160;
+                    return 280;
                 case BANDS_14_OPTION:
-                    return 196;
+                    return 364;
                 case BANDS_21_OPTION:
-                    return 252;
+                    return 516;
                 case BANDS_31_OPTION:
-                    return 372;
+                    return 728;
             }
         }
     }
