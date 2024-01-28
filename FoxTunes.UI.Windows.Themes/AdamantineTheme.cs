@@ -62,14 +62,14 @@ namespace FoxTunes
                     ColorPaletteRole.Visualization,
                     Strings.AdamantineTheme_ColorPalette_Default_Name,
                     Strings.AdamantineTheme_ColorPalette_Default_Description,
-                    Strings.AdamantineTheme_ColorPalette_Default_Value
+                    Resources.White
                 ),
                 new ColorPalette(
                     ID + "_BBBB",
                     ColorPaletteRole.Visualization,
                     Strings.AdamantineTheme_ColorPalette_Gradient1_Name,
                     Strings.AdamantineTheme_ColorPalette_Gradient1_Description,
-                    Strings.AdamantineTheme_ColorPalette_Gradient1_Value
+                    Resources.Transparent_White
                 ),
             };
         }
