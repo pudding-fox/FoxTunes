@@ -6,7 +6,21 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [TestFixture]
-    public abstract class TestBase
+    public abstract class TestBase : TestBase<HeadlessCore>
+    {
+        protected TestBase() : this(DEFAULT)
+        {
+
+        }
+
+        protected TestBase(long configuration) : base(configuration)
+        {
+
+        }
+    }
+
+    public abstract class TestBase<TCore>
+        where TCore : Core, new()
     {
         public const long DEFAULT = 0;
 
@@ -52,7 +66,7 @@ namespace FoxTunes
         [SetUp]
         public virtual void SetUp()
         {
-            this.Core = new TestCore();
+            this.Core = new TCore();
             this.Core.Load();
             if (this.Core.Factories.Database.Test() != DatabaseTestResult.OK)
             {

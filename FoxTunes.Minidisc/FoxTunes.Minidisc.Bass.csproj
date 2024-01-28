@@ -2,16 +2,18 @@
 
   <PropertyGroup>
     <TargetFrameworks>net40;net462</TargetFrameworks>
-    <AssemblyName>FoxTunes.Minidisc</AssemblyName>
+    <AssemblyName>FoxTunes.Minidisc.Bass</AssemblyName>
     <OutputPath>..\distribution\$(Platform)\</OutputPath>
+	<Platforms>x86;x64</Platforms>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
     <AssemblyVersion>2.3.1.0</AssemblyVersion>
-    <Platforms>x86;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
+	<!-- We need the encoder to create wav files. -->
+	<ProjectReference Include="..\FoxTunes.Encoder.Bass\FoxTunes.Encoder.Bass.csproj" />
   </ItemGroup>
 
   <ItemGroup>

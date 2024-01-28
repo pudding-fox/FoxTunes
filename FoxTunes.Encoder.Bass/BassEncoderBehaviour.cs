@@ -124,7 +124,7 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            return this.Encode(libraryItems, profile);
+            return this.Encode(libraryItems, profile, true);
         }
 
         public Task EncodePlaylist(string profile)
@@ -146,10 +146,10 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            return this.Encode(playlistItems, profile);
+            return this.Encode(playlistItems, profile, true);
         }
 
-        public async Task Encode(IFileData[] fileDatas, string profile)
+        public async Task<EncoderItem[]> Encode(IFileData[] fileDatas, string profile, bool report)
         {
             var factory = new EncoderItemFactory();
             factory.InitializeComponent(this.Core);
@@ -161,14 +161,18 @@ namespace FoxTunes
             catch (OperationCanceledException)
             {
                 //Browse dialog was cancelled.
-                return;
+                return new EncoderItem[] { };
             }
             using (var task = new EncodeTask(this, fileDatas, encoderItems))
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
                 await task.Run().ConfigureAwait(false);
-                this.OnReport(task.EncoderItems);
+                if (report)
+                {
+                    this.OnReport(task.EncoderItems);
+                }
+                return task.EncoderItems;
             }
         }
 

@@ -3,21 +3,25 @@ using MD.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class MinidiscReport : BaseComponent, IReport
+    public class MinidiscReport : BaseComponent, IReport, IActionable
     {
-        public MinidiscReport(IDevice device, IDisc disc)
+        public MinidiscReport(MinidiscBehaviour behaviour, IDevice device, IActions actions)
         {
+            this.Behaviour = behaviour;
             this.Device = device;
-            this.Disc = disc;
-            this.Tracks = disc.Tracks.ToDictionary(track => Guid.NewGuid());
+            this.Actions = actions;
+            this.Tracks = actions.UpdatedDisc.Tracks.ToDictionary(track => Guid.NewGuid());
         }
+
+        public MinidiscBehaviour Behaviour { get; private set; }
 
         public IDevice Device { get; private set; }
 
-        public IDisc Disc { get; private set; }
+        public IActions Actions { get; private set; }
 
         public Dictionary<Guid, ITrack> Tracks { get; private set; }
 
@@ -25,7 +29,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.Disc.Title;
+                return this.Actions.UpdatedDisc.Title;
             }
         }
 
@@ -65,22 +69,48 @@ namespace FoxTunes
             {
                 return key =>
                 {
-                    var track = default(ITrack);
-                    if (!this.Tracks.TryGetValue(key, out track))
-                    {
-                        return;
-                    }
-                    this.Play(track);
+                    //Nothing to do.
                 };
             }
         }
 
-        protected virtual void Play(ITrack track)
+        #region IActionable
+
+        string IActionable.Description
         {
-            var toolManager = new ToolManager();
-            var playbackManager = new global::MD.Net.PlaybackManager(toolManager);
-            playbackManager.Play(this.Device, track);
+            get
+            {
+                if (this.Actions.Count > 0)
+                {
+                    return Strings.MinidiscReport_Write;
+                }
+                else
+                {
+                    return Strings.MinidiscReport_Close;
+                }
+            }
         }
+
+        Task<bool> IActionable.Task
+        {
+            get
+            {
+                if (this.Actions.Count > 0)
+                {
+                    return this.Behaviour.WriteDisc(this.Device, this.Actions);
+                }
+                else
+                {
+#if NET40
+                    return TaskEx.FromResult(true);
+#else
+                    return Task.FromResult(true);
+#endif
+                }
+            }
+        }
+
+        #endregion
 
         public class ReportRow : IReportRow
         {

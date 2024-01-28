@@ -2,24 +2,32 @@
 using MD.Net;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class MinidiscBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent, IBackgroundTaskSource
     {
         public const string VIEW_DISC = "AAAA";
 
         public const string ERASE_DISC = "BBBB";
 
-        public const string SEND_TO_DISC = "CCCC";
+        public const string SEND_TO_DISC_SP = "CCCC";
+
+        public const string SEND_TO_DISC_LP2 = "DDDD";
+
+        public const string SEND_TO_DISC_LP4 = "EEEE";
 
         public ICore Core { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IReportEmitter ReportEmitter { get; private set; }
+
+        public IUserInterface UserInterface { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -30,6 +38,7 @@ namespace FoxTunes
             this.Core = core;
             this.PlaylistManager = core.Managers.Playlist;
             this.ReportEmitter = core.Components.ReportEmitter;
+            this.UserInterface = core.Components.UserInterface;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MinidiscBehaviourConfiguration.SECTION,
@@ -48,7 +57,9 @@ namespace FoxTunes
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, ERASE_DISC, Strings.MinidiscBehaviour_EraseDisc, path: Strings.MinidiscBehaviour_Path);
                     if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
                     {
-                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, SEND_TO_DISC, Strings.MinidiscBehaviour_SendToDisc, path: Strings.MinidiscBehaviour_Path);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, SEND_TO_DISC_SP, string.Format(Strings.MinidiscBehaviour_SendToDisc, "SP"), path: Strings.MinidiscBehaviour_Path);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, SEND_TO_DISC_LP2, string.Format(Strings.MinidiscBehaviour_SendToDisc, "LP2"), path: Strings.MinidiscBehaviour_Path);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, SEND_TO_DISC_LP4, string.Format(Strings.MinidiscBehaviour_SendToDisc, "LP4"), path: Strings.MinidiscBehaviour_Path);
                     }
                 }
             }
@@ -62,8 +73,12 @@ namespace FoxTunes
                     return this.ViewDisc();
                 case ERASE_DISC:
                     return this.EraseDisc();
-                case SEND_TO_DISC:
-                    return this.SendToDisc();
+                case SEND_TO_DISC_SP:
+                    return this.SendToDisc(Compression.None);
+                case SEND_TO_DISC_LP2:
+                    return this.SendToDisc(Compression.LP2);
+                case SEND_TO_DISC_LP4:
+                    return this.SendToDisc(Compression.LP4);
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -75,19 +90,45 @@ namespace FoxTunes
         public async Task ViewDisc()
         {
             var task = await this.OpenDisc().ConfigureAwait(false);
-            if (!task.Success)
+            if (task.Disc == null)
             {
                 return;
             }
-            this.OnReport(task.Device, task.Disc);
+            var actions = new Actions(task.Device, task.Disc, task.Disc, Actions.None);
+            this.ConfirmActions(task.Device, actions);
         }
 
-        public Task EraseDisc()
+        public async Task<bool> EraseDisc()
         {
-            throw new NotImplementedException();
+            if (!this.UserInterface.Confirm(Strings.MinidiscBehaviour_ConfirmEraseDisc))
+            {
+                return false;
+            }
+            using (var task = new EraseMinidiscTask())
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run().ConfigureAwait(false);
+                return task.Result != null && task.Result.Status == ResultStatus.Success;
+            }
         }
 
-        public async Task SendToDisc()
+        public async Task<bool> WriteDisc(IDevice device, IActions actions)
+        {
+            if (!this.UserInterface.Confirm(Strings.MinidiscBehaviour_ConfirmWriteDisc))
+            {
+                return false;
+            }
+            using (var task = new WriteMinidiscTask(device, actions))
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run().ConfigureAwait(false);
+                return task.Result != null && task.Result.Status == ResultStatus.Success;
+            }
+        }
+
+        public async Task SendToDisc(Compression compression)
         {
             if (this.PlaylistManager.SelectedItems == null)
             {
@@ -98,12 +139,28 @@ namespace FoxTunes
             {
                 return;
             }
-            var task = await this.OpenDisc().ConfigureAwait(false);
-            if (!task.Success)
+            var fileNames = await this.GetWaveFiles(playlistItems).ConfigureAwait(false);
+            if (!fileNames.Any())
             {
                 return;
             }
-            this.OnReport(task.Device, task.Disc);
+            var task = await this.OpenDisc().ConfigureAwait(false);
+            if (task.Disc == null)
+            {
+                return;
+            }
+            var device = task.Device;
+            var currentDisc = task.Disc;
+            var updatedDisc = currentDisc.Clone();
+            foreach (var fileName in fileNames)
+            {
+                updatedDisc.Tracks.Add(fileName, compression);
+            }
+            var toolManager = new ToolManager();
+            var formatManager = new FormatManager(toolManager);
+            var actionBuilder = new ActionBuilder(formatManager);
+            var actions = actionBuilder.GetActions(device, currentDisc, updatedDisc);
+            this.ConfirmActions(task.Device, actions);
         }
 
         protected virtual async Task<OpenMinidiscTask> OpenDisc()
@@ -117,11 +174,31 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnReport(IDevice device, IDisc disc)
+        protected virtual void ConfirmActions(IDevice device, IActions actions)
         {
-            var report = new MinidiscReport(device, disc);
+            var report = new MinidiscReport(this, device, actions);
             report.InitializeComponent(this.Core);
             this.ReportEmitter.Send(report);
+        }
+
+        public async Task<string[]> GetWaveFiles(IFileData[] fileDatas)
+        {
+            var fileNames = new List<string>();
+            var behaviour = ComponentRegistry.Instance.GetComponent<BassEncoderBehaviour>();
+            var encoderItems = await behaviour.Encode(fileDatas, RawProfile.PCM16, false).ConfigureAwait(false);
+            foreach (var encoderItem in encoderItems)
+            {
+                if (encoderItem.Status != EncoderItemStatus.Complete)
+                {
+                    //If something went wrong then present the conversion log.
+                    var report = new BassEncoderReport(encoderItems);
+                    report.InitializeComponent(this.Core);
+                    await this.ReportEmitter.Send(report).ConfigureAwait(false);
+                    return new string[] { };
+                }
+                fileNames.Add(encoderItem.OutputFileName);
+            }
+            return fileNames.ToArray();
         }
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
@@ -138,58 +215,6 @@ namespace FoxTunes
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return MinidiscBehaviourConfiguration.GetConfigurationSections();
-        }
-
-        public class OpenMinidiscTask : BackgroundTask
-        {
-            public const string ID = "7AE3FD56-9ADA-42F8-8A47-FE8BF5CDA54A";
-
-            public OpenMinidiscTask() : base(ID)
-            {
-
-            }
-
-            public override bool Visible
-            {
-                get
-                {
-                    return true;
-                }
-            }
-
-            public IDevice Device { get; private set; }
-
-            public IDisc Disc { get; private set; }
-
-            public bool Success { get; private set; }
-
-            protected override Task OnStarted()
-            {
-                this.Name = Strings.OpenMinidiscTask_Name;
-                return base.OnStarted();
-            }
-
-            protected override Task OnRun()
-            {
-                var toolManager = new ToolManager();
-                var deviceManager = new DeviceManager(toolManager);
-                var devices = deviceManager.GetDevices();
-                this.Device = devices.FirstOrDefault();
-                if (this.Device != null)
-                {
-                    var discManager = new DiscManager(toolManager);
-                    this.Disc = discManager.GetDisc(this.Device);
-                    if (this.Disc != null)
-                    {
-                        this.Success = true;
-                    }
-                }
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
         }
     }
 }
