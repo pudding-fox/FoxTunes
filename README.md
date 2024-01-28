@@ -1,8 +1,8 @@
 # FoxTunes
 A **portable, modular music player and converter** using the BASS framework for Windows XP/.../10/11.
 
-The main release is [FoxTunes-2.8.3-net462.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.8.3/FoxTunes-2.8.3-net462.zip).  
-For additional plugins, download [FoxTunes-2.8.3-Plugins-net462.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.8.3/FoxTunes-2.8.3-Plugins-net462.zip) (extract and copy required folders to the FoxTunes\lib directory).
+The main release is [FoxTunes-2.9.0-net462.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.9.0/FoxTunes-2.9.0-net462.zip).  
+For additional plugins, download [FoxTunes-2.9.0-Plugins-net462.zip](https://github.com/Raimusoft/FoxTunes/releases/download/2.9.0/FoxTunes-2.9.0-Plugins-net462.zip) (extract and copy required folders to the FoxTunes\lib directory).
 
 There is also a [Microsoft Store](https://www.microsoft.com/store/productId/9MWPJTXWTXLG) package.
 
@@ -30,6 +30,7 @@ You can save and switch between different layouts by activating in the settings 
 Additional windows can be added and customized.
 
 ![Main](https://user-images.githubusercontent.com/13859177/216791727-5e778da7-5d69-43ee-819b-7d2ead898a67.png)
+![Main](https://user-images.githubusercontent.com/13859177/218753844-7e1b707f-8406-4cdc-a7af-709f9d03bb3d.PNG)
 
 ## Scriptable
 
@@ -107,6 +108,7 @@ It needs at least;
 * **Memory** - Play tracks from memory.
   * Improves playback over a network or other slow storage.
 * **MetaDataEditor** - A simple batch mode tag editor. Can embed artwork.
+* **MetaDataViewer** - A simple meta data viewer.
 * **Minidisc** - Write physical minidiscs using a compatible netmd device.
   * Uses the MD.Net library: https://github.com/aidan-g/MD.Net
 * **MOD** - Play various mod music formats.
