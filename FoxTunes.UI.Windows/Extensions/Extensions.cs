@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Interop;
@@ -77,6 +78,49 @@ namespace FoxTunes
                 element = VisualTreeHelper.GetParent(element) as FrameworkElement;
             } while (element != null);
             return default(T);
+        }
+
+        public static bool Disconnect(this FrameworkElement element)
+        {
+            var parent = VisualTreeHelper.GetParent(element);
+            if (parent == null)
+            {
+                return false;
+            }
+            else if (parent is Panel panel)
+            {
+                if (panel.Children.Contains(element))
+                {
+                    panel.Children.Remove(element);
+                    return true;
+                }
+            }
+            else if (parent is Decorator decorator)
+            {
+                if (object.ReferenceEquals(decorator.Child, element))
+                {
+                    decorator.Child = null;
+                    return true;
+                }
+            }
+            else if (parent is ContentPresenter contentPresenter)
+            {
+                if (object.ReferenceEquals(contentPresenter.Content, element))
+                {
+                    contentPresenter.Content = null;
+                    return true;
+                }
+            }
+            else if (parent is ContentControl contentControl)
+            {
+                if (object.ReferenceEquals(contentControl.Content, element))
+                {
+                    contentControl.Content = null;
+                    return true;
+                }
+            }
+            //TODO: Unknown parent type.
+            return false;
         }
 
         public static T FindResource<T>(this FrameworkElement element, object resourceKey) where T : class

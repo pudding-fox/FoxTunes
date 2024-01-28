@@ -188,6 +188,10 @@ namespace FoxTunes
 
             protected virtual ContentControl CreateContentFromTabItem(TabItem tabItem)
             {
+                if (tabItem.Content is FrameworkElement element)
+                {
+                    element.Disconnect();
+                }
                 var contentControl = new ContentControl()
                 {
                     Content = tabItem.Content
