@@ -97,15 +97,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enabled.
-        /// </summary>
-        internal static string MiniPlayerBehaviourConfiguration_Enabled {
-            get {
-                return ResourceManager.GetString("MiniPlayerBehaviourConfiguration.Enabled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Playing Script.
         /// </summary>
         internal static string MiniPlayerBehaviourConfiguration_NowPlayingScript {

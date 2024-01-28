@@ -13,12 +13,12 @@
         <LocalViewModel:MiniPlayer x:Key="ViewModel"></LocalViewModel:MiniPlayer>
     </UserControl.Resources>
     <Grid>
-        <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding Enabled.Value, Source={StaticResource ViewModel}}">
+        <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding Enabled, Source={StaticResource ViewModel}}">
             <ContentControl Width="20" Height="20">
                 <ContentControl.Style>
                     <Style TargetType="{x:Type ContentControl}">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Enabled.Value, Source={StaticResource ViewModel}}" Value="False">
+                            <DataTrigger Binding="{Binding Enabled, Source={StaticResource ViewModel}}" Value="False">
                                 <Setter Property="Content">
                                     <Setter.Value>
                                         <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
@@ -33,7 +33,7 @@
                                     </Setter.Value>
                                 </Setter>
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding Enabled.Value, Source={StaticResource ViewModel}}" Value="True">
+                            <DataTrigger Binding="{Binding Enabled, Source={StaticResource ViewModel}}" Value="True">
                                 <Setter Property="Content">
                                     <Setter.Value>
                                         <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">

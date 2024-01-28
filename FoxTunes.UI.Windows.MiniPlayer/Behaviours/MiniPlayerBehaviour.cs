@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -29,13 +30,41 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public BooleanConfigurationElement Enabled { get; private set; }
-
         public BooleanConfigurationElement Topmost { get; private set; }
 
         public BooleanConfigurationElement ShowArtwork { get; private set; }
 
         public BooleanConfigurationElement ShowPlaylist { get; private set; }
+
+        public bool Enabled
+        {
+            get
+            {
+                return Windows.Registrations.IsVisible(MiniWindow.ID);
+            }
+            set
+            {
+                if (value)
+                {
+                    var task = this.Enable();
+                }
+                else
+                {
+                    var task = this.Disable();
+                }
+            }
+        }
+
+        protected virtual void OnEnabledChanged()
+        {
+            if (this.EnabledChanged != null)
+            {
+                this.EnabledChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Enabled");
+        }
+
+        public event EventHandler EnabledChanged;
 
         protected virtual Task Enable()
         {
@@ -43,6 +72,7 @@ namespace FoxTunes
             {
                 Windows.Registrations.Hide(MainWindow.ID);
                 Windows.Registrations.Show(MiniWindow.ID);
+                this.OnEnabledChanged();
             });
         }
 
@@ -52,6 +82,7 @@ namespace FoxTunes
             {
                 Windows.Registrations.Hide(MiniWindow.ID);
                 Windows.Registrations.Show(MainWindow.ID);
+                this.OnEnabledChanged();
             });
         }
 
@@ -61,25 +92,6 @@ namespace FoxTunes
             this.KeyBindingsBehaviour = ComponentRegistry.Instance.GetComponent<IKeyBindingsBehaviour>();
             this.Core = core;
             this.Configuration = core.Components.Configuration;
-            this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
-                MiniPlayerBehaviourConfiguration.SECTION,
-                MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT
-            );
-            this.Enabled.ConnectValue(async value =>
-            {
-                //TODO: This code is actually responsible for creating the main application window, 
-                //TODO: It should really be WindowsUserInterface.Show().
-                //Ensure resources are loaded.
-                await ThemeLoader.EnsureTheme().ConfigureAwait(false);
-                if (value)
-                {
-                    await this.Enable().ConfigureAwait(false);
-                }
-                else
-                {
-                    await this.Disable().ConfigureAwait(false);
-                }
-            });
             this.Topmost = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.TOPMOST_ELEMENT
@@ -107,13 +119,10 @@ namespace FoxTunes
         {
             get
             {
-                if (this.Enabled.Value)
-                {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, TOPMOST, this.Topmost.Name, attributes: this.Topmost.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, SHOW_ARTWORK, this.ShowArtwork.Name, attributes: this.ShowArtwork.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, SHOW_PLAYLIST, this.ShowPlaylist.Name, attributes: this.ShowPlaylist.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, QUIT, Strings.MiniPlayerBehaviour_Quit, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
-                }
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, TOPMOST, this.Topmost.Name, attributes: this.Topmost.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, SHOW_ARTWORK, this.ShowArtwork.Name, attributes: this.ShowArtwork.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, SHOW_PLAYLIST, this.ShowPlaylist.Name, attributes: this.ShowPlaylist.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, QUIT, Strings.MiniPlayerBehaviour_Quit, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
             }
         }
 
