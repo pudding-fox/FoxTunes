@@ -11,11 +11,13 @@
              Width="250">
     <Windows:UIComponentBase.Resources>
         <ViewModel:BackgroundTasks x:Key="ViewModel"></ViewModel:BackgroundTasks>
+        <ViewModel:ThemeInfo x:Key="ThemeInfo"></ViewModel:ThemeInfo>
+        <ViewModel:CornerRadiusConverter x:Key="CornerRadiusConverter"></ViewModel:CornerRadiusConverter>
     </Windows:UIComponentBase.Resources>
     <Border Background="{DynamicResource NormalBrush}" 
                     BorderBrush="{DynamicResource NormalBorderBrush}" 
                     BorderThickness="1" 
-                    CornerRadius="8,8,0,0" 
+                    CornerRadius="{Binding CornerRadius, Converter={StaticResource CornerRadiusConverter}, ConverterParameter={x:Static ViewModel:CornerRadiusMask.Top}, Mode=OneWay, Source={StaticResource ThemeInfo}}" 
                     Padding="10">
         <Border.Style>
             <Style TargetType="{x:Type Border}">

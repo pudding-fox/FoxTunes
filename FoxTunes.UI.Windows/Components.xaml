@@ -8,6 +8,7 @@
              d:DesignHeight="450" d:DesignWidth="800" IsVisibleChanged="OnIsVisibleChanged">
     <UserControl.Resources>
         <ViewModel:Components x:Key="ViewModel"/>
+        <ViewModel:ThemeInfo x:Key="ThemeInfo"/>
     </UserControl.Resources>
     <Popup PlacementTarget="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" 
 		Placement="Center" 
@@ -29,7 +30,7 @@
                 Background="{DynamicResource NormalBrush}" 
 			    BorderBrush="{DynamicResource NormalBorderBrush}" 
 			    BorderThickness="1" 
-			    CornerRadius="8,8,3,3" 
+			    CornerRadius="{Binding CornerRadius, Mode=OneWay, Source={StaticResource ThemeInfo}}" 
 			    Padding="10">
             <Grid>
                 <Grid.RowDefinitions>
