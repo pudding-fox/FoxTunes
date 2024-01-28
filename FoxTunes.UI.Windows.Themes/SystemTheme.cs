@@ -1,13 +1,11 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows;
 
 namespace FoxTunes
 {
-    [Component(ID, ComponentSlots.None)]
     [WindowsUserInterfaceDependency]
-    [ComponentRelease(ReleaseType.Minimal)]
+    [ComponentPreference(ReleaseType.Minimal)]
     public class SystemTheme : ThemeBase
     {
         public const string ID = "392B2FEE-B1E5-4776-AF3A-C28260EE8E81";

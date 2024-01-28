@@ -70,7 +70,7 @@ namespace FoxTunes
                     continue;
                 }
                 var name = attribute.Name;
-                var isDefault = attribute.Default;
+                var isDefault = ComponentRegistry.Instance.IsDefault(component);
                 if (string.IsNullOrEmpty(name))
                 {
                     name = component.GetType().FullName;

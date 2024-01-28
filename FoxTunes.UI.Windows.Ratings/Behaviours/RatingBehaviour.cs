@@ -11,7 +11,8 @@ using System.Windows.Markup;
 
 namespace FoxTunes
 {
-    [Component(ID, ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
+    [ComponentPriority(ComponentPriorityAttribute.LOW)]
+    [Component(ID)]
     [WindowsUserInterfaceDependency]
     public class RatingBehaviour : StandardBehaviour, IInvocableComponent, IUIPlaylistColumnProvider, IDatabaseInitializer
     {

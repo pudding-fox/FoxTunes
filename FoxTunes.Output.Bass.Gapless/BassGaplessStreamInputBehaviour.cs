@@ -6,7 +6,7 @@ using System.IO;
 
 namespace FoxTunes
 {
-    [Component("9B40FE6A-89F1-4F97-888C-05D7B34EC42A", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassGaplessStreamInputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    [Component("679D9459-BBCE-4D95-BB65-DD20C335719C", ComponentSlots.MetaData, @default: true)]
+    [ComponentPreference(ComponentPreferenceAttribute.DEFAULT)]
+    [Component("679D9459-BBCE-4D95-BB65-DD20C335719C", ComponentSlots.MetaData)]
     public class TagLibMetaDataSourceFactory : MetaDataSourceFactory
     {
         public BooleanConfigurationElement Extended { get; private set; }

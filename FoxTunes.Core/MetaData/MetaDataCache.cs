@@ -9,7 +9,7 @@ namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
     //Setting PRIORITY_HIGH so the the cache is cleared before being re-queried.
-    [Component("FD73BE5F-F7DF-4990-B95B-80190B557CD0", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     public class MetaDataCache : StandardComponent, IMetaDataCache, IDisposable
     {
         public static readonly KeyLock<MetaDataCacheKey> KeyLock = new KeyLock<MetaDataCacheKey>();

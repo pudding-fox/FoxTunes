@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    [Component("1A67B4C8-7392-4487-9DDD-75E02EC4807E", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
+    [ComponentPriority(ComponentPriorityAttribute.LOW)]
     public class BassStreamProvider : StandardComponent, IBassStreamProvider
     {
         public virtual IEnumerable<Type> SupportedInputs

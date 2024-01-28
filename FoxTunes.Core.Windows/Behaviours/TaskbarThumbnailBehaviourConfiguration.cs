@@ -10,7 +10,6 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(SECTION, Strings.WindowsConfiguration_Section)
                 .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, Strings.TaskbarThumbnailBehaviourConfiguration_Enabled).WithValue(false)
             );

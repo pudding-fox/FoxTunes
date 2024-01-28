@@ -3,7 +3,8 @@ using Noesis.Javascript;
 
 namespace FoxTunes
 {
-    [Component("8D4693E0-6416-4B33-9DE7-89116D15F5EA", ComponentSlots.ScriptingRuntime, @default: true)]
+    [ComponentPreference(ComponentPreferenceAttribute.DEFAULT)]
+    [Component("8D4693E0-6416-4B33-9DE7-89116D15F5EA", ComponentSlots.ScriptingRuntime)]
     //TODO: Noesis.Javascript.dll targets x86 
     [PlatformDependency(Architecture = ProcessorArchitecture.X86)]
     public class JSScriptingRuntime : ScriptingRuntime

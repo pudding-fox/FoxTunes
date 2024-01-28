@@ -35,7 +35,6 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(SECTION, Strings.BassOutputConfiguration_Section)
                 .WithElement(new SelectionConfigurationElement(RATE_ELEMENT, Strings.BassOutputConfiguration_Rate, path: Strings.General_Advanced).WithOptions(GetRateOptions()))
                 .WithElement(new SelectionConfigurationElement(DEPTH_ELEMENT, Strings.BassOutputConfiguration_Depth, path: Strings.General_Advanced).WithOptions(GetDepthOptions()))
@@ -47,7 +46,7 @@ namespace FoxTunes
                 .WithElement(new BooleanConfigurationElement(VOLUME_ENABLED_ELEMENT, Strings.BassOutputConfiguration_Volume, path: Strings.General_Advanced).WithValue(false))
                 .WithElement(new DoubleConfigurationElement(VOLUME_ELEMENT, Strings.BassOutputConfiguration_VolumeLevel, path: Strings.General_Advanced).WithValue(1).WithValidationRule(new DoubleValidationRule(0, 1, 0.01)).DependsOn(SECTION, VOLUME_ENABLED_ELEMENT))
                 .WithElement(new IntegerConfigurationElement(RESAMPLE_QUALITY_ELEMENT, Strings.BassOutputConfiguration_ResampleQuality, path: Strings.General_Advanced).WithValue(2).WithValidationRule(new IntegerValidationRule(1, 10)))
-                .WithElement(new BooleanConfigurationElement(DEVICE_MONITOR_ELEMENT, Strings.BassOutputConfiguration_DeviceMonitor, path: Strings.General_Advanced).WithValue(releaseType == ReleaseType.Default)
+                .WithElement(new BooleanConfigurationElement(DEVICE_MONITOR_ELEMENT, Strings.BassOutputConfiguration_DeviceMonitor, path: Strings.General_Advanced).WithValue(Publication.ReleaseType == ReleaseType.Default)
             );
         }
 
@@ -71,10 +70,9 @@ namespace FoxTunes
 
         public static IEnumerable<SelectionConfigurationOption> GetDepthOptions()
         {
-            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             var i16 = new SelectionConfigurationOption(DEPTH_16_OPTION, "16bit");
             var f32 = new SelectionConfigurationOption(DEPTH_32_OPTION, "32bit floating point");
-            if (releaseType == ReleaseType.Minimal)
+            if (Publication.ReleaseType == ReleaseType.Minimal)
             {
                 i16.Default();
             }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [Component("B0D25121-4CB4-4D0C-9130-A67AF9D2AFEA", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
+    [ComponentPriority(ComponentPriorityAttribute.LOW)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassAsioStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IDisposable
     {

@@ -497,6 +497,16 @@ namespace FoxTunes
                     PackageFlags.Default | PackageFlags.Minimal
                 ),
                 new Package(
+                     "v8net",
+                     new PackageElement[]
+                     {
+                        "FoxTunes.Scripting.JS.V8Net.dll",
+                        "V8.Net.dll",
+                        "x86/V8_Net_Proxy_x86.dll",
+                        "x64/V8_Net_Proxy_x64.dll"
+                     }
+                 ),
+                new Package(
                     "layout",
                     new PackageElement[]
                     {

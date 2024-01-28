@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    [Component("7D83EFFF-94BA-4CD4-A737-0AB635364F86", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassDirectSoundStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {

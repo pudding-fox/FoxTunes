@@ -3,8 +3,9 @@ using Microsoft.ClearScript.V8;
 
 namespace FoxTunes
 {
-    [Component("BA421DD1-22AB-4E39-82FA-55BFD95EE768", ComponentSlots.ScriptingRuntime)]
+    [ComponentPreference(ComponentPreferenceAttribute.NORMAL)]
     [PlatformDependency(Major = 6, Minor = 0)]
+    [Component("BA421DD1-22AB-4E39-82FA-55BFD95EE768", ComponentSlots.ScriptingRuntime)]
     public class JSScriptingRuntime : ScriptingRuntime
     {
         public ICore Core { get; private set; }

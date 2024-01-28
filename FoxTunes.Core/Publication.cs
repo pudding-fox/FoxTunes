@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
+using System.Configuration;
 using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
@@ -119,5 +121,37 @@ namespace FoxTunes
                 return _StoragePath.Value;
             }
         }
+
+        private static readonly Lazy<ReleaseType> _ReleaseType = new Lazy<ReleaseType>(() =>
+        {
+            try
+            {
+                var value = ConfigurationManager.AppSettings.Get("ReleaseType");
+                var result = default(ReleaseType);
+                if (string.IsNullOrEmpty(value) || !Enum.TryParse<ReleaseType>(value, out result))
+                {
+                    return ReleaseType.Default;
+                }
+                return result;
+            }
+            catch
+            {
+                return ReleaseType.Default;
+            }
+        });
+
+        public static ReleaseType ReleaseType
+        {
+            get
+            {
+                return _ReleaseType.Value;
+            }
+        }
+    }
+
+    public enum ReleaseType : byte
+    {
+        Default = 0,
+        Minimal = 1
     }
 }

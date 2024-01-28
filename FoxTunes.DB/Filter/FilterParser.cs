@@ -86,7 +86,7 @@ namespace FoxTunes
             return FilterParserConfiguration.GetConfigurationSections();
         }
 
-        [Component("219DC49B-0916-4820-BDE2-9354A9586753", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
+        [ComponentPriority(ComponentPriorityAttribute.LOW)]
         [ComponentDependency(Slot = ComponentSlots.Database)]
         public class DefaultFilterParserProvider : FilterParserProvider
         {
@@ -142,7 +142,7 @@ namespace FoxTunes
             }
         }
 
-        [Component("E49288CB-3FDA-4AE3-862C-F2E0911EE1DD", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_NORMAL)]
+        [ComponentPriority(ComponentPriorityAttribute.NORMAL)]
         [ComponentDependency(Slot = ComponentSlots.Database)]
         public class KeyValueFilterParserProvider : FilterParserProvider
         {
@@ -214,7 +214,7 @@ namespace FoxTunes
             }
         }
 
-        [Component("A14FFBBF-1985-45BA-8B9D-472B875A17FC", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+        [ComponentPriority(ComponentPriorityAttribute.HIGH)]
         [ComponentDependency(Slot = ComponentSlots.Database)]
         public class RatingFilterParserProvider : FilterParserProvider
         {

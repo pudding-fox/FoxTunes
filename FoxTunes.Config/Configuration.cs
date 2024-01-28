@@ -9,7 +9,8 @@ using System.Runtime.InteropServices;
 
 namespace FoxTunes
 {
-    [Component("BA77B392-1900-4931-B720-16206B23DDA1", ComponentSlots.Configuration, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [ComponentPriority(ComponentPriorityAttribute.HIGH)]
+    [Component("BA77B392-1900-4931-B720-16206B23DDA1", ComponentSlots.Configuration)]
     public class Configuration : StandardComponent, IConfiguration, IDisposable
     {
         const int TIMEOUT = 5000;
@@ -22,25 +23,7 @@ namespace FoxTunes
 
         public Debouncer Debouncer { get; private set; }
 
-        private static readonly Lazy<ReleaseType> _ReleaseType = new Lazy<ReleaseType>(() =>
-        {
-            try
-            {
-                var value = ConfigurationManager.AppSettings.Get("ReleaseType");
-                var result = default(ReleaseType);
-                if (string.IsNullOrEmpty(value) || !Enum.TryParse<ReleaseType>(value, out result))
-                {
-                    Logger.Write(typeof(Configuration), LogLevel.Error, "Failed to parse the release type \"{0}\", falling back to default.", value);
-                    return ReleaseType.Default;
-                }
-                return result;
-            }
-            catch (Exception e)
-            {
-                Logger.Write(typeof(Configuration), LogLevel.Error, "Failed to read the release type, falling back to default: {0}", e.Message);
-                return ReleaseType.Default;
-            }
-        });
+       
 
         public IEnumerable<string> AvailableProfiles
         {
@@ -63,14 +46,6 @@ namespace FoxTunes
             get
             {
                 return string.Equals(this.Profile, Strings.Profiles_Default, StringComparison.OrdinalIgnoreCase);
-            }
-        }
-
-        public ReleaseType ReleaseType
-        {
-            get
-            {
-                return _ReleaseType.Value;
             }
         }
 

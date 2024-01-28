@@ -8,7 +8,7 @@ namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
     //Setting PRIORITY_HIGH so the the cache is cleared before being re-queried.
-    [Component("E678301C-B04B-46A9-A275-E1A0AC09F171", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     public class LibraryCache : StandardComponent, ILibraryCache, IDisposable
     {
         public LibraryCache()

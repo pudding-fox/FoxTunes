@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [Component("ABCF439D-DE21-4EC6-BFD8-ECC475C3CA2B", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
+    [ComponentPriority(ComponentPriorityAttribute.LOW)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class BassSkipSilenceStreamAdvisor : BassStreamAdvisor

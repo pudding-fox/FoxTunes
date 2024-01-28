@@ -9,7 +9,7 @@ using System.Windows.Data;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    [ComponentRelease(ReleaseType.Default)]
+    [ComponentPreference(ReleaseType.Default)]
     public class UIComponentLayoutProvider : UILayoutProviderBase, IConfigurableComponent, IDisposable
     {
         public const string ID = "CCCC083C-3C19-4AAC-97C7-565AF8F83115";
