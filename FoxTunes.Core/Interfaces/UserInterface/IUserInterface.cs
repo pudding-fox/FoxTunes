@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
     public interface IUserInterface : IStandardComponent
     {
+        IEnumerable<IUserInterfaceWindow> Windows { get; }
+
         Task Show();
 
         void Activate();
@@ -24,24 +27,28 @@ namespace FoxTunes.Interfaces
         event UserInterfaceWindowEventHandler WindowDestroyed;
     }
 
-    public delegate void UserInterfaceWindowEventHandler(object sender, UserInterfaceWindowEventArgs e);
-
-    public class UserInterfaceWindowEventArgs : EventArgs
+    public interface IUserInterfaceWindow
     {
-        public UserInterfaceWindowEventArgs(IntPtr handle, UserInterfaceWindowRole role)
-        {
-            this.Handle = handle;
-            this.Role = role;
-        }
+        IntPtr Handle { get; }
 
-        public IntPtr Handle { get; private set; }
-
-        public UserInterfaceWindowRole Role { get; private set; }
+        UserInterfaceWindowRole Role { get; }
     }
 
     public enum UserInterfaceWindowRole : byte
     {
         None,
         Main
+    }
+
+    public delegate void UserInterfaceWindowEventHandler(object sender, UserInterfaceWindowEventArgs e);
+
+    public class UserInterfaceWindowEventArgs : EventArgs
+    {
+        public UserInterfaceWindowEventArgs(IUserInterfaceWindow window)
+        {
+            this.Window = window;
+        }
+
+        public IUserInterfaceWindow Window { get; private set; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Windows.Controls;
+using System.Runtime.CompilerServices;
 
 namespace FoxTunes
 {
@@ -10,13 +10,12 @@ namespace FoxTunes
     {
         public WindowSnappingBehaviour()
         {
-            this.Handles = new List<IntPtr>();
-            this.Windows = new List<SnappingWindow>();
+            this.Windows = new ConditionalWeakTable<IUserInterfaceWindow, SnappingWindow>();
         }
 
-        public IList<IntPtr> Handles { get; private set; }
+        public bool Enabled { get; private set; }
 
-        public IList<SnappingWindow> Windows { get; private set; }
+        public ConditionalWeakTable<IUserInterfaceWindow, SnappingWindow> Windows { get; private set; }
 
         public ICore Core { get; private set; }
 
@@ -50,40 +49,55 @@ namespace FoxTunes
 
         protected virtual void OnWindowCreated(object sender, UserInterfaceWindowEventArgs e)
         {
-            this.Handles.Add(e.Handle);
+            if (!this.Enabled)
+            {
+                return;
+            }
+            this.Enable(e.Window);
         }
 
         protected virtual void OnWindowDestroyed(object sender, UserInterfaceWindowEventArgs e)
         {
-            this.Handles.Remove(e.Handle);
-            for (var a = 0; a < this.Windows.Count; a++)
+            if (!this.Enabled)
             {
-                if (this.Windows[a].Handle != e.Handle)
-                {
-                    continue;
-                }
-                this.Windows[a].Dispose();
-                this.Windows.RemoveAt(a);
+                return;
             }
+            this.Disable(e.Window);
         }
 
         public void Enable()
         {
-            foreach (var handle in this.Handles)
+            this.Enabled = true;
+            foreach (var window in this.UserInterface.Windows)
             {
-                var window = new SnappingWindow(handle);
-                window.InitializeComponent(this.Core);
-                this.Windows.Add(window);
+                this.Enable(window);
             }
+        }
+
+        protected virtual void Enable(IUserInterfaceWindow window)
+        {
+            var snappingWindow = new SnappingWindow(window.Handle);
+            snappingWindow.InitializeComponent(this.Core);
+            this.Windows.Add(window, snappingWindow);
         }
 
         public void Disable()
         {
-            foreach (var window in this.Windows)
+            this.Enabled = false;
+            foreach (var window in this.UserInterface.Windows)
             {
-                window.Dispose();
+                this.Disable(window);
             }
-            this.Windows.Clear();
+        }
+
+        protected virtual void Disable(IUserInterfaceWindow window)
+        {
+            var snappingWindow = default(SnappingWindow);
+            if (!this.Windows.TryRemove(window, out snappingWindow))
+            {
+                return;
+            }
+            snappingWindow.Dispose();
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

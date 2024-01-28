@@ -11,6 +11,8 @@ namespace FoxTunes
     {
         public const int WM_NCLBUTTONDOWN = 0x00A1;
 
+        public const int WM_LBUTTONUP = 0x0202;
+
         public const int NC_CAPTION = 2;
 
         public const int NC_LEFT = 10;
@@ -93,6 +95,27 @@ namespace FoxTunes
 
         public HwndSourceHook Callback { get; private set; }
 
+        public bool Capture
+        {
+            get
+            {
+                return this.Window.IsMouseCaptured;
+            }
+            set
+            {
+                if (value)
+                {
+                    Logger.Write(this, LogLevel.Trace, "Window {0}: Capturing mouse.", this.Handle);
+                    this.Window.CaptureMouse();
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Trace, "Window {0}: Releasing mouse.", this.Handle);
+                    this.Window.ReleaseMouseCapture();
+                }
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.AddHook();
@@ -105,7 +128,7 @@ namespace FoxTunes
             var source = HwndSource.FromHwnd(this.Handle);
             if (source == null)
             {
-                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", this.Handle);
                 return;
             }
             source.AddHook(this.Callback);
@@ -125,11 +148,16 @@ namespace FoxTunes
                     return new IntPtr(1);
                 }
             }
+            else if (msg == WM_LBUTTONUP)
+            {
+                this.OnNonClientButtonUp();
+            }
             return IntPtr.Zero;
         }
 
         protected virtual bool OnNonClientButtonDown(int area)
         {
+            Logger.Write(this, LogLevel.Trace, "Non client mouse down {0},{1}.", X, Y);
             switch (area)
             {
                 case NC_CAPTION:
@@ -163,13 +191,30 @@ namespace FoxTunes
             return false;
         }
 
+        protected virtual void OnNonClientButtonUp()
+        {
+            Logger.Write(this, LogLevel.Trace, "Non client mouse up.");
+            this.OnComplete();
+        }
+
         protected virtual void OnMove()
         {
+            Logger.Write(this, LogLevel.Trace, "Begin move.");
+            this.Capture = true;
 
         }
 
         protected virtual void OnResize(ResizeDirection direction)
         {
+            Logger.Write(this, LogLevel.Trace, "Begin resize.");
+            this.Capture = true;
+
+        }
+
+        protected virtual void OnComplete()
+        {
+            Logger.Write(this, LogLevel.Trace, "End.");
+            this.Capture = false;
 
         }
 
