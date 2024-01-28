@@ -66,7 +66,12 @@ namespace FoxTunes
                     this.OnBegin(progress.File);
                     break;
                 case BassMemoryProgressType.Update:
-                    this.OnUpdate(progress.File, progress.Position, progress.Length);
+                    var cancel = default(bool);
+                    this.OnUpdate(progress.File, progress.Position, progress.Length, out cancel);
+                    if (cancel)
+                    {
+                        progress.Cancel = true;
+                    }
                     break;
                 case BassMemoryProgressType.End:
                     this.OnEnd(progress.File);
@@ -85,14 +90,16 @@ namespace FoxTunes
             var task = this.BackgroundTaskEmitter.Send(loadingTask);
         }
 
-        protected virtual void OnUpdate(string fileName, long position, long length)
+        protected virtual void OnUpdate(string fileName, long position, long length, out bool cancel)
         {
             var loadingTask = default(LoadingTask);
             if (!this.Tasks.TryGetValue(fileName, out loadingTask))
             {
+                cancel = false;
                 return;
             }
             loadingTask.Update(position, length);
+            cancel = loadingTask.IsCancellationRequested;
         }
 
         protected virtual void OnEnd(string fileName)
@@ -125,6 +132,13 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            if (this.Tasks != null)
+            {
+                foreach (var pair in this.Tasks)
+                {
+                    pair.Value.Dispose();
+                }
+            }
             if (this.BassPluginLoader != null)
             {
                 this.BassPluginLoader.IsLoadedChanged -= this.OnIsLoadedChanged;
@@ -163,6 +177,14 @@ namespace FoxTunes
             public string FileName { get; private set; }
 
             public override bool Visible
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
+            public override bool Cancellable
             {
                 get
                 {
