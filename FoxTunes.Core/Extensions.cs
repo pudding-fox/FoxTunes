@@ -609,5 +609,10 @@ namespace FoxTunes
                 return hash1 + (hash2 * 1566083941);
             }
         }
+
+        public static bool Any<TKey, TValue>(this IDictionary<TKey, TValue> sequence, IEnumerable<TKey> keys, Func<TValue, bool> predicate)
+        {
+            return keys.Any(key => predicate(sequence.GetValueOrDefault(key)));
+        }
     }
 }

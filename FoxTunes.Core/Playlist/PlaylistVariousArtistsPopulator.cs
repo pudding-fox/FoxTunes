@@ -20,7 +20,7 @@ namespace FoxTunes
                 switch (phase)
                 {
                     case DatabaseParameterPhase.Fetch:
-                        parameters["name"] = CustomMetaData.VariousArtists;
+                        parameters["name"] = CommonMetaData.IsCompilation;
                         parameters["type"] = MetaDataItemType.Tag;
                         parameters["value"] = bool.TrueString;
                         parameters["status"] = playlistItemStatus;
@@ -36,7 +36,7 @@ namespace FoxTunes
                 switch (phase)
                 {
                     case DatabaseParameterPhase.Fetch:
-                        parameters["name"] = CustomMetaData.VariousArtists;
+                        parameters["name"] = CommonMetaData.IsCompilation;
                         parameters["type"] = MetaDataItemType.Tag;
                         parameters["status"] = playlistItemStatus;
                         break;
