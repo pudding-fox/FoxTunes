@@ -137,16 +137,17 @@ namespace FoxTunes
         {
             private DropInsertBehaviour()
             {
-                this.Callback = new DelayedCallback(this.RemoveCore, TimeSpan.FromMilliseconds(100));
+                this.Callback = new DelayedCallback(this.RemoveCore, TimeSpan.FromMilliseconds(500));
             }
 
             public DropInsertBehaviour(ListView listView) : this()
             {
                 this.ListView = listView;
-                this.ListView.DragEnter += this.ListView_DragEnter;
-                this.ListView.DragOver += this.ListView_DragOver;
-                this.ListView.Drop += this.ListView_Drop;
-                this.ListView.DragLeave += this.ListView_DragLeave;
+                this.ListView.DragEnter += this.OnDragEnter;
+                this.ListView.DragOver += this.OnDragOver;
+                this.ListView.Drop += this.OnDrop;
+                this.ListView.DragLeave += this.OnDragLeave;
+                this.ListView.QueryContinueDrag += this.OnQueryContinueDrag;
                 this.Adorner = new DropInsertAdorner(listView);
             }
 
@@ -156,25 +157,32 @@ namespace FoxTunes
 
             public DropInsertAdorner Adorner { get; private set; }
 
-            protected virtual void ListView_DragEnter(object sender, DragEventArgs e)
+            protected virtual void OnDragEnter(object sender, DragEventArgs e)
             {
                 this.Add();
             }
 
-            protected virtual void ListView_DragOver(object sender, DragEventArgs e)
+            protected virtual void OnDragOver(object sender, DragEventArgs e)
             {
                 this.UpdateDropInsertIndex(e.GetPosition(this.ListView));
             }
 
-            protected virtual void ListView_Drop(object sender, DragEventArgs e)
+            protected virtual void OnDrop(object sender, DragEventArgs e)
             {
                 this.Remove();
             }
 
-            protected virtual void ListView_DragLeave(object sender, DragEventArgs e)
+            protected virtual void OnDragLeave(object sender, DragEventArgs e)
             {
-                var position = e.GetPosition(this.ListView);
-                if (position.X < 0 || position.Y < 0)
+                if (!this.ListView.IsMouseOver())
+                {
+                    this.Remove();
+                }
+            }
+
+            protected virtual void OnQueryContinueDrag(object sender, QueryContinueDragEventArgs e)
+            {
+                if (e.Action == DragAction.Cancel || e.EscapePressed)
                 {
                     this.Remove();
                 }
@@ -229,15 +237,22 @@ namespace FoxTunes
                     SetDropInsertValue(this.ListView, listViewItem.DataContext);
                     SetDropInsertOffset(this.ListView, offset);
                 }
+                else
+                {
+                    SetDropInsertActive(this.ListView, false);
+                    SetDropInsertItem(this.ListView, null);
+                    SetDropInsertOffset(this.ListView, 0);
+                }
                 this.Adorner.InvalidateVisual();
             }
 
             protected override void OnDisposing()
             {
-                this.ListView.DragEnter -= this.ListView_DragEnter;
-                this.ListView.DragOver -= this.ListView_DragOver;
-                this.ListView.Drop -= this.ListView_Drop;
-                this.ListView.DragLeave -= this.ListView_DragLeave;
+                this.ListView.DragEnter -= this.OnDragEnter;
+                this.ListView.DragOver -= this.OnDragOver;
+                this.ListView.Drop -= this.OnDrop;
+                this.ListView.DragLeave -= this.OnDragLeave;
+                this.ListView.QueryContinueDrag -= this.OnQueryContinueDrag;
                 base.OnDisposing();
             }
         }

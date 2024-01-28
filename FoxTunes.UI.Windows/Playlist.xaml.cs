@@ -25,7 +25,7 @@ namespace FoxTunes
                 return;
             }
             DragDrop.DoDragDrop(
-                this,
+                this.ListView,
                 items,
                 DragDropEffects.Copy
             );

@@ -260,6 +260,24 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnDragEnter(DragEventArgs e)
         {
+            this.UpdateDragDropEffects(e);
+        }
+
+        public ICommand DragOverCommand
+        {
+            get
+            {
+                return new Command<DragEventArgs>(this.OnDragOver);
+            }
+        }
+
+        protected virtual void OnDragOver(DragEventArgs e)
+        {
+            this.UpdateDragDropEffects(e);
+        }
+
+        protected virtual void UpdateDragDropEffects(DragEventArgs e)
+        {
             var effects = DragDropEffects.None;
             try
             {
