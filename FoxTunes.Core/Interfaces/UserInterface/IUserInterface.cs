@@ -35,6 +35,8 @@ namespace FoxTunes.Interfaces
         event UserInterfaceWindowEventHandler WindowCreated;
 
         event UserInterfaceWindowEventHandler WindowDestroyed;
+
+        event EventHandler ShuttingDown;
     }
 
     public interface IUserInterfaceWindow

@@ -26,6 +26,8 @@ namespace FoxTunes
 
         const int BUTTON_NEXT = 2;
 
+        const int WM_SHOWWINDOW = 0x0018;
+
         public TaskbarButtonsBehaviour()
         {
             this.Callback = new HwndSourceHook(this.OnCallback);
@@ -94,6 +96,7 @@ namespace FoxTunes
             this.UserInterface = core.Components.UserInterface;
             this.UserInterface.WindowCreated += this.OnWindowCreated;
             this.UserInterface.WindowDestroyed += this.OnWindowDestroyed;
+            this.UserInterface.ShuttingDown += this.OnShuttingDown;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 TaskbarButtonsBehaviourConfiguration.SECTION,
@@ -133,6 +136,29 @@ namespace FoxTunes
             }
             Logger.Write(this, LogLevel.Debug, "Window destroyed: {0}", e.Window.Handle);
             this.AddFlag(e.Window.Handle, TaskbarButtonsWindowFlags.Destroyed);
+        }
+
+        protected virtual void OnWindowIsVisibleChanged(IntPtr handle, bool visible)
+        {
+            if (!visible)
+            {
+                Logger.Write(this, LogLevel.Debug, "Window was hidden: {0}", handle);
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "Window was shown: {0}", handle); 
+                if (this.HasFlag(handle, TaskbarButtonsWindowFlags.ImagesCreated))
+                {
+                    this.DestroyImages(handle);
+                }
+                this.RemoveFlag(handle, TaskbarButtonsWindowFlags.ButtonsCreated);
+            }
+        }
+
+        protected virtual void OnShuttingDown(object sender, EventArgs e)
+        {
+            Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
+            this.Windows.Clear();
         }
 
         public void Enable()
@@ -265,6 +291,11 @@ namespace FoxTunes
                 {
                     this.OnButtonPressed(Convert.ToInt32(low));
                 }
+            }
+            else if (msg == WM_SHOWWINDOW)
+            {
+                var visiblity = wParam.ToInt32();
+                this.OnWindowIsVisibleChanged(hwnd, visiblity == 1);
             }
             else if (msg == WindowMessages.WM_TASKBARCREATED)
             {
@@ -702,6 +733,7 @@ namespace FoxTunes
             {
                 this.UserInterface.WindowCreated -= this.OnWindowCreated;
                 this.UserInterface.WindowDestroyed -= this.OnWindowDestroyed;
+                this.UserInterface.ShuttingDown -= this.OnShuttingDown;
             }
             this.Disable();
         }

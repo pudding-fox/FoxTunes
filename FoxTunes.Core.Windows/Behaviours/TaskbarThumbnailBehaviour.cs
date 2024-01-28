@@ -112,6 +112,7 @@ namespace FoxTunes
             this.UserInterface = core.Components.UserInterface;
             this.UserInterface.WindowCreated += this.OnWindowCreated;
             this.UserInterface.WindowDestroyed += this.OnWindowDestroyed;
+            this.UserInterface.ShuttingDown += this.OnShuttingDown;
             this.ArtworkProvider = core.Components.ArtworkProvider;
             this.LibraryBrowser = core.Components.LibraryBrowser;
             this.Configuration = core.Components.Configuration;
@@ -153,6 +154,12 @@ namespace FoxTunes
             }
             Logger.Write(this, LogLevel.Debug, "Window destroyed: {0}", e.Window.Handle);
             this.AddFlag(e.Window.Handle, TaskbarThumbnailWindowFlags.Destroyed);
+        }
+
+        protected virtual void OnShuttingDown(object sender, EventArgs e)
+        {
+            Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
+            this.Windows.Clear();
         }
 
         public void Enable()
@@ -565,6 +572,7 @@ namespace FoxTunes
             {
                 this.UserInterface.WindowCreated -= this.OnWindowCreated;
                 this.UserInterface.WindowDestroyed -= this.OnWindowDestroyed;
+                this.UserInterface.ShuttingDown -= this.OnShuttingDown;
             }
             this.Disable();
         }

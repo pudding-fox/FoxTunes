@@ -104,6 +104,7 @@ namespace FoxTunes
             }
             this.Application.Run(global::FoxTunes.Windows.Registrations.Show(MainWindow.ID));
         done:
+            this.OnShuttingDown();
             return global::FoxTunes.Windows.Shutdown();
         }
 

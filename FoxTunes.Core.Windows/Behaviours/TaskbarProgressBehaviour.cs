@@ -80,6 +80,7 @@ namespace FoxTunes
             this.UserInterface = core.Components.UserInterface;
             this.UserInterface.WindowCreated += this.OnWindowCreated;
             this.UserInterface.WindowDestroyed += this.OnWindowDestroyed;
+            this.UserInterface.ShuttingDown += this.OnShuttingDown;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 TaskbarProgressBehaviourConfiguration.SECTION,
@@ -121,6 +122,12 @@ namespace FoxTunes
             this.AddFlag(e.Window.Handle, TaskbarProgressWindowFlags.Destroyed);
         }
 
+        protected virtual void OnShuttingDown(object sender, EventArgs e)
+        {
+            Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
+            this.Windows.Clear();
+        }
+
         public void Enable()
         {
             lock (SyncRoot)
@@ -149,7 +156,7 @@ namespace FoxTunes
                     this.Timer = null;
                     Logger.Write(this, LogLevel.Debug, "Updater disabled.");
                 }
-            }           
+            }
             //Perform any cleanup.
             var task = this.Update();
         }
@@ -443,6 +450,7 @@ namespace FoxTunes
             {
                 this.UserInterface.WindowCreated -= this.OnWindowCreated;
                 this.UserInterface.WindowDestroyed -= this.OnWindowDestroyed;
+                this.UserInterface.ShuttingDown -= this.OnShuttingDown;
             }
             this.Disable();
         }
