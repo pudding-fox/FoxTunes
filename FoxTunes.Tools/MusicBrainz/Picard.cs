@@ -107,7 +107,11 @@ namespace FoxTunes
             {
                 return;
             }
-            var playlistItems = this.PlaylistManager.SelectedItems.ToArray();
+            //TODO: If the playlist contains duplicate tracks, will all be refreshed properly?
+            var playlistItems = this.PlaylistManager.SelectedItems
+                .GroupBy(playlistItem => playlistItem.FileName)
+                .Select(group => group.First())
+                .ToArray();
             if (!playlistItems.Any())
             {
                 return;

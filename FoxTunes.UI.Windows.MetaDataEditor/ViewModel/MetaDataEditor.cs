@@ -109,6 +109,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ImagesChanged;
 
+        private int _Count { get; set; }
+
+        public int Count
+        {
+            get
+            {
+                return this._Count;
+            }
+            set
+            {
+                this._Count = value;
+                this.OnCountChanged();
+            }
+        }
+
+        protected virtual void OnCountChanged()
+        {
+            if (this.CountChanged != null)
+            {
+                this.CountChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Count");
+        }
+
+        public event EventHandler CountChanged;
+
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public ILibraryManager LibraryManager { get; private set; }
@@ -173,14 +199,14 @@ namespace FoxTunes.ViewModel
                 return Task.CompletedTask;
 #endif
             }
+            //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
+            var libraryItems = this.LibraryHierarchyBrowser.GetItems(
+                this.LibraryManager.SelectedItem,
+                true
+            ).ToArray();
             return this.SetItems(
-                this.GetItems(
-                    //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
-                    this.LibraryHierarchyBrowser.GetItems(
-                        this.LibraryManager.SelectedItem,
-                        true
-                    ).ToArray()
-                )
+                this.GetItems(libraryItems),
+                libraryItems.Length
             );
         }
 
@@ -194,10 +220,22 @@ namespace FoxTunes.ViewModel
                 return Task.CompletedTask;
 #endif
             }
+            //TODO: If the playlist contains duplicate tracks, will all be refreshed properly?
+            var playlistItems = this.PlaylistManager.SelectedItems
+                .GroupBy(playlistItem => playlistItem.FileName)
+                .Select(group => group.First())
+                .ToArray();
+            if (!playlistItems.Any())
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
             return this.SetItems(
-                this.GetItems(
-                    this.PlaylistManager.SelectedItems.ToArray()
-                )
+                this.GetItems(playlistItems),
+                playlistItems.Length
             );
         }
 
@@ -224,12 +262,13 @@ namespace FoxTunes.ViewModel
             return result;
         }
 
-        protected virtual Task SetItems(IDictionary<MetaDataItemType, IEnumerable<MetaDataEntry>> items)
+        protected virtual Task SetItems(IDictionary<MetaDataItemType, IEnumerable<MetaDataEntry>> items, int count)
         {
             return Windows.Invoke(() =>
             {
                 this.Tags = new ObservableCollection<MetaDataEntry>(items[MetaDataItemType.Tag]);
                 this.Images = new ObservableCollection<MetaDataEntry>(items[MetaDataItemType.Image]);
+                this.Count = count;
                 this.OnHasItemsChanged();
             });
         }
