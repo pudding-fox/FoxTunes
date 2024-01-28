@@ -138,6 +138,42 @@
   <data name="AdamantineThemeConfiguration.ListRowShading" xml:space="preserve">
     <value>List Row Shading</value>
   </data>
+  <data name="Aero2Theme.ColorPalette.Default.Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Aero2Theme.ColorPalette.Default.Name" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Aero2Theme.ColorPalette.Gradient1.Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Aero2Theme.ColorPalette.Gradient1.Name" xml:space="preserve">
+    <value>Default (Gradient)</value>
+  </data>
+  <data name="Aero2Theme.Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Aero2Theme.Name" xml:space="preserve">
+    <value>Aero 2</value>
+  </data>
+  <data name="AeroTheme.ColorPalette.Default.Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="AeroTheme.ColorPalette.Default.Name" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="AeroTheme.ColorPalette.Gradient1.Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="AeroTheme.ColorPalette.Gradient1.Name" xml:space="preserve">
+    <value>Default (Gradient)</value>
+  </data>
+  <data name="AeroTheme.Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="AeroTheme.Name" xml:space="preserve">
+    <value>Aero</value>
+  </data>
   <data name="ExpressionDarkTheme.ColorPalette.Default.Description" xml:space="preserve">
     <value />
   </data>

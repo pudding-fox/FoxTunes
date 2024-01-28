@@ -126,6 +126,114 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        internal static string Aero2Theme_ColorPalette_Default_Description {
+            get {
+                return ResourceManager.GetString("Aero2Theme.ColorPalette.Default.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        internal static string Aero2Theme_ColorPalette_Default_Name {
+            get {
+                return ResourceManager.GetString("Aero2Theme.ColorPalette.Default.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Aero2Theme_ColorPalette_Gradient1_Description {
+            get {
+                return ResourceManager.GetString("Aero2Theme.ColorPalette.Gradient1.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default (Gradient).
+        /// </summary>
+        internal static string Aero2Theme_ColorPalette_Gradient1_Name {
+            get {
+                return ResourceManager.GetString("Aero2Theme.ColorPalette.Gradient1.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Aero2Theme_Description {
+            get {
+                return ResourceManager.GetString("Aero2Theme.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aero 2.
+        /// </summary>
+        internal static string Aero2Theme_Name {
+            get {
+                return ResourceManager.GetString("Aero2Theme.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AeroTheme_ColorPalette_Default_Description {
+            get {
+                return ResourceManager.GetString("AeroTheme.ColorPalette.Default.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        internal static string AeroTheme_ColorPalette_Default_Name {
+            get {
+                return ResourceManager.GetString("AeroTheme.ColorPalette.Default.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AeroTheme_ColorPalette_Gradient1_Description {
+            get {
+                return ResourceManager.GetString("AeroTheme.ColorPalette.Gradient1.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default (Gradient).
+        /// </summary>
+        internal static string AeroTheme_ColorPalette_Gradient1_Name {
+            get {
+                return ResourceManager.GetString("AeroTheme.ColorPalette.Gradient1.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AeroTheme_Description {
+            get {
+                return ResourceManager.GetString("AeroTheme.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Aero.
+        /// </summary>
+        internal static string AeroTheme_Name {
+            get {
+                return ResourceManager.GetString("AeroTheme.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         internal static string ExpressionDarkTheme_ColorPalette_Default_Description {
             get {
                 return ResourceManager.GetString("ExpressionDarkTheme.ColorPalette.Default.Description", resourceCulture);
