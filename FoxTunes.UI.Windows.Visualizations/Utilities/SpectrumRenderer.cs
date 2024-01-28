@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Markup;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -332,9 +331,9 @@ namespace FoxTunes
             var samples = data.Samples;
             var values = data.Values;
 
-            var samplesPerElement = data.FFTRange / data.Count;
+            var samplesPerValue = data.FFTRange / data.Count;
 
-            if (samplesPerElement == 1)
+            if (samplesPerValue == 1)
             {
                 for (int a = 0; a < data.FFTRange && a < values.Length; a++)
                 {
@@ -342,24 +341,24 @@ namespace FoxTunes
                     values[a] = ToDecibelFixed(value);
                 }
             }
-            else if (samplesPerElement > 1)
+            else if (samplesPerValue > 1)
             {
-                for (int a = 0, b = 0; a < data.FFTRange && b < values.Length; a += samplesPerElement, b++)
+                for (int a = 0, b = 0; a < data.FFTRange && b < values.Length; a += samplesPerValue, b++)
                 {
                     var value = default(float);
-                    for (var c = 0; c < samplesPerElement; c++)
+                    for (var c = 0; c < samplesPerValue; c++)
                     {
-                        value = Math.Max(samples[a + c], value);
+                        value += samples[a + c];
                     }
-                    values[b] = ToDecibelFixed(value);
+                    values[b] = ToDecibelFixed(value / samplesPerValue);
                 }
             }
             else
             {
-                //Not enough samples to fill the values, do the best we can.
-                for (int a = 0; a < data.FFTRange && a < values.Length; a++)
+                var valuesPerSample = (float)data.Count / data.FFTRange;
+                for (var a = 0; a < data.Count; a++)
                 {
-                    var value = samples[a];
+                    var value = samples[Convert.ToInt32(a / valuesPerSample)];
                     values[a] = ToDecibelFixed(value);
                 }
             }

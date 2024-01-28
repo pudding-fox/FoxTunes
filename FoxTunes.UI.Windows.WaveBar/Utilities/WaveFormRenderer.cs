@@ -143,7 +143,7 @@ namespace FoxTunes
             this.Update();
         }
 
-        public async Task Render()
+        public async Task Render(WaveFormRendererData data)
         {
             const byte SHADE = 30;
 
@@ -151,11 +151,6 @@ namespace FoxTunes
             var success = default(bool);
             var waveRenderInfo = default(BitmapHelper.RenderInfo);
             var powerRenderInfo = default(BitmapHelper.RenderInfo);
-
-            if (this.RendererData == null)
-            {
-                return;
-            }
 
             await Windows.Invoke(() =>
             {
@@ -198,11 +193,6 @@ namespace FoxTunes
 
             await Windows.Invoke(() =>
             {
-                if (!object.ReferenceEquals(this.Bitmap, bitmap))
-                {
-                    return;
-                }
-
                 bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }).ConfigureAwait(false);
@@ -210,16 +200,18 @@ namespace FoxTunes
 
         public void Update()
         {
-            if (this.GeneratorData != null && this.RendererData != null)
+            var generatorData = this.GeneratorData;
+            var rendererData = this.RendererData;
+            if (generatorData != null && rendererData != null)
             {
                 Update(
-                    this.GeneratorData,
-                    this.RendererData,
+                    generatorData,
+                    rendererData,
                     this.Rms.Value,
                     WaveBarBehaviourConfiguration.GetMode(this.Mode.Value)
                 );
             }
-            var task = this.Render();
+            var task = this.Render(rendererData);
         }
 
         protected virtual double GetPixelWidth()

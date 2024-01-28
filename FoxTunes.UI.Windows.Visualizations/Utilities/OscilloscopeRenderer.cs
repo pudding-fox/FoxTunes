@@ -489,10 +489,9 @@ namespace FoxTunes
                         values[0, x] += history[0, x, (a + position) % count];
                     }
                     values[0, x] /= count;
-                    peaks[0] = Math.Max(Math.Abs(values[0, x]), peaks[0]);
                 }
+                peaks[0] = Math.Max(Math.Abs(values[0, x]), peaks[0]);
             }
-            //NoiseReduction(values, 1, width, 5);
             if (position < capacity - 1)
             {
                 position++;
@@ -567,11 +566,10 @@ namespace FoxTunes
                             values[channel, x] += history[channel, x, (a + position) % count];
                         }
                         values[channel, x] /= count;
-                        peaks[channel] = Math.Max(Math.Abs(values[channel, x]), peaks[channel]);
                     }
+                    peaks[channel] = Math.Max(Math.Abs(values[channel, x]), peaks[channel]);
                 }
             }
-            //NoiseReduction(values, channels, width, 5);
             if (position < capacity - 1)
             {
                 position++;

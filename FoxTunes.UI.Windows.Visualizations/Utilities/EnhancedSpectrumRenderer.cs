@@ -158,12 +158,12 @@ namespace FoxTunes
                 {
                     return;
                 }
-                if (this.ShowRms.Value)
+                if (data.RmsElements != null)
                 {
                     var colors = this.Color.ToPair(SHADE);
                     valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, colors[0]);
                     rmsRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, colors[1]);
-                    if (this.ShowCrestFactor.Value)
+                    if (data.CrestPoints != null)
                     {
                         crestRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, Colors.Red);
                     }
