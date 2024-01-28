@@ -160,6 +160,8 @@ namespace FoxTunes
         protected virtual void OnApplicationDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             Logger.Write(this, LogLevel.Fatal, e.Exception.Message, e);
+            //Don't crash out.
+            e.Handled = true;
         }
 
         protected virtual void OnWindowCreated(object sender, EventArgs e)

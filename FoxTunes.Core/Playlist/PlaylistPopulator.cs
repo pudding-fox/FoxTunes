@@ -111,11 +111,18 @@ namespace FoxTunes
 
         protected override void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            if (this.Current != null)
+            try
             {
-                this.Description = Path.GetFileName(this.Current);
+                if (this.Current != null)
+                {
+                    this.Description = Path.GetFileName(this.Current);
+                }
+                base.OnElapsed(sender, e);
             }
-            base.OnElapsed(sender, e);
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
+            }
         }
     }
 }

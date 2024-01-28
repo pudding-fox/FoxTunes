@@ -28,8 +28,15 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnTick(object sender, EventArgs e)
         {
-            this.OnPositionChanged();
-            this.OnDescriptionChanged();
+            try
+            {
+                this.OnPositionChanged();
+                this.OnDescriptionChanged();
+            }
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
+            }
         }
 
         private long _Position { get; set; }

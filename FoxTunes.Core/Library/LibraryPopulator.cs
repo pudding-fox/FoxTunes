@@ -101,18 +101,25 @@ namespace FoxTunes
 
         protected override void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            var position = Interlocked.Exchange(ref this.position, 0);
-            if (position != 0)
+            try
             {
-                //Interval is fixed at 100ms.
-                position *= 10;
-                this.Name = string.Format("Populating library: {0} items/s", this.CountMetric.Average(position));
-                if (this.Current != null)
+                var position = Interlocked.Exchange(ref this.position, 0);
+                if (position != 0)
                 {
-                    this.Description = Path.GetFileName(this.Current);
+                    //Interval is fixed at 100ms.
+                    position *= 10;
+                    this.Name = string.Format("Populating library: {0} items/s", this.CountMetric.Average(position));
+                    if (this.Current != null)
+                    {
+                        this.Description = Path.GetFileName(this.Current);
+                    }
                 }
+                base.OnElapsed(sender, e);
             }
-            base.OnElapsed(sender, e);
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
+            }
         }
     }
 }

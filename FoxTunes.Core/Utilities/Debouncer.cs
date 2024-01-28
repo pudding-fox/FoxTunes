@@ -46,13 +46,20 @@ namespace FoxTunes
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            lock (SyncRoot)
+            try
             {
-                foreach (var action in this.Actions)
+                lock (SyncRoot)
                 {
-                    action();
+                    foreach (var action in this.Actions)
+                    {
+                        action();
+                    }
+                    this.Actions.Clear();
                 }
-                this.Actions.Clear();
+            }
+            catch
+            {
+                //Nothing can be done, never throw on background thread.
             }
         }
 
