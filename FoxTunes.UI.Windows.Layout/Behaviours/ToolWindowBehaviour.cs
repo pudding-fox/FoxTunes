@@ -137,6 +137,7 @@ namespace FoxTunes
 
         protected virtual void Unload(ToolWindowConfiguration config, ToolWindow window)
         {
+            ResourceDisposer.Dispose(window);
             this.Windows.TryGetValue(config, out window);
             if (!this.Windows.Remove(config))
             {

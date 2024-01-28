@@ -77,6 +77,10 @@ namespace FoxTunes
 
         private static void OnMainWindowClosed(object sender, EventArgs e)
         {
+            if (IsMainWindowCreated)
+            {
+                ResourceDisposer.Dispose(MainWindow);
+            }
             _MainWindow = new Lazy<Window>(() => new MainWindow());
             if (MainWindowClosed != null)
             {
@@ -131,6 +135,10 @@ namespace FoxTunes
 
         private static void OnMiniWindowClosed(object sender, EventArgs e)
         {
+            if (IsMiniWindowCreated)
+            {
+                ResourceDisposer.Dispose(MiniWindow);
+            }
             _MiniWindow = new Lazy<Window>(() => new MiniWindow());
             if (MiniWindowClosed != null)
             {
