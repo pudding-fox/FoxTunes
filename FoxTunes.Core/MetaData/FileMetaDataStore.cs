@@ -62,9 +62,14 @@ namespace FoxTunes
 
         public static void Clear(string prefix)
         {
+            var directoryName = Path.Combine(DataStoreDirectoryName, prefix);
+            if (!Directory.Exists(directoryName))
+            {
+                return;
+            }
             try
             {
-                Directory.Delete(Path.Combine(DataStoreDirectoryName, prefix), true);
+                Directory.Delete(directoryName, true);
             }
             catch (Exception e)
             {
