@@ -50,17 +50,26 @@ namespace FoxTunes
                     continue;
                 }
                 var fileName = BassCdUtils.CreateUrl(this.Drive, id, a);
-                var metaDatas = (
-                    await this.MetaDataSource.GetMetaData(fileName).ConfigureAwait(false)
-                ).ToArray();
+                var metaData = default(MetaDataItem[]);
+                try
+                {
+                    metaData = (
+                        await this.MetaDataSource.GetMetaData(fileName).ConfigureAwait(false)
+                    ).ToArray();
+                }
+                catch (Exception e)
+                {
+                    metaData = new MetaDataItem[] { };
+                    Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", fileName, e.Message);
+                }
                 Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
                 var playlistItem = new PlaylistItem()
                 {
                     DirectoryName = directoryName,
-                    FileName = Path.Combine(fileName, this.GetFileName(fileName, a, metaDatas)),
+                    FileName = Path.Combine(fileName, this.GetFileName(fileName, a, metaData)),
                     Status = PlaylistItemStatus.Import
                 };
-                playlistItem.MetaDatas = metaDatas;
+                playlistItem.MetaDatas = metaData;
                 playlistItems.Add(playlistItem);
             }
             return playlistItems.ToArray();
