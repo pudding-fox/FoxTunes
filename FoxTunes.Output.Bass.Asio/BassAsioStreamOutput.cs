@@ -1,7 +1,9 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using ManagedBass.Asio;
+using ManagedBass.Mix;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -9,49 +11,23 @@ namespace FoxTunes
 {
     public class BassAsioStreamOutput : BassStreamOutput
     {
-        const int CONNECT_ATTEMPTS = 5;
-
-        const int CONNECT_ATTEMPT_INTERVAL = 400;
-
-        const int START_ATTEMPTS = 5;
-
-        const int START_ATTEMPT_INTERVAL = 400;
-
         private BassAsioStreamOutput()
         {
             this.Flags = BassFlags.Default;
+            this.MixerChannelHandles = new HashSet<int>();
         }
 
         public BassAsioStreamOutput(BassAsioStreamOutputBehaviour behaviour, BassOutputStream stream)
             : this()
         {
             this.Behaviour = behaviour;
-            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
+            this.Rate = behaviour.Output.Rate;
+            this.Channels = BassAsioDevice.Info.Outputs;
+            this.Flags = BassFlags.Decode;
+            if (this.Behaviour.Output.Float)
             {
-                this.Rate = BassUtils.GetChannelDsdRate(stream.ChannelHandle);
-                this.Flags |= BassFlags.DSDRaw;
+                this.Flags |= BassFlags.Float;
             }
-            else
-            {
-                if (behaviour.Output.Rate == stream.Rate)
-                {
-                    this.Rate = stream.Rate;
-                }
-                else if (!behaviour.Output.EnforceRate && BassAsioDevice.Info.SupportedRates.Contains(stream.Rate))
-                {
-                    this.Rate = stream.Rate;
-                }
-                else
-                {
-                    Logger.Write(this, LogLevel.Debug, "The requested output rate is either enforced or the device does not support the stream's rate: {0} => {1}", stream.Rate, behaviour.Output.Rate);
-                    this.Rate = behaviour.Output.Rate;
-                }
-                if (behaviour.Output.Float)
-                {
-                    this.Flags |= BassFlags.Float;
-                }
-            }
-            this.Channels = stream.Channels;
         }
 
         public override string Name
@@ -78,14 +54,6 @@ namespace FoxTunes
 
         public BassAsioStreamOutputBehaviour Behaviour { get; private set; }
 
-        public int Device
-        {
-            get
-            {
-                return BassAsioDevice.Device;
-            }
-        }
-
         public override int Rate { get; protected set; }
 
         public override int Channels { get; protected set; }
@@ -94,6 +62,28 @@ namespace FoxTunes
 
         public override int ChannelHandle { get; protected set; }
 
+        public HashSet<int> MixerChannelHandles { get; protected set; }
+
+        public override bool CanControlVolume
+        {
+            get
+            {
+                return BassAsioDevice.CanControlVolume;
+            }
+        }
+
+        public override float Volume
+        {
+            get
+            {
+                return BassAsioDevice.Volume;
+            }
+            set
+            {
+                BassAsioDevice.Volume = value;
+            }
+        }
+
         public override bool CheckFormat(int rate, int channels)
         {
             return BassAsioDevice.Info.SupportedRates.Contains(rate) && channels <= BassAsioDevice.Info.Outputs;
@@ -101,88 +91,82 @@ namespace FoxTunes
 
         public override void Connect(IBassStreamComponent previous)
         {
-            if (previous.Channels > BassAsioDevice.Info.Outputs)
+            this.ConfigureASIO(previous);
+            if (this.ShouldCreateMixer(previous))
             {
-                //TODO: We should down mix.
-                Logger.Write(this, LogLevel.Error, "Cannot play stream with more channels than device outputs.");
-                throw new NotImplementedException(string.Format("The stream contains {0} channels which is greater than {1} output channels provided by the device.", previous.Channels, BassAsioDevice.Info.Outputs));
-            }
-            if (!this.CheckFormat(this.Rate, previous.Channels))
-            {
-                Logger.Write(this, LogLevel.Error, "Cannot play stream with unsupported rate.");
-                throw new NotImplementedException(string.Format("The stream has a rate of {0} which is not supported by the device.", this.Rate));
-            }
-            var exception = default(Exception);
-            for (var a = 1; a <= CONNECT_ATTEMPTS; a++)
-            {
-                Logger.Write(this, LogLevel.Debug, "Configuring ASIO, attempt: {0}", a);
-                try
+                Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", this.Rate, this.Channels);
+                this.ChannelHandle = BassMix.CreateMixerStream(this.Rate, this.Channels, this.Flags);
+                if (this.ChannelHandle == 0)
                 {
-                    if (BassAsioUtils.OK(this.ConfigureASIO(previous)))
+                    BassUtils.Throw();
+                }
+                Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
+                BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default | BassFlags.MixerBuffer));
+                BassUtils.OK(BassAsioHandler.StreamSet(this.ChannelHandle));
+                this.MixerChannelHandles.Add(previous.ChannelHandle);
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "The stream properties match the device, playing directly.");
+                BassUtils.OK(BassAsioHandler.StreamSet(previous.ChannelHandle));
+            }
+        }
+
+        protected virtual void ConfigureASIO(IBassStreamComponent previous)
+        {
+            if (BassUtils.GetChannelDsdRaw(previous.ChannelHandle))
+            {
+                this.Rate = BassUtils.GetChannelDsdRate(previous.ChannelHandle);
+                this.Flags |= BassFlags.DSDRaw;
+            }
+            else
+            {
+                if (this.Behaviour.Output.EnforceRate)
+                {
+                    if (!BassAsioDevice.Info.SupportedRates.Contains(this.Rate))
                     {
-                        var success = default(bool);
-                        if (previous.Flags.HasFlag(BassFlags.DSDRaw) || BassUtils.GetChannelDsdRaw(previous.ChannelHandle))
-                        {
-                            success = BassAsioUtils.OK(this.ConfigureASIO_DSD(previous));
-                        }
-                        else
-                        {
-                            success = BassAsioUtils.OK(this.ConfigureASIO_PCM(previous));
-                        }
-                        if (success)
-                        {
-                            Logger.Write(this, LogLevel.Debug, "Configured ASIO.");
-                            return;
-                        }
+                        var nearestRate = BassAsioDevice.Info.GetNearestRate(this.Rate);
+                        Logger.Write(this, LogLevel.Warn, "Enforced rate {0} isn't supposed by the device, falling back to {1}.", this.Rate, nearestRate);
+                        this.Rate = nearestRate;
+                    }
+                    else
+                    {
+                        //Enfoced rate is supported by the device, nothing to do.
                     }
                 }
-                catch (Exception e)
+                else
                 {
-                    exception = e;
-                    Logger.Write(this, LogLevel.Warn, "Failed to configure ASIO: {0}", e.Message);
-                    if (BassAsioDevice.IsInitialized)
+                    if (!BassAsioDevice.Info.SupportedRates.Contains(previous.Rate))
                     {
-                        Logger.Write(this, LogLevel.Warn, "Re-initializing ASIO, have you just switched from DSD to PCM?");
-                        BassAsioDevice.Free();
-                        BassAsioDevice.Init();
+                        var nearestRate = BassAsioDevice.Info.GetNearestRate(previous.Rate);
+                        Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", this.Rate, nearestRate);
+                        this.Rate = nearestRate;
+                    }
+                    else
+                    {
+                        //Stream rate is supported by the device, nothing to do.
+                        this.Rate = previous.Rate;
                     }
                 }
-                Thread.Sleep(CONNECT_ATTEMPT_INTERVAL);
             }
-            if (exception != null)
-            {
-                throw exception;
-            }
-            throw new NotImplementedException();
+            BassAsioDevice.Init(
+                this.Behaviour.AsioDevice,
+                this.Rate,
+                this.Channels,
+                this.Flags
+            );
         }
 
         protected virtual bool StartASIO()
         {
-            for (var a = 1; a <= START_ATTEMPTS; a++)
+            if (BassAsio.IsStarted)
             {
-                Logger.Write(this, LogLevel.Debug, "Starting ASIO, attempt: {0}", a);
-                try
-                {
-                    var success = BassAsio.Start(BassAsio.Info.PreferredBufferLength);
-                    if (success)
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Successfully started ASIO.");
-                        return true;
-                    }
-                    else
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Failed to start ASIO: {0}", Enum.GetName(typeof(Errors), BassAsio.LastError));
-                    }
-                }
-                catch (Exception e)
-                {
-                    //Nothing can be done.
-                    Logger.Write(this, LogLevel.Warn, "Failed to start ASIO: {0}", e.Message);
-                }
-                Thread.Sleep(START_ATTEMPT_INTERVAL);
+                Logger.Write(this, LogLevel.Debug, "ASIO has already been started.");
+                return false;
             }
-            Logger.Write(this, LogLevel.Warn, "Failed to start ASIO after {0} attempts.", START_ATTEMPTS);
-            return false;
+            Logger.Write(this, LogLevel.Debug, "Starting ASIO.");
+            BassUtils.OK(BassAsio.Start(BassAsio.Info.PreferredBufferLength));
+            return true;
         }
 
         protected virtual bool StopASIO()
@@ -197,130 +181,20 @@ namespace FoxTunes
             return true;
         }
 
-        protected virtual bool ConfigureASIO(IBassStreamComponent previous)
+        protected virtual bool ShouldCreateMixer(IBassStreamComponent previous)
         {
-            Logger.Write(this, LogLevel.Debug, "Configuring ASIO.");
-            BassAsioUtils.OK(BassAsioHandler.StreamSet(previous.ChannelHandle));
-            BassAsioUtils.OK(BassAsioHandler.ChannelEnable(false, BassAsioDevice.PRIMARY_CHANNEL));
-            if (previous.Channels == 1)
+            if (this.Behaviour.Mixer)
             {
-                Logger.Write(this, LogLevel.Debug, "Mirroring channel: {0} => {1}", BassAsioDevice.PRIMARY_CHANNEL, BassAsioDevice.SECONDARY_CHANNEL);
-                BassAsioUtils.OK(BassAsio.ChannelEnableMirror(BassAsioDevice.SECONDARY_CHANNEL, false, BassAsioDevice.PRIMARY_CHANNEL));
-            }
-            else
-            {
-                for (var channel = 1; channel < previous.Channels; channel++)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Joining channel: {0} => {1}", channel, BassAsioDevice.PRIMARY_CHANNEL);
-                    BassAsioUtils.OK(BassAsio.ChannelJoin(false, channel, BassAsioDevice.PRIMARY_CHANNEL));
-                }
-            }
-            return true;
-        }
-
-        protected virtual bool ConfigureASIO_PCM(IBassStreamComponent previous)
-        {
-            Logger.Write(this, LogLevel.Debug, "Configuring PCM.");
-            BassAsioUtils.OK(BassAsio.SetDSD(false));
-            if (!this.CheckFormat(this.Rate, this.Channels))
-            {
-                Logger.Write(this, LogLevel.Warn, "PCM format {0}:{1} is unsupported.", this.Rate, this.Channels);
-                return false;
-            }
-            else
-            {
-                BassAsio.Rate = this.Rate;
-            }
-            var format = default(AsioSampleFormat);
-            if (previous.Flags.HasFlag(BassFlags.Float))
-            {
-                format = AsioSampleFormat.Float;
-            }
-            else
-            {
-                format = AsioSampleFormat.Bit16;
-            }
-            Logger.Write(this, LogLevel.Debug, "PCM: Rate = {0}, Format = {1}", BassAsio.Rate, Enum.GetName(typeof(AsioSampleFormat), format));
-            BassAsioUtils.OK(BassAsio.ChannelSetRate(false, BassAsioDevice.PRIMARY_CHANNEL, previous.Rate));
-            BassAsioUtils.OK(BassAsio.ChannelSetFormat(false, BassAsioDevice.PRIMARY_CHANNEL, format));
-            return true;
-        }
-
-        protected virtual bool ConfigureASIO_DSD(IBassStreamComponent previous)
-        {
-            try
-            {
-                Logger.Write(this, LogLevel.Debug, "Configuring DSD RAW.");
-                try
-                {
-                    BassAsioUtils.OK(BassAsio.SetDSD(true));
-                }
-                catch
-                {
-                    //If we get here some drivers (at least Creative) will crash when BassAsio.Start is called.
-                    //I can't find a way to prevent it but it seems to be related to the allocated buffer size
-                    //not being what the driver *thinks* it is and over-flowing.
-                    //
-                    //It should be unlikely in real life as the device would have to report capability of some
-                    //very high PCM frequencies.
-                    Logger.Write(this, LogLevel.Error, "Failed to enable DSD RAW on the device. Creative ASIO driver becomes unstable and usually crashes soon...");
-                    return false;
-                }
-                if (!this.CheckFormat(this.Rate, previous.Channels))
-                {
-                    Logger.Write(this, LogLevel.Warn, "DSD format {0}:{1} is unsupported.", previous.Rate, previous.Channels);
-                    return false;
-                }
-                else
-                {
-                    BassAsio.Rate = this.Rate;
-                }
-                //It looks like BASS DSD always outputs 8 bit/MSB data so we don't need to determine the format.
-                //var format = default(AsioSampleFormat);
-                //switch (this.Depth)
-                //{
-                //    case BassAttribute.DSDFormat_LSB:
-                //        format = AsioSampleFormat.DSD_LSB;
-                //        break;
-                //    case BassAttribute.DSDFormat_None:
-                //    case BassAttribute.DSDFormat_MSB:
-                //        format = AsioSampleFormat.DSD_MSB;
-                //        break;
-                //    default:
-                //        throw new NotImplementedException();
-                //}
-                Logger.Write(this, LogLevel.Debug, "DSD: Rate = {0}, Format = {1}", BassAsio.Rate, Enum.GetName(typeof(AsioSampleFormat), AsioSampleFormat.DSD_MSB));
-                BassAsioUtils.OK(BassAsio.ChannelSetFormat(false, BassAsioDevice.PRIMARY_CHANNEL, AsioSampleFormat.DSD_MSB));
+                //Mixer is forced on, probably so visualizations work.
                 return true;
             }
-            catch (Exception e)
+            else if (previous.Rate != this.Rate || previous.Channels != this.Channels)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to configure DSD RAW: {0}", e.Message);
-                return false;
+                //Stream rate or channel count differs from device.
+                return true;
             }
-        }
-
-        protected virtual bool ResetASIO()
-        {
-            try
-            {
-                var flags =
-                    AsioChannelResetFlags.Enable |
-                    AsioChannelResetFlags.Join |
-                    AsioChannelResetFlags.Format |
-                    AsioChannelResetFlags.Rate;
-                Logger.Write(this, LogLevel.Debug, "Resetting channel attributes.");
-                for (var channel = 0; channel < this.Channels; channel++)
-                {
-                    BassAsioUtils.OK(BassAsio.ChannelReset(false, channel, flags));
-                }
-            }
-            catch (Exception e)
-            {
-                //Nothing can be done.
-                Logger.Write(this, LogLevel.Warn, "Failed to reset channel attributes: {0}", e.Message);
-            }
-            return true;
+            //Looks like no mixer is required.
+            return false;
         }
 
         public override bool IsPlaying
@@ -441,16 +315,32 @@ namespace FoxTunes
 
         public override int GetData(float[] buffer)
         {
-            return -1;
+            var length = default(uint);
+            switch (buffer.Length)
+            {
+                case 128:
+                    length = FFT256;
+                    break;
+                case 256:
+                    length = FFT512;
+                    break;
+                case 512:
+                    length = FFT1024;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            foreach (var channelHandle in this.MixerChannelHandles)
+            {
+                return BassMix.ChannelGetData(channelHandle, buffer, unchecked((int)length));
+            }
+            return 0;
         }
 
         protected override void OnDisposing()
         {
-            if (BassAsio.IsStarted)
-            {
-                BassAsioUtils.OK(this.StopASIO());
-                BassAsioUtils.OK(this.ResetASIO());
-            }
+            this.Stop();
+            BassAsioDevice.Free();
         }
     }
 }

@@ -18,7 +18,7 @@ namespace FoxTunes
         }
 
         [field: NonSerialized]
-        public EventHandler Invoked;
+        public event EventHandler Invoked;
 
         public CommandConfigurationElement WithHandler(Action action)
         {

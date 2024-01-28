@@ -13,6 +13,9 @@
     <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net40'">
       <HintPath>..\lib\net40\ManagedBass.dll</HintPath>
     </Reference>
+    <Reference Include="ManagedBass.Mix" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\ManagedBass.Mix.dll</HintPath>
+    </Reference>
     <Reference Include="ManagedBass.Asio" Condition="'$(TargetFramework)' == 'net40'">
       <HintPath>..\lib\net40\ManagedBass.Asio.dll</HintPath>
     </Reference>
@@ -21,6 +24,9 @@
   <ItemGroup>
     <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net461'">
       <HintPath>..\lib\ManagedBass.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedBass.Mix" Condition="'$(TargetFramework)' == 'net461'">
+      <HintPath>..\lib\ManagedBass.Mix.dll</HintPath>
     </Reference>
     <Reference Include="ManagedBass.Asio" Condition="'$(TargetFramework)' == 'net461'">
       <HintPath>..\lib\ManagedBass.Asio.dll</HintPath>

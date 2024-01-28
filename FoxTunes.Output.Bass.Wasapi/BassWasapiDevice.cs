@@ -59,11 +59,9 @@ namespace FoxTunes
                 BassUtils.OK(
                     BassWasapiHandler.Init(
                         device,
-                        0,
-                        0,
-                        GetFlags(exclusive, autoFormat, buffer, eventDriven, dither),
-                        0,
-                        0
+                        frequency,
+                        channels,
+                        GetFlags(exclusive, autoFormat, buffer, eventDriven, dither)
                     )
                 );
 
@@ -90,7 +88,14 @@ namespace FoxTunes
             try
             {
                 var flags = GetFlags(exclusive, autoFormat, buffer, eventDriven, dither);
-                BassUtils.OK(BassWasapiHandler.Init(device, 0, 0, flags, 0, 0));
+                BassUtils.OK(
+                    BassWasapiHandler.Init(
+                        device,
+                        0,
+                        0,
+                        flags
+                    )
+                );
                 var deviceInfo = default(WasapiDeviceInfo);
                 BassUtils.OK(BassWasapi.GetDeviceInfo(device, out deviceInfo));
                 Info = new BassWasapiDeviceInfo(
@@ -98,8 +103,16 @@ namespace FoxTunes
                     deviceInfo.MixFrequency,
                     0,
                     deviceInfo.MixChannels,
-                    GetSupportedFormats(device, flags),
-                    BassWasapi.CheckFormat(device, deviceInfo.MixFrequency, deviceInfo.MixChannels, flags)
+                    GetSupportedFormats(
+                        device,
+                        flags
+                    ),
+                    BassWasapi.CheckFormat(
+                        device,
+                        deviceInfo.MixFrequency,
+                        deviceInfo.MixChannels,
+                        flags
+                    )
                 );
 
                 LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detected WASAPI device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}, Format = {4}", device, Info.Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(WasapiFormat), Info.Format));
