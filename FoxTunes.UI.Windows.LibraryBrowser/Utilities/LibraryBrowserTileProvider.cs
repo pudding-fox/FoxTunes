@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -82,87 +83,82 @@ namespace FoxTunes
 
         private ImageSource CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
         {
+            var fileNames = libraryHierarchyNode.MetaDatas.Where(
+                metaDataItem => metaDataItem.Type == MetaDataItemType.Image && File.Exists(metaDataItem.Value)
+            ).Select(
+                metaDataItem => metaDataItem.Value
+            ).ToArray();
             switch (this.ImageMode)
             {
                 case LibraryBrowserImageMode.First:
-                    switch (libraryHierarchyNode.MetaDatas.Length)
+                    switch (fileNames.Length)
                     {
                         case 0:
                             return null;
                         default:
-                            return this.CreateImageSource1(libraryHierarchyNode, width, height);
+                            return this.CreateImageSource1(libraryHierarchyNode, fileNames, width, height);
                     }
                 default:
                 case LibraryBrowserImageMode.Compound:
-                    switch (libraryHierarchyNode.MetaDatas.Length)
+                    switch (fileNames.Length)
                     {
                         case 0:
                             return null;
                         case 1:
-                            return this.CreateImageSource1(libraryHierarchyNode, width, height);
+                            return this.CreateImageSource1(libraryHierarchyNode, fileNames, width, height);
                         case 2:
-                            return this.CreateImageSource2(libraryHierarchyNode, width, height, cache);
+                            return this.CreateImageSource2(libraryHierarchyNode, fileNames, width, height, cache);
                         case 3:
-                            return this.CreateImageSource3(libraryHierarchyNode, width, height, cache);
+                            return this.CreateImageSource3(libraryHierarchyNode, fileNames, width, height, cache);
                         default:
-                            return this.CreateImageSource4(libraryHierarchyNode, width, height, cache);
+                            return this.CreateImageSource4(libraryHierarchyNode, fileNames, width, height, cache);
                     }
             }
         }
 
-        private ImageSource CreateImageSource1(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
+        private ImageSource CreateImageSource1(LibraryHierarchyNode libraryHierarchyNode, string[] fileNames, int width, int height)
         {
-            var fileName = libraryHierarchyNode.MetaDatas[0].Value;
-            if (!File.Exists(fileName))
-            {
-                return null;
-            }
-            return this.ImageLoader.Load(fileName, width, height, true);
+            return this.ImageLoader.Load(fileNames[0], width, height, true);
         }
 
-        private ImageSource CreateImageSource2(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
+        private ImageSource CreateImageSource2(LibraryHierarchyNode libraryHierarchyNode, string[] fileNames, int width, int height, bool cache)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
             {
-                this.DrawImage(libraryHierarchyNode, context, 0, 2, width, height);
-                this.DrawImage(libraryHierarchyNode, context, 1, 2, width, height);
+                this.DrawImage(fileNames[0], context, 0, 2, width, height);
+                this.DrawImage(fileNames[1], context, 1, 2, width, height);
             }
             return this.Render(libraryHierarchyNode, visual, width, height, cache);
         }
 
-        private ImageSource CreateImageSource3(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
+        private ImageSource CreateImageSource3(LibraryHierarchyNode libraryHierarchyNode, string[] fileNames, int width, int height, bool cache)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
             {
-                this.DrawImage(libraryHierarchyNode, context, 0, 3, width, height);
-                this.DrawImage(libraryHierarchyNode, context, 1, 3, width, height);
-                this.DrawImage(libraryHierarchyNode, context, 2, 3, width, height);
+                this.DrawImage(fileNames[0], context, 0, 3, width, height);
+                this.DrawImage(fileNames[1], context, 1, 3, width, height);
+                this.DrawImage(fileNames[2], context, 2, 3, width, height);
             }
             return this.Render(libraryHierarchyNode, visual, width, height, cache);
         }
 
-        private ImageSource CreateImageSource4(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
+        private ImageSource CreateImageSource4(LibraryHierarchyNode libraryHierarchyNode, string[] fileNames, int width, int height, bool cache)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
             {
-                this.DrawImage(libraryHierarchyNode, context, 0, 4, width, height);
-                this.DrawImage(libraryHierarchyNode, context, 1, 4, width, height);
-                this.DrawImage(libraryHierarchyNode, context, 2, 4, width, height);
-                this.DrawImage(libraryHierarchyNode, context, 3, 4, width, height);
+                this.DrawImage(fileNames[0], context, 0, 4, width, height);
+                this.DrawImage(fileNames[1], context, 1, 4, width, height);
+                this.DrawImage(fileNames[2], context, 2, 4, width, height);
+                this.DrawImage(fileNames[3], context, 3, 4, width, height);
             }
             return this.Render(libraryHierarchyNode, visual, width, height, cache);
         }
 
-        private void DrawImage(LibraryHierarchyNode libraryHierarchyNode, DrawingContext context, int position, int count, int width, int height)
+        private void DrawImage(string fileName, DrawingContext context, int position, int count, int width, int height)
         {
-            var fileName = libraryHierarchyNode.MetaDatas[position].Value;
-            if (!File.Exists(fileName))
-            {
-                return;
-            }
             var region = this.GetRegion(context, position, count, width, height);
             var size = (int)Math.Max(region.Width, region.Height);
             var source = this.ImageLoader.Load(fileName, size, size, false);
