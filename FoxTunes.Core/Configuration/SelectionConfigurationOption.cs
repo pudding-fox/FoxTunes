@@ -24,6 +24,10 @@ namespace FoxTunes
             {
                 return false;
             }
+            if (object.ReferenceEquals(this, other))
+            {
+                return true;
+            }
             return string.Equals(this.Id, other.Id, StringComparison.OrdinalIgnoreCase);
         }
 
