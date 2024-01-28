@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -13,7 +14,7 @@ namespace FoxTunes
             "ControlType",
             typeof(Type),
             typeof(ControlSlot),
-            new FrameworkPropertyMetadata(typeof(object), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnControlTypeChanged))
+            new FrameworkPropertyMetadata(LayoutManager.PLACEHOLDER, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnControlTypeChanged))
         );
 
         public static Type GetControlType(ControlSlot source)
@@ -63,7 +64,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.ControlType != null && this.ControlType != typeof(object);
+                return this.ControlType != null && this.ControlType != LayoutManager.PLACEHOLDER;
             }
         }
 
@@ -72,7 +73,7 @@ namespace FoxTunes
             if (this.HasControlType)
             {
                 this.Visibility = Visibility.Visible;
-                this.Content = Activator.CreateInstance(this.ControlType);
+                this.Content = ComponentActivator.Instance.Activate<IUIComponent>(this.ControlType);
             }
             else
             {

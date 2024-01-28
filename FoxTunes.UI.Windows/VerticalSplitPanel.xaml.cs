@@ -13,7 +13,7 @@ namespace FoxTunes
             "ControlType",
             typeof(Type),
             typeof(VerticalSplitPanel),
-            new FrameworkPropertyMetadata(typeof(object), FrameworkPropertyMetadataOptions.None)
+            new FrameworkPropertyMetadata(LayoutManager.PLACEHOLDER, FrameworkPropertyMetadataOptions.None)
         );
 
         public static readonly DependencyProperty ControlTypeProperty = ControlTypePropertyKey.DependencyProperty;
@@ -32,7 +32,7 @@ namespace FoxTunes
             "ControlType1",
             typeof(Type),
             typeof(VerticalSplitPanel),
-            new FrameworkPropertyMetadata(typeof(object), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnControlType1Changed))
+            new FrameworkPropertyMetadata(LayoutManager.PLACEHOLDER, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnControlType1Changed))
         );
 
         public static Type GetControlType1(VerticalSplitPanel source)
@@ -59,7 +59,7 @@ namespace FoxTunes
             "ControlType2",
             typeof(Type),
             typeof(VerticalSplitPanel),
-            new FrameworkPropertyMetadata(typeof(object), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnControlType2Changed))
+            new FrameworkPropertyMetadata(LayoutManager.PLACEHOLDER, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnControlType2Changed))
         );
 
         public static Type GetControlType2(VerticalSplitPanel source)
@@ -153,7 +153,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.ControlType1 != null && this.ControlType1 != typeof(object);
+                return this.ControlType1 != null && this.ControlType1 != LayoutManager.PLACEHOLDER;
             }
         }
 
@@ -178,7 +178,7 @@ namespace FoxTunes
         {
             get
             {
-                return this.ControlType2 != null && this.ControlType2 != typeof(object);
+                return this.ControlType2 != null && this.ControlType2 != LayoutManager.PLACEHOLDER;
             }
         }
 
@@ -204,7 +204,7 @@ namespace FoxTunes
             if (this.HasControlType1 && this.HasControlType2)
             {
                 this.Style = this.FindResource<Style>("SplitStyle");
-                this.ControlType = typeof(object);
+                this.ControlType = LayoutManager.PLACEHOLDER;
                 this.Visibility = Visibility.Visible;
             }
             else if (this.HasControlType1)
@@ -228,7 +228,7 @@ namespace FoxTunes
             else
             {
                 this.Style = null;
-                this.ControlType = typeof(object);
+                this.ControlType = LayoutManager.PLACEHOLDER;
                 this.Visibility = Visibility.Collapsed;
             }
         }

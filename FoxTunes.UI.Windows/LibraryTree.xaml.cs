@@ -9,7 +9,8 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for LibraryTree.xaml
     /// </summary>
-    public partial class LibraryTree : UserControl
+    [UIComponent("86276AD4-3962-4659-A00F-95065CD92117", UIComponentSlots.TOP_LEFT, "Library Tree")]
+    public partial class LibraryTree : UIComponentBase
     {
         const int EXPAND_ALL_LIMIT = 3;
 

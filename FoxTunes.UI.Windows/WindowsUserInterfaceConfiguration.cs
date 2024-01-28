@@ -79,38 +79,11 @@ namespace FoxTunes
 
         private static IEnumerable<SelectionConfigurationOption> GetControlOptions(string id)
         {
-            var types = new[]
+            yield return new SelectionConfigurationOption(UIComponent.PLACEHOLDER, "Empty");
+            foreach (var component in LayoutManager.Instance.Components)
             {
-                typeof(object),
-                typeof(Playlist),
-                typeof(LibraryTree),
-                typeof(LibraryBrowser),
-                typeof(Artwork)
-            };
-            foreach (var type in types)
-            {
-                var option = default(SelectionConfigurationOption);
-                if (type != typeof(object))
-                {
-                    option = new SelectionConfigurationOption(type.FullName, type.Name);
-                }
-                else
-                {
-                    option = new SelectionConfigurationOption(type.FullName, "Empty");
-                }
-                if (string.Equals(id, TOP_LEFT_ELEMENT, StringComparison.OrdinalIgnoreCase) && type == typeof(LibraryTree))
-                {
-                    option.Default();
-                }
-                if (string.Equals(id, BOTTOM_LEFT_ELEMENT, StringComparison.OrdinalIgnoreCase) && type == typeof(Artwork))
-                {
-                    option.Default();
-                }
-                if (string.Equals(id, TOP_CENTER_ELEMENT, StringComparison.OrdinalIgnoreCase) && type == typeof(LibraryBrowser))
-                {
-                    option.Default();
-                }
-                if (string.Equals(id, BOTTOM_CENTER_ELEMENT, StringComparison.OrdinalIgnoreCase) && type == typeof(Playlist))
+                var option = new SelectionConfigurationOption(component.Id, component.Name, component.Description);
+                if (string.Equals(component.Slot, id, StringComparison.OrdinalIgnoreCase))
                 {
                     option.Default();
                 }
@@ -120,11 +93,12 @@ namespace FoxTunes
 
         public static Type GetControl(SelectionConfigurationOption option)
         {
-            if (option == null)
+            var component = LayoutManager.Instance.GetComponent(option.Id);
+            if (component == null)
             {
-                return typeof(object);
+                return LayoutManager.PLACEHOLDER;
             }
-            return typeof(WindowsUserInterfaceConfiguration).Assembly.GetType(option.Id) ?? typeof(object);
+            return component.Type;
         }
     }
 }

@@ -1,14 +1,14 @@
 ﻿using System.Collections;
-using System.Windows;
-using System.Windows.Controls;
 using System.Linq;
+using System.Windows;
 
 namespace FoxTunes
 {
     /// <summary>
     /// Interaction logic for Playlist.xaml
     /// </summary>
-    public partial class Playlist : UserControl
+    [UIComponent("12023E31-CB53-4F9C-8A5B-A0593706F37E", UIComponentSlots.BOTTOM_CENTER, "Playlist")]
+    public partial class Playlist : UIComponentBase
     {
         public Playlist()
         {

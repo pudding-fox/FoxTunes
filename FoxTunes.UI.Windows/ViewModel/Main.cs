@@ -76,33 +76,7 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler ScalingFactorChanged;
-
-        private LayoutManager _LayoutManager { get; set; }
-
-        public LayoutManager LayoutManager
-        {
-            get
-            {
-                return this._LayoutManager;
-            }
-            set
-            {
-                this._LayoutManager = value;
-                this.OnLayoutManagerChanged();
-            }
-        }
-
-        protected virtual void OnLayoutManagerChanged()
-        {
-            if (this.LayoutManagerChanged != null)
-            {
-                this.LayoutManagerChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("LayoutManager");
-        }
-
-        public event EventHandler LayoutManagerChanged;
-
+        
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = this.Core.Components.Configuration;
@@ -114,7 +88,6 @@ namespace FoxTunes.ViewModel
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
-            this.LayoutManager = ComponentRegistry.Instance.GetComponent<LayoutManager>();
             base.InitializeComponent(core);
         }
 
