@@ -55,7 +55,6 @@ CREATE TABLE [PlaylistColumns] (
   [Type] bigint NOT NULL,
   [Script] text NULL COLLATE NOCASE,
   [Plugin] text NULL COLLATE NOCASE,
-  [IsDynamic] INTEGER NOT NULL, 
   [Width] numeric(53,0) NULL,
   [Enabled] bit NOT NULL);
 

@@ -56,7 +56,6 @@ CREATE TABLE [PlaylistColumns] (
   [Type] bigint NOT NULL,
   [Script] nvarchar(max) NULL, 
   [Plugin] nvarchar(250) NULL, 
-  [IsDynamic] INTEGER NOT NULL, 
   [Width] numeric(38,0) NULL,
   [Enabled] bit NOT NULL);
 
