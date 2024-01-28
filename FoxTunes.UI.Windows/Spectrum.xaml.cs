@@ -31,6 +31,8 @@ namespace FoxTunes
 
         public static readonly IntegerConfigurationElement Amplitude;
 
+        public static readonly DoubleConfigurationElement ScalingFactor;
+
         static Spectrum()
         {
             var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
@@ -74,6 +76,10 @@ namespace FoxTunes
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.AMPLITUDE_ELEMENT
             );
+            ScalingFactor = configuration.GetElement<DoubleConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
+            );
         }
 
         public Spectrum()
@@ -89,6 +95,7 @@ namespace FoxTunes
             UpdateInterval.ValueChanged += this.OnValueChanged;
             FFTSize.ValueChanged += this.OnValueChanged;
             Amplitude.ValueChanged += this.OnValueChanged;
+            ScalingFactor.ValueChanged += this.OnValueChanged;
         }
 
         public Debouncer Debouncer { get; private set; }
@@ -149,9 +156,15 @@ namespace FoxTunes
                 {
                     color = Colors.Black;
                 }
+
+                var size = Windows.ActiveWindow.GetElementPixelSize(
+                    width * ScalingFactor.Value,
+                    height * ScalingFactor.Value
+                );
+
                 this.Renderer = new SpectrumRenderer(
-                    Convert.ToInt32(width),
-                    Convert.ToInt32(height),
+                    Convert.ToInt32(size.Width),
+                    Convert.ToInt32(size.Height),
                     SpectrumBehaviourConfiguration.GetBars(BarCount.Value),
                     SpectrumBehaviourConfiguration.GetFFTSize(FFTSize.Value),
                     UpdateInterval.Value,
