@@ -84,6 +84,14 @@ namespace FoxTunes
             }
         }
 
+        public string BPM
+        {
+            get
+            {
+                return Resources.BPM;
+            }
+        }
+
         public static ICoreScripts Instance = new JSCoreScripts();
     }
 }
