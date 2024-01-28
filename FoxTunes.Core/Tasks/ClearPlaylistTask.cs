@@ -31,13 +31,14 @@ namespace FoxTunes
 
         private void Clear()
         {
+            this.Name = "Clearing playlist";
             this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Playlist.Set.Clear()));
         }
 
         private void SaveChanges()
         {
-            this.SetName("Saving changes");
-            this.SetPosition(this.Count);
+            this.Name = "Saving changes";
+            this.Position = this.Count;
             this.Database.Interlocked(() => this.Database.SaveChanges());
         }
     }

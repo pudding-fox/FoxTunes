@@ -5,10 +5,13 @@ namespace FoxTunes.Managers
 {
     public class PlaybackManager : StandardManager, IPlaybackManager
     {
+        public ICore Core { get; private set; }
+
         public IOutput Output { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.Output = core.Components.Output;
             base.InitializeComponent(core);
         }
@@ -44,10 +47,20 @@ namespace FoxTunes.Managers
 
         public event EventHandler CurrentStreamChanged = delegate { };
 
-        public IOutputStream Load(string fileName)
+        public void Load(string fileName, bool play)
         {
             this.Unload();
-            return this.CurrentStream = this.Output.Load(fileName);
+            var task = new LoadOutputStreamTask(fileName);
+            task.InitializeComponent(this.Core);
+            if (play)
+            {
+                task.Completed += (sender, e) =>
+                {
+                    this.CurrentStream.Play();
+                };
+            }
+            this.OnBackgroundTask(task);
+            task.Run();
         }
 
         public void Unload()
@@ -60,6 +73,17 @@ namespace FoxTunes.Managers
             this.CurrentStream.Dispose();
             this.CurrentStream = null;
         }
+
+        protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
+        {
+            if (this.BackgroundTask == null)
+            {
+                return;
+            }
+            this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
+        }
+
+        public event BackgroundTaskEventHandler BackgroundTask = delegate { };
 
         public bool IsDisposed { get; private set; }
 

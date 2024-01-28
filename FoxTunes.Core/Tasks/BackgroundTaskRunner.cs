@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace FoxTunes.Tasks
+namespace FoxTunes
 {
     public class BackgroundTaskRunner : StandardComponent, IBackgroundTaskRunner
     {
