@@ -24,9 +24,13 @@ namespace FoxTunes.Interfaces
 
         Task<IOutputStream> Load(PlaylistItem playlistItem, bool immidiate);
 
+        event OutputStreamEventHandler Loaded;
+
         Task<bool> Preempt(IOutputStream stream);
 
         Task Unload(IOutputStream stream);
+
+        event OutputStreamEventHandler Unloaded;
 
         Task Shutdown();
 
@@ -39,5 +43,17 @@ namespace FoxTunes.Interfaces
         float Volume { get; set; }
 
         event EventHandler VolumeChanged;
+    }
+
+    public delegate void OutputStreamEventHandler(object sender, OutputStreamEventArgs e);
+
+    public class OutputStreamEventArgs
+    {
+        public OutputStreamEventArgs(IOutputStream stream)
+        {
+            this.Stream = stream;
+        }
+
+        public IOutputStream Stream { get; private set; }
     }
 }

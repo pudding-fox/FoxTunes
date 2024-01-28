@@ -278,8 +278,24 @@ namespace FoxTunes
 
             if (this.ReplayGain.Value)
             {
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.ReplayGainAlbumGain, tag.ReplayGainAlbumGain.ToString()), this.ErrorHandler);
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.ReplayGainTrackGain, tag.ReplayGainTrackGain.ToString()), this.ErrorHandler);
+                (this).Try(() =>
+                {
+                    if (tag.ReplayGainAlbumGain == 0 || double.IsNaN(tag.ReplayGainAlbumGain) || double.IsInfinity(tag.ReplayGainAlbumGain))
+                    {
+                        //Invalid replay gain value.
+                        return;
+                    }
+                    this.AddTag(metaData, CommonMetaData.ReplayGainAlbumGain, tag.ReplayGainAlbumGain.ToString());
+                }, this.ErrorHandler);
+                (this).Try(() =>
+                {
+                    if (tag.ReplayGainTrackGain == 0 || double.IsNaN(tag.ReplayGainTrackGain) || double.IsInfinity(tag.ReplayGainTrackGain))
+                    {
+                        //Invalid replay gain value.
+                        return;
+                    }
+                    this.AddTag(metaData, CommonMetaData.ReplayGainTrackGain, tag.ReplayGainTrackGain.ToString());
+                }, this.ErrorHandler);
             }
         }
 
