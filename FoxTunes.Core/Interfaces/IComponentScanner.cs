@@ -9,5 +9,7 @@ namespace FoxTunes.Interfaces
 
         [Obsolete("This method has no caching, use it sparingly.")]
         IEnumerable<Type> GetComponents(Type interfaceType);
+
+        IDictionary<string, IList<Type>> GetComponentsBySlot();
     }
 }

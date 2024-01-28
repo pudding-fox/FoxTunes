@@ -13,7 +13,9 @@ namespace FoxTunes
         private static readonly Lazy<IEnumerable<UIComponent>> _Components = new Lazy<IEnumerable<UIComponent>>(() =>
         {
             var components = new List<UIComponent>();
+#pragma warning disable 612, 618
             foreach (var type in ComponentScanner.Instance.GetComponents(typeof(IUIComponent)))
+#pragma warning restore 612, 618
             {
                 var attribute = default(UIComponentAttribute);
                 if (!type.HasCustomAttribute<UIComponentAttribute>(false, out attribute))

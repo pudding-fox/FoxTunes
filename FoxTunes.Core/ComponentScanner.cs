@@ -45,6 +45,8 @@ namespace FoxTunes
 
         private static Lazy<IEnumerable<Type>> _AllStandardResolvedComponents = new Lazy<IEnumerable<Type>>(GetAllStandardResolvedComponents);
 
+        private static IDictionary<string, IList<Type>> _ComponentsBySlot = new Dictionary<string, IList<Type>>(StringComparer.OrdinalIgnoreCase);
+
         private static IEnumerable<string> GetFileNames()
         {
             return Enumerable.Concat(
@@ -132,6 +134,11 @@ namespace FoxTunes
                 .ToArray();
         }
 
+        public IDictionary<string, IList<Type>> GetComponentsBySlot()
+        {
+            return _ComponentsBySlot;
+        }
+
         public static readonly IComponentScanner Instance = new ComponentScanner();
 
         public static bool ImplementsInterface(Type type, Type @interface)
@@ -168,6 +175,8 @@ namespace FoxTunes
                     else
                     {
                         var id = default(string);
+                        //Keep track of which components are available for this slot, regardless of whether we actually load them.
+                        _ComponentsBySlot.GetOrAdd(component.Slot, () => new List<Type>()).Add(type);
                         if (!ComponentResolver.Instance.Get(component.Slot, out id))
                         {
                             //Slot is not configured, update it.

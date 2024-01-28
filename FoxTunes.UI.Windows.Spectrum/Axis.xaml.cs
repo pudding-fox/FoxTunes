@@ -135,9 +135,11 @@ namespace FoxTunes
             var culture = CultureInfo.CurrentCulture;
             var typeFace = new Typeface(this.FontFamily, this.FontStyle, this.FontWeight, this.FontStretch);
             var labels = this.LabelProvider.GetLabels();
+#pragma warning disable 612, 618
             var formatted = labels.Select(
                 label => new FormattedText(label, culture, this.FlowDirection, typeFace, this.FontSize, this.Foreground)
             ).ToArray();
+#pragma warning restore 612, 618
             if (formatted.Length == 0)
             {
                 return;
