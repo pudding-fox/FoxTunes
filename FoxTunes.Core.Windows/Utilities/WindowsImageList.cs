@@ -5,16 +5,8 @@ namespace FoxTunes
 {
     public static class WindowsImageList
     {
-        public const int ILC_COLOR32 = 0x00000020;
-
         [DllImport("user32.dll")]
         public static extern int GetSystemMetrics(SystemMetric smIndex);
-
-        [DllImport("gdi32.dll")]
-        public static extern IntPtr CreateDIBSection(IntPtr hdc, [In, MarshalAs(UnmanagedType.LPStruct)]BITMAPINFO pbmi, uint iUsage, out IntPtr ppvBits, IntPtr hSection, uint dwOffset);
-
-        [DllImport("kernel32.dll")]
-        public static extern bool RtlMoveMemory(IntPtr dest, IntPtr source, int dwcount);
 
         [DllImport("comctl32.dll")]
         public static extern IntPtr ImageList_Create(int width, int height, uint flags, int count, int grow);
@@ -27,23 +19,6 @@ namespace FoxTunes
 
         [DllImport("comctl32.dll")]
         public static extern bool ImageList_Remove(IntPtr imageHandle, int index);
-
-        [StructLayout(LayoutKind.Sequential)]
-        public class BITMAPINFO
-        {
-            public Int32 biSize;
-            public Int32 biWidth;
-            public Int32 biHeight;
-            public Int16 biPlanes;
-            public Int16 biBitCount;
-            public Int32 biCompression;
-            public Int32 biSizeImage;
-            public Int32 biXPelsPerMeter;
-            public Int32 biYPelsPerMeter;
-            public Int32 biClrUsed;
-            public Int32 biClrImportant;
-            public Int32 colors;
-        };
 
         public enum SystemMetric
         {

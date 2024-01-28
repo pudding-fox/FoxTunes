@@ -115,6 +115,33 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Next.
+        /// </summary>
+        internal static string TaskbarButtonsBehaviour_Next {
+            get {
+                return ResourceManager.GetString("TaskbarButtonsBehaviour.Next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Play or pause.
+        /// </summary>
+        internal static string TaskbarButtonsBehaviour_PlayPause {
+            get {
+                return ResourceManager.GetString("TaskbarButtonsBehaviour.PlayPause", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Previous.
+        /// </summary>
+        internal static string TaskbarButtonsBehaviour_Previous {
+            get {
+                return ResourceManager.GetString("TaskbarButtonsBehaviour.Previous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
         internal static string TaskbarButtonsBehaviourConfiguration_Enabled {
@@ -138,6 +165,15 @@ namespace FoxTunes {
         internal static string TaskbarButtonsBehaviourConfiguration_Section {
             get {
                 return ResourceManager.GetString("TaskbarButtonsBehaviourConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thumbnail.
+        /// </summary>
+        internal static string TaskbarButtonsBehaviourConfiguration_Thumbnail {
+            get {
+                return ResourceManager.GetString("TaskbarButtonsBehaviourConfiguration.Thumbnail", resourceCulture);
             }
         }
     }
