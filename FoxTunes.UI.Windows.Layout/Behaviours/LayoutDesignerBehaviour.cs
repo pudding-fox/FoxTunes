@@ -1,11 +1,12 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class LayoutDesignerBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
+    public class LayoutDesignerBehaviour : StandardBehaviour, IInvocableComponent, IBackgroundTaskSource, IDisposable
     {
         public const string DESIGN = "AAAA";
 
@@ -18,6 +19,8 @@ namespace FoxTunes
         public IList<UIComponentRoot> Roots { get; private set; }
 
         public IList<UIComponentDesignerOverlay> Overlays { get; private set; }
+
+        public LayoutDesignerBehaviourTask DesignerTask { get; private set; }
 
         public bool Enabled
         {
@@ -109,6 +112,11 @@ namespace FoxTunes
 
         protected virtual void ShowDesignerOverlay()
         {
+            this.DesignerTask = new LayoutDesignerBehaviourTask(this);
+            this.DesignerTask.InitializeComponent(this.Core);
+            this.OnBackgroundTask(this.DesignerTask);
+            this.Dispatch(this.DesignerTask.Run);
+
             foreach (var root in this.Roots)
             {
                 this.ShowDesignerOverlay(root);
@@ -124,6 +132,12 @@ namespace FoxTunes
 
         protected virtual void HideDesignerOverlay()
         {
+            if (this.DesignerTask != null)
+            {
+                this.DesignerTask.Dispose();
+                this.DesignerTask = null;
+            }
+
             foreach (var designerOverlay in this.Overlays)
             {
                 designerOverlay.Dispose();
@@ -160,6 +174,17 @@ namespace FoxTunes
             return Task.CompletedTask;
 #endif
         }
+
+        protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
+        {
+            if (this.BackgroundTask == null)
+            {
+                return;
+            }
+            this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
+        }
+
+        public event BackgroundTaskEventHandler BackgroundTask;
 
         public bool IsDisposed { get; private set; }
 
@@ -198,6 +223,68 @@ namespace FoxTunes
             catch
             {
                 //Nothing can be done, never throw on GC thread.
+            }
+        }
+
+        public class LayoutDesignerBehaviourTask : BackgroundTask
+        {
+            public const string ID = "A8C4F704-F688-4CD2-8CF8-BAF8C7815759";
+
+            private LayoutDesignerBehaviourTask() : base(ID)
+            {
+                this.Name = "Editing Layout";
+                this.Handle = new AutoResetEvent(false);
+            }
+
+            public LayoutDesignerBehaviourTask(LayoutDesignerBehaviour behaviour) : this()
+            {
+                this.Behaviour = behaviour;
+            }
+
+            public AutoResetEvent Handle { get; private set; }
+
+            public LayoutDesignerBehaviour Behaviour { get; private set; }
+
+            public override bool Visible
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
+            public override bool Cancellable
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
+            protected override Task OnRun()
+            {
+                this.Handle.WaitOne();
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+
+            protected override void OnCancellationRequested()
+            {
+                var task = Windows.Invoke(() => this.Behaviour.IsDesigning = false);
+                base.OnCancellationRequested();
+            }
+
+            protected override void OnDisposing()
+            {
+                if (this.Handle != null)
+                {
+                    this.Handle.Set();
+                    this.Handle.Dispose();
+                }
+                base.OnDisposing();
             }
         }
     }

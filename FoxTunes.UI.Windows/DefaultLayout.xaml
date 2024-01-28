@@ -57,6 +57,7 @@
             <Windows:LibraryTree Grid.Column="0"></Windows:LibraryTree>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="4"></GridSplitter>
             <Windows:DefaultPlaylist Grid.Column="2"></Windows:DefaultPlaylist>
+            <Windows:BackgroundTasks Grid.ColumnSpan="3" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Windows:BackgroundTasks>
         </Grid>
     </DockPanel>
 </Windows:UIComponentBase>
