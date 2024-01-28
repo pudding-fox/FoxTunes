@@ -527,7 +527,8 @@ namespace FoxTunes
                 Elements = new Int32Pixel[height],
                 Mode = mode,
                 Scale = scale,
-                Smoothing = smoothing
+                Smoothing = smoothing,
+                Flags = mode.HasFlag(SpectrogramRendererMode.Seperate) ? VisualizationDataFlags.Individual : VisualizationDataFlags.None
             };
             return data;
         }

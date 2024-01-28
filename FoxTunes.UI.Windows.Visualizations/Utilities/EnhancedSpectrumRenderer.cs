@@ -597,7 +597,8 @@ namespace FoxTunes
                 }
             }
 
-            NoiseReduction(values, values.Length, 5);
+            const int SMOOTHING = 5;
+            NoiseReduction(values, values.Length, SMOOTHING);
         }
 
         private static void UpdateElementsFast(SpectrumRendererData data)
