@@ -189,7 +189,7 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to function version() {
-        ///    return &quot;Fox Tunes 1.9&quot;;
+        ///    return &quot;Fox Tunes 2.0.0&quot;;
         ///}
         ///
         ///function timestamp(value) {
@@ -215,8 +215,7 @@ namespace FoxTunes {
         ///        m = &quot;0&quot; + m;
         ///    }
         ///    parts.push(m);
-        ///    if (s &lt; 10) {
-        /// [rest of string was truncated]&quot;;.
+        ///    if (s &lt; 10) { [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string utils {
             get {

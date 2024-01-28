@@ -1,5 +1,5 @@
 ﻿function version() {
-    return "Fox Tunes 1.9";
+    return "Fox Tunes 2.0.0";
 }
 
 function timestamp(value) {
