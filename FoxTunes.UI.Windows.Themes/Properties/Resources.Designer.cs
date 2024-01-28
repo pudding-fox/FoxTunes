@@ -95,16 +95,12 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to //BACKGROUND
-        ///#01172F
-        ///#54129E
-        ///#F30B88
-        ///#F2AE29
-        ///1000:#FFDFF5
+        ///PURPLE
+        ///ORANGE
+        ///1000:WHITE
         /////VALUE
-        ///#FDFBF6
-        ///#F402F1
-        ///#1601CF
-        ///1000:#0A0220.
+        ///PURPLE
+        ///1000:BLUE.
         /// </summary>
         internal static string RetroVibes {
             get {
