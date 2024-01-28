@@ -33,7 +33,7 @@
         </Border.Style>
         <Grid>
             <Grid.LayoutTransform>
-                <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
+                <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}, FallbackValue=1}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}, FallbackValue=1}" />
             </Grid.LayoutTransform>
             <Windows:Mini MouseDown="OnMouseDown"></Windows:Mini>
             <Windows:NotifyIconElement Icon="{Binding Icon, Source={StaticResource ViewModel}}"  IsEnabled="{Binding ShowNotifyIcon.Value, Source={StaticResource ViewModel}}">

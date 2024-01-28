@@ -19,7 +19,7 @@
     </Window.Resources>
     <Grid Background="{DynamicResource NormalBrush}">
         <Grid.LayoutTransform>
-            <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
+            <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}, FallbackValue=1}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}, FallbackValue=1}" />
         </Grid.LayoutTransform>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
