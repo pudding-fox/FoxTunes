@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace FoxTunes
 {
@@ -22,8 +23,6 @@ namespace FoxTunes
         public const string QUALITY_LOW_OPTION = "BBBB06F5-6F01-4A4F-8674-5074747E2084";
 
         public const string SMOOTH_ELEMENT = "DEEEFBF0-AA25-456E-B759-AF94F6E9C371";
-
-        public const string SMOOTH_FACTOR_ELEMENT = "EDDD7A0-CA10-41F4-ACA0-3EA1C2CD87CB";
 
         public const string INTERVAL_ELEMENT = "FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438";
 
@@ -48,7 +47,6 @@ namespace FoxTunes
             yield return new ConfigurationSection(SECTION, Strings.VisualizationBehaviourConfiguration_Section)
                 .WithElement(new SelectionConfigurationElement(QUALITY_ELEMENT, Strings.VisualizationBehaviourConfiguration_Quality).WithOptions(GetQualityOptions()))
                 .WithElement(new BooleanConfigurationElement(SMOOTH_ELEMENT, Strings.VisualizationBehaviourConfiguration_Smooth, path: Strings.General_Advanced))
-                .WithElement(new IntegerConfigurationElement(SMOOTH_FACTOR_ELEMENT, Strings.VisualizationBehaviourConfiguration_SmoothFactor, path: Strings.General_Advanced).WithValue(10).WithValidationRule(new IntegerValidationRule(1, 100)).DependsOn(SECTION, SMOOTH_ELEMENT))
                 .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, Strings.VisualizationBehaviourConfiguration_Interval, path: Strings.General_Advanced).WithValidationRule(new IntegerValidationRule(1, 100)))
                 .WithElement(new SelectionConfigurationElement(FFT_SIZE_ELEMENT, Strings.VisualizationBehaviourConfiguration_FFTSize, path: Strings.General_Advanced).WithOptions(GetFFTOptions())
             );

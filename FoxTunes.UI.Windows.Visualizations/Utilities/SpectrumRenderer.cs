@@ -19,8 +19,6 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Smooth { get; private set; }
 
-        public IntegerConfigurationElement SmoothingFactor { get; private set; }
-
         public IntegerConfigurationElement HoldInterval { get; private set; }
 
         public SelectionConfigurationElement FFTSize { get; private set; }
@@ -44,10 +42,6 @@ namespace FoxTunes
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.SMOOTH_ELEMENT
             );
-            this.SmoothingFactor = this.Configuration.GetElement<IntegerConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.SMOOTH_FACTOR_ELEMENT
-            );
             this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
                SpectrumBehaviourConfiguration.SECTION,
                SpectrumBehaviourConfiguration.HOLD_ELEMENT
@@ -64,7 +58,6 @@ namespace FoxTunes
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
             this.HighCut.ValueChanged += this.OnValueChanged;
             this.Smooth.ValueChanged += this.OnValueChanged;
-            this.SmoothingFactor.ValueChanged += this.OnValueChanged;
             this.HoldInterval.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
             var task = this.CreateBitmap();
@@ -171,7 +164,7 @@ namespace FoxTunes
                 UpdateValues(data);
                 if (this.Smooth.Value && !data.LastUpdated.Equals(default(DateTime)))
                 {
-                    UpdateElementsSmooth(data.Values, data.Elements, data.Width, data.Height, this.SmoothingFactor.Value, Orientation.Vertical);
+                    UpdateElementsSmooth(data.Values, data.Elements, data.Width, data.Height, Orientation.Vertical);
                 }
                 else
                 {
@@ -225,10 +218,6 @@ namespace FoxTunes
             if (this.Smooth != null)
             {
                 this.Smooth.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.SmoothingFactor != null)
-            {
-                this.SmoothingFactor.ValueChanged -= this.OnValueChanged;
             }
             if (this.HoldInterval != null)
             {

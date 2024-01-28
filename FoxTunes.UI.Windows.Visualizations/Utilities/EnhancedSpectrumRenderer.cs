@@ -23,8 +23,6 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Smooth { get; private set; }
 
-        public IntegerConfigurationElement SmoothingFactor { get; private set; }
-
         public IntegerConfigurationElement HoldInterval { get; private set; }
 
         public SelectionConfigurationElement FFTSize { get; private set; }
@@ -52,10 +50,6 @@ namespace FoxTunes
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.SMOOTH_ELEMENT
             );
-            this.SmoothingFactor = this.Configuration.GetElement<IntegerConfigurationElement>(
-               VisualizationBehaviourConfiguration.SECTION,
-               VisualizationBehaviourConfiguration.SMOOTH_FACTOR_ELEMENT
-            );
             this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
                SpectrumBehaviourConfiguration.SECTION,
                SpectrumBehaviourConfiguration.HOLD_ELEMENT
@@ -73,7 +67,6 @@ namespace FoxTunes
             this.ShowRms.ValueChanged += this.OnValueChanged;
             this.ShowCrestFactor.ValueChanged += this.OnValueChanged;
             this.Smooth.ValueChanged += this.OnValueChanged;
-            this.SmoothingFactor.ValueChanged += this.OnValueChanged;
             this.HoldInterval.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
             var task = this.CreateBitmap();
@@ -267,10 +260,6 @@ namespace FoxTunes
             if (this.Smooth != null)
             {
                 this.Smooth.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.SmoothingFactor != null)
-            {
-                this.SmoothingFactor.ValueChanged -= this.OnValueChanged;
             }
             if (this.HoldInterval != null)
             {
@@ -486,18 +475,18 @@ namespace FoxTunes
 
         private static void UpdateElementsSmooth(SpectrumRendererData data)
         {
-            UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, data.Renderer.SmoothingFactor.Value, Orientation.Vertical);
+            UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, Orientation.Vertical);
             if (data.Rms != null && data.RmsElements != null)
             {
-                UpdateElementsSmooth(data.Rms, data.RmsElements, data.Width, data.Height, data.Renderer.SmoothingFactor.Value, Orientation.Vertical);
+                UpdateElementsSmooth(data.Rms, data.RmsElements, data.Width, data.Height, Orientation.Vertical);
             }
             if (data.Rms != null && data.CrestPoints != null)
             {
-                UpdateCrestPointsSmooth(data.Values, data.Rms, data.CrestPoints, data.Width, data.Height, data.Renderer.SmoothingFactor.Value);
+                UpdateCrestPointsSmooth(data.Values, data.Rms, data.CrestPoints, data.Width, data.Height);
             }
         }
 
-        private static void UpdateCrestPointsSmooth(float[] values, float[] rms, Int32Point[] elements, int width, int height, int smoothing)
+        private static void UpdateCrestPointsSmooth(float[] values, float[] rms, Int32Point[] elements, int width, int height)
         {
             if (values.Length == 0)
             {
@@ -506,6 +495,8 @@ namespace FoxTunes
             height = height - 1;
             var step = width / values.Length;
             var offset = default(float);
+            var minChange = 1;
+            var maxChange = Convert.ToInt32(height * 0.05f);
             for (var a = 0; a < values.Length; a++)
             {
                 offset = Math.Max(offset, values[a] - rms[a]);
@@ -523,7 +514,7 @@ namespace FoxTunes
                     y = height;
                 }
                 elements[a].X = x;
-                Animate(ref elements[a].Y, y, 1, height, smoothing);
+                Animate(ref elements[a].Y, y, 1, height, minChange, maxChange);
             }
         }
 

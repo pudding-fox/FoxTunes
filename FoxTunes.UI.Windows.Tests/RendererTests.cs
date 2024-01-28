@@ -21,12 +21,12 @@ namespace FoxTunes
         };
 
         [TestCaseSource("AnimateTestSource")]
-        public void AnimateTest(int value, int target, int min, int max, int smoothing, int[] expected)
+        public void AnimateTest(int value, int target, int min, int max, int minChange, int maxChange, int[] expected)
         {
             var actual = new List<int>();
             do
             {
-                Animate(ref value, target, min, max, smoothing);
+                Animate(ref value, target, min, max, minChange, maxChange);
                 actual.Add(value);
             } while (value != target);
             Assert.IsTrue(Enumerable.SequenceEqual(expected, actual));

@@ -263,9 +263,16 @@ namespace FoxTunes
                 actualWidth * this.ScalingFactor.Value,
                 actualHeight * this.ScalingFactor.Value
             );
-
             width = this.GetPixelWidth(size.Width);
             height = this.GetPixelHeight(size.Height);
+            if (width == 0 || height == 0)
+            {
+                //We need proper dimentions.
+                width = 0;
+                height = 0;
+                return false;
+            }
+
             return true;
         }
 
@@ -443,7 +450,7 @@ namespace FoxTunes
             }
         }
 
-        protected static void UpdateElementsSmooth(float[] values, Int32Rect[] elements, int width, int height, int smoothing, Orientation orientation)
+        protected static void UpdateElementsSmooth(float[] values, Int32Rect[] elements, int width, int height, Orientation orientation)
         {
             if (values.Length == 0)
             {
@@ -452,24 +459,28 @@ namespace FoxTunes
             if (orientation == Orientation.Horizontal)
             {
                 var step = Math.Max(height / values.Length, 1);
+                var minChange = 1;
+                var maxChange = Convert.ToInt32(width * 0.05f);
                 for (var a = 0; a < values.Length; a++)
                 {
                     var barWidth = Math.Max(Convert.ToInt32(values[a] * width), 1);
                     elements[a].X = 0;
                     elements[a].Y = a * step;
                     elements[a].Height = step;
-                    Animate(ref elements[a].Width, barWidth, 1, width, smoothing);
+                    Animate(ref elements[a].Width, barWidth, 1, width, minChange, maxChange);
                 }
             }
             else if (orientation == Orientation.Vertical)
             {
                 var step = Math.Max(width / values.Length, 1);
+                var minChange = 1;
+                var maxChange = Convert.ToInt32(height * 0.05f);
                 for (var a = 0; a < values.Length; a++)
                 {
                     var barHeight = Math.Max(Convert.ToInt32(values[a] * height), 1);
                     elements[a].X = a * step;
                     elements[a].Width = step;
-                    Animate(ref elements[a].Height, barHeight, 1, height, smoothing);
+                    Animate(ref elements[a].Height, barHeight, 1, height, minChange, maxChange);
                     elements[a].Y = height - elements[a].Height;
                 }
             }
@@ -675,7 +686,7 @@ namespace FoxTunes
             }
         }
 
-        protected static void Animate(ref int value, int target, int min, int max, int smoothing)
+        protected static void Animate(ref int value, int target, int min, int max, int minChange, int maxChange)
         {
             var difference = Math.Abs(value - target);
             if (difference == 0)
@@ -685,7 +696,7 @@ namespace FoxTunes
             }
 
             var distance = default(float);
-            if (target > 0)
+            if (difference < target)
             {
                 distance = (float)difference / target;
             }
@@ -694,17 +705,21 @@ namespace FoxTunes
                 distance = (float)difference / (max - target);
             }
 
-            var increment = 1 - (float)Math.Pow(1 - distance, 3);
-            var fast = Math.Max(Math.Min((float)Math.Abs(max - min) / smoothing, 10), 1);
-            var smoothed = Math.Min(Math.Max((float)Math.Floor(fast * increment), 1), fast);
-            if (target > value)
+            var increment = (int)Math.Min(Math.Max((1 - Math.Pow(1 - distance, 4)) * difference, minChange), maxChange);
+            if (value < target)
             {
-                value = (int)Math.Min(value + smoothed, max);
+                value += increment;
             }
-            else if (target < value)
+            else
             {
-                value = (int)Math.Max(value - smoothed, min);
+                value -= increment;
             }
+#if DEBUG
+            if (value < min || value > max)
+            {
+                throw new InvalidOperationException();
+            }
+#endif
         }
 
         protected static void NoiseReduction(float[,] values, int countx, int county, int smoothing)
