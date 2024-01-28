@@ -750,6 +750,25 @@ namespace FoxTunes
                 }
             }
         }
+
+        protected static void NoiseReduction(float[,] values, int countx, int county, int smoothing)
+        {
+            for (var y = 0; y < county; y++)
+            {
+                for (var x = 0; x < countx; x++)
+                {
+                    var start = Math.Max(y - smoothing, 0);
+                    var end = Math.Min(y + smoothing, county);
+                    var value = default(float);
+                    for (var a = start; a < end; a++)
+                    {
+                        value += values[x, a];
+                    }
+                    value /= end - start;
+                    values[x, y] = value;
+                }
+            }
+        }
     }
 
     public static partial class Extensions
