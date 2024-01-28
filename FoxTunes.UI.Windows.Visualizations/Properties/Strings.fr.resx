@@ -150,15 +150,6 @@
   <data name="PeakMeter.Name" xml:space="preserve">
     <value>Compteur de crête</value>
   </data>
-  <data name="PeakMeterBehaviourConfiguration.Orientation" xml:space="preserve">
-    <value>Orientation</value>
-  </data>
-  <data name="PeakMeterBehaviourConfiguration.Orientation.Horizontal" xml:space="preserve">
-    <value>Horizontale</value>
-  </data>
-  <data name="PeakMeterBehaviourConfiguration.Orientation.Vertical" xml:space="preserve">
-    <value>Verticale</value>
-  </data>
   <data name="PeakMeterBehaviourConfiguration.Path" xml:space="preserve">
     <value>Compteur de crête</value>
   </data>

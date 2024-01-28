@@ -11,8 +11,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" 
              Foreground="{DynamicResource TextBrush}"
-             MinWidth="100"
-             MinHeight="100">
+             MinWidth="160"
+             MinHeight="30">
     <UserControl.Resources>
         <LocalViewModel:PeakMeter x:Key="ViewModel"></LocalViewModel:PeakMeter>
         <LocalWindows:TextAxisLabelProvider x:Key="Levels" Values="{Binding Levels, Source={StaticResource ViewModel}}"></LocalWindows:TextAxisLabelProvider>
@@ -22,57 +22,39 @@
         <Windows:Menu Category="{Binding Source={x:Static LocalWindows:PeakMeterBehaviour.CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
     <Windows:Visualization>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="32"></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition></RowDefinition>
-                <RowDefinition Height="32"></RowDefinition>
-            </Grid.RowDefinitions>
-            <LocalWindows:Axis Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Channels}">
-                <LocalWindows:Axis.Style>
-                    <Style TargetType="{x:Type LocalWindows:Axis}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Orientation, Source={StaticResource ViewModel}}" Value="Horizontal">
-                                <Setter Property="Grid.Column" Value="0"></Setter>
-                                <Setter Property="Grid.Row" Value="0"></Setter>
-                                <Setter Property="Orientation" Value="Vertical"></Setter>
-                                <Setter Property="Padding" Value="1,0,1,0"></Setter>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Orientation, Source={StaticResource ViewModel}}" Value="Vertical">
-                                <Setter Property="Grid.Column" Value="1"></Setter>
-                                <Setter Property="Grid.Row" Value="1"></Setter>
-                                <Setter Property="Orientation" Value="Horizontal"></Setter>
-                                <Setter Property="Padding" Value="4,0,4,0"></Setter>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </LocalWindows:Axis.Style>
-            </LocalWindows:Axis>
-            <LocalWindows:Axis Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Levels}">
-                <LocalWindows:Axis.Style>
-                    <Style TargetType="{x:Type LocalWindows:Axis}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Orientation, Source={StaticResource ViewModel}}" Value="Horizontal">
-                                <Setter Property="Grid.Column" Value="1"></Setter>
-                                <Setter Property="Grid.Row" Value="1"></Setter>
-                                <Setter Property="Orientation" Value="Horizontal"></Setter>
-                                <Setter Property="Padding" Value="4,0,4,0"></Setter>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Orientation, Source={StaticResource ViewModel}}" Value="Vertical">
-                                <Setter Property="Grid.Column" Value="0"></Setter>
-                                <Setter Property="Grid.Row" Value="0"></Setter>
-                                <Setter Property="Orientation" Value="Vertical"></Setter>
-                                <Setter Property="Padding" Value="1,0,1,0"></Setter>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </LocalWindows:Axis.Style>
-            </LocalWindows:Axis>
-            <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="dB" Foreground="{DynamicResource TextBrush}"></TextBlock>
-            <LocalWindows:PeakRenderer Grid.Column="1" Grid.Row="0" Orientation="{Binding Orientation, Source={StaticResource ViewModel}}"></LocalWindows:PeakRenderer>
-        </Grid>
+        <LocalWindows:Chart>
+            <LocalWindows:Chart.XAxisContent>
+                <LocalWindows:Axis Height="32" Orientation="Horizontal" Foreground="{DynamicResource TextBrush}" Padding="4,0,4,0">
+                    <LocalWindows:Axis.Style>
+                        <Style TargetType="{x:Type LocalWindows:Axis}">
+                            <Setter Property="LabelProvider" Value="{StaticResource Levels}"></Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Orientation, Source={StaticResource ViewModel}}" Value="{x:Static Orientation.Vertical}">
+                                    <Setter Property="LabelProvider" Value="{StaticResource Channels}"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </LocalWindows:Axis.Style>
+                </LocalWindows:Axis>
+            </LocalWindows:Chart.XAxisContent>
+            <LocalWindows:Chart.YAxisContent>
+                <LocalWindows:Axis Width="32" Orientation="Vertical" Foreground="{DynamicResource TextBrush}" Padding="1,0,1,0">
+                    <LocalWindows:Axis.Style>
+                        <Style TargetType="{x:Type LocalWindows:Axis}">
+                            <Setter Property="LabelProvider" Value="{StaticResource Channels}"></Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Orientation, Source={StaticResource ViewModel}}" Value="{x:Static Orientation.Vertical}">
+                                    <Setter Property="LabelProvider" Value="{StaticResource Levels}"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </LocalWindows:Axis.Style>
+                </LocalWindows:Axis>
+            </LocalWindows:Chart.YAxisContent>
+            <LocalWindows:Chart.LegendContent>
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="dB" Foreground="{DynamicResource TextBrush}"></TextBlock>
+            </LocalWindows:Chart.LegendContent>
+            <LocalWindows:PeakRenderer Orientation="{Binding Orientation, Source={StaticResource ViewModel}}"></LocalWindows:PeakRenderer>
+        </LocalWindows:Chart>
     </Windows:Visualization>
 </Windows:UIComponentBase>

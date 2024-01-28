@@ -205,33 +205,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Orientation.
-        /// </summary>
-        internal static string PeakMeterBehaviourConfiguration_Orientation {
-            get {
-                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.Orientation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Horizontal.
-        /// </summary>
-        internal static string PeakMeterBehaviourConfiguration_Orientation_Horizontal {
-            get {
-                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.Orientation.Horizontal", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Vertical.
-        /// </summary>
-        internal static string PeakMeterBehaviourConfiguration_Orientation_Vertical {
-            get {
-                return ResourceManager.GetString("PeakMeterBehaviourConfiguration.Orientation.Vertical", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Peak Meter.
         /// </summary>
         internal static string PeakMeterBehaviourConfiguration_Path {

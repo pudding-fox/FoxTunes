@@ -1,10 +1,10 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace FoxTunes.ViewModel
 {
@@ -20,7 +20,7 @@ namespace FoxTunes.ViewModel
             {
                 return this._Orientation;
             }
-            private set
+            set
             {
                 this._Orientation = value;
                 this.OnOrientationChanged();
@@ -82,10 +82,7 @@ namespace FoxTunes.ViewModel
         {
             this.Output = core.Components.Output;
             this.Output.CanGetDataChanged += this.OnCanGetDataChanged;
-            core.Components.Configuration.GetElement<SelectionConfigurationElement>(
-                PeakMeterBehaviourConfiguration.SECTION,
-                PeakMeterBehaviourConfiguration.ORIENTATION
-            ).ConnectValue(value => this.Orientation = PeakMeterBehaviourConfiguration.GetOrientation(value));
+            var task = this.Refresh();
             base.InitializeComponent(core);
         }
 

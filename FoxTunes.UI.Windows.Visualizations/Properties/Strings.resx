@@ -165,15 +165,6 @@
   <data name="PeakMeter.Name" xml:space="preserve">
     <value>Peak Meter</value>
   </data>
-  <data name="PeakMeterBehaviourConfiguration.Orientation" xml:space="preserve">
-    <value>Orientation</value>
-  </data>
-  <data name="PeakMeterBehaviourConfiguration.Orientation.Horizontal" xml:space="preserve">
-    <value>Horizontal</value>
-  </data>
-  <data name="PeakMeterBehaviourConfiguration.Orientation.Vertical" xml:space="preserve">
-    <value>Vertical</value>
-  </data>
   <data name="PeakMeterBehaviourConfiguration.Path" xml:space="preserve">
     <value>Peak Meter</value>
   </data>
