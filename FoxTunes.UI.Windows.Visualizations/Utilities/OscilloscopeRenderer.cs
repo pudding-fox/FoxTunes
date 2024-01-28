@@ -363,10 +363,10 @@ namespace FoxTunes
             {
                 default:
                 case OscilloscopeRendererMode.Mono:
-                    UpdateValuesMono(data.History.Peak, data.Values, data.Peaks, data.Width, data.SampleCount);
+                    UpdateValuesMono(data.History.Avg, data.Values, data.Peaks, data.Width, data.SampleCount);
                     break;
                 case OscilloscopeRendererMode.Seperate:
-                    UpdateValuesSeperate(data.History.Peak, data.Values, data.Peaks, data.Channels, data.Width, data.SampleCount);
+                    UpdateValuesSeperate(data.History.Avg, data.Values, data.Peaks, data.Channels, data.Width, data.SampleCount);
                     break;
             }
             data.LastUpdated = DateTime.UtcNow;
@@ -473,7 +473,10 @@ namespace FoxTunes
         {
             public OscilloscopeRendererData()
             {
-                this.History = new VisualizationDataHistory();
+                this.History = new VisualizationDataHistory()
+                {
+                    Flags = VisualizationDataHistoryFlags.Average
+                };
             }
 
             public IOutputDataSource OutputDataSource;

@@ -50,19 +50,40 @@ namespace FoxTunes
                 data.OnAllocated();
                 if (data.History != null && data.History.Capacity > 0)
                 {
+                    var avg = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Average);
+                    var peak = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Peak);
+                    var rms = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Rms);
                     if (data.Flags.HasFlag(VisualizationDataFlags.Individual))
                     {
                         data.History.Values = new float[data.Channels, data.Samples32.Length, data.History.Capacity];
-                        data.History.Avg = new float[data.Channels, data.Samples32.Length];
-                        data.History.Peak = new float[data.Channels, data.Samples32.Length];
-                        data.History.Rms = new float[data.Channels, data.Samples32.Length];
+                        if (avg)
+                        {
+                            data.History.Avg = new float[data.Channels, data.Samples32.Length];
+                        }
+                        if (peak)
+                        {
+                            data.History.Peak = new float[data.Channels, data.Samples32.Length];
+                        }
+                        if (rms)
+                        {
+                            data.History.Rms = new float[data.Channels, data.Samples32.Length];
+                        }
                     }
                     else
                     {
                         data.History.Values = new float[1, data.Samples32.Length, data.History.Capacity];
-                        data.History.Avg = new float[1, data.Samples32.Length];
-                        data.History.Peak = new float[1, data.Samples32.Length];
-                        data.History.Rms = new float[1, data.Samples32.Length];
+                        if (avg)
+                        {
+                            data.History.Avg = new float[1, data.Samples32.Length];
+                        }
+                        if (peak)
+                        {
+                            data.History.Peak = new float[1, data.Samples32.Length];
+                        }
+                        if (rms)
+                        {
+                            data.History.Rms = new float[1, data.Samples32.Length];
+                        }
                     }
                     data.History.Position = 0;
                     data.History.Count = 0;
@@ -98,11 +119,11 @@ namespace FoxTunes
                 {
                     if (data.Flags.HasFlag(VisualizationDataFlags.Individual))
                     {
-                        UpdateHistorySeperate(data, data.SampleCount);
+                        UpdateHistorySeperate(data, data.SampleCount, true);
                     }
                     else
                     {
-                        UpdateHistoryMono(data, data.SampleCount);
+                        UpdateHistoryMono(data, data.SampleCount, true);
                     }
                 }
                 return true;
@@ -137,19 +158,40 @@ namespace FoxTunes
                 data.OnAllocated();
                 if (data.History != null && data.History.Capacity > 0)
                 {
+                    var avg = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Average);
+                    var peak = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Peak);
+                    var rms = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Rms);
                     if (data.Flags.HasFlag(VisualizationDataFlags.Individual))
                     {
                         data.History.Values = new float[data.Channels, data.Samples.Length, data.History.Capacity];
-                        data.History.Avg = new float[data.Channels, data.Samples.Length];
-                        data.History.Peak = new float[data.Channels, data.Samples.Length];
-                        data.History.Rms = new float[data.Channels, data.Samples.Length];
+                        if (avg)
+                        {
+                            data.History.Avg = new float[data.Channels, data.Samples.Length];
+                        }
+                        if (peak)
+                        {
+                            data.History.Peak = new float[data.Channels, data.Samples.Length];
+                        }
+                        if (rms)
+                        {
+                            data.History.Rms = new float[data.Channels, data.Samples.Length];
+                        }
                     }
                     else
                     {
                         data.History.Values = new float[1, data.Samples.Length, data.History.Capacity];
-                        data.History.Avg = new float[1, data.Samples.Length];
-                        data.History.Peak = new float[1, data.Samples.Length];
-                        data.History.Rms = new float[1, data.Samples.Length];
+                        if (avg)
+                        {
+                            data.History.Avg = new float[1, data.Samples.Length];
+                        }
+                        if (peak)
+                        {
+                            data.History.Peak = new float[1, data.Samples.Length];
+                        }
+                        if (rms)
+                        {
+                            data.History.Rms = new float[1, data.Samples.Length];
+                        }
                     }
                     data.History.Position = 0;
                     data.History.Count = 0;
@@ -180,11 +222,11 @@ namespace FoxTunes
                 {
                     if (data.Flags.HasFlag(VisualizationDataFlags.Individual))
                     {
-                        UpdateHistorySeperate(data, data.SampleCount);
+                        UpdateHistorySeperate(data, data.SampleCount, false);
                     }
                     else
                     {
-                        UpdateHistoryMono(data, data.SampleCount);
+                        UpdateHistoryMono(data, data.SampleCount, false);
                     }
                 }
                 return true;
@@ -213,46 +255,84 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void UpdateHistoryMono(VisualizationData data, int count)
+        protected virtual void UpdateHistoryMono(VisualizationData data, int count, bool signed)
         {
+            var avg = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Average);
+            var peak = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Peak);
+            var rms = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Rms);
             for (var a = 0; a < count; a++)
             {
                 data.History.Values[0, a, data.History.Position] = data.Data[0, a];
             }
+            if (data.History.Count < data.History.Capacity)
+            {
+                data.History.Count++;
+            }
             for (var a = 0; a < count; a++)
             {
-                data.History.Avg[0, a] = 0.0f;
-                data.History.Peak[0, a] = 0.0f;
-                data.History.Rms[0, a] = 0.0f;
+                if (avg)
+                {
+                    data.History.Avg[0, a] = 0.0f;
+                }
+                if (peak)
+                {
+                    data.History.Peak[0, a] = 0.0f;
+                }
+                if (rms)
+                {
+                    data.History.Rms[0, a] = 0.0f;
+                }
             }
             for (var a = 0; a < count; a++)
             {
                 for (var b = 0; b < data.History.Count; b++)
                 {
                     var value = data.History.Values[0, a, (b + data.History.Position) % data.History.Count];
-                    data.History.Avg[0, a] += value;
-                    if (data.History.Peak[0, a] < 0)
+                    if (avg)
                     {
-                        if (data.History.Peak[0, a] > value)
+                        data.History.Avg[0, a] += value;
+                    }
+                    if (peak)
+                    {
+                        if (signed)
                         {
-                            data.History.Peak[0, a] = value;
+                            if (data.History.Peak[0, a] < 0)
+                            {
+                                if (data.History.Peak[0, a] > value)
+                                {
+                                    data.History.Peak[0, a] = value;
+                                }
+                            }
+                            else if (data.History.Peak[0, a] > 0)
+                            {
+                                if (data.History.Peak[0, a] < value)
+                                {
+                                    data.History.Peak[0, a] = value;
+                                }
+                            }
+                            else
+                            {
+                                data.History.Peak[0, a] = value;
+                            }
+                        }
+                        else
+                        {
+                            data.History.Peak[0, a] = Math.Max(data.History.Peak[0, a], value);
                         }
                     }
-                    else if (data.History.Peak[0, a] > 0)
+                    if (rms)
                     {
-                        if (data.History.Peak[0, a] < value)
-                        {
-                            data.History.Peak[0, a] = value;
-                        }
+                        data.History.Rms[0, a] += value * value;
                     }
-                    else
-                    {
-                        data.History.Peak[0, a] = value;
-                    }
-                    data.History.Rms[0, a] += value * value;
                 }
-                data.History.Avg[0, a] = data.History.Avg[0, a] / data.History.Count;
-                data.History.Rms[0, a] = Convert.ToSingle(Math.Sqrt(data.History.Rms[0, a] / data.History.Count));
+                if (avg)
+                {
+                    data.History.Avg[0, a] = data.History.Avg[0, a] / data.History.Count;
+                }
+                if (rms)
+                {
+                    data.History.Rms[0, a] = Convert.ToSingle(Math.Sqrt(data.History.Rms[0, a] / data.History.Count));
+                }
             }
             if (data.History.Position < data.History.Capacity - 1)
             {
@@ -262,14 +342,13 @@ namespace FoxTunes
             {
                 data.History.Position = 0;
             }
-            if (data.History.Count < data.History.Capacity)
-            {
-                data.History.Count++;
-            }
         }
 
-        protected virtual void UpdateHistorySeperate(VisualizationData data, int count)
+        protected virtual void UpdateHistorySeperate(VisualizationData data, int count, bool signed)
         {
+            var avg = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Average);
+            var peak = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Peak);
+            var rms = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Rms);
             for (var channel = 0; channel < data.Channels; channel++)
             {
                 for (var a = 0; a < count; a++)
@@ -277,13 +356,26 @@ namespace FoxTunes
                     data.History.Values[channel, a, data.History.Position] = data.Data[channel, a];
                 }
             }
+            if (data.History.Count < data.History.Capacity)
+            {
+                data.History.Count++;
+            }
             for (var channel = 0; channel < data.Channels; channel++)
             {
                 for (var a = 0; a < count; a++)
                 {
-                    data.History.Avg[channel, a] = 0.0f;
-                    data.History.Peak[channel, a] = 0.0f;
-                    data.History.Rms[channel, a] = 0.0f;
+                    if (avg)
+                    {
+                        data.History.Avg[channel, a] = 0.0f;
+                    }
+                    if (peak)
+                    {
+                        data.History.Peak[channel, a] = 0.0f;
+                    }
+                    if (rms)
+                    {
+                        data.History.Rms[channel, a] = 0.0f;
+                    }
                 }
             }
             for (var channel = 0; channel < data.Channels; channel++)
@@ -293,29 +385,51 @@ namespace FoxTunes
                     for (var b = 0; b < data.History.Count; b++)
                     {
                         var value = data.History.Values[channel, a, (b + data.History.Position) % data.History.Count];
-                        data.History.Avg[channel, a] += value;
-                        if (data.History.Peak[channel, a] < 0)
+                        if (avg)
                         {
-                            if (data.History.Peak[channel, a] > value)
+                            data.History.Avg[channel, a] += value;
+                        }
+                        if (peak)
+                        {
+                            if (signed)
                             {
-                                data.History.Peak[channel, a] = value;
+                                if (data.History.Peak[channel, a] < 0)
+                                {
+                                    if (data.History.Peak[channel, a] > value)
+                                    {
+                                        data.History.Peak[channel, a] = value;
+                                    }
+                                }
+                                else if (data.History.Peak[channel, a] > 0)
+                                {
+                                    if (data.History.Peak[channel, a] < value)
+                                    {
+                                        data.History.Peak[channel, a] = value;
+                                    }
+                                }
+                                else
+                                {
+                                    data.History.Peak[channel, a] = value;
+                                }
+                            }
+                            else
+                            {
+                                data.History.Peak[channel, a] = Math.Max(data.History.Peak[channel, a], value);
                             }
                         }
-                        else if (data.History.Peak[channel, a] > 0)
+                        if (rms)
                         {
-                            if (data.History.Peak[channel, a] < value)
-                            {
-                                data.History.Peak[channel, a] = value;
-                            }
+                            data.History.Rms[channel, a] += value * value;
                         }
-                        else
-                        {
-                            data.History.Peak[channel, a] = value;
-                        }
-                        data.History.Rms[channel, a] += value * value;
                     }
-                    data.History.Avg[channel, a] = data.History.Avg[channel, a] / data.History.Count;
-                    data.History.Rms[channel, a] = Convert.ToSingle(Math.Sqrt(data.History.Rms[channel, a] / data.History.Count));
+                    if (avg)
+                    {
+                        data.History.Avg[channel, a] = data.History.Avg[channel, a] / data.History.Count;
+                    }
+                    if (rms)
+                    {
+                        data.History.Rms[channel, a] = Convert.ToSingle(Math.Sqrt(data.History.Rms[channel, a] / data.History.Count));
+                    }
                 }
             }
             if (data.History.Position < data.History.Capacity - 1)
@@ -325,10 +439,6 @@ namespace FoxTunes
             else
             {
                 data.History.Position = 0;
-            }
-            if (data.History.Count < data.History.Capacity)
-            {
-                data.History.Count++;
             }
         }
 
