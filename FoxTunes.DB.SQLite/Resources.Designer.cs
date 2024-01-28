@@ -61,19 +61,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT OR IGNORE INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;Value&quot;) 
-        ///SELECT @name, @type, @value;
-        ///
-        ///INSERT OR IGNORE INTO &quot;LibraryItem_MetaDataItem&quot; (&quot;LibraryItem_Id&quot;, &quot;MetaDataItem_Id&quot;)
-        ///SELECT @itemId, last_insert_rowid();.
-        /// </summary>
-        internal static string AddLibraryMetaDataItems {
-            get {
-                return ResourceManager.GetString("AddLibraryMetaDataItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to CREATE TABLE [MetaDataItems](
         ///	[Id] INTEGER PRIMARY KEY NOT NULL, 
         ///	[Name] text NOT NULL COLLATE NOCASE, 
