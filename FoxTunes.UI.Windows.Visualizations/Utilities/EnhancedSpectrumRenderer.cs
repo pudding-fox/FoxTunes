@@ -225,6 +225,10 @@ namespace FoxTunes
 
         protected override int GetPixelWidth(double width)
         {
+            if (this.Bands == null)
+            {
+                return 0;
+            }
             var min = EnhancedSpectrumConfiguration.GetWidth(this.Bands.Value);
             var bands = EnhancedSpectrumConfiguration.GetBands(this.Bands.Value);
             return base.GetPixelWidth(Math.Max(bands.Length * (Convert.ToInt32(width) / bands.Length), min));

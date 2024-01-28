@@ -165,4 +165,10 @@
   <data name="MiniPlaylist.Empty" xml:space="preserve">
     <value>Drop files anywhere.</value>
   </data>
+  <data name="MiniPlaylist.Name" xml:space="preserve">
+    <value>Simple Playlist</value>
+  </data>
+  <data name="NowPlaying.Name" xml:space="preserve">
+    <value>Marquee</value>
+  </data>
 </root>
