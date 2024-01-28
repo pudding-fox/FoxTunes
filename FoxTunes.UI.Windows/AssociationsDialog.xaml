@@ -29,6 +29,13 @@
                                 <CheckBox.Style>
                                     <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
                                         <Setter Property="Content" Value="{Binding FileAssociation.Extension, Mode=OneWay}"></Setter>
+                                        <!-- System -->
+                                        <Setter Property="SnapsToDevicePixels" Value="true" />
+                                        <Setter Property="FocusVisualStyle" Value="{DynamicResource CheckBoxFocusVisual}" />
+                                        <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
+                                        <Setter Property="Template" Value="{DynamicResource CheckBoxTemplate}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding FileAssociation, Mode=OneWay}" Value="{x:Null}">
                                                 <Setter Property="Content" Value="Select All"></Setter>
@@ -62,6 +69,12 @@
                     <Setter Property="Width" Value="60"></Setter>
                     <Setter Property="Height" Value="30"></Setter>
                     <Setter Property="Margin" Value="7,7,0,0"></Setter>
+                    <!-- System -->
+                    <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
+                    <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
+                    <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
                 </Style>
             </StackPanel.Resources>
             <Button Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>

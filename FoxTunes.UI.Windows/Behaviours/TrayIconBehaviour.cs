@@ -1,11 +1,12 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 
 namespace FoxTunes
 {
-    public class TrayIconBehaviour : StandardBehaviour, IDisposable
+    public class TrayIconBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public bool _Enabled { get; private set; }
 
@@ -34,6 +35,32 @@ namespace FoxTunes
             }
         }
 
+        public bool MinimizeToTray { get; private set; }
+
+        public bool CloseToTray { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
+                WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
+                TrayIconBehaviourConfiguration.TRAY_ICON_ELEMENT
+            ).ConnectValue<bool>(value => this.Enabled = value);
+            ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
+                WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
+                TrayIconBehaviourConfiguration.MINIMIZE_TO_TRAY_ELEMENT
+            ).ConnectValue<bool>(value => this.MinimizeToTray = value);
+            ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
+                WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
+                TrayIconBehaviourConfiguration.CLOSE_TO_TRAY_ELEMENT
+            ).ConnectValue<bool>(value => this.CloseToTray = value);
+            base.InitializeComponent(core);
+        }
+
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return TrayIconBehaviourConfiguration.GetConfigurationSections();
+        }
+
         //TODO: System.Windows.Forms
         public global::System.Windows.Forms.NotifyIcon NotifyIcon { get; private set; }
 
@@ -47,7 +74,13 @@ namespace FoxTunes
                 this.NotifyIcon.Icon = new global::System.Drawing.Icon(
                     Application.GetResourceStream(new Uri("pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico")).Stream
                 );
-                this.NotifyIcon.Click += this.OnClick;
+                //TODO: System.Windows.Forms
+                this.NotifyIcon.ContextMenu = new global::System.Windows.Forms.ContextMenu(new[]
+                {
+                    //TODO: System.Windows.Forms
+                    new global::System.Windows.Forms.MenuItem("Quit", this.OnClose)
+                });
+                this.NotifyIcon.Click += this.OnOpen;
                 this.NotifyIcon.Visible = true;
             }
             if (Application.Current != null && Application.Current.MainWindow != null)
@@ -57,7 +90,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnClick(object sender, EventArgs e)
+        protected virtual void OnOpen(object sender, EventArgs e)
         {
             if (Application.Current != null && Application.Current.MainWindow != null)
             {
@@ -70,28 +103,42 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnStateChanged(object sender, EventArgs e)
+        protected virtual void OnClose(object sender, EventArgs e)
         {
+            this.Disable();
             if (Application.Current != null && Application.Current.MainWindow != null)
             {
-                if (Application.Current.MainWindow.WindowState == WindowState.Minimized)
+                Application.Current.MainWindow.Close();
+            }
+        }
+
+        protected virtual void OnStateChanged(object sender, EventArgs e)
+        {
+            if (this.MinimizeToTray)
+            {
+                if (Application.Current != null && Application.Current.MainWindow != null)
                 {
-                    Application.Current.MainWindow.Hide();
+                    if (Application.Current.MainWindow.WindowState == WindowState.Minimized)
+                    {
+                        Application.Current.MainWindow.Hide();
+                    }
                 }
             }
         }
 
         protected virtual void OnClosing(object sender, CancelEventArgs e)
         {
-            //TODO: Close to tray.
+            if (this.CloseToTray)
+            {
+                e.Cancel = true;
+                Application.Current.MainWindow.Hide();
+            }
         }
 
         protected virtual void Disable()
         {
             if (this.NotifyIcon != null)
             {
-                this.NotifyIcon.Visible = false;
-                this.NotifyIcon.Click -= this.OnClick;
                 this.NotifyIcon.Dispose();
                 this.NotifyIcon = null;
             }

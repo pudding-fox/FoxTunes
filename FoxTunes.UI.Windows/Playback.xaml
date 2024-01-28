@@ -14,6 +14,12 @@
             <Setter Property="Height" Value="30"></Setter>
             <Setter Property="FontFamily" Value="Webdings"></Setter>
             <Setter Property="FontSize" Value="20"></Setter>
+            <!-- System -->
+            <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
+            <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
+            <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
         </Style>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal">

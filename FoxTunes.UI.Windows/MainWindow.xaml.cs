@@ -1,5 +1,4 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Windows;
 
@@ -24,10 +23,6 @@ namespace FoxTunes
                 this.Width = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Width;
                 this.Height = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Height;
             }
-            ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
-                WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
-                WindowsUserInterfaceConfiguration.SHOW_TRAY_ICON_ELEMENT
-            ).ConnectValue<bool>(value => ComponentRegistry.Instance.GetComponent<TrayIconBehaviour>().Enabled = value);
             base.OnInitialized(e);
         }
 

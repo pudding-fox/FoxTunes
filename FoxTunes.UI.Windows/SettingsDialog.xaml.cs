@@ -9,7 +9,7 @@ namespace FoxTunes
     {
         public SettingsDialog()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

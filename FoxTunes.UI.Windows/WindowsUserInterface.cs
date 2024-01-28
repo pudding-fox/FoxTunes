@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using FoxTunes.Theme;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,6 +19,9 @@ namespace FoxTunes
 
         public WindowsUserInterface()
         {
+            this.Application = new Application();
+            this.Application.DispatcherUnhandledException += this.OnApplicationDispatcherUnhandledException;
+            this.Window = new MainWindow();
             this.Queue = new PendingQueue<string>(TimeSpan.FromMilliseconds(100));
             this.Queue.Complete += async (sender, e) =>
             {
@@ -30,9 +32,59 @@ namespace FoxTunes
             };
         }
 
-        public PendingQueue<string> Queue { get; private set; }
+        private Application _Application { get; set; }
 
-        public Application Application { get; private set; }
+        public Application Application
+        {
+            get
+            {
+                return this._Application;
+            }
+            private set
+            {
+                this._Application = value;
+                this.OnApplicationChanged();
+            }
+        }
+
+        protected virtual void OnApplicationChanged()
+        {
+            if (this.ApplicationChanged != null)
+            {
+                this.ApplicationChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Application");
+        }
+
+        public event EventHandler ApplicationChanged = delegate { };
+
+        private Window _Window { get; set; }
+
+        public Window Window
+        {
+            get
+            {
+                return this._Window;
+            }
+            private set
+            {
+                this._Window = value;
+                this.OnWindowChanged();
+            }
+        }
+
+        protected virtual void OnWindowChanged()
+        {
+            if (this.WindowChanged != null)
+            {
+                this.WindowChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Window");
+        }
+
+        public event EventHandler WindowChanged = delegate { };
+
+        public PendingQueue<string> Queue { get; private set; }
 
         public ICore Core { get; private set; }
 
@@ -40,23 +92,18 @@ namespace FoxTunes
 
         public IPlaylistManager Playlist { get; private set; }
 
-        public IThemeLoader ThemeLoader { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.Output = core.Components.Output;
             this.Playlist = core.Managers.Playlist;
-            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<IThemeLoader>();
+            this.Window.DataContext = core;
             base.InitializeComponent(core);
         }
 
         public override void Show()
         {
-            this.Application = new Application();
-            this.Application.DispatcherUnhandledException += this.OnApplicationDispatcherUnhandledException;
-            this.ThemeLoader.Application = this.Application;
-            this.Application.Run(new MainWindow() { DataContext = this.Core });
+            this.Application.Run(this.Window);
         }
 
         public override void Run(string message)

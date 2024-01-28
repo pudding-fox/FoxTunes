@@ -60,6 +60,7 @@
     <Compile Include="Behaviours\LibraryActionsBehaviour.cs" />
     <Compile Include="Behaviours\PlaylistActionsBehaviour.cs" />
     <Compile Include="Behaviours\TrayIconBehaviour.cs" />
+    <Compile Include="Behaviours\TrayIconBehaviourConfiguration.cs" />
     <Compile Include="Components.xaml.cs">
       <DependentUpon>Components.xaml</DependentUpon>
     </Compile>
@@ -120,7 +121,6 @@
       <DependentUpon>StreamPosition.xaml</DependentUpon>
     </Compile>
     <Compile Include="Theme\ITheme.cs" />
-    <Compile Include="Theme\IThemeLoader.cs" />
     <Compile Include="Theme\ThemeBase.cs" />
     <Compile Include="Theme\ThemeLoader.cs" />
     <Compile Include="Utilities\CollectionManager.cs" />

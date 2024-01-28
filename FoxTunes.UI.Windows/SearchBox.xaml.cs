@@ -106,7 +106,10 @@ namespace FoxTunes
 
         protected virtual void OnTimerTick(object sender, EventArgs e)
         {
-            this.Timer.Stop();
+            if (this.Timer != null)
+            {
+                this.Timer.Stop();
+            }
             this.SearchText = this.Text;
         }
 
@@ -120,8 +123,11 @@ namespace FoxTunes
 
         public void Clear()
         {
+            if (this.Timer != null)
+            {
+                this.Timer.Stop();
+            }
             this.Text = string.Empty;
-            this.Timer.Stop();
             this.SearchText = string.Empty;
         }
     }
