@@ -12,14 +12,6 @@ namespace FoxTunes
             this.Clear = clear;
         }
 
-        public override bool Visible
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         public LibraryHierarchyNode LibraryHierarchyNode { get; private set; }
 
         public bool Clear { get; private set; }
@@ -31,7 +23,10 @@ namespace FoxTunes
                 await this.RemoveItems(PlaylistItemStatus.None);
             }
             await this.AddPlaylistItems();
-            await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
+            if (!this.Clear)
+            {
+                await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
+            }
             await this.SequenceItems();
             await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
         }

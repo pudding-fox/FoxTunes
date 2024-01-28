@@ -4,7 +4,6 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Text;
 
 namespace FoxTunes
@@ -46,6 +45,23 @@ namespace FoxTunes
             this.Core = core;
             this.DatabaseFactory = core.Factories.Database;
             base.InitializeComponent(core);
+        }
+
+        public IEnumerable<LibraryHierarchy> GetHierarchies()
+        {
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    var set = database.Set<LibraryHierarchy>(transaction);
+                    set.Fetch.Sort.Expressions.Clear();
+                    set.Fetch.Sort.AddColumn(set.Table.GetColumn(ColumnConfig.By("Sequence", ColumnFlags.None)));
+                    foreach (var element in set)
+                    {
+                        yield return element;
+                    }
+                }
+            }
         }
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy)

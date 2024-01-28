@@ -4,6 +4,7 @@
     <TargetFrameworks>net40;net461</TargetFrameworks>
     <AssemblyName>FoxTunes.UI</AssemblyName>
     <OutputPath>..\distribution\</OutputPath>
+    <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
   </PropertyGroup>
 
   <ItemGroup>

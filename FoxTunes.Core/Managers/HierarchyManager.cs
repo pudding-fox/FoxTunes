@@ -1,7 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System.Threading.Tasks;
 
-namespace FoxTunes.Managers
+namespace FoxTunes
 {
     public class HierarchyManager : StandardManager, IHierarchyManager
     {

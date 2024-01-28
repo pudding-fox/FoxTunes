@@ -3,9 +3,10 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace FoxTunes.Managers
+namespace FoxTunes
 {
     public class LibraryManager : StandardManager, ILibraryManager
     {
@@ -13,7 +14,61 @@ namespace FoxTunes.Managers
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
+        public ILibraryHierarchyBrowser HierarchyBrowser { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
+
+        private LibraryHierarchy _SelectedHierarchy { get; set; }
+
+        public LibraryHierarchy SelectedHierarchy
+        {
+            get
+            {
+                return this._SelectedHierarchy;
+            }
+            set
+            {
+                this._SelectedHierarchy = value;
+                this.OnSelectedHierarchyChanged();
+            }
+        }
+
+        protected virtual void OnSelectedHierarchyChanged()
+        {
+            if (this.SelectedHierarchyChanged != null)
+            {
+                this.SelectedHierarchyChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SelectedHierarchy");
+        }
+
+        public event EventHandler SelectedHierarchyChanged;
+
+        private LibraryHierarchyNode _SelectedNode { get; set; }
+
+        public LibraryHierarchyNode SelectedNode
+        {
+            get
+            {
+                return this._SelectedNode;
+            }
+            set
+            {
+                this._SelectedNode = value;
+                this.OnSelectedNodeChanged();
+            }
+        }
+
+        protected virtual void OnSelectedNodeChanged()
+        {
+            if (this.SelectedNodeChanged != null)
+            {
+                this.SelectedNodeChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SelectedNode");
+        }
+
+        public event EventHandler SelectedNodeChanged;
 
         private bool _CanNavigate { get; set; }
 
@@ -44,6 +99,7 @@ namespace FoxTunes.Managers
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.HierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.DatabaseFactory = core.Factories.Database;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
@@ -66,13 +122,13 @@ namespace FoxTunes.Managers
 #endif
         }
 
-        public Task<bool> HasItems()
+        public async Task<bool> HasItems()
         {
             using (var database = this.DatabaseFactory.Create())
             {
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    return database.ExecuteScalarAsync<bool>(database.QueryFactory.Build().With(query1 =>
+                    return await database.ExecuteScalarAsync<bool>(database.QueryFactory.Build().With(query1 =>
                     {
                         query1.Output.AddCase(
                             query1.Output.CreateCaseCondition(
@@ -99,6 +155,10 @@ namespace FoxTunes.Managers
 
         public async Task Refresh()
         {
+            if (this.SelectedHierarchy == null)
+            {
+                this.SelectedHierarchy = this.HierarchyBrowser.GetHierarchies().FirstOrDefault();
+            }
             Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
             this.CanNavigate = this.DatabaseFactory != null && await this.HasItems();
         }
