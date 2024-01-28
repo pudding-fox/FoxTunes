@@ -38,7 +38,7 @@
             ItemsSource="{Binding Hierarchies, Source={StaticResource ViewModel}}" 
             SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"
             DisplayMemberPath="Name"/>
-        <TreeView x:Name="TreeView" Grid.ColumnSpan="2" Grid.Row="1" 
+        <TreeView x:Name="TreeView" Grid.ColumnSpan="2" Grid.Row="1" Margin="0,2,0,2"
                   ItemsSource="{Binding Items, Source={StaticResource ViewModel}}"
                   Windows:TreeViewExtensions.SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}"
                   Windows:TreeViewExtensions.RightButtonSelect="True"

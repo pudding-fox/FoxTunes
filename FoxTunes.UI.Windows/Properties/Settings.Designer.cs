@@ -37,7 +37,7 @@ namespace FoxTunes.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(".35*")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.35*")]
         public string ColumnWidth_FC87DEC38708 {
             get {
                 return ((string)(this["ColumnWidth_FC87DEC38708"]));

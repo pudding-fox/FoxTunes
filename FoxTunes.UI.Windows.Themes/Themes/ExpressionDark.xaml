@@ -2263,7 +2263,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TreeView}">
                     <Grid>
-                        <Border x:Name="Border" Background="{DynamicResource ControlBackgroundBrush}" BorderBrush="{x:Null}" BorderThickness="1" CornerRadius="3,3,3,3">
+                        <Border x:Name="Border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" Background="{DynamicResource ControlBackgroundBrush}">
                             <ScrollViewer Style="{DynamicResource NuclearScrollViewer}" Focusable="False" Padding="4" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="False" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}">
                                 <ItemsPresenter />
                             </ScrollViewer>
@@ -2614,7 +2614,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListView}">
-                    <Border x:Name="Bd" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0,0,0,0" BorderBrush="{DynamicResource DefaultedBorderBrush}" Background="{DynamicResource ControlBackgroundBrush}">
+                    <Border x:Name="Border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" Background="{DynamicResource ControlBackgroundBrush}">
                         <ScrollViewer Padding="{TemplateBinding Padding}" Style="{DynamicResource {x:Static GridView.GridViewScrollViewerStyleKey}}">
                             <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                         </ScrollViewer>
@@ -2624,7 +2624,7 @@
                             <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
-                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
+                            <Setter Property="Background" TargetName="Border" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -3101,6 +3101,10 @@
             </Setter.Value>
         </Setter>
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    </Style>
+
+    <Style TargetType="{x:Type GridSplitter}">
+        <Setter Property="Background" Value="{DynamicResource NormalBrush}"/>
     </Style>
 
 </ResourceDictionary>
