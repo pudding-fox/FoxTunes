@@ -1,5 +1,9 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace FoxTunes
 {
@@ -18,15 +22,28 @@ namespace FoxTunes
             return LayoutManager.Instance.GetComponent(configuration.Component);
         }
 
-        public UIComponentBase CreateControl(UIComponentConfiguration configuration)
+        public FrameworkElement CreateControl(UIComponentConfiguration configuration)
         {
             var type = this.GetComponentType(configuration.Component);
+            if (type == null || type == LayoutManager.PLACEHOLDER)
+            {
+                //A plugin was uninstalled.
+                return null;
+            }
             var component = ComponentActivator.Instance.Activate<UIComponentBase>(type);
             if (component is IUIComponentPanel panel)
             {
                 panel.Component = configuration;
             }
-            return component;
+            //Some components expect to be hosted in a Grid (Artwork..)
+            //We might as well add a Rectangle to make the entire thing hit testable.
+            var grid = new Grid();
+            grid.Children.Add(new Rectangle()
+            {
+                Fill = Brushes.Transparent
+            });
+            grid.Children.Add(component);
+            return grid;
         }
 
         protected virtual Type GetComponentType(string id)

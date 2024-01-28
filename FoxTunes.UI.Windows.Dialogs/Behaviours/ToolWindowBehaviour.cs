@@ -72,6 +72,10 @@ namespace FoxTunes
                     window = new ToolWindow();
                     window.DataContext = this.Core;
                     window.Configuration = config;
+                    window.ShowActivated = false;
+                    //Don't set owner as it causes an "always on top" type of behaviour.
+                    //We have an option for that.
+                    //window.Owner = global::FoxTunes.Windows.ActiveWindow;
                     window.Closed += this.OnClosed;
                 }).ConfigureAwait(false);
                 this.Windows[config] = window;
@@ -165,13 +169,16 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual async void OnActiveWindowChanged(object sender, EventArgs e)
+        protected virtual void OnActiveWindowChanged(object sender, EventArgs e)
         {
-            if (!this.IsLoaded)
+            this.Dispatch(async () =>
             {
-                await this.Load().ConfigureAwait(false);
-            }
-            await this.Show().ConfigureAwait(false);
+                if (!this.IsLoaded)
+                {
+                    await this.Load().ConfigureAwait(false);
+                }
+                await this.Show().ConfigureAwait(false);
+            });
         }
 
         protected virtual void OnShuttingDown(object sender, EventArgs e)
@@ -183,8 +190,11 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, NEW, "New Window");
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, MANAGE, "Manage Windows", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                if (!IsToolWindowManagerWindowCreated)
+                {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, NEW, "New Window");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, MANAGE, "Manage Windows", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                }
             }
         }
 

@@ -8,10 +8,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace FoxTunes
 {
-    public class UIComponentContainer : ContentControl, IUIComponent, IValueConverter
+    public class UIComponentContainer : DockPanel, IUIComponent, IValueConverter
     {
         public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
 
@@ -52,16 +54,12 @@ namespace FoxTunes
 
         public UIComponentContainer()
         {
-            this.SetBinding(
-                ContentControl.ContentProperty,
-                new Binding()
-                {
-                    Path = new PropertyPath("Component"),
-                    Source = this,
-                    Converter = this
-                }
-            );
+            this.InitializeComponent();
         }
+
+        public ContentControl ContentControl { get; private set; }
+
+        public Rectangle Rectangle { get; private set; }
 
         public UIComponentConfiguration Component
         {
@@ -85,6 +83,26 @@ namespace FoxTunes
 
         public event EventHandler ComponentChanged;
 
+        protected virtual void InitializeComponent()
+        {
+            this.Rectangle = new Rectangle();
+            this.Rectangle.Fill = Brushes.Transparent;
+
+            this.ContentControl = new ContentControl();
+            this.ContentControl.SetBinding(
+                ContentControl.ContentProperty,
+                new Binding()
+                {
+                    Path = new PropertyPath("Component"),
+                    Source = this,
+                    Converter = this
+                }
+            );
+
+            this.Children.Add(this.Rectangle);
+            this.Children.Add(this.ContentControl);
+        }
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var configuration = value as UIComponentConfiguration;
@@ -92,7 +110,13 @@ namespace FoxTunes
             {
                 return this.CreateSelector();
             }
-            return Factory.CreateControl(configuration);
+            var control = Factory.CreateControl(configuration);
+            if (control == null)
+            {
+                //If a plugin was uninstalled the control will be null.
+                return this.CreateSelector();
+            }
+            return control;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -100,10 +124,21 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
-        protected virtual UIComponentSelector CreateSelector()
+        protected virtual FrameworkElement CreateSelector()
         {
+            var textBlock = new TextBlock();
+            textBlock.Text = "Select Component";
+            textBlock.IsHitTestVisible = false;
+            textBlock.HorizontalAlignment = HorizontalAlignment.Left;
+            textBlock.VerticalAlignment = VerticalAlignment.Center;
+            textBlock.Margin = new Thickness(8, 0, 40, 0);
+            textBlock.SetResourceReference(
+                TextBlock.ForegroundProperty,
+                "TextBrush"
+            );
+
             var selector = new UIComponentSelector();
-            selector.HorizontalAlignment = HorizontalAlignment.Center;
+            selector.HorizontalAlignment = HorizontalAlignment.Stretch;
             selector.VerticalAlignment = VerticalAlignment.Center;
             selector.SetBinding(
                 UIComponentSelector.ComponentProperty,
@@ -113,7 +148,12 @@ namespace FoxTunes
                     Path = new PropertyPath("Component")
                 }
             );
-            return selector;
+
+            var grid = new Grid();
+            grid.Children.Add(selector);
+            grid.Children.Add(textBlock);
+
+            return grid;
         }
 
         public void InitializeComponent(ICore core)
