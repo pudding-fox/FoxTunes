@@ -1,10 +1,12 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace FoxTunes
 {
-    public class ArtworkLocator
+    public class ArtworkProvider : StandardComponent, IArtworkProvider
     {
         public static IDictionary<ArtworkType, string[]> Names = GetNames();
 
@@ -37,12 +39,12 @@ namespace FoxTunes
             }
             return default(MetaDataItem);
         }
-    }
 
-    public enum ArtworkType
-    {
-        None,
-        FrontCover,
-        BackCover
+        public MetaDataItem Find(PlaylistItem playlistItem, ArtworkType type)
+        {
+            return playlistItem.MetaDatas.FirstOrDefault(
+                 metaDataItem => metaDataItem.Type == MetaDataItemType.Image && metaDataItem.Name == Enum.GetName(typeof(ArtworkType), type) && File.Exists(metaDataItem.FileValue)
+             );
+        }
     }
 }

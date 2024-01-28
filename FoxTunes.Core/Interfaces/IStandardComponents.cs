@@ -21,5 +21,7 @@
         ISignalEmitter SignalEmitter { get; }
 
         ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; }
+
+        IArtworkProvider ArtworkProvider { get; }
     }
 }

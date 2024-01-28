@@ -90,6 +90,14 @@ namespace FoxTunes
             }
         }
 
+        public IArtworkProvider ArtworkProvider
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IArtworkProvider>();
+            }
+        }
+
         public static readonly IStandardComponents Instance = new StandardComponents();
     }
 }
