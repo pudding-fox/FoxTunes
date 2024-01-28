@@ -70,8 +70,9 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            base.Loaded -= this.OnLoaded;
-            base.Unloaded -= this.OnUnloaded;
+            //TODO: Cannot unsubscribe from GC thread.
+            //base.Loaded -= this.OnLoaded;
+            //base.Unloaded -= this.OnUnloaded;
         }
 
         ~UIComponentRoot()

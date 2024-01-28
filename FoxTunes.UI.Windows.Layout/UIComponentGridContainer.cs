@@ -39,8 +39,11 @@ namespace FoxTunes
 
         public UIComponentGridContainer()
         {
-            this.InitializeComponent();
+            this.Grid = new Grid();
+            this.Content = this.Grid;
         }
+
+        public Grid Grid { get; private set; }
 
         protected override void OnComponentChanged()
         {
@@ -159,7 +162,6 @@ namespace FoxTunes
             {
                 return;
             }
-
         }
 
         public override IEnumerable<IInvocationComponent> Invocations
