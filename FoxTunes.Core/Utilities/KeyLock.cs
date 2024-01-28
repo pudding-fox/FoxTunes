@@ -59,9 +59,17 @@ namespace FoxTunes
             }
         }
 
-        public IDisposable Lock(T key)
+        public IDisposable Lock(T key, int timeout, bool throwOnTimeout = true)
         {
-            this.CreateOrIncrement(key).Wait();
+            if (!this.CreateOrIncrement(key).Wait(timeout))
+            {
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to establish lock after {0}ms.", timeout);
+                if (throwOnTimeout)
+                {
+                    throw new TimeoutException(string.Format("Failed to establish lock after {0}ms.", timeout));
+                }
+                return new NoOp();
+            }
             return new Releaser(this, key);
         }
 
@@ -150,6 +158,45 @@ namespace FoxTunes
             }
 
             ~Releaser()
+            {
+                Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+                try
+                {
+                    this.Dispose(true);
+                }
+                catch
+                {
+                    //Nothing can be done, never throw on GC thread.
+                }
+            }
+        }
+
+        public class NoOp : IDisposable
+        {
+            public bool IsDisposed { get; private set; }
+
+            public void Dispose()
+            {
+                this.Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (this.IsDisposed || !disposing)
+                {
+                    return;
+                }
+                this.OnDisposing();
+                this.IsDisposed = true;
+            }
+
+            protected virtual void OnDisposing()
+            {
+                //Nothing to do.
+            }
+
+            ~NoOp()
             {
                 Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
                 try

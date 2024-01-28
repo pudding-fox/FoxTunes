@@ -13,6 +13,8 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ImageLoader : StandardComponent, IConfigurableComponent
     {
+        const int TIMEOUT = 1000;
+
         private static readonly KeyLock<string> KeyLock = new KeyLock<string>();
 
         public IConfiguration Configuration { get; private set; }
@@ -145,7 +147,9 @@ namespace FoxTunes
             {
                 return fileName;
             }
-            using (KeyLock.Lock(id))
+            //TODO: Setting throwOnTimeout = false so we ignore synchronization timeout.
+            //TODO: I think there exists a deadlock bug in KeyLock but I haven't been able to prove it.
+            using (KeyLock.Lock(id, TIMEOUT, false))
             {
                 if (FileMetaDataStore.Exists(prefix, id, out fileName))
                 {
