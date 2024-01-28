@@ -9,6 +9,14 @@ namespace FoxTunes
     [Serializable]
     public abstract class BaseComponent : IBaseComponent
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         private volatile SemaphoreSlim Semaphore;
 
         private void EnsureSemaphore()
