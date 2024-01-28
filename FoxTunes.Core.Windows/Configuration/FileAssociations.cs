@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 
 namespace FoxTunes
 {
-    public class FileAssociations : IFileAssociations
+    public class FileAssociations : StandardComponent, IFileAssociations
     {
         public string Id
         {

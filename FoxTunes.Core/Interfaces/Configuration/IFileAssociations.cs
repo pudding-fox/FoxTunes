@@ -2,7 +2,7 @@
 
 namespace FoxTunes.Interfaces
 {
-    public interface IFileAssociations
+    public interface IFileAssociations : IBaseComponent
     {
         IEnumerable<IFileAssociation> Associations { get; }
 

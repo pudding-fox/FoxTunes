@@ -43,14 +43,10 @@
     <Compile Include="AssemblyResolver.cs" />
     <Compile Include="AsyncEventArgs.cs" />
     <Compile Include="Behaviours\EnqueueNextItemBehaviour.cs" />
-    <Compile Include="Behaviours\ExecutionStateBehaviour.cs" />
-    <Compile Include="Behaviours\ExecutionStateBehaviourConfiguration.cs" />
     <Compile Include="Behaviours\PreemptNextItemBehaviour.cs" />
     <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
     <Compile Include="Configuration\BooleanConfigurationElement.cs" />
     <Compile Include="Configuration\ComponentResolver.cs" />
-    <Compile Include="Configuration\FileAssociation.cs" />
-    <Compile Include="Configuration\FileAssociations.cs" />
     <Compile Include="Configuration\TextConfigurationElement.cs" />
     <Compile Include="CoreValidator.cs" />
     <Compile Include="Deferral.cs" />
@@ -87,6 +83,7 @@
     <Compile Include="LogManager.cs" />
     <Compile Include="Managers\HierarchyManager.cs" />
     <Compile Include="Managers\InputManager.cs" />
+    <Compile Include="Managers\InputManagerConfiguration.cs" />
     <Compile Include="Managers\PlaylistManager.cs" />
     <Compile Include="MetaData\CommonImageTypes.cs" />
     <Compile Include="MetaData\CustomMetaData.cs" />

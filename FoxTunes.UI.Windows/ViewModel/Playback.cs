@@ -210,24 +210,24 @@ namespace FoxTunes.ViewModel
             this.Output = this.Core.Components.Output;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
-            this.InputManager = this.Core.Managers.Input;
+            this.InputManager = ComponentRegistry.Instance.GetComponent<IInputManager>();
             this.Core.Components.Output.IsStartedChanged += (sender, e) => Command.InvalidateRequerySuggested();
             this.Configuration = this.Core.Components.Configuration;
             this.Configuration.GetElement<TextConfigurationElement>(
-                WindowsUserInterfaceConfiguration.KEYBOARD_SHORTCUTS_SECTION,
-                WindowsUserInterfaceConfiguration.PLAY_ELEMENT
+                InputManagerConfiguration.KEYBOARD_SHORTCUTS_SECTION,
+                InputManagerConfiguration.PLAY_ELEMENT
             ).ConnectValue<string>(value => this.PlayCommandBinding = value);
             this.Configuration.GetElement<TextConfigurationElement>(
-                WindowsUserInterfaceConfiguration.KEYBOARD_SHORTCUTS_SECTION,
-                WindowsUserInterfaceConfiguration.PREVIOUS_ELEMENT
+                InputManagerConfiguration.KEYBOARD_SHORTCUTS_SECTION,
+                InputManagerConfiguration.PREVIOUS_ELEMENT
             ).ConnectValue<string>(value => this.PreviousCommandBinding = value);
             this.Configuration.GetElement<TextConfigurationElement>(
-                WindowsUserInterfaceConfiguration.KEYBOARD_SHORTCUTS_SECTION,
-                WindowsUserInterfaceConfiguration.NEXT_ELEMENT
+                InputManagerConfiguration.KEYBOARD_SHORTCUTS_SECTION,
+                InputManagerConfiguration.NEXT_ELEMENT
             ).ConnectValue<string>(value => this.NextCommandBinding = value);
             this.Configuration.GetElement<TextConfigurationElement>(
-                WindowsUserInterfaceConfiguration.KEYBOARD_SHORTCUTS_SECTION,
-                WindowsUserInterfaceConfiguration.STOP_ELEMENT
+                InputManagerConfiguration.KEYBOARD_SHORTCUTS_SECTION,
+                InputManagerConfiguration.STOP_ELEMENT
             ).ConnectValue<string>(value => this.StopCommandBinding = value);
             this.OnCommandsChanged();
             base.OnCoreChanged();
@@ -257,11 +257,19 @@ namespace FoxTunes.ViewModel
 
         protected virtual void AddCommandBinding(string keys, Action action)
         {
+            if (this.InputManager == null)
+            {
+                return;
+            }
             this.InputManager.AddInputHook(keys, action);
         }
 
         protected virtual void RemoveCommandBinding(string keys)
         {
+            if (this.InputManager == null)
+            {
+                return;
+            }
             this.InputManager.RemoveInputHook(keys);
         }
 
