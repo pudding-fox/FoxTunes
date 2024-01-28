@@ -10,5 +10,4 @@
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static Windows:SpectrumBehaviour.CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
-    <Border BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1"></Border>
 </UserControl>

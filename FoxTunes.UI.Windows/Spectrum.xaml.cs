@@ -207,7 +207,7 @@ namespace FoxTunes
                     peaks[a, 3] = 1;
                     peaks[a, 1] = elements[a, 1];
                 }
-                else if (peaks[a, 1] < height)
+                else if (peaks[a, 1] < height - 1)
                 {
                     peaks[a, 1]++;
                 }
