@@ -4,13 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace FoxTunes
 {
-    public class CdPlaylistItemFactory : BaseComponent
+    public class CdPlaylistItemFactory : PopulatorBase
     {
-        public CdPlaylistItemFactory(int drive, bool cdLookup, IEnumerable<string> cdLookupHosts)
+        public CdPlaylistItemFactory(int drive, bool cdLookup, IEnumerable<string> cdLookupHosts, bool reportProgress) : base(reportProgress)
         {
             this.Drive = drive;
             this.CdLookup = cdLookup;
@@ -35,8 +37,13 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public async Task<PlaylistItem[]> Create()
+        public async Task<PlaylistItem[]> Create(CancellationToken cancellationToken)
         {
+            if (this.ReportProgress)
+            {
+                this.Name = Strings.CdPlaylistItemFactory_Name;
+            }
+
             var info = default(CDInfo);
             BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
             var id = BassCd.GetID(this.Drive, CDID.CDPlayer);
@@ -50,6 +57,10 @@ namespace FoxTunes
                     continue;
                 }
                 var fileName = CdUtils.CreateUrl(this.Drive, id, a);
+                if (this.ReportProgress)
+                {
+                    this.Description = Path.GetFileName(fileName);
+                }
                 var metaData = default(MetaDataItem[]);
                 try
                 {

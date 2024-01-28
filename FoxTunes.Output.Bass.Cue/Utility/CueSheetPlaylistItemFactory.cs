@@ -3,11 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace FoxTunes
 {
-    public class CueSheetPlaylistItemFactory : BaseComponent
+    public class CueSheetPlaylistItemFactory : PopulatorBase
     {
         private static IDictionary<string, string> FILE_NAMES = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -22,6 +24,11 @@ namespace FoxTunes
             { "DATE", CommonMetaData.Year }
         };
 
+        public CueSheetPlaylistItemFactory(bool reportProgress) : base(reportProgress)
+        {
+
+        }
+
         public IOutput Output { get; private set; }
 
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
@@ -35,6 +42,11 @@ namespace FoxTunes
 
         public async Task<PlaylistItem[]> Create(CueSheet cueSheet)
         {
+            if (this.ReportProgress)
+            {
+                this.Name = Strings.CueSheetPlaylistItemFactory_Name;
+            }
+
             var playlistItems = new List<PlaylistItem>();
             var directoryName = Path.GetDirectoryName(cueSheet.FileName);
             var metaDataSource = this.MetaDataSourceFactory.Create();
@@ -71,6 +83,10 @@ namespace FoxTunes
                             target,
                             file.Tracks[b].Index.Time
                         );
+                    }
+                    if (this.ReportProgress)
+                    {
+                        this.Description = Path.GetFileName(fileName);
                     }
                     var playlistItem = new PlaylistItem()
                     {

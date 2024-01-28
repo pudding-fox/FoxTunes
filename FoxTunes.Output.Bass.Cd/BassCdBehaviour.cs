@@ -299,7 +299,7 @@ namespace FoxTunes
             {
                 this.PlaylistManager = core.Managers.Playlist;
                 this.PlaylistBrowser = core.Components.PlaylistBrowser;
-                this.Factory = new CdPlaylistItemFactory(this.Drive, this.CdLookup, this.CdLookupHosts);
+                this.Factory = new CdPlaylistItemFactory(this.Drive, this.CdLookup, this.CdLookupHosts, this.Visible);
                 this.Factory.InitializeComponent(core);
                 base.InitializeComponent(core);
             }
@@ -314,7 +314,8 @@ namespace FoxTunes
                         throw new InvalidOperationException("Drive is not ready.");
                     }
                     var playlist = this.PlaylistManager.SelectedPlaylist;
-                    var playlistItems = await this.Factory.Create().ConfigureAwait(false);
+                    var playlistItems = default(PlaylistItem[]);
+                    await this.WithSubTask(this.Factory, async () => playlistItems = await this.Factory.Create(CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
                     using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                     {
                         //Always append for now.

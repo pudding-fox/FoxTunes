@@ -104,5 +104,14 @@ namespace FoxTunes {
                 return ResourceManager.GetString("BassSkipSilenceStreamComponent.None", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reading cue sheet.
+        /// </summary>
+        internal static string CueSheetPlaylistItemFactory_Name {
+            get {
+                return ResourceManager.GetString("CueSheetPlaylistItemFactory.Name", resourceCulture);
+            }
+        }
     }
 }

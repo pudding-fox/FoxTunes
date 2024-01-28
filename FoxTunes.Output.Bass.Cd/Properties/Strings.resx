@@ -138,4 +138,7 @@
   <data name="BassCdStreamProviderBehaviourConfiguration.Section" xml:space="preserve">
     <value>CD</value>
   </data>
+  <data name="CdPlaylistItemFactory.Name" xml:space="preserve">
+    <value>Reading CD</value>
+  </data>
 </root>
