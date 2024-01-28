@@ -54,7 +54,8 @@ namespace FoxTunes
             }
             else if (this.PlaylistItems != null)
             {
-                //TODO: Implement me.
+                await this.AddPlaylistItems(this.PlaylistItems).ConfigureAwait(false);
+                await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);
             }
         }
 
