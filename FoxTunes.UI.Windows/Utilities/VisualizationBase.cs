@@ -33,39 +33,24 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            PlaybackStateNotifier.IsPlayingChanged += this.OnIsPlayingChanged;
             base.InitializeComponent(core);
-            this.Output.CanGetDataChanged += this.OnCanGetDataChanged;
-            this.OnCanGetDataChanged(this, EventArgs.Empty);
-        }
-
-        protected virtual void OnCanGetDataChanged(object sender, EventArgs e)
-        {
-            PlaybackStateNotifier.Notify -= this.OnNotify;
-            if (this.Output.CanGetData)
-            {
-                PlaybackStateNotifier.Notify += this.OnNotify;
-            }
             this.Update();
         }
 
-        protected virtual void OnNotify(object sender, EventArgs e)
+        protected virtual void OnIsPlayingChanged(object sender, EventArgs e)
         {
             this.Update();
         }
 
         protected virtual void Update()
         {
-            var enabled = default(bool);
-            lock (this.SyncRoot)
-            {
-                enabled = this.Enabled;
-            }
-            if (PlaybackStateNotifier.IsPlaying && !enabled)
+            if (PlaybackStateNotifier.IsPlaying && !this.Enabled)
             {
                 Logger.Write(this, LogLevel.Debug, "Playback was started, starting renderer.");
                 this.Start();
             }
-            else if (!PlaybackStateNotifier.IsPlaying && enabled)
+            else if (!PlaybackStateNotifier.IsPlaying && this.Enabled)
             {
                 Logger.Write(this, LogLevel.Debug, "Playback was stopped, stopping renderer.");
                 this.Stop();
@@ -94,21 +79,13 @@ namespace FoxTunes
                     this.Enabled = false;
                 }
             }
-            if (!PlaybackStateNotifier.IsPlaying && !PlaybackStateNotifier.IsPaused)
-            {
-                var task = this.Clear();
-            }
         }
 
         protected abstract void OnElapsed(object sender, ElapsedEventArgs e);
 
         protected override void OnDisposing()
         {
-            if (this.Output != null)
-            {
-                this.Output.IsStartedChanged -= this.OnCanGetDataChanged;
-            }
-            PlaybackStateNotifier.Notify -= this.OnNotify;
+            PlaybackStateNotifier.IsPlayingChanged -= this.OnIsPlayingChanged;
             lock (this.SyncRoot)
             {
                 if (this.Timer != null)

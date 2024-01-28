@@ -185,6 +185,14 @@ namespace FoxTunes
             }
         }
 
+        public static void ForEach(this IEnumerable<Action> sequence)
+        {
+            foreach (var action in sequence)
+            {
+                action();
+            }
+        }
+
         public static IEnumerable<T> ForEach<T>(this IEnumerable<T> sequence, Action<T> action)
         {
             return sequence.Do(action).Enumerate();
