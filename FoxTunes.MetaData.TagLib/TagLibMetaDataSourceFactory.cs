@@ -61,24 +61,25 @@ namespace FoxTunes
                 yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.Year, MetaDataItemType.Tag);
                 yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.BeatsPerMinute, MetaDataItemType.Tag);
                 yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.InitialKey, MetaDataItemType.Tag);
+                yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.IsCompilation, MetaDataItemType.Tag);
                 if (this.Extended.Value)
                 {
-                    yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.MusicIpId, MetaDataItemType.Tag);
-                    yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.AmazonId, MetaDataItemType.Tag);
-                    yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.Comment, MetaDataItemType.Tag);
-                    yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.Copyright, MetaDataItemType.Tag);
-                    yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.Grouping, MetaDataItemType.Tag);
+                    yield return new KeyValuePair<string, MetaDataItemType>(ExtendedMetaData.MusicIpId, MetaDataItemType.Tag);
+                    yield return new KeyValuePair<string, MetaDataItemType>(ExtendedMetaData.AmazonId, MetaDataItemType.Tag);
+                    yield return new KeyValuePair<string, MetaDataItemType>(ExtendedMetaData.Comment, MetaDataItemType.Tag);
+                    yield return new KeyValuePair<string, MetaDataItemType>(ExtendedMetaData.Copyright, MetaDataItemType.Tag);
+                    yield return new KeyValuePair<string, MetaDataItemType>(ExtendedMetaData.Grouping, MetaDataItemType.Tag);
                 }
                 if (this.MusicBrainz.Value)
                 {
-                    yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.MusicBrainzArtistId, MetaDataItemType.Tag);
-                    yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.MusicBrainzDiscId, MetaDataItemType.Tag);
-                    yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.MusicBrainzReleaseArtistId, MetaDataItemType.Tag);
-                    yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.MusicBrainzReleaseCountry, MetaDataItemType.Tag);
-                    yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.MusicBrainzReleaseId, MetaDataItemType.Tag);
-                    yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.MusicBrainzReleaseStatus, MetaDataItemType.Tag);
-                    yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.MusicBrainzReleaseType, MetaDataItemType.Tag);
-                    yield return new KeyValuePair<string, MetaDataItemType>(CommonMetaData.MusicBrainzTrackId, MetaDataItemType.Tag);
+                    yield return new KeyValuePair<string, MetaDataItemType>(MusicBrainzMetaData.MusicBrainzArtistId, MetaDataItemType.Tag);
+                    yield return new KeyValuePair<string, MetaDataItemType>(MusicBrainzMetaData.MusicBrainzDiscId, MetaDataItemType.Tag);
+                    yield return new KeyValuePair<string, MetaDataItemType>(MusicBrainzMetaData.MusicBrainzReleaseArtistId, MetaDataItemType.Tag);
+                    yield return new KeyValuePair<string, MetaDataItemType>(MusicBrainzMetaData.MusicBrainzReleaseCountry, MetaDataItemType.Tag);
+                    yield return new KeyValuePair<string, MetaDataItemType>(MusicBrainzMetaData.MusicBrainzReleaseId, MetaDataItemType.Tag);
+                    yield return new KeyValuePair<string, MetaDataItemType>(MusicBrainzMetaData.MusicBrainzReleaseStatus, MetaDataItemType.Tag);
+                    yield return new KeyValuePair<string, MetaDataItemType>(MusicBrainzMetaData.MusicBrainzReleaseType, MetaDataItemType.Tag);
+                    yield return new KeyValuePair<string, MetaDataItemType>(MusicBrainzMetaData.MusicBrainzTrackId, MetaDataItemType.Tag);
                 }
                 if (this.Lyrics.Value)
                 {
@@ -93,6 +94,7 @@ namespace FoxTunes
                 }
 
                 //Properties.
+                yield return new KeyValuePair<string, MetaDataItemType>(CommonProperties.Description, MetaDataItemType.Property);
                 yield return new KeyValuePair<string, MetaDataItemType>(CommonProperties.Duration, MetaDataItemType.Property);
                 yield return new KeyValuePair<string, MetaDataItemType>(CommonProperties.AudioBitrate, MetaDataItemType.Property);
                 yield return new KeyValuePair<string, MetaDataItemType>(CommonProperties.AudioChannels, MetaDataItemType.Property);

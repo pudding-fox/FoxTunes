@@ -303,7 +303,13 @@ namespace FoxTunes
             (this).Try(() => this.AddTag(metaData, CommonMetaData.Disc, tag.Disc.ToString()), this.ErrorHandler);
             (this).Try(() => this.AddTag(metaData, CommonMetaData.DiscCount, tag.DiscCount.ToString()), this.ErrorHandler);
             (this).Try(() => this.AddTag(metaData, CommonMetaData.Genre, tag.FirstGenre), this.ErrorHandler);
-            (this).Try(() => this.AddTag(metaData, CommonMetaData.Performer, tag.FirstPerformer), this.ErrorHandler);
+            (this).Try(() =>
+            {
+                if (!string.Equals(tag.FirstAlbumArtist, tag.FirstPerformer, StringComparison.OrdinalIgnoreCase))
+                {
+                    this.AddTag(metaData, CommonMetaData.Performer, tag.FirstPerformer);
+                }
+            }, this.ErrorHandler);
             (this).Try(() => this.AddTag(metaData, CommonMetaData.Title, tag.Title), this.ErrorHandler);
             (this).Try(() => this.AddTag(metaData, CommonMetaData.Track, tag.Track.ToString()), this.ErrorHandler);
             (this).Try(() => this.AddTag(metaData, CommonMetaData.TrackCount, tag.TrackCount.ToString()), this.ErrorHandler);
@@ -313,23 +319,23 @@ namespace FoxTunes
 
             if (this.Extended.Value)
             {
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.MusicIpId, tag.MusicIpId), this.ErrorHandler);
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.AmazonId, tag.AmazonId), this.ErrorHandler);
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.Comment, tag.Comment), this.ErrorHandler);
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.Copyright, tag.Copyright), this.ErrorHandler);
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.Grouping, tag.Grouping), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, ExtendedMetaData.MusicIpId, tag.MusicIpId), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, ExtendedMetaData.AmazonId, tag.AmazonId), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, ExtendedMetaData.Comment, tag.Comment), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, ExtendedMetaData.Copyright, tag.Copyright), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, ExtendedMetaData.Grouping, tag.Grouping), this.ErrorHandler);
             }
 
             if (this.MusicBrainz.Value)
             {
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzArtistId, tag.MusicBrainzArtistId), this.ErrorHandler);
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzDiscId, tag.MusicBrainzDiscId), this.ErrorHandler);
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzReleaseArtistId, tag.MusicBrainzReleaseArtistId), this.ErrorHandler);
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzReleaseCountry, tag.MusicBrainzReleaseCountry), this.ErrorHandler);
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzReleaseId, tag.MusicBrainzReleaseId), this.ErrorHandler);
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzReleaseStatus, tag.MusicBrainzReleaseStatus), this.ErrorHandler);
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzReleaseType, tag.MusicBrainzReleaseType), this.ErrorHandler);
-                (this).Try(() => this.AddTag(metaData, CommonMetaData.MusicBrainzTrackId, tag.MusicBrainzTrackId), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, MusicBrainzMetaData.MusicBrainzArtistId, tag.MusicBrainzArtistId), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, MusicBrainzMetaData.MusicBrainzDiscId, tag.MusicBrainzDiscId), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, MusicBrainzMetaData.MusicBrainzReleaseArtistId, tag.MusicBrainzReleaseArtistId), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, MusicBrainzMetaData.MusicBrainzReleaseCountry, tag.MusicBrainzReleaseCountry), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, MusicBrainzMetaData.MusicBrainzReleaseId, tag.MusicBrainzReleaseId), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, MusicBrainzMetaData.MusicBrainzReleaseStatus, tag.MusicBrainzReleaseStatus), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, MusicBrainzMetaData.MusicBrainzReleaseType, tag.MusicBrainzReleaseType), this.ErrorHandler);
+                (this).Try(() => this.AddTag(metaData, MusicBrainzMetaData.MusicBrainzTrackId, tag.MusicBrainzTrackId), this.ErrorHandler);
             }
 
             if (this.Lyrics.Value)
@@ -354,6 +360,7 @@ namespace FoxTunes
 
         private void AddProperties(IList<MetaDataItem> metaData, Properties properties)
         {
+            (this).Try(() => this.AddProperty(metaData, CommonProperties.Description, properties.Description), this.ErrorHandler);
             (this).Try(() => this.AddProperty(metaData, CommonProperties.Duration, properties.Duration.TotalMilliseconds.ToString()), this.ErrorHandler);
             (this).Try(() => this.AddProperty(metaData, CommonProperties.AudioBitrate, properties.AudioBitrate.ToString()), this.ErrorHandler);
             (this).Try(() => this.AddProperty(metaData, CommonProperties.AudioChannels, properties.AudioChannels.ToString()), this.ErrorHandler);

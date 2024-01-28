@@ -66,6 +66,7 @@ namespace FoxTunes
                 MetaDataBehaviourConfiguration.READ_LYRICS_TAGS,
                 MetaDataBehaviourConfiguration.READ_REPLAY_GAIN_TAGS,
                 MetaDataBehaviourConfiguration.READ_POPULARIMETER_TAGS,
+                MetaDataBehaviourConfiguration.READ_DOCUMENTS,
                 MetaDataBehaviourConfiguration.DETECT_COMPILATIONS
             };
             foreach (var elementId in elementIds)
