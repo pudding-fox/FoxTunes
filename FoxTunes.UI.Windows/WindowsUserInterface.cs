@@ -120,11 +120,21 @@ namespace FoxTunes
 
         public override void Warn(string message)
         {
+            if (global::FoxTunes.Windows.IsShuttingDown)
+            {
+                //Don't bother showing messages when shutting down.
+                return;
+            }
             MessageBox.Show(message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         public override void Fatal(Exception exception)
         {
+            if (global::FoxTunes.Windows.IsShuttingDown)
+            {
+                //Don't bother showing messages when shutting down.
+                return;
+            }
             var message = exception.Message + Environment.NewLine + Environment.NewLine + exception.StackTrace;
             MessageBox.Show(message, "Fatal", MessageBoxButton.OK, MessageBoxImage.Error);
         }
