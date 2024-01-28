@@ -112,20 +112,22 @@ namespace FoxTunes
                 StringComparer.OrdinalIgnoreCase
             );
             var valueColors = default(Color[]);
-            if (palettes.TryGetValue(COLOR_PALETTE_VALUE, out valueColors))
+            if (!palettes.TryGetValue(COLOR_PALETTE_VALUE, out valueColors))
             {
-                var backgroundColors = default(Color[]);
-                if (palettes.TryGetValue(COLOR_PALETTE_BACKGROUND, out backgroundColors))
+                valueColors = new[]
                 {
-                    valueColors = backgroundColors.Concat(valueColors).ToArray().ToGradient(1000);
-                }
-                if (valueColors.Length > 1)
-                {
-                    return valueColors;
-                }
+                    Colors.White
+                };
             }
-            //Configuration did not produce enough colors, fall back to the default.
-            return GetDefaultColorPalette().ToColorStops().ToGradient();
+            var backgroundColors = default(Color[]);
+            if (!palettes.TryGetValue(COLOR_PALETTE_BACKGROUND, out backgroundColors))
+            {
+                backgroundColors = new[]
+                {
+                    Colors.Black
+                };
+            }
+            return backgroundColors.Concat(valueColors).ToArray().ToGradient(1000);
         }
     }
 }

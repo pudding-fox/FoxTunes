@@ -118,13 +118,12 @@ namespace FoxTunes
             listBox.ScrollIntoView(listBox.SelectedItem);
         }
 
-        protected override void OnLoaded(object sender, RoutedEventArgs e)
+        protected virtual void OnListBoxLoaded(object sender, RoutedEventArgs e)
         {
             this.FixFocus();
-            base.OnLoaded(sender, e);
         }
 
-        protected virtual void OnUnloaded(object sender, RoutedEventArgs e)
+        protected virtual void OnListBoxUnloaded(object sender, RoutedEventArgs e)
         {
             this.FixFocus();
         }

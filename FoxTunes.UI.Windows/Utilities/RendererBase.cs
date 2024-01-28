@@ -968,9 +968,10 @@ namespace FoxTunes
         public static Color[] ToGradient(this Color[] colors, int count)
         {
             var position = default(int);
+            var step = count / colors.Length;
             return colors.Select(color =>
             {
-                var index = count * (position++);
+                var index = (position++) * step;
                 return new ColorStop(index, color);
             }).ToArray().ToGradient();
         }
