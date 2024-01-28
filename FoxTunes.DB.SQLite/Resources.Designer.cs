@@ -129,29 +129,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DELETE FROM &quot;LibraryHierarchy_LibraryHierarchyItem&quot;;
-        ///DELETE FROM &quot;LibraryHierarchyItems&quot;;
-        ///DELETE FROM &quot;LibraryHierarchyItem_LibraryItem&quot;;
-        ///DELETE FROM &quot;LibraryItems&quot;;
-        ///DELETE FROM &quot;LibraryItem_MetaDataItem&quot;;.
-        /// </summary>
-        internal static string CLearLibrary {
-            get {
-                return ResourceManager.GetString("CLearLibrary", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to DELETE FROM &quot;PlaylistItems&quot;;
-        ///DELETE FROM &quot;PlaylistItem_MetaDataItem&quot;;.
-        /// </summary>
-        internal static string ClearPlaylist {
-            get {
-                return ResourceManager.GetString("ClearPlaylist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to BEGIN TRANSACTION;
         ///CREATE TABLE [PlaylistItems](
         ///    [Id] INTEGER CONSTRAINT [sqlite_master_PK_PlaylistItems] PRIMARY KEY NOT NULL, 

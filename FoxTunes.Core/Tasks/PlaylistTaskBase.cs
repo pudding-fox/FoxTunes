@@ -92,5 +92,28 @@ namespace FoxTunes
             query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));
             this.Database.Execute(query, parameters => parameters["status"] = LibraryItemStatus.None, transaction);
         }
+
+        protected virtual void CleanupMetaData(ITransactionSource transaction)
+        {
+            var table = this.Database.Config.Table("PlaylistItem_MetaDataItem", TableFlags.None);
+            var column = table.Column("PlaylistItem_Id");
+            var query = this.Database.QueryFactory.Build();
+            query.Delete.Touch();
+            query.Source.AddTable(table);
+            query.Filter.Add().With(expression =>
+            {
+                expression.Left = expression.CreateColumn(column);
+                expression.Operator = expression.CreateOperator(QueryOperator.Not);
+                expression.Right = expression.CreateUnary(
+                    QueryOperator.In,
+                    expression.CreateSubQuery(this.Database.QueryFactory.Build().With(subQuery =>
+                    {
+                        subQuery.Output.AddColumn(this.Database.Tables.PlaylistItem.PrimaryKey);
+                        subQuery.Source.AddTable(this.Database.Tables.PlaylistItem);
+                    }))
+                );
+            });
+            this.Database.Execute(query, transaction);
+        }
     }
 }

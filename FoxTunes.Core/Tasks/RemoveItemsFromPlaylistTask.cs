@@ -32,6 +32,7 @@ namespace FoxTunes
                         command.ExecuteNonQuery();
                     }
                 }
+                this.CleanupMetaData(transaction);
                 transaction.Commit();
             }
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));

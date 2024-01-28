@@ -130,12 +130,6 @@
   <data name="AddPlaylistSequenceRecord" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\addplaylistsequencerecord.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="CLearLibrary" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\clearlibrary.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="ClearPlaylist" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\clearplaylist.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="Database" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\database.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>

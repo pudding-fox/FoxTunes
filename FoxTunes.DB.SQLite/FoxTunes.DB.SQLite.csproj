@@ -98,7 +98,6 @@
     <None Include="packages.config" />
     <None Include="Resources\AddLibraryHierarchyNodeToPlaylist.sql" />
     <None Include="Resources\AddPlaylistSequenceRecord.sql" />
-    <None Include="Resources\ClearPlaylist.sql" />
     <None Include="Resources\Database.sql" />
     <None Include="Resources\GetLibraryHierarchyMetaDataItems.sql" />
     <None Include="Resources\GetLibraryHierarchyNodes.sql" />
@@ -108,7 +107,6 @@
   <ItemGroup>
     <None Include="Resources\AddLibraryMetaDataItems.sql" />
     <None Include="Resources\AddPlaylistMetaDataItems.sql" />
-    <None Include="Resources\ClearLibrary.sql" />
     <Content Include="Templates\LibraryHierarchyBuilder.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>LibraryHierarchyBuilder.cs</LastGenOutput>
