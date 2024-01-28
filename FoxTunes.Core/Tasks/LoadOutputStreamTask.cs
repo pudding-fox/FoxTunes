@@ -25,6 +25,21 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public override BackgroundTaskPriority Priority
+        {
+            get
+            {
+                if (this.Immediate)
+                {
+                    return BackgroundTaskPriority.High;
+                }
+                else
+                {
+                    return BackgroundTaskPriority.Low;
+                }
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
