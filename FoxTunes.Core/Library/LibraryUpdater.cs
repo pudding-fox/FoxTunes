@@ -1,4 +1,5 @@
-﻿using FoxDb;
+﻿#pragma warning disable 612, 618
+using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
@@ -58,7 +59,13 @@ namespace FoxTunes
 
         public async Task Populate(CancellationToken cancellationToken)
         {
-            var set = this.Database.Set<LibraryItem>(this.Transaction);
+            //Using source without relations.
+            //TODO: Add this kind of thing to FoxDb, we're actually performing some schema queries to create this structure.
+            var source = this.Database.Source(
+                this.Database.Config.Transient.Table<LibraryItem>(TableFlags.AutoColumns),
+                this.Transaction
+            );
+            var set = this.Database.Set<LibraryItem>(source);
 
             if (this.ReportProgress)
             {

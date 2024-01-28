@@ -20,6 +20,8 @@ namespace FoxTunes
 
         public ITableConfig PlaylistColumn { get; private set; }
 
+        public ITableConfig LibraryRoot { get; private set; }
+
         public ITableConfig LibraryItem { get; private set; }
 
         public ITableConfig LibraryHierarchy { get; private set; }
@@ -33,6 +35,7 @@ namespace FoxTunes
             this.MetaDataItem = this.Database.Config.Table<MetaDataItem>();
             this.PlaylistItem = this.Database.Config.Table<PlaylistItem>();
             this.PlaylistColumn = this.Database.Config.Table<PlaylistColumn>();
+            this.LibraryRoot = this.Database.Config.Table<LibraryRoot>();
             this.LibraryItem = this.Database.Config.Table<LibraryItem>();
             this.LibraryHierarchy = this.Database.Config.Table<LibraryHierarchy>();
             this.LibraryHierarchyLevel = this.Database.Config.Table<LibraryHierarchyLevel>();

@@ -27,9 +27,13 @@ namespace FoxTunes
             await base.OnStarted();
         }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
-            return this.RemoveItems(this.Status);
+            await this.RemoveItems(this.Status);
+            if (!this.Status.HasValue)
+            {
+                await this.ClearRoots();
+            }
         }
 
         protected override async Task OnCompleted()

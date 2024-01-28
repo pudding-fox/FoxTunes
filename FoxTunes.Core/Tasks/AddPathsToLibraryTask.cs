@@ -37,13 +37,14 @@ namespace FoxTunes
             await base.OnStarted();
         }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
             if (!this.MetaDataSourceFactory.Enabled)
             {
                 throw new InvalidOperationException("Cannot add to library, meta data extraction is disabled.");
             }
-            return this.AddPaths(this.Paths, true);
+            await this.AddRoots(this.Paths);
+            await this.AddPaths(this.Paths, true);
         }
 
         protected override async Task OnCompleted()

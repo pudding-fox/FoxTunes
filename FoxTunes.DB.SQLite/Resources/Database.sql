@@ -4,6 +4,10 @@ CREATE TABLE [MetaDataItems](
 	[Type] bigint NOT NULL,
 	[Value] text COLLATE NOCASE);
 
+CREATE TABLE [LibraryRoots] (
+	[Id] INTEGER PRIMARY KEY NOT NULL, 
+	[DirectoryName] text NOT NULL COLLATE NOCASE);
+
 CREATE TABLE [LibraryItems] (
 	[Id] INTEGER PRIMARY KEY NOT NULL, 
 	[DirectoryName] text NOT NULL COLLATE NOCASE, 
