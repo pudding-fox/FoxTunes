@@ -123,6 +123,11 @@ namespace FoxTunes
                 section.InitializeComponent();
             }
             var fileName = Profiles.GetFileName(profile);
+            if (!string.Equals(Profiles.Profile, profile, StringComparison.OrdinalIgnoreCase))
+            {
+                //Switching profile, ensure the current one is saved.
+                this.Save(Profiles.Profile, true);
+            }
             if (!File.Exists(fileName))
             {
                 Logger.Write(this, LogLevel.Debug, "Configuration file \"{0}\" does not exist.", fileName);
@@ -196,13 +201,18 @@ namespace FoxTunes
 
         public void Save()
         {
-            this.Save(this.Profile);
+            this.Save(this.Profile, false);
         }
 
         public void Save(string profile)
         {
+            this.Save(profile, true);
+        }
+
+        protected virtual void Save(string profile, bool immidiate)
+        {
             var fileName = Profiles.GetFileName(profile);
-            this.Debouncer.Exec(() =>
+            var action = new Action(() =>
             {
                 Logger.Write(this, LogLevel.Debug, "Saving configuration to file \"{0}\".", fileName);
                 try
@@ -224,6 +234,14 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
                 }
             });
+            if (immidiate)
+            {
+                this.Debouncer.ExecNow(action);
+            }
+            else
+            {
+                this.Debouncer.Exec(action);
+            }
             //Configuration not technically saved *yet* but it doesn't matter.
             this.OnSaved();
         }
