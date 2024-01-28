@@ -61,6 +61,7 @@ namespace FoxTunes.ViewModel
             { CommonProperties.AudioBitrate, BitrateValueProvider.Instance },
             { CommonProperties.AudioSampleRate, SamplerateValueProvider.Instance },
             { CommonProperties.Duration, NumericMetaDataValueProvider.Instance },
+            { CommonImageTypes.FrontCover, MetaDataValueProvider.Instance },
         };
 
         private static readonly IDictionary<string, ValueAggregator> AGGREGATORS = new Dictionary<string, ValueAggregator>(StringComparer.OrdinalIgnoreCase)
@@ -391,6 +392,7 @@ namespace FoxTunes.ViewModel
                 try
                 {
                     aggregator.Add(
+                        fileData,
                         values,
                         provider.GetValue(fileData, metaData, name)
                     );
@@ -439,7 +441,7 @@ namespace FoxTunes.ViewModel
             {
                 return provider;
             }
-            return MetaDataValueProvider.Instance;
+            return TextMetaDataValueProvider.Instance;
         }
 
         protected virtual ValueAggregator GetAggregator(string name)
@@ -480,6 +482,21 @@ namespace FoxTunes.ViewModel
             public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
             {
                 var value = default(string);
+                if (metaData != null && metaData.TryGetValue(name, out value))
+                {
+                    return value;
+                }
+                return null;
+            }
+
+            public static readonly ValueProvider Instance = new MetaDataValueProvider();
+        }
+
+        public class TextMetaDataValueProvider : MetaDataValueProvider
+        {
+            public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
+            {
+                var value = default(string);
                 if (metaData != null && metaData.TryGetValue(name, out value) && !string.IsNullOrEmpty(value))
                 {
                     return value;
@@ -487,7 +504,7 @@ namespace FoxTunes.ViewModel
                 return Strings.SelectionProperties_NoValue;
             }
 
-            public static readonly ValueProvider Instance = new MetaDataValueProvider();
+            new public static readonly ValueProvider Instance = new TextMetaDataValueProvider();
         }
 
         public class NumericMetaDataValueProvider : MetaDataValueProvider
@@ -563,7 +580,7 @@ namespace FoxTunes.ViewModel
 
         public abstract class ValueAggregator
         {
-            public abstract void Add(IList<object> values, object value);
+            public abstract void Add(IFileData fileData, IList<object> values, object value);
 
             public abstract string GetValue(IEnumerable<object> values);
         }
@@ -578,7 +595,7 @@ namespace FoxTunes.ViewModel
 
             public static readonly ConditionalWeakTable<IList<object>, ISet<string>> History = new ConditionalWeakTable<IList<object>, ISet<string>>();
 
-            public override void Add(IList<object> values, object value)
+            public override void Add(IFileData fileData, IList<object> values, object value)
             {
                 if (values.Count > LIMIT)
                 {
@@ -619,7 +636,7 @@ namespace FoxTunes.ViewModel
 
         public class TimeSpanValueAggregator : ValueAggregator
         {
-            public override void Add(IList<object> values, object value)
+            public override void Add(IFileData fileData, IList<object> values, object value)
             {
                 if (value is string text)
                 {
@@ -653,7 +670,7 @@ namespace FoxTunes.ViewModel
         {
             private static readonly string[] SUFFIX = { "B", "KB", "MB", "GB", "TB" };
 
-            public override void Add(IList<object> values, object value)
+            public override void Add(IFileData fileData, IList<object> values, object value)
             {
                 if (value is string text)
                 {
@@ -694,7 +711,7 @@ namespace FoxTunes.ViewModel
         {
             public const string NAME = "SelectionCount";
 
-            public override void Add(IList<object> values, object value)
+            public override void Add(IFileData fileData, IList<object> values, object value)
             {
                 values.Add(value);
             }

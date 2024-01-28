@@ -98,7 +98,7 @@
                         <TextBlock Grid.Column="0" Text="{x:Static ViewModel:StringResources.SelectionProperties_Images}" Foreground="{DynamicResource TextBrush}" FontSize="20"></TextBlock>
                         <Rectangle Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Height="1" Stroke="{DynamicResource TextBrush}"></Rectangle>
                     </Grid>
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden" Margin="4">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden" Margin="4" PreviewMouseWheel="OnPreviewMouseWheel">
                         <ItemsControl ItemsSource="{Binding Images, Source={StaticResource ViewModel}}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -107,10 +107,7 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel>
-                                        <Windows:AsyncImage DataContext="{Binding Value, Converter={StaticResource ArtworkImageConverter}}" Width="100" Height="100" Source="{Binding Value, FallbackValue={StaticResource Transparent}}" Margin="0,0,5,0"></Windows:AsyncImage>
-                                        <TextBlock HorizontalAlignment="Center" Text="{Binding Name, Converter={StaticResource MetaDataNameConverter}}" Foreground="{DynamicResource TextBrush}"></TextBlock>
-                                    </StackPanel>
+                                    <Windows:AsyncImage DataContext="{Binding Value, Converter={StaticResource ArtworkImageConverter}}" Width="100" Height="100" Source="{Binding Value, FallbackValue={StaticResource Transparent}}" Margin="0,0,5,0"></Windows:AsyncImage>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>

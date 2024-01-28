@@ -9,6 +9,10 @@ namespace FoxTunes
         public static void Read(TagLibMetaDataSource source, IList<MetaDataItem> metaData, File file)
         {
             var info = new global::System.IO.FileInfo(file.Name);
+            if (!info.Exists)
+            {
+                return;
+            }
             source.AddTag(metaData, FileSystemProperties.FileName, info.Name);
             source.AddTag(metaData, FileSystemProperties.DirectoryName, info.DirectoryName);
             source.AddTag(metaData, FileSystemProperties.FileExtension, info.Extension);
