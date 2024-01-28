@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Extensions\GridView.cs" />
     <Compile Include="Extensions\ListView.cs" />
+    <Compile Include="Integration\Explorer.cs" />
     <Compile Include="Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
