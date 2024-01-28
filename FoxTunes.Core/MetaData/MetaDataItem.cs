@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Text.RegularExpressions;
 
 namespace FoxTunes
@@ -20,7 +21,31 @@ namespace FoxTunes
 
         public MetaDataItemType Type { get; set; }
 
-        public string Value { get; set; }
+        private string _Value { get; set; }
+
+        public string Value
+        {
+            get
+            {
+                return this._Value;
+            }
+            set
+            {
+                this._Value = value;
+                this.OnValueChanged();
+            }
+        }
+
+        protected virtual void OnValueChanged()
+        {
+            if (this.ValueChanged != null)
+            {
+                this.ValueChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Value");
+        }
+
+        public event EventHandler ValueChanged;
 
         public bool IsNumeric
         {

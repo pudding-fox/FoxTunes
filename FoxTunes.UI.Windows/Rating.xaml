@@ -3,7 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" DataContextChanged="OnDataContextChanged">
+            xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ViewModel:Rating x:Key="ViewModel" FileData="{Binding}"></ViewModel:Rating>
+    </UserControl.Resources>
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type ToggleButton}">
@@ -34,10 +38,10 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <ToggleButton x:Name="Star1" Grid.Column="0" Tag="1" Click="OnClick"/>
-        <ToggleButton x:Name="Star2" Grid.Column="1" Tag="2" Click="OnClick"/>
-        <ToggleButton x:Name="Star3" Grid.Column="2" Tag="3" Click="OnClick"/>
-        <ToggleButton x:Name="Star4" Grid.Column="3" Tag="4" Click="OnClick"/>
-        <ToggleButton x:Name="Star5" Grid.Column="4" Tag="5" Click="OnClick"/>
+        <ToggleButton x:Name="Star1" Grid.Column="0" IsChecked="{Binding Star1, Source={StaticResource ViewModel}}" />
+        <ToggleButton x:Name="Star2" Grid.Column="1" IsChecked="{Binding Star2, Source={StaticResource ViewModel}}" />
+        <ToggleButton x:Name="Star3" Grid.Column="2" IsChecked="{Binding Star3, Source={StaticResource ViewModel}}"/>
+        <ToggleButton x:Name="Star4" Grid.Column="3" IsChecked="{Binding Star4, Source={StaticResource ViewModel}}" />
+        <ToggleButton x:Name="Star5" Grid.Column="4" IsChecked="{Binding Star5, Source={StaticResource ViewModel}}" />
     </Grid>
 </UserControl>

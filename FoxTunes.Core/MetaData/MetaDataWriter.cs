@@ -3,6 +3,7 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -28,9 +29,9 @@ namespace FoxTunes
 
         public IDatabaseCommand UpdateCommand { get; private set; }
 
-        public async Task Write(int itemId, IEnumerable<MetaDataItem> metaDataItems)
+        public async Task Write(int itemId, IEnumerable<MetaDataItem> metaDataItems, Func<MetaDataItem, bool> predicate)
         {
-            foreach (var metaDataItem in metaDataItems)
+            foreach (var metaDataItem in metaDataItems.Where(predicate))
             {
                 await this.Write(itemId, metaDataItem).ConfigureAwait(false);
             }
@@ -42,22 +43,19 @@ namespace FoxTunes
             {
                 return;
             }
-            var metaDataItemId = metaDataItem.Id;
-            if (metaDataItemId == default(int))
+            var metaDataItemId = default(int);
+            if (!this.Store.TryGetValue(metaDataItem.Name, metaDataItem.Type, metaDataItem.Value, out metaDataItemId))
             {
-                if (!this.Store.TryGetValue(metaDataItem.Name, metaDataItem.Type, metaDataItem.Value, out metaDataItemId))
-                {
-                    this.AddCommand.Parameters["name"] = metaDataItem.Name;
-                    this.AddCommand.Parameters["type"] = metaDataItem.Type;
-                    this.AddCommand.Parameters["value"] = metaDataItem.Value;
-                    metaDataItemId = Convert.ToInt32(await this.AddCommand.ExecuteScalarAsync().ConfigureAwait(false));
-                    this.Store.Add(metaDataItem.Name, metaDataItem.Type, metaDataItem.Value, metaDataItemId);
-                }
-                metaDataItem.Id = metaDataItemId;
+                this.AddCommand.Parameters["name"] = metaDataItem.Name;
+                this.AddCommand.Parameters["type"] = metaDataItem.Type;
+                this.AddCommand.Parameters["value"] = metaDataItem.Value;
+                metaDataItemId = Convert.ToInt32(await this.AddCommand.ExecuteScalarAsync().ConfigureAwait(false));
+                this.Store.Add(metaDataItem.Name, metaDataItem.Type, metaDataItem.Value, metaDataItemId);
             }
             this.UpdateCommand.Parameters["itemId"] = itemId;
             this.UpdateCommand.Parameters["metaDataItemId"] = metaDataItemId;
             await this.UpdateCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+            metaDataItem.Id = metaDataItemId;
         }
 
         private bool HasValue(string value)
