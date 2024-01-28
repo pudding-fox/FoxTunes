@@ -42,7 +42,7 @@ namespace FoxTunes
                 var rate = GetTempoFrequency(this.Rate, this.OutputEffects.Tempo.Rate);
                 return string.Format(
                     "{0}%, Pitch {1} semitones, Rate {2}{3}",
-                    this.OutputEffects.Tempo.Tempo,
+                    this.OutputEffects.Tempo.Value,
                     this.OutputEffects.Tempo.Pitch,
                     MetaDataInfo.SampleRateDescription(rate),
                     this.OutputEffects.Tempo.AAFilter ? string.Format(", aa filter {0} taps", this.OutputEffects.Tempo.AAFilterLength) : string.Empty
@@ -68,7 +68,7 @@ namespace FoxTunes
                 {
                     return false;
                 }
-                if (!this.OutputEffects.Tempo.Available || !this.OutputEffects.Tempo.Enabled || (this.OutputEffects.Tempo.Tempo == 0 && this.OutputEffects.Tempo.Pitch == 0 && this.OutputEffects.Tempo.Rate == 0))
+                if (!this.OutputEffects.Tempo.Available || !this.OutputEffects.Tempo.Enabled || (this.OutputEffects.Tempo.Value == 0 && this.OutputEffects.Tempo.Pitch == 0 && this.OutputEffects.Tempo.Rate == 0))
                 {
                     return false;
                 }
@@ -84,7 +84,7 @@ namespace FoxTunes
             if (this.OutputEffects.Tempo != null)
             {
                 this.OutputEffects.Tempo.EnabledChanged += this.OnEnabledChanged;
-                this.OutputEffects.Tempo.TempoChanged += this.OnTempoChanged;
+                this.OutputEffects.Tempo.ValueChanged += this.OnValueChanged;
                 this.OutputEffects.Tempo.PitchChanged += this.OnPitchChanged;
                 this.OutputEffects.Tempo.RateChanged += this.OnRateChanged;
                 this.OutputEffects.Tempo.AAFilterChanged += this.OnAAFilterChanged;
@@ -105,7 +105,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnTempoChanged(object sender, EventArgs e)
+        protected virtual void OnValueChanged(object sender, EventArgs e)
         {
             if (this.IsActive)
             {
@@ -164,12 +164,12 @@ namespace FoxTunes
                 this,
                 LogLevel.Debug,
                 "Tempo effect enabled: Tempo {0}%, Pitch {1} semitones, Rate {2}{3}",
-                this.OutputEffects.Tempo.Tempo,
+                this.OutputEffects.Tempo.Value,
                 this.OutputEffects.Tempo.Pitch,
                 MetaDataInfo.SampleRateDescription(rate),
                 this.OutputEffects.Tempo.AAFilter ? string.Format(", aa filter {0} taps", this.OutputEffects.Tempo.AAFilterLength) : string.Empty
             );
-            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Tempo, this.OutputEffects.Tempo.Tempo));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Tempo, this.OutputEffects.Tempo.Value));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Pitch, this.OutputEffects.Tempo.Pitch));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, rate));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoUseAAFilter, this.OutputEffects.Tempo.AAFilter ? 1 : 0));
@@ -206,7 +206,7 @@ namespace FoxTunes
             if (this.OutputEffects != null && this.OutputEffects.Tempo != null)
             {
                 this.OutputEffects.Tempo.EnabledChanged -= this.OnEnabledChanged;
-                this.OutputEffects.Tempo.TempoChanged -= this.OnTempoChanged;
+                this.OutputEffects.Tempo.ValueChanged -= this.OnValueChanged;
                 this.OutputEffects.Tempo.PitchChanged -= this.OnPitchChanged;
                 this.OutputEffects.Tempo.RateChanged -= this.OnRateChanged;
                 this.OutputEffects.Tempo.AAFilterChanged -= this.OnAAFilterChanged;
