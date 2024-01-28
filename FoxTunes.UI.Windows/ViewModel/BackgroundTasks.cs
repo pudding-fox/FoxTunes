@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace FoxTunes.ViewModel
@@ -9,10 +10,10 @@ namespace FoxTunes.ViewModel
     {
         public BackgroundTasks()
         {
-            this.RunningTasks = new ObservableCollection<IBackgroundTask>();
+            this.RunningTasks = new ObservableCollection<BackgroundTask>();
         }
 
-        public ObservableCollection<IBackgroundTask> RunningTasks { get; set; }
+        public ObservableCollection<BackgroundTask> RunningTasks { get; set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -29,22 +30,58 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnBackgroundTaskStarted(object sender, EventArgs e)
         {
-            var task = sender as IBackgroundTask;
-            if (!task.Visible)
+            var backgroundTask = sender as IBackgroundTask;
+            if (backgroundTask == null || !backgroundTask.Visible)
             {
                 return;
             }
-            this.RunningTasks.Add(task);
+            this.Add(backgroundTask);
         }
 
         protected virtual void OnBackgroundTaskCompleted(object sender, EventArgs e)
         {
-            this.RunningTasks.Remove(sender as IBackgroundTask);
+            var backgroundTask = sender as IBackgroundTask;
+            if (backgroundTask == null)
+            {
+                return;
+            }
+            this.Remove(backgroundTask);
         }
 
         protected virtual void OnBackgroundTaskFaulted(object sender, EventArgs e)
         {
-            this.RunningTasks.Remove(sender as IBackgroundTask);
+            var backgroundTask = sender as IBackgroundTask;
+            if (backgroundTask == null)
+            {
+                return;
+            }
+            this.Remove(backgroundTask);
+        }
+
+        public Task Add(IBackgroundTask backgroundTask)
+        {
+            return Windows.Invoke(() => this.RunningTasks.Add(new BackgroundTask(backgroundTask)));
+        }
+
+        public Task Remove(IBackgroundTask backgroundTask)
+        {
+            backgroundTask.Started -= this.OnBackgroundTaskStarted;
+            backgroundTask.Completed -= this.OnBackgroundTaskCompleted;
+            backgroundTask.Faulted -= this.OnBackgroundTaskFaulted;
+            foreach (var element in this.RunningTasks)
+            {
+                if (object.ReferenceEquals(element.InnerBackgroundTask, backgroundTask))
+                {
+                    return Windows.Invoke(() => this.RunningTasks.Remove(element));
+                }
+            }
+            return Task.CompletedTask;
+        }
+
+        protected override void OnDisposing()
+        {
+            ComponentRegistry.Instance.ForEach<IBackgroundTaskSource>(component => component.BackgroundTask -= this.OnBackgroundTask);
+            base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()

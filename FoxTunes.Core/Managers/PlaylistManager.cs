@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Managers
 {
-    public class PlaylistManager : StandardManager, IPlaylistManager
+    public class PlaylistManager : StandardManager, IPlaylistManager, IDisposable
     {
         public const string CLEAR_PLAYLIST = "ZZZZ";
 
@@ -31,30 +31,33 @@ namespace FoxTunes.Managers
             {
                 return this._CanNavigate;
             }
-            set
-            {
-                this._CanNavigate = value;
-                this.OnCanNavigateChanged();
-            }
         }
 
-        protected virtual void OnCanNavigateChanged()
+        protected Task SetCanNavigate(bool value)
+        {
+            this._CanNavigate = value;
+            return this.OnCanNavigateChanged();
+        }
+
+        protected virtual async Task OnCanNavigateChanged()
         {
             if (this.CanNavigateChanged != null)
             {
-                this.CanNavigateChanged(this, EventArgs.Empty);
+                var e = new AsyncEventArgs();
+                this.CanNavigateChanged(this, e);
+                await e.Complete();
             }
             this.OnPropertyChanged("CanNavigate");
         }
 
-        public event EventHandler CanNavigateChanged = delegate { };
+        public event AsyncEventHandler CanNavigateChanged = delegate { };
 
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.DatabaseFactory = core.Factories.Database;
             this.PlaybackManager = core.Managers.Playback;
-            this.PlaybackManager.CurrentStreamChanged += this.PlaybackManager_CurrentStreamChanged;
+            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             //TODO: Bad .Wait().
@@ -106,7 +109,7 @@ namespace FoxTunes.Managers
         public async Task Refresh()
         {
             Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
-            this.CanNavigate = this.DatabaseFactory != null && await this.HasItems();
+            await this.SetCanNavigate(this.DatabaseFactory != null && await this.HasItems());
             if (this.CanNavigate)
             {
                 Logger.Write(this, LogLevel.Debug, "Navigation is possible.");
@@ -118,8 +121,14 @@ namespace FoxTunes.Managers
                         using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                         {
                             var set = database.Set<PlaylistItem>(transaction);
-                            if ((this.CurrentItem = await set.FindAsync(this.CurrentItem.Id)) == null)
+                            var playlistItem = await set.FindAsync(this.CurrentItem.Id);
+                            if (playlistItem != null && string.Equals(this.CurrentItem.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase))
                             {
+                                await this.SetCurrentItem(playlistItem);
+                            }
+                            else
+                            {
+                                await this.SetCurrentItem(null);
                                 Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
                             }
                         }
@@ -132,17 +141,23 @@ namespace FoxTunes.Managers
             }
         }
 
-        protected virtual void PlaybackManager_CurrentStreamChanged(object sender, EventArgs e)
+        protected virtual async void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
         {
             Logger.Write(this, LogLevel.Debug, "Playback manager output stream changed, updating current playlist item.");
             if (this.PlaybackManager.CurrentStream == null)
             {
-                this.CurrentItem = null;
+                using (e.Defer())
+                {
+                    await this.SetCurrentItem(null);
+                }
                 Logger.Write(this, LogLevel.Debug, "Playback manager output stream is empty. Cleared current playlist item.");
             }
             else if (this.PlaybackManager.CurrentStream.PlaylistItem != this.CurrentItem)
             {
-                this.CurrentItem = this.PlaybackManager.CurrentStream.PlaylistItem;
+                using (e.Defer())
+                {
+                    await this.SetCurrentItem(this.PlaybackManager.CurrentStream.PlaylistItem);
+                }
                 Logger.Write(this, LogLevel.Debug, "Updated current playlist item: {0} => {1}", this.CurrentItem.Id, this.CurrentItem.FileName);
             }
         }
@@ -427,27 +442,10 @@ namespace FoxTunes.Managers
 
         public async Task Play(PlaylistItem playlistItem)
         {
-            await this.PlaybackManager.Load(playlistItem, true);
-            if (this.CurrentItem == null)
-            {
-                Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it empty.", playlistItem.Id, playlistItem.FileName);
-                return;
-            }
-            if (this.CurrentItem != playlistItem)
-            {
-                Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it was {2} => {3}", playlistItem.Id, playlistItem.FileName, this.CurrentItem.Id, this.CurrentItem.FileName);
-                return;
-            }
-            if (this.PlaybackManager.CurrentStream.PlaylistItem != playlistItem)
-            {
-                Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it was {2} => {3}", playlistItem.Id, playlistItem.FileName, this.PlaybackManager.CurrentStream.PlaylistItem.Id, this.PlaybackManager.CurrentStream.PlaylistItem.FileName);
-                return;
-            }
-            Logger.Write(this, LogLevel.Debug, "Playing current output stream: {0} => {1}", playlistItem.Id, playlistItem.FileName);
             var exception = default(Exception);
             try
             {
-                await this.PlaybackManager.CurrentStream.Play();
+                await this.PlaybackManager.Load(playlistItem, true);
                 return;
             }
             catch (Exception e)
@@ -495,23 +493,26 @@ namespace FoxTunes.Managers
             {
                 return this._CurrentItem;
             }
-            private set
-            {
-                this._CurrentItem = value;
-                this.OnCurrentItemChanged();
-            }
         }
 
-        protected virtual void OnCurrentItemChanged()
+        private Task SetCurrentItem(PlaylistItem value)
+        {
+            this._CurrentItem = value;
+            return this.OnCurrentItemChanged();
+        }
+
+        protected virtual async Task OnCurrentItemChanged()
         {
             if (this.CurrentItemChanged != null)
             {
-                this.CurrentItemChanged(this, EventArgs.Empty);
+                var e = new AsyncEventArgs();
+                this.CurrentItemChanged(this, e);
+                await e.Complete();
             }
             this.OnPropertyChanged("CurrentItem");
         }
 
-        public event EventHandler CurrentItemChanged = delegate { };
+        public event AsyncEventHandler CurrentItemChanged = delegate { };
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
         {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows.Controls;
 
-namespace FoxTunes.Utilities
+namespace FoxTunes
 {
     public class RefreshableGridViewColumn : GridViewColumn
     {

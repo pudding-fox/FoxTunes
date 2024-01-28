@@ -52,13 +52,9 @@ namespace FoxTunes
         {
             get
             {
-                return Semaphores.GetOrAdd(this.Id, type => new SemaphoreSlim(this.Concurrency, this.Concurrency));
+                return Semaphores.GetOrAdd(this.Id, key => new SemaphoreSlim(this.Concurrency, this.Concurrency));
             }
         }
-
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
-        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
 
         private string _Name { get; set; }
 
@@ -68,26 +64,26 @@ namespace FoxTunes
             {
                 return this._Name;
             }
-            protected set
-            {
-                this._Name = value;
-                this.OnNameChanged();
-            }
         }
 
-        protected virtual Task OnNameChanged()
+        protected Task SetName(string value)
         {
-            return this.ForegroundTaskRunner.Run(() =>
-            {
-                if (this.NameChanged != null)
-                {
-                    this.NameChanged(this, EventArgs.Empty);
-                }
-                this.OnPropertyChanged("Name");
-            });
+            this._Name = value;
+            return this.OnNameChanged();
         }
 
-        public event EventHandler NameChanged = delegate { };
+        protected virtual async Task OnNameChanged()
+        {
+            if (this.NameChanged != null)
+            {
+                var e = new AsyncEventArgs();
+                this.NameChanged(this, e);
+                await e.Complete();
+            }
+            this.OnPropertyChanged("Name");
+        }
+
+        public event AsyncEventHandler NameChanged = delegate { };
 
         private string _Description { get; set; }
 
@@ -97,26 +93,26 @@ namespace FoxTunes
             {
                 return this._Description;
             }
-            protected set
-            {
-                this._Description = value;
-                this.OnDescriptionChanged();
-            }
         }
 
-        protected virtual Task OnDescriptionChanged()
+        protected Task SetDescription(string value)
         {
-            return this.ForegroundTaskRunner.Run(() =>
-            {
-                if (this.DescriptionChanged != null)
-                {
-                    this.DescriptionChanged(this, EventArgs.Empty);
-                }
-                this.OnPropertyChanged("Description");
-            });
+            this._Description = value;
+            return this.OnDescriptionChanged();
         }
 
-        public event EventHandler DescriptionChanged = delegate { };
+        protected virtual async Task OnDescriptionChanged()
+        {
+            if (this.DescriptionChanged != null)
+            {
+                var e = new AsyncEventArgs();
+                this.DescriptionChanged(this, e);
+                await e.Complete();
+            }
+            this.OnPropertyChanged("Description");
+        }
+
+        public event AsyncEventHandler DescriptionChanged = delegate { };
 
         private int _Position { get; set; }
 
@@ -126,27 +122,27 @@ namespace FoxTunes
             {
                 return this._Position;
             }
-            protected set
-            {
-                this._Position = value;
-                this.OnPositionChanged();
-            }
         }
 
-        protected virtual Task OnPositionChanged()
+        protected Task SetPosition(int value)
         {
-            return this.ForegroundTaskRunner.Run(() =>
-            {
-                if (this.PositionChanged != null)
-                {
-                    this.PositionChanged(this, EventArgs.Empty);
-                }
-                this.OnPropertyChanged("Position");
-                return this.OnIsIndeterminateChanged();
-            });
+            this._Position = value;
+            return this.OnPositionChanged();
         }
 
-        public event EventHandler PositionChanged = delegate { };
+        protected virtual async Task OnPositionChanged()
+        {
+            if (this.PositionChanged != null)
+            {
+                var e = new AsyncEventArgs();
+                this.PositionChanged(this, e);
+                await e.Complete();
+            }
+            this.OnPropertyChanged("Position");
+            await this.OnIsIndeterminateChanged();
+        }
+
+        public event AsyncEventHandler PositionChanged = delegate { };
 
         private int _Count { get; set; }
 
@@ -156,27 +152,27 @@ namespace FoxTunes
             {
                 return this._Count;
             }
-            protected set
-            {
-                this._Count = value;
-                this.OnCountChanged();
-            }
         }
 
-        protected virtual Task OnCountChanged()
+        protected Task SetCount(int value)
         {
-            return this.ForegroundTaskRunner.Run(() =>
-            {
-                if (this.CountChanged != null)
-                {
-                    this.CountChanged(this, EventArgs.Empty);
-                }
-                this.OnPropertyChanged("Count");
-                return this.OnIsIndeterminateChanged();
-            });
+            this._Count = value;
+            return this.OnCountChanged();
         }
 
-        public event EventHandler CountChanged = delegate { };
+        protected virtual async Task OnCountChanged()
+        {
+            if (this.CountChanged != null)
+            {
+                var e = new AsyncEventArgs();
+                this.CountChanged(this, e);
+                await e.Complete();
+            }
+            this.OnPropertyChanged("Count");
+            await this.OnIsIndeterminateChanged();
+        }
+
+        public event AsyncEventHandler CountChanged = delegate { };
 
         public bool IsIndeterminate
         {
@@ -184,71 +180,68 @@ namespace FoxTunes
             {
                 return this.Position == 0 && this.Count == 0;
             }
-            set
-            {
-                if (value)
-                {
-                    this.Position = 0;
-                    this.Count = 0;
-                }
-                else
-                {
-                    //Nothing to do.
-                }
-                this.OnIsIndeterminateChanged();
-            }
         }
 
-        protected virtual Task OnIsIndeterminateChanged()
+        protected async Task SetIsIndeterminate(bool value)
         {
-            return this.ForegroundTaskRunner.Run(() =>
+            if (value)
             {
-                if (this.IsIndeterminateChanged != null)
-                {
-                    this.IsIndeterminateChanged(this, EventArgs.Empty);
-                }
-                this.OnPropertyChanged("IsIndeterminate");
-            });
+                await this.SetPosition(0);
+                await this.SetCount(0);
+            }
+            else
+            {
+                //Nothing to do.
+            }
+            await this.OnIsIndeterminateChanged();
         }
 
-        public event EventHandler IsIndeterminateChanged = delegate { };
+        protected virtual async Task OnIsIndeterminateChanged()
+        {
+            if (this.IsIndeterminateChanged != null)
+            {
+                var e = new AsyncEventArgs();
+                this.IsIndeterminateChanged(this, e);
+                await e.Complete();
+            }
+            this.OnPropertyChanged("IsIndeterminate");
+        }
 
-        public virtual Task Run()
+        public event AsyncEventHandler IsIndeterminateChanged = delegate { };
+
+        public virtual async Task Run()
         {
             Logger.Write(this, LogLevel.Debug, "Running background task.");
-            return this.BackgroundTaskRunner.Run(async () =>
+            await this.OnStarted();
+            await Semaphore.WaitAsync();
+            try
             {
-                await this.OnStarted();
-                await Semaphore.WaitAsync();
                 try
                 {
-                    try
-                    {
-                        await this.OnRun();
-                    }
-                    finally
-                    {
-                        Semaphore.Release();
-                    }
-                    Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
-                    await this.OnCompleted();
-                    return;
+                    await this.OnRun();
                 }
-                catch (AggregateException e)
+                finally
                 {
-                    foreach (var innerException in e.InnerExceptions)
-                    {
-                        Logger.Write(this, LogLevel.Error, "Background task failed: {0}", innerException.Message);
-                    }
-                    this.Exception = e;
+                    Semaphore.Release();
                 }
-                catch (Exception e)
+                Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
+                await this.OnCompleted();
+                return;
+            }
+            catch (AggregateException e)
+            {
+                foreach (var innerException in e.InnerExceptions)
                 {
-                    Logger.Write(this, LogLevel.Error, "Background task failed: {0}", e.Message);
-                    this.Exception = e;
+                    Logger.Write(this, LogLevel.Error, "Background task failed: {0}", innerException.Message);
                 }
-                await this.OnFaulted();
-            });
+                this.Exception = e;
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Error, "Background task failed: {0}", e.Message);
+                this.Exception = e;
+            }
+            await this.OnFaulted();
         }
 
         protected abstract Task OnRun();
@@ -259,12 +252,9 @@ namespace FoxTunes
             {
                 return Task.CompletedTask;
             }
-            return this.ForegroundTaskRunner.Run(() =>
-            {
-                var e = new AsyncEventArgs();
-                this.Started(this, e);
-                return e.Complete();
-            });
+            var e = new AsyncEventArgs();
+            this.Started(this, e);
+            return e.Complete();
         }
 
         public event AsyncEventHandler Started = delegate { };
@@ -275,12 +265,9 @@ namespace FoxTunes
             {
                 return Task.CompletedTask;
             }
-            return this.ForegroundTaskRunner.Run(() =>
-            {
-                var e = new AsyncEventArgs();
-                this.Completed(this, e);
-                return e.Complete();
-            });
+            var e = new AsyncEventArgs();
+            this.Completed(this, e);
+            return e.Complete();
         }
 
         public event AsyncEventHandler Completed = delegate { };
@@ -300,16 +287,13 @@ namespace FoxTunes
             }
         }
 
-        protected virtual Task OnExceptionChanged()
+        protected virtual void OnExceptionChanged()
         {
-            return this.ForegroundTaskRunner.Run(() =>
+            if (this.ExceptionChanged != null)
             {
-                if (this.ExceptionChanged != null)
-                {
-                    this.ExceptionChanged(this, EventArgs.Empty);
-                }
-                this.OnPropertyChanged("Exception");
-            });
+                this.ExceptionChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Exception");
         }
 
         public event EventHandler ExceptionChanged = delegate { };
@@ -320,22 +304,12 @@ namespace FoxTunes
             {
                 return Task.CompletedTask;
             }
-            return this.ForegroundTaskRunner.Run(() =>
-            {
-                var e = new AsyncEventArgs();
-                this.Faulted(this, e);
-                return e.Complete();
-            });
+            var e = new AsyncEventArgs();
+            this.Faulted(this, e);
+            return e.Complete();
         }
 
         public event AsyncEventHandler Faulted = delegate { };
-
-        public override void InitializeComponent(ICore core)
-        {
-            this.BackgroundTaskRunner = core.Components.BackgroundTaskRunner;
-            this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
-            base.InitializeComponent(core);
-        }
 
         public virtual void Cancel()
         {
@@ -347,6 +321,32 @@ namespace FoxTunes
         }
 
         public bool IsDisposed { get; private set; }
+
+        protected virtual async Task WithPopulator(PopulatorBase populator, Func<Task> func)
+        {
+            var nameChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetName(populator.Name); });
+            var descriptionChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetDescription(populator.Description); });
+            var positionChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetPosition(populator.Position); });
+            var countChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetCount(populator.Count); });
+            var isIndeterminateChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetIsIndeterminate(populator.IsIndeterminate); });
+            populator.NameChanged += nameChanged;
+            populator.DescriptionChanged += descriptionChanged;
+            populator.PositionChanged += positionChanged;
+            populator.CountChanged += countChanged;
+            populator.IsIndeterminateChanged += isIndeterminateChanged;
+            try
+            {
+                await func();
+            }
+            finally
+            {
+                populator.NameChanged -= nameChanged;
+                populator.DescriptionChanged -= descriptionChanged;
+                populator.PositionChanged -= positionChanged;
+                populator.CountChanged -= countChanged;
+                populator.IsIndeterminateChanged -= isIndeterminateChanged;
+            }
+        }
 
         public void Dispose()
         {

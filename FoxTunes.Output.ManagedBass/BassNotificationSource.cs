@@ -1,11 +1,11 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
-using System.Timers;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassNotificationSource : BaseComponent, IDisposable
+    public class BassNotificationSource : BaseComponent
     {
         const int STOPPING_THRESHOLD = 5;
 
@@ -15,10 +15,6 @@ namespace FoxTunes
         }
 
         public BassOutputStream OutputStream { get; private set; }
-
-        public int Interval { get; set; }
-
-        private Timer Timer { get; set; }
 
         public long EndingPosition
         {
@@ -30,10 +26,6 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Timer = new Timer();
-            this.Timer.Interval = this.Interval;
-            this.Timer.Elapsed += this.Timer_Elapsed;
-            this.Timer.Start();
             Logger.Write(this, LogLevel.Debug, "Creating \"Ending\" channel sync {0} seconds from the end for channel: {1}", STOPPING_THRESHOLD, this.OutputStream.ChannelHandle);
             BassUtils.OK(Bass.ChannelSetSync(
                 this.OutputStream.ChannelHandle,
@@ -51,100 +43,54 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            this.OnUpdated();
-        }
-
         protected virtual void OnEnding(int Handle, int Channel, int Data, IntPtr User)
         {
-            this.Ending();
+            //Critical: Don't block in this call back, it glitches playback.
+            var task = Task.Run(new Action(this.Ending));
         }
 
         public virtual void Ending()
         {
             Logger.Write(this, LogLevel.Debug, "Channel {0} sync point reached: \"Ending\".", this.OutputStream.ChannelHandle);
-            this.OnStopping();
+            var task = this.OnStopping();
         }
 
         protected virtual void OnEnded(int Handle, int Channel, int Data, IntPtr User)
         {
-            this.Ended();
+            //Critical: Don't block in this call back, it glitches playback.
+            var task = Task.Run(new Action(this.Ended));
         }
 
         public virtual void Ended()
         {
             Logger.Write(this, LogLevel.Debug, "Channel {0} sync point reached: \"Ended\".", this.OutputStream.ChannelHandle);
-            this.OnStopped();
+            var task = this.OnStopped();
         }
 
-        protected virtual void OnUpdated()
-        {
-            if (this.Updated == null)
-            {
-                return;
-            }
-            this.Updated(this, BassNotificationSourceEventArgs.Empty);
-        }
-
-        public event BassNotificationSourceEventHandler Updated = delegate { };
-
-        protected virtual void OnStopping()
+        protected virtual Task OnStopping()
         {
             if (this.Stopping == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.Stopping(this, BassNotificationSourceEventArgs.Empty);
+            var e = new AsyncEventArgs();
+            this.Stopping(this, e);
+            return e.Complete();
         }
 
-        public event BassNotificationSourceEventHandler Stopping = delegate { };
+        public event AsyncEventHandler Stopping = delegate { };
 
-        protected virtual void OnStopped()
+        protected virtual Task OnStopped()
         {
             if (this.Stopped == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.Stopped(this, BassNotificationSourceEventArgs.Empty);
+            var e = new AsyncEventArgs();
+            this.Stopped(this, e);
+            return e.Complete();
         }
 
-        public event BassNotificationSourceEventHandler Stopped = delegate { };
-
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
-            this.Timer.Dispose();
-        }
-
-        ~BassNotificationSource()
-        {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            this.Dispose(true);
-        }
-    }
-
-    public delegate void BassNotificationSourceEventHandler(object sender, BassNotificationSourceEventArgs e);
-
-    public class BassNotificationSourceEventArgs : EventArgs
-    {
-        new public static BassNotificationSourceEventArgs Empty = new BassNotificationSourceEventArgs();
+        public event AsyncEventHandler Stopped = delegate { };
     }
 }

@@ -45,8 +45,8 @@ namespace FoxTunes
                             {
                                 if (position % interval == 0)
                                 {
-                                    this.Description = new FileInfo(fileName).Name;
-                                    this.Position = position;
+                                    await this.SetDescription(new FileInfo(fileName).Name);
+                                    await this.SetPosition(position);
                                 }
                                 position++;
                             }

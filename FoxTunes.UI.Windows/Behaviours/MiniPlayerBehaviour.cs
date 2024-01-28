@@ -1,172 +1,122 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Threading;
 
 namespace FoxTunes
 {
-    public class MiniPlayerBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent, IDisposable
+    public class MiniPlayerBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
+        public const string SHOW_ARTWORK = "AAAA";
+
+        public const string SHOW_PLAYLIST = "BBBB";
+
         public const string QUIT = "ZZZZ";
 
-        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
+        public ICore Core { get; private set; }
+
+        public IUserInterface UserInterface { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
-        public bool _Enabled { get; private set; }
+        public BooleanConfigurationElement Enabled { get; private set; }
 
-        public bool Enabled
+        public BooleanConfigurationElement ShowArtwork { get; private set; }
+
+        public BooleanConfigurationElement ShowPlaylist { get; private set; }
+
+        public TextConfigurationElement ScalingFactor { get; private set; }
+
+        protected virtual Task Enable()
         {
-            get
+            return Windows.Invoke(() =>
             {
-                return this._Enabled;
-            }
-            set
-            {
-                this._Enabled = value;
-                this.OnEnabledChanged();
-            }
+                if (Windows.IsMainWindowCreated)
+                {
+                    Windows.MainWindow.Hide();
+                }
+                if (Windows.MiniWindow.DataContext == null)
+                {
+                    Windows.MiniWindow.DataContext = this.Core;
+                }
+                Windows.MiniWindow.Show();
+                Windows.MiniWindow.BringToFront();
+                Windows.ActiveWindow = Windows.MiniWindow;
+            });
         }
 
-        protected virtual void OnEnabledChanged()
+        protected virtual Task Disable()
         {
-            if (this.Enabled)
+            return Windows.Invoke(() =>
             {
-                this.Enable();
-            }
-            else
-            {
-                this.Disable();
-            }
-        }
-
-        public bool _Topmost { get; private set; }
-
-        public bool Topmost
-        {
-            get
-            {
-                return this._Topmost;
-            }
-            set
-            {
-                this._Topmost = value;
-                this.OnTopmostChanged();
-            }
-        }
-
-        protected virtual void OnTopmostChanged()
-        {
-            if (this.Enabled)
-            {
-                if (Application.Current != null && Application.Current.MainWindow != null)
+                if (Windows.IsMiniWindowCreated)
                 {
-                    Application.Current.MainWindow.Topmost = this.Topmost;
+                    Windows.MiniWindow.Hide();
                 }
-            }
-        }
-
-        protected virtual void Enable()
-        {
-            if (Application.Current != null && Application.Current.MainWindow != null)
-            {
-                if (!Application.Current.MainWindow.RestoreBounds.IsEmpty())
+                if (Windows.MainWindow.DataContext == null)
                 {
-                    global::FoxTunes.Properties.Settings.Default.MainWindowBounds = Application.Current.MainWindow.RestoreBounds;
-                    global::FoxTunes.Properties.Settings.Default.Save();
+                    Windows.MainWindow.DataContext = this.Core;
                 }
-                Application.Current.MainWindow.Hide();
-                try
-                {
-                    if (Application.Current.MainWindow.WindowState != WindowState.Normal)
-                    {
-                        Application.Current.MainWindow.WindowState = WindowState.Normal;
-                    }
-                    Application.Current.MainWindow.ResizeMode = ResizeMode.NoResize;
-                    Application.Current.MainWindow.SizeToContent = SizeToContent.WidthAndHeight;
-                    if (!global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.IsEmpty())
-                    {
-                        Application.Current.MainWindow.Left = global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.Left;
-                        Application.Current.MainWindow.Top = global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.Top;
-                        Application.Current.MainWindow.Width = global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.Width;
-                        Application.Current.MainWindow.Height = global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.Height;
-                    }
-                    Application.Current.MainWindow.Topmost = this.Topmost;
-                    Application.Current.MainWindow.MouseDown += this.OnMouseDown;
-                }
-                finally
-                {
-                    Application.Current.MainWindow.Show();
-                }
-            }
-        }
-
-        protected virtual void Disable()
-        {
-            if (Application.Current != null && Application.Current.MainWindow != null)
-            {
-                if (!Application.Current.MainWindow.RestoreBounds.IsEmpty())
-                {
-                    global::FoxTunes.Properties.Settings.Default.MiniWindowBounds = Application.Current.MainWindow.RestoreBounds;
-                    global::FoxTunes.Properties.Settings.Default.Save();
-                }
-                Application.Current.MainWindow.Hide();
-                try
-                {
-                    Application.Current.MainWindow.ResizeMode = ResizeMode.CanResize;
-                    Application.Current.MainWindow.SizeToContent = SizeToContent.Manual;
-                    if (!global::FoxTunes.Properties.Settings.Default.MainWindowBounds.IsEmpty())
-                    {
-                        Application.Current.MainWindow.Left = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Left;
-                        Application.Current.MainWindow.Top = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Top;
-                        Application.Current.MainWindow.Width = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Width;
-                        Application.Current.MainWindow.Height = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Height;
-                    }
-                    Application.Current.MainWindow.Topmost = false;
-                    Application.Current.MainWindow.MouseDown -= this.OnMouseDown;
-                }
-                finally
-                {
-                    Application.Current.MainWindow.Show();
-                }
-            }
-        }
-
-        protected virtual void OnMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                if (Application.Current != null && Application.Current.MainWindow != null)
-                {
-                    Application.Current.MainWindow.DragMove();
-                }
-            }
+                Windows.MainWindow.Show();
+                Windows.MainWindow.BringToFront();
+                Windows.ActiveWindow = Windows.MainWindow;
+            });
         }
 
         public override void InitializeComponent(ICore core)
         {
-            this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
+            this.Core = core;
+            this.UserInterface = core.Components.UserInterface;
             this.Configuration = core.Components.Configuration;
-            this.Configuration.GetElement<BooleanConfigurationElement>(
+            this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT
-            ).ConnectValue<bool>(value => this.Enabled = value);
-            this.Configuration.GetElement<BooleanConfigurationElement>(
+            );
+            this.Enabled.ConnectValue<bool>(async value =>
+            {
+                if (value)
+                {
+                    await this.Enable();
+                }
+                else
+                {
+                    await this.Disable();
+                }
+                if (this.IsInitialized)
+                {
+                    await Task.Run(() => this.Configuration.Save());
+                }
+            });
+            this.ShowArtwork = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
-                MiniPlayerBehaviourConfiguration.TOPMOST_ELEMENT
-            ).ConnectValue<bool>(value => this.Topmost = value);
+                MiniPlayerBehaviourConfiguration.SHOW_ARTWORK_ELEMENT
+            );
+            this.ShowPlaylist = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MiniPlayerBehaviourConfiguration.SECTION,
+                MiniPlayerBehaviourConfiguration.SHOW_PLAYLIST_ELEMENT
+            );
+            this.ScalingFactor = this.Configuration.GetElement<TextConfigurationElement>(
+              WindowsUserInterfaceConfiguration.SECTION,
+              WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
+            );
+            this.ScalingFactor.ConnectValue<string>(value =>
+            {
+                if (this.IsInitialized && Windows.IsMiniWindowCreated)
+                {
+                    this.UserInterface.Restart();
+                }
+            });
+            base.InitializeComponent(core);
         }
 
         public IEnumerable<IInvocationComponent> Invocations
         {
             get
             {
-                if (this.Enabled)
+                if (this.Enabled.Value)
                 {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, QUIT, "Quit");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, SHOW_ARTWORK, "Show Artwork", attributes: this.ShowArtwork.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, SHOW_PLAYLIST, "Show Playlist", attributes: this.ShowPlaylist.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_MINI_PLAYER, QUIT, "Quit", attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
                 }
             }
         }
@@ -175,66 +125,22 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
+                case SHOW_ARTWORK:
+                    this.ShowArtwork.Toggle();
+                    return Task.Run(() => this.Configuration.Save());
+                case SHOW_PLAYLIST:
+                    this.ShowPlaylist.Toggle();
+                    return Task.Run(() => this.Configuration.Save());
                 case QUIT:
-                    return this.ForegroundTaskRunner.Run(() => this.Quit());
+                    Windows.Shutdown();
+                    break;
             }
             return Task.CompletedTask;
-        }
-
-        protected virtual void Quit()
-        {
-            //We have to close the main window as a low priority task otherwise the dispatcher 
-            //running *this* task is shut down which causes an exception.
-            if (Application.Current != null && Application.Current.Dispatcher != null)
-            {
-                Application.Current.Dispatcher.BeginInvoke(
-                    DispatcherPriority.ApplicationIdle,
-                    new Action(() =>
-                    {
-                        if (Application.Current != null && Application.Current.MainWindow != null)
-                        {
-                            Application.Current.MainWindow.Close();
-                        }
-                    })
-                );
-            }
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return MiniPlayerBehaviourConfiguration.GetConfigurationSections();
-        }
-
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
-            if (this.Enabled)
-            {
-                this.Disable();
-            }
-        }
-
-        ~MiniPlayerBehaviour()
-        {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            this.Dispose(true);
         }
     }
 }

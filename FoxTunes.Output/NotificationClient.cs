@@ -97,7 +97,7 @@ namespace FoxTunes
 
     public delegate void NotificationClientEventHandler(object sender, NotificationClientEventArgs e);
 
-    public class NotificationClientEventArgs : EventArgs
+    public class NotificationClientEventArgs : AsyncEventArgs
     {
         public NotificationClientEventArgs(DataFlow? flow, Role? role, string device, DeviceState? state, PropertyKey key)
         {

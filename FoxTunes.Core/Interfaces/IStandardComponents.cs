@@ -12,10 +12,6 @@
 
         IScriptingRuntime ScriptingRuntime { get; }
 
-        IBackgroundTaskRunner BackgroundTaskRunner { get; }
-
-        IForegroundTaskRunner ForegroundTaskRunner { get; }
-
         ILogger Logger { get; }
 
         ISignalEmitter SignalEmitter { get; }

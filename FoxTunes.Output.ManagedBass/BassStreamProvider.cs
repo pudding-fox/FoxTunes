@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassStreamProvider : BaseComponent, IBassStreamProvider
+    public class BassStreamProvider : StandardComponent, IBassStreamProvider
     {
         public const byte PRIORITY_HIGH = 0;
 
@@ -26,12 +26,24 @@ namespace FoxTunes
 
         public ConcurrentDictionary<BassStreamProviderKey, byte[]> Streams { get; private set; }
 
+        public IBassStreamFactory StreamFactory { get; private set; }
+
         public virtual byte Priority
         {
             get
             {
                 return PRIORITY_NORMAL;
             }
+        }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
+            if (this.StreamFactory != null)
+            {
+                this.StreamFactory.Register(this);
+            }
+            base.InitializeComponent(core);
         }
 
         public virtual bool CanCreateStream(IBassOutput output, PlaylistItem playlistItem)
@@ -55,7 +67,7 @@ namespace FoxTunes
                     var channelHandle = Bass.CreateStream(buffer, 0, buffer.Length, flags);
                     if (channelHandle != 0)
                     {
-                        if (!this.Streams.TryAdd(new BassStreamProviderKey(playlistItem, channelHandle), buffer))
+                        if (!this.Streams.TryAdd(new BassStreamProviderKey(playlistItem.FileName, channelHandle), buffer))
                         {
                             Logger.Write(this, LogLevel.Warn, "Failed to pin handle of buffer for file \"{0}\". Playback may fail.", playlistItem.FileName);
                         }
@@ -75,7 +87,7 @@ namespace FoxTunes
             var buffer = default(byte[]);
             foreach (var key in this.Streams.Keys)
             {
-                if (key.PlaylistItem == playlistItem && this.Streams.TryGetValue(key, out buffer))
+                if (string.Equals(key.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase) && this.Streams.TryGetValue(key, out buffer))
                 {
                     Logger.Write(this, LogLevel.Debug, "Recycling existing buffer of {0} bytes from file \"{0}\".", buffer.Length, playlistItem.FileName);
                     return buffer;
@@ -95,7 +107,7 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Freeing stream: {0}", channelHandle);
             Bass.StreamFree(channelHandle); //Not checking result code as it contains an error if the application is shutting down.
-            if (this.Streams.TryRemove(new BassStreamProviderKey(playlistItem, channelHandle)))
+            if (this.Streams.TryRemove(new BassStreamProviderKey(playlistItem.FileName, channelHandle)))
             {
                 Logger.Write(this, LogLevel.Debug, "Released handle of buffer for channel {0}.", channelHandle);
             }
@@ -132,13 +144,13 @@ namespace FoxTunes
 
         public class BassStreamProviderKey : IEquatable<BassStreamProviderKey>
         {
-            public BassStreamProviderKey(PlaylistItem playlistItem, int channelHandle)
+            public BassStreamProviderKey(string fileName, int channelHandle)
             {
-                this.PlaylistItem = playlistItem;
+                this.FileName = fileName;
                 this.ChannelHandle = channelHandle;
             }
 
-            public PlaylistItem PlaylistItem { get; private set; }
+            public string FileName { get; private set; }
 
             public int ChannelHandle { get; private set; }
 
@@ -152,7 +164,7 @@ namespace FoxTunes
                 {
                     return true;
                 }
-                if (this.PlaylistItem != other.PlaylistItem)
+                if (!string.Equals(this.FileName, other.FileName, StringComparison.OrdinalIgnoreCase))
                 {
                     return false;
                 }
@@ -173,9 +185,9 @@ namespace FoxTunes
                 var hashCode = default(int);
                 unchecked
                 {
-                    if (this.PlaylistItem != null)
+                    if (!string.IsNullOrEmpty(this.FileName))
                     {
-                        hashCode += this.PlaylistItem.GetHashCode();
+                        hashCode += this.FileName.GetHashCode();
                     }
                     hashCode += this.ChannelHandle.GetHashCode();
                 }

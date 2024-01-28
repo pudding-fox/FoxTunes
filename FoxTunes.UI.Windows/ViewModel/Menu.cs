@@ -11,12 +11,6 @@ namespace FoxTunes.ViewModel
 {
     public class Menu : ViewModelBase
     {
-        public Menu()
-        {
-            this.InvocableComponents = new ObservableCollection<IInvocableComponent>();
-            this.Items = new ObservableCollection<MenuItem>();
-        }
-
         public static readonly DependencyProperty CategoryProperty = DependencyProperty.Register(
             "Category",
             typeof(string),
@@ -44,6 +38,39 @@ namespace FoxTunes.ViewModel
             menu.OnCategoryChanged();
         }
 
+        public static readonly DependencyProperty MenuVisibleProperty = DependencyProperty.Register(
+            "MenuVisible",
+            typeof(bool),
+            typeof(Menu),
+            new PropertyMetadata(new PropertyChangedCallback(OnMenuVisibleChanged))
+        );
+
+        public static bool GetMenuVisible(Menu source)
+        {
+            return (bool)source.GetValue(MenuVisibleProperty);
+        }
+
+        public static void SetMenuVisible(Menu source, bool value)
+        {
+            source.SetValue(MenuVisibleProperty, value);
+        }
+
+        public static void OnMenuVisibleChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var menu = sender as Menu;
+            if (menu == null)
+            {
+                return;
+            }
+            menu.OnMenuVisibleChanged();
+        }
+
+        public Menu()
+        {
+            this.InvocableComponents = new ObservableCollection<IInvocableComponent>();
+            this.Items = new ObservableCollection<MenuItem>();
+        }
+
         public string Category
         {
             get
@@ -67,6 +94,35 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler CategoryChanged = delegate { };
 
+        private bool _MenuVisible { get; set; }
+
+        public bool MenuVisible
+        {
+            get
+            {
+                return (bool)this.GetValue(MenuVisibleProperty);
+            }
+            set
+            {
+                this.SetValue(MenuVisibleProperty, value);
+            }
+        }
+
+        protected virtual void OnMenuVisibleChanged()
+        {
+            if (this.MenuVisible)
+            {
+                this.Refresh();
+            }
+            if (this.MenuVisibleChanged != null)
+            {
+                this.MenuVisibleChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("MenuVisible");
+        }
+
+        public event EventHandler MenuVisibleChanged = delegate { };
+
         public ObservableCollection<IInvocableComponent> InvocableComponents { get; set; }
 
         public ObservableCollection<MenuItem> Items { get; set; }
@@ -88,9 +144,9 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public override void InitializeComponent(ICore core)
+        protected virtual void Refresh()
         {
-            this.InvocableComponents.AddRange(ComponentRegistry.Instance.GetComponents<IInvocableComponent>());
+            this.Items.Clear();
             foreach (var item in this.GetItems().OrderBy(item => item.Invocation.Category).ThenBy(item => item.Invocation.Id))
             {
                 if (item.Separator)
@@ -99,6 +155,11 @@ namespace FoxTunes.ViewModel
                 }
                 this.Items.Add(item);
             }
+        }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.InvocableComponents.AddRange(ComponentRegistry.Instance.GetComponents<IInvocableComponent>());
             base.InitializeComponent(core);
         }
         protected override Freezable CreateInstanceCore()
@@ -125,13 +186,13 @@ namespace FoxTunes.ViewModel
 
         public IInvocationComponent Invocation { get; private set; }
 
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
         public ICommand Command
         {
             get
             {
-                return new AsyncCommand(this.BackgroundTaskRunner, this.OnInvoke);
+                return CommandFactory.Instance.CreateCommand(
+                    new Func<Task>(this.OnInvoke)
+                );
             }
         }
 
@@ -143,10 +204,12 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public override void InitializeComponent(ICore core)
+        public bool Selected
         {
-            this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
-            base.InitializeComponent(core);
+            get
+            {
+                return (this.Invocation.Attributes & InvocationComponent.ATTRIBUTE_SELECTED) == InvocationComponent.ATTRIBUTE_SELECTED;
+            }
         }
 
         protected virtual Task OnInvoke()

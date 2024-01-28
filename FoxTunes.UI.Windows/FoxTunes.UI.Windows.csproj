@@ -101,6 +101,12 @@
     <Compile Include="MiniPlayer.xaml.cs">
       <DependentUpon>MiniPlayer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MiniPlaylist.xaml.cs">
+      <DependentUpon>MiniPlaylist.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MiniWindow.xaml.cs">
+      <DependentUpon>MiniWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="NotifyIconElement.cs" />
     <Compile Include="NowPlaying.xaml.cs">
       <DependentUpon>NowPlaying.xaml</DependentUpon>
@@ -154,11 +160,14 @@
     <Compile Include="Utilities\MouseCursorAdorner.cs" />
     <Compile Include="Utilities\MouseHelper.cs" />
     <Compile Include="Utilities\RefreshableGridViewColumn.cs" />
+    <Compile Include="Utilities\Windows.cs" />
     <Compile Include="ViewModel\Artwork.cs" />
     <Compile Include="ViewModel\Associations.cs" />
+    <Compile Include="ViewModel\BackgroundTask.cs" />
     <Compile Include="ViewModel\BackgroundTasks.cs" />
     <Compile Include="ViewModel\AsyncCommand.cs" />
     <Compile Include="ViewModel\CommandBase.cs" />
+    <Compile Include="ViewModel\CommandFactory.cs" />
     <Compile Include="ViewModel\Components.cs" />
     <Compile Include="ViewModel\Converters\ColumnWidthConverter.cs" />
     <Compile Include="ViewModel\Converters\DataGridSelectedItemConverter.cs" />
@@ -178,13 +187,15 @@
     <Compile Include="ViewModel\Menu.cs" />
     <Compile Include="ViewModel\Mini.cs" />
     <Compile Include="ViewModel\MiniPlayer.cs" />
+    <Compile Include="ViewModel\MiniPlaylist.cs" />
     <Compile Include="ViewModel\NowPlaying.cs" />
+    <Compile Include="ViewModel\OutputStream.cs" />
+    <Compile Include="ViewModel\PlaylistBase.cs" />
     <Compile Include="ViewModel\PlaylistSettings.cs" />
     <Compile Include="Utilities\ScriptBinding.cs" />
     <Compile Include="ViewModel\Titlebar.cs" />
     <Compile Include="ViewModel\ValidationRule.cs" />
     <Compile Include="ViewModel\Wrapper.cs" />
-    <Compile Include="WindowsForegroundTaskRunner.cs" />
     <Compile Include="WindowsUserInterfaceConfiguration.cs" />
     <Compile Include="ViewModel\Command.cs" />
     <Compile Include="ViewModel\Playback.cs" />
@@ -262,6 +273,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MiniPlaylist.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MiniWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="NowPlaying.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -321,6 +340,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Playlist.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

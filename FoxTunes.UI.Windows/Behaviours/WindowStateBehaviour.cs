@@ -1,37 +1,54 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 
 namespace FoxTunes
 {
-    public class WindowStateBehaviour : StandardBehaviour, IDisposable
+    public class WindowStateBehaviour : StandardBehaviour
     {
         const int WM_GETMINMAXINFO = 0x0024;
 
         public WindowStateBehaviour()
         {
             this.Hook = new HwndSourceHook(this.WindowProc);
+            Windows.MainWindowCreated += this.OnMainWindowCreated;
         }
 
         public HwndSourceHook Hook { get; private set; }
 
+        public IntPtr Handle { get; private set; }
+
+        protected virtual void OnMainWindowCreated(object sender, EventArgs e)
+        {
+            Windows.MainWindow.Loaded += this.OnLoaded;
+            Windows.MainWindow.Closed += this.OnClosed;
+        }
+
+        protected virtual void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            this.Enable();
+        }
+
+        protected virtual void OnClosed(object sender, EventArgs e)
+        {
+            this.Disable();
+        }
+
         public void Enable()
         {
-            if (Application.Current != null && Application.Current.MainWindow != null)
+            if (Windows.MainWindow != null)
             {
-                var handle = new WindowInteropHelper(Application.Current.MainWindow).Handle;
-                HwndSource.FromHwnd(handle).AddHook(this.Hook);
+                this.Handle = new WindowInteropHelper(Windows.MainWindow).Handle;
+                HwndSource.FromHwnd(this.Handle).AddHook(this.Hook);
             }
         }
 
         public void Disable()
         {
-            if (Application.Current != null && Application.Current.MainWindow != null)
+            if (this.Handle != IntPtr.Zero)
             {
-                var handle = new WindowInteropHelper(Application.Current.MainWindow).Handle;
-                HwndSource.FromHwnd(handle).RemoveHook(this.Hook);
+                HwndSource.FromHwnd(this.Handle).RemoveHook(this.Hook);
             }
         }
 
@@ -77,44 +94,6 @@ namespace FoxTunes
             }
 
             Marshal.StructureToPtr(minMaxInfo, lParam, true);
-        }
-
-        public override void InitializeComponent(ICore core)
-        {
-            if (Application.Current != null && Application.Current.MainWindow != null)
-            {
-                Application.Current.MainWindow.Loaded += (sender, e) => this.Enable();
-            }
-            base.InitializeComponent(core);
-        }
-
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
-            this.Disable();
-        }
-
-        ~WindowStateBehaviour()
-        {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            this.Dispose(true);
         }
 
         [DllImport("user32.dll")]

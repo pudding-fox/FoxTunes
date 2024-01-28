@@ -7,7 +7,6 @@
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-             xmlns:Utilities="clr-namespace:FoxTunes.Utilities"
              x:Class="FoxTunes.LibraryTree"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
@@ -76,13 +75,13 @@
             </TextBlock.Style>
         </TextBlock>
         <Windows:SearchBox Grid.Row="2" SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}"></Windows:SearchBox>
-        <Utilities:MouseCursorAdorner x:Name="MouseCursorAdorner">
-            <Utilities:MouseCursorAdorner.Template>
+        <Windows:MouseCursorAdorner x:Name="MouseCursorAdorner">
+            <Windows:MouseCursorAdorner.Template>
                 <DataTemplate>
                     <ItemsControl ItemsSource="{Binding SelectedItem.MetaDatas, Source={StaticResource ViewModel}}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <Utilities:DiagonalStackPanel XStep="25" YStep="15" Reverse="True"></Utilities:DiagonalStackPanel>
+                                <Windows:DiagonalStackPanel XStep="25" YStep="15" Reverse="True"></Windows:DiagonalStackPanel>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
@@ -98,7 +97,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </DataTemplate>
-            </Utilities:MouseCursorAdorner.Template>
-        </Utilities:MouseCursorAdorner>
+            </Windows:MouseCursorAdorner.Template>
+        </Windows:MouseCursorAdorner>
     </Grid>
 </UserControl>

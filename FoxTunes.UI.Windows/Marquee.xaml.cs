@@ -227,7 +227,11 @@ namespace FoxTunes
         protected virtual void Start()
         {
             this.Reset();
-            this.Timer.Start();
+            this.Dispatcher.InvokeAsync(async () =>
+            {
+                await Task.Delay(this.Pause);
+                this.Timer.Start();
+            });
         }
 
         protected virtual void Stop()
@@ -251,12 +255,15 @@ namespace FoxTunes
 
         protected virtual void Reverse()
         {
-            this.Timer.Stop();
-            this.Dispatcher.InvokeAsync(async () =>
+            if (this.Timer.IsEnabled)
             {
-                await Task.Delay(this.Pause);
-                this.Timer.Start();
-            });
+                this.Timer.Stop();
+                this.Dispatcher.InvokeAsync(async () =>
+                {
+                    await Task.Delay(this.Pause);
+                    this.Timer.Start();
+                });
+            }
             switch (this.Direction)
             {
                 case FlowDirection.LeftToRight:

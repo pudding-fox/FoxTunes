@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [Component("C051C82C-3391-4DDC-B856-C4BDEA86ADDC", null, priority: ComponentAttribute.PRIORITY_LOW)]
-    public class BassCdStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent
+    public class BassCdStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent, IDisposable
     {
         public const string OPEN_CD = "FFFF";
 
@@ -97,7 +97,6 @@ namespace FoxTunes
                 BassCdStreamProviderBehaviourConfiguration.SECTION,
                 BassCdStreamProviderBehaviourConfiguration.LOOKUP_HOST_ELEMENT
             ).ConnectValue<string>(value => this.CdLookupHost = value);
-            ComponentRegistry.Instance.GetComponent<IBassStreamFactory>().Register(new BassCdStreamProvider());
             base.InitializeComponent(core);
         }
 
@@ -177,6 +176,39 @@ namespace FoxTunes
 
         public event BackgroundTaskEventHandler BackgroundTask = delegate { };
 
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Output != null)
+            {
+                this.Output.Init -= this.OnInit;
+                this.Output.Free -= this.OnFree;
+            }
+        }
+
+        ~BassCdStreamProviderBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
+        }
+
         private class AddCdToPlaylistTask : PlaylistTaskBase
         {
             public AddCdToPlaylistTask(int drive, bool cdLookup, string cdLookupHost)
@@ -214,8 +246,8 @@ namespace FoxTunes
                 {
                     throw new InvalidOperationException("A valid drive must be provided.");
                 }
-                this.Name = "Opening CD";
-                this.IsIndeterminate = true;
+                await this.SetName("Opening CD");
+                await this.SetIsIndeterminate(true);
                 try
                 {
                     if (!BassCd.IsReady(this.Drive))
@@ -245,8 +277,8 @@ namespace FoxTunes
 
             private async Task AddPlaylistItems()
             {
-                this.Name = "Getting track list";
-                this.IsIndeterminate = true;
+                await this.SetName("Getting track list");
+                await this.SetIsIndeterminate(true);
                 var info = default(CDInfo);
                 BassUtils.OK(BassCd.GetInfo(this.Drive, out info));
                 var directoryName = string.Format("{0}:\\", info.DriveLetter);

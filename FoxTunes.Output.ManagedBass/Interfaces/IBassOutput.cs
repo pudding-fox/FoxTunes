@@ -14,9 +14,9 @@ namespace FoxTunes.Interfaces
 
         IBassStreamFactory StreamFactory { get; }
 
-        IBassStreamPipeline Pipeline { get; }
+        void WithPipeline(Action<IBassStreamPipeline> pipeline);
 
-        IBassStreamPipeline GetOrCreatePipeline(BassOutputStream stream);
+        void WithPipeline(BassOutputStream stream, Action<IBassStreamPipeline> pipeline);
 
         event EventHandler Init;
 

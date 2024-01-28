@@ -49,7 +49,7 @@ namespace FoxTunes.ViewModel
             {
                 //TODO: Logging.
             }
-            InvalidateRequerySuggested();
+            this.OnCanExecuteChanged();
         }
     }
 
@@ -100,7 +100,7 @@ namespace FoxTunes.ViewModel
             {
                 //TODO: Logging.
             }
-            InvalidateRequerySuggested();
+            this.OnCanExecuteChanged();
         }
     }
 

@@ -76,8 +76,6 @@
     <Compile Include="Interfaces\Output\IOutputStreamQueue.cs" />
     <Compile Include="Interfaces\Scripting\ICoreScripts.cs" />
     <Compile Include="Interfaces\Signal\ISignal.cs" />
-    <Compile Include="Interfaces\Tasks\IBackgroundTaskRunner.cs" />
-    <Compile Include="Interfaces\Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="InvocationComponent.cs" />
     <Compile Include="Library\LibraryHierarchy.cs" />
     <Compile Include="Library\LibraryHierarchyBrowser.cs" />
@@ -192,7 +190,6 @@
     <Compile Include="StandardManagers.cs" />
     <Compile Include="Tasks\AddLibraryHierarchyNodeToPlaylistTask.cs" />
     <Compile Include="Tasks\AddPathsToPlaylistTask.cs" />
-    <Compile Include="Tasks\BackgroundTaskRunner.cs" />
     <Compile Include="Tasks\BuildLibraryHierarchiesTask.cs" />
     <Compile Include="Tasks\ClearLibraryTask.cs" />
     <Compile Include="Tasks\ClearPlaylistTask.cs" />
@@ -214,6 +211,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Interfaces\Tasks\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

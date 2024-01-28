@@ -21,11 +21,11 @@ namespace FoxTunes
 
         public IEnumerable<string> Paths { get; private set; }
 
-        protected override Task OnStarted()
+        protected override async Task OnStarted()
         {
-            this.Name = "Getting file list";
-            this.IsIndeterminate = true;
-            return base.OnStarted();
+            await this.SetName("Getting file list");
+            await this.SetIsIndeterminate(true);
+            await base.OnStarted();
         }
 
         protected override Task OnRun()
@@ -35,8 +35,8 @@ namespace FoxTunes
 
         protected override async Task OnCompleted()
         {
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
             await base.OnCompleted();
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.LibraryUpdated));
         }
     }
 }

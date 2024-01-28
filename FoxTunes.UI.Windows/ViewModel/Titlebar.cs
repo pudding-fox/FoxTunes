@@ -1,28 +1,77 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
     public class Titlebar : ViewModelBase
     {
+        public Titlebar()
+        {
+            Windows.MainWindowCreated += this.OnMainWindowCreated;
+        }
+
+        public string Title
+        {
+            get
+            {
+                if (Windows.IsMainWindowCreated)
+                {
+                    return Windows.MainWindow.Title;
+                }
+                return null;
+            }
+            set
+            {
+                if (Windows.IsMainWindowCreated)
+                {
+                    Windows.MainWindow.Title = value;
+                }
+                this.OnTitleChanged();
+            }
+        }
+
+        protected virtual void OnTitleChanged()
+        {
+            if (this.TitleChanged != null)
+            {
+                this.TitleChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Title");
+        }
+
+        public event EventHandler TitleChanged = delegate { };
+
         public WindowState WindowState
         {
             get
             {
-                if (Application.Current != null && Application.Current.MainWindow != null)
+                if (Windows.IsMainWindowCreated)
                 {
-                    return Application.Current.MainWindow.WindowState;
+                    return Windows.MainWindow.WindowState;
                 }
                 return WindowState.Normal;
             }
             set
             {
-                if (Application.Current != null && Application.Current.MainWindow != null)
+                if (Windows.IsMainWindowCreated)
                 {
-                    Application.Current.MainWindow.WindowState = value;
+                    Windows.MainWindow.WindowState = value;
                 }
+                this.OnWindowStateChanged();
             }
         }
+
+        protected virtual void OnWindowStateChanged()
+        {
+            if (this.WindowStateChanged != null)
+            {
+                this.WindowStateChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("WindowState");
+        }
+
+        public event EventHandler WindowStateChanged = delegate { };
 
         public ICommand MinimizeCommand
         {
@@ -68,10 +117,13 @@ namespace FoxTunes.ViewModel
 
         public void Close()
         {
-            if (Application.Current != null && Application.Current.MainWindow != null)
-            {
-                Application.Current.MainWindow.Close();
-            }
+            Windows.Shutdown();
+        }
+
+        protected virtual void OnMainWindowCreated(object sender, EventArgs e)
+        {
+            this.OnTitleChanged();
+            this.OnWindowStateChanged();
         }
 
         protected override Freezable CreateInstanceCore()

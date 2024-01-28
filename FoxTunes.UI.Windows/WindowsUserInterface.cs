@@ -21,7 +21,6 @@ namespace FoxTunes
         {
             this.Application = new Application();
             this.Application.DispatcherUnhandledException += this.OnApplicationDispatcherUnhandledException;
-            this.Window = new MainWindow();
             this.Queue = new PendingQueue<string>(TimeSpan.FromMilliseconds(100));
             this.Queue.Complete += async (sender, e) =>
             {
@@ -58,32 +57,6 @@ namespace FoxTunes
 
         public event EventHandler ApplicationChanged = delegate { };
 
-        private Window _Window { get; set; }
-
-        public Window Window
-        {
-            get
-            {
-                return this._Window;
-            }
-            private set
-            {
-                this._Window = value;
-                this.OnWindowChanged();
-            }
-        }
-
-        protected virtual void OnWindowChanged()
-        {
-            if (this.WindowChanged != null)
-            {
-                this.WindowChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Window");
-        }
-
-        public event EventHandler WindowChanged = delegate { };
-
         public PendingQueue<string> Queue { get; private set; }
 
         public ICore Core { get; private set; }
@@ -97,13 +70,22 @@ namespace FoxTunes
             this.Core = core;
             this.Output = core.Components.Output;
             this.Playlist = core.Managers.Playlist;
-            this.Window.DataContext = core;
             base.InitializeComponent(core);
         }
 
         public override void Show()
         {
-            this.Application.Run(this.Window);
+            this.RestartPending = false;
+            if (Windows.IsMiniWindowCreated)
+            {
+                Windows.MiniWindow.DataContext = this.Core;
+                this.Application.Run(Windows.MiniWindow);
+            }
+            else
+            {
+                Windows.MainWindow.DataContext = this.Core;
+                this.Application.Run(Windows.MainWindow);
+            }
         }
 
         public override void Run(string message)
@@ -128,6 +110,11 @@ namespace FoxTunes
         public override void Fatal(Exception exception)
         {
             MessageBox.Show(exception.Message, "Fatal", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        public override void Restart()
+        {
+            MessageBox.Show("Restart is required.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         protected virtual async Task OnOpen(IEnumerable<string> paths)

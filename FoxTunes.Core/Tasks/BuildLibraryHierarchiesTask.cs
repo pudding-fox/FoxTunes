@@ -17,12 +17,12 @@ namespace FoxTunes
             }
         }
 
-        protected override Task OnStarted()
+        protected override async Task OnStarted()
         {
-            this.Name = "Building hierarchies";
-            this.Description = "Preparing";
-            this.IsIndeterminate = true;
-            return base.OnStarted();
+            await this.SetName("Building hierarchies");
+            await this.SetDescription("Preparing");
+            await this.SetIsIndeterminate(true);
+            await base.OnStarted();
         }
 
         protected override Task OnRun()
@@ -32,8 +32,8 @@ namespace FoxTunes
 
         protected override async Task OnCompleted()
         {
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
             await base.OnCompleted();
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
         }
     }
 }

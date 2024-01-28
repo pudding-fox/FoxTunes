@@ -21,13 +21,6 @@ namespace FoxTunes
             this.Converter = this;
         }
 
-        protected ScriptBinding(IScriptingContext scriptingContext, string script)
-            : this()
-        {
-            this.ScriptingContext = scriptingContext;
-            this.Script = script;
-        }
-
         private IScriptingContext _ScriptingContext { get; set; }
 
         public IScriptingContext ScriptingContext

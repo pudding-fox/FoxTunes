@@ -5,6 +5,11 @@ namespace FoxTunes
 {
     public class Core : BaseComponent, ICore
     {
+        public Core()
+        {
+            ComponentRegistry.Instance.Clear();
+        }
+
         public IStandardComponents Components
         {
             get
@@ -121,8 +126,14 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            ComponentRegistry.Instance.ForEach<IDisposable>(component => component.Dispose());
-            ComponentRegistry.Instance.Clear();
+            ComponentRegistry.Instance.ForEach<IDisposable>(component =>
+            {
+                if (object.ReferenceEquals(this, component))
+                {
+                    return;
+                }
+                component.Dispose();
+            });
         }
 
         ~Core()

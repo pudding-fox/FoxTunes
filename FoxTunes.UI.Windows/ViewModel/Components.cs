@@ -15,13 +15,10 @@ namespace FoxTunes.ViewModel
             this.Errors = new ObservableCollection<ComponentError>();
         }
 
-        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
-
         public ObservableCollection<ComponentError> Errors { get; set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             ComponentRegistry.Instance.ForEach(component =>
             {
                 component.Error += this.OnError;
@@ -57,9 +54,9 @@ namespace FoxTunes.ViewModel
 
         protected virtual async void OnFaulted(object sender, AsyncEventArgs e)
         {
-            var backgroundTask = sender as IBackgroundTask;
             using (e.Defer())
             {
+                var backgroundTask = sender as IBackgroundTask;
                 if (backgroundTask.Exception is AggregateException)
                 {
                     foreach (var innerException in (backgroundTask.Exception as AggregateException).InnerExceptions)
@@ -76,7 +73,7 @@ namespace FoxTunes.ViewModel
 
         public Task Add(ComponentError error)
         {
-            return this.ForegroundTaskRunner.Run(() =>
+            return Windows.Invoke(() =>
             {
                 if (this.Errors.Contains(error))
                 {
@@ -94,6 +91,20 @@ namespace FoxTunes.ViewModel
             {
                 return new Command(() => this.Errors.Clear());
             }
+        }
+
+        protected override void OnDisposing()
+        {
+            ComponentRegistry.Instance.ForEach(component =>
+            {
+                component.Error -= this.OnError;
+                if (component is IBackgroundTaskSource)
+                {
+                    (component as IBackgroundTaskSource).BackgroundTask -= this.OnBackgroundTask;
+                }
+            });
+            ViewModelBase.Error -= this.OnError;
+            base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()
@@ -128,13 +139,16 @@ namespace FoxTunes.ViewModel
         public override int GetHashCode()
         {
             var hashCode = 0;
-            if (!string.IsNullOrEmpty(this.Message))
+            unchecked
             {
-                hashCode += this.Message.GetHashCode();
-            }
-            if (this.Exception != null && !string.IsNullOrEmpty(this.Exception.Message))
-            {
-                hashCode += this.Exception.Message.GetHashCode();
+                if (!string.IsNullOrEmpty(this.Message))
+                {
+                    hashCode += this.Message.GetHashCode();
+                }
+                if (this.Exception != null && !string.IsNullOrEmpty(this.Exception.Message))
+                {
+                    hashCode += this.Exception.Message.GetHashCode();
+                }
             }
             return hashCode;
         }

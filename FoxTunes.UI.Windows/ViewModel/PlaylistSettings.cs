@@ -11,8 +11,6 @@ namespace FoxTunes.ViewModel
 {
     public class PlaylistSettings : ViewModelBase
     {
-        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
-
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
@@ -89,7 +87,6 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
-            this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.DatabaseFactory = this.Core.Factories.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
@@ -124,22 +121,34 @@ namespace FoxTunes.ViewModel
             {
                 case CommonSignals.SettingsUpdated:
                 case CommonSignals.PlaylistColumnsUpdated:
-                    return this.ForegroundTaskRunner.Run(() => this.Refresh());
+                    return this.Refresh();
             }
             return Task.CompletedTask;
         }
 
-        protected virtual void Refresh()
+        protected virtual Task Refresh()
         {
-            using (var database = this.DatabaseFactory.Create())
+            return Windows.Invoke(() =>
             {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                using (var database = this.DatabaseFactory.Create())
                 {
-                    this.PlaylistColumns.ItemsSource = new ObservableCollection<PlaylistColumn>(
-                        database.Set<PlaylistColumn>(transaction)
-                    );
+                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                    {
+                        this.PlaylistColumns.ItemsSource = new ObservableCollection<PlaylistColumn>(
+                            database.Set<PlaylistColumn>(transaction)
+                        );
+                    }
                 }
+            });
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.SignalEmitter != null)
+            {
+                this.SignalEmitter.Signal -= this.OnSignal;
             }
+            base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()

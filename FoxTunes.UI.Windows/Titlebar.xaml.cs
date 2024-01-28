@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace FoxTunes
@@ -18,9 +17,9 @@ namespace FoxTunes
         {
             if (e.ChangedButton == MouseButton.Left)
             {
-                if (Application.Current != null && Application.Current.MainWindow != null)
+                if (Windows.ActiveWindow != null)
                 {
-                    Application.Current.MainWindow.DragMove();
+                    Windows.ActiveWindow.DragMove();
                 }
             }
         }

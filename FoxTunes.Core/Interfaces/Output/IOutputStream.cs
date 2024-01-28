@@ -13,8 +13,6 @@ namespace FoxTunes.Interfaces
 
         long Position { get; set; }
 
-        event AsyncEventHandler PositionChanged;
-
         long Length { get; }
 
         int Rate { get; }
@@ -35,15 +33,9 @@ namespace FoxTunes.Interfaces
 
         Task Play();
 
-        event PlayedEventHandler Played;
-
         Task Pause();
 
-        event AsyncEventHandler Paused;
-
         Task Resume();
-
-        event AsyncEventHandler Resumed;
 
         Task Stop();
 
@@ -56,11 +48,13 @@ namespace FoxTunes.Interfaces
         Task BeginSeek();
 
         Task EndSeek();
+
+        bool IsDisposed { get; }
     }
 
     public delegate void PlayedEventHandler(object sender, PlayedEventArgs e);
 
-    public class PlayedEventArgs : AsyncEventArgs
+    public class PlayedEventArgs : EventArgs
     {
         public PlayedEventArgs(bool manual)
         {

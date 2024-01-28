@@ -7,7 +7,6 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             BassUtils.BUILT_IN_FORMATS.Add("dts");
-            ComponentRegistry.Instance.GetComponent<IBassStreamFactory>().Register(new BassDtsStreamProvider());
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    public class BassWasapiStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent
+    public class BassWasapiStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public IBassOutput Output { get; private set; }
 
@@ -103,8 +103,11 @@ namespace FoxTunes
                 BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_EVENT
             ).ConnectValue<bool>(value => this.EventDriven = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
-            this.BassStreamPipelineFactory.QueryingPipeline += this.OnQueryingPipeline;
-            this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
+            if (this.BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.QueryingPipeline += this.OnQueryingPipeline;
+                this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
+            }
             base.InitializeComponent(core);
         }
 
@@ -179,6 +182,44 @@ namespace FoxTunes
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return BassWasapiStreamOutputConfiguration.GetConfigurationSections();
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Output != null)
+            {
+                this.Output.Init -= this.OnInit;
+                this.Output.Free -= this.OnFree;
+            }
+            if (this.BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.QueryingPipeline -= this.OnQueryingPipeline;
+                this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;
+            }
+        }
+
+        ~BassWasapiStreamOutputBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
         }
     }
 }

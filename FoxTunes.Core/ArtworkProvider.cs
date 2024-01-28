@@ -43,7 +43,10 @@ namespace FoxTunes
         public MetaDataItem Find(PlaylistItem playlistItem, ArtworkType type)
         {
             return playlistItem.MetaDatas.FirstOrDefault(
-                 metaDataItem => metaDataItem.Type == MetaDataItemType.Image && metaDataItem.Name == Enum.GetName(typeof(ArtworkType), type) && File.Exists(metaDataItem.FileValue)
+                 metaDataItem => 
+                     metaDataItem.Type == MetaDataItemType.Image && 
+                     string.Equals(metaDataItem.Name, Enum.GetName(typeof(ArtworkType), type), StringComparison.OrdinalIgnoreCase) && 
+                     File.Exists(metaDataItem.FileValue)
              );
         }
     }

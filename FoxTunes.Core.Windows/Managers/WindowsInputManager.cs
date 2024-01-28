@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -47,7 +48,7 @@ namespace FoxTunes
                             var modifiers = this.GetModifiers();
                             var keyCode = keys.KeyCode;
                             //TODO: Bad awaited Task.
-                            this.BackgroundTaskRunner.Run(() => this.OnInputEvent(modifiers, keyCode));
+                            Task.Run(() => this.OnInputEvent(modifiers, keyCode));
                             break;
                     }
                 }

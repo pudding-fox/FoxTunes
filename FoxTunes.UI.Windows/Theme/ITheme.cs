@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
-using System.Windows;
 
-namespace FoxTunes.Theme
+namespace FoxTunes
 {
     public interface ITheme : IStandardComponent
     {
@@ -10,6 +9,8 @@ namespace FoxTunes.Theme
         string Name { get; }
 
         string Description { get; }
+
+        string ArtworkPlaceholder { get; }
 
         void Enable();
 

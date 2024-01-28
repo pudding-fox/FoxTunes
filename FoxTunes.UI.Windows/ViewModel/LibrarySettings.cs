@@ -15,8 +15,6 @@ namespace FoxTunes.ViewModel
 
         public IHierarchyManager HierarchyManager { get; private set; }
 
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public ISignalEmitter SignalEmitter { get; private set; }
@@ -91,10 +89,11 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(this.BackgroundTaskRunner, this.Save)
-                {
-                    Tag = CommandHints.DISMISS
-                };
+                var command = CommandFactory.Instance.CreateCommand(
+                    new Func<Task>(this.Save)
+                );
+                command.Tag = CommandHints.DISMISS;
+                return command;
             }
         }
 
@@ -129,10 +128,11 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(this.BackgroundTaskRunner, this.Rescan)
-                {
-                    Tag = CommandHints.DISMISS
-                };
+                var command = CommandFactory.Instance.CreateCommand(
+                    new Func<Task>(this.Rescan)
+                );
+                command.Tag = CommandHints.DISMISS;
+                return command;
             }
         }
 
@@ -145,10 +145,11 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(this.BackgroundTaskRunner, this.Clear)
-                {
-                    Tag = CommandHints.DISMISS
-                };
+                var command = CommandFactory.Instance.CreateCommand(
+                    new Func<Task>(this.Clear)
+                );
+                command.Tag = CommandHints.DISMISS;
+                return command;
             }
         }
 
@@ -178,7 +179,6 @@ namespace FoxTunes.ViewModel
         {
             this.LibraryManager = this.Core.Managers.Library;
             this.HierarchyManager = this.Core.Managers.Hierarchy;
-            this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.DatabaseFactory = this.Core.Factories.Database;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.LibraryHierarchyLevels = new CollectionManager<LibraryHierarchyLevel>()
@@ -222,26 +222,21 @@ namespace FoxTunes.ViewModel
                     item2.Sequence = temp;
                 }
             };
-            this.LibraryHierarchies.SelectedValueChanged += (sender, e) =>
-            {
-                if (this.LibraryHierarchies.SelectedValue != null)
-                {
-                    this.LibraryHierarchyLevels.ItemsSource = this.LibraryHierarchies.SelectedValue.Levels;
-                }
-                else
-                {
-                    this.LibraryHierarchyLevels.ItemsSource = null;
-                }
-            };
+            this.LibraryHierarchies.SelectedValueChanged += this.OnSelectedValueChanged;
             this.Refresh();
-            this.OnCommandsChanged();
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnCommandsChanged()
+        protected virtual void OnSelectedValueChanged(object sender, EventArgs e)
         {
-            this.OnPropertyChanged("RescanCommand");
-            this.OnPropertyChanged("ClearCommand");
+            if (this.LibraryHierarchies.SelectedValue != null)
+            {
+                this.LibraryHierarchyLevels.ItemsSource = this.LibraryHierarchies.SelectedValue.Levels;
+            }
+            else
+            {
+                this.LibraryHierarchyLevels.ItemsSource = null;
+            }
         }
 
         protected virtual void Refresh()
@@ -255,6 +250,15 @@ namespace FoxTunes.ViewModel
                     );
                 }
             }
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.LibraryHierarchies != null)
+            {
+                this.LibraryHierarchies.SelectedValueChanged -= this.OnSelectedValueChanged;
+            }
+            base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()

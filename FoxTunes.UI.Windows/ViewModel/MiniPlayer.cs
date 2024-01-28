@@ -34,6 +34,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler EnabledChanged = delegate { };
 
+        public bool _SaveChanges { get; private set; }
+
+        public bool SaveChanges
+        {
+            get
+            {
+                return this._SaveChanges;
+            }
+            set
+            {
+                this._SaveChanges = value;
+                this.OnSaveChangesChanged();
+            }
+        }
+
+        protected virtual void OnSaveChangesChanged()
+        {
+            if (this.SaveChangesChanged != null)
+            {
+                this.SaveChangesChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SaveChanges");
+        }
+
+        public event EventHandler SaveChangesChanged = delegate { };
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = this.Core.Components.Configuration;

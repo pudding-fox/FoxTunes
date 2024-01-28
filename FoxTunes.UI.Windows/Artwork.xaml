@@ -4,22 +4,23 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" >
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" >
     <UserControl.Resources>
-        <ViewModel:Artwork x:Key="ViewModel" Core="{Binding}"/>
+        <ViewModel:Artwork x:Key="ViewModel" Core="{Binding}" ShowPlaceholder="{Binding ShowPlaceholder, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:Artwork}}}"/>
     </UserControl.Resources>
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="{Binding Image.FileValue, Source={StaticResource ViewModel}}"></ImageBrush>
+            <ImageBrush ImageSource="{Binding Image.FileValue, Source={StaticResource ViewModel}}"/>
         </Grid.Background>
         <Grid.Style>
             <Style TargetType="{x:Type Grid}">
-                <Setter Property="Height" Value="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource Self}}"></Setter>
+                <Setter Property="Height" Value="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource Self}}"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Image.FileValue, Source={StaticResource ViewModel}}" Value="{x:Null}">
-                        <Setter Property="Height" Value="0"></Setter>
+                        <Setter Property="Height" Value="0"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>

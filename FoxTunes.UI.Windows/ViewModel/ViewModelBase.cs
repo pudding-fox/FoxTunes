@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public abstract class ViewModelBase : Freezable, IBaseComponent, INotifyPropertyChanged
+    public abstract class ViewModelBase : Freezable, IBaseComponent, INotifyPropertyChanged, IDisposable
     {
         protected static ILogger Logger
         {
@@ -122,5 +122,34 @@ namespace FoxTunes.ViewModel
         }
 
         public static event ComponentErrorEventHandler Error;
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            //Nothing to do.
+        }
+
+        ~ViewModelBase()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
+        }
     }
 }

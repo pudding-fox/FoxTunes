@@ -8,8 +8,6 @@ namespace FoxTunes.ViewModel
 {
     public class Playback : ViewModelBase
     {
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
         public IOutput Output { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -24,25 +22,38 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(
-                    this.BackgroundTaskRunner,
+                return CommandFactory.Instance.CreateCommand(
                     () =>
                     {
                         if (this.PlaybackManager.CurrentStream == null)
                         {
-                            return this.PlaylistManager.Next();
+                            this.PlaylistManager.Next();
                         }
                         else if (this.PlaybackManager.CurrentStream.IsPaused)
                         {
-                            return this.PlaybackManager.CurrentStream.Resume();
+                            this.PlaybackManager.CurrentStream.Resume();
                         }
                         else if (this.PlaybackManager.CurrentStream.IsStopped)
                         {
-                            return this.PlaybackManager.CurrentStream.Play();
+                            this.PlaybackManager.CurrentStream.Play();
                         }
-                        return Task.CompletedTask;
                     },
-                    () => this.PlaybackManager != null && this.PlaylistManager != null && this.PlaylistManager.CanNavigate && (this.PlaybackManager.CurrentStream == null || (this.PlaybackManager.CurrentStream.IsPaused || this.PlaybackManager.CurrentStream.IsStopped))
+                    () =>
+                    {
+                        if (this.PlaybackManager == null)
+                        {
+                            return false;
+                        }
+                        if (this.PlaybackManager.CurrentStream != null)
+                        {
+                            return this.PlaybackManager.CurrentStream.IsPaused;
+                        }
+                        if (this.PlaylistManager == null)
+                        {
+                            return false;
+                        }
+                        return this.PlaylistManager.CanNavigate;
+                    }
                 );
             }
         }
@@ -51,21 +62,30 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(
-                    this.BackgroundTaskRunner,
+                return CommandFactory.Instance.CreateCommand(
                     () =>
                     {
                         if (this.PlaybackManager.CurrentStream.IsPaused)
                         {
-                            return this.PlaybackManager.CurrentStream.Resume();
+                            this.PlaybackManager.CurrentStream.Resume();
                         }
                         else if (this.PlaybackManager.CurrentStream.IsPlaying)
                         {
-                            return this.PlaybackManager.CurrentStream.Pause();
+                            this.PlaybackManager.CurrentStream.Pause();
                         }
-                        return Task.CompletedTask;
                     },
-                    () => this.PlaybackManager != null && this.PlaybackManager.CurrentStream != null && (this.PlaybackManager.CurrentStream.IsPlaying || this.PlaybackManager.CurrentStream.IsPaused)
+                    () =>
+                    {
+                        if (this.PlaybackManager == null)
+                        {
+                            return false;
+                        }
+                        if (this.PlaybackManager.CurrentStream != null)
+                        {
+                            return this.PlaybackManager.CurrentStream.IsPlaying || this.PlaybackManager.CurrentStream.IsPaused;
+                        }
+                        return false;
+                    }
                 );
             }
         }
@@ -74,8 +94,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(
-                    this.BackgroundTaskRunner,
+                return CommandFactory.Instance.CreateCommand(
                     () => this.PlaybackManager.CurrentStream.Stop(),
                     () => this.PlaybackManager != null && this.PlaybackManager.CurrentStream != null && this.PlaybackManager.CurrentStream.IsPlaying
                 );
@@ -86,8 +105,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(
-                    this.BackgroundTaskRunner,
+                return CommandFactory.Instance.CreateCommand(
                     () => this.PlaybackManager.Stop(),
                     () => this.PlaybackManager != null && this.Output != null && this.Output.IsStarted
                 );
@@ -98,8 +116,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(
-                    this.BackgroundTaskRunner,
+                return CommandFactory.Instance.CreateCommand(
                     () => this.PlaylistManager.Previous(),
                     () => this.PlaylistManager != null && this.PlaylistManager.CanNavigate
                 );
@@ -110,8 +127,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new AsyncCommand(
-                    this.BackgroundTaskRunner,
+                return CommandFactory.Instance.CreateCommand(
                     () => this.PlaylistManager.Next(),
                     () => this.PlaylistManager != null && this.PlaylistManager.CanNavigate
                 );
@@ -206,12 +222,15 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
-            this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
             this.Output = this.Core.Components.Output;
             this.PlaylistManager = this.Core.Managers.Playlist;
+            this.PlaylistManager.CanNavigateChanged += this.OnCanNavigateChanged;
             this.PlaybackManager = this.Core.Managers.Playback;
+            this.PlaybackManager.IsPlayingChanged += this.OnIsPlayingChanged;
+            this.PlaybackManager.IsPausedChanged += this.OnIsPausedChanged;
+            this.PlaybackManager.IsStoppedChanged += this.OnIsStoppedChanged;
+            this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.InputManager = ComponentRegistry.Instance.GetComponent<IInputManager>();
-            this.Core.Components.Output.IsStartedChanged += (sender, e) => Command.InvalidateRequerySuggested();
             this.Configuration = this.Core.Components.Configuration;
             this.Configuration.GetElement<TextConfigurationElement>(
                 InputManagerConfiguration.SECTION,
@@ -229,18 +248,82 @@ namespace FoxTunes.ViewModel
                 InputManagerConfiguration.SECTION,
                 InputManagerConfiguration.STOP_ELEMENT
             ).ConnectValue<string>(value => this.StopCommandBinding = value);
-            this.OnCommandsChanged();
+            var task = this.Refresh();
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnCommandsChanged()
+        protected virtual async void OnCanNavigateChanged(object sender, AsyncEventArgs e)
         {
-            this.OnPropertyChanged("PlayCommand");
-            this.OnPropertyChanged("PauseCommand");
-            this.OnPropertyChanged("StopStreamCommand");
-            this.OnPropertyChanged("StopOutputCommand");
-            this.OnPropertyChanged("PreviousCommand");
-            this.OnPropertyChanged("NextCommand");
+            using (e.Defer())
+            {
+                await Windows.Invoke(() =>
+                {
+                    this.OnPropertyChanged("PlayCommand");
+                    this.OnPropertyChanged("PreviousCommand");
+                    this.OnPropertyChanged("NextCommand");
+                });
+            }
+        }
+
+        protected virtual async void OnIsPlayingChanged(object sender, AsyncEventArgs e)
+        {
+            using (e.Defer())
+            {
+                await Windows.Invoke(() =>
+                {
+                    this.OnPropertyChanged("PlayCommand");
+                    this.OnPropertyChanged("PauseCommand");
+                    this.OnPropertyChanged("StopStreamCommand");
+                    this.OnPropertyChanged("StopOutputCommand");
+                });
+            }
+        }
+
+        protected virtual async void OnIsPausedChanged(object sender, AsyncEventArgs e)
+        {
+            using (e.Defer())
+            {
+                await Windows.Invoke(() =>
+                {
+                    this.OnPropertyChanged("PlayCommand");
+                    this.OnPropertyChanged("PauseCommand");
+                });
+            }
+        }
+
+        protected virtual async void OnIsStoppedChanged(object sender, AsyncEventArgs e)
+        {
+            using (e.Defer())
+            {
+                await Windows.Invoke(() =>
+                {
+                    this.OnPropertyChanged("PlayCommand");
+                    this.OnPropertyChanged("PauseCommand");
+                    this.OnPropertyChanged("StopStreamCommand");
+                    this.OnPropertyChanged("StopOutputCommand");
+                });
+            }
+        }
+
+        protected virtual async void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
+        {
+            using (e.Defer())
+            {
+                await this.Refresh();
+            }
+        }
+
+        public Task Refresh()
+        {
+            return Windows.Invoke(() =>
+            {
+                this.OnPropertyChanged("PlayCommand");
+                this.OnPropertyChanged("PauseCommand");
+                this.OnPropertyChanged("StopStreamCommand");
+                this.OnPropertyChanged("StopOutputCommand");
+                this.OnPropertyChanged("PreviousCommand");
+                this.OnPropertyChanged("NextCommand");
+            });
         }
 
         protected virtual void AddCommandBinding(string keys, ICommand command)
@@ -271,6 +354,22 @@ namespace FoxTunes.ViewModel
                 return;
             }
             this.InputManager.RemoveInputHook(keys);
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.PlaylistManager != null)
+            {
+                this.PlaylistManager.CanNavigateChanged -= this.OnCanNavigateChanged;
+            }
+            if (this.PlaybackManager != null)
+            {
+                this.PlaybackManager.IsPlayingChanged -= this.OnIsPlayingChanged;
+                this.PlaybackManager.IsPausedChanged -= this.OnIsPausedChanged;
+                this.PlaybackManager.IsStoppedChanged -= this.OnIsStoppedChanged;
+                this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;
+            }
+            base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()

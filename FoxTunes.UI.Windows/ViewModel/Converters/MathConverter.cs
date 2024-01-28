@@ -19,6 +19,9 @@ namespace FoxTunes.ViewModel
                 }
                 switch (parameter as string)
                 {
+                    case "+":
+                        result += value;
+                        break;
                     case "-":
                         result -= value;
                         break;

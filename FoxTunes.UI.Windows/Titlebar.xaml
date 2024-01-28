@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Shell="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              mc:Ignorable="d" d:DesignHeight="30" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" Focusable="False" MouseDown="OnMouseDown">
     <UserControl.Resources>
         <ViewModel:Titlebar x:Key="ViewModel"></ViewModel:Titlebar>
@@ -15,6 +16,7 @@
             <Setter Property="Margin" Value="0,0,0,5"></Setter>
             <Setter Property="FontFamily" Value="Marlett"></Setter>
             <Setter Property="FontSize" Value="12"></Setter>
+            <Setter Property="Shell:WindowChrome.IsHitTestVisibleInChrome" Value="True"></Setter>
             <!-- System -->
             <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
@@ -62,16 +64,14 @@
                 <ImageBrush ImageSource="pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico"></ImageBrush>
             </Rectangle.Fill>
         </Rectangle>
-        <TextBlock Grid.Column="1" Text="{Binding Title, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" VerticalAlignment="Center"></TextBlock>
+        <TextBlock Grid.Column="1" Text="{Binding Title, Source={StaticResource ViewModel}}" VerticalAlignment="Center"></TextBlock>
         <Button Grid.Column="2" Command="{Binding MinimizeCommand, Mode=OneWay, Source={StaticResource ViewModel}}">&#x30;</Button>
         <Button Grid.Column="3" Command="{Binding MaximizeRestoreCommand, Mode=OneWay, Source={StaticResource ViewModel}}">
             <Button.Style>
                 <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                    <Setter Property="Content" Value="&#x31;"></Setter>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="Normal">
-                            <Setter Property="Content" Value="&#x31;"></Setter>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="Maximized">
+                        <DataTrigger Binding="{Binding WindowState, Source={StaticResource ViewModel}}" Value="Maximized">
                             <Setter Property="Content" Value="&#x32;"></Setter>
                         </DataTrigger>
                     </Style.Triggers>

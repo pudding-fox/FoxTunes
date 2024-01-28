@@ -31,19 +31,6 @@ namespace FoxTunes
 
         public abstract long Position { get; set; }
 
-        protected virtual async Task OnPositionChanged()
-        {
-            if (this.PositionChanged != null)
-            {
-                var e = new AsyncEventArgs();
-                this.PositionChanged(this, e);
-                await e.Complete();
-            }
-            this.OnPropertyChanged("Position");
-        }
-
-        public event AsyncEventHandler PositionChanged = delegate { };
-
         public abstract long Length { get; }
 
         public abstract int Rate { get; }
@@ -97,48 +84,9 @@ namespace FoxTunes
 
         public abstract Task Play();
 
-        protected virtual Task OnPlayed(bool manual)
-        {
-            if (this.Played == null)
-            {
-                return Task.CompletedTask;
-            }
-            var e = new PlayedEventArgs(manual);
-            this.Played(this, e);
-            return e.Complete();
-        }
-
-        public event PlayedEventHandler Played = delegate { };
-
         public abstract Task Pause();
 
-        protected virtual Task OnPaused()
-        {
-            if (this.Paused == null)
-            {
-                return Task.CompletedTask;
-            }
-            var e = new AsyncEventArgs();
-            this.Paused(this, e);
-            return e.Complete();
-        }
-
-        public event AsyncEventHandler Paused = delegate { };
-
         public abstract Task Resume();
-
-        protected virtual Task OnResumed()
-        {
-            if (this.Resumed == null)
-            {
-                return Task.CompletedTask;
-            }
-            var e = new AsyncEventArgs();
-            this.Resumed(this, e);
-            return e.Complete();
-        }
-
-        public event AsyncEventHandler Resumed = delegate { };
 
         public abstract Task Stop();
 
@@ -188,6 +136,8 @@ namespace FoxTunes
 
         protected virtual async Task EmitState()
         {
+            //It takes a moment for the stream to start playing or whatever.
+            await Task.Delay(100);
             await this.OnIsPlayingChanged();
             await this.OnIsPausedChanged();
             await this.OnIsStoppedChanged();

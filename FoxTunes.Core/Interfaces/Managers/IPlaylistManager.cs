@@ -30,6 +30,8 @@ namespace FoxTunes.Interfaces
 
         bool CanNavigate { get; }
 
+        event AsyncEventHandler CanNavigateChanged;
+
         Task<PlaylistItem> GetNext();
 
         Task<PlaylistItem> GetPrevious();
@@ -44,6 +46,6 @@ namespace FoxTunes.Interfaces
 
         PlaylistItem CurrentItem { get; }
 
-        event EventHandler CurrentItemChanged;
+        event AsyncEventHandler CurrentItemChanged;
     }
 }

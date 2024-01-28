@@ -12,7 +12,11 @@ namespace FoxTunes
 
         public const string CATEGORY_NOTIFY_ICON = "F9E060E6-D791-4E9A-A109-FD145EAECBA2";
 
+        public const byte ATTRIBUTE_NONE = 0;
+
         public const byte ATTRIBUTE_SEPARATOR = 1;
+
+        public const byte ATTRIBUTE_SELECTED = 2;
 
         public InvocationComponent(string category, string id, string name = null, string description = null, byte attributes = 0)
         {

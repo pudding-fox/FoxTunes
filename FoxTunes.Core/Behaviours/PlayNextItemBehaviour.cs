@@ -1,35 +1,24 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class PlayNextItemBehaviour : StandardBehaviour
+    public class PlayNextItemBehaviour : StandardBehaviour, IDisposable
     {
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
         public IPlaybackManager PlaybackManager { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.BackgroundTaskRunner = core.Components.BackgroundTaskRunner;
             this.PlaybackManager = core.Managers.Playback;
+            this.PlaybackManager.Stopped += this.OnStopped;
             this.PlaylistManager = core.Managers.Playlist;
-            this.PlaybackManager.CurrentStreamChanged += this.PlaybackManager_CurrentStreamChanged;
             base.InitializeComponent(core);
         }
 
-        protected virtual void PlaybackManager_CurrentStreamChanged(object sender, EventArgs e)
-        {
-            if (this.PlaybackManager.CurrentStream == null)
-            {
-                return;
-            }
-            this.PlaybackManager.CurrentStream.Stopped += this.CurrentStream_Stopped;
-        }
-
-        protected virtual async void CurrentStream_Stopped(object sender, StoppedEventArgs e)
+        protected virtual async void OnStopped(object sender, StoppedEventArgs e)
         {
             if (e.Manual)
             {
@@ -38,8 +27,40 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Stream was stopped likely due to reaching the end, playing next item.");
             using (e.Defer())
             {
-                await this.BackgroundTaskRunner.Run(() => this.PlaylistManager.Next());
+                await this.PlaylistManager.Next();
             }
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.PlaybackManager != null)
+            {
+                this.PlaybackManager.Stopped -= this.OnStopped;
+            }
+        }
+
+        ~PlayNextItemBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
         }
     }
 }

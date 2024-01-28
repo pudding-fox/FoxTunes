@@ -158,6 +158,12 @@ namespace FoxTunes
                 return;
             }
 
+            var window = this.FindAncestor<Window>();
+            if (Windows.ActiveWindow != window)
+            {
+                return;
+            }
+
             var x = default(int);
             var y = default(int);
             MouseHelper.GetPosition(out x, out y);

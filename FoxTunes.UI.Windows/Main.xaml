@@ -68,7 +68,7 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                     </Grid.RowDefinitions>
                     <Windows:LibraryTree Style="{StaticResource LibraryTreeStyle}" Margin="2,2,4,2"></Windows:LibraryTree>
-                    <Windows:Artwork Grid.Row="1" Style="{StaticResource ArtworkStyle}" Margin="0,0,5,0"></Windows:Artwork>
+                    <Windows:Artwork Grid.Row="1" Style="{StaticResource ArtworkStyle}" Margin="2,0,4,2"></Windows:Artwork>
                     <Windows:BackgroundTasks Grid.RowSpan="2" VerticalAlignment="Bottom"></Windows:BackgroundTasks>
                     <GridSplitter Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="4"></GridSplitter>
                     <Windows:Playlist Grid.Column="1" Grid.RowSpan="2" Margin="0,2,2,2"></Windows:Playlist>
