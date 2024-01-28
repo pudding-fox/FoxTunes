@@ -2,6 +2,8 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -228,6 +230,24 @@ namespace FoxTunes.ViewModel
             }
             await this.Refresh().ConfigureAwait(false);
             await this.HierarchyManager.Build(null).ConfigureAwait(false);
+        }
+
+        public ICommand HelpCommand
+        {
+            get
+            {
+                return CommandFactory.Instance.CreateCommand(this.Help);
+            }
+        }
+
+        public void Help()
+        {
+            var fileName = Path.Combine(
+                Path.GetTempPath(),
+                "Scripting.txt"
+            );
+            File.WriteAllText(fileName, Resources.Scripting);
+            Process.Start(fileName);
         }
 
         protected override void InitializeComponent(ICore core)

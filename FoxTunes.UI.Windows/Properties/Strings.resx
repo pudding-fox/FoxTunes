@@ -276,6 +276,9 @@
   <data name="LibrarySettingsDialog.GroupHeader" xml:space="preserve">
     <value>Views</value>
   </data>
+  <data name="LibrarySettingsDialog.Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
   <data name="LibrarySettingsDialog.Levels" xml:space="preserve">
     <value>Levels</value>
   </data>
@@ -452,6 +455,9 @@
   </data>
   <data name="PlaylistSelector.Name" xml:space="preserve">
     <value>Playlist Selector</value>
+  </data>
+  <data name="PlaylistSettingsDialog.Help" xml:space="preserve">
+    <value>Help</value>
   </data>
   <data name="PlaylistSortingBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Sorting</value>

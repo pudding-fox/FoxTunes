@@ -538,6 +538,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Help.
+        /// </summary>
+        internal static string LibrarySettingsDialog_Help {
+            get {
+                return ResourceManager.GetString("LibrarySettingsDialog.Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Levels.
         /// </summary>
         internal static string LibrarySettingsDialog_Levels {
@@ -1065,6 +1074,15 @@ namespace FoxTunes {
         internal static string PlaylistSelector_Name {
             get {
                 return ResourceManager.GetString("PlaylistSelector.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help.
+        /// </summary>
+        internal static string PlaylistSettingsDialog_Help {
+            get {
+                return ResourceManager.GetString("PlaylistSettingsDialog.Help", resourceCulture);
             }
         }
         

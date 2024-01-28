@@ -206,6 +206,14 @@
             }
         }
 
+        public static string LibrarySettingsDialog_Help
+        {
+            get
+            {
+                return Strings.LibrarySettingsDialog_Help;
+            }
+        }
+
         public static string LibraryRootsDialog_GroupHeader
         {
             get
