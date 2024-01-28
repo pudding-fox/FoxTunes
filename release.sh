@@ -23,6 +23,10 @@ basswma.dll
 basswv.dll
 "
 
+ADDON_MOD="
+basszxtune.dll
+"
+
 LAUNCHER="
 FoxTunes.Launcher.exe
 FoxTunes.Launcher.exe.config
@@ -207,6 +211,10 @@ FoxTunes.Output.Bass.Cue.dll
 bass_substream_handler.dll
 "
 
+MOD="
+FoxTunes.Output.Bass.Mod.dll
+"
+
 MINIMAL="
 bass
 conf
@@ -271,6 +279,8 @@ do
 		mkdir -p "./release/$platform/$target/Plugins/librarybrowser"
 		mkdir -p "./release/$platform/$target/Plugins/logger"
 		mkdir -p "./release/$platform/$target/Plugins/metadataeditor"
+		mkdir -p "./release/$platform/$target/Plugins/mod"
+		mkdir -p "./release/$platform/$target/Plugins/mod/addon"
 		mkdir -p "./release/$platform/$target/Plugins/replaygain"
 		mkdir -p "./release/$platform/$target/Plugins/simplemetadata"
 		mkdir -p "./release/$platform/$target/Plugins/sox"
@@ -501,6 +511,22 @@ do
 		do
 				echo $file
 				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/cue"
+		done
+		echo
+
+		echo "Creating plugin: mod"
+		for file in $MOD
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/mod"
+		done
+		echo
+
+		echo "Installing addons (mod)"
+		for file in $ADDON_MOD
+		do
+			echo "$file"
+			cp "./distribution/$platform/$target/Addon/$file" "./release/$platform/$target/Plugins/mod/addon"
 		done
 		echo
 
