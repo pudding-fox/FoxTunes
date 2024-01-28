@@ -26,7 +26,7 @@ namespace FoxTunes
         {
             get
             {
-                return true;
+                return this.LibraryItems.Count() > 1;
             }
         }
 
@@ -71,9 +71,12 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Saving meta data").ConfigureAwait(false);
-            await this.SetPosition(0).ConfigureAwait(false);
-            await this.SetCount(this.LibraryItems.Count()).ConfigureAwait(false);
+            if (this.Visible)
+            {
+                await this.SetName("Saving meta data").ConfigureAwait(false);
+                await this.SetPosition(0).ConfigureAwait(false);
+                await this.SetCount(this.LibraryItems.Count()).ConfigureAwait(false);
+            }
             await base.OnStarted().ConfigureAwait(false);
         }
 
@@ -90,8 +93,11 @@ namespace FoxTunes
                         break;
                     }
 
-                    await this.SetDescription(Path.GetFileName(libraryItem.FileName)).ConfigureAwait(false);
-                    await this.SetPosition(position).ConfigureAwait(false);
+                    if (this.Visible)
+                    {
+                        await this.SetDescription(Path.GetFileName(libraryItem.FileName)).ConfigureAwait(false);
+                        await this.SetPosition(position).ConfigureAwait(false);
+                    }
 
                     try
                     {

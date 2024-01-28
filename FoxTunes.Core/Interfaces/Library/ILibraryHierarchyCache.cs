@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace FoxTunes.Interfaces
 {
@@ -20,43 +18,35 @@ namespace FoxTunes.Interfaces
 
     public class LibraryHierarchyCacheKey : IEquatable<LibraryHierarchyCacheKey>
     {
-        public LibraryHierarchyCacheKey(params object[] state)
+        public LibraryHierarchyCacheKey(LibraryHierarchy libraryHierarchy, LibraryHierarchyNode libraryHierarchyNode, string filter)
         {
-            this.State = state;
+            this.LibraryHierarchy = libraryHierarchy;
+            this.LibraryHierarchyNode = libraryHierarchyNode;
+            this.Filter = filter;
         }
 
-        public object[] State { get; private set; }
+        public LibraryHierarchy LibraryHierarchy { get; private set; }
 
-        public override string ToString()
-        {
-            var builder = new StringBuilder();
-            foreach (var state in this.State)
-            {
-                if (state == null)
-                {
-                    continue;
-                }
-                if (builder.Length > 0)
-                {
-                    builder.Append(", ");
-                }
-                builder.AppendFormat("{0} = {1}", state.GetType().Name, state);
-            }
-            return builder.ToString();
-        }
+        public LibraryHierarchyNode LibraryHierarchyNode { get; private set; }
+
+        public string Filter { get; private set; }
 
         public override int GetHashCode()
         {
             var hashCode = default(int);
             unchecked
             {
-                foreach (var state in this.State)
+                if (this.LibraryHierarchy != null)
                 {
-                    if (state == null)
-                    {
-                        continue;
-                    }
-                    hashCode += state.GetHashCode();
+                    hashCode += this.LibraryHierarchy.GetHashCode();
+                }
+                if (this.LibraryHierarchyNode != null)
+                {
+                    hashCode += this.LibraryHierarchyNode.GetHashCode();
+                }
+                if (!string.IsNullOrEmpty(this.Filter))
+                {
+                    hashCode += this.Filter.ToLower().GetHashCode();
                 }
             }
             return hashCode;
@@ -77,7 +67,19 @@ namespace FoxTunes.Interfaces
             {
                 return true;
             }
-            return Enumerable.SequenceEqual(this.State, other.State);
+            if (!object.Equals(this.LibraryHierarchy, other.LibraryHierarchy))
+            {
+                return false;
+            }
+            if (!object.Equals(this.LibraryHierarchyNode, other.LibraryHierarchyNode))
+            {
+                return false;
+            }
+            if (!string.Equals(this.Filter, other.Filter, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            return true;
         }
 
         public static bool operator ==(LibraryHierarchyCacheKey a, LibraryHierarchyCacheKey b)

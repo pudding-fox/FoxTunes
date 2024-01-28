@@ -8,6 +8,8 @@ using System.Linq;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
+    //Setting PRIORITY_HIGH so the the cache is cleared before being re-queried.
+    [Component("267C58E3-8794-4377-97BF-C71118B27DB5", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class LibraryHierarchyCache : StandardComponent, ILibraryHierarchyCache, IDisposable
     {
         public IEnumerable<LibraryHierarchyCacheKey> Keys
@@ -40,6 +42,16 @@ namespace FoxTunes
         {
             switch (signal.Name)
             {
+                case CommonSignals.MetaDataUpdated:
+                    //Just reset caches with filters.
+                    var keys = this.Keys.Where(
+                        key => !string.IsNullOrEmpty(key.Filter)
+                    );
+                    foreach (var key in keys)
+                    {
+                        this.Evict(key);
+                    }
+                    break;
                 case CommonSignals.HierarchiesUpdated:
                     if (!object.Equals(signal.State, CommonSignalFlags.SOFT))
                     {

@@ -5,11 +5,12 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
-    public class LibraryHierarchyBrowser : StandardComponent, ILibraryHierarchyBrowser
+    public class LibraryHierarchyBrowser : StandardComponent, ILibraryHierarchyBrowser, IDisposable
     {
         const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Tag | MetaDataItemType.Image;
 
@@ -25,6 +26,8 @@ namespace FoxTunes
         public ILibraryHierarchyCache LibraryHierarchyCache { get; private set; }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
+
+        public ISignalEmitter SignalEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -90,8 +93,29 @@ namespace FoxTunes
             this.LibraryManager = core.Managers.Library;
             this.LibraryHierarchyCache = core.Components.LibraryHierarchyCache;
             this.DatabaseFactory = core.Factories.Database;
+            this.SignalEmitter = core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = core.Components.Configuration;
             base.InitializeComponent(core);
+        }
+
+        protected virtual Task OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.MetaDataUpdated:
+                    if (!string.IsNullOrEmpty(this.Filter))
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Meta data was updated and there is an active filter, refreshing.");
+                        return this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
+                    }
+                    break;
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         public IEnumerable<LibraryHierarchy> GetHierarchies()
@@ -121,7 +145,7 @@ namespace FoxTunes
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy)
         {
-            var key = new LibraryHierarchyCacheKey(libraryHierarchy, this.Filter);
+            var key = new LibraryHierarchyCacheKey(libraryHierarchy, null, this.Filter);
             var nodes = this.LibraryHierarchyCache.GetNodes(key, () => this.GetNodesCore(libraryHierarchy));
             if (this.LibraryManager.SelectedItem != null)
             {
@@ -137,7 +161,7 @@ namespace FoxTunes
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyNode libraryHierarchyNode)
         {
-            var key = new LibraryHierarchyCacheKey(libraryHierarchyNode, this.Filter);
+            var key = new LibraryHierarchyCacheKey(null, libraryHierarchyNode, this.Filter);
             return this.LibraryHierarchyCache.GetNodes(key, () => this.GetNodesCore(libraryHierarchyNode));
         }
 
@@ -250,6 +274,45 @@ namespace FoxTunes
         private LibraryHierarchyNode FindNode(IEnumerable<LibraryHierarchyNode> nodes, string value)
         {
             return nodes.FirstOrDefault(node => string.Equals(node.Value, value, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.SignalEmitter != null)
+            {
+                this.SignalEmitter.Signal -= this.OnSignal;
+            }
+        }
+
+        ~LibraryHierarchyBrowser()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }
