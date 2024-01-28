@@ -17,6 +17,10 @@ namespace FoxTunes.Interfaces
 
         Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice);
 
+        long GetPosition(int channelHandle);
+
+        void SetPosition(int channelHandle, long value);
+
         void FreeStream(PlaylistItem playlistItem, int channelHandle);
     }
 

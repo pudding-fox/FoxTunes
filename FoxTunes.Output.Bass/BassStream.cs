@@ -31,11 +31,12 @@ namespace FoxTunes
         {
             get
             {
-                return Bass.ChannelGetPosition(this.ChannelHandle, PositionFlags.Bytes);
+                return this.Provider.GetPosition(this.ChannelHandle);
+                
             }
             set
             {
-                BassUtils.OK(Bass.ChannelSetPosition(this.ChannelHandle, value, PositionFlags.Bytes));
+                this.Provider.SetPosition(this.ChannelHandle, value);
                 this.OnPositionChanged();
             }
         }

@@ -115,6 +115,11 @@ namespace FoxTunes
 
         protected virtual IBassStream CreateStream(int channelHandle, IEnumerable<IBassStreamAdvice> advice)
         {
+            if (channelHandle == 0)
+            {
+                Logger.Write(this, LogLevel.Debug, "Failed to create stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                return BassStream.Empty;
+            }
             var stream = default(IBassStream);
             foreach (var advisory in advice)
             {
@@ -141,6 +146,16 @@ namespace FoxTunes
                 }
             }
             return playlistItem.FileName;
+        }
+
+        public virtual long GetPosition(int channelHandle)
+        {
+            return Bass.ChannelGetPosition(channelHandle, PositionFlags.Bytes);
+        }
+
+        public virtual void SetPosition(int channelHandle, long value)
+        {
+            BassUtils.OK(Bass.ChannelSetPosition(channelHandle, value, PositionFlags.Bytes));
         }
 
         public virtual void FreeStream(PlaylistItem playlistItem, int channelHandle)

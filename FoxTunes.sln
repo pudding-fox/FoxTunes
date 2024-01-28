@@ -105,6 +105,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.Cue", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bass_substream_handler", "bass_substream_handler\bass_substream_handler.vcxproj", "{085D0BF6-B9D1-4DF8-93CE-3364D52E1F69}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Output.Bass.Mod", "FoxTunes.Output.Bass.Mod\FoxTunes.Output.Bass.Mod.csproj", "{5AB4D410-4754-4B16-B58F-917A7208951F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -473,6 +475,14 @@ Global
 		{085D0BF6-B9D1-4DF8-93CE-3364D52E1F69}.Release|x64.Build.0 = Release|x64
 		{085D0BF6-B9D1-4DF8-93CE-3364D52E1F69}.Release|x86.ActiveCfg = Release|Win32
 		{085D0BF6-B9D1-4DF8-93CE-3364D52E1F69}.Release|x86.Build.0 = Release|Win32
+		{5AB4D410-4754-4B16-B58F-917A7208951F}.Debug|x64.ActiveCfg = Debug|x64
+		{5AB4D410-4754-4B16-B58F-917A7208951F}.Debug|x64.Build.0 = Debug|x64
+		{5AB4D410-4754-4B16-B58F-917A7208951F}.Debug|x86.ActiveCfg = Debug|x86
+		{5AB4D410-4754-4B16-B58F-917A7208951F}.Debug|x86.Build.0 = Debug|x86
+		{5AB4D410-4754-4B16-B58F-917A7208951F}.Release|x64.ActiveCfg = Release|x64
+		{5AB4D410-4754-4B16-B58F-917A7208951F}.Release|x64.Build.0 = Release|x64
+		{5AB4D410-4754-4B16-B58F-917A7208951F}.Release|x86.ActiveCfg = Release|x86
+		{5AB4D410-4754-4B16-B58F-917A7208951F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
