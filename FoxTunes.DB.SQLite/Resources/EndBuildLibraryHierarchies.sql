@@ -24,7 +24,8 @@ SET "Parent_Id" =
 			AND "LibraryHierarchy_Copy"."SortValue" = "LibraryHierarchyItems_Copy"."SortValue"
 			AND "LibraryHierarchy_Copy"."IsLeaf" = "LibraryHierarchyItems_Copy"."IsLeaf"
 	LIMIT 1
-);
+)
+WHERE "Parent_Id" IS NULL;
 
 INSERT INTO "LibraryHierarchyItem_LibraryItem" ("LibraryHierarchyItem_Id", "LibraryItem_Id")
 SELECT "LibraryHierarchyItems"."Id", "LibraryHierarchy"."LibraryItem_Id"

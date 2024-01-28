@@ -46,6 +46,7 @@ AS
 	FROM ""LibraryItems""
 		JOIN ""LibraryItem_MetaDataItem"" ON ""LibraryItems"".""Id"" = ""LibraryItem_MetaDataItem"".""LibraryItem_Id""
 		JOIN ""MetaDataItems"" ON ""MetaDataItems"".""Id"" = ""LibraryItem_MetaDataItem"".""MetaDataItem_Id""
+	WHERE NOT EXISTS(SELECT * FROM ""LibraryHierarchyItem_LibraryItem"" WHERE ""LibraryHierarchyItem_LibraryItem"".""LibraryItem_Id"" = ""LibraryItems"".""Id"")
 	ORDER BY ""LibraryItems"".""Id""
 )
 ,
@@ -54,7 +55,7 @@ AS
 (
 ");
             
-            #line 30 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
+            #line 31 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(new PivotViewBuilder(
 		this.Database,
 		"VerticalMetaData", 
@@ -72,7 +73,7 @@ AS
 SELECT ""LibraryHierarchyLevels"".""LibraryHierarchy_Id"" AS ""LibraryHierarchy_Id"", ""LibraryHierarchyLevels"".""Id"" AS ""LibraryHierarchyLevel_Id"", ""HorizontalMetaData"".""Id"" AS ""LibraryItem_Id"", ""HorizontalMetaData"".""FileName"", ""LibraryHierarchyLevels"".""DisplayScript"", ""LibraryHierarchyLevels"".""SortScript""
 ");
             
-            #line 43 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
+            #line 44 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
 
 	for(var index = 0; index < this.MetaDataNames.Length; index++)
 	{
@@ -82,21 +83,21 @@ SELECT ""LibraryHierarchyLevels"".""LibraryHierarchy_Id"" AS ""LibraryHierarchy_
             #line hidden
             this.Write(",\"Key_");
             
-            #line 46 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
+            #line 47 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("\", \"Value_");
             
-            #line 46 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
+            #line 47 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("_Value\"");
             
-            #line 46 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
+            #line 47 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\LibraryHierarchyBuilder.tt"
 
 	}
 

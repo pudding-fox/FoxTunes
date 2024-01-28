@@ -72,7 +72,7 @@ namespace FoxTunes
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                using (var libraryPopulator = new LibraryPopulator(this.Database, this.PlaybackManager, true, transaction))
+                using (var libraryPopulator = new LibraryPopulator(this.Database, this.PlaybackManager, this.Visible, transaction))
                 {
                     libraryPopulator.InitializeComponent(this.Core);
                     libraryPopulator.NameChanged += (sender, e) => this.Name = libraryPopulator.Name;
@@ -92,7 +92,7 @@ namespace FoxTunes
                 var query = this.Database
                     .AsQueryable<LibraryItem>(this.Database.Source(new DatabaseQueryComposer<LibraryItem>(this.Database), transaction))
                     .Where(libraryItem => libraryItem.Status == LibraryItemStatus.Import && !libraryItem.MetaDatas.Any());
-                using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddLibraryMetaDataItems, true, transaction))
+                using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddLibraryMetaDataItems, this.Visible, transaction))
                 {
                     metaDataPopulator.InitializeComponent(this.Core);
                     metaDataPopulator.NameChanged += (sender, e) => this.Name = metaDataPopulator.Name;
@@ -150,7 +150,7 @@ namespace FoxTunes
 
         private async Task AddHiearchies(IDatabaseReader reader, CancellationToken cancellationToken, ITransactionSource transaction)
         {
-            using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, true, transaction))
+            using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, this.Visible, transaction))
             {
                 libraryHierarchyPopulator.InitializeComponent(this.Core);
                 libraryHierarchyPopulator.NameChanged += (sender, e) => this.Name = libraryHierarchyPopulator.Name;

@@ -41,7 +41,9 @@ namespace FoxTunes
         {
             if (this.NotifyIcon == null)
             {
+                //TODO: System.Windows.Forms
                 this.NotifyIcon = new global::System.Windows.Forms.NotifyIcon();
+                //TODO: System.Drawing
                 this.NotifyIcon.Icon = new global::System.Drawing.Icon(
                     Application.GetResourceStream(new Uri("pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico")).Stream
                 );

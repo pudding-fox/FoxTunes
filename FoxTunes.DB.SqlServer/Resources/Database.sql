@@ -1,6 +1,3 @@
-
-BEGIN TRANSACTION;
-
 CREATE TABLE [MetaDataItems](
     [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
     [Name] nvarchar(250) NOT NULL, 
@@ -24,9 +21,9 @@ CREATE TABLE [PlaylistItems](
     [Status] INTEGER NOT NULL);
 
 CREATE TABLE [LibraryHierarchies] ( 
-  [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL 
-, [Sequence] INTEGER NOT NULL
-, [Name] nvarchar(250) NOT NULL);
+  [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
+  [Sequence] INTEGER NOT NULL, 
+  [Name] nvarchar(250) NOT NULL);
 
 CREATE TABLE "LibraryHierarchyLevels" (
 	"Id"	INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL,
@@ -221,6 +218,7 @@ ON "LibraryHierarchy"
 	"SortValue",
 	"IsLeaf"
 );
+
 CREATE INDEX "IDX_LibraryHierarchy_LibraryItem" 
 ON "LibraryHierarchy"
 (
@@ -248,5 +246,3 @@ INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,Displ
 INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,DisplayScript,SortScript) VALUES (5,2,1,'Year - Album','(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(" - ");}return "No Album";})()',NULL);
 INSERT INTO "LibraryHierarchyLevels" (Id,LibraryHierarchy_Id,Sequence,Name,DisplayScript,SortScript) VALUES (6,2,2,'Disk - Track - Title','(function(){if(tag.title){var parts=[];if(parseInt(tag.disccount) != 1 && parseInt(tag.disc)){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return fileName;})()',NULL);
 SET IDENTITY_INSERT "LibraryHierarchyLevels" OFF
-
-COMMIT;

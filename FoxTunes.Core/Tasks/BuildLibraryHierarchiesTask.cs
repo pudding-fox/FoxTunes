@@ -27,8 +27,6 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            await this.RemoveHierarchies();
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
             await this.BuildHierarchies();
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
         }
