@@ -10,6 +10,12 @@ namespace FoxTunes.ViewModel
 {
     public abstract class LibraryBase : ViewModelBase
     {
+        const string LOADING = "Loading...";
+
+        const string UPDATING = "Updating...";
+
+        const string EMPTY = "Add to collection by dropping files here.";
+
         public bool IsNavigating { get; private set; }
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
@@ -236,27 +242,28 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.HierarchyManager != null)
+                if (this.HierarchyManager == null || this.LibraryHierarchyBrowser == null || this.Items == null)
                 {
-                    if (!this.HierarchyManager.CanNavigate)
+                    return LOADING;
+                }
+                if (!this.HierarchyManager.CanNavigate)
+                {
+                    var isUpdating = global::FoxTunes.BackgroundTask.Active
+                        .OfType<LibraryTaskBase>()
+                        .Any();
+                    if (isUpdating)
                     {
-                        var isUpdating = global::FoxTunes.BackgroundTask.Active
-                            .OfType<LibraryTaskBase>()
-                            .Any();
-                        if (isUpdating)
-                        {
-                            return "Updating...";
-                        }
-                        if (this.LibraryHierarchyBrowser != null)
-                        {
-                            switch (this.LibraryHierarchyBrowser.State)
-                            {
-                                case LibraryHierarchyBrowserState.Loading:
-                                    return "Loading...";
-                            }
-                        }
-                        return "Add to collection by dropping files here.";
+                        return UPDATING;
                     }
+                    else
+                    {
+                        return EMPTY;
+                    }
+                }
+                switch (this.LibraryHierarchyBrowser.State)
+                {
+                    case LibraryHierarchyBrowserState.Loading:
+                        return LOADING;
                 }
                 return null;
             }
@@ -277,16 +284,18 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this.Items != null && this.Items.Count > 0)
+                if (this.LibraryHierarchyBrowser == null || this.HierarchyManager == null || this.Items == null || this.Items.Count == 0)
                 {
-                    return false;
+                    return true;
                 }
-                if (this.HierarchyManager != null)
+                switch (this.LibraryHierarchyBrowser.State)
                 {
-                    if (!this.HierarchyManager.CanNavigate)
-                    {
+                    case LibraryHierarchyBrowserState.Loading:
                         return true;
-                    }
+                }
+                if (!this.HierarchyManager.CanNavigate)
+                {
+                    return true;
                 }
                 return false;
             }
@@ -321,16 +330,16 @@ namespace FoxTunes.ViewModel
             }).ConfigureAwait(false);
         }
 
-        protected virtual Task RefreshItems()
+        protected virtual async Task RefreshItems()
         {
             var items = this.LibraryHierarchyBrowser.GetNodes(this.SelectedHierarchy);
             if (this.Items == null)
             {
-                return Windows.Invoke(() => this.Items = new LibraryHierarchyNodeCollection(items));
+                await Windows.Invoke(() => this.Items = new LibraryHierarchyNodeCollection(items)).ConfigureAwait(false);
             }
             else
             {
-                return Windows.Invoke(this.Items.Update(items));
+                await Windows.Invoke(this.Items.Update(items)).ConfigureAwait(false);
             }
         }
 
