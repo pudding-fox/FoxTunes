@@ -217,5 +217,28 @@ namespace FoxTunes
             }
             return section.GetElement(elementId);
         }
+
+        public string SaveValue<T>(T value)
+        {
+            using (var stream = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(stream, value);
+                stream.Position = 0;
+                return Convert.ToBase64String(stream.ToArray());
+            }
+        }
+
+        public T LoadValue<T>(string value)
+        {
+            var buffer = Convert.FromBase64String(value);
+            using (var stream = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                stream.Write(buffer, 0, buffer.Length);
+                stream.Position = 0;
+                return (T)formatter.Deserialize(stream);
+            }
+        }
     }
 }
