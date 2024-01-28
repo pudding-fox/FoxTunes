@@ -28,7 +28,8 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-                this.Output.Shutdown();
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
             }
         }
 

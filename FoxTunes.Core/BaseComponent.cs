@@ -59,12 +59,17 @@ namespace FoxTunes
 
         protected virtual Task OnError(string message, Exception exception)
         {
-            Logger.Write(this, LogLevel.Error, message, exception);
+            return this.OnError(this, new ComponentErrorEventArgs(message, exception));
+        }
+
+        protected virtual Task OnError(object sender, ComponentErrorEventArgs e)
+        {
+            Logger.Write(this, LogLevel.Error, e.Message);
             if (this.Error == null)
             {
                 return Task.CompletedTask;
             }
-            return this.Error(this, new ComponentErrorEventArgs(message, exception));
+            return this.Error(sender, e);
         }
 
         [field: NonSerialized]

@@ -47,6 +47,7 @@
     <Compile Include="BassStreamFactory.cs" />
     <Compile Include="BassStreamPipeline.cs" />
     <Compile Include="BassStreamPipelineFactory.cs" />
+    <Compile Include="BassStreamPipelineManager.cs" />
     <Compile Include="BassStreamPipelineQueryResult.cs" />
     <Compile Include="BassUtils.cs" />
     <Compile Include="BassStreamComponent.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="Interfaces\IBassStreamInput.cs" />
     <Compile Include="Interfaces\IBassStreamPipeline.cs" />
     <Compile Include="Interfaces\IBassStreamPipelineFactory.cs" />
+    <Compile Include="Interfaces\IBassStreamPipelineManager.cs" />
     <Compile Include="Interfaces\IBassStreamPipelineQueryResult.cs" />
     <Compile Include="Interfaces\IBassStreamProvider.cs" />
     <Compile Include="BassStreamOutput.cs" />

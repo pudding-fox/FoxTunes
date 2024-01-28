@@ -17,7 +17,7 @@ namespace FoxTunes
             }
         }
 
-        public override bool CanCreateStream(IBassOutput output, PlaylistItem playlistItem)
+        public override bool CanCreateStream(PlaylistItem playlistItem)
         {
             if (!new[]
             {
@@ -29,14 +29,14 @@ namespace FoxTunes
             return true;
         }
 
-        public override Task<int> CreateStream(IBassOutput output, PlaylistItem playlistItem)
+        public override Task<int> CreateStream(PlaylistItem playlistItem)
         {
             var flags = BassFlags.Decode;
-            if (output.Float)
+            if (this.Output.Float)
             {
                 flags |= BassFlags.Float;
             }
-            if (output.PlayFromMemory)
+            if (this.Output.PlayFromMemory)
             {
                 Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
             }

@@ -18,14 +18,14 @@ namespace FoxTunes
             }
         }
 
-        public override bool CanCreateStream(IBassOutput output, PlaylistItem playlistItem)
+        public override bool CanCreateStream(PlaylistItem playlistItem)
         {
             var drive = default(int);
             var track = default(int);
             return ParseUrl(playlistItem.FileName, out drive, out track);
         }
 
-        public override Task<int> CreateStream(IBassOutput output, PlaylistItem playlistItem)
+        public override Task<int> CreateStream(PlaylistItem playlistItem)
         {
             var drive = default(int);
             var track = default(int);
@@ -34,28 +34,28 @@ namespace FoxTunes
                 return Task.FromResult(0);
             }
             var channelHandle = default(int);
-            if (this.GetCurrentStream(output, drive, track, out channelHandle))
+            if (this.GetCurrentStream(drive, track, out channelHandle))
             {
                 return Task.FromResult(channelHandle);
             }
             var flags = BassFlags.Decode;
-            if (output.Float)
+            if (this.Output.Float)
             {
                 flags |= BassFlags.Float;
             }
-            if (output.PlayFromMemory)
+            if (this.Output.PlayFromMemory)
             {
                 Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
             }
             return Task.FromResult(BassCd.CreateStream(drive, track, flags));
         }
 
-        protected virtual bool GetCurrentStream(IBassOutput output, int drive, int track, out int channelHandle)
+        protected virtual bool GetCurrentStream(int drive, int track, out int channelHandle)
         {
-            if (output.IsStarted)
+            if (this.Output.IsStarted)
             {
                 var enqueuedChannelHandle = default(int);
-                output.WithPipeline(pipeline =>
+                this.PipelineManager.WithPipeline(pipeline =>
                 {
                     if (pipeline != null)
                     {

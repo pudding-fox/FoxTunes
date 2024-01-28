@@ -100,47 +100,43 @@ namespace FoxTunes
 
         protected virtual void OnMouseLeftButtonDown(object sender, EventArgs e)
         {
-            //TODO: Respect IForegroundTaskRunner component.
-            this.Dispatcher.BeginInvoke(new Action(() =>
+            Windows.Invoke(() =>
             {
                 this.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
                 {
                     RoutedEvent = Mouse.MouseDownEvent,
                     Source = this
                 });
-            }));
+            });
         }
 
         protected virtual void OnMouseLeftButtonUp(object sender, EventArgs e)
         {
-            //TODO: Respect IForegroundTaskRunner component.
-            this.Dispatcher.BeginInvoke(new Action(() =>
+            Windows.Invoke(() =>
             {
                 this.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
                 {
                     RoutedEvent = Mouse.MouseUpEvent,
                     Source = this
                 });
-            }));
+            });
         }
 
         protected virtual void OnMouseRightButtonDown(object sender, EventArgs e)
         {
-            //TODO: Respect IForegroundTaskRunner component.
-            this.Dispatcher.BeginInvoke(new Action(() =>
+            Windows.Invoke(() =>
             {
                 this.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Right)
                 {
                     RoutedEvent = Mouse.MouseDownEvent,
                     Source = this
                 });
-            }));
+            });
         }
 
         protected virtual void OnMouseRightButtonUp(object sender, EventArgs e)
         {
-            //TODO: Respect IForegroundTaskRunner component.
-            this.Dispatcher.BeginInvoke(new Action(() =>
+            Windows.Invoke(() =>
             {
                 this.ShowContextMenu();
                 this.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Right)
@@ -148,7 +144,7 @@ namespace FoxTunes
                     RoutedEvent = Mouse.MouseUpEvent,
                     Source = this
                 });
-            }));
+            });
         }
 
         protected virtual void ShowContextMenu()

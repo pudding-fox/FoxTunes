@@ -109,8 +109,7 @@ namespace FoxTunes
 
         protected virtual void OnPhase(object sender, CommandPhaseEventArgs e)
         {
-            //TODO: Respect IForegroundTaskRunner component.
-            this.Dispatcher.Invoke(() =>
+            Windows.Invoke(() =>
             {
                 var tag = GetTag(this);
                 if (!string.Equals(tag, e.Tag, StringComparison.OrdinalIgnoreCase))

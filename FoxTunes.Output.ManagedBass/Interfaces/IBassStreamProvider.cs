@@ -7,9 +7,9 @@ namespace FoxTunes.Interfaces
     {
         byte Priority { get; }
 
-        bool CanCreateStream(IBassOutput output, PlaylistItem playlistItem);
+        bool CanCreateStream(PlaylistItem playlistItem);
 
-        Task<int> CreateStream(IBassOutput output, PlaylistItem playlistItem);
+        Task<int> CreateStream(PlaylistItem playlistItem);
 
         void FreeStream(PlaylistItem playlistItem, int channelHandle);
     }
