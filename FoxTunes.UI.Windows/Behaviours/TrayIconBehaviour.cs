@@ -164,6 +164,7 @@ namespace FoxTunes
 
         protected virtual void Enable()
         {
+            Windows.ShuttingDown += this.OnShuttingDown;
             this.NotifyIcon.Icon = Icon.Handle;
             this.NotifyIcon.Show();
             if (this.NotifyIcon.MessageSink != null)
@@ -177,6 +178,7 @@ namespace FoxTunes
 
         protected virtual void Disable()
         {
+            Windows.ShuttingDown -= this.OnShuttingDown;
             if (this.NotifyIcon != null)
             {
                 this.NotifyIcon.Hide();
@@ -188,6 +190,11 @@ namespace FoxTunes
                 }
             }
             this.RemoveWindowHooks();
+        }
+
+        protected virtual void OnShuttingDown(object sender, EventArgs e)
+        {
+            this.Disable();
         }
 
         protected virtual void OnMouseLeftButtonUp(object sender, EventArgs e)
