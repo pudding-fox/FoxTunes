@@ -230,11 +230,11 @@ FoxTunes.UI.Windows.WaveBar.dll
 "
 
 RATINGS="
-FoxTunes.UI.Windows.Ratings
+FoxTunes.UI.Windows.Ratings.dll
 "
 
 STATISTICS="
-FoxTunes.Statistics
+FoxTunes.Statistics.dll
 "
 
 MINIMAL="
