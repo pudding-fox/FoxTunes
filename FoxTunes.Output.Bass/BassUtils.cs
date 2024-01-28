@@ -1,6 +1,5 @@
 ﻿using ManagedBass;
 using System;
-using System.Runtime.InteropServices;
 
 namespace FoxTunes
 {

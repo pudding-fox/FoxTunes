@@ -61,6 +61,7 @@ namespace FoxTunes
         public override void Connect(BassOutputStream stream)
         {
             BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.KeepAlive, true));
+            BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.RecycleStream, true));
             Logger.Write(this, LogLevel.Debug, "Creating BASS GAPLESS stream with rate {0} and {1} channels.", stream.Rate, stream.Channels);
             this.ChannelHandle = BassGapless.StreamCreate(stream.Rate, stream.Channels, stream.Flags);
             if (this.ChannelHandle == 0)

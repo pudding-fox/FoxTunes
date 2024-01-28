@@ -27,9 +27,12 @@ namespace FoxTunes
 
         public BassCdStreamProviderBehaviour()
         {
+            this.CurrentDrive = CdUtils.NO_DRIVE;
             BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
             BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_gapless_cd.dll"));
         }
+
+        public int CurrentDrive { get; private set; }
 
         public ICore Core { get; private set; }
 
@@ -43,7 +46,7 @@ namespace FoxTunes
 
         public CdDoorMonitor DoorMonitor { get; private set; }
 
-        new public bool IsInitialized { get; private set; }
+        public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
 
         private bool _Enabled { get; set; }
 
@@ -57,21 +60,6 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-            }
-        }
-
-        private int _Drive { get; set; }
-
-        public int Drive
-        {
-            get
-            {
-                return this._Drive;
-            }
-            set
-            {
-                this._Drive = value;
-                Logger.Write(this, LogLevel.Debug, "Drive = {0}", this.Drive);
             }
         }
 
@@ -109,7 +97,6 @@ namespace FoxTunes
         {
             this.Core = core;
             this.Output = core.Components.Output as IBassOutput;
-            this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
             this.PlaylistManager = core.Managers.Playlist;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
@@ -128,34 +115,61 @@ namespace FoxTunes
                 BassCdStreamProviderBehaviourConfiguration.SECTION,
                 BassCdStreamProviderBehaviourConfiguration.LOOKUP_HOST_ELEMENT
             ).ConnectValue(value => this.CdLookupHost = value);
+            this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
+            this.BassStreamPipelineFactory.CreatingPipeline += this.OnCreatingPipeline;
             base.InitializeComponent(core);
-        }
-
-        protected virtual void OnInit(object sender, EventArgs e)
-        {
-            if (!this.Enabled || this.Drive == CdUtils.NO_DRIVE)
-            {
-                return;
-            }
-            var flags = BassFlags.Decode;
-            if (this.Output.Float)
-            {
-                flags |= BassFlags.Float;
-            }
-            BassUtils.OK(BassGapless.Cd.Enable(this.Drive, flags));
-            this.IsInitialized = true;
         }
 
         protected virtual void OnFree(object sender, EventArgs e)
         {
-            if (!this.IsInitialized)
+            if (this.CurrentDrive == CdUtils.NO_DRIVE)
             {
                 return;
             }
-            BassGapless.Cd.Disable();
-            //Ignoring result on purpose.
-            BassCd.Release(this.Drive);
-            this.IsInitialized = false;
+            try
+            {
+                BassGapless.Cd.Disable();
+                //Ignoring result on purpose.
+                BassCd.Release(this.CurrentDrive);
+                Logger.Write(this, LogLevel.Debug, "Gapless CD playback was disabled.");
+            }
+            catch (Exception ex)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to disable gapless CD playback: {0}", ex.Message);
+            }
+            this.CurrentDrive = CdUtils.NO_DRIVE;
+        }
+
+        protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
+        {
+            if (!this.Enabled)
+            {
+                return;
+            }
+            var drive = default(int);
+            var id = default(string);
+            var track = default(int);
+            if (!CdUtils.ParseUrl(e.Stream.FileName, out drive, out id, out track))
+            {
+                return;
+            }
+            var flags = BassFlags.Decode;
+            if (e.Stream.Flags.HasFlag(BassFlags.Float))
+            {
+                flags |= BassFlags.Float;
+            }
+            try
+            {
+                if (BassGapless.Cd.Enable(drive, flags))
+                {
+                    Logger.Write(this, LogLevel.Debug, "Gapless CD playback was enabled.");
+                    this.CurrentDrive = drive;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to enable gapless CD playback: {0}", ex.Message);
+            }
         }
 
         protected virtual void OnStateChanged(object sender, EventArgs e)
@@ -242,8 +256,11 @@ namespace FoxTunes
         {
             if (this.Output != null)
             {
-                this.Output.Init -= this.OnInit;
                 this.Output.Free -= this.OnFree;
+            }
+            if (this.BassStreamPipelineFactory != null)
+            {
+                this.BassStreamPipelineFactory.CreatingPipeline -= this.OnCreatingPipeline;
             }
         }
 

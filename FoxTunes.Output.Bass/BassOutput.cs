@@ -390,7 +390,7 @@ namespace FoxTunes
                 return null;
             }
             var flags = BassFlags.Default;
-            if (this.Float)
+            if (stream.Format == OutputStreamFormat.Float)
             {
                 flags |= BassFlags.Float;
             }
@@ -440,6 +440,28 @@ namespace FoxTunes
             else
             {
                 Logger.Write(this, LogLevel.Debug, "Not yet started, cannot pre-empt playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.FromResult(false);
+#endif
+        }
+
+        public override Task<bool> IsPlaying(IOutputStream stream)
+        {
+            var outputStream = stream as BassOutputStream;
+            if (this.IsStarted)
+            {
+                return this.PipelineManager.WithPipelineExclusive(pipeline =>
+                {
+                    if (pipeline != null)
+                    {
+                        var isPlaying = pipeline.Input.Position(outputStream) == 0;
+                        return isPlaying;
+                    }
+                    return false;
+                });
             }
 #if NET40
             return TaskEx.FromResult(false);

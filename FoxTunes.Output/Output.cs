@@ -56,6 +56,8 @@ namespace FoxTunes
 
         public abstract Task<bool> Preempt(IOutputStream stream);
 
+        public abstract Task<bool> IsPlaying(IOutputStream stream);
+
         protected virtual void OnLoaded(IOutputStream stream)
         {
             if (this.Loaded != null)

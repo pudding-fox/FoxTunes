@@ -87,10 +87,17 @@ namespace FoxTunes
                 {
                     return;
                 }
-                Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", currentStream.Id, currentStream.FileName);
                 this.OnCurrentStreamChanging();
                 this._CurrentStream = stream;
-                await this.Unload(currentStream).ConfigureAwait(false);
+                if (stream != null && await this.Output.IsPlaying(currentStream).ConfigureAwait(false))
+                {
+                    Logger.Write(this, LogLevel.Debug, "Current stream is still playing, not unloading: {0} => {1}", currentStream.Id, currentStream.FileName);
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", currentStream.Id, currentStream.FileName);
+                    await this.Unload(currentStream).ConfigureAwait(false);
+                }
             }
             else
             {
@@ -169,7 +176,7 @@ namespace FoxTunes
             }
         }
 
-        public Task Unload()
+        protected virtual Task Unload()
         {
             if (this.CurrentStream == null)
             {
