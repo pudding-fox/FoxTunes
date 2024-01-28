@@ -117,7 +117,7 @@ namespace FoxTunes
                     this.Current = fileData;
                     Interlocked.Increment(ref this.position);
                 }
-            }, cancellationToken, this.Threads);
+            }, cancellationToken, this.ParallelOptions);
         }
 
         protected override async void OnElapsed(object sender, ElapsedEventArgs e)
