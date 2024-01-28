@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using FoxTunes.UI.Windows.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;

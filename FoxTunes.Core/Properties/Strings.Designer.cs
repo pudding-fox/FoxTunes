@@ -39,7 +39,7 @@ namespace FoxTunes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.UI.Windows.Properties.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Core.Properties.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,11 +61,65 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add to collection by dropping files here..
+        ///   Looks up a localized string similar to Enabled.
         /// </summary>
-        internal static string LibraryBase_Add {
+        internal static string InputManagerConfiguration_Enabled {
             get {
-                return ResourceManager.GetString("LibraryBase.Add", resourceCulture);
+                return ResourceManager.GetString("InputManagerConfiguration.Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next.
+        /// </summary>
+        internal static string InputManagerConfiguration_Next {
+            get {
+                return ResourceManager.GetString("InputManagerConfiguration.Next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Global Hotkeys.
+        /// </summary>
+        internal static string InputManagerConfiguration_Path_GlobalHotkeys {
+            get {
+                return ResourceManager.GetString("InputManagerConfiguration.Path.GlobalHotkeys", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Play.
+        /// </summary>
+        internal static string InputManagerConfiguration_Play {
+            get {
+                return ResourceManager.GetString("InputManagerConfiguration.Play", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Previous.
+        /// </summary>
+        internal static string InputManagerConfiguration_Previous {
+            get {
+                return ResourceManager.GetString("InputManagerConfiguration.Previous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keyboard Shortcuts.
+        /// </summary>
+        internal static string InputManagerConfiguration_Section {
+            get {
+                return ResourceManager.GetString("InputManagerConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop.
+        /// </summary>
+        internal static string InputManagerConfiguration_Stop {
+            get {
+                return ResourceManager.GetString("InputManagerConfiguration.Stop", resourceCulture);
             }
         }
     }
