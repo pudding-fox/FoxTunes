@@ -52,9 +52,13 @@ namespace FoxTunes
             EXTENSIONS.Add(extension);
         }
 
-        public static void AddPath(string path)
+        public static bool AddPath(string path)
         {
-            PATHS.Add(path);
+            if (Directory.Exists(path) || File.Exists(path))
+            {
+                return PATHS.Add(path);
+            }
+            return false;
         }
 
         static BassPluginLoader()
@@ -118,6 +122,7 @@ namespace FoxTunes
             {
                 return;
             }
+            var failures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var path in PATHS)
             {
                 if (File.Exists(path))
@@ -137,25 +142,45 @@ namespace FoxTunes
                     {
                         try
                         {
-                            this.Load(fileName);
+                            if (this.Load(fileName))
+                            {
+                                continue;
+                            }
                         }
                         catch (Exception e)
                         {
                             Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", fileName, e.Message);
                         }
+                        failures.Add(fileName);
+                    }
+                }
+            }
+            //We don't have anything to handle plugin inter-dependency, hopefully the second attempt will work.
+            if (failures.Any())
+            {
+                Logger.Write(this, LogLevel.Warn, "At least one plugin failed to load, retrying..");
+                foreach (var fileName in failures)
+                {
+                    try
+                    {
+                        this.Load(fileName);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", fileName, e.Message);
                     }
                 }
             }
             this.IsLoaded = true;
         }
 
-        public void Load(string fileName)
+        public bool Load(string fileName)
         {
             var handle = Bass.PluginLoad(fileName);
             if (handle == 0)
             {
                 Logger.Write(typeof(BassPluginLoader), LogLevel.Warn, "Failed to load plugin: {0}", fileName);
-                return;
+                return false;
             }
             var info = Bass.PluginGetInfo(handle);
             Logger.Write(typeof(BassPluginLoader), LogLevel.Debug, "Plugin loaded \"{0}\": {1}", fileName, info.Version);
@@ -164,6 +189,7 @@ namespace FoxTunes
                 info,
                 handle
             ));
+            return true;
         }
 
         public void Unload()
