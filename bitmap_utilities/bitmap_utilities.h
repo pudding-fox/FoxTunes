@@ -32,9 +32,18 @@ typedef struct Int32Rect
 	INT32 Height;
 } Int32Rect;
 
+typedef struct Int32Point
+{
+	INT32 X;
+
+	INT32 Y;
+} Int32Point;
+
 BOOL WINAPI draw_rectangles(RenderInfo* info, Int32Rect* rectangles, size_t count);
 
 BOOL WINAPI draw_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height);
+
+BOOL WINAPI draw_lines(RenderInfo* info, Int32Point* points, size_t dimentions, size_t count);
 
 BOOL WINAPI draw_line(RenderInfo* info, INT32 x1, INT32 y1, INT32 x2, INT32 y2);
 

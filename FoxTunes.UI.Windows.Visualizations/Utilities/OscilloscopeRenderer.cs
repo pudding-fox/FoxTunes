@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Runtime.Remoting.Channels;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Media.Imaging;
@@ -367,37 +368,12 @@ namespace FoxTunes
 
         private static void RenderMono(BitmapHelper.RenderInfo info, Int32Point[,] elements, int width)
         {
-            for (var x = 0; x < width - 1; x++)
-            {
-                var point1 = elements[0, x];
-                var point2 = elements[0, x + 1];
-                BitmapHelper.DrawLine(
-                    ref info,
-                    point1.X,
-                    point1.Y,
-                    point2.X,
-                    point2.Y
-                );
-            }
+            BitmapHelper.DrawLines(ref info, elements, 1, width);
         }
 
         private static void RenderSeperate(BitmapHelper.RenderInfo info, Int32Point[,] elements, int channels, int width)
         {
-            for (var channel = 0; channel < channels; channel++)
-            {
-                for (var x = 0; x < width - 1; x++)
-                {
-                    var point1 = elements[channel, x];
-                    var point2 = elements[channel, x + 1];
-                    BitmapHelper.DrawLine(
-                        ref info,
-                        point1.X,
-                        point1.Y,
-                        point2.X,
-                        point2.Y
-                    );
-                }
-            }
+            BitmapHelper.DrawLines(ref info, elements, channels, width);
         }
 
         private static void UpdateValues(OscilloscopeRendererData data)
