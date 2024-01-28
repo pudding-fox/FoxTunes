@@ -17,10 +17,17 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.MinidiscBehaviourConfiguration_Section)
-                .WithElement(new BooleanConfigurationElement(ENABLED, Strings.MinidiscBehaviourConfiguration_Enabled).WithValue(false))
-                .WithElement(new TextConfigurationElement(DISC_TITLE_SCRIPT, Strings.MinidiscBehaviourConfiguration_DiscTitleScript, path: Strings.MinidiscBehaviourConfiguration_Advanced).WithValue(Resources.DiscTitle))
-                .WithElement(new TextConfigurationElement(TRACK_NAME_SCRIPT, Strings.MinidiscBehaviourConfiguration_TrackNameScript, path: Strings.MinidiscBehaviourConfiguration_Advanced).WithValue(Resources.TrackName))
-                .WithElement(new CommandConfigurationElement(CLEANUP, Strings.MinidiscBehaviourConfiguration_Cleanup).WithHandler(() => MinidiscBehaviour.Cleanup())
+                .WithElement(new BooleanConfigurationElement(ENABLED, Strings.MinidiscBehaviourConfiguration_Enabled)
+                    .WithValue(false))
+                .WithElement(new TextConfigurationElement(DISC_TITLE_SCRIPT, Strings.MinidiscBehaviourConfiguration_DiscTitleScript, path: Strings.MinidiscBehaviourConfiguration_Advanced)
+                    .WithValue(Resources.DiscTitle)
+                    .DependsOn(SECTION, ENABLED))
+                .WithElement(new TextConfigurationElement(TRACK_NAME_SCRIPT, Strings.MinidiscBehaviourConfiguration_TrackNameScript, path: Strings.MinidiscBehaviourConfiguration_Advanced)
+                    .WithValue(Resources.TrackName)
+                    .DependsOn(SECTION, ENABLED))
+                .WithElement(new CommandConfigurationElement(CLEANUP, Strings.MinidiscBehaviourConfiguration_Cleanup)
+                    .WithHandler(() => MinidiscBehaviour.Cleanup())
+                    .DependsOn(SECTION, ENABLED)
             );
         }
     }

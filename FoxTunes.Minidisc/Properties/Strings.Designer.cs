@@ -124,6 +124,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No device was found or the disc could not be read..
+        /// </summary>
+        internal static string MinidiscBehaviour_NoDisc {
+            get {
+                return ResourceManager.GetString("MinidiscBehaviour.NoDisc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Minidisc.
         /// </summary>
         internal static string MinidiscBehaviour_Path {
@@ -286,11 +295,29 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No device was found or the disc could not be read..
+        /// </summary>
+        internal static string MinidiscTask_NoDisc {
+            get {
+                return ResourceManager.GetString("MinidiscTask.NoDisc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reading disc.
         /// </summary>
         internal static string OpenMinidiscTask_Name {
             get {
                 return ResourceManager.GetString("OpenMinidiscTask.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string String1 {
+            get {
+                return ResourceManager.GetString("String1", resourceCulture);
             }
         }
         

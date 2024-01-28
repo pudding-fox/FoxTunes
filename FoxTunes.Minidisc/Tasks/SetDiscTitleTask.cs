@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using MD.Net;
+using System;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -39,6 +40,7 @@ namespace FoxTunes
             else
             {
                 Logger.Write(this, LogLevel.Warn, "Disc could not be read.");
+                throw new Exception(Strings.MinidiscTask_NoDisc);
             }
 #if NET40
             return TaskEx.FromResult(false);
