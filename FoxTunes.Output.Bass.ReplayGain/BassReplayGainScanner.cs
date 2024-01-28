@@ -151,12 +151,15 @@ namespace FoxTunes
                 throw new InvalidOperationException(string.Format("Failed to create stream for file \"{0}\": Unknown error.", scannerItem.FileName));
             }
             Logger.Write(this, LogLevel.Debug, "Created stream for file \"{0}\": {1}", scannerItem.FileName, stream.ChannelHandle);
+            var monitor = new ChannelMonitor(scannerItem, stream);
             try
             {
+                monitor.Start();
                 success = this.ScanTrack(scannerItem, stream);
             }
             finally
             {
+                monitor.Dispose();
                 Logger.Write(this, LogLevel.Debug, "Releasing stream for file \"{0}\": {1}", scannerItem.FileName, stream.ChannelHandle);
                 Bass.StreamFree(stream.ChannelHandle);
             }
@@ -238,12 +241,24 @@ namespace FoxTunes
                     }
                 }
                 var success = default(bool);
+                var monitors = new List<ChannelMonitor>();
                 try
                 {
+                    foreach (var scannerItem in streams.Keys)
+                    {
+                        var stream = streams[scannerItem];
+                        var monitor = new ChannelMonitor(scannerItem, stream);
+                        monitor.Start();
+                        monitors.Add(monitor);
+                    }
                     success = this.ScanGroup(streams);
                 }
                 finally
                 {
+                    foreach (var monitor in monitors)
+                    {
+                        monitor.Dispose();
+                    }
                     foreach (var scannerItem in streams.Keys)
                     {
                         var stream = streams[scannerItem];
