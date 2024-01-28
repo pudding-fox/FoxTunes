@@ -194,5 +194,77 @@ namespace FoxTunes {
                 return ResourceManager.GetString("ProfilesBehaviourConfiguration.Section", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Cursor Adorners.
+        /// </summary>
+        public static string WindowsUserInterfaceConfiguration_Cursors {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Cursors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Transparency.
+        /// </summary>
+        public static string WindowsUserInterfaceConfiguration_Glass {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Glass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layout.
+        /// </summary>
+        public static string WindowsUserInterfaceConfiguration_Layout {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Layout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Marquee Interval.
+        /// </summary>
+        public static string WindowsUserInterfaceConfiguration_MarqueeInterval {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.MarqueeInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Marquee Step.
+        /// </summary>
+        public static string WindowsUserInterfaceConfiguration_MarqueeStep {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.MarqueeStep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scaling Factor.
+        /// </summary>
+        public static string WindowsUserInterfaceConfiguration_Scaling {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Scaling", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Appearance.
+        /// </summary>
+        public static string WindowsUserInterfaceConfiguration_Section {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Theme.
+        /// </summary>
+        public static string WindowsUserInterfaceConfiguration_Theme {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Theme", resourceCulture);
+            }
+        }
     }
 }

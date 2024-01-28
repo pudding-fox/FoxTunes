@@ -16,8 +16,8 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, Strings.LyricsBehaviourConfiguration_Section)
-                .WithElement(new SelectionConfigurationElement(AUTO_LOOKUP_PROVIDER, Strings.LyricsBehaviourConfiguration_AutoLookupProvider)
+            yield return new ConfigurationSection(SECTION)
+                .WithElement(new SelectionConfigurationElement(AUTO_LOOKUP_PROVIDER)
                     .WithOptions(new[] { new SelectionConfigurationOption(ChartLyricsProvider.ID, Strings.ChartLyrics) })
                     .DependsOn(SECTION, AUTO_LOOKUP))
                 .WithElement(new TextConfigurationElement(BASE_URL, Strings.ChartLyricsProviderConfiguration_BaseUrl, path: Strings.ChartLyrics)

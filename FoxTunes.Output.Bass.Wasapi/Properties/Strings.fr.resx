@@ -150,9 +150,6 @@
   <data name="BassWasapiStreamOutputConfiguration.RefreshDevices" xml:space="preserve">
     <value>Actualiser les dispositifs</value>
   </data>
-  <data name="BassWasapiStreamOutputConfiguration.Section" xml:space="preserve">
-    <value>Sortie</value>
-  </data>
   <data name="WASAPI" xml:space="preserve">
     <value>WASAPI</value>
   </data>

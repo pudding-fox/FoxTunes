@@ -117,73 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DefaultLayoutProvider.Name" xml:space="preserve">
-    <value>Default</value>
+  <data name="LibraryBrowserBehaviourConfiguration.Image" xml:space="preserve">
+    <value>Image Type</value>
   </data>
-  <data name="General.Advanced" xml:space="preserve">
-    <value>Advanced</value>
+  <data name="LibraryBrowserBehaviourConfiguration.Path" xml:space="preserve">
+    <value>Library Browser</value>
   </data>
-  <data name="General.Cancel" xml:space="preserve">
-    <value>Cancel</value>
+  <data name="LibraryBrowserBehaviourConfiguration.Size" xml:space="preserve">
+    <value>Tile Size</value>
   </data>
-  <data name="General.OK" xml:space="preserve">
-    <value>OK</value>
+  <data name="LibraryBrowserBehaviourConfiguration.View" xml:space="preserve">
+    <value>View Type</value>
   </data>
-  <data name="LibraryBase.Add" xml:space="preserve">
-    <value>Add to collection by dropping files here.</value>
+  <data name="LibraryBrowserBehaviourConfiguration.View.Grid" xml:space="preserve">
+    <value>Grid</value>
   </data>
-  <data name="MinimalLayoutProvider.Name" xml:space="preserve">
-    <value>Minimal</value>
-  </data>
-  <data name="PlaylistGroupingBehaviourConfiguration.Enabled" xml:space="preserve">
-    <value>Grouping</value>
-  </data>
-  <data name="PlaylistGroupingBehaviourConfiguration.Script" xml:space="preserve">
-    <value>Grouping Script</value>
-  </data>
-  <data name="PlaylistSortingBehaviourConfiguration.Enabled" xml:space="preserve">
-    <value>Sorting</value>
-  </data>
-  <data name="ProfilesBehaviour.Delete" xml:space="preserve">
-    <value>Delete</value>
-  </data>
-  <data name="ProfilesBehaviour.New" xml:space="preserve">
-    <value>New</value>
-  </data>
-  <data name="ProfilesBehaviour.New.Prompt" xml:space="preserve">
-    <value>Profile Name</value>
-  </data>
-  <data name="ProfilesBehaviour.Path" xml:space="preserve">
-    <value>Profiles</value>
-  </data>
-  <data name="ProfilesBehaviourConfiguration.Enabled" xml:space="preserve">
-    <value>Enabled</value>
-  </data>
-  <data name="ProfilesBehaviourConfiguration.Section" xml:space="preserve">
-    <value>Profiles</value>
-  </data>
-  <data name="WindowsUserInterfaceConfiguration.Cursors" xml:space="preserve">
-    <value>Show Cursor Adorners</value>
-  </data>
-  <data name="WindowsUserInterfaceConfiguration.Glass" xml:space="preserve">
-    <value>Transparency</value>
-  </data>
-  <data name="WindowsUserInterfaceConfiguration.Layout" xml:space="preserve">
-    <value>Layout</value>
-  </data>
-  <data name="WindowsUserInterfaceConfiguration.MarqueeInterval" xml:space="preserve">
-    <value>Marquee Interval</value>
-  </data>
-  <data name="WindowsUserInterfaceConfiguration.MarqueeStep" xml:space="preserve">
-    <value>Marquee Step</value>
-  </data>
-  <data name="WindowsUserInterfaceConfiguration.Scaling" xml:space="preserve">
-    <value>Scaling Factor</value>
-  </data>
-  <data name="WindowsUserInterfaceConfiguration.Section" xml:space="preserve">
-    <value>Appearance</value>
-  </data>
-  <data name="WindowsUserInterfaceConfiguration.Theme" xml:space="preserve">
-    <value>Theme</value>
+  <data name="LibraryBrowserBehaviourConfiguration.View.List" xml:space="preserve">
+    <value>List</value>
   </data>
 </root>

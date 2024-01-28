@@ -160,15 +160,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Output.
-        /// </summary>
-        internal static string BassWasapiStreamOutputConfiguration_Section {
-            get {
-                return ResourceManager.GetString("BassWasapiStreamOutputConfiguration.Section", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to WASAPI.
         /// </summary>
         internal static string WASAPI {

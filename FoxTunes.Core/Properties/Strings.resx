@@ -201,6 +201,9 @@
   <data name="MetaDataBehaviourConfiguration.WriteTagsAndStatistics" xml:space="preserve">
     <value>Tags &amp; Statistics</value>
   </data>
+  <data name="PlaybackBehaviourConfiguration.Section" xml:space="preserve">
+    <value>Playback</value>
+  </data>
   <data name="SearchBehaviourConfiguration.Commit" xml:space="preserve">
     <value>Commit Behaviour</value>
   </data>

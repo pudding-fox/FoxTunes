@@ -4,6 +4,8 @@ namespace FoxTunes
 {
     public static class KeyBindingsBehaviourConfiguration
     {
+        public const string SECTION = InputManagerConfiguration.SECTION;
+
         public const string PLAY_ELEMENT = "AAAA39A4-A260-4AA8-8E3F-E0ECD5C6727C";
 
         public const string PREVIOUS_ELEMENT = "BBBBC8F4-5F5B-4260-B7A5-F9829F4C8DF1";
@@ -20,7 +22,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(InputManagerConfiguration.SECTION, "Keyboard Shortcuts")
+            yield return new ConfigurationSection(SECTION)
                 .WithElement(
                     new TextConfigurationElement(PLAY_ELEMENT, "Play")
                         .WithValue("Alt+Space"))

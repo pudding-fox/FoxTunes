@@ -35,7 +35,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, Strings.BassWasapiStreamOutputConfiguration_Section)
+            yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(OUTPUT_ELEMENT, Strings.BassWasapiStreamOutputConfiguration_Mode)
                     .WithOptions(new[] { new SelectionConfigurationOption(OUTPUT_WASAPI_OPTION, Strings.WASAPI) })
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_WASAPI_OPTION))

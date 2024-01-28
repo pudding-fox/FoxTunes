@@ -313,6 +313,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Playback.
+        /// </summary>
+        internal static string PlaybackBehaviourConfiguration_Section {
+            get {
+                return ResourceManager.GetString("PlaybackBehaviourConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Commit Behaviour.
         /// </summary>
         internal static string SearchBehaviourConfiguration_Commit {

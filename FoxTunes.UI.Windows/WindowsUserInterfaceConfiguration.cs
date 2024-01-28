@@ -26,21 +26,21 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
-            yield return new ConfigurationSection(SECTION, "Appearance")
+            yield return new ConfigurationSection(SECTION, Strings.WindowsUserInterfaceConfiguration_Section)
                 .WithElement(
-                    new SelectionConfigurationElement(THEME_ELEMENT, "Theme").WithOptions(GetThemeOptions()))
+                    new SelectionConfigurationElement(THEME_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Theme).WithOptions(GetThemeOptions()))
                 .WithElement(
-                    new SelectionConfigurationElement(LAYOUT_ELEMENT, "Layout"))
+                    new SelectionConfigurationElement(LAYOUT_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Layout))
                 .WithElement(
-                    new DoubleConfigurationElement(UI_SCALING_ELEMENT, "Scaling Factor", path: "Advanced").WithValue(1.0).WithValidationRule(new DoubleValidationRule(1, 4, 0.4)))
+                    new DoubleConfigurationElement(UI_SCALING_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Scaling, path: Strings.General_Advanced).WithValue(1.0).WithValidationRule(new DoubleValidationRule(1, 4, 0.4)))
                 .WithElement(
-                    new IntegerConfigurationElement(MARQUEE_INTERVAL_ELEMENT, "Marquee Interval", path: "Advanced").WithValue(50).WithValidationRule(new IntegerValidationRule(10, 1000)))
+                    new IntegerConfigurationElement(MARQUEE_INTERVAL_ELEMENT, Strings.WindowsUserInterfaceConfiguration_MarqueeInterval, path: Strings.General_Advanced).WithValue(50).WithValidationRule(new IntegerValidationRule(10, 1000)))
                 .WithElement(
-                    new DoubleConfigurationElement(MARQUEE_STEP_ELEMENT, "Marquee Step", path: "Advanced").WithValue(0.80).WithValidationRule(new DoubleValidationRule(0.80, 10, 0.4)))
+                    new DoubleConfigurationElement(MARQUEE_STEP_ELEMENT, Strings.WindowsUserInterfaceConfiguration_MarqueeStep, path: Strings.General_Advanced).WithValue(0.80).WithValidationRule(new DoubleValidationRule(0.80, 10, 0.4)))
                 .WithElement(
-                    new BooleanConfigurationElement(EXTEND_GLASS_ELEMENT, "Extend Glass").WithValue(false))
+                    new BooleanConfigurationElement(EXTEND_GLASS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Glass, path: Strings.General_Advanced).WithValue(false))
                 .WithElement(
-                    new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS, "Show Cursor Adorners", path: "Advanced").WithValue(releaseType == ReleaseType.Default)
+                    new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS, Strings.WindowsUserInterfaceConfiguration_Cursors, path: Strings.General_Advanced).WithValue(releaseType == ReleaseType.Default)
             );
         }
 
