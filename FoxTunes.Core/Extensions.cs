@@ -172,6 +172,22 @@ namespace FoxTunes
             return sequence.ForEach(element => element.Try(action, errorHandler));
         }
 
+        public static T Try<T>(this T value, Action action, Action<Exception> errorHandler = null)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                if (errorHandler != null)
+                {
+                    errorHandler(e);
+                }
+            }
+            return value;
+        }
+
         public static T Try<T>(this T value, Action<T> action, Action<T, Exception> errorHandler = null)
         {
             try
