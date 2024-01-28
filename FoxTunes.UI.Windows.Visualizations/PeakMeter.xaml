@@ -40,11 +40,13 @@
                                 <Setter Property="Grid.Column" Value="0"></Setter>
                                 <Setter Property="Grid.Row" Value="0"></Setter>
                                 <Setter Property="Orientation" Value="Vertical"></Setter>
+                                <Setter Property="Padding" Value="1,0,1,0"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Orientation, Source={StaticResource ViewModel}}" Value="Vertical">
                                 <Setter Property="Grid.Column" Value="1"></Setter>
                                 <Setter Property="Grid.Row" Value="1"></Setter>
                                 <Setter Property="Orientation" Value="Horizontal"></Setter>
+                                <Setter Property="Padding" Value="4,0,4,0"></Setter>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -58,11 +60,13 @@
                                 <Setter Property="Grid.Column" Value="1"></Setter>
                                 <Setter Property="Grid.Row" Value="1"></Setter>
                                 <Setter Property="Orientation" Value="Horizontal"></Setter>
+                                <Setter Property="Padding" Value="4,0,4,0"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Orientation, Source={StaticResource ViewModel}}" Value="Vertical">
                                 <Setter Property="Grid.Column" Value="0"></Setter>
                                 <Setter Property="Grid.Row" Value="0"></Setter>
                                 <Setter Property="Orientation" Value="Vertical"></Setter>
+                                <Setter Property="Padding" Value="1,0,1,0"></Setter>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>

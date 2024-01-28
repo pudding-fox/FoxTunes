@@ -157,9 +157,10 @@ namespace FoxTunes
 
         protected virtual void OnRenderHorizontal(FormattedText[] labels, DrawingContext drawingContext)
         {
-            var position = 0;
             var width = Convert.ToInt32(this.ActualWidth);
             var y = Convert.ToInt32(this.ActualHeight / 2);
+            labels = this.TrimToWidth(labels, width);
+            var position = 0;
             for (int step = width / labels.Length, x = step / 2; x < width && position < labels.Length; x += step, position++)
             {
                 var label = labels[position];
@@ -168,17 +169,54 @@ namespace FoxTunes
             }
         }
 
+        protected virtual FormattedText[] TrimToWidth(FormattedText[] labels, int width)
+        {
+            do
+            {
+                var total = labels.Sum(
+                    label => this.Padding.Left + label.Width + this.Padding.Right
+                );
+                if (total <= width)
+                {
+                    break;
+                }
+                labels = labels.Where(
+                    (label, index) => index % 2 == 0
+                ).ToArray();
+            } while (labels.Length > 2);
+            return labels;
+        }
+
         protected virtual void OnRenderVertical(FormattedText[] labels, DrawingContext drawingContext)
         {
-            var position = labels.Length - 1;
             var height = Convert.ToInt32(this.ActualHeight);
             var x = Convert.ToInt32(this.ActualWidth / 2);
+            labels = this.TrimToHeight(labels, height);
+            var position = labels.Length - 1;
             for (int step = height / labels.Length, y = step / 2; y < height && position >= 0; y += step, position--)
             {
                 var label = labels[position];
                 var origin = new Point(x - (label.Width / 2), y - (label.Height / 2));
                 drawingContext.DrawText(label, origin);
             }
+        }
+
+        protected virtual FormattedText[] TrimToHeight(FormattedText[] labels, int height)
+        {
+            do
+            {
+                var total = labels.Sum(
+                    label => this.Padding.Top + label.Height + this.Padding.Bottom
+                );
+                if (total <= height)
+                {
+                    break;
+                }
+                labels = labels.Where(
+                    (label, index) => index % 2 == 0
+                ).ToArray();
+            } while (labels.Length > 2);
+            return labels;
         }
     }
 
