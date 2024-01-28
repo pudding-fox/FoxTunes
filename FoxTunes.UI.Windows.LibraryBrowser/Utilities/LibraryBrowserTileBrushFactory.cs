@@ -31,9 +31,11 @@ namespace FoxTunes
 
         public IntegerConfigurationElement TileSize { get; private set; }
 
+        public SelectionConfigurationElement ImageMode { get; private set; }
+
         public TaskFactory Factory { get; private set; }
 
-        public ImageBrushCache<LibraryHierarchyNode> Store { get; private set; }
+        public ImageBrushCache<Tuple<LibraryHierarchyNode, LibraryBrowserImageMode>> Store { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -48,6 +50,10 @@ namespace FoxTunes
             this.TileSize = this.Configuration.GetElement<IntegerConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_SIZE
+            );
+            this.ImageMode = this.Configuration.GetElement<SelectionConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_IMAGE
             );
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 ImageBehaviourConfiguration.SECTION,
@@ -98,6 +104,7 @@ namespace FoxTunes
         {
             var width = this.TileSize.Value;
             var height = this.TileSize.Value;
+            var mode = LibraryBrowserBehaviourConfiguration.GetLibraryImage(this.ImageMode.Value);
             this.PixelSizeConverter.Convert(ref width, ref height);
             var placeholder = this.PlaceholderBrushFactory.Create(width, height);
             if (libraryHierarchyNode == null)
@@ -116,7 +123,7 @@ namespace FoxTunes
             if (cache)
             {
                 return new MonitoringAsyncResult<ImageBrush>(libraryHierarchyNode, placeholder, () => this.Factory.StartNew(
-                    () => this.Store.GetOrAdd(libraryHierarchyNode, width, height, factory)
+                    () => this.Store.GetOrAdd(new Tuple<LibraryHierarchyNode, LibraryBrowserImageMode>(libraryHierarchyNode, mode), width, height, factory)
                 ));
             }
             return new MonitoringAsyncResult<ImageBrush>(libraryHierarchyNode, placeholder, () => this.Factory.StartNew(factory));
@@ -159,7 +166,7 @@ namespace FoxTunes
         protected virtual void CreateCache(int capacity)
         {
             Logger.Write(this, LogLevel.Debug, "Creating cache for {0} items.", capacity);
-            this.Store = new ImageBrushCache<LibraryHierarchyNode>(capacity);
+            this.Store = new ImageBrushCache<Tuple<LibraryHierarchyNode, LibraryBrowserImageMode>>(capacity);
         }
 
         protected virtual void Reset(IEnumerable<string> names)

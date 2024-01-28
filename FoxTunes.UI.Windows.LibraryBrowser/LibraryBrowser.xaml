@@ -55,7 +55,7 @@
             <LocalWindows:LibraryBrowserTemplateSelector.DefaultTemplate>
                 <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
                     <StackPanel Width="{Binding TileSize, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,3,0,0">
-                        <Rectangle DataContext="{Binding Converter={StaticResource LibraryBrowserImageConverter}, Mode=OneWay}" Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Fill="{Binding Value, FallbackValue={StaticResource Transparent}}" Margin="0,0,5,0"></Rectangle>
+                        <Windows:AsyncImage DataContext="{Binding Converter={StaticResource LibraryBrowserImageConverter}, Mode=OneWay}" Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Source="{Binding Value, FallbackValue={StaticResource Transparent}}" Margin="0,0,5,0"></Windows:AsyncImage>
                         <TextBlock HorizontalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
                     </StackPanel>
                 </DataTemplate>
@@ -88,7 +88,7 @@
             <LocalWindows:LibraryBrowserTemplateSelector.DefaultTemplate>
                 <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
                     <StackPanel Orientation="Horizontal">
-                        <Rectangle DataContext="{Binding Converter={StaticResource LibraryBrowserImageConverter}, Mode=OneWay}" Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Fill="{Binding Value, FallbackValue={StaticResource Transparent}}" Margin="0,0,4,0"></Rectangle>
+                        <Windows:AsyncImage DataContext="{Binding Converter={StaticResource LibraryBrowserImageConverter}, Mode=OneWay}" Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Source="{Binding Value, FallbackValue={StaticResource Transparent}}" Margin="0,0,4,0"></Windows:AsyncImage>
                         <TextBlock VerticalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
                     </StackPanel>
                 </DataTemplate>

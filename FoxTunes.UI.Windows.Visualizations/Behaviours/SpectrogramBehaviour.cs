@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -97,7 +98,14 @@ namespace FoxTunes
                 }
                 else
                 {
-                    this.Smoothing.Value = SpectrogramBehaviourConfiguration.SMOOTHING_DEFAULT;
+                    if (string.Equals(component.Name, Strings.SpectrogramBehaviourConfiguration_Smoothing_Off, StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.Smoothing.Value = SpectrogramBehaviourConfiguration.SMOOTHING_MIN;
+                    }
+                    else
+                    {
+                        this.Smoothing.Value = SpectrogramBehaviourConfiguration.SMOOTHING_DEFAULT;
+                    }
                 }
             }
             this.Configuration.Save();
