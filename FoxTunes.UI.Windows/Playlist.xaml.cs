@@ -57,6 +57,11 @@ namespace FoxTunes
             {
                 return;
             }
+            if (listView.SelectedItems != null && listView.SelectedItems.Count > 0)
+            {
+                //When multi-selecting don't mess with the scroll position.
+                return;
+            }
             listView.ScrollIntoView(listView.SelectedItem);
         }
 
