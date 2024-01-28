@@ -24,6 +24,14 @@ namespace FoxTunes
             Semaphore = new SemaphoreSlim(1, 1);
         }
 
+        public IArtworkProvider ArtworkProvider { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.ArtworkProvider = core.Components.ArtworkProvider;
+            base.InitializeComponent(core);
+        }
+
         public async Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)
         {
             if (!this.IsSupported(fileName))
@@ -39,7 +47,10 @@ namespace FoxTunes
                 {
                     this.AddTags(metaData, file.Tag);
                     this.AddProperties(metaData, file.Properties);
-                    await this.AddImages(metaData, CommonMetaData.Pictures, file, file.Tag, file.Tag.Pictures);
+                    if (!await this.AddImages(metaData, CommonMetaData.Pictures, file, file.Tag, file.Tag.Pictures))
+                    {
+                        await this.AddImages(metaData, file);
+                    }
                 }
             }
             catch (UnsupportedFormatException)
@@ -188,15 +199,32 @@ namespace FoxTunes
             metaData.Add(new MetaDataItem(name, MetaDataItemType.Property) { Value = value.Trim() });
         }
 
-        private async Task AddImages(IList<MetaDataItem> metaData, string name, File file, Tag tag, IPicture[] pictures)
+
+        private async Task AddImages(List<MetaDataItem> metaData, File file)
+        {
+            foreach (var type in new[] { ArtworkType.FrontCover, ArtworkType.BackCover })
+            {
+                if (!ArtworkTypes.HasFlag(type))
+                {
+                    continue;
+                }
+                var metaDataItem = await this.ArtworkProvider.Find(file.Name, type);
+                if (metaDataItem != null)
+                {
+                    metaData.Add(metaDataItem);
+                }
+            }
+        }
+
+        private async Task<bool> AddImages(IList<MetaDataItem> metaData, string name, File file, Tag tag, IPicture[] pictures)
         {
             if (pictures == null)
             {
-                return;
+                return false;
             }
+            var types = new List<ArtworkType>();
             try
             {
-                var types = new List<ArtworkType>();
                 foreach (var picture in pictures.OrderBy(picture => GetPicturePriority(picture)))
                 {
                     var type = GetArtworkType(picture.Type);
@@ -219,6 +247,7 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to read pictures: {0} => {1}", file.Name, e.Message);
             }
+            return types.Any();
         }
 
         private async Task<string> ImportImage(Tag tag, IPicture picture, ArtworkType type, bool overwrite)
