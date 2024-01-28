@@ -11,12 +11,7 @@ namespace FoxTunes
     {
         public LibraryHierarchyNode()
         {
-            this._Children = new Lazy<LibraryHierarchyNode[]>(
-                () => this.LibraryHierarchyBrowser.GetNodes(this).ToArray()
-            );
-            this._MetaDatas = new Lazy<MetaDataItem[]>(
-                () => this.MetaDataBrowser.GetMetaDatas(this, MetaDataItemType.Image).ToArray()
-            );
+
         }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
@@ -42,7 +37,14 @@ namespace FoxTunes
             {
                 if (this.IsExpanded)
                 {
-                    return this._Children.Value;
+                    if (this._Children != null)
+                    {
+                        return this._Children.Value;
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
                 else if (this.IsLeaf)
                 {
@@ -72,7 +74,14 @@ namespace FoxTunes
         {
             get
             {
-                return this._MetaDatas.Value;
+                if (this._MetaDatas != null)
+                {
+                    return this._MetaDatas.Value;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
@@ -165,6 +174,12 @@ namespace FoxTunes
             this.DatabaseFactory = core.Factories.Database;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.MetaDataBrowser = core.Components.MetaDataBrowser;
+            this._Children = new Lazy<LibraryHierarchyNode[]>(
+                () => this.LibraryHierarchyBrowser.GetNodes(this).ToArray()
+            );
+            this._MetaDatas = new Lazy<MetaDataItem[]>(
+                () => this.MetaDataBrowser.GetMetaDatas(this, MetaDataItemType.Image).ToArray()
+            );
             base.InitializeComponent(core);
         }
 
