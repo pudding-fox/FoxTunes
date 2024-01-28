@@ -109,10 +109,12 @@
     <Compile Include="Theme\ThemeLoader.cs" />
     <Compile Include="Utilities\DiagonalStackPanel.cs" />
     <Compile Include="Utilities\MouseCursorAdorner.cs" />
+    <Compile Include="Utilities\RefreshableGridViewColumn.cs" />
     <Compile Include="ViewModel\Artwork.cs" />
     <Compile Include="ViewModel\BackgroundTasks.cs" />
     <Compile Include="ViewModel\AsyncCommand.cs" />
     <Compile Include="ViewModel\Converters\DataGridSelectedItemConverter.cs" />
+    <Compile Include="Utilities\PlaylistGridViewColumnFactory.cs" />
     <Compile Include="ViewModel\InvokeParameterizedCommandAction.cs" />
     <Compile Include="ViewModel\Library.cs" />
     <Compile Include="ViewModel\LibraryBrowser.cs" />
@@ -120,7 +122,9 @@
     <Compile Include="ViewModel\LibraryHierarchySettings.cs" />
     <Compile Include="ViewModel\Log.cs" />
     <Compile Include="ViewModel\Main.cs" />
+    <Compile Include="Utilities\PlaylistScriptBinding.cs" />
     <Compile Include="ViewModel\PlaylistSettings.cs" />
+    <Compile Include="Utilities\ScriptBinding.cs" />
     <Compile Include="WindowsForegroundTaskRunner.cs" />
     <Compile Include="WindowsUserInterfaceConfiguration.cs" />
     <Compile Include="ViewModel\Command.cs" />

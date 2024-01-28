@@ -1,19 +1,18 @@
 ﻿using FoxTunes.Integration;
 using FoxTunes.Interfaces;
+using FoxTunes.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public class Playlist : ViewModelBase, IValueConverter
+    public class Playlist : ViewModelBase
     {
         public Playlist()
         {
@@ -26,8 +25,6 @@ namespace FoxTunes.ViewModel
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
-        public IScriptingContext ScriptingContext { get; private set; }
-
         public IDatabaseComponent Database { get; private set; }
 
         public IPlaybackManager PlaybackManager { get; private set; }
@@ -36,7 +33,35 @@ namespace FoxTunes.ViewModel
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public PlaylistGridViewColumnFactory GridViewColumnFactory { get; private set; }
+
         public IList SelectedItems { get; set; }
+
+        private bool _AutoSizeGridColumns { get; set; }
+
+        public bool AutoSizeGridColumns
+        {
+            get
+            {
+                return this._AutoSizeGridColumns;
+            }
+            set
+            {
+                this._AutoSizeGridColumns = value;
+                this.OnAutoSizeGridColumnsChanged();
+            }
+        }
+
+        protected virtual void OnAutoSizeGridColumnsChanged()
+        {
+            if (this.AutoSizeGridColumnsChanged != null)
+            {
+                this.AutoSizeGridColumnsChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("AutoSizeGridColumns");
+        }
+
+        public event EventHandler AutoSizeGridColumnsChanged = delegate { };
 
         private bool _InsertActive { get; set; }
 
@@ -116,28 +141,18 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler InsertOffsetChanged = delegate { };
 
+        private ObservableCollection<GridViewColumn> _GridColumns { get; set; }
+
         public ObservableCollection<GridViewColumn> GridColumns
         {
             get
             {
-                var columns = new ObservableCollection<GridViewColumn>();
-                if (this.Database != null)
-                {
-                    foreach (var column in this.Database.Sets.PlaylistColumn)
-                    {
-                        columns.Add(new GridViewColumn()
-                        {
-                            Header = column.Name,
-                            DisplayMemberBinding = new Binding()
-                            {
-                                Converter = this,
-                                ConverterParameter = column.DisplayScript
-                            },
-                            Width = column.Width.HasValue ? column.Width.Value : double.NaN
-                        });
-                    }
-                }
-                return columns;
+                return this._GridColumns;
+            }
+            set
+            {
+                this._GridColumns = value;
+                this.OnGridColumnsChanged();
             }
         }
 
@@ -152,20 +167,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler GridColumnsChanged = delegate { };
 
-        public void Reload()
-        {
-            this.OnGridColumnsChanged();
-        }
-
-        private void EnsureScriptingContext()
-        {
-            if (this.ScriptingContext != null)
-            {
-                return;
-            }
-            this.ScriptingContext = this.ScriptingRuntime.CreateContext();
-        }
-
         protected override void OnCoreChanged()
         {
             this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
@@ -175,10 +176,11 @@ namespace FoxTunes.ViewModel
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
             //TODO: This is a hack in order to make the playlist's "is playing" field update.
-            this.PlaybackManager.CurrentStreamChanged += (sender, e) => this.OnGridColumnsChanged();
+            this.PlaybackManager.CurrentStreamChanged += (sender, e) => this.Refresh();
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
-            this.OnGridColumnsChanged();
+            this.GridViewColumnFactory = new PlaylistGridViewColumnFactory(this.PlaybackManager, this.ScriptingRuntime);
+            this.Refresh();
             this.OnCommandsChanged();
             base.OnCoreChanged();
         }
@@ -330,37 +332,44 @@ namespace FoxTunes.ViewModel
             return true;
         }
 
-        #region IValueConverter
-
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        protected virtual IEnumerable<GridViewColumn> GetGridColumns()
         {
-            var playlistItem = value as PlaylistItem;
-            if (playlistItem == null)
+            if (this.Database != null && this.GridViewColumnFactory != null)
             {
-                return null;
+                foreach (var column in this.Database.Sets.PlaylistColumn)
+                {
+                    yield return this.GridViewColumnFactory.Create(column);
+                }
             }
-            var script = parameter as string;
-            if (string.IsNullOrEmpty(script))
+        }
+
+        protected virtual void Refresh()
+        {
+            if (this.GridColumns == null)
             {
-                return null;
+                this.Reload();
             }
-            return this.ExecuteScript(playlistItem, script);
+            if (this.GridColumns != null)
+            {
+                foreach (var column in this.GridColumns)
+                {
+                    this.GridViewColumnFactory.Refresh(column);
+                    if (this.AutoSizeGridColumns)
+                    {
+                        if (double.IsNaN(column.Width))
+                        {
+                            column.Width = column.ActualWidth;
+                            column.Width = double.NaN;
+                        }
+                    }
+                }
+            }
         }
 
-        private string ExecuteScript(PlaylistItem playlistItem, string script)
+        protected virtual void Reload()
         {
-            this.EnsureScriptingContext();
-            var runner = new PlaylistItemScriptRunner(this.PlaybackManager, this.ScriptingContext, playlistItem, script);
-            runner.Prepare();
-            return global::System.Convert.ToString(runner.Run());
+            this.GridColumns = new ObservableCollection<GridViewColumn>(this.GetGridColumns());
         }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
 
         private bool _SettingsVisible { get; set; }
 
