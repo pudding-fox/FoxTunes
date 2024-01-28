@@ -37,10 +37,10 @@ jobs:
       run: nuget restore FoxTunes.sln
 
     - name: Build x86
-      run: msbuild FoxTunes.sln /p:Configuration=Release /p:TargetFrameworks=net462 /property:Platform=x86
+      run: msbuild FoxTunes.sln /p:Configuration=Release /p:TargetFrameworks=net462
 
     - name: Build x64
-      run: msbuild FoxTunes.sln /p:Configuration=Release /p:TargetFrameworks=net462 /property:Platform=x64
+      run: msbuild FoxTunes.sln /p:Configuration=Release /p:TargetFrameworks=net462
 
     - name: Package
       run: |
