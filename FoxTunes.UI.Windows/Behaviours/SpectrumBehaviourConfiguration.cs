@@ -5,11 +5,19 @@ namespace FoxTunes
 {
     public static class SpectrumBehaviourConfiguration
     {
+        private static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         public const string SECTION = "B06236E7-F320-4D87-A1A6-9937E0B399BB";
 
         public const string ENABLED_ELEMENT = "50564810-FD40-4A44-BDF6-F0B2F60E674A";
 
-        public const string BARS_ELEMENT = "CF0A0663-7CBF-4EE4-99C8-A0A096D4E876";
+        public const string BARS_ELEMENT = "AAAA0663-7CBF-4EE4-99C8-A0A096D4E876";
 
         public const string BARS_16_OPTION = "AAAADF84-DC4C-463E-9A76-D9D424890D91";
 
@@ -20,6 +28,12 @@ namespace FoxTunes
         public const string BARS_128_OPTION = "DDDD558E-7B9C-4101-992A-709B87756991";
 
         public const string BARS_256_OPTION = "EEEEFFC1-592E-4EC6-9CCD-5182935AD12E";
+
+        public const string QUALITY_ELEMENT = "BBBBB7B8-FEE1-4D3E-A7EB-D2DF8765EED0";
+
+        public const string QUALITY_HIGH_OPTION = "AAAAF4FD-5A1A-4243-9015-BF76ABDEADBA";
+
+        public const string QUALITY_LOW_OPTION = "BBBB06F5-6F01-4A4F-8674-5074747E2084";
 
         public const string PEAKS_ELEMENT = "DDDD7FCF-8A71-4367-8F48-4F8D8C89739C";
 
@@ -37,12 +51,50 @@ namespace FoxTunes
             yield return new ConfigurationSection(SECTION, "Spectrum")
                 .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Show In Toolbar").WithValue(releaseType == ReleaseType.Default))
                 .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, "Bars").WithOptions(GetBarsOptions()))
-                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, "Peaks").WithValue(releaseType == ReleaseType.Default))
-                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, "Peak Hold").WithValue(500).WithValidationRule(new IntegerValidationRule(0, 1000)).DependsOn(SECTION, PEAKS_ELEMENT))
-                .WithElement(new BooleanConfigurationElement(HIGH_CUT_ELEMENT, "High Cut").WithValue(true))
-                .WithElement(new BooleanConfigurationElement(SMOOTH_ELEMENT, "Smooth").WithValue(releaseType == ReleaseType.Default))
-                .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, "Interval").WithValue(releaseType == ReleaseType.Default ? 1 : 100).WithValidationRule(new IntegerValidationRule(1, 100))
+                .WithElement(new SelectionConfigurationElement(QUALITY_ELEMENT, "Quality").WithOptions(GetQualityOptions()))
+                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, "Peaks", path: "Advanced"))
+                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, "Peak Hold", path: "Advanced").WithValue(1000).WithValidationRule(new IntegerValidationRule(500, 5000)).DependsOn(SECTION, PEAKS_ELEMENT))
+                .WithElement(new BooleanConfigurationElement(HIGH_CUT_ELEMENT, "High Cut", path: "Advanced").WithValue(true))
+                .WithElement(new BooleanConfigurationElement(SMOOTH_ELEMENT, "Smooth", path: "Advanced"))
+                .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, "Interval", path: "Advanced").WithValidationRule(new IntegerValidationRule(1, 100))
             );
+            ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(
+                SECTION,
+                QUALITY_ELEMENT
+            ).ConnectValue(option => UpdateConfiguration(option));
+        }
+
+        private static void UpdateConfiguration(SelectionConfigurationOption option)
+        {
+            var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
+            var peaks = configuration.GetElement<BooleanConfigurationElement>(
+                SECTION,
+                PEAKS_ELEMENT
+            );
+            var smooth = configuration.GetElement<BooleanConfigurationElement>(
+                SECTION,
+                SMOOTH_ELEMENT
+            );
+            var interval = configuration.GetElement<IntegerConfigurationElement>(
+                SECTION,
+                INTERVAL_ELEMENT
+            );
+            switch (option.Id)
+            {
+                default:
+                case QUALITY_HIGH_OPTION:
+                    Logger.Write(typeof(SpectrumBehaviourConfiguration), LogLevel.Debug, "Using high quality profile.");
+                    peaks.Value = true;
+                    smooth.Value = true;
+                    interval.Value = 1;
+                    break;
+                case QUALITY_LOW_OPTION:
+                    Logger.Write(typeof(SpectrumBehaviourConfiguration), LogLevel.Debug, "Using low quality profile.");
+                    peaks.Value = false;
+                    smooth.Value = false;
+                    interval.Value = 100;
+                    break;
+            }
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetBarsOptions()
@@ -70,6 +122,23 @@ namespace FoxTunes
                 case BARS_256_OPTION:
                     return 256;
             }
+        }
+
+        private static IEnumerable<SelectionConfigurationOption> GetQualityOptions()
+        {
+            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
+            var high = new SelectionConfigurationOption(QUALITY_HIGH_OPTION, "High");
+            var low = new SelectionConfigurationOption(QUALITY_LOW_OPTION, "Low");
+            if (releaseType == ReleaseType.Default)
+            {
+                high.Default();
+            }
+            else
+            {
+                low.Default();
+            }
+            yield return high;
+            yield return low;
         }
 
         public static int GetWidth(SelectionConfigurationOption option)
