@@ -73,11 +73,6 @@ namespace FoxTunes
             });
         }
 
-        public override void InitializeComponent()
-        {
-            //Nothing to do.
-        }
-
         public override void Update(ConfigurationElement element)
         {
             //Nothing to do.

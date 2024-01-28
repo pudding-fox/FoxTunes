@@ -38,7 +38,7 @@ namespace FoxTunes
 
         public IDictionary<string, ConfigurationElement> Elements { get; protected set; }
 
-        public bool IsInitialized { get; private set; }
+        public bool IsInitialized { get; protected set; }
 
         public ConfigurationSection WithElement(ConfigurationElement element)
         {
@@ -90,10 +90,14 @@ namespace FoxTunes
             return this;
         }
 
-        public void InitializeComponent()
+        public virtual void InitializeComponent()
         {
             foreach (var pair in this.Elements)
             {
+                if (pair.Value.IsInitialized)
+                {
+                    continue;
+                }
                 pair.Value.InitializeComponent();
             }
             this.IsInitialized = true;
@@ -157,7 +161,7 @@ namespace FoxTunes
             }
             return default(ConfigurationElement);
         }
-                                                                                                       
+
         public void Reset()
         {
             foreach (var pair in this.Elements)

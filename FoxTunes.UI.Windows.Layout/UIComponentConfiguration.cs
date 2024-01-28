@@ -12,7 +12,7 @@ namespace FoxTunes
             this.Id = Guid.NewGuid();
             this.Component = UIComponent.None;
             this.Children = new ObservableCollection<UIComponentConfiguration>();
-            this.MetaData = new ConcurrentDictionary<string, string>();
+            this.MetaData = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
         public UIComponentConfiguration(UIComponent component) : this()
