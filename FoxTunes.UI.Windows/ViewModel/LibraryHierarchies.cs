@@ -61,6 +61,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SelectedHierarchyChanged = delegate { };
 
+        private LibraryHierarchyLevel _SelectedHierarchyLevel { get; set; }
+
+        public LibraryHierarchyLevel SelectedHierarchyLevel
+        {
+            get
+            {
+                return this._SelectedHierarchyLevel;
+            }
+            set
+            {
+                this._SelectedHierarchyLevel = value;
+                this.OnSelectedHierarchyLevelChanged();
+            }
+        }
+
+        protected virtual void OnSelectedHierarchyLevelChanged()
+        {
+            if (this.SelectedHierarchyLevelChanged != null)
+            {
+                this.SelectedHierarchyLevelChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SelectedHierarchyLevel");
+        }
+
+        public event EventHandler SelectedHierarchyLevelChanged = delegate { };
+
         private bool _SettingsVisible { get; set; }
 
         public bool SettingsVisible
@@ -119,11 +145,11 @@ namespace FoxTunes.ViewModel
 
         public void Update()
         {
-            if (this.SelectedHierarchy.Id == 0)
+            if (this.SelectedHierarchy.Id == 0 && this.SelectedHierarchyLevel != null)
             {
                 return;
             }
-            this.DatabaseContext.Sets.LibraryHierarchy.Update(this.SelectedHierarchy);
+            this.DatabaseContext.GetSet<LibraryHierarchyLevel>().Update(this.SelectedHierarchyLevel);
         }
 
         public ICommand SaveCommand
