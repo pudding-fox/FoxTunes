@@ -109,7 +109,10 @@ namespace FoxTunes
             this.Adapter.RemoveHook(this.DefaultHook);
             this.Adapter.RemoveHook(this.MoveHook);
             this.Adapter.RemoveHook(this.ResizeHook);
-            this.Adapter.AddHook(hook);
+            if (hook != null)
+            {
+                this.Adapter.AddHook(hook);
+            }
         }
 
         protected virtual IntPtr DefaultHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -402,6 +405,7 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            this.SetHook(null);
             lock (Instances)
             {
                 for (var a = Instances.Count - 1; a >= 0; a--)
