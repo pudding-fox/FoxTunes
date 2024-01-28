@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class PlaylistColumnManager : StandardManager, IPlaylistColumnManager
     {
         public PlaylistColumnManager()

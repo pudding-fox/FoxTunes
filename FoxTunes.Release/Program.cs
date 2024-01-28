@@ -619,10 +619,11 @@ namespace FoxTunes
                     "replaygain",
                     new PackageElement[]
                     {
-                        "bass_replay_gain.dll",
                         new PackageElement("FoxTunes.Output.Bass.ReplayGain.exe", PackageElementFlags.LargeAddressAware),
                         "FoxTunes.Output.Bass.ReplayGain.exe.config",
-                        "ManagedBass.ReplayGain.dll"
+                        "ManagedBass.ReplayGain.dll",
+                        new PackageElement("x86/bass_replay_gain.dll", "addon", PackageElementFlags.PlatformX86 | PackageElementFlags.Flatten),
+                        new PackageElement("x64/bass_replay_gain.dll", "addon", PackageElementFlags.PlatformX64 | PackageElementFlags.Flatten)
                     },
                     PackageFlags.Default
                 ),

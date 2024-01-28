@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class ReportSource : StandardComponent, IReportEmitter
+    public class ReportEmitter : StandardComponent, IReportEmitter
     {
         public Task Send(IReportComponent report)
         {

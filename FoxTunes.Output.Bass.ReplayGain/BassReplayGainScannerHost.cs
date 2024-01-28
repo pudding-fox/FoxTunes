@@ -37,7 +37,7 @@ namespace FoxTunes
             LogManager.FileName = Path.Combine(
                 Publication.StoragePath,
                 string.Format(
-                    "Log_Converter_{0}.txt",
+                    "Log_ReplayGain_{0}.txt",
                     DateTime.UtcNow.ToFileTime()
                 )
             );
