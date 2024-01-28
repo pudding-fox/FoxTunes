@@ -16,6 +16,8 @@ namespace FoxTunes
 
         public const string LyricsRelease = "__FT_LyricsRelease";
 
+        public const string SourceFileName = "__FT_SourceFileName";
+
         public static IDictionary<string, string> Lookup = GetLookup();
 
         private static IDictionary<string, string> GetLookup()

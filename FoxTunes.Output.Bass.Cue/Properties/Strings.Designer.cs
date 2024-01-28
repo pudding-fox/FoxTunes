@@ -108,18 +108,18 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Reading cue sheet.
         /// </summary>
-        internal static string CueSheetPlaylistItemFactory_Name {
+        internal static string CueSheetItemFactory_Name {
             get {
-                return ResourceManager.GetString("CueSheetPlaylistItemFactory.Name", resourceCulture);
+                return ResourceManager.GetString("CueSheetItemFactory.Name", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Cue data file {0}.
         /// </summary>
-        internal static string CueSheetPlaylistItemFactory_Prompt {
+        internal static string CueSheetItemFactory_Prompt {
             get {
-                return ResourceManager.GetString("CueSheetPlaylistItemFactory.Prompt", resourceCulture);
+                return ResourceManager.GetString("CueSheetItemFactory.Prompt", resourceCulture);
             }
         }
     }

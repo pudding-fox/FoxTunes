@@ -1,13 +1,9 @@
 ﻿using FoxTunes.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace FoxTunes
 {
-    public class TagLibFileAbstraction : global::TagLib.File.IFileAbstraction
+    public class TagLibFileAbstraction : ITagLibFileAbstraction
     {
         public TagLibFileAbstraction(IFileAbstraction fileAbstraction)
         {

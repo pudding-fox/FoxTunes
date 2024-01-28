@@ -132,7 +132,7 @@ namespace FoxTunes
                                 Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", path, e.Message);
                             }
                         }
-                        this.EnsureMetaData(a, entry, item);
+                        this.EnsureMetaData(path, a, entry, item);
                         items.Add(item);
                     }
                     else
@@ -147,7 +147,7 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void EnsureMetaData(int index, Archive.ArchiveEntry entry, T item)
+        protected virtual void EnsureMetaData(string path, int index, Archive.ArchiveEntry entry, T item)
         {
             var hasTrack = false;
             var hasTitle = false;
@@ -179,6 +179,10 @@ namespace FoxTunes
                     Value = entry.path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).LastOrDefault()
                 });
             }
+            item.MetaDatas.Add(new MetaDataItem(CustomMetaData.SourceFileName, MetaDataItemType.Tag)
+            {
+                Value = path
+            });
         }
     }
 }

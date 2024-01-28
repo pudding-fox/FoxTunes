@@ -7,6 +7,16 @@ namespace FoxTunes.Interfaces
     {
         string FileName { get; }
 
+        string DirectoryName { get; }
+
+        string FileExtension { get; }
+
+        long FileSize { get; }
+
+        DateTime FileCreationTime { get; }
+
+        DateTime FileModificationTime { get; }
+
         Stream ReadStream { get; }
 
         Stream WriteStream { get; }

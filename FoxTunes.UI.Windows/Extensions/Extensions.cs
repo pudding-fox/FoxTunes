@@ -354,5 +354,24 @@ namespace FoxTunes
                 UIDisposer.Dispose(element, flags);
             }
         }
+
+        public static void Clear(this UIElementCollection items, UIDisposerFlags flags = UIDisposerFlags.Default)
+        {
+            if (items.Count == 0)
+            {
+                return;
+            }
+            if (flags == UIDisposerFlags.None)
+            {
+                items.Clear();
+                return;
+            }
+            var elements = items.OfType<FrameworkElement>().ToArray();
+            items.Clear();
+            foreach (var element in elements)
+            {
+                UIDisposer.Dispose(element, flags);
+            }
+        }
     }
 }

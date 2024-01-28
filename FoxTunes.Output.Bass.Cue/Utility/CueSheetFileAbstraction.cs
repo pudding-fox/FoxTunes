@@ -1,24 +1,15 @@
 ﻿using FoxTunes.Interfaces;
-using ManagedBass.ZipStream;
 using System;
 using System.IO;
 
 namespace FoxTunes
 {
-    public class ArchiveFileAbstraction : BaseComponent, IFileAbstraction
+    public class CueSheetFileAbstraction : BaseComponent, IFileAbstraction
     {
-        private IntPtr Entry;
-
-        private ArchiveFileAbstraction()
-        {
-            this.Entry = IntPtr.Zero;
-        }
-
-        public ArchiveFileAbstraction(string fileName, string entryName, int index) : this()
+        public CueSheetFileAbstraction(string fileName, string entryName)
         {
             this.Info = new FileInfo(fileName);
             this.EntryName = entryName;
-            this.Index = index;
         }
 
         #region IFileAbstraction
@@ -51,11 +42,7 @@ namespace FoxTunes
         {
             get
             {
-                if (!this.IsOpen)
-                {
-                    return -1;
-                }
-                return this.ReadStream.Length;
+                return 0;
             }
         }
 
@@ -90,30 +77,11 @@ namespace FoxTunes
 
         public string EntryName { get; private set; }
 
-        public int Index { get; private set; }
-
         public bool IsOpen { get; private set; }
-
-        public long Result
-        {
-            get
-            {
-                var result = default(long);
-                if (!IntPtr.Zero.Equals(this.Entry))
-                {
-                    ArchiveEntry.GetEntryResult(this.Entry, out result);
-                }
-                return result;
-            }
-        }
 
         public void Open()
         {
-            if (!ArchiveEntry.OpenEntry(this.Info.FullName, this.Index, out this.Entry))
-            {
-                return;
-            }
-            this.ReadStream = new ArchiveEntryStream(this.Entry);
+            this.ReadStream = File.OpenRead(this.Info.FullName);
             this.IsOpen = true;
         }
 
@@ -124,14 +92,8 @@ namespace FoxTunes
                 this.ReadStream.Dispose();
                 this.ReadStream = null;
             }
-            if (!IntPtr.Zero.Equals(this.Entry))
-            {
-                ArchiveEntry.CloseEntry(this.Entry);
-                this.Entry = IntPtr.Zero;
-            }
             this.IsOpen = false;
         }
-
 
         public bool IsDisposed { get; private set; }
 
@@ -156,7 +118,7 @@ namespace FoxTunes
             this.Close();
         }
 
-        ~ArchiveFileAbstraction()
+        ~CueSheetFileAbstraction()
         {
             Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
@@ -169,9 +131,9 @@ namespace FoxTunes
             }
         }
 
-        public static ArchiveFileAbstraction Create(string fileName, string entryName, int index)
+        public static CueSheetFileAbstraction Create(string fileName, string entryName)
         {
-            var fileAbstraction = new ArchiveFileAbstraction(fileName, entryName, index);
+            var fileAbstraction = new CueSheetFileAbstraction(fileName, entryName);
             fileAbstraction.Open();
             return fileAbstraction;
         }
