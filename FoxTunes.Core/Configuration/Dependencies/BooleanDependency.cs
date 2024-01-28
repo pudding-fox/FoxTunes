@@ -4,7 +4,7 @@ namespace FoxTunes
 {
     public class BooleanDependency : Dependency
     {
-        public BooleanDependency(string sectionId, string elementId) : base(sectionId, elementId)
+        public BooleanDependency(string sectionId, string elementId, bool negate) : base(sectionId, elementId, negate)
         {
 
         }
@@ -13,7 +13,12 @@ namespace FoxTunes
         {
             if (element is BooleanConfigurationElement booleanConfigurationElement)
             {
-                return booleanConfigurationElement.Value;
+                var result = booleanConfigurationElement.Value;
+                if (this.Negate)
+                {
+                    result = !result;
+                }
+                return result;
             }
             return false;
         }

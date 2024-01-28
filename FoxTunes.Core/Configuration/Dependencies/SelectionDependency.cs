@@ -4,7 +4,7 @@ namespace FoxTunes
 {
     public class SelectionDependency : Dependency
     {
-        public SelectionDependency(string sectionId, string elementId, string optionId) : base(sectionId, elementId)
+        public SelectionDependency(string sectionId, string elementId, string optionId, bool negate) : base(sectionId, elementId, negate)
         {
             this.OptionId = optionId;
         }
@@ -15,7 +15,12 @@ namespace FoxTunes
         {
             if (element is SelectionConfigurationElement selectionConfigurationElement)
             {
-                return string.Equals(selectionConfigurationElement.Value.Id, this.OptionId, StringComparison.OrdinalIgnoreCase);
+                var result = string.Equals(selectionConfigurationElement.Value.Id, this.OptionId, StringComparison.OrdinalIgnoreCase);
+                if (this.Negate)
+                {
+                    result = !result;
+                }
+                return result;
             }
             return false;
         }

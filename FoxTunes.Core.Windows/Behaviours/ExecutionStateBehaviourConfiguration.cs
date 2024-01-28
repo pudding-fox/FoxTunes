@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace FoxTunes
 {
@@ -16,19 +15,24 @@ namespace FoxTunes
 
         public const string SLEEP_DISPLAY_OPTION = "CCCC64A7-1884-484F-AA13-7C221B1EA128";
 
+        public const string ONLY_WHILE_PLAYING_ELEMENT = "GGGG5385-BECC-4111-894D-82A30A1AA3A0";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "Power")
-                .WithElement(
-                    new SelectionConfigurationElement(SLEEP_ELEMENT, "Sleep").WithOptions(GetSleepOptions())
+            yield return new ConfigurationSection(SECTION, Strings.ExecutionStateBehaviourConfiguration_Section)
+                .WithElement(new SelectionConfigurationElement(SLEEP_ELEMENT, Strings.ExecutionStateBehaviourConfiguration_Sleep)
+                    .WithOptions(GetSleepOptions()))
+                .WithElement(new BooleanConfigurationElement(ONLY_WHILE_PLAYING_ELEMENT, Strings.ExecutionStateBehaviourConfiguration_OnlyWhilePlaying)
+                    .WithValue(true)
+                    .DependsOn(SECTION, SLEEP_ELEMENT, SLEEP_NONE_OPTION, true)
                );
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetSleepOptions()
         {
-            yield return new SelectionConfigurationOption(SLEEP_NONE_OPTION, "Allow Sleep");
-            yield return new SelectionConfigurationOption(SLEEP_SYSTEM_OPTION, "Prevent System Sleep");
-            yield return new SelectionConfigurationOption(SLEEP_DISPLAY_OPTION, "Prevent Display Sleep");
+            yield return new SelectionConfigurationOption(SLEEP_NONE_OPTION, Strings.ExecutionStateBehaviourConfiguration_SleepNone);
+            yield return new SelectionConfigurationOption(SLEEP_SYSTEM_OPTION, Strings.ExecutionStateBehaviourConfiguration_SleepSystem);
+            yield return new SelectionConfigurationOption(SLEEP_DISPLAY_OPTION, Strings.ExecutionStateBehaviourConfiguration_SleepDisplay);
         }
 
         public static EXECUTION_STATE GetExecutionState(SelectionConfigurationOption option)
