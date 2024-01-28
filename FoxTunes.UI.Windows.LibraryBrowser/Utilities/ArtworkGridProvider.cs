@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class ArtworkGridProvider : StandardComponent
+    public class ArtworkGridProvider : StandardComponent, IDisposable
     {
         const int TIMEOUT = 1000;
 
@@ -25,11 +25,37 @@ namespace FoxTunes
 
         public ImageLoader ImageLoader { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
             this.ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
+            this.SignalEmitter = core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             base.InitializeComponent(core);
+        }
+
+        protected virtual Task OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.HierarchiesUpdated:
+                    if (!object.Equals(signal.State, CommonSignalFlags.SOFT))
+                    {
+#if NET40
+                        var task = TaskEx.Run(() => this.Clear());
+#else
+                        var task = Task.Run(() => this.Clear());
+#endif
+                    }
+                    break;
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         public async Task<ImageSource> CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
@@ -278,5 +304,44 @@ namespace FoxTunes
         }
 
         public event EventHandler Cleared;
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.SignalEmitter != null)
+            {
+                this.SignalEmitter.Signal -= this.OnSignal;
+            }
+        }
+
+        ~ArtworkGridProvider()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
+        }
     }
 }
