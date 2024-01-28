@@ -7,9 +7,11 @@ namespace FoxTunes
 {
     public class EncoderItem : MarshalByRefObject
     {
+        const int ERROR_CAPACITY = 10;
+
         private EncoderItem()
         {
-            this._Errors = new List<string>();
+            this._Errors = new List<string>(ERROR_CAPACITY);
         }
 
         public const int PROGRESS_NONE = 0;
@@ -45,6 +47,10 @@ namespace FoxTunes
         public void AddError(string error)
         {
             this._Errors.Add(error);
+            if (this._Errors.Count > ERROR_CAPACITY)
+            {
+                this._Errors.RemoveAt(0);
+            }
         }
 
         public static EncoderItem FromPlaylistItem(PlaylistItem playlistItem)
