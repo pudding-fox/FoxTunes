@@ -455,10 +455,24 @@ namespace FoxTunes
                         "encoders/opusenc.exe",
                         "encoders/opusenc_license.txt",
                         "encoders/refalac.exe",
-                        "encoders/sox.exe",
-                        "encoders/sox_license.txt",
                         "encoders/wavpack.exe",
                         "encoders/wavpack_license.txt",
+                        "sox/libflac-8.dll",
+                        "sox/libgcc_s_sjlj-1.dll",
+                        "sox/libgomp-1.dll",
+                        "sox/libid3tag-0.dll",
+                        "sox/libogg-0.dll",
+                        "sox/libpng16-16.dll",
+                        "sox/libsox-3.dll",
+                        "sox/libssp-0.dll",
+                        "sox/libvorbis-0.dll",
+                        "sox/libvorbisenc-2.dll",
+                        "sox/libvorbisfile-3.dll",
+                        "sox/libwavpack-1.dll",
+                        "sox/libwinpthread-1.dll",
+                        "sox/LICENSE.GPL.txt",
+                        "sox/sox.exe",
+                        "sox/zlib1.dll",
                         new PackageElement("FoxTunes.Encoder.Bass.exe", PackageElementFlags.LargeAddressAware),
                         "FoxTunes.Encoder.Bass.exe.config"
                     },
@@ -520,6 +534,27 @@ namespace FoxTunes
                         "FoxTunes.UI.Windows.Lyrics.dll"
                     },
                     PackageFlags.Default
+                ),
+                new Package(
+                    "minidisc",
+                    new PackageElement[]
+                    {
+                        "FoxTunes.Minidisc.Bass.dll",
+                        "MD.Net.dll",
+                        "x86/atracdenc.exe",
+                        "x86/gcrypt.dll",
+                        "x86/himdcli.exe",
+                        "x86/libgcc_s_dw2-1.dll",
+                        "x86/libgcc_s_sjlj-1.dll",
+                        "x86/libgcrypt-20.dll",
+                        "x86/libglib-2.0-0.dll",
+                        "x86/libgpg-error-0.dll",
+                        "x86/libjson-c-5.dll",
+                        "x86/libusb-1.0.dll",
+                        "x86/libwinpthread-1.dll",
+                        "x86/netmdcli.exe",
+                        "x86/zlib1.dll"
+                    }
                 ),
                 new Package(
                     "metadataeditor",
