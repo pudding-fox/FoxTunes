@@ -427,6 +427,7 @@ namespace FoxTunes
 
         public Task Shutdown()
         {
+            this.Save();
             this.IsLoaded = false;
             return global::FoxTunes.Windows.Invoke(() =>
             {

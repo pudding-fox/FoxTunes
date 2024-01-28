@@ -67,7 +67,7 @@ namespace FoxTunes
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
                 this.History.ValueChanged += this.OnValueChanged;
                 this.FFTSize.ValueChanged += this.OnValueChanged;
-                var task = this.CreateBitmap();
+                var task = this.CreateBitmap(true);
             }
             base.OnConfigurationChanged();
         }

@@ -204,7 +204,7 @@ namespace FoxTunes
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
-            var task = this.CreateBitmap();
+            var task = this.CreateBitmap(false);
             base.OnRenderSizeChanged(sizeInfo);
         }
 
@@ -213,7 +213,7 @@ namespace FoxTunes
             drawingContext.DrawRectangle(this.Background, null, new Rect(0, 0, this.ActualWidth, this.ActualHeight));
         }
 
-        protected virtual Task CreateBitmap()
+        protected virtual Task CreateBitmap(bool force)
         {
             return Windows.Invoke(() =>
             {
@@ -222,6 +222,14 @@ namespace FoxTunes
                 if (!this.GetPixelSize(out width, out height))
                 {
                     return;
+                }
+                if (this.Bitmap != null && !force)
+                {
+                    if (this.Bitmap.PixelWidth == width && this.Bitmap.PixelHeight == height)
+                    {
+                        //Nothing to do.
+                        return;
+                    }
                 }
                 if (!this.CreateData(width, height))
                 {

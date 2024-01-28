@@ -36,7 +36,7 @@ namespace FoxTunes
                 );
                 this.Mode.ValueChanged += this.OnValueChanged;
                 this.Duration.ValueChanged += this.OnValueChanged;
-                var task = this.CreateBitmap();
+                var task = this.CreateBitmap(true);
             }
             base.OnConfigurationChanged();
         }
