@@ -460,69 +460,133 @@ namespace FoxTunes
 
         private void SetTag(MetaDataItem metaDataItem, File file, Tag tag)
         {
-            //TODO: Make this case insensitive.
-            switch (metaDataItem.Name)
+            if (string.Equals(metaDataItem.Name, CommonMetaData.Album, StringComparison.OrdinalIgnoreCase))
             {
-                case CommonMetaData.Album:
-                    tag.Album = metaDataItem.Value;
-                    break;
-                case CommonMetaData.Artist:
-                    tag.AlbumArtists = new[] { metaDataItem.Value };
-                    break;
-                case CommonMetaData.Composer:
-                    tag.Composers = new[] { metaDataItem.Value };
-                    break;
-                case CommonMetaData.Conductor:
-                    tag.Conductor = metaDataItem.Value;
-                    break;
-                case CommonMetaData.Disc:
-                    tag.Disc = Convert.ToUInt32(metaDataItem.Value);
-                    break;
-                case CommonMetaData.DiscCount:
-                    tag.DiscCount = Convert.ToUInt32(metaDataItem.Value);
-                    break;
-                case CommonMetaData.Genre:
-                    tag.Genres = new[] { metaDataItem.Value };
-                    break;
-                case CommonMetaData.LastPlayed:
-                    if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value).HasFlag(WriteBehaviour.Statistics))
+                this.Try(() => tag.Album = metaDataItem.Value, this.ErrorHandler);
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.Artist, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Try(() => tag.AlbumArtists = new[] { metaDataItem.Value }, this.ErrorHandler);
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.Composer, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Try(() => tag.Composers = new[] { metaDataItem.Value }, this.ErrorHandler);
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.Conductor, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Try(() => tag.Conductor = metaDataItem.Value, this.ErrorHandler);
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.Disc, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Try(() =>
+                {
+                    var disc = default(uint);
+                    if (uint.TryParse(metaDataItem.Value, out disc))
                     {
-                        PopularimeterManager.Write(this, metaDataItem, file);
+                        tag.Disc = disc;
                     }
-                    break;
-                case CommonMetaData.Performer:
-                    tag.Performers = new[] { metaDataItem.Value };
-                    break;
-                case CommonMetaData.PlayCount:
-                    if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value).HasFlag(WriteBehaviour.Statistics))
+                    else
                     {
-                        PopularimeterManager.Write(this, metaDataItem, file);
+                        tag.Disc = 0;
                     }
-                    break;
-                case CommonMetaData.Rating:
-                    PopularimeterManager.Write(this, metaDataItem, file);
-                    break;
-                case CommonMetaData.ReplayGainAlbumGain:
-                case CommonMetaData.ReplayGainAlbumPeak:
-                case CommonMetaData.ReplayGainTrackGain:
-                case CommonMetaData.ReplayGainTrackPeak:
-                    if (this.ReplayGain.Value)
+                }, this.ErrorHandler);
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.DiscCount, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Try(() =>
+                {
+                    var discCount = default(uint);
+                    if (uint.TryParse(metaDataItem.Value, out discCount))
                     {
-                        ReplayGainManager.Write(this, metaDataItem, file);
+                        tag.DiscCount = discCount;
                     }
-                    break;
-                case CommonMetaData.Title:
-                    tag.Title = metaDataItem.Value;
-                    break;
-                case CommonMetaData.Track:
-                    tag.Track = Convert.ToUInt32(metaDataItem.Value);
-                    break;
-                case CommonMetaData.TrackCount:
-                    tag.TrackCount = Convert.ToUInt32(metaDataItem.Value);
-                    break;
-                case CommonMetaData.Year:
-                    tag.Year = Convert.ToUInt32(metaDataItem.Value);
-                    break;
+                    else
+                    {
+                        tag.DiscCount = 0;
+                    }
+                }, this.ErrorHandler);
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.Genre, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Try(() => tag.Genres = new[] { metaDataItem.Value }, this.ErrorHandler);
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.LastPlayed, StringComparison.OrdinalIgnoreCase))
+            {
+                if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value).HasFlag(WriteBehaviour.Statistics))
+                {
+                    this.Try(() => PopularimeterManager.Write(this, metaDataItem, file), this.ErrorHandler);
+                }
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.Performer, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Try(() => tag.Performers = new[] { metaDataItem.Value }, this.ErrorHandler);
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.PlayCount, StringComparison.OrdinalIgnoreCase))
+            {
+                if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value).HasFlag(WriteBehaviour.Statistics))
+                {
+                    this.Try(() => PopularimeterManager.Write(this, metaDataItem, file), this.ErrorHandler);
+                }
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.Rating, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Try(() => PopularimeterManager.Write(this, metaDataItem, file), this.ErrorHandler);
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.ReplayGainAlbumGain, StringComparison.OrdinalIgnoreCase) || string.Equals(metaDataItem.Name, CommonMetaData.ReplayGainAlbumPeak, StringComparison.OrdinalIgnoreCase) || string.Equals(metaDataItem.Name, CommonMetaData.ReplayGainTrackGain, StringComparison.OrdinalIgnoreCase) || string.Equals(metaDataItem.Name, CommonMetaData.ReplayGainTrackPeak, StringComparison.OrdinalIgnoreCase))
+            {
+                if (this.ReplayGain.Value)
+                {
+                    this.Try(() => ReplayGainManager.Write(this, metaDataItem, file), this.ErrorHandler);
+                }
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.Title, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Try(() => tag.Title = metaDataItem.Value, this.ErrorHandler);
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.Track, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Try(() =>
+                {
+                    var track = default(uint);
+                    if (uint.TryParse(metaDataItem.Value, out track))
+                    {
+                        tag.Track = track;
+                    }
+                    else
+                    {
+                        tag.Track = 0;
+                    }
+                }, this.ErrorHandler);
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.TrackCount, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Try(() =>
+                {
+                    var trackCount = default(uint);
+                    if (uint.TryParse(metaDataItem.Value, out trackCount))
+                    {
+                        tag.TrackCount = trackCount;
+                    }
+                    else
+                    {
+                        tag.TrackCount = 0;
+                    }
+                }, this.ErrorHandler);
+            }
+            else if (string.Equals(metaDataItem.Name, CommonMetaData.Year, StringComparison.OrdinalIgnoreCase))
+            {
+                this.Try(() =>
+                {
+                    var year = default(uint);
+                    if (uint.TryParse(metaDataItem.Value, out year))
+                    {
+                        tag.Year = year;
+                    }
+                    else
+                    {
+                        tag.Year = 0;
+                    }
+                }, this.ErrorHandler);
             }
         }
 
