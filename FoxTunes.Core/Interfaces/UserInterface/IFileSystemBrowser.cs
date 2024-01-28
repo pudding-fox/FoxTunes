@@ -48,7 +48,8 @@ namespace FoxTunes.Interfaces
         None = 0,
         File = 1,
         Folder = 2,
-        Multiselect = 4
+        Multiselect = 4,
+        Save = 8
     }
 
     public class BrowseResult

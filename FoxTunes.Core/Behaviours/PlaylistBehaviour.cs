@@ -32,7 +32,7 @@ namespace FoxTunes
                         InvocationComponent.CATEGORY_PLAYBACK,
                         option.Id,
                         option.Name,
-                        path: "Order",
+                        path: Strings.PlaylistBehaviour_Order,
                         attributes: string.Equals(option.Id, this.Order.Value.Id, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
