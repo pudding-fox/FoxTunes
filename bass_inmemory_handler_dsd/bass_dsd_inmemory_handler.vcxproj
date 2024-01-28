@@ -12,9 +12,10 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{C1A0B5D4-9245-47EE-95A9-8654A9F5CF00}</ProjectGuid>
-    <RootNamespace>basswasapihandler</RootNamespace>
+    <ProjectGuid>{530C8EC7-66B4-4A17-9BF4-001193151FDA}</ProjectGuid>
+    <RootNamespace>bassinmemoryhandlerdsd</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <ProjectName>bass_inmemory_handler_dsd</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -54,7 +55,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BASS_WASAPI_HANDLER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;BASS_INMEMORY_HANDLER_DSD_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
@@ -72,7 +73,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;BASS_WASAPI_HANDLER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;BASS_INMEMORY_HANDLER_DSD_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <Link>
@@ -83,17 +84,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Library Include="..\lib\Addon\bassdsd.lib" />
     <Library Include="..\lib\bass.lib" />
-    <Library Include="..\lib\basswasapi.lib" />
     <Library Include="..\lib\msvcrt.lib" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="bass_wasapi_handler.c" />
+    <ClCompile Include="..\bass_inmemory_handler\buffer.c" />
+    <ClCompile Include="..\bass_inmemory_handler\file_name.c" />
+    <ClCompile Include="..\bass_inmemory_handler\inmemory_stream.c" />
+    <ClCompile Include="..\bass_inmemory_handler\reader.c" />
+    <ClCompile Include="bass_inmemory_handler_dsd.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bass\bass.h" />
-    <ClInclude Include="bass\basswasapi.h" />
-    <ClInclude Include="bass_wasapi_handler.h" />
+    <ClInclude Include="bass\bassdsd.h" />
+    <ClInclude Include="bass_inmemory_handler_dsd.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

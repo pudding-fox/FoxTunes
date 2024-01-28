@@ -19,12 +19,9 @@ namespace FoxTunes
         public BassStreamProvider()
         {
             this.Semaphore = new SemaphoreSlim(1, 1);
-            this.Streams = new ConcurrentDictionary<BassStreamProviderKey, byte[]>();
         }
 
         public SemaphoreSlim Semaphore { get; private set; }
-
-        public ConcurrentDictionary<BassStreamProviderKey, byte[]> Streams { get; private set; }
 
         public IBassOutput Output { get; private set; }
 
@@ -57,7 +54,11 @@ namespace FoxTunes
             return true;
         }
 
+#if NET40
+        public virtual Task<int> CreateStream(PlaylistItem playlistItem)
+#else
         public virtual async Task<int> CreateStream(PlaylistItem playlistItem)
+#endif
         {
             var flags = BassFlags.Decode;
             if (this.Output.Float)
@@ -71,20 +72,24 @@ namespace FoxTunes
 #endif
             try
             {
+                var channelHandle = default(int);
                 if (this.Output.PlayFromMemory)
                 {
-                    var buffer = await this.GetBuffer(playlistItem);
-                    var channelHandle = Bass.CreateStream(buffer, 0, buffer.Length, flags);
-                    if (channelHandle != 0)
+                    channelHandle = BassInMemoryHandler.CreateStream(playlistItem.FileName, 0, 0, flags);
+                    if (channelHandle == 0)
                     {
-                        if (!this.Streams.TryAdd(new BassStreamProviderKey(playlistItem.FileName, channelHandle), buffer))
-                        {
-                            Logger.Write(this, LogLevel.Warn, "Failed to pin handle of buffer for file \"{0}\". Playback may fail.", playlistItem.FileName);
-                        }
+                        Logger.Write(this, LogLevel.Warn, "Failed to load file into memory: {0}", playlistItem.FileName);
                     }
-                    return channelHandle;
                 }
-                return Bass.CreateStream(playlistItem.FileName, 0, 0, flags);
+                else
+                {
+                    channelHandle = Bass.CreateStream(playlistItem.FileName, 0, 0, flags);
+                }
+#if NET40
+                return TaskEx.FromResult(channelHandle);
+#else
+                return channelHandle;
+#endif
             }
             finally
             {
@@ -92,35 +97,10 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task<byte[]> GetBuffer(PlaylistItem playlistItem)
-        {
-            var buffer = default(byte[]);
-            foreach (var key in this.Streams.Keys)
-            {
-                if (string.Equals(key.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase) && this.Streams.TryGetValue(key, out buffer))
-                {
-                    Logger.Write(this, LogLevel.Debug, "Recycling existing buffer of {0} bytes from file \"{0}\".", buffer.Length, playlistItem.FileName);
-                    return buffer;
-                }
-            }
-            Logger.Write(this, LogLevel.Debug, "Loading file \"{0}\" into memory.", playlistItem.FileName);
-            using (var stream = File.OpenRead(playlistItem.FileName))
-            {
-                buffer = new byte[stream.Length];
-                await stream.ReadAsync(buffer, 0, buffer.Length);
-                Logger.Write(this, LogLevel.Debug, "Buffered {0} bytes from file \"{0}\".", buffer.Length, playlistItem.FileName);
-            }
-            return buffer;
-        }
-
         public virtual void FreeStream(PlaylistItem playlistItem, int channelHandle)
         {
             Logger.Write(this, LogLevel.Debug, "Freeing stream: {0}", channelHandle);
             Bass.StreamFree(channelHandle); //Not checking result code as it contains an error if the application is shutting down.
-            if (this.Streams.TryRemove(new BassStreamProviderKey(playlistItem.FileName, channelHandle)))
-            {
-                Logger.Write(this, LogLevel.Debug, "Released handle of buffer for channel {0}.", channelHandle);
-            }
         }
 
         public bool IsDisposed { get; private set; }
@@ -143,7 +123,7 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            this.Streams.Clear();
+            //Nothing to do.
         }
 
         ~BassStreamProvider()

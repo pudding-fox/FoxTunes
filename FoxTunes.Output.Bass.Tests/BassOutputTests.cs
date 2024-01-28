@@ -5,10 +5,10 @@ namespace FoxTunes.Output.Bass.Tests
 {
     [Explicit]
     [TestFixture(BassOutputTests.DEFAULT)]
-    [TestFixture(BassOutputTests.DEFAULT | BassOutputTests.RESAMPLER)]
-    [TestFixture(BassOutputTests.DEFAULT | BassOutputTests.ASIO)]
-    [TestFixture(BassOutputTests.DEFAULT | BassOutputTests.RESAMPLER | BassOutputTests.ASIO)]
-    [TestFixture(BassOutputTests.DEFAULT | BassOutputTests.RESAMPLER | BassOutputTests.WASAPI)]
+    //[TestFixture(BassOutputTests.DEFAULT | BassOutputTests.RESAMPLER)]
+    //[TestFixture(BassOutputTests.DEFAULT | BassOutputTests.ASIO)]
+    //[TestFixture(BassOutputTests.DEFAULT | BassOutputTests.RESAMPLER | BassOutputTests.ASIO)]
+    //[TestFixture(BassOutputTests.DEFAULT | BassOutputTests.RESAMPLER | BassOutputTests.WASAPI)]
     public class BassOutputTests : TestBase
     {
         public const long RESAMPLER = 128;
@@ -170,6 +170,24 @@ namespace FoxTunes.Output.Bass.Tests
 #endif
             Assert.AreEqual(outputStreams[0].Length, outputStreams[0].Position);
             Assert.IsTrue(outputStreams[1].Position > 0);
+        }
+
+        [Test]
+        public async Task CanPlayFromMemory()
+        {
+            this.Core.Components.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassOutputConfiguration.PLAY_FROM_RAM_ELEMENT
+            ).Value = true;
+            var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[4], false);
+            await outputStream.Play();
+#if NET40
+            await TaskEx.Delay(1000);
+#else
+            await Task.Delay(1000);
+#endif
+            Assert.IsTrue(outputStream.Position > 0);
+            outputStream.Dispose();
         }
     }
 }

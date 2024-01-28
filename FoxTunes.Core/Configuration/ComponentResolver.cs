@@ -1,17 +1,24 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using System.Reflection;
 using System.Xml.Linq;
-using System.Linq;
 
 namespace FoxTunes
 {
     public class ComponentResolver : IComponentResolver
     {
-        public static readonly string FILE_NAME = string.Format("{0}.config", Assembly.GetEntryAssembly().Location);
+        public static readonly string FILE_NAME = GetFileName();
+
+        private static string GetFileName()
+        {
+            var assembly = Assembly.GetEntryAssembly();
+            if (assembly == null)
+            {
+                return "<No Config>";
+            }
+            return string.Format("{0}.config", assembly.Location);
+        }
 
         static ComponentResolver()
         {
