@@ -8,6 +8,7 @@ using System.Windows.Data;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class UIComponentLayoutProvider : UILayoutProviderBase, IConfigurableComponent, IDisposable
     {
         public override string Id

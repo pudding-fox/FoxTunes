@@ -4,6 +4,7 @@ using System;
 namespace FoxTunes
 {
     [Component("827B3916-831F-4A8A-9A37-33C70E8D60CF", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class PlaylistNavigationStrategyFactory : StandardComponent
     {
         public ICore Core { get; private set; }

@@ -7,6 +7,7 @@ using System.Windows.Shapes;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class UIComponentFactory : StandardFactory
     {
         public UIComponentConfiguration CreateConfiguration(UIComponent component)
