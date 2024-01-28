@@ -183,7 +183,7 @@ FoxTunes.Logging.dll
 "
 
 REPLAYGAIN="
-FoxTunes.Output.Bass.ReplayGain.dll
+FoxTunes.Output.Bass.ReplayGain.exe
 ManagedBass.ReplayGain.dll
 bass_replay_gain.dll
 "
