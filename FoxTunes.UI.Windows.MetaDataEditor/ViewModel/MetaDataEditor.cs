@@ -38,76 +38,9 @@ namespace FoxTunes.ViewModel
             this.Images = new ObservableCollection<MetaDataEntry>();
         }
 
-        public bool HasItems
-        {
-            get
-            {
-                return this.Tags.Any() || this.Images.Any();
-            }
-        }
+        public ObservableCollection<MetaDataEntry> Tags { get; private set; }
 
-        protected virtual void OnHasItemsChanged()
-        {
-            if (this.HasItemsChanged != null)
-            {
-                this.HasItemsChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("HasItems");
-        }
-
-        public event EventHandler HasItemsChanged;
-
-        private ObservableCollection<MetaDataEntry> _Tags { get; set; }
-
-        public ObservableCollection<MetaDataEntry> Tags
-        {
-            get
-            {
-                return this._Tags;
-            }
-            set
-            {
-                this._Tags = value;
-                this.OnTagsChanged();
-            }
-        }
-
-        protected virtual void OnTagsChanged()
-        {
-            if (this.TagsChanged != null)
-            {
-                this.TagsChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Tags");
-        }
-
-        public event EventHandler TagsChanged;
-
-        private ObservableCollection<MetaDataEntry> _Images { get; set; }
-
-        public ObservableCollection<MetaDataEntry> Images
-        {
-            get
-            {
-                return this._Images;
-            }
-            set
-            {
-                this._Images = value;
-                this.OnImagesChanged();
-            }
-        }
-
-        protected virtual void OnImagesChanged()
-        {
-            if (this.ImagesChanged != null)
-            {
-                this.ImagesChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Images");
-        }
-
-        public event EventHandler ImagesChanged;
+        public ObservableCollection<MetaDataEntry> Images { get; private set; }
 
         private int _Count { get; set; }
 
@@ -317,10 +250,11 @@ namespace FoxTunes.ViewModel
         {
             return Windows.Invoke(() =>
             {
-                this.Tags = new ObservableCollection<MetaDataEntry>(items[MetaDataItemType.Tag]);
-                this.Images = new ObservableCollection<MetaDataEntry>(items[MetaDataItemType.Image]);
+                this.Tags.Clear();
+                this.Tags.AddRange(items[MetaDataItemType.Tag]);
+                this.Images.Clear();
+                this.Images.AddRange(items[MetaDataItemType.Image]);
                 this.Count = count;
-                this.OnHasItemsChanged();
             });
         }
 
@@ -410,15 +344,10 @@ namespace FoxTunes.ViewModel
         {
             return Windows.Invoke(() =>
             {
-                this.Tags = new ObservableCollection<MetaDataEntry>();
-                this.Images = new ObservableCollection<MetaDataEntry>();
-                this.OnHasItemsChanged();
+                this.Tags.Clear();
+                this.Images.Clear();
+                this.Count = 0;
             });
-        }
-
-        protected override void OnDisposing()
-        {
-            base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()

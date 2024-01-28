@@ -16,9 +16,16 @@
         <ViewModel:NegatingBooleanToVisibilityConverter x:Key="NegatingBooleanToVisibilityConverter"></ViewModel:NegatingBooleanToVisibilityConverter>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
-    <Windows:UIComponentBase.IsComponentEnabled>
-        <Binding Mode="OneWay" Path="HasItems" Source="{StaticResource ViewModel}"/>
-    </Windows:UIComponentBase.IsComponentEnabled>
+    <UserControl.Style>
+        <Style TargetType="{x:Type UserControl}">
+            <Setter Property="Windows:UIComponentBase.IsComponentEnabled" Value="True"></Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Count, Source={StaticResource ViewModel}}" Value="0">
+                    <Setter Property="Windows:UIComponentBase.IsComponentEnabled" Value="False"></Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Grid.IsSharedSizeScope="True">
             <Grid.RowDefinitions>
