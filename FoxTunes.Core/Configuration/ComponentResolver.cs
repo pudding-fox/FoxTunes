@@ -74,6 +74,11 @@ namespace FoxTunes
                         var pairs = Serializer.Load(stream);
                         foreach (var pair in pairs)
                         {
+                            if (string.Equals(pair.Value.Id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase) || string.Equals(pair.Value.Id, ComponentSlots.Blocked, StringComparison.OrdinalIgnoreCase))
+                            {
+                                //This was likely saved due to a bug, we should never "load" a blocked slot.
+                                continue;
+                            }
                             if (!this.Slots.TryAdd(pair.Key, pair.Value))
                             {
                                 continue;
@@ -140,7 +145,12 @@ namespace FoxTunes
 
         public void Add(string slot, string id)
         {
-            this.Slots[slot] = new ComponentSlot(id, ComponentSlotFlags.Modified);
+            var flags = ComponentSlotFlags.None;
+            if (!string.Equals(id, ComponentSlots.None, StringComparison.OrdinalIgnoreCase))
+            {
+                flags |= ComponentSlotFlags.Modified;
+            }
+            this.Slots[slot] = new ComponentSlot(id, flags);
         }
 
         public void Remove(string slot)
