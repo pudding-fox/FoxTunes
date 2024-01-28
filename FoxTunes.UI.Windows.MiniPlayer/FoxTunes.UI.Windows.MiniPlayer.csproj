@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net40;net462</TargetFrameworks>
-		<AssemblyName>FoxTunes.UI.Windows</AssemblyName>
+		<AssemblyName>FoxTunes.UI.Windows.MiniPlayer</AssemblyName>
 		<OutputPath>..\distribution\$(Platform)\</OutputPath>
 		<SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
 		<SkipValidatePackageReferences>true</SkipValidatePackageReferences>
@@ -21,10 +21,6 @@
 		<Reference Include="WindowsBase" />
 		<!-- TODO: Use only WPF frameworks. -->
 		<Reference Include="System.Windows.Forms" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Properties\" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -74,27 +70,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Remove="Images\Fox.ico" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Page Remove="Resources\PlaybackState.xaml" />
-		<Page Remove="Resources\TabContent.xaml" />
-		<Page Remove="Resources\WindowBase.xaml" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="Images\Fox.ico">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</EmbeddedResource>
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\FoxTunes.UI\FoxTunes.UI.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\FoxTunes.UI.Windows\FoxTunes.UI.Windows.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

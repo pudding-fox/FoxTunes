@@ -129,6 +129,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripting", "Scripting", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Minidisc.Bass", "FoxTunes.Minidisc\FoxTunes.Minidisc.Bass.csproj", "{6D8DCA45-0E00-4472-A535-DB5CB465DF1B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.UI.Windows.MiniPlayer", "FoxTunes.UI.Windows.MiniPlayer\FoxTunes.UI.Windows.MiniPlayer.csproj", "{22A35D2D-6C20-4B3D-BD12-F31118BD1245}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -577,6 +579,14 @@ Global
 		{6D8DCA45-0E00-4472-A535-DB5CB465DF1B}.Release|x64.Build.0 = Release|x64
 		{6D8DCA45-0E00-4472-A535-DB5CB465DF1B}.Release|x86.ActiveCfg = Release|x86
 		{6D8DCA45-0E00-4472-A535-DB5CB465DF1B}.Release|x86.Build.0 = Release|x86
+		{22A35D2D-6C20-4B3D-BD12-F31118BD1245}.Debug|x64.ActiveCfg = Debug|x64
+		{22A35D2D-6C20-4B3D-BD12-F31118BD1245}.Debug|x64.Build.0 = Debug|x64
+		{22A35D2D-6C20-4B3D-BD12-F31118BD1245}.Debug|x86.ActiveCfg = Debug|x86
+		{22A35D2D-6C20-4B3D-BD12-F31118BD1245}.Debug|x86.Build.0 = Debug|x86
+		{22A35D2D-6C20-4B3D-BD12-F31118BD1245}.Release|x64.ActiveCfg = Release|x64
+		{22A35D2D-6C20-4B3D-BD12-F31118BD1245}.Release|x64.Build.0 = Release|x64
+		{22A35D2D-6C20-4B3D-BD12-F31118BD1245}.Release|x86.ActiveCfg = Release|x86
+		{22A35D2D-6C20-4B3D-BD12-F31118BD1245}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -637,6 +647,7 @@ Global
 		{1B3AD4FC-EEBB-430C-9A63-A3ED79AA5543} = {35CF0450-D838-4C99-9F03-0E0E9C4956A1}
 		{C74CCEF7-C3EA-4954-B480-1836BFFDD0B6} = {E9BFA65B-36CD-40D3-8EAE-B5D544A1E7F5}
 		{6D8DCA45-0E00-4472-A535-DB5CB465DF1B} = {B8B91C76-F6E7-47C7-A034-E0FC5B5466F2}
+		{22A35D2D-6C20-4B3D-BD12-F31118BD1245} = {05C1FA04-4070-44A7-9DFC-38B48FEFA3C2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9293982D-B2F3-4C86-A307-057EE1CFA115}

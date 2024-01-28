@@ -18,7 +18,7 @@ namespace FoxTunes
 
         private static readonly Lazy<Icon> _Icon = new Lazy<Icon>(() =>
         {
-            using (var stream = typeof(Mini).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Images.Fox.ico"))
+            using (var stream = typeof(Main).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Images.Fox.ico"))
             {
                 if (stream == null)
                 {
@@ -112,15 +112,10 @@ namespace FoxTunes
 
         protected virtual void AddWindowHooks()
         {
-            Windows.Registrations.AddCreated(
-                new[] { MainWindow.ID, MiniWindow.ID },
-                this.OnWindowCreated
-            );
-            Windows.Registrations.AddClosed(
-                new[] { MainWindow.ID, MiniWindow.ID },
-                this.OnWindowClosed
-            );
-            foreach (var window in Windows.Registrations.WindowsByIds(new[] { MainWindow.ID, MiniWindow.ID }))
+            var ids = Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main);
+            Windows.Registrations.AddCreated(ids, this.OnWindowCreated);
+            Windows.Registrations.AddClosed(ids, this.OnWindowClosed);
+            foreach (var window in Windows.Registrations.WindowsByIds(ids))
             {
                 this.AddWindowHooks(window);
             }
@@ -135,15 +130,10 @@ namespace FoxTunes
 
         protected virtual void RemoveWindowHooks()
         {
-            Windows.Registrations.RemoveCreated(
-                new[] { MainWindow.ID, MiniWindow.ID },
-                this.OnWindowCreated
-            );
-            Windows.Registrations.RemoveClosed(
-                new[] { MainWindow.ID, MiniWindow.ID },
-                this.OnWindowClosed
-            );
-            foreach (var window in Windows.Registrations.WindowsByIds(new[] { MainWindow.ID, MiniWindow.ID }))
+            var ids = Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main);
+            Windows.Registrations.RemoveCreated(ids, this.OnWindowCreated);
+            Windows.Registrations.RemoveClosed(ids, this.OnWindowClosed);
+            foreach (var window in Windows.Registrations.WindowsByIds(ids))
             {
                 this.RemoveWindowHooks(window);
             }

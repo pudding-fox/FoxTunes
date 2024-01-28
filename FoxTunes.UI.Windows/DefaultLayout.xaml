@@ -27,7 +27,8 @@
             <StackPanel Grid.Column="2" Orientation="Horizontal">
                 <Windows:Volume Margin="2,0,0,0"></Windows:Volume>
                 <Windows:Equalizer Margin="2,0,0,0"></Windows:Equalizer>
-                <Windows:MiniPlayer Margin="2,0,0,0"></Windows:MiniPlayer>
+                <!-- Use the mini player plugin if it's available. -->
+                <Windows:UIComponentShim Margin="2,0,0,0" Component="3EAA32EE-9CB2-491B-928E-EA1E9E547E30"></Windows:UIComponentShim>
                 <Windows:Settings Margin="2,0,0,0"></Windows:Settings>
             </StackPanel>
         </Grid>

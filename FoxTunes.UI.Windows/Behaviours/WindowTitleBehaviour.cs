@@ -48,7 +48,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             Windows.Registrations.AddCreated(
-                new[] { MainWindow.ID, MiniWindow.ID },
+                Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main),
                 this.OnWindowCreated
             );
             this.PlaybackManager = core.Managers.Playback;
@@ -104,7 +104,7 @@ namespace FoxTunes
 
         protected virtual void SetWindowTitle(string title)
         {
-            foreach (var window in Windows.Registrations.WindowsByIds(new[] { MainWindow.ID, MiniWindow.ID }))
+            foreach (var window in Windows.Registrations.WindowsByIds(Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main)))
             {
                 this.SetWindowTitle(window, title);
             }
@@ -112,6 +112,7 @@ namespace FoxTunes
 
         protected virtual void SetWindowTitle(Window window, string title)
         {
+            Logger.Write(this, LogLevel.Debug, "Setting window title {0}: {1}", window.GetType().Name, title);
             window.Title = title;
         }
 
@@ -141,7 +142,7 @@ namespace FoxTunes
         protected virtual void OnDisposing()
         {
             Windows.Registrations.RemoveCreated(
-                new[] { MainWindow.ID, MiniWindow.ID },
+                Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main),
                 this.OnWindowCreated
             );
             if (this.PlaybackManager != null)

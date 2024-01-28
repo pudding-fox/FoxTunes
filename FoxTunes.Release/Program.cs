@@ -557,6 +557,14 @@ namespace FoxTunes
                     }
                 ),
                 new Package(
+                    "miniplayer",
+                    new PackageElement[]
+                    {
+                        "FoxTunes.UI.Windows.MiniPlayer.dll"
+                    },
+                    PackageFlags.Default
+                ),
+                new Package(
                     "metadataeditor",
                     new PackageElement[]
                     {

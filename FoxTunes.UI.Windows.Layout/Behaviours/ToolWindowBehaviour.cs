@@ -14,6 +14,10 @@ namespace FoxTunes
     [WindowsUserInterfaceDependency]
     public class ToolWindowBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent, IDisposable
     {
+        const string MAIN_WINDOW_ID = MainWindow.ID;
+
+        const string MINI_WINDOW_ID = "95FA900C-2B6C-4571-B119-D24834E2FC22";
+
         public const string NEW = "BBBB";
 
         public const string MANAGE = "CCCC";
@@ -128,13 +132,20 @@ namespace FoxTunes
         protected virtual Task Show(ToolWindowConfiguration config, ToolWindow window)
         {
             var show = false;
-            var main = global::FoxTunes.Windows.ActiveWindow is MainWindow;
-            var mini = global::FoxTunes.Windows.ActiveWindow is MiniWindow;
-            if (config.ShowWithMainWindow && main)
+            var id = default(string);
+            if (global::FoxTunes.Windows.ActiveWindow is WindowBase activeWindow)
+            {
+                id = activeWindow.Id;
+            }
+            else
+            {
+                id = MAIN_WINDOW_ID;
+            }
+            if (config.ShowWithMainWindow && string.Equals(id, MAIN_WINDOW_ID, StringComparison.OrdinalIgnoreCase))
             {
                 show = true;
             }
-            else if (config.ShowWithMiniWindow && mini)
+            else if (config.ShowWithMiniWindow && string.Equals(id, MINI_WINDOW_ID, StringComparison.OrdinalIgnoreCase))
             {
                 show = true;
             }

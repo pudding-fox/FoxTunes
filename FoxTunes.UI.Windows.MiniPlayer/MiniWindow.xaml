@@ -4,26 +4,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
-        xmlns:Windows="clr-namespace:FoxTunes" 
-        xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+        xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows"
+        xmlns:LocalWindows="clr-namespace:FoxTunes" 
+        xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
         x:Class="FoxTunes.MiniWindow"
         mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
         Title="Fox Tunes"
         SizeToContent="WidthAndHeight"
         ResizeMode="CanMinimize">
     <Window.Resources>
-        <ViewModel:Mini x:Key="ViewModel"></ViewModel:Mini>
+        <LocalViewModel:Mini x:Key="ViewModel"></LocalViewModel:Mini>
     </Window.Resources>
     <Border Margin="8" Padding="5" CornerRadius="5" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1">
         <Border.Style>
             <Style TargetType="{x:Type Border}">
                 <Setter Property="Background" Value="{DynamicResource NormalBrush}"></Setter>
-                <Setter Property="Windows:GlassLabel.IsGlassEnabled" Value="False"></Setter>
+                <Setter Property="LocalWindows:GlassLabel.IsGlassEnabled" Value="False"></Setter>
                 <Setter Property="BitmapEffect" Value="{DynamicResource PopupDropShadow}"></Setter>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding ExtendGlass.Value, Source={StaticResource ViewModel}}" Value="True">
                         <Setter Property="Background" Value="#3FFFFFFF"></Setter>
-                        <Setter Property="Windows:GlassLabel.IsGlassEnabled" Value="True"></Setter>
+                        <Setter Property="LocalWindows:GlassLabel.IsGlassEnabled" Value="True"></Setter>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -32,7 +33,7 @@
             <Grid.LayoutTransform>
                 <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}, FallbackValue=1}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}, FallbackValue=1}" />
             </Grid.LayoutTransform>
-            <Windows:Mini MouseDown="OnMouseDown"></Windows:Mini>
+            <LocalWindows:Mini MouseDown="OnMouseDown"></LocalWindows:Mini>
             <Windows:Components></Windows:Components>
         </Grid>
     </Border>
