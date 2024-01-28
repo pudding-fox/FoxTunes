@@ -151,7 +151,7 @@ namespace FoxTunes
             {
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    var items = database.ExecuteEnumerator<LibraryItem>(database.Queries.GetLibraryItems, (parameters, phase) =>
+                    var items = database.ExecuteEnumerator<LibraryItem>(database.Queries.GetLibraryItems(this.Filter), (parameters, phase) =>
                     {
                         switch (phase)
                         {

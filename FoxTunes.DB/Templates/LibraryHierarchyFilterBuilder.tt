@@ -9,6 +9,20 @@
 <#
 if (this.Filter != null)
 {
+	switch (this.Source)
+	{
+		case LibraryHierarchyFilterSource.LibraryItem:
+#>
+AND EXISTS
+	(
+		SELECT *
+		FROM "MetaDataItems"
+			INNER JOIN "LibraryItem_MetaDataItem"
+				ON "LibraryItem_MetaDataItem"."MetaDataItem_Id" = "MetaDataItems"."Id"
+			WHERE "LibraryItem_MetaDataItem"."LibraryItem_Id" = "LibraryItems"."Id"
+<#
+			break;
+		case LibraryHierarchyFilterSource.LibraryHierarchyItem:
 #>
 AND EXISTS
 	(
@@ -20,6 +34,8 @@ AND EXISTS
 				ON "LibraryItem_MetaDataItem"."MetaDataItem_Id" = "MetaDataItems"."Id"
 			WHERE "LibraryHierarchyItem_LibraryItem"."LibraryHierarchyItem_Id" = "LibraryHierarchyItems"."Id"
 <#
+			break;
+	}
 	foreach (var group in this.Filter.Groups)
 	{
 #>	 AND (<#
@@ -43,7 +59,7 @@ AND EXISTS
 					break;
 				}
 			}
-#>("MetaDataItems"."Name" = <#= this.Database.QueryFactory.Dialect.String(entry.Name) #>) AND "MetaDataItems"."Value"<#
+#>("MetaDataItems"."Name" = <#= this.Database.QueryFactory.Dialect.String(entry.Name) #> AND "MetaDataItems"."Value"<#
 			switch (entry.Operator)
 			{
 				default:
@@ -71,12 +87,18 @@ AND EXISTS
 		FilterParserResultEntry.WILDCARD,
 		"%"
 	)
-) #><#
+) #>)<#
 		}
 #>)<#		
 	}
+	switch (this.Source)
+	{
+		case LibraryHierarchyFilterSource.LibraryItem:
+		case LibraryHierarchyFilterSource.LibraryHierarchyItem:
 #>
 	)
 <#		
+			break;
+	}
 }
 #>

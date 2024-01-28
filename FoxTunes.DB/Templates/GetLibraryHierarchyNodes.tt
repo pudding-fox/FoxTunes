@@ -11,5 +11,5 @@ FROM "LibraryHierarchyItems"
 WHERE "LibraryHierarchy_Id" = @libraryHierarchyId
 	AND ((@libraryHierarchyItemId IS NULL AND "LibraryHierarchyItems"."Parent_Id" IS NULL) 
 		OR "LibraryHierarchyItems"."Parent_Id" = @libraryHierarchyItemId)
-<#= new LibraryHierarchyFilterBuilder(this.Database, this.Filter).TransformText()  #>
+<#= new LibraryHierarchyFilterBuilder(this.Database, this.Filter, LibraryHierarchyFilterSource.LibraryHierarchyItem).TransformText()  #>
 ORDER BY "Value"
