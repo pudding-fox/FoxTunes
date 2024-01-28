@@ -4,6 +4,8 @@ namespace FoxTunes
 {
     public class InvocationComponent : IInvocationComponent
     {
+        public const string CATEGORY_GLOBAL = "75AF5307-7530-471E-8CE0-503D9AC4E430";
+
         public const string CATEGORY_PLAYLIST = "42BC8F63-202C-4F77-8383-04A54FFFDCD5";
 
         public const string CATEGORY_LIBRARY = "CE91AB2A-3442-4019-B585-C4DCFEF1DB65";

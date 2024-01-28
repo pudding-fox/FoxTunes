@@ -78,8 +78,14 @@ namespace FoxTunes
         private static void OnMainWindowClosed(object sender, EventArgs e)
         {
             _MainWindow = new Lazy<Window>(() => new MainWindow());
+            if (MainWindowClosed != null)
+            {
+                MainWindowClosed(typeof(MainWindow), EventArgs.Empty);
+            }
             CheckShutdown();
         }
+
+        public static event EventHandler MainWindowClosed;
 
         private static Lazy<Window> _MiniWindow { get; set; }
 
@@ -126,8 +132,14 @@ namespace FoxTunes
         private static void OnMiniWindowClosed(object sender, EventArgs e)
         {
             _MiniWindow = new Lazy<Window>(() => new MiniWindow());
+            if (MiniWindowClosed != null)
+            {
+                MiniWindowClosed(typeof(MiniWindow), EventArgs.Empty);
+            }
             CheckShutdown();
         }
+
+        public static event EventHandler MiniWindowClosed;
 
         private static Lazy<Window> _SettingsWindow { get; set; }
 
@@ -174,7 +186,14 @@ namespace FoxTunes
         private static void OnSettingsWindowClosed(object sender, EventArgs e)
         {
             _SettingsWindow = new Lazy<Window>(() => new SettingsWindow());
+            if (SettingsWindowClosed == null)
+            {
+                return;
+            }
+            SettingsWindowClosed(typeof(SettingsWindow), EventArgs.Empty);
         }
+
+        public static event EventHandler SettingsWindowClosed;
 
         private static Window _ActiveWindow { get; set; }
 
