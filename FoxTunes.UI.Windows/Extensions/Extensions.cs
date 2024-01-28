@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -10,6 +9,28 @@ namespace FoxTunes
 {
     public static partial class Extensions
     {
+        public static IEnumerable<T> FindChildren<T>(this DependencyObject visual) where T : DependencyObject
+        {
+            var stack = new Stack<DependencyObject>();
+            stack.Push(visual);
+            while (stack.Count > 0)
+            {
+                visual = stack.Pop();
+                if (visual is T element)
+                {
+                    yield return element;
+                }
+                for (int a = 0, b = VisualTreeHelper.GetChildrenCount(visual); a < b; a++)
+                {
+                    var child = VisualTreeHelper.GetChild(visual, a) as DependencyObject;
+                    if (child != null)
+                    {
+                        stack.Push(child);
+                    }
+                }
+            }
+        }
+
         public static T FindAncestor<T>(this DependencyObject visual) where T : DependencyObject
         {
             do

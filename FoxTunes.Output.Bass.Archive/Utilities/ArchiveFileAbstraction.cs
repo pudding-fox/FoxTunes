@@ -41,6 +41,19 @@ namespace FoxTunes
 
         public bool IsOpen { get; private set; }
 
+        public long Result
+        {
+            get
+            {
+                var result = default(long);
+                if (!IntPtr.Zero.Equals(this.Entry))
+                {
+                    ArchiveEntry.GetEntryResult(this.Entry, out result);
+                }
+                return result;
+            }
+        }
+
         public void Open()
         {
             if (!ArchiveEntry.OpenEntry(this.FileName, this.Index, out this.Entry))

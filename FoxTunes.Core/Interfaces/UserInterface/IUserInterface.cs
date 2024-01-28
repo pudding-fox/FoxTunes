@@ -18,7 +18,7 @@ namespace FoxTunes.Interfaces
 
         bool Confirm(string message);
 
-        string Prompt(string message);
+        string Prompt(string message, UserInterfacePromptFlags flags = UserInterfacePromptFlags.None);
 
         void SelectInShell(string fileName);
 
@@ -56,5 +56,12 @@ namespace FoxTunes.Interfaces
         }
 
         public IUserInterfaceWindow Window { get; private set; }
+    }
+
+    [Flags]
+    public enum UserInterfacePromptFlags : byte
+    {
+        None = 0,
+        Password = 1
     }
 }

@@ -123,6 +123,9 @@
   <data name="BassArchiveStreamProviderBehaviourConfiguration.BufferTimeout" xml:space="preserve">
     <value>Buffer Timeout (ms)</value>
   </data>
+  <data name="BassArchiveStreamProviderBehaviourConfiguration.Cleanup" xml:space="preserve">
+    <value>Cleanup Temp Files</value>
+  </data>
   <data name="BassArchiveStreamProviderBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Enabled</value>
   </data>

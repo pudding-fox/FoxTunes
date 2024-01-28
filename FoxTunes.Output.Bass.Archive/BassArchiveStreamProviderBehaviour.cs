@@ -279,6 +279,12 @@ namespace FoxTunes
 
             public override void InitializeComponent(ICore core)
             {
+                //Clear any cached passwords if possible.
+                var password = ComponentRegistry.Instance.GetComponent<BassArchiveStreamPasswordBehaviour>();
+                if (password != null)
+                {
+                    password.Reset();
+                }
                 this.PlaylistBrowser = core.Components.PlaylistBrowser;
                 this.Factory = new ArchivePlaylistItemFactory(this.FileName);
                 this.Factory.InitializeComponent(core);

@@ -15,6 +15,8 @@ namespace FoxTunes
 
         public const string BUFFER_TIMEOUT_ELEMENT = "DDDD48A8-E758-4819-B2FB-4F96879EC018";
 
+        public const string CLEANUP_ELEMENT = "ZZZZB7CC-C87C-4A96-96A2-F52D7495D4D4";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.BassArchiveStreamProviderBehaviourConfiguration_Section)
@@ -31,6 +33,9 @@ namespace FoxTunes
                 .WithElement(new IntegerConfigurationElement(BUFFER_TIMEOUT_ELEMENT, Strings.BassArchiveStreamProviderBehaviourConfiguration_BufferTimeout)
                     .WithValue(BassZipStream.DEFAULT_BUFFER_TIMEOUT)
                     .WithValidationRule(new IntegerValidationRule(1, 5000))
+                    .DependsOn(SECTION, ENABLED_ELEMENT))
+                .WithElement(new CommandConfigurationElement(CLEANUP_ELEMENT, Strings.BassArchiveStreamProviderBehaviourConfiguration_Cleanup)
+                    .WithHandler(() => Archive.Cleanup())
                     .DependsOn(SECTION, ENABLED_ELEMENT));
         }
     }
