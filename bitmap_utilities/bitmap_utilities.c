@@ -1,5 +1,12 @@
 #include "bitmap_utilities.h"
 
+//I have no idea how to prevent linking against this routine in msvcrt.
+//It doesn't exist on Windows XP.
+//Hopefully it doesn't do anything important.
+int _except_handler4_common() {
+	return 0;
+}
+
 BOOL WINAPI draw_rectangles(RenderInfo* info, Int32Rect* rectangles, size_t count) {
 	BOOL result = TRUE;
 	for (size_t position = 0; position < count; position++) {
