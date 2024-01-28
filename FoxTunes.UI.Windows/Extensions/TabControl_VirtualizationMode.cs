@@ -66,6 +66,10 @@ namespace FoxTunes
                 return;
             }
             var tabControl = GetInternalTabControl(decorator);
+            if (tabControl == null)
+            {
+                return;
+            }
             var contentManager = ContentManager.GetContentManager(tabControl, decorator);
             contentManager.UpdateSelectedTab();
         }
