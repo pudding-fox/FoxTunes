@@ -12,11 +12,18 @@ namespace FoxTunes
     /// </summary>
     public partial class ArtworkGrid : UserControl
     {
+        public static TaskScheduler Scheduler = new TaskScheduler(new ParallelOptions()
+        {
+            MaxDegreeOfParallelism = Environment.ProcessorCount
+        });
+
+        public static TaskFactory Factory = new TaskFactory(Scheduler);
+
         public static readonly ArtworkGridProvider Provider = new ArtworkGridProvider();
 
         private static readonly ISignalEmitter SignalEmitter = ComponentRegistry.Instance.GetComponent<ISignalEmitter>();
 
-        private static Lazy<Size> PixelSize { get; set; }
+        public static Lazy<Size> PixelSize { get; set; }
 
         static ArtworkGrid()
         {
@@ -35,7 +42,6 @@ namespace FoxTunes
 #endif
             };
         }
-
 
         public static readonly DependencyProperty ImageSourceProperty = DependencyProperty.Register(
             "ImageSource",
@@ -119,21 +125,13 @@ namespace FoxTunes
 
         public Task Refresh(LibraryHierarchyNode libraryHierarchyNode)
         {
-#if NET40
-            return TaskEx.Run(async () =>
-#else
-            return Task.Run(async () =>
-#endif
+            return Factory.StartNew(async () =>
             {
                 if (!libraryHierarchyNode.IsMetaDatasLoaded)
                 {
                     await libraryHierarchyNode.LoadMetaDatas();
                 }
-                return Windows.Dispatcher.BeginInvoke(new Func<Task>(async () =>
-                {
-                    var imageSource = await Provider.CreateImageSource(libraryHierarchyNode, this.DecodePixelWidth, this.DecodePixelHeight);
-                    await Windows.Invoke(() => this.ImageSource = imageSource);
-                }));
+                await Windows.Invoke(() => this.ImageSource = Provider.CreateImageSource(libraryHierarchyNode, this.DecodePixelWidth, this.DecodePixelHeight));
             });
         }
     }

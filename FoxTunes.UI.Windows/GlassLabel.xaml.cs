@@ -101,7 +101,7 @@ namespace FoxTunes
                 );
                 if (element != null)
                 {
-                    element.ConnectValue(value => Windows.Invoke(() => this.IsGlassEnabled = value));
+                    element.ConnectValue(async value => await Windows.Invoke(() => this.IsGlassEnabled = value));
                 }
             }
             this.InitializeComponent();

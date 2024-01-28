@@ -22,7 +22,26 @@ namespace FoxTunes
             return File.Exists(fileName);
         }
 
-        public static async Task<string> Write(string prefix, string id, byte[] data)
+        public static string Write(string prefix, string id, byte[] data)
+        {
+            var fileName = GetFileName(prefix, id);
+            LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Trace, "Writing data: {0} => {1}", id, fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            try
+            {
+                using (var stream = File.Open(fileName, FileMode.Create))
+                {
+                    stream.Write(data, 0, data.Length);
+                }
+            }
+            catch (Exception e)
+            {
+                LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Error, "Failed to write data: {0} => {1} => {2}", id, fileName, e.Message);
+            }
+            return fileName;
+        }
+
+        public static async Task<string> WriteAsync(string prefix, string id, byte[] data)
         {
             var fileName = GetFileName(prefix, id);
             LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Trace, "Writing data: {0} => {1}", id, fileName);
@@ -41,7 +60,26 @@ namespace FoxTunes
             return fileName;
         }
 
-        public static async Task<string> Write(string prefix, string id, Stream stream)
+        public static string Write(string prefix, string id, Stream stream)
+        {
+            var fileName = GetFileName(prefix, id);
+            LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Trace, "Writing data: {0} => {1}", id, fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            using (var file = File.OpenWrite(fileName))
+            {
+                try
+                {
+                    stream.CopyTo(file);
+                }
+                catch (Exception e)
+                {
+                    LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Error, "Failed to write data: {0} => {1} => {2}", id, fileName, e.Message);
+                }
+            }
+            return fileName;
+        }
+
+        public static async Task<string> WriteAsync(string prefix, string id, Stream stream)
         {
             var fileName = GetFileName(prefix, id);
             LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Trace, "Writing data: {0} => {1}", id, fileName);
