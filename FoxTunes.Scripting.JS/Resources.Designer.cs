@@ -189,7 +189,7 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to function version() {
-        ///    return &quot;Fox Tunes 0.9&quot;;
+        ///    return &quot;Fox Tunes 1.9&quot;;
         ///}
         ///
         ///function timestamp(value) {
