@@ -61,10 +61,6 @@ namespace FoxTunes
 
         protected virtual void OnScalingFactorChanged()
         {
-            if (this.IsInitialized)
-            {
-                this.Dispatch(this.Refresh);
-            }
             if (this.ScalingFactorChanged != null)
             {
                 this.ScalingFactorChanged(this, EventArgs.Empty);
