@@ -96,7 +96,7 @@ namespace FoxTunes
             {
                 return;
             }
-            BassDirectSoundDevice.Init(this.DirectSoundDevice);
+            BassDirectSoundDevice.Init();
         }
 
         protected virtual void OnFree(object sender, EventArgs e)
