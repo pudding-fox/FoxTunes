@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -103,6 +104,15 @@ namespace FoxTunes.ViewModel
                 new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
             }));
             this.OnItemsChanged();
+        }
+
+        public override Task Reload()
+        {
+            this.Synchronize(new List<LibraryBrowserFrame>(new[]
+            {
+                new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
+            }));
+            return base.Reload();
         }
 
         protected virtual void OnActiveComponentsChanged(object sender, EventArgs e)

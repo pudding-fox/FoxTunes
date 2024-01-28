@@ -30,7 +30,18 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
+                    <RowDefinition>
+                        <RowDefinition.Style>
+                            <Style TargetType="{x:Type RowDefinition}">
+                                <Setter Property="Height" Value="0"></Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding LibraryHierarchies.SelectedValue.Type, Source={StaticResource ViewModel}}" Value="{x:Static Core:LibraryHierarchyType.Script}">
+                                        <Setter Property="Height" Value="*"></Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </RowDefinition.Style>
+                    </RowDefinition>
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0">
                     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -78,19 +89,26 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
-                        <Label Grid.Column="0" Grid.Row="0">Heirarchy Name</Label>
+                        <Label Grid.Column="0" Grid.Row="0">Name</Label>
                         <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Name}" Margin="0,0,0,5"></TextBox>
-                        <Label Grid.Column="0" Grid.Row="1">Heirarchy Type</Label>
+                        <Label Grid.Column="0" Grid.Row="1">Type</Label>
                         <ComboBox Grid.Column="1" Grid.Row="1" SelectedValue="{Binding Type}" ItemsSource="{Binding Mode=OneWay, Source={StaticResource LibraryHierarchyTypes}}" Margin="0,0,0,5"></ComboBox>
+                        <Label Grid.Column="0" Grid.Row="2">Enabled</Label>
+                        <CheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding Enabled}" Margin="0,0,0,5" VerticalAlignment="Center" ></CheckBox>
                     </Grid>
                     <Grid DockPanel.Dock="Bottom" DataContext="{Binding LibraryHierarchyLevels.SelectedValue, Source={StaticResource ViewModel}}">
                         <Grid.Style>
                             <Style TargetType="{x:Type Grid}">
                                 <Setter Property="IsEnabled" Value="True"></Setter>
+                                <Setter Property="Visibility" Value="Collapsed"></Setter>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding}" Value="{x:Null}">
                                         <Setter Property="IsEnabled" Value="False"></Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LibraryHierarchies.SelectedValue.Type, Source={StaticResource ViewModel}}" Value="{x:Static Core:LibraryHierarchyType.Script}">
+                                        <Setter Property="Visibility" Value="Visible"></Setter>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -99,12 +117,6 @@
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Label"></ColumnDefinition>
                             <ColumnDefinition></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Label Grid.Column="0" Grid.Row="0">Level Name</Label>
-                        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Name}" Grid.ColumnSpan="2" Margin="0,0,0,5"></TextBox>
                         <Label Grid.Column="0" Grid.Row="1">Script</Label>
                         <TextBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" AcceptsReturn="True" AcceptsTab="True" SpellCheck.IsEnabled="False" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"  Text="{Binding Script}"></TextBox>
                     </Grid>

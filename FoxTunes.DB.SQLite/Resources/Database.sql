@@ -23,13 +23,13 @@ CREATE TABLE [LibraryHierarchies] (
 	[Id] INTEGER PRIMARY KEY NOT NULL, 
 	[Sequence] INTEGER NOT NULL, 
 	[Name] TEXT NOT NULL,
-	[Type] bigint NOT NULL);
+	[Type] bigint NOT NULL,
+	[Enabled] bit NOT NULL);
 
 CREATE TABLE [LibraryHierarchyLevels] (
 	[Id]	INTEGER PRIMARY KEY NOT NULL,
 	[LibraryHierarchy_Id]  INTEGER NULL REFERENCES LibraryHierarchies([Id]),
 	[Sequence] INTEGER NOT NULL,
-	[Name] text NOT NULL,
 	[Script]	TEXT NOT NULL);
 
 CREATE TABLE [LibraryHierarchyItems](

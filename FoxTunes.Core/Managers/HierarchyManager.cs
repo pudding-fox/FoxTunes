@@ -92,11 +92,12 @@ namespace FoxTunes
                     Name = "Artist/Album/Title",
                     Type = LibraryHierarchyType.Script,
                     Sequence = 0,
+                    Enabled = true,
                     Levels = new ObservableCollection<LibraryHierarchyLevel>()
                     {
-                        new LibraryHierarchyLevel() { Name = "Artist", Sequence = 0, Script = scripts.Artist },
-                        new LibraryHierarchyLevel() { Name = "Year - Album", Sequence = 1, Script = scripts.Year_Album },
-                        new LibraryHierarchyLevel() { Name = "Disk - Track - Title", Sequence = 2, Script = scripts.Disk_Track_Title }
+                        new LibraryHierarchyLevel() { Sequence = 0, Script = scripts.Artist },
+                        new LibraryHierarchyLevel() { Sequence = 1, Script = scripts.Year_Album },
+                        new LibraryHierarchyLevel() { Sequence = 2, Script = scripts.Disk_Track_Title }
                     }
                 });
                 set.Add(new LibraryHierarchy()
@@ -104,18 +105,20 @@ namespace FoxTunes
                     Name = "Genre/Album/Title",
                     Type = LibraryHierarchyType.Script,
                     Sequence = 1,
+                    Enabled = false,
                     Levels = new ObservableCollection<LibraryHierarchyLevel>()
                     {
-                        new LibraryHierarchyLevel() { Name = "Genre", Sequence = 0, Script = scripts.Genre },
-                        new LibraryHierarchyLevel() { Name = "Year - Album", Sequence = 1, Script = scripts.Year_Album },
-                        new LibraryHierarchyLevel() { Name = "Disk - Track - Title", Sequence = 2, Script = scripts.Disk_Track_Title }
+                        new LibraryHierarchyLevel() { Sequence = 0, Script = scripts.Genre },
+                        new LibraryHierarchyLevel() { Sequence = 1, Script = scripts.Year_Album },
+                        new LibraryHierarchyLevel() { Sequence = 2, Script = scripts.Disk_Track_Title }
                     }
                 });
                 set.Add(new LibraryHierarchy()
                 {
                     Name = "Folder Structure",
                     Type = LibraryHierarchyType.FileSystem,
-                    Sequence = 2
+                    Sequence = 2,
+                    Enabled = false
                 });
                 transaction.Commit();
             }

@@ -25,27 +25,7 @@
                                 <ColumnDefinition></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" VerticalAlignment="Center" Padding="0,0,7,0" ContentStringFormat="{}{0}:"></Label>
-                            <CheckBox Grid.Column="1" IsChecked="{Binding IsSelected}">
-                                <CheckBox.Style>
-                                    <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
-                                        <Setter Property="Content" Value="{Binding FileAssociation.Extension, Mode=OneWay}"></Setter>
-                                        <!-- System -->
-                                        <Setter Property="SnapsToDevicePixels" Value="true" />
-                                        <Setter Property="FocusVisualStyle" Value="{DynamicResource CheckBoxFocusVisual}" />
-                                        <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
-                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                                        <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
-                                        <Setter Property="Template" Value="{DynamicResource CheckBoxTemplate}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding FileAssociation, Mode=OneWay}" Value="{x:Null}">
-                                                <Setter Property="Content" Value="Select All"></Setter>
-                                                <Setter Property="Command" Value="{Binding SelectAllCommand, Mode=OneWay, Source={StaticResource ViewModel}}"></Setter>
-                                                <Setter Property="CommandParameter" Value="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}"></Setter>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </CheckBox.Style>
-                            </CheckBox>
+                            <CheckBox Grid.Column="1" IsChecked="{Binding IsSelected}" Content="{Binding FileAssociation.Extension, Mode=OneWay}" VerticalAlignment="Center"></CheckBox>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

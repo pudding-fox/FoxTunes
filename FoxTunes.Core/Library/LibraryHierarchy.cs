@@ -84,6 +84,32 @@ namespace FoxTunes
 
         public event EventHandler TypeChanged;
 
+        private bool _Enabled { get; set; }
+
+        public bool Enabled
+        {
+            get
+            {
+                return this._Enabled;
+            }
+            set
+            {
+                this._Enabled = value;
+                this.OnEnabledChanged();
+            }
+        }
+
+        protected virtual void OnEnabledChanged()
+        {
+            if (this.EnabledChanged != null)
+            {
+                this.EnabledChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Enabled");
+        }
+
+        public event EventHandler EnabledChanged;
+
         public ObservableCollection<LibraryHierarchyLevel> Levels { get; set; }
 
         public static readonly LibraryHierarchy Empty = new LibraryHierarchy();
