@@ -4,7 +4,6 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,8 +11,10 @@ namespace FoxTunes
 {
     public abstract class LibraryTaskBase : BackgroundTask
     {
-        protected LibraryTaskBase(string id)
-            : base(id)
+        public const string ID = "B6AF297E-F334-481D-8D60-BD5BE5935BD9";
+
+        protected LibraryTaskBase()
+            : base(ID)
         {
         }
 

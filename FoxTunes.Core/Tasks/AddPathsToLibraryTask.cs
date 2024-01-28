@@ -6,10 +6,8 @@ namespace FoxTunes
 {
     public class AddPathsToLibraryTask : LibraryTaskBase
     {
-        public const string ID = "972222C8-8F6E-44CF-8EBE-DA4FCFD7CD80";
-
         public AddPathsToLibraryTask(IEnumerable<string> paths)
-            : base(ID)
+            : base()
         {
             this.Paths = paths;
         }

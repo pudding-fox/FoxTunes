@@ -6,10 +6,8 @@ namespace FoxTunes
 {
     public class ClearLibraryTask : LibraryTaskBase
     {
-        public const string ID = "08D1EDBA-B9FF-4327-88BE-0CDB6DD4531C";
-
         public ClearLibraryTask()
-            : base(ID)
+            : base()
         {
 
         }

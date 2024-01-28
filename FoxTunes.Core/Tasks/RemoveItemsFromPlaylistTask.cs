@@ -5,10 +5,8 @@ namespace FoxTunes
 {
     public class RemoveItemsFromPlaylistTask : PlaylistTaskBase
     {
-        public const string ID = "E7778FE8-D73D-4263-8C40-FEF179F6C7F7";
-
         public RemoveItemsFromPlaylistTask(IEnumerable<PlaylistItem> playlistItems)
-            : base(ID)
+            : base()
         {
             this.PlaylistItems = playlistItems;
         }

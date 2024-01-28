@@ -1,19 +1,11 @@
-﻿using FoxDb;
-using FoxDb.Interfaces;
-using FoxTunes.Interfaces;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public class BuildLibraryHierarchiesTask : LibraryTaskBase
     {
-        public const string ID = "B6AF297E-F334-481D-8D60-BD5BE5935BD9";
-
         public BuildLibraryHierarchiesTask()
-            : base(ID)
+            : base()
         {
         }
 

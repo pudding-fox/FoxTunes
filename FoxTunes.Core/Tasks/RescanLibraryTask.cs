@@ -1,18 +1,15 @@
 ﻿using FoxDb;
-using FoxDb.Interfaces;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public class RescanLibraryTask : LibraryTaskBase
     {
-        public const string ID = "4403475F-D67C-4ED8-BF1F-68D22F28066F";
-
         public RescanLibraryTask()
-            : base(ID)
+            : base()
         {
 
         }
