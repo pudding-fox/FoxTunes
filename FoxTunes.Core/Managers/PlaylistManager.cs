@@ -730,14 +730,15 @@ namespace FoxTunes
                     set.Add(new PlaylistColumn() { Name = "Title / track artist", Type = PlaylistColumnType.Script, Sequence = 3, Script = scriptingRuntime.CoreScripts.Title_Performer, Width = PlaylistColumn.WIDTH_LARGE, Enabled = true });
                     set.Add(new PlaylistColumn() { Name = "Duration", Type = PlaylistColumnType.Tag, Sequence = 4, Tag = CommonProperties.Duration, Format = CommonFormats.TimeSpan, Enabled = true });
                     set.Add(new PlaylistColumn() { Name = "Codec", Type = PlaylistColumnType.Script, Sequence = 5, Script = scriptingRuntime.CoreScripts.Codec, Enabled = true });
-                    set.Add(new PlaylistColumn() { Name = "BPM", Type = PlaylistColumnType.Tag, Sequence = 6, Tag = CommonMetaData.BeatsPerMinute, Enabled = false });
-                    set.Add(new PlaylistColumn() { Name = "Album gain", Type = PlaylistColumnType.Script, Sequence = 7, Script = scriptingRuntime.CoreScripts.ReplayGainAlbumGain, Enabled = false });
-                    set.Add(new PlaylistColumn() { Name = "Album peak", Type = PlaylistColumnType.Script, Sequence = 8, Script = scriptingRuntime.CoreScripts.ReplayGainAlbumPeak, Enabled = false });
-                    set.Add(new PlaylistColumn() { Name = "Track gain", Type = PlaylistColumnType.Script, Sequence = 9, Script = scriptingRuntime.CoreScripts.ReplayGainTrackGain, Enabled = false });
-                    set.Add(new PlaylistColumn() { Name = "Track peak", Type = PlaylistColumnType.Script, Sequence = 10, Script = scriptingRuntime.CoreScripts.ReplayGainTrackPeak, Enabled = false });
-                    set.Add(new PlaylistColumn() { Name = "Play count", Type = PlaylistColumnType.Script, Sequence = 11, Script = scriptingRuntime.CoreScripts.PlayCount, Enabled = false });
-                    set.Add(new PlaylistColumn() { Name = "Last played", Type = PlaylistColumnType.Script, Sequence = 12, Script = scriptingRuntime.CoreScripts.LastPlayed, Enabled = false });
-                    set.Add(new PlaylistColumn() { Name = "Initial key", Type = PlaylistColumnType.Tag, Sequence = 13, Tag = CommonMetaData.InitialKey, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Genre", Type = PlaylistColumnType.Script, Sequence = 6, Script = scriptingRuntime.CoreScripts.Genre, Width = PlaylistColumn.WIDTH_MEDIUM, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "BPM", Type = PlaylistColumnType.Tag, Sequence = 7, Tag = CommonMetaData.BeatsPerMinute, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Album gain", Type = PlaylistColumnType.Script, Sequence = 8, Script = scriptingRuntime.CoreScripts.ReplayGainAlbumGain, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Album peak", Type = PlaylistColumnType.Script, Sequence = 9, Script = scriptingRuntime.CoreScripts.ReplayGainAlbumPeak, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Track gain", Type = PlaylistColumnType.Script, Sequence = 10, Script = scriptingRuntime.CoreScripts.ReplayGainTrackGain, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Track peak", Type = PlaylistColumnType.Script, Sequence = 11, Script = scriptingRuntime.CoreScripts.ReplayGainTrackPeak, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Play count", Type = PlaylistColumnType.Script, Sequence = 12, Script = scriptingRuntime.CoreScripts.PlayCount, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Last played", Type = PlaylistColumnType.Script, Sequence = 13, Script = scriptingRuntime.CoreScripts.LastPlayed, Enabled = false });
+                    set.Add(new PlaylistColumn() { Name = "Initial key", Type = PlaylistColumnType.Tag, Sequence = 14, Tag = CommonMetaData.InitialKey, Enabled = false });
                 }
                 transaction.Commit();
             }
