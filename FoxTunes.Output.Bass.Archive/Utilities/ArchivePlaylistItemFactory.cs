@@ -21,6 +21,8 @@ namespace FoxTunes
 
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
 
+        public BassArchiveStreamPasswordBehaviour PasswordBehaviour { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public BooleanConfigurationElement MetaData { get; private set; }
@@ -29,6 +31,7 @@ namespace FoxTunes
         {
             this.Output = core.Components.Output;
             this.MetaDataSourceFactory = core.Factories.MetaDataSource;
+            this.PasswordBehaviour = ComponentRegistry.Instance.GetComponent<BassArchiveStreamPasswordBehaviour>();
             this.Configuration = core.Components.Configuration;
             this.MetaData = this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassArchiveStreamProviderBehaviourConfiguration.SECTION,
@@ -92,6 +95,7 @@ namespace FoxTunes
                         {
                             try
                             {
+                            retry:
                                 using (var fileAbstraction = ArchiveFileAbstraction.Create(this.FileName, entry.path, a))
                                 {
                                     if (fileAbstraction.IsOpen)
@@ -99,6 +103,17 @@ namespace FoxTunes
                                         playlistItem.MetaDatas = (
                                             await metaDataSource.GetMetaData(fileAbstraction).ConfigureAwait(false)
                                         ).ToList();
+                                        switch (fileAbstraction.Result)
+                                        {
+                                            case ArchiveEntry.RESULT_PASSWORD_REQUIRED:
+                                                Logger.Write(this, LogLevel.Warn, "Invalid password for \"{0}\".", this.FileName);
+                                                if (this.PasswordBehaviour != null && !this.PasswordBehaviour.WasCancelled(this.FileName))
+                                                {
+                                                    this.PasswordBehaviour.Reset(this.FileName);
+                                                    goto retry;
+                                                }
+                                                break;
+                                        }
                                     }
                                 }
                             }

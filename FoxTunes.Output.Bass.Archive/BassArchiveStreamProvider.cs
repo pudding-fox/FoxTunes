@@ -7,11 +7,14 @@ namespace FoxTunes
 {
     public class BassArchiveStreamProvider : BassStreamProvider
     {
-        public BassArchiveStreamProviderBehaviour Behaviour { get; private set; }
+        public BassArchiveStreamProviderBehaviour ProviderBehaviour { get; private set; }
+
+        public BassArchiveStreamPasswordBehaviour PasswordBehaviour { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.Behaviour = ComponentRegistry.Instance.GetComponent<BassArchiveStreamProviderBehaviour>();
+            this.ProviderBehaviour = ComponentRegistry.Instance.GetComponent<BassArchiveStreamProviderBehaviour>();
+            this.PasswordBehaviour = ComponentRegistry.Instance.GetComponent<BassArchiveStreamPasswordBehaviour>();
             base.InitializeComponent(core);
         }
 
@@ -42,7 +45,26 @@ namespace FoxTunes
                 //The associated entry was not found.
                 return BassStream.Empty;
             }
+        retry:
             var channelHandle = BassZipStream.CreateStream(fileName, index, Flags: flags);
+            if (channelHandle == 0)
+            {
+                switch (ArchiveError.GetLastError())
+                {
+                    case ArchiveError.E_PASSWORD_REQUIRED:
+                        Logger.Write(this, LogLevel.Warn, "Invalid password for \"{0}\".", fileName);
+                        if (this.PasswordBehaviour != null)
+                        {
+                            var cancelled = this.PasswordBehaviour.WasCancelled(fileName);
+                            this.PasswordBehaviour.Reset(fileName);
+                            if (!cancelled)
+                            {
+                                goto retry;
+                            }
+                        }
+                        break;
+                }
+            }
             return this.CreateBasicStream(channelHandle, advice, flags);
         }
 
@@ -61,7 +83,26 @@ namespace FoxTunes
                 //The associated entry was not found.
                 return BassStream.Empty;
             }
+        retry:
             var channelHandle = BassZipStream.CreateStream(fileName, index, Flags: flags);
+            if (channelHandle == 0)
+            {
+                switch (ArchiveError.GetLastError())
+                {
+                    case ArchiveError.E_PASSWORD_REQUIRED:
+                        Logger.Write(this, LogLevel.Warn, "Invalid password for \"{0}\".", fileName);
+                        if (this.PasswordBehaviour != null)
+                        {
+                            var cancelled = this.PasswordBehaviour.WasCancelled(fileName);
+                            this.PasswordBehaviour.Reset(fileName);
+                            if (!cancelled)
+                            {
+                                goto retry;
+                            }
+                        }
+                        break;
+                }
+            }
             return this.CreateInteractiveStream(channelHandle, advice, flags);
         }
     }
