@@ -143,6 +143,10 @@ namespace FoxTunes
             yield return root;
             foreach (var folder in this.Folders)
             {
+                if (!Directory.Exists(folder))
+                {
+                    continue;
+                }
                 yield return Path.Combine(root, folder);
             }
         }
