@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Core", "FoxTunes.Core\FoxTunes.Core.csproj", "{62CD8F70-8415-4C15-B672-CB18475ABD7E}"
 EndProject
@@ -22,8 +22,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.MetaData", "FoxTunes.MetaData\FoxTunes.MetaData.csproj", "{395751A0-49B7-49DC-88A8-02B14A322E99}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.MetaData.TagLib", "FoxTunes.MetaData.TagLib\FoxTunes.MetaData.TagLib.csproj", "{1BCB836B-688F-4183-8702-EFF08440CC8A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Output.CSCore", "FoxTunes.Output.CSCore\FoxTunes.Output.CSCore.csproj", "{30AFD731-FD4C-426C-9566-38186FA6AFA1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.DB.EntityFramework", "FoxTunes.DB.EntityFramework\FoxTunes.DB.EntityFramework.csproj", "{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}"
 EndProject
@@ -87,10 +85,6 @@ Global
 		{1BCB836B-688F-4183-8702-EFF08440CC8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BCB836B-688F-4183-8702-EFF08440CC8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BCB836B-688F-4183-8702-EFF08440CC8A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{30AFD731-FD4C-426C-9566-38186FA6AFA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{30AFD731-FD4C-426C-9566-38186FA6AFA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{30AFD731-FD4C-426C-9566-38186FA6AFA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{30AFD731-FD4C-426C-9566-38186FA6AFA1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Release|Any CPU.ActiveCfg = Release|Any CPU
