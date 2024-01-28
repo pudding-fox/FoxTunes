@@ -28,6 +28,8 @@ namespace FoxTunes
 
         public const int MAX_TIMER_FREQUENCY = 1000;
 
+        public const string ACCENT_COLOR = "2A835DBB-8ACE-4FFC-B975-9131D4D82947";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.WindowsUserInterfaceConfiguration_Section)

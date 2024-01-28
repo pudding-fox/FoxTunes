@@ -14,12 +14,16 @@ namespace FoxTunes.UI.Windows.Themes
 
         public const int MAX_OPACITY = 100;
 
+        public const string ACCENT_COLOR = WindowsUserInterfaceConfiguration.ACCENT_COLOR;
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new IntegerConfigurationElement(OPACITY, Strings.TransparentThemeConfiguration_Opacity)
                     .WithValue(DEFAULT_OPACITY)
                     .WithValidationRule(new IntegerValidationRule(MIN_OPACITY, MAX_OPACITY))
+                    .DependsOn(WindowsUserInterfaceConfiguration.SECTION, WindowsUserInterfaceConfiguration.THEME_ELEMENT, TransparentTheme.ID))
+                 .WithElement(new TextConfigurationElement(ACCENT_COLOR, Strings.TransparentThemeConfiguration_AccentColor)
                     .DependsOn(WindowsUserInterfaceConfiguration.SECTION, WindowsUserInterfaceConfiguration.THEME_ELEMENT, TransparentTheme.ID));
         }
     }

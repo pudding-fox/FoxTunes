@@ -259,6 +259,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Accent Color.
+        /// </summary>
+        internal static string TransparentThemeConfiguration_AccentColor {
+            get {
+                return ResourceManager.GetString("TransparentThemeConfiguration.AccentColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Opacity.
         /// </summary>
         internal static string TransparentThemeConfiguration_Opacity {

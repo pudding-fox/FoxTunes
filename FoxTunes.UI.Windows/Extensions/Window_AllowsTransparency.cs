@@ -3,8 +3,8 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Controls.Primitives;
 using System.Windows.Interop;
+using System.Windows.Media;
 
 namespace FoxTunes
 {
@@ -58,6 +58,7 @@ namespace FoxTunes
             {
                 this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
                 this.UserInterface = ComponentRegistry.Instance.GetComponent<IUserInterface>();
+                this.Configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
             }
 
             public AllowsTransparencyBehaviour(Window window) : this()
@@ -69,11 +70,36 @@ namespace FoxTunes
                     this.ThemeLoader.ThemeChanged += this.OnThemeChanged;
                     this.Refresh();
                 }
+                if (this.Configuration != null)
+                {
+                    this.Configuration.GetElement<TextConfigurationElement>(
+                        WindowsUserInterfaceConfiguration.SECTION,
+                        WindowsUserInterfaceConfiguration.ACCENT_COLOR
+                    ).ConnectValue(value =>
+                    {
+                        if (string.IsNullOrEmpty(value))
+                        {
+                            this.AccentColor = DefaultAccentColor;
+                        }
+                        else
+                        {
+                            this.AccentColor = value.ToColor();
+                        }
+                        if (this.Window != null)
+                        {
+                            this.EnableBlur();
+                        }
+                    });
+                }
             }
 
             public ThemeLoader ThemeLoader { get; private set; }
 
             public IUserInterface UserInterface { get; private set; }
+
+            public IConfiguration Configuration { get; private set; }
+
+            public Color AccentColor { get; private set; }
 
             public Window Window { get; private set; }
 
@@ -112,7 +138,14 @@ namespace FoxTunes
             protected virtual void EnableBlur()
             {
                 var windowHelper = new WindowInteropHelper(this.Window);
-                WindowExtensions.EnableBlur(windowHelper.Handle);
+                if (SupportsAcrylicBlur)
+                {
+                    WindowExtensions.EnableAcrylicBlur(windowHelper.Handle, this.AccentColor);
+                }
+                else
+                {
+                    WindowExtensions.EnableBlur(windowHelper.Handle);
+                }
             }
 
             protected override void OnDisposing()
@@ -122,6 +155,38 @@ namespace FoxTunes
                     this.ThemeLoader.ThemeChanged -= this.OnThemeChanged;
                 }
                 base.OnDisposing();
+            }
+        }
+
+        public static bool SupportsAcrylicBlur
+        {
+            get
+            {
+                OsVersion version = new OsVersion();
+                if (RtlGetVersion(ref version) == 0)
+                {
+                    return version.BuildNumber >= 22621;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public static Color DefaultAccentColor
+        {
+            get
+            {
+                var colors = new DwmColors();
+                DwmGetColorizationParameters(ref colors);
+                var color = Color.FromArgb(
+                    (byte)((colors.ColorizationColor >> 24) & 0xff),
+                    (byte)((colors.ColorizationColor >> 16) & 0xff),
+                    (byte)((colors.ColorizationColor >> 8) & 0xff),
+                    (byte)((colors.ColorizationColor >> 0) & 0xff)
+                );
+                return color;
             }
         }
 
@@ -148,6 +213,62 @@ namespace FoxTunes
             }
         }
 
+        public static void EnableAcrylicBlur(IntPtr handle, Color color)
+        {
+            var accent = new AccentPolicy()
+            {
+                AccentState = AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND,
+                GradientColor = (0 << 24) + (color.B << 16) + (color.G << 8) + color.R
+            };
+            var accentStructSize = Marshal.SizeOf(accent);
+            var accentPtr = Marshal.AllocHGlobal(accentStructSize);
+            try
+            {
+                Marshal.StructureToPtr(accent, accentPtr, false);
+                var data = new WindowCompositionAttributeData();
+                data.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
+                data.SizeOfData = accentStructSize;
+                data.Data = accentPtr;
+                SetWindowCompositionAttribute(handle, ref data);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(accentPtr);
+            }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct OsVersion
+        {
+            public uint OSVersionInfoSize;
+            public uint MajorVersion;
+            public uint MinorVersion;
+            public uint BuildNumber;
+            public uint PlatformId;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+            public string CSDVersion;
+        }
+
+        [DllImport("ntdll.dll", SetLastError = true)]
+        public static extern int RtlGetVersion(ref OsVersion version);
+
+        public struct DwmColors
+        {
+            public uint ColorizationColor;
+
+            public uint ColorizationAfterglow;
+
+            public uint ColorizationColorBalance;
+
+            public uint ColorizationAfterglowBalance;
+            public uint ColorizationBlurBalance;
+            public uint ColorizationGlassReflectionIntensity;
+            public uint ColorizationOpaqueBlend;
+        }
+
+        [DllImport("dwmapi.dll", EntryPoint = "#127")]
+        public static extern void DwmGetColorizationParameters(ref DwmColors colors);
+
         [DllImport("user32.dll")]
         public static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
 
@@ -157,7 +278,7 @@ namespace FoxTunes
             ACCENT_ENABLE_GRADIENT = 0,
             ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
             ACCENT_ENABLE_BLURBEHIND = 3,
-            ACCENT_INVALID_STATE = 4
+            ACCENT_ENABLE_ACRYLICBLURBEHIND = 4
         }
 
         [StructLayout(LayoutKind.Sequential)]
