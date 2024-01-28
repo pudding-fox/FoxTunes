@@ -1,5 +1,5 @@
-﻿using FoxTunes.Factories;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FoxTunes.Managers
@@ -68,9 +68,17 @@ namespace FoxTunes.Managers
             }
             if (index < 0)
             {
-                index = this.Playlist.Items.Count;
+                index = this.Playlist.Items.Count - 1;
             }
             this.Playlist.SelectedItem = this.Playlist.Items[index];
+        }
+
+        public IEnumerable<IPlaylistItem> Items
+        {
+            get
+            {
+                return this.Playlist.Items;
+            }
         }
     }
 }

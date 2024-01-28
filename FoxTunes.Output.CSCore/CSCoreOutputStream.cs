@@ -1,5 +1,6 @@
 ﻿using CSCore;
 using CSCore.Codecs;
+using CSCore.Ffmpeg;
 using CSCore.SoundOut;
 using CSCore.Streams;
 
@@ -89,7 +90,7 @@ namespace FoxTunes
 
         private void InitializeComponent()
         {
-            this.WaveSource = CodecFactory.Instance.GetCodec(this.FileName);
+            this.WaveSource = new FfmpegDecoder(this.FileName); //CodecFactory.Instance.GetCodec(this.FileName);
             this.SampleSource = this.WaveSource.ToSampleSource();
             this.NotificationSource = new NotificationSource(this.SampleSource);
             this.NotificationSource.Interval = UPDATE_INTERVAL;

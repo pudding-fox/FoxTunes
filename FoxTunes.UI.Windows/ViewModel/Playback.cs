@@ -1,5 +1,5 @@
 ﻿using FoxTunes.Interfaces;
-using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -16,7 +16,10 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command<IOutputStream>(stream => stream.Play(), stream => stream != null);
+                return new Command<IPlaybackManager>(
+                    playback => playback.CurrentStream.Play(),
+                    playback => playback != null && playback.CurrentStream != null && !playback.CurrentStream.IsPlaying
+                );
             }
         }
 
@@ -24,17 +27,19 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command<IOutputStream>(stream =>
-                {
-                    if (stream.IsPaused)
+                return new Command<IPlaybackManager>(playback =>
                     {
-                        stream.Resume();
-                    }
-                    else if (stream.IsPlaying)
-                    {
-                        stream.Pause();
-                    }
-                }, stream => stream != null);
+                        if (playback.CurrentStream.IsPaused)
+                        {
+                            playback.CurrentStream.Resume();
+                        }
+                        else if (playback.CurrentStream.IsPlaying)
+                        {
+                            playback.CurrentStream.Pause();
+                        }
+                    },
+                    playback => playback != null && playback.CurrentStream != null
+                );
             }
         }
 
@@ -42,7 +47,32 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command<IOutputStream>(stream => stream.Stop(), stream => stream != null && stream.IsPlaying);
+                return new Command<IPlaybackManager>(
+                    playback => playback.CurrentStream.Stop(),
+                    playback => playback != null && playback.CurrentStream != null && playback.CurrentStream.IsPlaying
+                );
+            }
+        }
+
+        public ICommand PreviousCommand
+        {
+            get
+            {
+                return new Command<IPlaylistManager>(
+                    playlist => playlist.Previous(),
+                    playlist => playlist != null && playlist.Items.Any()
+                );
+            }
+        }
+
+        public ICommand NextCommand
+        {
+            get
+            {
+                return new Command<IPlaylistManager>(
+                    playlist => playlist.Next(),
+                    playlist => playlist != null && playlist.Items.Any()
+                );
             }
         }
     }

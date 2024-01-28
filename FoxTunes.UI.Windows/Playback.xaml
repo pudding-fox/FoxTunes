@@ -17,10 +17,10 @@
         </Style>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal">
-        <Button Command="{Binding Source={StaticResource ViewModel}, Path=StopCommand}" CommandParameter="{Binding Managers.Playback.CurrentStream}">&lt;</Button>
-        <Button Command="{Binding Source={StaticResource ViewModel}, Path=PlayCommand}" CommandParameter="{Binding Managers.Playback.CurrentStream}">4</Button>
-        <Button Command="{Binding Source={StaticResource ViewModel}, Path=PauseCommand}" CommandParameter="{Binding Managers.Playback.CurrentStream}">;</Button>
-        <Button>9</Button>
-        <Button>:</Button>
+        <Button Command="{Binding Source={StaticResource ViewModel}, Path=StopCommand}" CommandParameter="{Binding Managers.Playback}">&lt;</Button>
+        <Button Command="{Binding Source={StaticResource ViewModel}, Path=PlayCommand}" CommandParameter="{Binding Managers.Playback}">4</Button>
+        <Button Command="{Binding Source={StaticResource ViewModel}, Path=PauseCommand}" CommandParameter="{Binding Managers.Playback}">;</Button>
+        <Button Command="{Binding Source={StaticResource ViewModel}, Path=PreviousCommand}" CommandParameter="{Binding Managers.Playlist}">9</Button>
+        <Button  Command="{Binding Source={StaticResource ViewModel}, Path=NextCommand}" CommandParameter="{Binding Managers.Playlist}">:</Button>
     </StackPanel>
 </UserControl>
