@@ -4,17 +4,6 @@ namespace FoxTunes
 {
     public class JSCoreScripts : BaseComponent, ICoreScripts
     {
-
-        public static ICoreScripts Instance = new JSCoreScripts();
-
-        public string PlaylistSortValues
-        {
-            get
-            {
-                return Resources.PlaylistSortValues;
-            }
-        }
-
         public string Artist
         {
             get
@@ -86,5 +75,7 @@ namespace FoxTunes
                 return Resources.Year_Album;
             }
         }
+
+        public static ICoreScripts Instance = new JSCoreScripts();
     }
 }

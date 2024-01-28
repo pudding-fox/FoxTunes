@@ -228,20 +228,7 @@ namespace FoxTunes
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
-                await this.Database.ExecuteAsync(this.Database.Queries.BeginSequencePlaylistItems, transaction);
-                using (var reader = this.Database.ExecuteReader(this.Database.Queries.SequencePlaylistItems(metaDataNames), (parameters, phase) =>
-                {
-                    switch (phase)
-                    {
-                        case DatabaseParameterPhase.Fetch:
-                            parameters["status"] = PlaylistItemStatus.Import;
-                            break;
-                    }
-                }, transaction))
-                {
-                    await this.SequenceItems(reader, transaction);
-                }
-                await this.Database.ExecuteAsync(this.Database.Queries.EndSequencePlaylistItems, (parameters, phase) =>
+                await this.Database.ExecuteAsync(this.Database.Queries.SequencePlaylistItems(metaDataNames), (parameters, phase) =>
                 {
                     switch (phase)
                     {
@@ -251,15 +238,6 @@ namespace FoxTunes
                     }
                 }, transaction);
                 transaction.Commit();
-            }
-        }
-
-        protected virtual async Task SequenceItems(IDatabaseReader reader, ITransactionSource transaction)
-        {
-            using (var playlistSequencePopulator = new PlaylistSequencePopulator(this.Database, transaction))
-            {
-                playlistSequencePopulator.InitializeComponent(this.Core);
-                await playlistSequencePopulator.Populate(reader, CancellationToken.None);
             }
         }
 

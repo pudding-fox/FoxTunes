@@ -1,5 +1,6 @@
 ﻿<#@ template language="C#" #>
 <#@ assembly name="System.Core" #>
+<#@ import namespace="FoxDb" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
@@ -35,11 +36,23 @@ AS
 #>
 )
 
-SELECT "HorizontalMetaData"."Id" AS "PlaylistItem_Id", "HorizontalMetaData"."FileName" AS "FileName"
-<#
-	for(var index = 0; index < this.MetaDataNames.Length; index++)
-	{
-		#>,"Key_<#= index #>", "Value_<#= index #>_Value"<#
-	}
-#>
-FROM "HorizontalMetaData";
+UPDATE "PlaylistItems"
+SET "Sequence" = "Sequence" + ("RowNumber" - 1)
+FROM "PlaylistItems"
+	JOIN
+	(
+		SELECT "HorizontalMetaData"."Id", ROW_NUMBER() OVER 
+		(
+			ORDER BY CASE 
+				WHEN <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("__FT_VariousArtists")) #> IS NOT NULL THEN <#= this.Database.QueryFactory.Dialect.String("1") #>
+				ELSE <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Artist")) #> 
+			END, 
+			<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Year")) #>, 
+			<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Album")) #>, 
+			CAST(<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Disc")) #> AS int), 
+			CAST(<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Track")) #> AS int), 
+			"HorizontalMetaData"."FileName"
+		) AS "RowNumber"
+		FROM "HorizontalMetaData"
+	) AS "PlaylistItemsRowNumber" 
+		ON "PlaylistItems"."Id" = "PlaylistItemsRowNumber"."Id"

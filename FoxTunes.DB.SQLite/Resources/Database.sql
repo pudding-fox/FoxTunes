@@ -61,26 +61,3 @@ CREATE TABLE [LibraryHierarchyItem_LibraryItem] (
 	[LibraryHierarchyItem_Id] INTEGER NOT NULL REFERENCES LibraryHierarchyItems([Id]),
 	[LibraryItem_Id] INTEGER NOT NULL REFERENCES LibraryItems([Id]) 
 );
-
-CREATE TABLE [PlaylistSort]
-(
-	[Id] INTEGER PRIMARY KEY NOT NULL,
-	[PlaylistItem_Id] INTEGER NOT NULL REFERENCES PlaylistItems([Id]),
-	[Value1]text NULL,
-	[Value2] text NULL,
-	[Value3] text NULL,
-	[Value4] text NULL,
-	[Value5] text NULL,
-	[Value6] text NULL,
-	[Value7] text NULL,
-	[Value8] text NULL,
-	[Value9] text NULL,
-	[Value10] text NULL
-);
-
-CREATE TABLE [PlaylistSequence]
-(
-	[Id] INTEGER PRIMARY KEY NOT NULL,
-	[PlaylistItem_Id] INTEGER NOT NULL REFERENCES PlaylistItems([Id]),
-	[Sequence] INTEGER NULL
-);

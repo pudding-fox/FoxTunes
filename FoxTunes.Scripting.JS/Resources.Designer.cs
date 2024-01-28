@@ -139,46 +139,6 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to (function () {
-        ///  var parts = [];
-        ///
-        ///  if (tag.__ft_variousartists) {
-        ///    parts.push(&quot;Various Artists&quot;);
-        ///  }
-        ///  else {
-        ///    if (tag.artist) {
-        ///        parts.push(tag.artist);
-        ///    }
-        ///  }
-        ///
-        ///  if (tag.year) {
-        ///    parts.push(tag.year);
-        ///  }
-        ///
-        ///  if (tag.album) {
-        ///    parts.push(tag.album);
-        ///  }
-        ///
-        ///  if (tag.disccount != 1 &amp;&amp; tag.disc) {
-        ///    parts.push(tag.disc);
-        ///  }
-        ///
-        ///  if (tag.track) {
-        ///    parts.push(zeropad(tag.track, 2));
-        ///  }
-        ///
-        ///  parts.push(fileName);
-        ///
-        ///  return parts;
-        ///})();.
-        /// </summary>
-        internal static string PlaylistSortValues {
-            get {
-                return ResourceManager.GetString("PlaylistSortValues", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to (function () {
         ///    var parts = [];
         ///    if (tag.title) {
         ///        parts.push(tag.title);
