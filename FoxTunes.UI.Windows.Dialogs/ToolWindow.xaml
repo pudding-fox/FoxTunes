@@ -4,20 +4,37 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
-        xmlns:Windows="clr-namespace:FoxTunes" 
-        xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-        x:Class="FoxTunes.ToolWindowManagerWindow"
+        xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
+        xmlns:LocalWindows="clr-namespace:FoxTunes"
+        xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
+        xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
+        x:Class="FoxTunes.ToolWindow"
         mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
-        Title="Window Manager"
         WindowStartupLocation="CenterOwner"    
         WindowStyle="None" 
         AllowsTransparency="True" 
-        Background="Transparent"
-        Width="600"
-        Height="400">
+        Background="Transparent">
     <Window.Resources>
-        <ViewModel:PlaylistManager x:Key="ViewModel" Core="{Binding}"></ViewModel:PlaylistManager>
+        <LocalViewModel:Tool x:Key="ViewModel" Core="{Binding}"></LocalViewModel:Tool>
     </Window.Resources>
+    <Window.Topmost>
+        <Binding Path="AlwaysOnTop" Source="{StaticResource ViewModel}"/>
+    </Window.Topmost>
+    <Window.Top>
+        <Binding Path="Top" Source="{StaticResource ViewModel}" Mode="TwoWay"/>
+    </Window.Top>
+    <Window.Height>
+        <Binding Path="Height" Source="{StaticResource ViewModel}" Mode="TwoWay"/>
+    </Window.Height>
+    <Window.Width>
+        <Binding Path="Width" Source="{StaticResource ViewModel}" Mode="TwoWay"/>
+    </Window.Width>
+    <Window.Left>
+        <Binding Path="Left" Source="{StaticResource ViewModel}" Mode="TwoWay"/>
+    </Window.Left>
+    <Window.Title>
+        <Binding Mode="OneWay" Path="Title" Source="{StaticResource ViewModel}"/>
+    </Window.Title>
     <Grid Background="{DynamicResource NormalBrush}">
         <Grid.LayoutTransform>
             <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
@@ -25,9 +42,10 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Windows:Titlebar></Windows:Titlebar>
-        <Windows:ToolWindowManager Grid.Row="1" Padding="3,0,3,3"></Windows:ToolWindowManager>
+        <LocalWindows:Tool x:Name="Tool" Grid.Row="1" Margin="4"></LocalWindows:Tool>
         <Rectangle Grid.RowSpan="3" Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
     </Grid>
 </Window>

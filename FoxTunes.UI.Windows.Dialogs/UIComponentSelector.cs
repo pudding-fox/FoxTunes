@@ -68,7 +68,7 @@ namespace FoxTunes
 
             this.TextBlock = new TextBlock();
             this.TextBlock.Text = "Select Component";
-            this.TextBlock.HorizontalAlignment = HorizontalAlignment.Center;
+            this.TextBlock.HorizontalAlignment = HorizontalAlignment.Left;
             this.TextBlock.VerticalAlignment = VerticalAlignment.Center;
             this.TextBlock.Margin = new Thickness(8, 0, 40, 0);
             this.TextBlock.SetResourceReference(

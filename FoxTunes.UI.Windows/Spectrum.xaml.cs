@@ -68,10 +68,6 @@ namespace FoxTunes
             {
                 return;
             }
-            if (this.Parent is UIComponentContainer)
-            {
-                renderer.Start();
-            }
             else if (Enabled != null)
             {
                 Enabled.ConnectValue(value =>

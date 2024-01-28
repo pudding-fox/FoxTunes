@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace FoxTunes
 {
@@ -17,6 +19,11 @@ namespace FoxTunes
         public const string NEW = "AAAA";
 
         public const string MANAGE = "BBBB";
+
+        static ToolWindowBehaviour()
+        {
+            Reset();
+        }
 
         public ToolWindowBehaviour()
         {
@@ -105,15 +112,15 @@ namespace FoxTunes
             {
                 return global::FoxTunes.Windows.Invoke(window.Show);
             }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
+            else
+            {
+                return global::FoxTunes.Windows.Invoke(window.Hide);
+            }
         }
 
         protected virtual void Unload(ToolWindowConfiguration config)
         {
+            config.PropertyChanged -= this.OnConfigPropertyChanged;
             if (!this.Windows.Remove(config))
             {
                 return;
@@ -228,16 +235,20 @@ namespace FoxTunes
         {
             return global::FoxTunes.Windows.Invoke(() =>
             {
-                if (!global::FoxTunes.Windows.IsToolWindowManagerWindowCreated)
+                if (!IsToolWindowManagerWindowCreated)
                 {
-                    global::FoxTunes.Windows.ToolWindowManagerWindow.DataContext = this.Core;
-                    global::FoxTunes.Windows.ToolWindowManagerWindow.Show();
+                    ToolWindowManagerWindow.DataContext = this.Core;
+                    ToolWindowManagerWindow.Show();
                 }
             });
         }
 
         public Task Shutdown()
         {
+            if (IsToolWindowManagerWindowCreated)
+            {
+                ToolWindowManagerWindow.Close();
+            }
             return global::FoxTunes.Windows.Invoke(() =>
             {
                 foreach (var window in this.Windows.Values)
@@ -259,6 +270,7 @@ namespace FoxTunes
             {
                 await this.Load(config).ConfigureAwait(false);
             }
+            await this.Show().ConfigureAwait(false);
             this.Save();
         }
 
@@ -301,6 +313,69 @@ namespace FoxTunes
             {
                 //Nothing can be done, never throw on GC thread.
             }
+        }
+
+        private static Lazy<Window> _ToolWindowManagerWindow { get; set; }
+
+        public static bool IsToolWindowManagerWindowCreated
+        {
+            get
+            {
+                return _ToolWindowManagerWindow.IsValueCreated;
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public static Window ToolWindowManagerWindow
+        {
+            get
+            {
+                var raiseEvent = !IsToolWindowManagerWindowCreated;
+                try
+                {
+                    return _ToolWindowManagerWindow.Value;
+                }
+                finally
+                {
+                    if (IsToolWindowManagerWindowCreated && raiseEvent)
+                    {
+                        OnToolWindowManagerWindowCreated();
+                    }
+                }
+            }
+        }
+
+        private static void OnToolWindowManagerWindowCreated()
+        {
+            ToolWindowManagerWindow.Closed += OnToolWindowManagerWindowClosed;
+            if (ToolWindowManagerWindowCreated == null)
+            {
+                return;
+            }
+            ToolWindowManagerWindowCreated(ToolWindowManagerWindow, EventArgs.Empty);
+        }
+
+        public static event EventHandler ToolWindowManagerWindowCreated;
+
+        private static void OnToolWindowManagerWindowClosed(object sender, EventArgs e)
+        {
+            if (IsToolWindowManagerWindowCreated)
+            {
+                ResourceDisposer.Dispose(ToolWindowManagerWindow);
+            }
+            _ToolWindowManagerWindow = new Lazy<Window>(() => new ToolWindowManagerWindow() { Owner = global::FoxTunes.Windows.ActiveWindow });
+            if (ToolWindowManagerWindowClosed == null)
+            {
+                return;
+            }
+            ToolWindowManagerWindowClosed(typeof(ToolWindowManagerWindow), EventArgs.Empty);
+        }
+
+        public static event EventHandler ToolWindowManagerWindowClosed;
+
+        private static void Reset()
+        {
+            _ToolWindowManagerWindow = new Lazy<Window>(() => new ToolWindowManagerWindow() { Owner = global::FoxTunes.Windows.ActiveWindow });
         }
     }
 
