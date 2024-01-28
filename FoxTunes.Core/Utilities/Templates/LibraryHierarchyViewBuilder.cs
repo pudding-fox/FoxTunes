@@ -28,35 +28,36 @@ namespace FoxTunes.Utilities.Templates
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write(@"
-CREATE TEMPORARY TABLE ""LibraryHierarchy""
-AS
-	WITH ""VerticalMetaData""
-	AS
-	(
-		SELECT ""LibraryItems"".""Id"", ""LibraryItems"".""FileName"", ""MetaDataItems"".""Name"", 
-			CASE 
-				WHEN ""MetaDataItems"".""NumericValue"" IS NOT NULL THEN 'Numeric' 
-				WHEN ""MetaDataItems"".""TextValue"" IS NOT NULL THEN 'Text' 
-				WHEN ""MetaDataItems"".""FileValue"" IS NOT NULL THEN 'File' 
-			END AS ""ValueType"",
-				CASE 
-				WHEN ""MetaDataItems"".""NumericValue"" IS NOT NULL THEN ""MetaDataItems"".""NumericValue""
-				WHEN ""MetaDataItems"".""TextValue"" IS NOT NULL THEN ""MetaDataItems"".""TextValue"" 
-				WHEN ""MetaDataItems"".""FileValue"" IS NOT NULL THEN ""MetaDataItems"".""FileValue""
-			END AS ""Value""
-		FROM ""LibraryItems""
-			JOIN ""LibraryItem_MetaDataItem"" ON ""LibraryItems"".""Id"" = ""LibraryItem_MetaDataItem"".""LibraryItem_Id""
-			JOIN ""MetaDataItems"" ON ""MetaDataItems"".""Id"" = ""LibraryItem_MetaDataItem"".""MetaDataItem_Id""
-		ORDER BY ""LibraryItems"".""Id""
-	)
-	,
-	""HorizontalMetaData""
-	AS
-	(
-	");
+            this.Write("\r\nDROP TABLE IF EXISTS \"LibraryHierarchyLevelLeaf\";\r\nCREATE TEMPORARY TABLE \"Libr" +
+                    "aryHierarchyLevelLeaf\"\r\nAS\r\n\tSELECT LibraryHierarchy_Id, MAX(\"LibraryHierarchyLe" +
+                    "vel_Id\") AS \"LibraryHierarchyLevel_Id\"\r\n\tFROM \"LibraryHierarchy_LibraryHierarchy" +
+                    "Level\"\r\n\tGROUP BY \"LibraryHierarchy_Id\";\r\nCREATE UNIQUE INDEX \"IDX_LibraryHierar" +
+                    "chyLevelLeaf\" ON \"LibraryHierarchyLevelLeaf\"\r\n(\r\n\t\"LibraryHierarchy_Id\"\r\n);\r\n\r\nD" +
+                    "ROP TABLE IF EXISTS \"LibraryHierarchyLevelParent\";\r\nCREATE TEMPORARY TABLE \"Libr" +
+                    "aryHierarchyLevelParent\"\r\nAS\r\n\tSELECT \"LibraryHierarchy_LibraryHierarchyLevel\".\"" +
+                    "Id\" AS \"Id\", MAX(\"LibraryHierarchy_LibraryHierarchyLevel_Copy\".\"Id\") AS \"Parent_" +
+                    "Id\"\r\n\tFROM \"LibraryHierarchy_LibraryHierarchyLevel\"\r\n\tJOIN \"LibraryHierarchy_Lib" +
+                    "raryHierarchyLevel\" AS \"LibraryHierarchy_LibraryHierarchyLevel_Copy\"\r\n\t\tON \"Libr" +
+                    "aryHierarchy_LibraryHierarchyLevel\".\"LibraryHierarchy_Id\"  = \"LibraryHierarchy_L" +
+                    "ibraryHierarchyLevel_Copy\".\"LibraryHierarchy_Id\"\r\n\t\t\tAND \"LibraryHierarchy_Libra" +
+                    "ryHierarchyLevel_Copy\".\"Id\" < \"LibraryHierarchy_LibraryHierarchyLevel\".\"Id\"\r\n\tGR" +
+                    "OUP BY \"LibraryHierarchy_LibraryHierarchyLevel\".\"Id\";\r\nCREATE UNIQUE INDEX \"IDX_" +
+                    "LibraryHierarchyLevelParent\" ON \"LibraryHierarchyLevelParent\"\r\n(\r\n\t\"Id\"\r\n);\r\n\r\nD" +
+                    "ROP TABLE IF EXISTS \"LibraryHierarchy\";\r\nCREATE TEMPORARY TABLE \"LibraryHierarch" +
+                    "y\"\r\nAS\r\n\tWITH \"VerticalMetaData\"\r\n\tAS\r\n\t(\r\n\t\tSELECT \"LibraryItems\".\"Id\", \"Librar" +
+                    "yItems\".\"FileName\", \"MetaDataItems\".\"Name\", \r\n\t\t\tCASE \r\n\t\t\t\tWHEN \"MetaDataItems\"" +
+                    ".\"NumericValue\" IS NOT NULL THEN \'Numeric\' \r\n\t\t\t\tWHEN \"MetaDataItems\".\"TextValue" +
+                    "\" IS NOT NULL THEN \'Text\' \r\n\t\t\t\tWHEN \"MetaDataItems\".\"FileValue\" IS NOT NULL THE" +
+                    "N \'File\' \r\n\t\t\tEND AS \"ValueType\",\r\n\t\t\t\tCASE \r\n\t\t\t\tWHEN \"MetaDataItems\".\"NumericV" +
+                    "alue\" IS NOT NULL THEN \"MetaDataItems\".\"NumericValue\"\r\n\t\t\t\tWHEN \"MetaDataItems\"." +
+                    "\"TextValue\" IS NOT NULL THEN \"MetaDataItems\".\"TextValue\" \r\n\t\t\t\tWHEN \"MetaDataIte" +
+                    "ms\".\"FileValue\" IS NOT NULL THEN \"MetaDataItems\".\"FileValue\"\r\n\t\t\tEND AS \"Value\"\r" +
+                    "\n\t\tFROM \"LibraryItems\"\r\n\t\t\tJOIN \"LibraryItem_MetaDataItem\" ON \"LibraryItems\".\"Id" +
+                    "\" = \"LibraryItem_MetaDataItem\".\"LibraryItem_Id\"\r\n\t\t\tJOIN \"MetaDataItems\" ON \"Met" +
+                    "aDataItems\".\"Id\" = \"LibraryItem_MetaDataItem\".\"MetaDataItem_Id\"\r\n\t\tORDER BY \"Lib" +
+                    "raryItems\".\"Id\"\r\n\t)\r\n\t,\r\n\t\"HorizontalMetaData\"\r\n\tAS\r\n\t(\r\n\t");
             
-            #line 32 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 58 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(new PivotViewBuilder(
 			"VerticalMetaData", 
 			new[] { "Id", "FileName" }, 
@@ -77,7 +78,7 @@ AS
 			""LibraryHierarchyLevels"".""DisplayScript""
 	");
             
-            #line 48 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 74 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
 
 		for(var index = 0; index < this.MetaDataNames.Length; index++)
 		{
@@ -87,21 +88,21 @@ AS
             #line hidden
             this.Write(",\"Key_");
             
-            #line 51 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 77 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("\", \"Value_");
             
-            #line 51 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 77 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("_Value\"");
             
-            #line 51 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 77 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
 
 		}
 	
@@ -111,7 +112,7 @@ AS
             this.Write("\t\t) AS DisplayValue,\r\n\t\tEXECUTE_SCRIPT\r\n\t\t(\r\n\t\t\t\"HorizontalMetaData\".\"FileName\",\r" +
                     "\n\t\t\t\"LibraryHierarchyLevels\".\"SortScript\"\r\n\t");
             
-            #line 59 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 85 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
 
 		for(var index = 0; index < this.MetaDataNames.Length; index++)
 		{
@@ -121,70 +122,69 @@ AS
             #line hidden
             this.Write(",\"Key_");
             
-            #line 62 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 88 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("\", \"Value_");
             
-            #line 62 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 88 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index));
             
             #line default
             #line hidden
             this.Write("_Value\"");
             
-            #line 62 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
+            #line 88 "C:\Source\FoxTunes\FoxTunes.Core\Utilities\Templates\LibraryHierarchyViewBuilder.tt"
 
 		}
 	
             
             #line default
             #line hidden
-            this.Write("\t\t) AS SortValue,\r\n\t\tCASE WHEN \r\n\t\t\tEXISTS\r\n\t\t\t(\r\n\t\t\t\tSELECT * \r\n\t\t\t\tFROM \"Librar" +
-                    "yHierarchy_LibraryHierarchyLevel\" AS \"LibraryHierarchy_LibraryHierarchyLevel_Cop" +
-                    "y\" \r\n\t\t\t\tWHERE \"LibraryHierarchy_LibraryHierarchyLevel_Copy\".\"LibraryHierarchy_I" +
-                    "d\" = \"LibraryHierarchy_LibraryHierarchyLevel\".\"LibraryHierarchy_Id\" \r\n\t\t\t\t\tAND \"" +
-                    "LibraryHierarchy_LibraryHierarchyLevel_Copy\".\"LibraryHierarchyLevel_Id\" > \"Libra" +
-                    "ryHierarchyLevels\".\"Id\"\r\n\t\t\t) THEN 0 \r\n\t\t\tELSE 1 \r\n\t\tEND AS \"IsLeaf\"\r\n\tFROM \"Lib" +
-                    "raryHierarchyLevels\"\r\n\t\tJOIN \"LibraryHierarchy_LibraryHierarchyLevel\" \r\n\t\t\tON \"L" +
-                    "ibraryHierarchyLevels\".\"Id\" = \"LibraryHierarchy_LibraryHierarchyLevel\".\"LibraryH" +
-                    "ierarchyLevel_Id\"\r\n\t\tJOIN \"HorizontalMetaData\";\r\n\r\nDELETE FROM \"LibraryHierarchy" +
-                    "Items\";\r\n\r\nINSERT INTO \"LibraryHierarchyItems\" (\"LibraryHierarchy_Id\", \"LibraryH" +
-                    "ierarchyLevel_Id\", \"DisplayValue\", \"SortValue\", \"IsLeaf\")\r\nSELECT \"LibraryHierar" +
-                    "chy_Id\", \"LibraryHierarchyLevel_Id\", \"DisplayValue\", \"SortValue\", \"IsLeaf\"\r\nFROM" +
-                    " \"LibraryHierarchy\"\r\nGROUP BY \"LibraryHierarchy_Id\", \"LibraryHierarchyLevel_Id\"," +
-                    " \"DisplayValue\", \"SortValue\", \"IsLeaf\";\r\n\r\nUPDATE \"LibraryHierarchyItems\"\r\nSET \"" +
-                    "Parent_Id\" = \r\n(\r\n\tSELECT \"LibraryHierarchyItems_Copy\".\"Id\"\r\n\tFROM \"LibraryHiera" +
-                    "rchyItems\" AS \"LibraryHierarchyItems_Copy\"\r\n\t\tJOIN \"LibraryHierarchy\" ON \"Librar" +
-                    "yHierarchy\".\"LibraryHierarchy_Id\" = \"LibraryHierarchyItems\".\"LibraryHierarchy_Id" +
-                    "\"\r\n\t\tAND \"LibraryHierarchy\".\"LibraryHierarchyLevel_Id\" = \"LibraryHierarchyItems\"" +
-                    ".\"LibraryHierarchyLevel_Id\"\r\n\t\tAND \"LibraryHierarchy\".\"DisplayValue\" = \"LibraryH" +
-                    "ierarchyItems\".\"DisplayValue\"\r\n\t\tAND \"LibraryHierarchy\".\"SortValue\" = \"LibraryHi" +
-                    "erarchyItems\".\"SortValue\"\r\n\t\tAND \"LibraryHierarchy\".\"IsLeaf\" = \"LibraryHierarchy" +
-                    "Items\".\"IsLeaf\"\r\n\tJOIN \"LibraryHierarchy\" AS \"LibraryHierarchy_Copy\" ON \"Library" +
-                    "Hierarchy_Copy\".\"LibraryHierarchy_Id\" = \"LibraryHierarchyItems_Copy\".\"LibraryHie" +
-                    "rarchy_Id\"\r\n\t\tAND \"LibraryHierarchy_Copy\".\"LibraryHierarchyLevel_Id\" = \r\n\t\t(\r\n\t\t" +
-                    "\tSELECT MAX(\"LibraryHierarchyLevels\".\"Id\") \r\n\t\t\tFROM \"LibraryHierarchyLevels\" \r\n" +
-                    "\t\t\t\tJOIN \"LibraryHierarchy_LibraryHierarchyLevel\" ON \"LibraryHierarchyLevels\".\"I" +
-                    "d\" = \"LibraryHierarchy_LibraryHierarchyLevel\".\"LibraryHierarchyLevel_Id\"\r\n\t\t\tWHE" +
-                    "RE \"LibraryHierarchyLevels\".\"Id\" < \"LibraryHierarchy\".\"LibraryHierarchyLevel_Id\"" +
-                    " AND \"LibraryHierarchy_LibraryHierarchyLevel\".\"LibraryHierarchy_Id\" = \"LibraryHi" +
-                    "erarchy\".\"LibraryHierarchy_Id\" \r\n\t\t)\r\n\t\tAND \"LibraryHierarchy_Copy\".\"LibraryItem" +
-                    "_Id\" = \"LibraryHierarchy\".\"LibraryItem_Id\"\r\n\t\tAND \"LibraryHierarchy_Copy\".\"Displ" +
-                    "ayValue\" = \"LibraryHierarchyItems_Copy\".\"DisplayValue\"\r\n\t\tAND \"LibraryHierarchy_" +
-                    "Copy\".\"SortValue\" = \"LibraryHierarchyItems_Copy\".\"SortValue\"\r\n\t\tAND \"LibraryHier" +
-                    "archy_Copy\".\"IsLeaf\" = \"LibraryHierarchyItems_Copy\".\"IsLeaf\"\r\n);\r\n\r\nDELETE FROM " +
-                    "\"LibraryHierarchyItem_LibraryItem\";\r\n\r\nINSERT INTO \"LibraryHierarchyItem_Library" +
-                    "Item\" (\"LibraryHierarchyItem_Id\", \"LibraryItem_Id\")\r\nSELECT \"LibraryHierarchyIte" +
-                    "ms\".\"Id\", \"LibraryHierarchy\".\"LibraryItem_Id\"\r\nFROM \"LibraryHierarchyItems\"\r\n\tJO" +
-                    "IN \"LibraryHierarchy\" ON \"LibraryHierarchy\".\"LibraryHierarchy_Id\" \r\n\t\tAND \"Libra" +
-                    "ryHierarchy\".\"LibraryHierarchyLevel_Id\" = \"LibraryHierarchyItems\".\"LibraryHierar" +
-                    "chyLevel_Id\"\r\n\t\tAND \"LibraryHierarchy\".\"DisplayValue\" = \"LibraryHierarchyItems\"." +
-                    "\"DisplayValue\"\r\n\t\tAND \"LibraryHierarchy\".\"SortValue\" = \"LibraryHierarchyItems\".\"" +
-                    "SortValue\"\r\n\t\tAND \"LibraryHierarchy\".\"IsLeaf\" = \"LibraryHierarchyItems\".\"IsLeaf\"" +
-                    ";\r\n\r\nDROP TABLE \"LibraryHierarchy\";");
+            this.Write("\t\t) AS SortValue,\r\n\t\t\"LibraryHierarchy_LibraryHierarchyLevel\".\"LibraryHierarchyLe" +
+                    "vel_Id\" = \"LibraryHierarchyLevelLeaf\".\"LibraryHierarchyLevel_Id\" AS \"IsLeaf\"\r\n\tF" +
+                    "ROM \"LibraryHierarchyLevels\"\r\n\t\tJOIN \"LibraryHierarchy_LibraryHierarchyLevel\" \r\n" +
+                    "\t\t\tON \"LibraryHierarchyLevels\".\"Id\" = \"LibraryHierarchy_LibraryHierarchyLevel\".\"" +
+                    "LibraryHierarchyLevel_Id\"\r\n\t\tJOIN \"LibraryHierarchyLevelLeaf\" \r\n\t\t\tON \"LibraryHi" +
+                    "erarchyLevelLeaf\".\"LibraryHierarchy_Id\" = \"LibraryHierarchy_LibraryHierarchyLeve" +
+                    "l\".\"LibraryHierarchy_Id\" \r\n\t\tJOIN \"HorizontalMetaData\";\r\nCREATE UNIQUE INDEX \"ID" +
+                    "X_LibraryHierarchy\" ON \"LibraryHierarchy\"\r\n(\r\n\t\"LibraryHierarchy_Id\",\r\n\t\"Library" +
+                    "HierarchyLevel_Id\",\r\n\t\"LibraryItem_Id\",\r\n\t\"DisplayValue\",\r\n\t\"SortValue\",\r\n\t\"IsLe" +
+                    "af\"\r\n);\r\nCREATE INDEX \"IDX_LibraryHierarchy_LibraryItem\" ON \"LibraryHierarchy\"\r\n" +
+                    "(\r\n\t\"LibraryItem_Id\"\r\n);\r\n\r\nDELETE FROM \"LibraryHierarchyItems\";\r\n\r\nINSERT INTO " +
+                    "\"LibraryHierarchyItems\" (\"LibraryHierarchy_Id\", \"LibraryHierarchyLevel_Id\", \"Dis" +
+                    "playValue\", \"SortValue\", \"IsLeaf\")\r\nSELECT \"LibraryHierarchy_Id\", \"LibraryHierar" +
+                    "chyLevel_Id\", \"DisplayValue\", \"SortValue\", \"IsLeaf\"\r\nFROM \"LibraryHierarchy\"\r\nGR" +
+                    "OUP BY \"LibraryHierarchy_Id\", \"LibraryHierarchyLevel_Id\", \"DisplayValue\", \"SortV" +
+                    "alue\", \"IsLeaf\";\r\n\r\nUPDATE \"LibraryHierarchyItems\"\r\nSET \"Parent_Id\" = \r\n(\r\n\tSELE" +
+                    "CT \"LibraryHierarchyItems_Copy\".\"Id\"\r\n\tFROM \"LibraryHierarchyItems\" AS \"LibraryH" +
+                    "ierarchyItems_Copy\"\r\n\t\tJOIN \"LibraryHierarchy\" ON \"LibraryHierarchy\".\"LibraryHie" +
+                    "rarchy_Id\" = \"LibraryHierarchyItems\".\"LibraryHierarchy_Id\"\r\n\t\tAND \"LibraryHierar" +
+                    "chy\".\"LibraryHierarchyLevel_Id\" = \"LibraryHierarchyItems\".\"LibraryHierarchyLevel" +
+                    "_Id\"\r\n\t\tAND \"LibraryHierarchy\".\"DisplayValue\" = \"LibraryHierarchyItems\".\"Display" +
+                    "Value\"\r\n\t\tAND \"LibraryHierarchy\".\"SortValue\" = \"LibraryHierarchyItems\".\"SortValu" +
+                    "e\"\r\n\t\tAND \"LibraryHierarchy\".\"IsLeaf\" = \"LibraryHierarchyItems\".\"IsLeaf\"\r\n\tJOIN " +
+                    "\"LibraryHierarchyLevelParent\" \r\n\t\tON \"LibraryHierarchyLevelParent\".\"Id\" = \"Libra" +
+                    "ryHierarchyItems\".\"LibraryHierarchyLevel_Id\"\r\n\tJOIN \"LibraryHierarchy\" AS \"Libra" +
+                    "ryHierarchy_Copy\" ON \"LibraryHierarchy_Copy\".\"LibraryHierarchy_Id\" = \"LibraryHie" +
+                    "rarchyItems_Copy\".\"LibraryHierarchy_Id\"\r\n\t\tAND \"LibraryHierarchy_Copy\".\"LibraryH" +
+                    "ierarchyLevel_Id\" = \"LibraryHierarchyLevelParent\".\"Parent_Id\"\r\n\t\tAND \"LibraryHie" +
+                    "rarchy_Copy\".\"LibraryItem_Id\" = \"LibraryHierarchy\".\"LibraryItem_Id\"\r\n\t\tAND \"Libr" +
+                    "aryHierarchy_Copy\".\"DisplayValue\" = \"LibraryHierarchyItems_Copy\".\"DisplayValue\"\r" +
+                    "\n\t\tAND \"LibraryHierarchy_Copy\".\"SortValue\" = \"LibraryHierarchyItems_Copy\".\"SortV" +
+                    "alue\"\r\n\t\tAND \"LibraryHierarchy_Copy\".\"IsLeaf\" = \"LibraryHierarchyItems_Copy\".\"Is" +
+                    "Leaf\"\r\n);\r\n\r\nDELETE FROM \"LibraryHierarchyItem_LibraryItem\";\r\n\r\nINSERT INTO \"Lib" +
+                    "raryHierarchyItem_LibraryItem\" (\"LibraryHierarchyItem_Id\", \"LibraryItem_Id\")\r\nSE" +
+                    "LECT \"LibraryHierarchyItems\".\"Id\", \"LibraryHierarchy\".\"LibraryItem_Id\"\r\nFROM \"Li" +
+                    "braryHierarchyItems\"\r\n\tJOIN \"LibraryHierarchy\" ON \"LibraryHierarchy\".\"LibraryHie" +
+                    "rarchy_Id\" \r\n\t\tAND \"LibraryHierarchy\".\"LibraryHierarchyLevel_Id\" = \"LibraryHiera" +
+                    "rchyItems\".\"LibraryHierarchyLevel_Id\"\r\n\t\tAND \"LibraryHierarchy\".\"DisplayValue\" =" +
+                    " \"LibraryHierarchyItems\".\"DisplayValue\"\r\n\t\tAND \"LibraryHierarchy\".\"SortValue\" = " +
+                    "\"LibraryHierarchyItems\".\"SortValue\"\r\n\t\tAND \"LibraryHierarchy\".\"IsLeaf\" = \"Librar" +
+                    "yHierarchyItems\".\"IsLeaf\";\r\n\r\nDROP TABLE \"LibraryHierarchyLevelLeaf\";\r\nDROP TABL" +
+                    "E \"LibraryHierarchyLevelParent\";\r\nDROP TABLE \"LibraryHierarchy\";");
             return this.GenerationEnvironment.ToString();
         }
     }
