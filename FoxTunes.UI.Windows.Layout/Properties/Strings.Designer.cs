@@ -232,6 +232,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Parent: {0}.
+        /// </summary>
+        internal static string UIComponentDesignerOverlay_Path_Parent {
+            get {
+                return ResourceManager.GetString("UIComponentDesignerOverlay.Path.Parent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Collapsable.
         /// </summary>
         internal static string UIComponentDockContainer_Collapse {

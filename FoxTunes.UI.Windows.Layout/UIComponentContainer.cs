@@ -18,10 +18,6 @@ namespace FoxTunes
 
         public const string CLEAR = "YYYY";
 
-        public const string EXIT = "ZZZZ";
-
-        public static readonly LayoutDesignerBehaviour Behaviour = ComponentRegistry.Instance.GetComponent<LayoutDesignerBehaviour>();
-
         public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
 
         protected static ILogger Logger
@@ -273,10 +269,6 @@ namespace FoxTunes
                     }
                 }
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, CLEAR, Strings.UIComponentContainer_Clear, attributes: attributes);
-                if (!Windows.Registrations.IsVisible(ToolWindowManagerWindow.ID))
-                {
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, EXIT, Strings.UIComponentContainer_Exit, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
-                }
             }
         }
 
@@ -288,8 +280,7 @@ namespace FoxTunes
                     return this.Replace(component.Name);
                 case CLEAR:
                     return this.Clear();
-                case EXIT:
-                    return this.Exit();
+
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -323,11 +314,6 @@ namespace FoxTunes
         public Task Clear()
         {
             return Windows.Invoke(() => this.Component = new UIComponentConfiguration());
-        }
-
-        public Task Exit()
-        {
-            return Windows.Invoke(() => Behaviour.IsDesigning = false);
         }
 
         public IConfiguration GetConfiguration(IConfigurableComponent component)
