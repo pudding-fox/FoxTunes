@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace FoxTunes
 {
@@ -85,6 +86,15 @@ namespace FoxTunes
             catch
             {
                 //Nothing can be done, never throw on GC thread.
+            }
+        }
+
+        protected virtual void OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var viewModel = this.FindResource<global::FoxTunes.ViewModel.Artwork>("ViewModel");
+            if (viewModel != null)
+            {
+                var task = viewModel.Next();
             }
         }
     }

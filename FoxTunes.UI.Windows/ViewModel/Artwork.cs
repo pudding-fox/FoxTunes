@@ -4,11 +4,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
     public class Artwork : ViewModelBase
     {
+        public Artwork()
+        {
+            this.ArtworkType = ArtworkType.FrontCover;
+        }
+
+        private ArtworkType _ArtworkType { get; set; }
+
+        public ArtworkType ArtworkType
+        {
+            get
+            {
+                return this._ArtworkType;
+            }
+            set
+            {
+                this._ArtworkType = value;
+                this.OnArtworkTypeChanged();
+            }
+        }
+
+        protected virtual void OnArtworkTypeChanged()
+        {
+            if (this.ArtworkTypeChanged != null)
+            {
+                this.ArtworkTypeChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ArtworkType");
+        }
+
+        public event EventHandler ArtworkTypeChanged;
+
         private string _FileName { get; set; }
 
         public string FileName
@@ -137,6 +169,7 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
+            var artworkType = this.ArtworkType;
             var fileName = default(string);
             var fileData = default(IFileData);
             var outputStream = this.PlaybackManager.CurrentStream;
@@ -150,13 +183,18 @@ namespace FoxTunes.ViewModel
                 {
                     fileData = outputStream.PlaylistItem;
                 }
+                if (!object.ReferenceEquals(this.FileData, fileData))
+                {
+                    artworkType = ArtworkType.FrontCover;
+                }
                 fileName = await this.ArtworkProvider.Find(
                     fileData,
-                    ArtworkType.FrontCover
+                    artworkType
                 ).ConfigureAwait(false);
             }
             await Windows.Invoke(() =>
             {
+                this.ArtworkType = artworkType;
                 this.FileName = fileName;
                 this.FileData = fileData;
             }).ConfigureAwait(false);
@@ -166,6 +204,27 @@ namespace FoxTunes.ViewModel
         {
             this.OnFileNameChanged();
             this.OnFileDataChanged();
+        }
+
+        public ICommand NextCommand
+        {
+            get
+            {
+                return CommandFactory.Instance.CreateCommand(this.Next);
+            }
+        }
+
+        public Task Next()
+        {
+            if (this.ArtworkType == ArtworkType.FrontCover)
+            {
+                this.ArtworkType = ArtworkType.BackCover;
+            }
+            else
+            {
+                this.ArtworkType = ArtworkType.FrontCover;
+            }
+            return this.Refresh();
         }
 
         protected override Freezable CreateInstanceCore()
