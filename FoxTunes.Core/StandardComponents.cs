@@ -89,6 +89,14 @@ namespace FoxTunes
             }
         }
 
+        public IMetaDataBrowser MetaDataBrowser
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IMetaDataBrowser>();
+            }
+        }
+
         public static readonly IStandardComponents Instance = new StandardComponents();
     }
 }

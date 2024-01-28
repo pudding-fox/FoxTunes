@@ -2,19 +2,28 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace FoxTunes
 {
     [Table(Name = "LibraryHierarchyItems")]
     public class LibraryHierarchyNode : PersistableComponent, ISelectable, IExpandable, IHierarchical
     {
-        const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Image;
+        public LibraryHierarchyNode()
+        {
+            this._Children = new Lazy<LibraryHierarchyNode[]>(
+                () => this.LibraryHierarchyBrowser.GetNodes(this).ToArray()
+            );
+            this._MetaDatas = new Lazy<MetaDataItem[]>(
+                () => this.MetaDataBrowser.GetMetaDatas(this, MetaDataItemType.Image).ToArray()
+            );
+        }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
+        public IMetaDataBrowser MetaDataBrowser { get; private set; }
 
         [Column(Name = "LibraryHierarchy_Id")]
         public int LibraryHierarchyId { get; set; }
@@ -25,18 +34,24 @@ namespace FoxTunes
 
         public LibraryHierarchyNode Parent { get; set; }
 
-        private ObservableCollection<LibraryHierarchyNode> _Children { get; set; }
+        private Lazy<LibraryHierarchyNode[]> _Children { get; set; }
 
-        public ObservableCollection<LibraryHierarchyNode> Children
+        public LibraryHierarchyNode[] Children
         {
             get
             {
-                return this._Children;
-            }
-            set
-            {
-                this._Children = value;
-                this.OnChildrenChanged();
+                if (this.IsExpanded)
+                {
+                    return this._Children.Value;
+                }
+                else if (this.IsLeaf)
+                {
+                    return new LibraryHierarchyNode[] { };
+                }
+                else
+                {
+                    return new LibraryHierarchyNode[] { LibraryHierarchyNode.Empty };
+                }
             }
         }
 
@@ -51,44 +66,13 @@ namespace FoxTunes
 
         public event EventHandler ChildrenChanged;
 
-        private bool _IsChildrenLoaded { get; set; }
+        private Lazy<MetaDataItem[]> _MetaDatas { get; set; }
 
-        public bool IsChildrenLoaded
+        public MetaDataItem[] MetaDatas
         {
             get
             {
-                return this._IsChildrenLoaded;
-            }
-            set
-            {
-                this._IsChildrenLoaded = value;
-                this.OnIsChildrenLoadedChanged();
-            }
-        }
-
-        protected virtual void OnIsChildrenLoadedChanged()
-        {
-            if (this.IsChildrenLoadedChanged != null)
-            {
-                this.IsChildrenLoadedChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("IsChildrenLoaded");
-        }
-
-        public event EventHandler IsChildrenLoadedChanged;
-
-        private ObservableCollection<MetaDataItem> _MetaDatas { get; set; }
-
-        public ObservableCollection<MetaDataItem> MetaDatas
-        {
-            get
-            {
-                return this._MetaDatas;
-            }
-            set
-            {
-                this._MetaDatas = value;
-                this.OnMetaDatasChanged();
+                return this._MetaDatas.Value;
             }
         }
 
@@ -102,32 +86,6 @@ namespace FoxTunes
         }
 
         public event EventHandler MetaDatasChanged;
-
-        private bool _IsMetaDatasLoaded { get; set; }
-
-        public bool IsMetaDatasLoaded
-        {
-            get
-            {
-                return this._IsMetaDatasLoaded;
-            }
-            set
-            {
-                this._IsMetaDatasLoaded = value;
-                this.OnIsMetaDatasLoadedChanged();
-            }
-        }
-
-        protected virtual void OnIsMetaDatasLoadedChanged()
-        {
-            if (this.IsMetaDatasLoadedChanged != null)
-            {
-                this.IsMetaDatasLoadedChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("IsMetaDatasLoaded");
-        }
-
-        public event EventHandler IsMetaDatasLoadedChanged;
 
         private bool _IsExpanded { get; set; }
 
@@ -146,6 +104,7 @@ namespace FoxTunes
 
         protected virtual void OnIsExpandedChanged()
         {
+            this.OnChildrenChanged();
             if (this.IsExpandedChanged != null)
             {
                 this.IsExpandedChanged(this, EventArgs.Empty);
@@ -205,107 +164,8 @@ namespace FoxTunes
         {
             this.DatabaseFactory = core.Factories.Database;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
-            if (this.IsLeaf)
-            {
-                this.Children = new ObservableCollection<LibraryHierarchyNode>();
-            }
-            else
-            {
-                this.Children = new ObservableCollection<LibraryHierarchyNode>(new[] { Empty });
-            }
+            this.MetaDataBrowser = core.Components.MetaDataBrowser;
             base.InitializeComponent(core);
-        }
-
-        public virtual void LoadChildren()
-        {
-            if (this.IsChildrenLoaded)
-            {
-                return;
-            }
-            this.Children = new ObservableCollection<LibraryHierarchyNode>(this.LibraryHierarchyBrowser.GetNodes(this));
-            this.IsChildrenLoaded = true;
-        }
-
-        public virtual Task LoadChildrenAsync()
-        {
-            return this.LoadChildrenAsync(CollectionLoader<LibraryHierarchyNode>.Instance);
-        }
-
-        public virtual Task LoadChildrenAsync(ICollectionLoader<LibraryHierarchyNode> collectionLoader)
-        {
-            if (this.IsChildrenLoaded)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            return collectionLoader.Load(
-                () => this.LibraryHierarchyBrowser.GetNodes(this),
-                children =>
-                {
-                    this.Children = children;
-                    this.IsChildrenLoaded = true;
-                }
-            );
-        }
-
-        public virtual void LoadMetaDatas()
-        {
-            if (this.IsMetaDatasLoaded)
-            {
-                return;
-            }
-            this.MetaDatas = new ObservableCollection<MetaDataItem>(this.GetMetaDatas());
-            this.IsMetaDatasLoaded = true;
-        }
-
-        public virtual Task LoadMetaDatasAsync()
-        {
-            return this.LoadMetaDatasAsync(CollectionLoader<MetaDataItem>.Instance);
-        }
-
-        public virtual Task LoadMetaDatasAsync(ICollectionLoader<MetaDataItem> collectionLoader)
-        {
-            if (this.IsMetaDatasLoaded)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            return collectionLoader.Load(
-                this.GetMetaDatas,
-                metaDatas =>
-                {
-                    this.MetaDatas = metaDatas;
-                    this.IsMetaDatasLoaded = true;
-                }
-            );
-        }
-
-        protected virtual IEnumerable<MetaDataItem> GetMetaDatas()
-        {
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    using (var reader = MetaDataInfo.GetMetaData(database, this, META_DATA_TYPE, transaction))
-                    {
-                        var metaDatas = new List<MetaDataItem>();
-                        foreach (var record in reader)
-                        {
-                            metaDatas.Add(new MetaDataItem()
-                            {
-                                Value = record.Get<string>("Value")
-                            });
-                        }
-                        return metaDatas;
-                    }
-                }
-            }
         }
 
         public override int GetHashCode()
@@ -318,10 +178,6 @@ namespace FoxTunes
             return this.Equals(obj as LibraryHierarchyNode);
         }
 
-        public static readonly LibraryHierarchyNode Empty = new LibraryHierarchyNode()
-        {
-            IsChildrenLoaded = true,
-            IsMetaDatasLoaded = true
-        };
+        public static readonly LibraryHierarchyNode Empty = new LibraryHierarchyNode();
     }
 }

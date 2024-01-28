@@ -86,10 +86,6 @@ namespace FoxTunes
                 }
                 if (viewModel.ShowCursorAdorners)
                 {
-                    if (!viewModel.SelectedItem.IsMetaDatasLoaded)
-                    {
-                        viewModel.SelectedItem.LoadMetaDatas();
-                    }
                     this.MouseCursorAdorner.DataContext = viewModel.SelectedItem;
                     this.MouseCursorAdorner.Show();
                 }

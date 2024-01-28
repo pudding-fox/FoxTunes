@@ -113,8 +113,6 @@ namespace FoxTunes
                     {
                         break;
                     }
-                    //Ensure the children are loaded.
-                    value.LoadChildren();
                     if (item != null)
                     {
                         //If we had a previous item then expand it.

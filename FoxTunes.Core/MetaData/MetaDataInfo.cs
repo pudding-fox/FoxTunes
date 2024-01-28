@@ -1,10 +1,4 @@
-﻿#pragma warning disable 612, 618
-using FoxDb;
-using FoxDb.Interfaces;
-using FoxTunes.Interfaces;
-using System.Collections.Generic;
-
-namespace FoxTunes
+﻿namespace FoxTunes
 {
     public static class MetaDataInfo
     {
@@ -60,50 +54,6 @@ namespace FoxTunes
                     return "DSD";
             }
             return string.Format("{0} bit", depth);
-        }
-
-        public static IEnumerable<string> GetMetaDataNames(IDatabaseComponent database, ITransactionSource transaction)
-        {
-            var query = database.QueryFactory.Build();
-            var name = database.Tables.MetaDataItem.Column("Name");
-            query.Output.AddColumn(name);
-            query.Source.AddTable(database.Tables.MetaDataItem);
-            query.Aggregate.AddColumn(name);
-            using (var reader = database.ExecuteReader(query, null, transaction))
-            {
-                foreach (var record in reader)
-                {
-                    yield return record.Get<string>(name.Identifier);
-                }
-            }
-        }
-
-        public static IDatabaseReader GetMetaData(IDatabaseComponent database, LibraryItem libraryItem, MetaDataItemType metaDataItemType, ITransactionSource transaction)
-        {
-            return database.ExecuteReader(database.Queries.GetLibraryMetaData, (parameters, phase) =>
-            {
-                switch (phase)
-                {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["libraryItemId"] = libraryItem.Id;
-                        parameters["type"] = metaDataItemType;
-                        break;
-                }
-            }, transaction);
-        }
-
-        public static IDatabaseReader GetMetaData(IDatabaseComponent database, LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType, ITransactionSource transaction)
-        {
-            return database.ExecuteReader(database.Queries.GetLibraryHierarchyMetaData, (parameters, phase) =>
-            {
-                switch (phase)
-                {
-                    case DatabaseParameterPhase.Fetch:
-                        parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
-                        parameters["type"] = metaDataItemType;
-                        break;
-                }
-            }, transaction);
         }
     }
 }

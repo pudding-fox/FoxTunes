@@ -36,6 +36,8 @@ namespace FoxTunes
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
+        public IMetaDataBrowser MetaDataBrowser { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
@@ -44,6 +46,7 @@ namespace FoxTunes
             this.MetaDataSourceFactory = core.Factories.MetaDataSource;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
+            this.MetaDataBrowser = core.Components.MetaDataBrowser;
             base.InitializeComponent(core);
         }
 
@@ -232,9 +235,9 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Sequencing playlist items.");
             await this.SetIsIndeterminate(true).ConfigureAwait(false);
+            var metaDataNames = this.MetaDataBrowser.GetMetaDataNames();
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
-                var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
                 await this.Database.ExecuteAsync(this.Database.Queries.SequencePlaylistItems(metaDataNames), (parameters, phase) =>
                 {
                     switch (phase)
