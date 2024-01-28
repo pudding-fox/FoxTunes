@@ -4,7 +4,7 @@ using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public class AsyncResult<T> : ViewModelBase
+    public class AsyncResult<T> : ViewModelBase where T : class
     {
         private AsyncResult()
         {
@@ -22,6 +22,13 @@ namespace FoxTunes.ViewModel
             this.Dispatch(this.Run);
         }
 
+        public AsyncResult(T value, Task<T> task) : this()
+        {
+            this.Value = value;
+            this.Task = task;
+            this.Dispatch(this.Run);
+        }
+
         public Task<T> Task { get; private set; }
 
         private T _Value { get; set; }
@@ -34,6 +41,10 @@ namespace FoxTunes.ViewModel
             }
             set
             {
+                if (object.ReferenceEquals(this.Value, value))
+                {
+                    return;
+                }
                 this._Value = value;
                 this.OnValueChanged();
             }

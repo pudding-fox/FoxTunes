@@ -121,6 +121,8 @@ namespace FoxTunes
                 var source = ImageLoader.Load(
                     ThemeLoader.Theme.Id,
                     () => ThemeLoader.Theme.ArtworkPlaceholder,
+                    Convert.ToInt32(this.ActualWidth * this.ScalingFactor),
+                    Convert.ToInt32(this.ActualHeight * this.ScalingFactor),
                     true
                 );
                 var brush = new ImageBrush(source)

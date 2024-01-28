@@ -43,6 +43,16 @@ namespace FoxTunes
             return result;
         }
 
+        public bool TryRemove(TKey key)
+        {
+            var result = this.Store.TryRemove(key);
+            if (result)
+            {
+                this.Keys.Remove(key);
+            }
+            return result;
+        }
+
         public void Clear()
         {
             lock (SyncRoot)

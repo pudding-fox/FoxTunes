@@ -9,17 +9,25 @@ namespace FoxTunes.ViewModel
 {
     public class LibraryBrowserImageConverter : IValueConverter
     {
+        public static readonly ThemeLoader ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+
+        public static readonly ImageLoader ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
+
         public static readonly ILibraryHierarchyBrowser LibraryHierarchyBrowser = ComponentRegistry.Instance.GetComponent<ILibraryHierarchyBrowser>();
 
         public static readonly LibraryBrowserTileProvider LibraryBrowserTileProvider = ComponentRegistry.Instance.GetComponent<LibraryBrowserTileProvider>();
 
         public static readonly ISignalEmitter SignalEmitter = ComponentRegistry.Instance.GetComponent<ISignalEmitter>();
 
+        public static TaskFactory Factory { get; private set; }
+
         public static CappedDictionary<LibraryHierarchyNode, Lazy<ImageBrush>> Store { get; private set; }
 
         public static int TileWidth { get; private set; }
 
         public static int TileHeight { get; private set; }
+
+        public static ResettableLazy<ImageBrush> FallbackValue { get; private set; }
 
         static LibraryBrowserImageConverter()
         {
@@ -30,8 +38,19 @@ namespace FoxTunes.ViewModel
             }
             configuration.GetElement<IntegerConfigurationElement>(
                 ImageBehaviourConfiguration.SECTION,
+                ImageLoaderConfiguration.THREADS
+            ).ConnectValue(value => Factory = new TaskFactory(new TaskScheduler(new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = value
+            })));
+            configuration.GetElement<IntegerConfigurationElement>(
+                ImageBehaviourConfiguration.SECTION,
                 ImageLoaderConfiguration.CACHE_SIZE
             ).ConnectValue(value => Store = new CappedDictionary<LibraryHierarchyNode, Lazy<ImageBrush>>(value));
+            configuration.GetElement<SelectionConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_VIEW
+            ).ConnectValue(option => Store.Clear());
             var scalingFactor = configuration.GetElement<DoubleConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
@@ -75,6 +94,26 @@ namespace FoxTunes.ViewModel
                 return Task.CompletedTask;
 #endif
             };
+            FallbackValue = new ResettableLazy<ImageBrush>(() =>
+            {
+                var source = ImageLoader.Load(
+                    ThemeLoader.Theme.Id,
+                    () => ThemeLoader.Theme.ArtworkPlaceholder,
+                    TileWidth,
+                    TileHeight,
+                    true
+                );
+                var brush = new ImageBrush(source)
+                {
+                    Stretch = Stretch.Uniform
+                };
+                brush.Freeze();
+                return brush;
+            });
+            ThemeLoader.ThemeChanged += (sender, e) =>
+            {
+                FallbackValue.Reset();
+            };
         }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -88,15 +127,15 @@ namespace FoxTunes.ViewModel
             {
                 return AsyncResult<ImageBrush>.FromValue(cachedBrush.Value);
             }
-#if NET40
-            return new AsyncResult<ImageBrush>(TaskEx.Run(() =>
-#else
-            return new AsyncResult<ImageBrush>(Task.Run(() =>
-#endif
+            return new AsyncResult<ImageBrush>(FallbackValue.Value, Factory.StartNew(() =>
             {
                 Store.Add(libraryHierarchyNode, new Lazy<ImageBrush>(() =>
                 {
                     var source = LibraryBrowserTileProvider.CreateImageSource(libraryHierarchyNode, TileWidth, TileHeight, true);
+                    if (source == null)
+                    {
+                        return FallbackValue.Value;
+                    }
                     var brush = new ImageBrush(source)
                     {
                         Stretch = Stretch.Uniform

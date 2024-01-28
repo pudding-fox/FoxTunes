@@ -33,7 +33,7 @@
         <LocalWindows:LibraryBrowserTemplateSelector x:Key="GridLibraryBrowserTemplateSelector">
             <LocalWindows:LibraryBrowserTemplateSelector.UpTemplate>
                 <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
-                    <StackPanel Width="{Binding TileSize, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,0,5,0">
+                    <StackPanel Width="{Binding TileSize, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,3,0,0">
                         <Border Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" BorderBrush="{DynamicResource TextBrush}" BorderThickness="1" Opacity=".50">
                             <Viewbox  Stretch="Uniform">
                                 <Canvas Width="48" Height="48">
@@ -56,7 +56,7 @@
             </LocalWindows:LibraryBrowserTemplateSelector.UpTemplate>
             <LocalWindows:LibraryBrowserTemplateSelector.DefaultTemplate>
                 <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
-                    <StackPanel Width="{Binding TileSize, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,0,5,0">
+                    <StackPanel Width="{Binding TileSize, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,3,0,0">
                         <Rectangle DataContext="{Binding Converter={StaticResource LibraryBrowserImageConverter}, Mode=OneWay}" Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Fill="{Binding Value, FallbackValue={StaticResource Transparent}}" Margin="0,0,5,0"></Rectangle>
                         <TextBlock HorizontalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
                     </StackPanel>
@@ -67,7 +67,7 @@
             <LocalWindows:LibraryBrowserTemplateSelector.UpTemplate>
                 <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
                     <StackPanel Orientation="Horizontal">
-                        <Border Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" BorderBrush="{DynamicResource TextBrush}" BorderThickness="1" Opacity=".50" Margin="0,0,5,0">
+                        <Border Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" BorderBrush="{DynamicResource TextBrush}" BorderThickness="1" Opacity=".50" Margin="0,0,4,0">
                             <Viewbox  Stretch="Uniform">
                                 <Canvas Width="48" Height="48">
                                     <Path>
@@ -90,7 +90,7 @@
             <LocalWindows:LibraryBrowserTemplateSelector.DefaultTemplate>
                 <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
                     <StackPanel Orientation="Horizontal">
-                        <Rectangle DataContext="{Binding Converter={StaticResource LibraryBrowserImageConverter}, Mode=OneWay}" Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Fill="{Binding Value, FallbackValue={StaticResource Transparent}}" Margin="0,0,5,0"></Rectangle>
+                        <Rectangle DataContext="{Binding Converter={StaticResource LibraryBrowserImageConverter}, Mode=OneWay}" Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Fill="{Binding Value, FallbackValue={StaticResource Transparent}}" Margin="0,0,4,0"></Rectangle>
                         <TextBlock VerticalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
                     </StackPanel>
                 </DataTemplate>
