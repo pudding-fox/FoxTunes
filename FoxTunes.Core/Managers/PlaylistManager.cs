@@ -56,6 +56,7 @@ namespace FoxTunes.Managers
                 where this.PlaybackManager.IsSupported(fileName)
                 select this.PlaylistItemFactory.Create(fileName);
             this.Playlist.Set.AddRange(this.OrderBy(query));
+            this.Database.SaveChanges();
             this.OnUpdated();
         }
 
@@ -66,6 +67,7 @@ namespace FoxTunes.Managers
                 where this.PlaybackManager.IsSupported(libraryItem.FileName)
                 select this.PlaylistItemFactory.Create(libraryItem);
             this.Playlist.Set.AddRange(this.OrderBy(query));
+            this.Database.SaveChanges();
             this.OnUpdated();
         }
 
@@ -132,6 +134,7 @@ namespace FoxTunes.Managers
         {
             this.Playlist.Set.Clear();
             this.Database.SaveChanges();
+            this.OnUpdated();
         }
 
         protected virtual void UpdateCurrentItem()

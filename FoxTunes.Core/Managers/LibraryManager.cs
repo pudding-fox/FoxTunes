@@ -49,6 +49,7 @@ namespace FoxTunes.Managers
                 where this.PlaybackManager.IsSupported(fileName)
                 select this.LibraryItemFactory.Create(fileName);
             this.Library.Set.AddRange(query);
+            this.Database.SaveChanges();
             this.OnUpdated();
         }
 
