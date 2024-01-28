@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -77,19 +78,9 @@ namespace FoxTunes
 
         protected virtual async Task<SearchLyricResult> Lookup(string artist, string song)
         {
-            var baseUrl = this.BaseUrl.Value;
-            if (string.IsNullOrEmpty(baseUrl))
-            {
-                baseUrl = BASE_URL;
-            }
-            var url = string.Format(
-                "{0}/SearchLyric?artist={1}&song={2}",
-                baseUrl,
-                Uri.EscapeDataString(artist),
-                Uri.EscapeDataString(song)
-            );
+            var url = this.GetUrl(artist, song);
             Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
-            var request = WebRequest.Create(url);
+            var request = WebRequestFactory.Create(url);
             using (var response = (HttpWebResponse)request.GetResponse())
             {
                 if (response.StatusCode != HttpStatusCode.OK)
@@ -105,6 +96,24 @@ namespace FoxTunes
                     return await this.Lookup(artist, song, results).ConfigureAwait(false);
                 }
             }
+        }
+
+        protected virtual string GetUrl(string artist, string song)
+        {
+            var baseUrl = this.BaseUrl.Value;
+            if (string.IsNullOrEmpty(baseUrl))
+            {
+                baseUrl = BASE_URL;
+            }
+            var builder = new StringBuilder();
+            builder.Append(baseUrl);
+            builder.Append("/SearchLyric?");
+            builder.Append(UrlHelper.GetParameters(new Dictionary<string, string>()
+            {
+                { "artist", artist },
+                { "song", song }
+            }));
+            return builder.ToString();
         }
 
         protected virtual Task<SearchLyricResult> Lookup(string artist, string song, IEnumerable<SearchLyricResult> searchResults)

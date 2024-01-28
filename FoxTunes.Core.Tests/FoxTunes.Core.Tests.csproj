@@ -5,6 +5,7 @@
     <AssemblyName>FoxTunes.Core.Tests</AssemblyName>
     <OutputPath>..\distribution\$(Platform)\</OutputPath>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
+    <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
     <Platforms>x86;x64</Platforms>
   </PropertyGroup>
 
