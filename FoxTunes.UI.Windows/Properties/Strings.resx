@@ -516,6 +516,18 @@
   <data name="Shuffle.Name" xml:space="preserve">
     <value>Shuffle</value>
   </data>
+  <data name="StaticImage.Name" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="StaticImageConfiguration.Interval" xml:space="preserve">
+    <value>Interval (seconds)</value>
+  </data>
+  <data name="StaticImageConfiguration.Path" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="StaticImageConfiguration.Section" xml:space="preserve">
+    <value>Image</value>
+  </data>
   <data name="StreamPosition.Name" xml:space="preserve">
     <value>Seekbar</value>
   </data>

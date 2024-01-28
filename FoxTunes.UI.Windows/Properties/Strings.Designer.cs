@@ -1258,6 +1258,42 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Image.
+        /// </summary>
+        internal static string StaticImage_Name {
+            get {
+                return ResourceManager.GetString("StaticImage.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Interval (seconds).
+        /// </summary>
+        internal static string StaticImageConfiguration_Interval {
+            get {
+                return ResourceManager.GetString("StaticImageConfiguration.Interval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path.
+        /// </summary>
+        internal static string StaticImageConfiguration_Path {
+            get {
+                return ResourceManager.GetString("StaticImageConfiguration.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image.
+        /// </summary>
+        internal static string StaticImageConfiguration_Section {
+            get {
+                return ResourceManager.GetString("StaticImageConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Seekbar.
         /// </summary>
         internal static string StreamPosition_Name {
