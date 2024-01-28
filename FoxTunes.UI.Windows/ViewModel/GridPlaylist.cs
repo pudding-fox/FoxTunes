@@ -509,9 +509,9 @@ namespace FoxTunes.ViewModel
             return new PlaylistGridViewColumn[] { };
         }
 
-        public virtual async Task Refresh()
+        public override async Task Refresh()
         {
-            await this.RefreshItems().ConfigureAwait(false);
+            await base.Refresh().ConfigureAwait(false);
             await this.RefreshSelectedItems().ConfigureAwait(false);
             await this.RefreshColumns(null).ConfigureAwait(false);
         }

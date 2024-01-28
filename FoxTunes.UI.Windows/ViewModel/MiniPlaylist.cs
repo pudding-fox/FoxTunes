@@ -132,10 +132,10 @@ namespace FoxTunes.ViewModel
             return this.Refresh();
         }
 
-        public virtual async Task Refresh()
+        public override async Task Refresh()
         {
             this.CurrentPlaylist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
-            await this.RefreshItems().ConfigureAwait(false);
+            await base.Refresh().ConfigureAwait(false);
             await this.RefreshSelectedItem().ConfigureAwait(false);
         }
 

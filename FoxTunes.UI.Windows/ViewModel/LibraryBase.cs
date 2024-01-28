@@ -85,6 +85,34 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ItemsChanged;
 
+        protected virtual string GetStatusMessage()
+        {
+            if (this.LibraryHierarchyBrowser == null || this.Items == null)
+            {
+                return LOADING;
+            }
+            if (this.Items.Count > 0)
+            {
+                return null;
+            }
+            switch (this.LibraryHierarchyBrowser.State)
+            {
+                case LibraryHierarchyBrowserState.Loading:
+                    return LOADING;
+            }
+            var isUpdating = global::FoxTunes.BackgroundTask.Active
+                .OfType<LibraryTaskBase>()
+                .Any();
+            if (isUpdating)
+            {
+                return UPDATING;
+            }
+            else
+            {
+                return EMPTY;
+            }
+        }
+
         public virtual LibraryHierarchyNode SelectedItem
         {
             get
@@ -150,34 +178,18 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowCursorAdornersChanged;
 
-        public string StatusMessage
+        private string _StatusMessage { get; set; }
+
+        public virtual string StatusMessage
         {
             get
             {
-                if (this.LibraryHierarchyBrowser == null || this.Items == null)
-                {
-                    return LOADING;
-                }
-                if (this.Items.Count > 0)
-                {
-                    return null;
-                }
-                switch (this.LibraryHierarchyBrowser.State)
-                {
-                    case LibraryHierarchyBrowserState.Loading:
-                        return LOADING;
-                }
-                var isUpdating = global::FoxTunes.BackgroundTask.Active
-                    .OfType<LibraryTaskBase>()
-                    .Any();
-                if (isUpdating)
-                {
-                    return UPDATING;
-                }
-                else
-                {
-                    return EMPTY;
-                }
+                return this._StatusMessage;
+            }
+            set
+            {
+                this._StatusMessage = value;
+                this.OnStatusMessageChanged();
             }
         }
 
@@ -217,9 +229,10 @@ namespace FoxTunes.ViewModel
 
         protected virtual Task RefreshStatus()
         {
+            var statusMessage = this.GetStatusMessage();
             return Windows.Invoke(() =>
             {
-                this.OnStatusMessageChanged();
+                this.StatusMessage = statusMessage;
                 this.OnHasStatusMessageChanged();
             });
         }
