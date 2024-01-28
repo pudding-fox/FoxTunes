@@ -242,22 +242,25 @@ namespace FoxTunes.ViewModel
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.InputManager = ComponentRegistry.Instance.GetComponent<IInputManager>();
             this.Configuration = this.Core.Components.Configuration;
-            this.Configuration.GetElement<TextConfigurationElement>(
-                InputManagerConfiguration.SECTION,
-                InputManagerConfiguration.PLAY_ELEMENT
-            ).ConnectValue<string>(value => this.PlayCommandBinding = value);
-            this.Configuration.GetElement<TextConfigurationElement>(
-                InputManagerConfiguration.SECTION,
-                InputManagerConfiguration.PREVIOUS_ELEMENT
-            ).ConnectValue<string>(value => this.PreviousCommandBinding = value);
-            this.Configuration.GetElement<TextConfigurationElement>(
-                InputManagerConfiguration.SECTION,
-                InputManagerConfiguration.NEXT_ELEMENT
-            ).ConnectValue<string>(value => this.NextCommandBinding = value);
-            this.Configuration.GetElement<TextConfigurationElement>(
-                InputManagerConfiguration.SECTION,
-                InputManagerConfiguration.STOP_ELEMENT
-            ).ConnectValue<string>(value => this.StopCommandBinding = value);
+            if (this.Configuration.GetSection(InputManagerConfiguration.SECTION) != null)
+            {
+                this.Configuration.GetElement<TextConfigurationElement>(
+                    InputManagerConfiguration.SECTION,
+                    InputManagerConfiguration.PLAY_ELEMENT
+                ).ConnectValue<string>(value => this.PlayCommandBinding = value);
+                this.Configuration.GetElement<TextConfigurationElement>(
+                    InputManagerConfiguration.SECTION,
+                    InputManagerConfiguration.PREVIOUS_ELEMENT
+                ).ConnectValue<string>(value => this.PreviousCommandBinding = value);
+                this.Configuration.GetElement<TextConfigurationElement>(
+                    InputManagerConfiguration.SECTION,
+                    InputManagerConfiguration.NEXT_ELEMENT
+                ).ConnectValue<string>(value => this.NextCommandBinding = value);
+                this.Configuration.GetElement<TextConfigurationElement>(
+                    InputManagerConfiguration.SECTION,
+                    InputManagerConfiguration.STOP_ELEMENT
+                ).ConnectValue<string>(value => this.StopCommandBinding = value);
+            }
             var task = this.Refresh();
             base.InitializeComponent(core);
         }

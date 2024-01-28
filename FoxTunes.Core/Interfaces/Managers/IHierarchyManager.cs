@@ -4,7 +4,7 @@ namespace FoxTunes.Interfaces
 {
     public interface IHierarchyManager : IStandardManager, IBackgroundTaskSource
     {
-        Task Build();
+        Task Build(bool reset);
 
         Task Clear();
     }

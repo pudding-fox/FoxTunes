@@ -23,7 +23,7 @@ namespace FoxTunes.Behaviours
             switch (signal.Name)
             {
                 case CommonSignals.LibraryUpdated:
-                    return this.HierarchyManager.Build();
+                    return this.HierarchyManager.Build(true);
             }
 #if NET40
             return TaskEx.FromResult(false);

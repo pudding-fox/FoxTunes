@@ -1,12 +1,20 @@
 #!/bin/sh
 
+TARGET="
+net40
+net461
+"
+
 ADDON="
 bass_aac.dll
+bass_ac3.dll
 bass_ape.dll
 bassalac.dll
 bassdsd.dll
 bassflac.dll
 basswv.dll
+bassmidi.dll
+basswma.dll
 "
 
 MAIN="
@@ -36,15 +44,21 @@ FoxTunes.Scripting.JS.dll
 FoxTunes.UI.dll
 FoxTunes.UI.Windows.dll
 FoxTunes.UI.Windows.Themes.dll
-log4net.config
 log4net.dll
 ManagedBass.dll
 ManagedBass.Gapless.dll
 ManagedBass.Mix.dll
 Noesis.Javascript.dll
 System.Data.SQLite.dll
+System.IO.dll
+System.Runtime.dll
+System.Threading.Tasks.dll
 System.Windows.Interactivity.dll
 taglib-sharp.dll
+Microsoft.Threading.Tasks.dll
+Microsoft.Threading.Tasks.Extensions.Desktop.dll
+Microsoft.Threading.Tasks.Extensions.dll
+Microsoft.Windows.Shell.dll
 "
 
 WINDOWS="
@@ -60,7 +74,7 @@ ManagedBass.Asio.dll
 
 CD="
 bass_gapless_cd.dll
-Addon/basscd.dll
+basscd.dll
 FoxTunes.Output.Bass.Cd.dll
 ManagedBass.Cd.dll
 ManagedBass.Gapless.Cd.dll
@@ -96,119 +110,107 @@ FoxDb.SqlServer.dll
 FoxDb.SqlServer.2012.dll
 "
 
-DEPENDENCIES=" 
-x86/Microsoft.VC100.CRT/msvcp100.dll
-x86/Microsoft.VC100.CRT/msvcr100.dll
-"
-
 TAG=$(git describe --abbrev=0 --tags)
 
 echo "Current version is $TAG.."
-
-MSBUILD="/c/Program Files (x86)/MSBuild/12.0/Bin/MSBuild.exe"
-
-if [ -f "$MSBUILD" ]
-then
-
-	rm -rf "./distribution"
-
-	"$MSBUILD" FoxTunes.sln //t:Build //p:Configuration=Release
-else 
-	echo "Skipping build, not such $MSBUILD."
-fi
+sleep 1
+echo "3.."
+sleep 1
+echo "2.."
+sleep 1
+echo "1.."
+sleep 1
 
 rm -rf "./release"
 
-mkdir -p "./release/Main"
-mkdir -p "./release/Main/Addon"
-mkdir -p "./release/Plugins"
-mkdir -p "./release/Plugins/windows"
-mkdir -p "./release/Plugins/asio"
-mkdir -p "./release/Plugins/cd"
-mkdir -p "./release/Plugins/dsd"
-mkdir -p "./release/Plugins/dts"
-mkdir -p "./release/Plugins/sox"
-mkdir -p "./release/Plugins/wasapi"
-mkdir -p "./release/Plugins/sqlserver"
-mkdir -p "./release/Dependencies"
-
-echo "Creating main package.."
-
-for file in $ADDON
+for target in $TARGET
 do
-	echo "$file"
-	cp "./distribution/Release/Addon/$file" "./release/Main/Addon"
+
+	mkdir -p "./release/$target/Main"
+	mkdir -p "./release/$target/Main/Addon"
+	mkdir -p "./release/$target/Plugins"
+	mkdir -p "./release/$target/Plugins/windows"
+	mkdir -p "./release/$target/Plugins/asio"
+	mkdir -p "./release/$target/Plugins/cd"
+	mkdir -p "./release/$target/Plugins/dsd"
+	mkdir -p "./release/$target/Plugins/dts"
+	mkdir -p "./release/$target/Plugins/sox"
+	mkdir -p "./release/$target/Plugins/wasapi"
+	mkdir -p "./release/$target/Plugins/sqlserver"
+
+	echo "Creating main package.."
+
+	for file in $ADDON
+	do
+		echo "$file"
+		cp "./distribution/$target/Addon/$file" "./release/$target/Main/Addon"
+	done
+
+	for file in $MAIN
+	do
+		if [ ! -f "./distribution/$target/$file" ]
+		then
+			echo "SKIPPING $file" 
+			continue
+		fi
+		echo "$file"
+		cp "./distribution/$target/$file" "./release/$target/Main"
+	done
+
+	tar -zcvf "./release/$target/FoxTunes-$TAG.tar.gz" -C "./release/$target/Main" . --xform='s!^\./!!'
+
+	echo "Creating plugins package.."
+
+	for file in $WINDOWS
+	do
+		echo $file
+		cp "./distribution/$target/$file" "./release/$target/Plugins/windows"
+	done
+
+	for file in $ASIO
+	do
+		echo $file
+		cp "./distribution/$target/$file" "./release/$target/Plugins/asio"
+	done
+
+	for file in $CD
+	do
+		echo $file
+		cp "./distribution/$target/$file" "./release/$target/Plugins/cd"
+	done
+
+	for file in $DSD
+	do
+		echo $file
+		cp "./distribution/$target/$file" "./release/$target/Plugins/dsd"
+	done
+
+	for file in $DTS
+	do
+		echo $file
+		cp "./distribution/$target/$file" "./release/$target/Plugins/dts"
+	done
+
+	for file in $SOX
+	do
+		echo $file
+		cp "./distribution/$target/$file" "./release/$target/Plugins/sox"
+	done
+
+	for file in $WASAPI
+	do
+		echo $file
+		cp "./distribution/$target/$file" "./release/$target/Plugins/wasapi"
+	done
+
+	for file in $SQLSERVER
+	do
+			echo $file
+			cp "./distribution/$target/$file" "./release/$target/Plugins/sqlserver"
+	done
+
+	tar -zcvf "./release/$target/FoxTunes-$TAG-Plugins.tar.gz" -C "./release/$target/Plugins" . --xform='s!^\./!!'
 done
-
-for file in $MAIN
-do
-	echo "$file"
-	cp "./distribution/Release/$file" "./release/Main"
-done
-
-tar -zcvf "./release/FoxTunes-$TAG.tar.gz" -C "./release/Main" . --xform='s!^\./!!'
-
-echo "Creating plugins package.."
-
-for file in $WINDOWS
-do
-	echo $file
-	cp "./distribution/Release/$file" "./release/Plugins/windows"
-done
-
-for file in $ASIO
-do
-	echo $file
-	cp "./distribution/Release/$file" "./release/Plugins/asio"
-done
-
-for file in $CD
-do
-	echo $file
-	cp "./distribution/Release/$file" "./release/Plugins/cd"
-done
-
-for file in $DSD
-do
-	echo $file
-	cp "./distribution/Release/$file" "./release/Plugins/dsd"
-done
-
-for file in $DTS
-do
-	echo $file
-	cp "./distribution/Release/$file" "./release/Plugins/dts"
-done
-
-for file in $SOX
-do
-	echo $file
-	cp "./distribution/Release/$file" "./release/Plugins/sox"
-done
-
-for file in $WASAPI
-do
-	echo $file
-	cp "./distribution/Release/$file" "./release/Plugins/wasapi"
-done
-
-for file in $SQLSERVER
-do
-        echo $file
-        cp "./distribution/Release/$file" "./release/Plugins/sqlserver"
-done
-
-tar -zcvf "./release/FoxTunes-$TAG-Plugins.tar.gz" -C "./release/Plugins" . --xform='s!^\./!!'
-
-echo "Creating dependencies package.."
-
-for file in $DEPENDENCIES
-do
-	echo $file
-	cp "./distribution/Release/$file" "./release/Dependencies"
-done
-
-tar -zcvf "./release/FoxTunes-$TAG-Dependencies.tar.gz" -C "./release/Dependencies" . --xform='s!^\./!!'
 
 echo "All done."
 
