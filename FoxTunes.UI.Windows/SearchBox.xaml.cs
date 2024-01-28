@@ -1,6 +1,8 @@
-﻿using System;
+﻿using FoxTunes.ViewModel;
+using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace FoxTunes
@@ -106,6 +108,21 @@ namespace FoxTunes
         {
             this.Timer.Stop();
             this.SearchText = this.Text;
+        }
+
+        public ICommand ClearCommand
+        {
+            get
+            {
+                return new Command(() => this.Clear());
+            }
+        }
+
+        public void Clear()
+        {
+            this.Text = null;
+            this.Timer.Stop();
+            this.SearchText = null;
         }
     }
 }
