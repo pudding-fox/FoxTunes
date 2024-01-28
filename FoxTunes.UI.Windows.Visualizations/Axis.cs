@@ -152,7 +152,7 @@ namespace FoxTunes
             var y = Convert.ToInt32(this.ActualHeight / 2);
             labels = this.TrimToWidth(labels, width);
             var position = 0;
-            for (int step = width / labels.Length, x = step / 2; x < width && position < labels.Length; x += step, position++)
+            for (float step = (float)width / labels.Length, x = step / 2; x < width && position < labels.Length; x += step, position++)
             {
                 var label = labels[position];
                 var origin = new Point(x - (label.Width / 2), y - (label.Height / 2));
@@ -184,7 +184,7 @@ namespace FoxTunes
             var x = Convert.ToInt32(this.ActualWidth / 2);
             labels = this.TrimToHeight(labels, height);
             var position = labels.Length - 1;
-            for (int step = height / labels.Length, y = step / 2; y < height && position >= 0; y += step, position--)
+            for (float step = (float)height / labels.Length, y = step / 2; y < height && position >= 0; y += step, position--)
             {
                 var label = labels[position];
                 var origin = new Point(x - (label.Width / 2), y - (label.Height / 2));
