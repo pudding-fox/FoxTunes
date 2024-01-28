@@ -22,6 +22,8 @@ namespace FoxTunes.Interfaces
 
         Task Play(string fileName);
 
+        Task Play(int sequence);
+
         bool CanNavigate { get; }
 
         PlaylistItem GetNext();

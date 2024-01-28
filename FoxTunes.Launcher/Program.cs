@@ -33,6 +33,7 @@ namespace FoxTunes.Launcher
                     {
                         core.Components.UserInterface.Run(e.Message);
                     };
+                    core.Components.UserInterface.Run(Environment.CommandLine);
                     core.Components.UserInterface.Show();
                 }
             }

@@ -17,7 +17,7 @@ namespace FoxTunes
             this.Mutex = new Mutex(true, Id, out success);
             if (success)
             {
-                Task.Factory.StartNew(this.OnStart);
+                Task.Factory.StartNew(() => this.OnStart());
             }
             else
             {
