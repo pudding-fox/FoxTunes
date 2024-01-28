@@ -6,6 +6,7 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Extensions="clr-namespace:FoxTunes.Extensions"
              x:Class="FoxTunes.Library"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
@@ -26,7 +27,10 @@
         <TextBlock VerticalAlignment="Center" Padding="0,0,7,0" ><Run Text="View Mode:"/></TextBlock>
         <ComboBox Grid.Column="1" ItemsSource="{Binding Components.Library.LibraryHierarchyQuery}" SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}" SelectedIndex="0" DisplayMemberPath="Name"/>
         <Windows:LibraryHierarchies Grid.Column="2"></Windows:LibraryHierarchies>
-        <TreeView x:Name="TreeView" Grid.ColumnSpan="3" Grid.Row="1" ItemsSource="{Binding Items, Source={StaticResource ViewModel}}">
+        <TreeView x:Name="TreeView" Grid.ColumnSpan="3" Grid.Row="1" ItemsSource="{Binding Items, Source={StaticResource ViewModel}}"
+                  Extensions:TreeViewExtensions.SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}"
+                  Extensions:VisualExtensions.ImageStack="True"
+                  Extensions:VisualExtensions.ImageStackItems="{Binding SelectedItem.Items, Source={StaticResource ViewModel}}">
             <TreeView.Resources>
                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"></Setter>

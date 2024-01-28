@@ -74,6 +74,32 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("Items");
         }
 
+        private RenderableLibraryHierarchyItem _SelectedItem { get; set; }
+
+        public RenderableLibraryHierarchyItem SelectedItem
+        {
+            get
+            {
+                return this._SelectedItem;
+            }
+            set
+            {
+                this._SelectedItem = value;
+                this.OnSelectedItemChanged();
+            }
+        }
+
+        protected virtual void OnSelectedItemChanged()
+        {
+            if (this.SelectedItemChanged != null)
+            {
+                this.SelectedItemChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SelectedItem");
+        }
+
+        public event EventHandler SelectedItemChanged = delegate { };
+
         public void Reload()
         {
             this._Items.Clear();
