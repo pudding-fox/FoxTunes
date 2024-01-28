@@ -14,7 +14,8 @@ namespace FoxTunes
         public InternalDbContext(DbConnection connection, DbCompiledModel model)
             : base(connection, model, false)
         {
-
+            this.Configuration.AutoDetectChangesEnabled = false;
+            this.Configuration.ValidateOnSaveEnabled = false;
         }
     }
 }

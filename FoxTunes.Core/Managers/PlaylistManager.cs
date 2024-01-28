@@ -136,6 +136,7 @@ namespace FoxTunes.Managers
         public void Clear()
         {
             this.Playlist.Set.Clear();
+            this.Database.SaveChanges();
         }
 
         protected virtual void UpdateCurrentItem()

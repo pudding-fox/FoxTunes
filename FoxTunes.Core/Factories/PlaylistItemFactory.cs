@@ -24,7 +24,7 @@ namespace FoxTunes.Factories
 
         public PlaylistItem Create(LibraryItem libraryItem)
         {
-            var item = new PlaylistItem(libraryItem.FileName, libraryItem);
+            var item = new PlaylistItem(libraryItem.FileName, new LibraryMetaDataSource(libraryItem));
             item.InitializeComponent(this.Core);
             return item;
         }

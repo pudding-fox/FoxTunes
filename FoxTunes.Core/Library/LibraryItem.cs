@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace FoxTunes
 {
-    public class LibraryItem : PersistableComponent, IMetaDataSource
+    public class LibraryItem : PersistableComponent
     {
         public LibraryItem()
         {
