@@ -124,6 +124,7 @@
     <Compile Include="Theme\ThemeLoader.cs" />
     <Compile Include="Utilities\CollectionManager.cs" />
     <Compile Include="Utilities\DiagonalStackPanel.cs" />
+    <Compile Include="Utilities\DpiHelper.cs" />
     <Compile Include="Utilities\MouseCursorAdorner.cs" />
     <Compile Include="Utilities\MouseHelper.cs" />
     <Compile Include="Utilities\RefreshableGridViewColumn.cs" />
