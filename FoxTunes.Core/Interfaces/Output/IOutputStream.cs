@@ -19,6 +19,8 @@ namespace FoxTunes.Interfaces
 
         int Channels { get; }
 
+        bool IsReady { get; }
+
         bool IsPlaying { get; }
 
         bool IsPaused { get; }

@@ -425,9 +425,13 @@ namespace FoxTunes
         public async Task Play(PlaylistItem playlistItem)
         {
             var outputStream = this.PlaybackManager.CurrentStream;
-            if (outputStream != null && outputStream.PlaylistItem == playlistItem)
+            if (outputStream != null && outputStream.PlaylistItem == playlistItem && outputStream.IsReady)
             {
                 outputStream.Position = 0;
+                if (!outputStream.IsPlaying)
+                {
+                    await outputStream.Play().ConfigureAwait(false);
+                }
                 return;
             }
             var exception = default(Exception);
