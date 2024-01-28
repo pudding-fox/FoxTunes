@@ -35,12 +35,15 @@ namespace FoxTunes
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.LibraryManager = core.Managers.Library;
             this.DatabaseFactory = core.Factories.Database;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             base.InitializeComponent(core);
         }
 
@@ -53,7 +56,7 @@ namespace FoxTunes
             using (var task = new BuildLibraryHierarchiesTask(status))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -67,7 +70,7 @@ namespace FoxTunes
             using (var task = new ClearLibraryHierarchiesTask(status, signal))
             {
                 task.InitializeComponent(this.Core);
-                await this.OnBackgroundTask(task).ConfigureAwait(false);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -144,23 +147,6 @@ namespace FoxTunes
             }
             return false;
         }
-
-        protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var e = new BackgroundTaskEventArgs(backgroundTask);
-            this.BackgroundTask(this, e);
-            return e.Complete();
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
 
         public string Checksum
         {

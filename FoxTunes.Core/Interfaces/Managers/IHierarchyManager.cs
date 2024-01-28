@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IHierarchyManager : IStandardManager, IBackgroundTaskSource, IDatabaseInitializer
+    public interface IHierarchyManager : IStandardManager, IDatabaseInitializer
     {
         HierarchyManagerState State { get; }
 

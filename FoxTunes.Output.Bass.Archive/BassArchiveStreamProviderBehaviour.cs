@@ -14,7 +14,7 @@ namespace FoxTunes
 {
     [Component("5E1331EE-37F9-41BB-BD5E-82E9B4995B8A", null, priority: ComponentAttribute.PRIORITY_LOW)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassArchiveStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent, IFileActionHandler, IDisposable
+    public class BassArchiveStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IFileActionHandler, IDisposable
     {
         public const string OPEN_ARCHIVE = "FGGG";
 
@@ -25,6 +25,8 @@ namespace FoxTunes
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public IFileSystemBrowser FileSystemBrowser { get; private set; }
+
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -104,6 +106,7 @@ namespace FoxTunes
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.FileSystemBrowser = core.Components.FileSystemBrowser;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 BassArchiveStreamProviderBehaviourConfiguration.SECTION,
@@ -260,7 +263,7 @@ namespace FoxTunes
             using (var task = new AddArchivesToLibraryTask(paths))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
@@ -276,21 +279,10 @@ namespace FoxTunes
             using (var task = new AddArchivesToPlaylistTask(playlist, index, paths, false))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
-
-        protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-                return;
-            }
-            this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
 
         public bool IsDisposed { get; private set; }
 

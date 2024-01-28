@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class RatingManager : StandardManager, IBackgroundTaskSource
+    public class RatingManager : StandardManager
     {
         public IMetaDataManager MetaDataManager { get; private set; }
 
@@ -45,22 +45,5 @@ namespace FoxTunes
             await this.MetaDataManager.Save(fileDatas, true, false, CommonStatistics.Rating).ConfigureAwait(false);
             await this.HierarchyManager.Refresh(fileDatas, CommonStatistics.Rating).ConfigureAwait(false);
         }
-
-        protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var e = new BackgroundTaskEventArgs(backgroundTask);
-            this.BackgroundTask(this, e);
-            return e.Complete();
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
     }
 }

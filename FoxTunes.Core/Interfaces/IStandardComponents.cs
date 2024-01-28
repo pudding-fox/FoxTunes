@@ -51,5 +51,7 @@
         ISortParser SortParser { get; }
 
         IReportEmitter ReportEmitter { get; }
+
+        IBackgroundTaskEmitter BackgroundTaskEmitter { get; }
     }
 }

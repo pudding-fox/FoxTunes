@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class MinidiscBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent, IBackgroundTaskSource
+    public class MinidiscBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string VIEW_DISC = "AAAA";
 
@@ -29,6 +29,8 @@ namespace FoxTunes
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
+
         public IReportEmitter ReportEmitter { get; private set; }
 
         public IUserInterface UserInterface { get; private set; }
@@ -47,6 +49,7 @@ namespace FoxTunes
         {
             this.Core = core;
             this.PlaylistManager = core.Managers.Playlist;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ReportEmitter = core.Components.ReportEmitter;
             this.UserInterface = core.Components.UserInterface;
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
@@ -140,7 +143,7 @@ namespace FoxTunes
             using (var task = new SetDiscTitleTask(device, title))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
                 return task.Result != null && task.Result.Status == ResultStatus.Success;
             }
@@ -165,7 +168,7 @@ namespace FoxTunes
             using (var task = new EraseMinidiscTask(device))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
                 return task.Result != null && task.Result.Status == ResultStatus.Success;
             }
@@ -189,7 +192,7 @@ namespace FoxTunes
             using (var task = new WriteMinidiscTask(device, actions))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
                 return task.Result != null && task.Result.Status == ResultStatus.Success;
             }
@@ -257,7 +260,7 @@ namespace FoxTunes
             using (var task = new OpenMinidiscTask())
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
                 return task;
             }
@@ -353,17 +356,6 @@ namespace FoxTunes
             }
             throw new NotImplementedException();
         }
-
-        protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-                return;
-            }
-            this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {

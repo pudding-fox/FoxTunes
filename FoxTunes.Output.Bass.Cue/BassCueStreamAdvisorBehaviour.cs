@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassCueStreamAdvisorBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent, IFileActionHandler, IDisposable
+    public class BassCueStreamAdvisorBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IFileActionHandler, IDisposable
     {
         public const string CUE = ".cue";
 
@@ -22,6 +22,8 @@ namespace FoxTunes
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public IFileSystemBrowser FileSystemBrowser { get; private set; }
+
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
 
         public IBassOutput Output { get; private set; }
 
@@ -49,6 +51,7 @@ namespace FoxTunes
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.FileSystemBrowser = core.Components.FileSystemBrowser;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassCueStreamAdvisorBehaviourConfiguration.SECTION,
@@ -169,21 +172,10 @@ namespace FoxTunes
             using (var task = new AddCueToPlaylistTask(playlist, index, fileName))
             {
                 task.InitializeComponent(this.Core);
-                this.OnBackgroundTask(task);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
                 await task.Run().ConfigureAwait(false);
             }
         }
-
-        protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
-        {
-            if (this.BackgroundTask == null)
-            {
-                return;
-            }
-            this.BackgroundTask(this, new BackgroundTaskEventArgs(backgroundTask));
-        }
-
-        public event BackgroundTaskEventHandler BackgroundTask;
 
         public bool IsDisposed { get; private set; }
 
