@@ -29,9 +29,14 @@ namespace FoxTunes
             {
                 if (string.IsNullOrEmpty(this._BrowseFolder))
                 {
+                    var path = default(string);
+                    if (FileSystemHelper.IsLocalPath(fileName))
+                    {
+                        path = Path.GetDirectoryName(fileName);
+                    }
                     var options = new BrowseOptions(
                         "Save As",
-                        Path.GetDirectoryName(fileName),
+                        path,
                         Enumerable.Empty<BrowseFilter>(),
                         BrowseFlags.Folder
                     );

@@ -137,7 +137,12 @@ namespace FoxTunes.ViewModel.Config
             {
                 return;
             }
-            var options = new BrowseOptions(this.Element.Name, this.Element.Value, Enumerable.Empty<BrowseFilter>(), BrowseFlags.File);
+            var path = default(string);
+            if (!string.IsNullOrEmpty(this.Element.Value) && FileSystemHelper.IsLocalPath(this.Element.Value))
+            {
+                path = this.Element.Value;
+            }
+            var options = new BrowseOptions(this.Element.Name, path, Enumerable.Empty<BrowseFilter>(), BrowseFlags.File);
             var result = browser.Browse(options);
             if (!result.Success)
             {
@@ -153,7 +158,12 @@ namespace FoxTunes.ViewModel.Config
             {
                 return;
             }
-            var options = new BrowseOptions(this.Element.Name, this.Element.Value, Enumerable.Empty<BrowseFilter>(), BrowseFlags.Folder);
+            var path = default(string);
+            if (!string.IsNullOrEmpty(this.Element.Value) && FileSystemHelper.IsLocalPath(this.Element.Value))
+            {
+                path = this.Element.Value;
+            }
+            var options = new BrowseOptions(this.Element.Name, path, Enumerable.Empty<BrowseFilter>(), BrowseFlags.Folder);
             var result = browser.Browse(options);
             if (!result.Success)
             {
