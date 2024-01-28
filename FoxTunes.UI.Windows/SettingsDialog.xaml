@@ -44,7 +44,7 @@
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
-                <Windows:SearchBox Grid.Row="1" SearchText="{Binding Filter, Source={StaticResource ViewModel}, UpdateSourceTrigger=PropertyChanged}"></Windows:SearchBox>
+                <Windows:SearchBox Grid.Row="1" SearchText="{Binding Filter, Source={StaticResource ViewModel}, UpdateSourceTrigger=PropertyChanged}" Interval="0"></Windows:SearchBox>
                 <ScrollViewer Grid.Column="1" Grid.RowSpan="2" Grid.IsSharedSizeScope="True" VerticalScrollBarVisibility="Auto" Margin="4,0,0,0" Padding="4" Background="{DynamicResource NormalBrush}">
                     <ItemsControl ItemsSource="{Binding SelectedSection.Elements, Source={StaticResource ViewModel}}">
                         <ItemsControl.ItemContainerStyle>

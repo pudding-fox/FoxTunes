@@ -12,7 +12,7 @@ namespace FoxTunes
     /// </summary>
     public partial class SearchBox : UserControl
     {
-        private static readonly TimeSpan SEARCH_COMMIT_INTERVAL = TimeSpan.FromSeconds(1);
+        const int DEFAULT_INTERVAL = 1000;
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
             "Text",
@@ -58,6 +58,33 @@ namespace FoxTunes
             source.SetValue(SearchTextProperty, value);
         }
 
+        public static readonly DependencyProperty IntervalProperty = DependencyProperty.Register(
+            "Interval",
+            typeof(int),
+            typeof(SearchBox),
+            new FrameworkPropertyMetadata(DEFAULT_INTERVAL, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnIntervalChanged))
+        );
+
+        public static int GetInterval(SearchBox source)
+        {
+            return (int)source.GetValue(IntervalProperty);
+        }
+
+        public static void SetInterval(SearchBox source, int value)
+        {
+            source.SetValue(IntervalProperty, value);
+        }
+
+        private static void OnIntervalChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var searchBox = sender as SearchBox;
+            if (searchBox == null)
+            {
+                return;
+            }
+            searchBox.OnIntervalChanged();
+        }
+
         public SearchBox()
         {
             InitializeComponent();
@@ -86,7 +113,7 @@ namespace FoxTunes
             else
             {
                 this.Timer = new DispatcherTimer();
-                this.Timer.Interval = SEARCH_COMMIT_INTERVAL;
+                this.Timer.Interval = TimeSpan.FromMilliseconds(this.Interval);
                 this.Timer.Tick += this.OnTimerTick;
             }
             this.Timer.Start();
@@ -101,6 +128,26 @@ namespace FoxTunes
             set
             {
                 SetSearchText(this, value);
+            }
+        }
+
+        public int Interval
+        {
+            get
+            {
+                return GetInterval(this);
+            }
+            set
+            {
+                SetInterval(this, value);
+            }
+        }
+
+        protected virtual void OnIntervalChanged()
+        {
+            if (this.Timer != null)
+            {
+                this.Timer.Interval = TimeSpan.FromMilliseconds(this.Interval);
             }
         }
 

@@ -1,5 +1,4 @@
-﻿using FoxDb;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +21,8 @@ namespace FoxTunes.ViewModel
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public ILibraryManager LibraryManager { get; private set; }
+
+        private IConfiguration Configuration { get; set; }
 
         public IEnumerable<LibraryHierarchy> Hierarchies
         {
@@ -145,6 +146,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SelectedItemChanged;
 
+        private int _SearchInterval { get; set; }
+
+        public virtual int SearchInterval
+        {
+            get
+            {
+                return this._SearchInterval;
+            }
+            set
+            {
+                this._SearchInterval = value;
+                this.OnSearchIntervalChanged();
+            }
+        }
+
+        protected virtual void OnSearchIntervalChanged()
+        {
+            if (this.SearchIntervalChanged != null)
+            {
+                this.SearchIntervalChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SearchInterval");
+        }
+
+        public event EventHandler SearchIntervalChanged;
+
         public virtual void Refresh()
         {
             this.OnItemsChanged();
@@ -181,6 +208,11 @@ namespace FoxTunes.ViewModel
             this.LibraryManager = this.Core.Managers.Library;
             this.LibraryManager.SelectedHierarchyChanged += this.OnSelectedHierarchyChanged;
             this.LibraryManager.SelectedItemChanged += this.OnSelectedItemChanged;
+            this.Configuration = this.Core.Components.Configuration;
+            this.Configuration.GetElement<IntegerConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                WindowsUserInterfaceConfiguration.SEARCH_INTERVAL_ELEMENT
+            ).ConnectValue(value => this.SearchInterval = value);
             //TODO: Bad .Wait().
             this.Reload().Wait();
             base.InitializeComponent(core);
