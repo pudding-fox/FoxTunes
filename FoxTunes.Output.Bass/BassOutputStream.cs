@@ -216,6 +216,14 @@ namespace FoxTunes
             }
         }
 
+        public override bool IsEnded
+        {
+            get
+            {
+                return this.Stream.IsEnded;
+            }
+        }
+
         public override Task Play()
         {
             return this.Manager.WithPipelineExclusive(this, pipeline =>

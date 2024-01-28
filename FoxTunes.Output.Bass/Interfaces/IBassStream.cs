@@ -18,6 +18,8 @@ namespace FoxTunes.Interfaces
 
         bool IsEmpty { get; }
 
+        bool IsEnded { get; }
+
         IEnumerable<IBassStreamAdvice> Advice { get; }
 
         BassFlags Flags { get; }

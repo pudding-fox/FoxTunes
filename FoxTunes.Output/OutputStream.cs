@@ -45,6 +45,8 @@ namespace FoxTunes
 
         public abstract bool IsStopped { get; }
 
+        public abstract bool IsEnded { get; }
+
         public abstract Task Play();
 
         public abstract Task Pause();
