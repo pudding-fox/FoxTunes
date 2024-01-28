@@ -128,5 +128,14 @@ namespace FoxTunes
             }
             errors.Add(message);
         }
+
+        protected override void OnDisposing()
+        {
+            if (this.Database != null)
+            {
+                this.Database.Dispose();
+            }
+            base.OnDisposing();
+        }
     }
 }

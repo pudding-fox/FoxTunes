@@ -135,7 +135,7 @@ namespace FoxTunes
                     }
                 ).ConfigureAwait(false);
             }
-            await PlaylistTaskBase.UpdatePlaylistItem(this.Database, playlistItem);
+            await PlaylistTaskBase.UpdatePlaylistItem(this.Database, playlistItem).ConfigureAwait(false);
         }
 
         protected virtual void AddError(PlaylistItem playlistItem, string message)
@@ -147,6 +147,15 @@ namespace FoxTunes
                 this.Errors.Add(playlistItem, errors);
             }
             errors.Add(message);
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.Database != null)
+            {
+                this.Database.Dispose();
+            }
+            base.OnDisposing();
         }
     }
 }
