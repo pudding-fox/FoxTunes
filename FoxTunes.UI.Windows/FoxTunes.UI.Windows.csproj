@@ -71,9 +71,12 @@
     </Compile>
     <Compile Include="Theme\ITheme.cs" />
     <Compile Include="Theme\IThemeLoader.cs" />
+    <Compile Include="Theme\IThemeRegistry.cs" />
     <Compile Include="Theme\ThemeAttribute.cs" />
     <Compile Include="Theme\ThemeBase.cs" />
     <Compile Include="Theme\ThemeLoader.cs" />
+    <Compile Include="Theme\ThemeRegistry.cs" />
+    <Compile Include="WindowsUserInterfaceConfiguration.cs" />
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
     <Compile Include="ViewModel\Command.cs" />
     <Compile Include="ViewModel\Playback.cs" />

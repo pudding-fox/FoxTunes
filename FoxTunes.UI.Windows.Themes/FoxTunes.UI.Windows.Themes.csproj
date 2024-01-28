@@ -43,6 +43,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExpressionLightTheme.cs" />
     <Compile Include="ExpressionDarkTheme.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

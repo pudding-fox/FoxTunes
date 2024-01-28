@@ -4,8 +4,8 @@ using System.Windows;
 
 namespace FoxTunes
 {
-    [Theme("3E9EFE8C-5245-4F8B-97D1-EB47CC70E373", "ExpressionDark")]
-    public class ExpressionDarkTheme : ThemeBase
+    [Theme("BF3790D0-033B-4526-8D06-1B3F66637EAF", "ExpressionLight")]
+    public class ExpressionLightTheme : ThemeBase
     {
         public override void Apply(Application application)
         {
@@ -13,7 +13,7 @@ namespace FoxTunes
             application.Resources.MergedDictionaries.Add(
                 new ResourceDictionary()
                 {
-                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ExpressionDark.xaml", UriKind.Relative)
+                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ExpressionLight.xaml", UriKind.Relative)
                 }
             );
         }
