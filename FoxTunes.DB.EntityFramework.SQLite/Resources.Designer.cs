@@ -161,6 +161,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AddPlaylistSequenceRecord {
+            get {
+                return ResourceManager.GetString("AddPlaylistSequenceRecord", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to WITH 
         ///&quot;PropertyItems_Lookup&quot; AS
         ///(

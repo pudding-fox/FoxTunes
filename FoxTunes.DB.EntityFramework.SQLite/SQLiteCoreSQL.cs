@@ -28,6 +28,14 @@ namespace FoxTunes
             }
         }
 
+        public string AddPlaylistSequenceRecord
+        {
+            get
+            {
+                return Resources.AddPlaylistSequenceRecord;
+            }
+        }
+
         public string AddLibraryItem
         {
             get

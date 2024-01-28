@@ -118,6 +118,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="SQLite_Interop_x64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\packages\system.data.sqlite.core.1.0.105.2\build\net46\x64\sqlite.interop.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="SQLite_Interop_x86" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\packages\system.data.sqlite.core.1.0.105.2\build\net46\x86\sqlite.interop.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="AddImageItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\addimageitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
@@ -135,6 +141,9 @@
   </data>
   <data name="AddPlaylistItem" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\addplaylistitem.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="AddPlaylistSequenceRecord" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>resources\addplaylistsequencerecord.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="AddPropertyItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\addpropertyitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
@@ -165,12 +174,6 @@
   </data>
   <data name="ShiftPlaylistItems" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\shiftplaylistitems.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="SQLite_Interop_x64" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\packages\system.data.sqlite.core.1.0.105.2\build\net46\x64\sqlite.interop.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="SQLite_Interop_x86" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\packages\system.data.sqlite.core.1.0.105.2\build\net46\x86\sqlite.interop.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="VariousArtists" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\variousartists.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>

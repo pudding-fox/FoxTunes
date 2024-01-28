@@ -8,6 +8,14 @@ namespace FoxTunes
     {
         public ICore Core { get; private set; }
 
+        public override ICoreScripts CoreScripts
+        {
+            get
+            {
+                return JSCoreScripts.Instance;
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;

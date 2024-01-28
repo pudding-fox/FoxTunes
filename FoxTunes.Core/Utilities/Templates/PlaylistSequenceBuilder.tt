@@ -1,0 +1,86 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+DROP TABLE IF EXISTS "PlaylistSort";
+CREATE TEMPORARY TABLE "PlaylistSort"
+(
+	"PlaylistItem_Id" INTEGER NOT NULL, 
+	"Value1" text NULL,
+	"Value2" text NULL,
+	"Value3" text NULL,
+	"Value4" text NULL,
+	"Value5" text NULL
+);
+
+WITH "VerticalMetaData"
+AS
+(
+	SELECT "PlaylistItems"."Id", "PlaylistItems"."FileName", "MetaDataItems"."Name", 
+		CASE 
+			WHEN "MetaDataItems"."NumericValue" IS NOT NULL THEN 'Numeric' 
+			WHEN "MetaDataItems"."TextValue" IS NOT NULL THEN 'Text' 
+			WHEN "MetaDataItems"."FileValue" IS NOT NULL THEN 'File' 
+		END AS "ValueType",
+			CASE 
+			WHEN "MetaDataItems"."NumericValue" IS NOT NULL THEN "MetaDataItems"."NumericValue"
+			WHEN "MetaDataItems"."TextValue" IS NOT NULL THEN "MetaDataItems"."TextValue" 
+			WHEN "MetaDataItems"."FileValue" IS NOT NULL THEN "MetaDataItems"."FileValue"
+		END AS "Value"
+	FROM "PlaylistItems"
+		JOIN "PlaylistItem_MetaDataItem" 
+			ON "PlaylistItems"."Id" = "PlaylistItem_MetaDataItem"."PlaylistItem_Id"
+		JOIN "MetaDataItems" 
+			ON "MetaDataItems"."Id" = "PlaylistItem_MetaDataItem"."MetaDataItem_Id"
+	WHERE "PlaylistItems"."Status" = @status
+	ORDER BY "PlaylistItems"."Id"
+)
+,
+"HorizontalMetaData"
+AS
+(
+<#= 
+	new PivotViewBuilder(
+		"VerticalMetaData", 
+		new[] { "Id", "FileName" }, 
+		new[] { "Name" }, 
+		new[] { "ValueType", "Value" }, 
+		this.MetaDataNames
+	).TransformText() 
+#>
+)
+
+SELECT "HorizontalMetaData"."Id" AS "PlaylistItem_Id", "HorizontalMetaData"."FileName" AS "FileName"
+<#
+	for(var index = 0; index < this.MetaDataNames.Length; index++)
+	{
+		#>,"Key_<#= index #>", "Value_<#= index #>_Value"<#
+	}
+#>
+FROM "HorizontalMetaData";
+
+DROP TABLE IF EXISTS "PlaylistSequence";
+CREATE TEMPORARY TABLE "PlaylistSequence"
+(
+	"Id" INTEGER PRIMARY KEY NOT NULL,
+	"PlaylistItem_Id" INTEGER NOT NULL
+);
+
+INSERT INTO "PlaylistSequence" ("PlaylistItem_Id")
+SELECT "PlaylistItem_Id"
+FROM "PlaylistSort"
+ORDER BY "Value1", "Value2", "Value3", "Value4", "Value5";
+
+UPDATE "PlaylistItems"
+SET "Sequence" = "Sequence" +
+(
+	SELECT "Id" - 1
+	FROM "PlaylistSequence"
+	WHERE "PlaylistSequence"."PlaylistItem_Id" = "PlaylistItems"."Id"
+)
+WHERE "Status" = @status;
+
+DROP TABLE "PlaylistSort";
+DROP TABLE "PlaylistSequence";
