@@ -4,17 +4,17 @@ namespace FoxTunes
 {
     public static class BassOutputTempoStreamComponentBehaviourConfiguration
     {
-        public const string ENABLED = "";
+        public const string ENABLED = "AAAA1050-B08A-4EDB-9A06-C7A3758F5B7E";
 
-        public const string TEMPO = "";
+        public const string TEMPO = "BBBBBDC6-889F-4461-BA5F-140F551F3F0F";
 
-        public const string PITCH = "";
+        public const string PITCH = "CCCC9C66-A64F-4408-B7C5-98055E40A03C";
 
-        public const string RATE = "";
+        public const string RATE = "DDDD2C8A-B2F9-4F6C-9AE9-BD3BCB6C5594";
 
-        public const string AA_FILTER = "";
+        public const string AA_FILTER = "EEEE9F21-3EEB-4D67-ABB0-8AC163FEB5CD";
 
-        public const string AA_FILTER_LENGTH = "";
+        public const string AA_FILTER_LENGTH = "FFFFFF38-8567-46EA-A1DB-5EEE64BA3099";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -23,17 +23,20 @@ namespace FoxTunes
                     new BooleanConfigurationElement(ENABLED, "Enabled", path: "Tempo")
                         .WithValue(false))
                 .WithElement(
-                    new DoubleConfigurationElement(TEMPO, "Tempo", path: "Tempo")
-                        .WithValue(0.0)
-                        .DependsOn(BassOutputConfiguration.SECTION, ENABLED))
+                    new IntegerConfigurationElement(TEMPO, "Tempo", path: "Tempo")
+                        .WithValue(0)
+                        .DependsOn(BassOutputConfiguration.SECTION, ENABLED)
+                        .WithValidationRule(new IntegerValidationRule(Tempo.MIN_TEMPO, Tempo.MAX_TEMPO, 1)))
                 .WithElement(
-                    new DoubleConfigurationElement(PITCH, "Pitch", path: "Tempo")
-                        .WithValue(0.0)
-                        .DependsOn(BassOutputConfiguration.SECTION, ENABLED))
+                    new IntegerConfigurationElement(PITCH, "Pitch", path: "Tempo")
+                        .WithValue(0)
+                        .DependsOn(BassOutputConfiguration.SECTION, ENABLED)
+                        .WithValidationRule(new IntegerValidationRule(Tempo.MIN_PITCH, Tempo.MAX_PITCH, 1)))
                 .WithElement(
-                    new DoubleConfigurationElement(RATE, "Rate", path: "Tempo")
-                        .WithValue(0.0)
-                        .DependsOn(BassOutputConfiguration.SECTION, ENABLED))
+                    new IntegerConfigurationElement(RATE, "Rate", path: "Tempo")
+                        .WithValue(0)
+                        .DependsOn(BassOutputConfiguration.SECTION, ENABLED)
+                        .WithValidationRule(new IntegerValidationRule(Tempo.MIN_RATE, Tempo.MAX_RATE, 1)))
                 .WithElement(
                     new BooleanConfigurationElement(AA_FILTER, "Anti Alias Filter", path: "Tempo")
                         .WithValue(true)
@@ -42,7 +45,8 @@ namespace FoxTunes
                     new IntegerConfigurationElement(AA_FILTER_LENGTH, "Anti Alias Filter Length", path: "Tempo")
                         .WithValue(32)
                         .DependsOn(BassOutputConfiguration.SECTION, ENABLED)
-                        .DependsOn(BassOutputConfiguration.SECTION, AA_FILTER));
+                        .DependsOn(BassOutputConfiguration.SECTION, AA_FILTER)
+                        .WithValidationRule(new IntegerValidationRule(Tempo.MIN_AA_FILTER_LENGTH, Tempo.MAX_AA_FILTER_LENGTH, 1)));
         }
     }
 }

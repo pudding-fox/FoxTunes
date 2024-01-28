@@ -97,7 +97,7 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        private void OnEnabledChanged(object sender, EventArgs e)
+        protected virtual void OnEnabledChanged(object sender, EventArgs e)
         {
             if (this.IsActive)
             {
@@ -185,7 +185,7 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            if (this.OutputEffects.Equalizer != null)
+            if (this.OutputEffects != null && this.OutputEffects.Equalizer != null)
             {
                 this.OutputEffects.Equalizer.EnabledChanged -= this.OnEnabledChanged;
                 foreach (var band in this.OutputEffects.Equalizer.Bands)

@@ -23,11 +23,11 @@ namespace FoxTunes
             }
         }
 
-        public float Tempo
+        public int Tempo
         {
             get
             {
-                return Convert.ToSingle(this.TempoElement.Value);
+                return this.TempoElement.Value;
             }
             set
             {
@@ -50,11 +50,11 @@ namespace FoxTunes
 
         public event EventHandler TempoChanged;
 
-        public float Pitch
+        public int Pitch
         {
             get
             {
-                return Convert.ToSingle(this.PitchElement.Value);
+                return this.PitchElement.Value;
             }
             set
             {
@@ -77,11 +77,11 @@ namespace FoxTunes
 
         public event EventHandler PitchChanged;
 
-        public float Rate
+        public int Rate
         {
             get
             {
-                return Convert.ToSingle(this.RateElement.Value);
+                return this.RateElement.Value;
             }
             set
             {
@@ -162,11 +162,11 @@ namespace FoxTunes
 
         public BooleanConfigurationElement EnabledElement { get; private set; }
 
-        public DoubleConfigurationElement TempoElement { get; private set; }
+        public IntegerConfigurationElement TempoElement { get; private set; }
 
-        public DoubleConfigurationElement PitchElement { get; private set; }
+        public IntegerConfigurationElement PitchElement { get; private set; }
 
-        public DoubleConfigurationElement RateElement { get; private set; }
+        public IntegerConfigurationElement RateElement { get; private set; }
 
         public BooleanConfigurationElement AAFilterElement { get; private set; }
 
@@ -180,15 +180,15 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassOutputTempoStreamComponentBehaviourConfiguration.ENABLED
             );
-            this.TempoElement = this.Configuration.GetElement<DoubleConfigurationElement>(
+            this.TempoElement = this.Configuration.GetElement<IntegerConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassOutputTempoStreamComponentBehaviourConfiguration.TEMPO
             );
-            this.PitchElement = this.Configuration.GetElement<DoubleConfigurationElement>(
+            this.PitchElement = this.Configuration.GetElement<IntegerConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassOutputTempoStreamComponentBehaviourConfiguration.PITCH
             );
-            this.RateElement = this.Configuration.GetElement<DoubleConfigurationElement>(
+            this.RateElement = this.Configuration.GetElement<IntegerConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassOutputTempoStreamComponentBehaviourConfiguration.RATE
             );
