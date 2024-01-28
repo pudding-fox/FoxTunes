@@ -69,12 +69,31 @@ namespace FoxTunes
             }
         }
 
+        public bool IsMiniPlayerActive
+        {
+            get
+            {
+                if (Application.Current != null && Application.Current.MainWindow != null)
+                {
+                    return Application.Current.MainWindow.ResizeMode == ResizeMode.NoResize;
+                }
+                return false;
+            }
+        }
+
         protected virtual void Enable()
         {
+            if (this.IsMiniPlayerActive)
+            {
+                return;
+            }
             if (Application.Current != null && Application.Current.MainWindow != null)
             {
-                global::FoxTunes.Properties.Settings.Default.MainWindowBounds = Application.Current.MainWindow.RestoreBounds;
-                global::FoxTunes.Properties.Settings.Default.Save();
+                if (!Application.Current.MainWindow.RestoreBounds.IsEmpty())
+                {
+                    global::FoxTunes.Properties.Settings.Default.MainWindowBounds = Application.Current.MainWindow.RestoreBounds;
+                    global::FoxTunes.Properties.Settings.Default.Save();
+                }
                 if (Application.Current.MainWindow.WindowState != WindowState.Normal)
                 {
                     Application.Current.MainWindow.WindowState = WindowState.Normal;
@@ -82,6 +101,13 @@ namespace FoxTunes
                 Application.Current.MainWindow.WindowStyle = WindowStyle.None;
                 Application.Current.MainWindow.ResizeMode = ResizeMode.NoResize;
                 Application.Current.MainWindow.SizeToContent = SizeToContent.WidthAndHeight;
+                if (!global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.IsEmpty())
+                {
+                    Application.Current.MainWindow.Left = global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.Left;
+                    Application.Current.MainWindow.Top = global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.Top;
+                    Application.Current.MainWindow.Width = global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.Width;
+                    Application.Current.MainWindow.Height = global::FoxTunes.Properties.Settings.Default.MiniWindowBounds.Height;
+                }
                 Application.Current.MainWindow.Topmost = this.Topmost;
                 Application.Current.MainWindow.MouseDown += this.OnMouseDown;
             }
@@ -89,15 +115,27 @@ namespace FoxTunes
 
         protected virtual void Disable()
         {
+            if (!this.IsMiniPlayerActive)
+            {
+                return;
+            }
             if (Application.Current != null && Application.Current.MainWindow != null)
             {
+                if (!Application.Current.MainWindow.RestoreBounds.IsEmpty())
+                {
+                    global::FoxTunes.Properties.Settings.Default.MiniWindowBounds = Application.Current.MainWindow.RestoreBounds;
+                    global::FoxTunes.Properties.Settings.Default.Save();
+                }
                 Application.Current.MainWindow.WindowStyle = WindowStyle.SingleBorderWindow;
                 Application.Current.MainWindow.ResizeMode = ResizeMode.CanResize;
                 Application.Current.MainWindow.SizeToContent = SizeToContent.Manual;
-                Application.Current.MainWindow.Left = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Left;
-                Application.Current.MainWindow.Top = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Top;
-                Application.Current.MainWindow.Width = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Width;
-                Application.Current.MainWindow.Height = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Height;
+                if (!global::FoxTunes.Properties.Settings.Default.MainWindowBounds.IsEmpty())
+                {
+                    Application.Current.MainWindow.Left = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Left;
+                    Application.Current.MainWindow.Top = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Top;
+                    Application.Current.MainWindow.Width = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Width;
+                    Application.Current.MainWindow.Height = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Height;
+                }
                 Application.Current.MainWindow.Topmost = false;
                 Application.Current.MainWindow.MouseDown -= this.OnMouseDown;
             }
