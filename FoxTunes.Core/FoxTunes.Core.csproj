@@ -43,7 +43,19 @@
     <Compile Include="AssemblyResolver.cs" />
     <Compile Include="BaseBehaviour.cs" />
     <Compile Include="BaseComponent.cs" />
+    <Compile Include="BaseFactory.cs" />
+    <Compile Include="BaseLoader.cs" />
     <Compile Include="BaseManager.cs" />
+    <Compile Include="FactoryLoader.cs" />
+    <Compile Include="Interfaces\Factories\IMetaDataSourceFactory.cs" />
+    <Compile Include="Interfaces\IBaseFactory.cs" />
+    <Compile Include="Interfaces\IBaseLoader.cs" />
+    <Compile Include="Interfaces\IStandardFactories.cs" />
+    <Compile Include="Interfaces\IStandardFactory.cs" />
+    <Compile Include="Interfaces\MetaData\IMetaDataItem.cs" />
+    <Compile Include="Interfaces\MetaData\IMetaDataItems.cs" />
+    <Compile Include="Interfaces\MetaData\IMetaDataSource.cs" />
+    <Compile Include="Interfaces\Factories\IPlaylistItemFactory.cs" />
     <Compile Include="ManagerLoader.cs" />
     <Compile Include="BehaviourLoader.cs" />
     <Compile Include="Behaviours\PlayNextItemBehaviour.cs" />
@@ -57,6 +69,7 @@
     <Compile Include="Managers\PlaylistManager.cs" />
     <Compile Include="Playlist\Playlist.cs" />
     <Compile Include="Playlist\PlaylistItem.cs" />
+    <Compile Include="Factories\PlaylistItemFactory.cs" />
     <Compile Include="Playlist\PlaylistItems.cs" />
     <Compile Include="StandardBehaviour.cs" />
     <Compile Include="StandardComponent.cs" />
@@ -66,14 +79,12 @@
     <Compile Include="Interfaces\IBaseBehaviour.cs" />
     <Compile Include="Interfaces\IBaseComponent.cs" />
     <Compile Include="Interfaces\IBaseManager.cs" />
-    <Compile Include="Interfaces\IBehaviourLoader.cs" />
     <Compile Include="Interfaces\IComponentRegistry.cs" />
     <Compile Include="Interfaces\IComponentScanner.cs" />
     <Compile Include="Interfaces\IConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Interfaces\ICore.cs" />
     <Compile Include="Interfaces\Database\IDatabase.cs" />
-    <Compile Include="Interfaces\IManagerLoader.cs" />
     <Compile Include="Interfaces\IObservable.cs" />
     <Compile Include="Interfaces\IStandardBehaviour.cs" />
     <Compile Include="Interfaces\IStandardComponents.cs" />
@@ -83,17 +94,20 @@
     <Compile Include="Interfaces\Managers\IPlaylistManager.cs" />
     <Compile Include="Interfaces\Output\IOutput.cs" />
     <Compile Include="Interfaces\IComponentActivator.cs" />
-    <Compile Include="Interfaces\IComponentLoader.cs" />
     <Compile Include="Interfaces\Output\IOutputStream.cs" />
     <Compile Include="Interfaces\Playlist\IPlaylist.cs" />
     <Compile Include="Interfaces\Playlist\IPlaylistItem.cs" />
     <Compile Include="Interfaces\Playlist\IPlaylistItems.cs" />
     <Compile Include="Interfaces\IStandardComponent.cs" />
     <Compile Include="Interfaces\UserInterface\IUserInterface.cs" />
+    <Compile Include="StandardFactories.cs" />
+    <Compile Include="StandardFactory.cs" />
     <Compile Include="StandardManager.cs" />
     <Compile Include="StandardManagers.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="MetaData\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

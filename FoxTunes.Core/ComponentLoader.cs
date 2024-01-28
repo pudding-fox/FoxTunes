@@ -1,25 +1,14 @@
 ﻿using FoxTunes.Interfaces;
-using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    public class ComponentLoader : IComponentLoader
+    public class ComponentLoader : BaseLoader<IStandardComponent>
     {
         private ComponentLoader()
         {
 
         }
 
-        public IEnumerable<IBaseComponent> Load()
-        {
-            var components = new List<IBaseComponent>();
-            foreach (var type in ComponentScanner.Instance.GetComponents(typeof(IStandardComponent)))
-            {
-                components.Add(ComponentActivator.Instance.Activate<IBaseComponent>(type));
-            }
-            return components;
-        }
-
-        public static readonly IComponentLoader Instance = new ComponentLoader();
+        public static readonly IBaseLoader<IStandardComponent> Instance = new ComponentLoader();
     }
 }

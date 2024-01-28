@@ -6,12 +6,8 @@
 
         IStandardManagers Managers { get; }
 
-        void LoadComponents();
+        IStandardFactories Factories { get; }
 
-        void LoadManagers();
-
-        void LoadBehaviours();
-
-        void InitializeComponents();
+        void Load();
     }
 }

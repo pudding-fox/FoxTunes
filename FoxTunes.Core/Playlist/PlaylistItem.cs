@@ -4,17 +4,14 @@ namespace FoxTunes
 {
     public class PlaylistItem : BaseComponent, IPlaylistItem
     {
-        public PlaylistItem(IPlaylist playlist, IPlaylistItems items, string fileName)
+        public PlaylistItem(string fileName, IMetaDataSource metaData)
         {
-            this.Playlist = playlist;
-            this.Items = items;
             this.FileName = fileName;
+            this.MetaData = metaData;
         }
 
-        public IPlaylist Playlist { get; private set; }
-
-        public IPlaylistItems Items { get; private set; }
-
         public string FileName { get; private set; }
+
+        public IMetaDataSource MetaData { get; private set; }
     }
 }

@@ -7,8 +7,10 @@ namespace FoxTunes
     {
         public Playlist()
         {
-            this.Items = new PlaylistItems(this);
+            this.Items = new PlaylistItems();
         }
+
+        public IDatabase Database { get; private set; }
 
         public IPlaylistItems Items { get; private set; }
 
@@ -49,5 +51,11 @@ namespace FoxTunes
         }
 
         public event EventHandler SelectedItemChanged = delegate { };
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.Database = core.Components.Database;
+            base.InitializeComponent(core);
+        }
     }
 }

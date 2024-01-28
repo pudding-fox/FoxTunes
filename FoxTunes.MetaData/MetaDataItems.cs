@@ -1,22 +1,26 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class PlaylistItems : BaseComponent, IPlaylistItems
+    public abstract class MetaDataItems : BaseComponent, IMetaDataItems
     {
-        public PlaylistItems()
+        protected MetaDataItems()
         {
-            this.Items = new ObservableCollection<IPlaylistItem>();
+            this.Items = new ObservableCollection<IMetaDataItem>();
             this.Items.CollectionChanged += (sender, e) => this.CollectionChanged(this, e);
         }
 
-        private ObservableCollection<IPlaylistItem> Items { get; set; }
+        private ObservableCollection<IMetaDataItem> Items { get; set; }
 
-        public void Add(IPlaylistItem item)
+        public void Add(IMetaDataItem item)
         {
             this.Items.Add(item);
         }
@@ -26,12 +30,12 @@ namespace FoxTunes
             this.Items.Clear();
         }
 
-        public bool Contains(IPlaylistItem item)
+        public bool Contains(IMetaDataItem item)
         {
             return this.Items.Contains(item);
         }
 
-        public void CopyTo(IPlaylistItem[] array, int arrayIndex)
+        public void CopyTo(IMetaDataItem[] array, int arrayIndex)
         {
             this.Items.CopyTo(array, arrayIndex);
         }
@@ -52,29 +56,33 @@ namespace FoxTunes
             }
         }
 
-        public bool Remove(IPlaylistItem item)
+        public bool Remove(IMetaDataItem item)
         {
             return this.Items.Remove(item);
         }
 
-        public int IndexOf(IPlaylistItem item)
+        public int IndexOf(IMetaDataItem item)
         {
             return this.Items.IndexOf(item);
         }
 
-        public IPlaylistItem this[int index]
+        public IMetaDataItem this[int index]
         {
             get
             {
                 return this.Items[index];
             }
-            set
+        }
+
+        public IMetaDataItem this[string name]
+        {
+            get
             {
-                this.Items[index] = value;
+                return this.Items.FirstOrDefault(item => string.Equals(item.Name, name, StringComparison.OrdinalIgnoreCase));
             }
         }
 
-        public IEnumerator<IPlaylistItem> GetEnumerator()
+        public IEnumerator<IMetaDataItem> GetEnumerator()
         {
             return this.Items.GetEnumerator();
         }
