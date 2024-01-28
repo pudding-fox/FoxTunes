@@ -10,11 +10,19 @@ namespace FoxTunes.ViewModel
 {
     public class Plugins : ViewModelBase
     {
+        public Plugins() : base(false)
+        {
+            this.Items = new ObservableCollection<Plugin>();
+            this.InitializeComponent(Core.Instance);
+        }
+
         public ObservableCollection<Plugin> Items { get; private set; }
+
+        public IUserInterface UserInterface { get; private set; }
 
         protected override void InitializeComponent(ICore core)
         {
-            this.Items = new ObservableCollection<Plugin>();
+            this.UserInterface = core.Components.UserInterface;
             this.Refresh();
             base.InitializeComponent(core);
         }
@@ -39,6 +47,10 @@ namespace FoxTunes.ViewModel
 
         public void Save()
         {
+            if (!ComponentResolver.Instance.Enabled)
+            {
+                return;
+            }
             foreach (var plugin in this.Items)
             {
                 if (plugin.Components.Count <= 1 || plugin.SelectedComponent == null)
@@ -50,6 +62,7 @@ namespace FoxTunes.ViewModel
                 ComponentResolver.Instance.AddConflict(plugin.Id);
             }
             ComponentResolver.Instance.Save();
+            this.UserInterface.Warn(string.Format(Strings.Plugins_RestartWarning, ComponentResolver.FileName.GetName()));
         }
 
         public ICommand CancelCommand

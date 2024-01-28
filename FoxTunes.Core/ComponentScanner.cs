@@ -105,12 +105,18 @@ namespace FoxTunes
 
         private static IEnumerable<Type> GetAllStandardResolvedComponents()
         {
+            var types = _AllStandardComponents.Value
+                .OrderBy(ComponentSorter.Type)
+                .ThenBy(ComponentSorter.Preference)
+                .ThenBy(ComponentSorter.Priority);
+            if (!ComponentResolver.Instance.Enabled)
+            {
+                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Component set is fixed, skipping config/dependency checks.");
+                return types.ToArray();
+            }
             try
             {
-                return _AllStandardComponents.Value
-                    .OrderBy(ComponentSorter.Type)
-                    .ThenBy(ComponentSorter.Preference)
-                    .ThenBy(ComponentSorter.Priority)
+                return types
                     .Where(ComponentFilter.IsSelected)
                     //TODO: ComponentFilter.IsSelected actually populates the ComponentResolver so we need to flush the stream here to make sure it's done.
                     .ToArray()
@@ -130,11 +136,17 @@ namespace FoxTunes
 
         public IEnumerable<Type> GetComponents(Type type)
         {
-            return _AllComponents.Value
+            var types = _AllComponents.Value
                 .Where(ComponentFilter.IsComponent(type))
                 .OrderBy(ComponentSorter.Type)
                 .ThenBy(ComponentSorter.Preference)
-                .ThenBy(ComponentSorter.Priority)
+                .ThenBy(ComponentSorter.Priority);
+            if (!ComponentResolver.Instance.Enabled)
+            {
+                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Component set is fixed, skipping config/dependency checks.");
+                return types.ToArray();
+            }
+            return types
                 .Where(ComponentFilter.IsSelected)
                 .Where(ComponentFilter.HasDependencies)
                 .ToArray();

@@ -47,14 +47,26 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        public bool Enabled { get; private set; }
+
         public void Enable()
         {
+            if (this.Enabled)
+            {
+                return;
+            }
             Archive.GetPassword(this.Handler);
+            this.Enabled = true;
         }
 
         public void Disable()
         {
+            if (!this.Enabled)
+            {
+                return;
+            }
             Archive.GetPassword(null);
+            this.Enabled = false;
         }
 
         protected virtual bool GetPassword(ref Archive.ArchivePassword password)

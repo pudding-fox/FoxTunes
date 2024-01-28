@@ -952,6 +952,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Plugin selection was updated, restart the application to apply. If something goes wrong, delete the config file: {0}..
+        /// </summary>
+        internal static string Plugins_RestartWarning {
+            get {
+                return ResourceManager.GetString("Plugins.RestartWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Plugins.
         /// </summary>
         internal static string PluginsDialog_Header {
