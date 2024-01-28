@@ -410,23 +410,23 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnActiveChanged(object sender, EventArgs e)
         {
-            var task = this.RefreshStatus();
+            this.Dispatch(this.RefreshStatus);
         }
 
         protected virtual void OnFilterChanged(object sender, EventArgs e)
         {
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
         }
 
         protected virtual void OnStateChanged(object sender, EventArgs e)
         {
-            var task = this.RefreshStatus();
+            this.Dispatch(this.RefreshStatus);
         }
 
         protected virtual void OnSelectedHierarchyChanged(object sender, EventArgs e)
         {
             this.OnSelectedHierarchyChanged();
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
         }
 
         protected virtual void OnSelectedItemChanged(object sender, EventArgs e)
@@ -436,7 +436,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnCanNavigateChanged(object sender, EventArgs e)
         {
-            var task = this.RefreshStatus();
+            this.Dispatch(this.RefreshStatus);
         }
 
         protected virtual Task OnSignal(object sender, ISignal signal)

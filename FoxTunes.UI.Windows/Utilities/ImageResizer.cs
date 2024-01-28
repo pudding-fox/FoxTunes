@@ -33,11 +33,7 @@ namespace FoxTunes
                 case CommonSignals.HierarchiesUpdated:
                     if (!object.Equals(signal.State, CommonSignalFlags.SOFT))
                     {
-#if NET40
-                        var task = TaskEx.Run(() => this.Clear());
-#else
-                        var task = Task.Run(() => this.Clear());
-#endif
+                        this.Dispatch(new Action(this.Clear));
                     }
                     break;
             }

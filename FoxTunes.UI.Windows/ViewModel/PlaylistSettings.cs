@@ -138,7 +138,7 @@ namespace FoxTunes.ViewModel
 
         public void Cancel()
         {
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
         }
 
         public ICommand ResetCommand
@@ -205,7 +205,7 @@ namespace FoxTunes.ViewModel
             this.PlaylistColumnProviders = new ObservableCollection<IUIPlaylistColumnProvider>(
                 this.PlaylistColumnProviderManager.Providers
             );
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
 

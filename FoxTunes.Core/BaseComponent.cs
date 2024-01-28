@@ -23,6 +23,24 @@ namespace FoxTunes
             this.IsInitialized = true;
         }
 
+        protected virtual void Dispatch(Action action)
+        {
+#if NET40
+            var task = TaskEx.Run(action);
+#else
+            var task = Task.Run(action);
+#endif
+        }
+
+        protected virtual void Dispatch(Func<Task> function)
+        {
+#if NET40
+            var task = TaskEx.Run(function);
+#else
+            var task = Task.Run(function);
+#endif
+        }
+
         protected virtual void OnPropertyChanging(string propertyName)
         {
             if (this.PropertyChanging == null)

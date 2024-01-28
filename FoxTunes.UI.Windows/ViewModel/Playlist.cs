@@ -199,7 +199,7 @@ namespace FoxTunes.ViewModel
                 PlaylistGroupingBehaviourConfiguration.GROUP_SCRIPT_ELEMENT
             ).ConnectValue(value => this.GroupingScript = value);
 #endif
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
         }
 
         protected virtual void OnColumnChanged(object sender, PlaylistColumn e)

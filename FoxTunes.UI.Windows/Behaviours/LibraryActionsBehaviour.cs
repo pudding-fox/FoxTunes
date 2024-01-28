@@ -64,11 +64,7 @@ namespace FoxTunes
                             yield return invocationComponent;
                         }
                         //Don't block the menu from opening while we fetch ratings.
-#if NET40
-                        var task = TaskEx.Run(() => this.GetRating(this.LibraryManager.SelectedItem, invocationComponents));
-#else
-                        var task = Task.Run(() => this.GetRating(this.LibraryManager.SelectedItem, invocationComponents));
-#endif
+                        this.Dispatch(() => this.GetRating(this.LibraryManager.SelectedItem, invocationComponents));
                     }
                 }
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, RESCAN, "Rescan Files", path: "Library");
