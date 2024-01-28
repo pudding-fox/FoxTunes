@@ -1,0 +1,62 @@
+﻿<Windows:UIComponentBase x:Class="FoxTunes.DefaultLayout"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"                              
+             xmlns:Windows="clr-namespace:FoxTunes" 
+             xmlns:Properties="clr-namespace:FoxTunes.Properties"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+    <Windows:UIComponentBase.Resources>
+        <ViewModel:Main x:Key="ViewModel" Core="{Binding}"></ViewModel:Main>
+        <ViewModel:GridLengthConverter x:Key="GridLengthConverter"></ViewModel:GridLengthConverter>
+    </Windows:UIComponentBase.Resources>
+    <DockPanel>
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Windows:Playback></Windows:Playback>
+                <Windows:Shuffle Margin="2,0,0,0"></Windows:Shuffle>
+                <ContentControl Margin="2,0,0,0">
+                    <ContentControl.Style>
+                        <Style TargetType="{x:Type ContentControl}">
+                            <Setter Property="Content" Value="{x:Null}"></Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowSpectrum.Value, Source={StaticResource ViewModel}}" Value="True">
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Windows:Spectrum ></Windows:Spectrum>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
+            </StackPanel>
+            <Windows:StreamPosition Grid.Column="1" Margin="2,0,0,0"></Windows:StreamPosition>
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Windows:Volume Margin="2,0,0,0"></Windows:Volume>
+                <Windows:Equalizer Margin="2,0,0,0"></Windows:Equalizer>
+                <Windows:MiniPlayer Margin="2,0,0,0"></Windows:MiniPlayer>
+                <Windows:Settings Margin="2,0,0,0"></Windows:Settings>
+            </StackPanel>
+        </Grid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{Binding ColumnWidth_FC87DEC38708, Source={x:Static Properties:Settings.Default}, Converter={StaticResource GridLengthConverter}, Mode=TwoWay}"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Windows:LibraryTree Grid.Column="0"></Windows:LibraryTree>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="4"></GridSplitter>
+            <Windows:DefaultPlaylist Grid.Column="2"></Windows:DefaultPlaylist>
+        </Grid>
+    </DockPanel>
+</Windows:UIComponentBase>

@@ -11,17 +11,9 @@ namespace FoxTunes
 
         public const string THEME_ELEMENT = "AAAA9DEE-1168-4D96-9355-31ECC0666820";
 
-        public const string TOP_LEFT_ELEMENT = "BBBBBF2-DA76-4696-A4E1-F1E77D169C4F";
+        public const string LAYOUT_ELEMENT = "BBBB9A67-F909-49EA-A4D3-6E26659A5797";
 
-        public const string BOTTOM_LEFT_ELEMENT = "CCCC515-DC31-4DAD-8EF2-273AEE88A627";
-
-        public const string TOP_CENTER_ELEMENT = "DDDD122D-45D9-4463-8BE3-E706CBB2FF67";
-
-        public const string BOTTOM_CENTER_ELEMENT = "EEEE00E8-5BC8-465D-A5CE-BB93938B43C6";
-
-        public const string TOP_RIGHT_ELEMENT = "FFFF12F1-1F4E-414B-B437-E9422C440CC0";
-
-        public const string BOTTOM_RIGHT_ELEMENT = "GGGGEC8-4D19-4E0F-9D65-44A15288B22A";
+        public const string LAYOUT_STATE_ELEMENT = "CCCC6F9A-8886-44FA-83C2-262F8D5334C0";
 
         public const string PRIMARY_LIBRARY_VIEW = "GGII1A2C-E16D-449D-A0E7-262B49D28C7D";
 
@@ -42,17 +34,7 @@ namespace FoxTunes
                 .WithElement(
                     new SelectionConfigurationElement(THEME_ELEMENT, "Theme").WithOptions(GetThemeOptions()))
                 .WithElement(
-                    new SelectionConfigurationElement(TOP_LEFT_ELEMENT, "Top Left", path: "Layout").WithOptions(GetControlOptions(TOP_LEFT_ELEMENT)))
-                .WithElement(
-                    new SelectionConfigurationElement(BOTTOM_LEFT_ELEMENT, "Bottom Left", path: "Layout").WithOptions(GetControlOptions(BOTTOM_LEFT_ELEMENT)))
-                .WithElement(
-                    new SelectionConfigurationElement(TOP_CENTER_ELEMENT, "Top Center", path: "Layout").WithOptions(GetControlOptions(TOP_CENTER_ELEMENT)))
-                .WithElement(
-                    new SelectionConfigurationElement(BOTTOM_CENTER_ELEMENT, "Bottom Center", path: "Layout").WithOptions(GetControlOptions(BOTTOM_CENTER_ELEMENT)))
-                .WithElement(
-                    new SelectionConfigurationElement(TOP_RIGHT_ELEMENT, "Top Right", path: "Layout").WithOptions(GetControlOptions(TOP_RIGHT_ELEMENT)))
-                .WithElement(
-                    new SelectionConfigurationElement(BOTTOM_RIGHT_ELEMENT, "Bottom Right", path: "Layout").WithOptions(GetControlOptions(BOTTOM_RIGHT_ELEMENT)))
+                    new SelectionConfigurationElement(LAYOUT_ELEMENT, "Layout"))
                 .WithElement(
                     new SelectionConfigurationElement(PRIMARY_LIBRARY_VIEW, "Primary Library View", path: "Advanced").WithOptions(GetLibraryViews()))
                 .WithElement(
@@ -89,24 +71,6 @@ namespace FoxTunes
             return themes.FirstOrDefault(theme => string.Equals(theme.Id, option.Id, StringComparison.OrdinalIgnoreCase));
         }
 
-        private static IEnumerable<SelectionConfigurationOption> GetControlOptions(string id)
-        {
-            yield return new SelectionConfigurationOption(UIComponent.PLACEHOLDER, "Empty");
-            foreach (var component in LayoutManager.Instance.Components)
-            {
-                if (component.Role == UIComponentRole.Hidden)
-                {
-                    //Don't show hidden components to the user.
-                    continue;
-                }
-                var option = new SelectionConfigurationOption(component.Id, component.Name, component.Description);
-                if (string.Equals(component.Slot, id, StringComparison.OrdinalIgnoreCase))
-                {
-                    option.Default();
-                }
-                yield return option;
-            }
-        }
 
         public static Type GetControl(SelectionConfigurationOption option)
         {

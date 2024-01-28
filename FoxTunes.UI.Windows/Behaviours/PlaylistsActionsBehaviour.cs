@@ -26,7 +26,7 @@ namespace FoxTunes
         {
             get
             {
-                return LayoutManager.Instance.IsComponentActive(typeof(Playlists));
+                return LayoutManager.Instance.IsComponentActive(Playlists.ID);
             }
         }
 
@@ -56,17 +56,11 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            LayoutManager.Instance.ActiveComponentsChanged += this.OnEnabledChanged;
             this.Core = core;
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             base.InitializeComponent(core);
-        }
-
-        protected virtual void OnEnabledChanged(object sender, EventArgs e)
-        {
-            this.OnEnabledChanged();
         }
 
         public IEnumerable<IInvocationComponent> Invocations

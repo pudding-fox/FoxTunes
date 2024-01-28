@@ -45,6 +45,15 @@ namespace FoxTunes
             }
         }
 
+        public void ExecNow(Action action)
+        {
+            lock (SyncRoot)
+            {
+                this.Actions.Remove(action);
+                action();
+            }
+        }
+
         public void Cancel(Action action)
         {
             lock (SyncRoot)

@@ -44,41 +44,6 @@ namespace FoxTunes
             componentBase.OnIsComponentEnabledChanged();
         }
 
-        public static readonly DependencyProperty IsComponentValidProperty = DependencyProperty.Register(
-           "IsComponentValid",
-           typeof(bool),
-           typeof(UIComponentBase),
-           new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, new PropertyChangedCallback(OnIsComponentValidChanged))
-       );
-
-        public static bool GetIsComponentValid(UIComponentBase source)
-        {
-            return (bool)source.GetValue(IsComponentValidProperty);
-        }
-
-        public static void SetIsComponentValid(UIComponentBase source, bool value)
-        {
-            source.SetValue(IsComponentValidProperty, value);
-        }
-
-        private static void OnIsComponentValidChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var componentBase = sender as UIComponentBase;
-            if (componentBase == null)
-            {
-                return;
-            }
-            componentBase.OnIsComponentValidChanged();
-        }
-
-        protected UIComponentBase()
-        {
-            if (LayoutManager.Instance != null)
-            {
-                LayoutManager.Instance.ConnectComponentValid(this);
-            }
-        }
-
         protected virtual bool IsHostedIn<T>() where T : Window
         {
             var window = Window.GetWindow(this);
@@ -111,29 +76,6 @@ namespace FoxTunes
         }
 
         public event EventHandler IsComponentEnabledChanged;
-
-        public bool IsComponentValid
-        {
-            get
-            {
-                return GetIsComponentValid(this);
-            }
-            set
-            {
-                SetIsComponentValid(this, value);
-            }
-        }
-
-        protected virtual void OnIsComponentValidChanged()
-        {
-            if (this.IsComponentValidChanged != null)
-            {
-                this.IsComponentValidChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("IsComponentValid");
-        }
-
-        public event EventHandler IsComponentValidChanged;
 
         public virtual void InitializeComponent(ICore core)
         {

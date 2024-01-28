@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,7 +10,7 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for DefaultPlaylist.xaml
     /// </summary>
-    [UIComponent("12023E31-CB53-4F9C-8A5B-A0593706F37E", UIComponentSlots.BOTTOM_CENTER, "Playlist")]
+    [UIComponent("12023E31-CB53-4F9C-8A5B-A0593706F37E", "Playlist")]
     public partial class DefaultPlaylist : UIComponentBase
     {
         public DefaultPlaylist()
