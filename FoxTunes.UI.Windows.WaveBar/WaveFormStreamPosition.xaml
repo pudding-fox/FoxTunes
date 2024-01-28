@@ -34,7 +34,7 @@
         </Interactivity:EventTrigger>
     </Interactivity:Interaction.Triggers>
     <UserControl.Background>
-        <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}"></ImageBrush>
+        <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
     </UserControl.Background>
     <Windows:DraggableSlider Value="{Binding CurrentStream.Position, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}" ToolTip="{Binding CurrentStream.Description, Mode=OneWay, Source={StaticResource ViewModel}}">
         <Slider.Style>
