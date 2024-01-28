@@ -13,6 +13,8 @@ namespace FoxTunes
     {
         public SpectrogramRendererData RendererData { get; private set; }
 
+        public SpectrogramRendererHistory RendererHistory { get; private set; }
+
         public SelectionConfigurationElement Mode { get; private set; }
 
         public SelectionConfigurationElement Scale { get; private set; }
@@ -72,35 +74,28 @@ namespace FoxTunes
 
         protected override bool CreateData(int width, int height)
         {
-            var data = this.RendererData;
-            if (data != null)
+            this.RendererData = Create(
+                this.Output,
+                width,
+                height,
+                VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
+                SpectrogramBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value),
+                SpectrogramBehaviourConfiguration.GetMode(this.Mode.Value),
+                SpectrogramBehaviourConfiguration.GetScale(this.Scale.Value),
+                this.Smoothing.Value
+            );
+            if (this.History.Value > 0)
             {
-                lock (data)
+                if (this.RendererHistory == null || this.RendererHistory.Capacity != this.History.Value)
                 {
-                    data.Width = width;
-                    data.Height = height;
-                    data.FFTSize = VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value);
-                    data.Colors = SpectrogramBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value);
-                    data.Mode = SpectrogramBehaviourConfiguration.GetMode(this.Mode.Value);
-                    data.Scale = SpectrogramBehaviourConfiguration.GetScale(this.Scale.Value);
-                    data.Smoothing = this.Smoothing.Value;
-                    data.HistoryCapacity = this.History.Value;
-                    data.Initialized = false;
+                    this.RendererHistory = Create(
+                         this.History.Value
+                    );
                 }
             }
             else
             {
-                this.RendererData = Create(
-                    this.Output,
-                    width,
-                    height,
-                    VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
-                    SpectrogramBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value),
-                    SpectrogramBehaviourConfiguration.GetMode(this.Mode.Value),
-                    SpectrogramBehaviourConfiguration.GetScale(this.Scale.Value),
-                    this.Smoothing.Value,
-                    this.History.Value
-                );
+                this.RendererHistory = null;
             }
             return true;
         }
@@ -109,16 +104,17 @@ namespace FoxTunes
         {
             var bitmap = base.CreateBitmap(width, height);
             var data = this.RendererData;
-            if (data != null && data.HistoryCount > 0)
+            var history = this.RendererHistory;
+            if (data != null && history != null && history.Count > 0)
             {
                 try
                 {
                     if (bitmap.TryLock(LockTimeout))
                     {
                         var info = BitmapHelper.CreateRenderInfo(bitmap, this.Color);
-                        lock (data)
+                        lock (history)
                         {
-                            Restore(info, data);
+                            Restore(info, data, history);
                         }
                         bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                         bitmap.Unlock();
@@ -194,6 +190,7 @@ namespace FoxTunes
         protected override void OnElapsed(object sender, ElapsedEventArgs e)
         {
             var data = this.RendererData;
+            var history = this.RendererHistory;
             if (data == null)
             {
                 this.Restart();
@@ -201,16 +198,20 @@ namespace FoxTunes
             }
             try
             {
-                lock (data)
+                if (!data.Update())
                 {
-                    if (!data.Update())
-                    {
-                        this.Restart();
-                        return;
-                    }
-                    UpdateValues(data);
-                    UpdateElements(data);
+                    this.Restart();
+                    return;
                 }
+                if (history != null)
+                {
+                    lock (history)
+                    {
+                        history.Write(data);
+                    }
+                }
+                UpdateValues(data);
+                UpdateElements(data);
 
                 var task = this.Render(data);
             }
@@ -427,13 +428,10 @@ namespace FoxTunes
             }
         }
 
-        private static void Restore(BitmapHelper.RenderInfo info, SpectrogramRendererData data)
+        private static void Restore(BitmapHelper.RenderInfo info, SpectrogramRendererData data, SpectrogramRendererHistory history)
         {
-            if (info.Width != data.Width || info.Height != data.Height)
-            {
-                //Bitmap does not match data.
-                return;
-            }
+            data.Channels = history.Channels;
+            data.Elements = new Int32Pixel[data.Height];
 
             //TODO: Only realloc if required.
             switch (data.Mode)
@@ -447,39 +445,25 @@ namespace FoxTunes
                     break;
             }
 
-            var height = data.Height;
-            var channels = data.Channels;
-            var samples = data.Samples;
-            var history = data.History;
-            var position = data.HistoryPosition - 1;
-            var count = data.HistoryCount;
-            var capacity = data.HistoryCapacity;
-            var values = data.Values;
-            var colors = data.Colors;
-            var elements = data.Elements;
-            var mode = data.Mode;
-            for (int a = 0, x = data.Width - 1; a < count && x > 0; a++, x--)
+            var position = history.Position - 1;
+            for (int a = 0, x = data.Width - 1; a < history.Count && x > 0; a++, x--)
             {
-                //TODO: Can't find an Array.Copy which can handle the dimention difference.
-                for (var b = 0; b < samples.Length; b++)
-                {
-                    samples[b] = history[b, position];
-                }
+                history.Read(data, position);
 
                 UpdateValues(data);
 
-                switch (mode)
+                switch (data.Mode)
                 {
                     default:
                     case SpectrogramRendererMode.Mono:
-                        UpdateElementsMono(values, elements, colors, x, height);
+                        UpdateElementsMono(data.Values, data.Elements, data.Colors, x, data.Height);
                         break;
                     case SpectrogramRendererMode.Seperate:
-                        UpdateElementsSeperate(values, elements, colors, x, height, channels);
+                        UpdateElementsSeperate(data.Values, data.Elements, data.Colors, x, data.Height, data.Channels);
                         break;
                 }
 
-                BitmapHelper.DrawDots(ref info, elements, elements.Length);
+                BitmapHelper.DrawDots(ref info, data.Elements, data.Elements.Length);
 
                 if (position > 0)
                 {
@@ -487,12 +471,12 @@ namespace FoxTunes
                 }
                 else
                 {
-                    position = count - 1;
+                    position = history.Count - 1;
                 }
             }
         }
 
-        public static SpectrogramRendererData Create(IOutput output, int width, int height, int fftSize, Color[] colors, SpectrogramRendererMode mode, SpectrogramRendererScale scale, int smoothing, int history)
+        public static SpectrogramRendererData Create(IOutput output, int width, int height, int fftSize, Color[] colors, SpectrogramRendererMode mode, SpectrogramRendererScale scale, int smoothing)
         {
             var data = new SpectrogramRendererData()
             {
@@ -500,7 +484,6 @@ namespace FoxTunes
                 Width = width,
                 Height = height,
                 FFTSize = fftSize,
-                HistoryCapacity = history,
                 Colors = colors,
                 Mode = mode,
                 Scale = scale,
@@ -528,14 +511,6 @@ namespace FoxTunes
             public float[] Samples;
 
             public int SampleCount;
-
-            public float[,] History;
-
-            public int HistoryPosition;
-
-            public int HistoryCount;
-
-            public int HistoryCapacity;
 
             public float[,] Values;
 
@@ -573,36 +548,7 @@ namespace FoxTunes
                         break;
                 }
                 this.SampleCount = this.Output.GetData(this.Samples, this.FFTSize, individual);
-                if (this.SampleCount == 0)
-                {
-                    return false;
-                }
-                if (this.HistoryCapacity > 0)
-                {
-                    UpdateHistory(this.Samples, this.History, ref this.HistoryPosition, ref this.HistoryCount, this.HistoryCapacity);
-                }
-                return true;
-            }
-
-            private void UpdateHistory(float[] samples, float[,] history, ref int position, ref int count, int capacity)
-            {
-                //TODO: Can't find an Array.Copy which can handle the dimention difference.
-                for (var a = 0; a < samples.Length; a++)
-                {
-                    history[a, position] = samples[a];
-                }
-                if (position < capacity - 1)
-                {
-                    position++;
-                }
-                else
-                {
-                    position = 0;
-                }
-                if (count < capacity)
-                {
-                    count++;
-                }
+                return this.SampleCount > 0;
             }
 
             private void Update(int rate, int channels, OutputStreamFormat format)
@@ -632,24 +578,82 @@ namespace FoxTunes
                 }
 
                 this.Elements = new Int32Pixel[this.Height];
+            }
+        }
 
-                if (this.HistoryCapacity > 0)
+        public static SpectrogramRendererHistory Create(int history)
+        {
+            return new SpectrogramRendererHistory()
+            {
+                Capacity = history
+            };
+        }
+
+        public class SpectrogramRendererHistory
+        {
+            public float[,] Samples;
+
+            public int Channels;
+
+            public int Position;
+
+            public int Count;
+
+            public int Capacity;
+
+            public void Read(SpectrogramRendererData data, int position)
+            {
+                if (data.Samples == null)
                 {
-                    if (this.History == null || this.History.GetLength(0) != this.Samples.Length || this.History.GetLength(1) != this.HistoryCapacity)
+                    data.Samples = new float[this.Samples.GetLength(0)];
+                }
+
+                //TODO: Can't find an Array.Copy which can handle the dimention difference.
+                for (var a = 0; a < data.Samples.Length; a++)
+                {
+                    data.Samples[a] = this.Samples[a, position];
+                }
+            }
+
+            public void Write(SpectrogramRendererData data)
+            {
+                if (this.Capacity > 0)
+                {
+                    this.Channels = data.Channels;
+                    if (this.Samples == null || this.Samples.GetLength(0) != data.Samples.Length || this.Samples.GetLength(1) != this.Capacity)
                     {
-                        this.HistoryPosition = 0;
-                        this.HistoryCount = 0;
-                        this.History = new float[this.Samples.Length, this.HistoryCapacity];
+                        this.Position = 0;
+                        this.Count = 0;
+                        this.Samples = new float[data.Samples.Length, this.Capacity];
                     }
                 }
                 else
                 {
-                    if (this.History != null)
+                    if (this.Samples != null)
                     {
-                        this.HistoryPosition = 0;
-                        this.HistoryCount = 0;
-                        this.History = null;
+                        this.Position = 0;
+                        this.Count = 0;
+                        this.Samples = null;
                     }
+                    return;
+                }
+
+                //TODO: Can't find an Array.Copy which can handle the dimention difference.
+                for (var a = 0; a < data.Samples.Length; a++)
+                {
+                    this.Samples[a, this.Position] = data.Samples[a];
+                }
+                if (this.Position < this.Capacity - 1)
+                {
+                    this.Position++;
+                }
+                else
+                {
+                    this.Position = 0;
+                }
+                if (this.Count < this.Capacity)
+                {
+                    this.Count++;
                 }
             }
         }
