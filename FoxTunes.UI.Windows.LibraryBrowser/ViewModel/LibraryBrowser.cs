@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -225,26 +226,26 @@ namespace FoxTunes.ViewModel
         protected override async Task OnRefresh()
         {
             await base.OnRefresh().ConfigureAwait(false);
-            await this.Synchronize(new List<LibraryBrowserFrame>()
+            await Windows.Invoke(() => this.Synchronize(new List<LibraryBrowserFrame>()
             {
                 new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-            }).ConfigureAwait(false);
+            })).ConfigureAwait(false);
         }
 
         public override async Task Reload()
         {
             await base.Reload().ConfigureAwait(false);
-            await this.Synchronize(new List<LibraryBrowserFrame>()
+            await Windows.Invoke(() => this.Synchronize(new List<LibraryBrowserFrame>()
             {
                 new LibraryBrowserFrame(LibraryHierarchyNode.Empty, this.Items)
-            }).ConfigureAwait(false);
+            })).ConfigureAwait(false);
         }
 
         protected override void OnSelectedItemChanged(object sender, EventArgs e)
         {
             if (!this.IsNavigating)
             {
-                this.Dispatch(this.Synchronize);
+                this.Synchronize();
             }
             base.OnSelectedItemChanged(sender, e);
         }
@@ -257,37 +258,34 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        public Task Browse(bool up)
+        public void Browse(bool up)
         {
             if (up)
             {
-                return this.Up();
+                this.Up();
+                return;
             }
             if (this.AddToPlaylistCommand.CanExecute(false))
             {
                 this.AddToPlaylistCommand.Execute(false);
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                return;
             }
             if (this.SelectedItem == null || LibraryHierarchyNode.Empty.Equals(this.SelectedItem))
             {
-                return this.Up();
+                this.Up();
             }
             else
             {
-                return this.Down();
+                this.Down();
             }
         }
 
-        private Task Up()
+        private void Up()
         {
-            return this.Up(this.Frames, true);
+            this.Up(this.Frames, true);
         }
 
-        private async Task Up(IList<LibraryBrowserFrame> frames, bool updateSelection)
+        private void Up(IList<LibraryBrowserFrame> frames, bool updateSelection)
         {
             if (frames.Count <= 1)
             {
@@ -298,36 +296,29 @@ namespace FoxTunes.ViewModel
             {
                 return;
             }
-            if (object.ReferenceEquals(this.Frames, frames))
-            {
-                await Windows.Invoke(() => frames.Remove(frame)).ConfigureAwait(false);
-            }
-            else
-            {
-                frames.Remove(frame);
-            }
+            frames.Remove(frame);
             if (updateSelection && object.ReferenceEquals(this.Frames, frames))
             {
-                await Windows.Invoke(() => this.SelectedItem = frame.ItemsSource).ConfigureAwait(false);
+                this.SelectedItem = frame.ItemsSource;
             }
         }
 
-        private Task Down()
+        private void Down()
         {
-            return this.Down(this.SelectedItem, true);
+            this.Down(this.SelectedItem, true);
         }
 
-        private Task Down(LibraryHierarchyNode libraryHierarchyNode, bool updateSelection)
+        private void Down(LibraryHierarchyNode libraryHierarchyNode, bool updateSelection)
         {
-            return this.Down(libraryHierarchyNode, this.Frames, updateSelection);
+            this.Down(libraryHierarchyNode, this.Frames, updateSelection);
         }
 
-        private async Task<bool> Down(LibraryHierarchyNode libraryHierarchyNode, IList<LibraryBrowserFrame> frames, bool updateSelection)
+        private void Down(LibraryHierarchyNode libraryHierarchyNode, IList<LibraryBrowserFrame> frames, bool updateSelection)
         {
             var libraryHierarchyNodes = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchyNode);
             if (!libraryHierarchyNodes.Any())
             {
-                return false;
+                return;
             }
             var frame = new LibraryBrowserFrame(
                 libraryHierarchyNode,
@@ -336,33 +327,25 @@ namespace FoxTunes.ViewModel
                     LibraryHierarchyNode.Empty
                 }.Concat(libraryHierarchyNodes)
             );
-            if (object.ReferenceEquals(this.Frames, frames))
-            {
-                await Windows.Invoke(() => frames.Add(frame)).ConfigureAwait(false);
-            }
-            else
-            {
-                frames.Add(frame);
-            }
+            frames.Add(frame);
             if (updateSelection && object.ReferenceEquals(this.Frames, frames))
             {
-                await Windows.Invoke(() => this.SelectedItem = libraryHierarchyNodes.FirstOrDefault()).ConfigureAwait(false);
+                this.SelectedItem = libraryHierarchyNodes.FirstOrDefault();
             }
-            return true;
         }
 
-        private Task Synchronize()
+        private void Synchronize()
         {
-            return this.Synchronize(this.Frames);
+            this.Synchronize(this.Frames);
         }
 
-        private async Task Synchronize(IList<LibraryBrowserFrame> frames)
+        private void Synchronize(IList<LibraryBrowserFrame> frames)
         {
             if (this.SelectedItem == null || LibraryHierarchyNode.Empty.Equals(this.SelectedItem))
             {
                 if (!object.ReferenceEquals(this.Frames, frames))
                 {
-                    await Windows.Invoke(() => this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames)).ConfigureAwait(false);
+                    this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames);
                 }
                 return;
             }
@@ -383,23 +366,23 @@ namespace FoxTunes.ViewModel
                     {
                         while (frames.Count > a)
                         {
-                            await this.Up(frames, false).ConfigureAwait(false);
+                            this.Up(frames, false);
                         }
-                        await this.Down(libraryHierarchyNode, frames, false).ConfigureAwait(false);
+                        this.Down(libraryHierarchyNode, frames, false);
                     }
                 }
                 else
                 {
-                    await this.Down(libraryHierarchyNode, frames, false).ConfigureAwait(false);
+                    this.Down(libraryHierarchyNode, frames, false);
                 }
             }
             while (frames.Count > path.Count)
             {
-                await this.Up(frames, false).ConfigureAwait(false);
+                this.Up(frames, false);
             }
             if (!object.ReferenceEquals(this.Frames, frames))
             {
-                await Windows.Invoke(() => this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames)).ConfigureAwait(false);
+                this.Frames = new ObservableCollection<LibraryBrowserFrame>(frames);
             }
         }
 
