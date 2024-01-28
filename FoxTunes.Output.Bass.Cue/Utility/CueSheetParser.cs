@@ -21,6 +21,8 @@ namespace FoxTunes
 
         public const string TRACK = "TRACK";
 
+        public const string FLAGS = "FLAGS";
+
         public const string INDEX = "INDEX";
 
         public CueSheet Parse(string fileName)
@@ -104,6 +106,9 @@ namespace FoxTunes
                         break;
                     case ISRC:
                         //TODO: Should we do something with this? International Standard Recording Code.
+                        break;
+                    case FLAGS:
+                        //TODO: Should we do something with this? Copy protection, multi channel...
                         break;
                     case TRACK:
                         if (!string.IsNullOrEmpty(trackNumber) && !string.IsNullOrEmpty(trackType) && trackIndexes.Count > 0)
