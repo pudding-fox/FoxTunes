@@ -441,6 +441,11 @@ namespace FoxTunes.ViewModel
                 {
                     sequence--;
                 }
+                if (!this.IsInsertSequenceValid(playlistItems, sequence))
+                {
+                    //Operation doesn't make sense.
+                    return;
+                }
                 await this.PlaylistManager.Move(playlist, sequence, playlistItems).ConfigureAwait(false);
             }
             else
@@ -457,6 +462,28 @@ namespace FoxTunes.ViewModel
                 return false;
             }
             sequence = this.InsertItem.Sequence;
+            return true;
+        }
+
+        protected virtual bool IsInsertSequenceValid(IEnumerable<PlaylistItem> playlistItems, int sequence)
+        {
+            var min = int.MaxValue;
+            var max = int.MinValue;
+            foreach (var playlistItem in playlistItems)
+            {
+                min = Math.Min(playlistItem.Sequence, min);
+                max = Math.Max(playlistItem.Sequence, max);
+            }
+            if (min == sequence && max == sequence)
+            {
+                //No change.
+                return false;
+            }
+            if (sequence > min && sequence < max)
+            {
+                //Attempting to insert sequence into itself?
+                return false;
+            }
             return true;
         }
 

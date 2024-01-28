@@ -219,36 +219,8 @@ namespace FoxTunes
 
         protected virtual async Task MoveItems(IEnumerable<PlaylistItem> playlistItems)
         {
-            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
-            {
-                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-                {
-                    foreach (var playlistItem in playlistItems)
-                    {
-                        playlistItem.Sequence = this.Sequence;
-                        await this.Database.ExecuteAsync(this.Database.Queries.MovePlaylistItem, (parameters, phase) =>
-                        {
-                            switch (phase)
-                            {
-                                case DatabaseParameterPhase.Fetch:
-                                    parameters["id"] = playlistItem.Id;
-                                    parameters["sequence"] = playlistItem.Sequence;
-                                    break;
-                            }
-                        }, transaction).ConfigureAwait(false);
-                        if (playlistItem.Sequence > this.Sequence)
-                        {
-                            //TODO: If the current sequence is less than the target sequence we don't have to increment the counter.
-                            //TODO: I don't really understand why.
-                            this.Sequence++;
-                        }
-                    }
-                    transaction.Commit();
-                }
-            }))
-            {
-                await task.Run().ConfigureAwait(false);
-            }
+            await this.RemoveItems(playlistItems).ConfigureAwait(false);
+            await this.AddPlaylistItems(playlistItems).ConfigureAwait(false);
         }
 
         protected virtual async Task RemoveItems(IEnumerable<PlaylistItem> playlistItems)

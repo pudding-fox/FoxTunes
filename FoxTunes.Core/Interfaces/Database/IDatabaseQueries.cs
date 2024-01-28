@@ -28,8 +28,6 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery GetPlaylistMetaData(int count);
 
-        IDatabaseQuery MovePlaylistItem { get; }
-
         IDatabaseQuery RemoveCancelledLibraryItems { get; }
 
         IDatabaseQuery RemoveLibraryHierarchyItems { get; }

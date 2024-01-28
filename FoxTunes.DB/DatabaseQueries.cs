@@ -157,18 +157,6 @@ namespace FoxTunes
 
         public abstract IDatabaseQuery GetPlaylistMetaData(int count);
 
-        public IDatabaseQuery MovePlaylistItem
-        {
-            get
-            {
-                return this.Database.QueryFactory.Create(
-                    Resources.MovePlaylistItem,
-                    new DatabaseQueryParameter("id", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("sequence", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
-            }
-        }
-
         public IDatabaseQuery RemoveCancelledLibraryItems
         {
             get
