@@ -72,7 +72,14 @@ namespace FoxTunes
                         builder.Append(Path.GetFileName(encoderItem.InputFileName));
                     }
                 }
-                await this.SetDescription(builder.ToString());
+                if (builder.Length > 0)
+                {
+                    await this.SetDescription(builder.ToString());
+                }
+                else
+                {
+                    await this.SetDescription("Waiting for encoder");
+                }
                 await this.SetPosition(position);
                 await this.SetCount(count);
 #if NET40
