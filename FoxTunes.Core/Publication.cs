@@ -130,6 +130,19 @@ namespace FoxTunes
             }
         }
 
+        private static Lazy<string> _RelativeStoragePath = new Lazy<string>(() =>
+        {
+            return FileSystemHelper.GetRelativePath(StoragePath, Environment.CurrentDirectory);
+        });
+
+        public static string RelativeStoragePath
+        {
+            get
+            {
+                return _RelativeStoragePath.Value;
+            }
+        }
+
         private static readonly Lazy<ReleaseType> _ReleaseType = new Lazy<ReleaseType>(() =>
         {
             try

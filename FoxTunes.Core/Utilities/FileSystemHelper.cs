@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace FoxTunes
 {
@@ -19,14 +20,12 @@ namespace FoxTunes
             }
         }
 
-        public static HashSet<string> IgnoredDirectories = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            //TODO: Coupling to some other random component?
-            FileMetaDataStore.DataStoreDirectoryName
-        };
-
         public static HashSet<string> IgnoredNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
+            "FoxTunes.Launcher.exe",
+            "FoxTunes.Launcher.x86.exe",
+            //TODO: Coupling to some other random component?
+            "DataStore",
             "x86",
             "x64",
             //TODO: Translations should be better managed.
@@ -82,18 +81,20 @@ namespace FoxTunes
                         continue;
                     }
                 }
-                var fileNames = new List<string>();
+                var fileNames = default(IEnumerable<string>);
                 try
                 {
-                    fileNames.AddRange(
-                        Directory.EnumerateFiles(path, searchPattern, global::System.IO.SearchOption.TopDirectoryOnly)
-                    );
+                    fileNames = Directory.EnumerateFiles(path, searchPattern, global::System.IO.SearchOption.TopDirectoryOnly);
+                    if (searchOption.HasFlag(SearchOption.UseSystemExclusions))
+                    {
+                        fileNames = WithSystemExclusions(fileNames);
+                    }
                     if (searchOption.HasFlag(SearchOption.Sort))
                     {
                         //The results are already sorted (if using NTFS)
                         //The underlying API is https://docs.microsoft.com/en-gb/windows/win32/api/fileapi/nf-fileapi-findnextfilea
                         //.NET doesn't specify any order though so here we are..
-                        fileNames.Sort();
+                        fileNames = fileNames.OrderBy();
                     }
                 }
                 catch
@@ -107,15 +108,11 @@ namespace FoxTunes
             }
         }
 
-        private static IEnumerable<string> WithSystemExclusions(IEnumerable<string> directoryNames)
+        private static IEnumerable<string> WithSystemExclusions(IEnumerable<string> paths)
         {
-            return directoryNames.Where(directoryName =>
+            return paths.Where(path =>
             {
-                if (IgnoredDirectories.Contains(directoryName, StringComparer.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-                if (IgnoredNames.Contains(Path.GetFileName(directoryName), StringComparer.OrdinalIgnoreCase))
+                if (IgnoredNames.Contains(Path.GetFileName(path), StringComparer.OrdinalIgnoreCase))
                 {
                     return false;
                 }
@@ -145,6 +142,63 @@ namespace FoxTunes
                 Logger.Write(typeof(FileSystemHelper), LogLevel.Warn, "Failed to determine whether \"{0}\" is a local path: {1}", fileName, e.Message);
                 return false;
             }
+        }
+
+        /// <summary>
+        /// This routine was based on PathUtility.GetRelativePath: https://source.dot.net/#Microsoft.DotNet.Cli.Utils/PathUtility.cs,
+        /// </summary>
+        /// <param name="path1"></param>
+        /// <param name="path2"></param>
+        /// <returns></returns>
+        public static string GetRelativePath(string path1, string path2)
+        {
+            path1 = Path.GetFullPath(path1);
+            path2 = Path.GetFullPath(path2);
+
+            if (string.Equals(path1, path2, StringComparison.OrdinalIgnoreCase))
+            {
+                return path2;
+            }
+
+            var index = 0;
+            var path1Segments = path1.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var path2Segments = path2.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var len1 = path1Segments.Length - 1;
+            var len2 = path2Segments.Length;
+
+            var min = Math.Min(len1, len2);
+            while (min > index)
+            {
+                if (!string.Equals(path1Segments[index], path2Segments[index], StringComparison.OrdinalIgnoreCase))
+                {
+                    break;
+                }
+                else if ((len1 == index && len2 > index + 1) || (len1 > index && len2 == index + 1))
+                {
+                    break;
+                }
+                index++;
+            }
+
+            var result = new StringBuilder();
+            for (var a = index; len1 > a; a++)
+            {
+                result.Append("..");
+                result.Append(Path.DirectorySeparatorChar);
+            }
+
+            for (var a = index; len2 - 1 > a; a++)
+            {
+                result.Append(path2Segments[a]);
+                result.Append(Path.DirectorySeparatorChar);
+            }
+
+            if (!string.IsNullOrEmpty(path2Segments[len2 - 1]))
+            {
+                result.Append(path2Segments[len2 - 1]);
+            }
+
+            return result.ToString();
         }
 
         public class Cache
