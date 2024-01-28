@@ -1,7 +1,7 @@
 # FoxTunes
 A modular music player and converter using the BASS framework.
 
-The main release is [FoxTunes-2.1.3-net461.zip](https://github.com/aidan-g/FoxTunes/releases/download/2.1.3/FoxTunes-2.1.3-net461.zip)
+The main release is [FoxTunes-2.1.4-net461.zip](https://github.com/aidan-g/FoxTunes/releases/download/2.1.4/FoxTunes-2.1.4-net461.zip)
 There is also a [Microsoft Store](https://www.microsoft.com/store/productId/9MWPJTXWTXLG) package.
 
 The wiki is [FoxTunes-wiki](https://github.com/aidan-g/FoxTunes/wiki)
