@@ -37,12 +37,32 @@ DWORD CALLBACK AsioGaplessProc(BOOL input, DWORD channel, void *buffer, DWORD le
 	return result;
 }
 
+DWORD CALLBACK WasapiGaplessProc(void *buffer, DWORD length, void *user) {
+	DWORD result;
+	if (channelPrimary != 0 && BASS_ChannelIsActive(channelPrimary)) {
+		result = BASS_ChannelGetData(channelPrimary, buffer, length);
+	}
+	else if (channelSecondary != 0 && BASS_ChannelIsActive(channelSecondary)) {
+		result = BASS_ChannelGetData(channelSecondary, buffer, length);
+		channelPrimary = channelSecondary;
+		channelSecondary = 0;
+	}
+	else {
+		result = 0;
+	}
+	return result;
+}
+
 HSTREAM BASSDEF(BASS_StreamCreateGaplessMaster)(DWORD freq, DWORD chans, DWORD flags, void *user) {
 	return channelMaster = BASS_StreamCreate(freq, chans, flags, &GaplessProc, user);
 }
 
 BOOL BASSASIODEF(BASS_ASIO_ChannelEnableGaplessMaster)(BOOL input, DWORD channel, void *user) {
 	return BASS_ASIO_ChannelEnable(input, channel, &AsioGaplessProc, user);
+}
+
+BOOL BASSWASAPIDEF(BASS_WASAPI_InitGaplessMaster)(int device, DWORD freq, DWORD chans, DWORD flags, float buffer, float period, void *user) {
+	return BASS_WASAPI_Init(device, freq, chans, flags, buffer, period, &WasapiGaplessProc, user);
 }
 
 DWORD BASSDEF(BASS_ChannelGetGaplessPrimary)() {

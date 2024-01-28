@@ -1,13 +1,12 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
+using ManagedBass.Dsd;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using ManagedBass.Asio;
-using ManagedBass.Dsd;
-using System.Globalization;
 
 namespace FoxTunes
 {
@@ -96,6 +95,22 @@ namespace FoxTunes
             }
         }
 
+        private int _WasapiDevice { get; set; }
+
+        public int WasapiDevice
+        {
+            get
+            {
+                return this._WasapiDevice;
+            }
+            private set
+            {
+                this._WasapiDevice = value;
+                Logger.Write(this, LogLevel.Debug, "WASAPI Device = {0}", this.WasapiDevice);
+                this.Shutdown();
+            }
+        }
+
         private bool _DsdDirect { get; set; }
 
         public bool DsdDirect
@@ -144,6 +159,9 @@ namespace FoxTunes
                     case BassOutputMode.ASIO:
                         this.StartASIO();
                         break;
+                    case BassOutputMode.WASAPI:
+                        this.StartWASAPI();
+                        break;
                 }
                 this.MasterChannel = BassMasterChannelFactory.Instance.Create(this);
                 this.MasterChannel.InitializeComponent(this.Core);
@@ -160,14 +178,23 @@ namespace FoxTunes
 
         private void StartDirectSound()
         {
+            BassUtils.OK(Bass.Configure(Configuration.UpdateThreads, 1));
             BassUtils.OK(Bass.Init(this.DirectSoundDevice, this.Rate));
             Logger.Write(this, LogLevel.Debug, "BASS Initialized.");
         }
 
         private void StartASIO()
         {
+            BassUtils.OK(Bass.Configure(Configuration.UpdateThreads, 0));
             BassUtils.OK(Bass.Init(Bass.NoSoundDevice, this.Rate));
-            Logger.Write(this, LogLevel.Debug, "BASS ASIO Initialized.");
+            Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
+        }
+
+        private void StartWASAPI()
+        {
+            BassUtils.OK(Bass.Configure(Configuration.UpdateThreads, 0));
+            BassUtils.OK(Bass.Init(Bass.NoSoundDevice, this.Rate));
+            Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
         }
 
         public void Shutdown(bool force = false)
@@ -219,6 +246,10 @@ namespace FoxTunes
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.ELEMENT_ASIO_DEVICE
             ).ConnectValue<string>(value => this.AsioDevice = BassOutputConfiguration.GetAsioDevice(value));
+            this.Core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.ELEMENT_WASAPI_DEVICE
+            ).ConnectValue<string>(value => this.WasapiDevice = BassOutputConfiguration.GetWasapiDevice(value));
             this.Core.Components.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
                 BassOutputConfiguration.DSD_RAW_ELEMENT
@@ -354,6 +385,7 @@ namespace FoxTunes
     {
         None,
         DirectSound,
-        ASIO
+        ASIO,
+        WASAPI
     }
 }

@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using ManagedBass.Asio;
+using ManagedBass.Wasapi;
 using System;
 using System.Collections.Generic;
 
@@ -9,6 +10,8 @@ namespace FoxTunes
     public static class BassOutputConfiguration
     {
         public const int ASIO_NO_DEVICE = -1;
+
+        public const int WASAPI_NO_DEVICE = -1;
 
         public const string OUTPUT_SECTION = "8399D051-81BC-41A6-940D-36E6764213D2";
 
@@ -36,11 +39,15 @@ namespace FoxTunes
 
         public const string ELEMENT_ASIO_DEVICE = "2E20B9CE-96FC-4FBB-8956-84B9A7E3FEB3";
 
+        public const string ELEMENT_WASAPI_DEVICE = "ADBFBF5B-8BC8-44E8-8366-012E3CBA047D";
+
         public const string MODE_ELEMENT = "76096B39-2F8A-4667-9C03-9742FF2D1EA7";
 
         public const string MODE_DS_OPTION = "F8691348-069B-4763-89CF-5ACBE53E9F75";
 
         public const string MODE_ASIO_OPTION = "598987DA-EE55-467A-B2F5-61480F2F12F6";
+
+        public const string MODE_WASAPI_OPTION = "1AB7AB7A-1186-4A98-B42E-C5C3A5581D62";
 
         public const string DSD_RAW_ELEMENT = "9044043A-8A30-42A0-B2CB-3DE379636DD6";
 
@@ -61,9 +68,12 @@ namespace FoxTunes
                     .WithOptions(() => GetDSDevices()))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_ASIO_DEVICE, "Device")
                     .WithOptions(() => GetASIODevices()))
+                .WithElement(new SelectionConfigurationElement(ELEMENT_WASAPI_DEVICE, "Device")
+                    .WithOptions(() => GetWASAPIDevices()))
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, "Mode")
                     .WithOption(new SelectionConfigurationOption(MODE_DS_OPTION, "Direct Sound"), true)
-                    .WithOption(new SelectionConfigurationOption(MODE_ASIO_OPTION, "ASIO")))
+                    .WithOption(new SelectionConfigurationOption(MODE_ASIO_OPTION, "ASIO"))
+                    .WithOption(new SelectionConfigurationOption(MODE_WASAPI_OPTION, "WASAPI")))
                 .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct").WithValue(false)
             );
             StandardComponents.Instance.Configuration.GetElement(OUTPUT_SECTION, MODE_ELEMENT).ConnectValue<string>(mode => UpdateDevices(mode));
@@ -96,6 +106,26 @@ namespace FoxTunes
             }
         }
 
+        private static IEnumerable<SelectionConfigurationOption> GetWASAPIDevices()
+        {
+            for (var a = 0; a < BassWasapi.DeviceCount; a++)
+            {
+                var deviceInfo = default(WasapiDeviceInfo);
+                BassUtils.OK(BassWasapi.GetDeviceInfo(a, out deviceInfo));
+                if (!deviceInfo.IsEnabled || deviceInfo.IsUnplugged || deviceInfo.IsInput)
+                {
+                    continue;
+                }
+                LogManager.Logger.Write(typeof(BassOutputConfiguration), LogLevel.Debug, "WASAPI Device: {0} => {1} => {2}", a, deviceInfo.Name, deviceInfo.ID);
+                var option = new SelectionConfigurationOption(deviceInfo.Name, deviceInfo.Name, deviceInfo.ID);
+                if (deviceInfo.IsDefault)
+                {
+                    option.Default();
+                }
+                yield return option;
+            }
+        }
+
         private static void UpdateDevices(string mode)
         {
             switch (mode)
@@ -103,11 +133,19 @@ namespace FoxTunes
                 case MODE_DS_OPTION:
                     StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_DS_DEVICE).Show();
                     StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_ASIO_DEVICE).Hide();
+                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_WASAPI_DEVICE).Hide();
                     StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(OUTPUT_SECTION, DSD_RAW_ELEMENT).Hide();
                     break;
                 case MODE_ASIO_OPTION:
                     StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_DS_DEVICE).Hide();
                     StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_ASIO_DEVICE).Show();
+                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_WASAPI_DEVICE).Hide();
+                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(OUTPUT_SECTION, DSD_RAW_ELEMENT).Show();
+                    break;
+                case MODE_WASAPI_OPTION:
+                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_DS_DEVICE).Hide();
+                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_ASIO_DEVICE).Hide();
+                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_WASAPI_DEVICE).Show();
                     StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(OUTPUT_SECTION, DSD_RAW_ELEMENT).Show();
                     break;
             }
@@ -154,6 +192,8 @@ namespace FoxTunes
                     return BassOutputMode.DirectSound;
                 case MODE_ASIO_OPTION:
                     return BassOutputMode.ASIO;
+                case MODE_WASAPI_OPTION:
+                    return BassOutputMode.WASAPI;
             }
         }
 
@@ -186,6 +226,20 @@ namespace FoxTunes
                 }
             }
             return ASIO_NO_DEVICE;
+        }
+
+        public static int GetWasapiDevice(string value)
+        {
+            for (var a = 0; a < BassWasapi.DeviceCount; a++)
+            {
+                var deviceInfo = default(WasapiDeviceInfo);
+                BassUtils.OK(BassWasapi.GetDeviceInfo(a, out deviceInfo));
+                if (string.Equals(deviceInfo.Name, value, StringComparison.OrdinalIgnoreCase))
+                {
+                    return a;
+                }
+            }
+            return WASAPI_NO_DEVICE;
         }
     }
 }
