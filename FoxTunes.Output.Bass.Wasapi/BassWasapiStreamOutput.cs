@@ -61,7 +61,7 @@ namespace FoxTunes
         {
             get
             {
-                var bufferLength = Convert.ToInt32(Bass.ChannelBytes2Seconds(this.ChannelHandle, BassWasapi.Info.BufferLength) / 1000);
+                var bufferLength = Convert.ToInt32(Bass.ChannelBytes2Seconds(this.ChannelHandle, BassWasapi.Info.BufferLength) * 1000);
                 foreach (var channelHandle in this.MixerChannelHandles)
                 {
                     bufferLength += BassUtils.GetMixerBufferLength();

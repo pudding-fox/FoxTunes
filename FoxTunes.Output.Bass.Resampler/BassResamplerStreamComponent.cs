@@ -64,7 +64,7 @@ namespace FoxTunes
                 {
                     return 0;
                 }
-                return Convert.ToInt32(Bass.ChannelBytes2Seconds(this.InputChannelHandle, length) / 1000);
+                return Convert.ToInt32(Bass.ChannelBytes2Seconds(this.InputChannelHandle, length) * 1000);
             }
         }
 
