@@ -286,12 +286,14 @@ namespace FoxTunes
                 if (this.CollapseLeft && !this.LeftEnabled && !this.IsInDesignMode)
                 {
                     this.LeftContainer.Visibility = Visibility.Collapsed;
+                    this.Splitter.Visibility = Visibility.Collapsed;
                     this.LeftColumn.Width = new GridLength(0, GridUnitType.Pixel);
                     this.SplitterColumn.Width = new GridLength(0, GridUnitType.Pixel);
                 }
                 else if (this.CollapseRight && !this.RightEnabled && !this.IsInDesignMode)
                 {
                     this.RightContainer.Visibility = Visibility.Collapsed;
+                    this.Splitter.Visibility = Visibility.Collapsed;
                     this.SplitterColumn.Width = new GridLength(0, GridUnitType.Pixel);
                     this.RightColumn.Width = new GridLength(0, GridUnitType.Pixel);
                 }
@@ -328,6 +330,7 @@ namespace FoxTunes
                     }
                     this.LeftContainer.Visibility = Visibility.Visible;
                     this.RightContainer.Visibility = Visibility.Visible;
+                    this.Splitter.Visibility = Visibility.Visible;
                 }
                 this.IsComponentEnabled = true;
             }
