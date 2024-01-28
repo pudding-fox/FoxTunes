@@ -36,6 +36,9 @@
             <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type TabPanel}" ExactMatch="True">
                 <ViewModel:InvokeParameterizedCommandAction Command="{Binding AddPlaylistCommand, Source={StaticResource ViewModel}}" />
             </Windows:FilteredEventTrigger>
+            <Interactivity:EventTrigger EventName="TabSelected">
+                <Interactivity:InvokeCommandAction Command="{Binding PlaylistSelectedCommand, Source={StaticResource ViewModel}}"/>
+            </Interactivity:EventTrigger>
         </Interactivity:Interaction.Triggers>
         <Windows:TabControl.ContentTemplate>
             <DataTemplate DataType="{x:Type Core:Playlist}">

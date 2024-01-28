@@ -12,6 +12,8 @@ namespace FoxTunes
 
         public const string PlaylistUpdated = "PlaylistUpdated";
 
+        public const string PlaylistSelected = "PlaylistSelected";
+
         public const string PlaylistColumnsUpdated = "PlaylistColumnsUpdated";
 
         public const string MetaDataUpdated = "MetaDataUpdated";

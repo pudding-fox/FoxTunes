@@ -99,6 +99,8 @@ namespace FoxTunes.ViewModel
 
         public Debouncer Debouncer { get; private set; }
 
+        public object FileDatasSource { get; private set; }
+
         public ObservableCollection<IFileData> FileDatas { get; private set; }
 
         public ObservableCollection<Row> Tags { get; private set; }
@@ -118,6 +120,8 @@ namespace FoxTunes.ViewModel
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
+
+        public ISignalEmitter SignalEmitter { get; private set; }
 
         private bool _ShowTags { get; set; }
 
@@ -263,6 +267,8 @@ namespace FoxTunes.ViewModel
             this.PlaylistManager.SelectedItemsChanged += this.OnSelectedItemsChanged;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
+            this.SignalEmitter = core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             this.Debouncer.Exec(this.Refresh);
             base.InitializeComponent(core);
         }
@@ -297,33 +303,97 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnSelectedItemChanged(object sender, EventArgs e)
         {
-            if (this.LibraryManager.SelectedItem == null)
+            var libraryHierarchyNode = this.LibraryManager.SelectedItem;
+            if (libraryHierarchyNode == null)
             {
                 return;
             }
-            this.Dispatch(() => this.Refresh(this.LibraryManager.SelectedItem));
+            if (object.ReferenceEquals(this.FileDatasSource, libraryHierarchyNode))
+            {
+                return;
+            }
+            this.Dispatch(() => this.Refresh(libraryHierarchyNode));
         }
 
         protected virtual void OnSelectedPlaylistChanged(object sender, EventArgs e)
         {
-            if (this.PlaylistManager.SelectedPlaylist == null)
+            var playlist = this.PlaylistManager.SelectedPlaylist;
+            if (playlist == null)
             {
                 return;
             }
-            this.Dispatch(() => this.Refresh(this.PlaylistManager.SelectedPlaylist));
+            if (object.ReferenceEquals(this.FileDatasSource, playlist))
+            {
+                return;
+            }
+            this.Dispatch(() => this.Refresh(playlist));
         }
 
         protected virtual void OnSelectedItemsChanged(object sender, EventArgs e)
         {
-            if (this.PlaylistManager.SelectedItems == null || !this.PlaylistManager.SelectedItems.Any())
+            var playlistItems = this.PlaylistManager.SelectedItems;
+            if (playlistItems == null || !playlistItems.Any())
             {
                 return;
             }
-            this.Dispatch(() => this.Refresh(this.PlaylistManager.SelectedItems));
+            if (object.ReferenceEquals(this.FileDatasSource, playlistItems))
+            {
+                return;
+            }
+            this.FileDatasSource = playlistItems;
+            this.Dispatch(() => this.Refresh(playlistItems));
+        }
+
+        protected virtual Task OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.PlaylistUpdated:
+                    this.OnPlaylistUpdated(signal.State as PlaylistUpdatedSignalState);
+                    break;
+                case CommonSignals.PlaylistSelected:
+                    this.OnPlaylistSelected();
+                    break;
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
+        protected virtual void OnPlaylistUpdated(PlaylistUpdatedSignalState state)
+        {
+            if (state != null && state.Playlists != null)
+            {
+                var playlist = state.Playlists.FirstOrDefault();
+                if (object.ReferenceEquals(this.FileDatasSource, playlist))
+                {
+                    this.Dispatch(() => this.Refresh(playlist));
+                }
+            }
+            else
+            {
+                //Nothing to do.
+            }
+        }
+
+        protected virtual void OnPlaylistSelected()
+        {
+            var playlist = this.PlaylistManager.SelectedPlaylist;
+            if (object.ReferenceEquals(this.FileDatasSource, playlist))
+            {
+                return;
+            }
+            this.Dispatch(() => this.Refresh(playlist));
         }
 
         protected virtual void Refresh()
         {
+            if (this.FileDatas == null)
+            {
+                return;
+            }
             this.Dispatch(() => this.Refresh(this.FileDatas.ToArray()));
         }
 
@@ -338,6 +408,7 @@ namespace FoxTunes.ViewModel
                 return Task.CompletedTask;
 #endif
             }
+            this.FileDatasSource = libraryHierarchyNode;
             return this.Refresh(libraryItems);
         }
 
@@ -352,6 +423,7 @@ namespace FoxTunes.ViewModel
                 return Task.CompletedTask;
 #endif
             }
+            this.FileDatasSource = playlist;
             return this.Refresh(playlistItems);
         }
 
@@ -555,6 +627,10 @@ namespace FoxTunes.ViewModel
             {
                 this.PlaylistManager.SelectedPlaylistChanged -= this.OnSelectedPlaylistChanged;
                 this.PlaylistManager.SelectedItemsChanged -= this.OnSelectedItemsChanged;
+            }
+            if (this.SignalEmitter != null)
+            {
+                this.SignalEmitter.Signal -= this.OnSignal;
             }
             base.OnDisposing();
         }

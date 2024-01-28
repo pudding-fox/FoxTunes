@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace FoxTunes
@@ -128,9 +129,35 @@ namespace FoxTunes
             source.SetValue(ContentTemplateProperty, value);
         }
 
+        public static readonly RoutedEvent TabSelectedEvent = EventManager.RegisterRoutedEvent(
+            "TabSelected",
+            RoutingStrategy.Bubble,
+            typeof(RoutedEventHandler),
+            typeof(TabControl)
+        );
+
+        public static void AddTabSelectedHandler(DependencyObject source, RoutedEventHandler handler)
+        {
+            var element = source as UIElement;
+            if (element != null)
+            {
+                element.AddHandler(TabSelectedEvent, handler);
+            }
+        }
+
+        public static void RemoveTabSelectedHandler(DependencyObject source, RoutedEventHandler handler)
+        {
+            var element = source as UIElement;
+            if (element != null)
+            {
+                element.RemoveHandler(TabSelectedEvent, handler);
+            }
+        }
+
         public TabControl()
         {
             this._TabControl = new global::System.Windows.Controls.TabControl();
+            this._TabControl.PreviewMouseDown += this.OnPreviewMouseDown;
             this._TabControl.SelectionChanged += this.OnSelectionChanged;
             TabControlExtensions.SetDragOverSelection(this._TabControl, true);
             this.AddVisualChild(this._TabControl);
@@ -149,6 +176,17 @@ namespace FoxTunes
         protected override Visual GetVisualChild(int index)
         {
             return this._TabControl;
+        }
+
+        protected virtual void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Source is TabItem tabItem)
+            {
+                if (object.ReferenceEquals(this.GetContent(tabItem), this.SelectedItem))
+                {
+                    this.RaiseEvent(new RoutedEventArgs(TabSelectedEvent));
+                }
+            }
         }
 
         protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -252,6 +290,23 @@ namespace FoxTunes
         protected virtual void OnDisplayMemberPathChanged()
         {
 
+        }
+
+        public event RoutedEventHandler TabSelected
+        {
+            add
+            {
+                AddTabSelectedHandler(this, value);
+            }
+            remove
+            {
+                RemoveTabSelectedHandler(this, value);
+            }
+        }
+
+        protected virtual void OnTabSelected()
+        {
+            this.RaiseEvent(new RoutedEventArgs(TabSelectedEvent));
         }
 
         protected virtual void Reset(IEnumerable items)
@@ -400,6 +455,7 @@ namespace FoxTunes
         {
             if (this._TabControl != null)
             {
+                this._TabControl.PreviewMouseDown -= this.OnPreviewMouseDown;
                 this._TabControl.SelectionChanged -= this.OnSelectionChanged;
             }
             if (this.ItemsSource is INotifyCollectionChanged collectionChanged)
