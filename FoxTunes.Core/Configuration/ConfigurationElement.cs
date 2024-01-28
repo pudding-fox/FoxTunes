@@ -233,6 +233,8 @@ namespace FoxTunes
     public enum ConfigurationElementFlags : byte
     {
         None = 0,
-        MultiLine = 1
+        MultiLine = 1,
+        FileName = 2,
+        FolderName = 4
     }
 }

@@ -5,48 +5,70 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Config="clr-namespace:FoxTunes.ViewModel.Config"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" d:DataContext="{d:DesignInstance Core:TextConfigurationElement}">
     <UserControl.Resources>
-        <ViewModel:HasFlagConverter x:Key="HasFlagConverter"></ViewModel:HasFlagConverter>
+        <Config:TextConfigurationElement x:Key="ViewModel" Element="{Binding}"></Config:TextConfigurationElement>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
-    <TextBox>
-        <TextBox.Resources>
-            <ViewModel:Wrapper x:Key="Proxy" Value="{Binding}"></ViewModel:Wrapper>
-        </TextBox.Resources>
-        <TextBox.Text>
-            <Binding Path="Value" UpdateSourceTrigger="LostFocus">
-                <Binding.ValidationRules>
-                    <ViewModel:ValidationRule>
-                        <ViewModel:ValidationRule.ConfigurationElement>
-                            <ViewModel:Wrapper Value="{Binding Value, Source={StaticResource Proxy}}"></ViewModel:Wrapper>
-                        </ViewModel:ValidationRule.ConfigurationElement>
-                    </ViewModel:ValidationRule>
-                </Binding.ValidationRules>
-            </Binding>
-        </TextBox.Text>
-        <TextBox.Style>
-            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
-                <!-- System -->
-                <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
-                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                <Setter Property="AllowDrop" Value="true" />
-                <Setter Property="Template" Value="{DynamicResource TextBoxTemplate}" />
-                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource SolidBorderBrush}"/>
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Flags, Converter={StaticResource HasFlagConverter}, ConverterParameter={x:Static Core:ConfigurationElementFlags.MultiLine}}" Value="True">
-                        <Setter Property="AcceptsReturn" Value="True"></Setter>
-                        <Setter Property="AcceptsTab" Value="True"></Setter>
-                        <Setter Property="SpellCheck.IsEnabled" Value="False"></Setter>
-                        <Setter Property="MinLines" Value="10"></Setter>
-                        <Setter Property="MaxLines" Value="10"></Setter>
-                        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"></Setter>
-                        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"></Setter>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </TextBox.Style>
-    </TextBox>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <TextBox>
+            <TextBox.Resources>
+                <ViewModel:Wrapper x:Key="Proxy" Value="{Binding}"></ViewModel:Wrapper>
+            </TextBox.Resources>
+            <TextBox.Text>
+                <Binding Path="Value" UpdateSourceTrigger="LostFocus">
+                    <Binding.ValidationRules>
+                        <ViewModel:ValidationRule>
+                            <ViewModel:ValidationRule.ConfigurationElement>
+                                <ViewModel:Wrapper Value="{Binding Value, Source={StaticResource Proxy}}"></ViewModel:Wrapper>
+                            </ViewModel:ValidationRule.ConfigurationElement>
+                        </ViewModel:ValidationRule>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+            <TextBox.Style>
+                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+                    <!-- System -->
+                    <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                    <Setter Property="AllowDrop" Value="true" />
+                    <Setter Property="Template" Value="{DynamicResource TextBoxTemplate}" />
+                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                    <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource SolidBorderBrush}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsMultiline, Mode=OneWay, Source={StaticResource ViewModel}}" Value="True">
+                            <Setter Property="AcceptsReturn" Value="True"></Setter>
+                            <Setter Property="AcceptsTab" Value="True"></Setter>
+                            <Setter Property="SpellCheck.IsEnabled" Value="False"></Setter>
+                            <Setter Property="MinLines" Value="10"></Setter>
+                            <Setter Property="MaxLines" Value="10"></Setter>
+                            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"></Setter>
+                            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"></Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <Button Grid.Column="1" Content="..." Margin="2,0,0,0" Command="{Binding BrowseCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Visibility="{Binding CanBrowse, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay, Source={StaticResource ViewModel}}">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                    <Setter Property="Width" Value="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"></Setter>
+                    <Setter Property="FontSize" Value="10"></Setter>
+                    <!-- System -->
+                    <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
+                    <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
+                    <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
+                </Style>
+            </Button.Style>
+        </Button>
+    </Grid>
 </UserControl>

@@ -34,20 +34,8 @@ namespace FoxTunes
                      Filter = GetFilter(options.Filters),
                      Multiselect = options.Flags.HasFlag(BrowseFlags.Multiselect),
                  };
-                 var success = default(bool?);
-                 if (Windows.ActiveWindow != null)
-                 {
-                     success = dialog.ShowDialog(Windows.ActiveWindow);
-                 }
-                 else
-                 {
-                     //TODO: Hack: This temporary topmost window ensures that the dialog is focused and visible.
-                     var window = new Window()
-                     {
-                         Topmost = true
-                     };
-                     success = dialog.ShowDialog(window);
-                 }
+                 var window = this.GetActiveWindow();
+                 var success = dialog.ShowDialog(window);
                  return new BrowseResult(dialog.FileNames, success.GetValueOrDefault());
              });
         }
@@ -61,22 +49,9 @@ namespace FoxTunes
                 {
                     dialog.Description = options.Title;
                     dialog.SelectedPath = options.InitialDirectory;
-                    var result = default(global::System.Windows.Forms.DialogResult);
-                    if (Windows.ActiveWindow != null)
-                    {
-                        result = dialog.ShowDialog(new Win32Window(Windows.ActiveWindow.GetHandle()));
-                    }
-                    else
-                    {
-                        //TODO: Hack: This temporary topmost window ensures that the dialog is focused and visible.
-                        var window = new Window()
-                        {
-                            Topmost = true
-                        };
-                        result = dialog.ShowDialog(new Win32Window(window.GetHandle()));
-                    }
+                    var window = this.GetActiveWindow();
                     var success = default(bool);
-                    switch (result)
+                    switch (dialog.ShowDialog(new Win32Window(window.GetHandle())))
                     {
                         case global::System.Windows.Forms.DialogResult.OK:
                             success = true;
@@ -102,6 +77,25 @@ namespace FoxTunes
             //TODO: No timeout, could deadlock.
             thread.Join();
             return result;
+        }
+
+        protected virtual Window GetActiveWindow()
+        {
+            if (Windows.IsSettingsWindowCreated && Windows.SettingsWindow.IsVisible)
+            {
+                return Windows.SettingsWindow;
+            }
+            if (Windows.ActiveWindow != null)
+            {
+                return Windows.ActiveWindow;
+            }
+            //TODO: Hack: This temporary topmost window ensures that the dialog is focused and visible.
+            Logger.Write(this, LogLevel.Debug, "Creating temporary window to host windows browse dialog.");
+            var window = new Window()
+            {
+                Topmost = true
+            };
+            return window;
         }
 
         private static string GetFilter(IEnumerable<BrowseFilter> filters)
