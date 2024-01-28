@@ -58,27 +58,34 @@ namespace FoxTunes
 #endif
         }
 
-        public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
+        public ImageSource CreateImageSource(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
         {
             var id = this.GetImageId(libraryHierarchyNode, width, height);
-            var fileName = default(string);
-            if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
+            if (cache)
             {
-                return this.ImageLoader.Load(id, fileName, 0, 0, true);
+                var fileName = default(string);
+                if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
+                {
+                    return this.ImageLoader.Load(id, fileName, 0, 0, true);
+                }
             }
             //TODO: Setting throwOnTimeout = false so we ignore synchronization timeout.
             //TODO: I think there exists a deadlock bug in KeyLock but I haven't been able to prove it.
             using (KeyLock.Lock(id, TIMEOUT, false))
             {
-                if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
+                if (cache)
                 {
-                    return this.ImageLoader.Load(id, fileName, 0, 0, true);
+                    var fileName = default(string);
+                    if (FileMetaDataStore.Exists(PREFIX, id, out fileName))
+                    {
+                        return this.ImageLoader.Load(id, fileName, 0, 0, true);
+                    }
                 }
-                return this.CreateImageSourceCore(libraryHierarchyNode, width, height);
+                return this.CreateImageSourceCore(libraryHierarchyNode, width, height, cache);
             }
         }
 
-        private ImageSource CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
+        private ImageSource CreateImageSourceCore(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
         {
             switch (libraryHierarchyNode.MetaDatas.Length)
             {
@@ -87,11 +94,11 @@ namespace FoxTunes
                 case 1:
                     return this.CreateImageSource1(libraryHierarchyNode, width, height);
                 case 2:
-                    return this.CreateImageSource2(libraryHierarchyNode, width, height);
+                    return this.CreateImageSource2(libraryHierarchyNode, width, height, cache);
                 case 3:
-                    return this.CreateImageSource3(libraryHierarchyNode, width, height);
+                    return this.CreateImageSource3(libraryHierarchyNode, width, height, cache);
                 default:
-                    return this.CreateImageSource4(libraryHierarchyNode, width, height);
+                    return this.CreateImageSource4(libraryHierarchyNode, width, height, cache);
             }
         }
 
@@ -112,7 +119,7 @@ namespace FoxTunes
             return this.ImageLoader.Load(id, fileName, width, height, true);
         }
 
-        private ImageSource CreateImageSource2(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
+        private ImageSource CreateImageSource2(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
@@ -120,10 +127,10 @@ namespace FoxTunes
                 this.DrawImage(libraryHierarchyNode, context, 0, 2, width, height);
                 this.DrawImage(libraryHierarchyNode, context, 1, 2, width, height);
             }
-            return this.Render(libraryHierarchyNode, visual, width, height);
+            return this.Render(libraryHierarchyNode, visual, width, height, cache);
         }
 
-        private ImageSource CreateImageSource3(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
+        private ImageSource CreateImageSource3(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
@@ -132,10 +139,10 @@ namespace FoxTunes
                 this.DrawImage(libraryHierarchyNode, context, 1, 3, width, height);
                 this.DrawImage(libraryHierarchyNode, context, 2, 3, width, height);
             }
-            return this.Render(libraryHierarchyNode, visual, width, height);
+            return this.Render(libraryHierarchyNode, visual, width, height, cache);
         }
 
-        private ImageSource CreateImageSource4(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
+        private ImageSource CreateImageSource4(LibraryHierarchyNode libraryHierarchyNode, int width, int height, bool cache)
         {
             var visual = new DrawingVisual();
             using (var context = visual.RenderOpen())
@@ -145,7 +152,7 @@ namespace FoxTunes
                 this.DrawImage(libraryHierarchyNode, context, 2, 4, width, height);
                 this.DrawImage(libraryHierarchyNode, context, 3, 4, width, height);
             }
-            return this.Render(libraryHierarchyNode, visual, width, height);
+            return this.Render(libraryHierarchyNode, visual, width, height, cache);
         }
 
         private void DrawImage(LibraryHierarchyNode libraryHierarchyNode, DrawingContext context, int position, int count, int width, int height)
@@ -236,18 +243,21 @@ namespace FoxTunes
             );
         }
 
-        private ImageSource Render(LibraryHierarchyNode libraryHierarchyNode, DrawingVisual visual, int width, int height)
+        private ImageSource Render(LibraryHierarchyNode libraryHierarchyNode, DrawingVisual visual, int width, int height, bool cache)
         {
             var target = new RenderTargetBitmap(width, height, DPIX, DPIY, PixelFormats.Pbgra32);
             target.Render(visual);
             var encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(target));
-            using (var stream = new MemoryStream())
+            if (cache)
             {
-                encoder.Save(stream);
-                stream.Seek(0, SeekOrigin.Begin);
-                FileMetaDataStore.Write(PREFIX, this.GetImageId(libraryHierarchyNode, width, height), stream);
-                stream.Seek(0, SeekOrigin.Begin);
+                using (var stream = new MemoryStream())
+                {
+                    encoder.Save(stream);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    FileMetaDataStore.Write(PREFIX, this.GetImageId(libraryHierarchyNode, width, height), stream);
+                    stream.Seek(0, SeekOrigin.Begin);
+                }
             }
             target.Freeze();
             return target;
