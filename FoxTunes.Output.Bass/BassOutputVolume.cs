@@ -14,7 +14,7 @@ namespace FoxTunes
             }
             protected set
             {
-                throw new NotImplementedException();
+                //Nothing to do.
             }
         }
 

@@ -156,7 +156,7 @@ namespace FoxTunes.ViewModel
             {
                 using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
                 {
-                    this.PlaylistManager.InitializeDatabase(database);
+                    this.Core.InitializeDatabase(database, DatabaseInitializeType.Playlist);
 #if NET40
                     return TaskEx.FromResult(false);
 #else

@@ -177,8 +177,12 @@ namespace FoxTunes
 
         public event BackgroundTaskEventHandler BackgroundTask;
 
-        public void InitializeDatabase(IDatabaseComponent database)
+        public void InitializeDatabase(IDatabaseComponent database, DatabaseInitializeType type)
         {
+            if (!type.HasFlag(DatabaseInitializeType.Library))
+            {
+                return;
+            }
             var scriptingRuntime = ComponentRegistry.Instance.GetComponent<IScriptingRuntime>();
             if (scriptingRuntime == null)
             {

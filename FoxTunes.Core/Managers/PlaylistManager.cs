@@ -486,8 +486,12 @@ namespace FoxTunes
 #endif
         }
 
-        public void InitializeDatabase(IDatabaseComponent database)
+        public void InitializeDatabase(IDatabaseComponent database, DatabaseInitializeType type)
         {
+            if (!type.HasFlag(DatabaseInitializeType.Playlist))
+            {
+                return;
+            }
             var scriptingRuntime = ComponentRegistry.Instance.GetComponent<IScriptingRuntime>();
             if (scriptingRuntime == null)
             {
