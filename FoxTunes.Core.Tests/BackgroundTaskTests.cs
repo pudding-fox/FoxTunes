@@ -1,8 +1,5 @@
 ﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -10,17 +7,6 @@ namespace FoxTunes
     [TestFixture]
     public class BackgroundTaskTests : TestBase
     {
-        public ParallelOptions ParallelOptions
-        {
-            get
-            {
-                return new ParallelOptions()
-                {
-                    MaxDegreeOfParallelism = Environment.ProcessorCount
-                };
-            }
-        }
-
         [Test]
         public void BackgroundTaskRespectsConcurrency()
         {

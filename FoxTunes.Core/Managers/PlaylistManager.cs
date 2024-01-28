@@ -311,36 +311,36 @@ namespace FoxTunes.Managers
                 .FirstOrDefault();
         }
 
-        public Task Play(PlaylistItem playlistItem)
+        public async Task Play(PlaylistItem playlistItem)
         {
-            return this.PlaybackManager.Load(playlistItem, true)
-                .ContinueWith(_ =>
-                {
-                    if (this.CurrentItem == null)
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it empty.", playlistItem.Id, playlistItem.FileName);
-                        return;
-                    }
-                    if (this.CurrentItem != playlistItem)
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it was {2} => {3}", playlistItem.Id, playlistItem.FileName, this.CurrentItem.Id, this.CurrentItem.FileName);
-                        return;
-                    }
-                    if (this.PlaybackManager.CurrentStream.PlaylistItem != playlistItem)
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it was {2} => {3}", playlistItem.Id, playlistItem.FileName, this.PlaybackManager.CurrentStream.PlaylistItem.Id, this.PlaybackManager.CurrentStream.PlaylistItem.FileName);
-                        return;
-                    }
-                    Logger.Write(this, LogLevel.Debug, "Playing current output stream: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-                    try
-                    {
-                        this.PlaybackManager.CurrentStream.Play();
-                    }
-                    catch (Exception e)
-                    {
-                        this.OnError(e);
-                    }
-                });
+            await this.PlaybackManager.Load(playlistItem, true);
+            if (this.CurrentItem == null)
+            {
+                Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it empty.", playlistItem.Id, playlistItem.FileName);
+                return;
+            }
+            if (this.CurrentItem != playlistItem)
+            {
+                Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it was {2} => {3}", playlistItem.Id, playlistItem.FileName, this.CurrentItem.Id, this.CurrentItem.FileName);
+                return;
+            }
+            if (this.PlaybackManager.CurrentStream.PlaylistItem != playlistItem)
+            {
+                Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it was {2} => {3}", playlistItem.Id, playlistItem.FileName, this.PlaybackManager.CurrentStream.PlaylistItem.Id, this.PlaybackManager.CurrentStream.PlaylistItem.FileName);
+                return;
+            }
+            Logger.Write(this, LogLevel.Debug, "Playing current output stream: {0} => {1}", playlistItem.Id, playlistItem.FileName);
+            var exception = default(Exception);
+            try
+            {
+                this.PlaybackManager.CurrentStream.Play();
+                return;
+            }
+            catch (Exception e)
+            {
+                exception = e;
+            }
+            await this.OnError(exception);
         }
 
         public async Task Play(string fileName)

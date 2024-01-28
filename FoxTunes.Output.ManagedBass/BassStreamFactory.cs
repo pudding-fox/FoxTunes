@@ -15,8 +15,11 @@ namespace FoxTunes
 
         public BassStreamFactory()
         {
+            this.Semaphore = new SemaphoreSlim(1, 1);
             this.Providers = new SortedList<byte, IBassStreamProvider>(new PriorityComparer());
         }
+
+        public SemaphoreSlim Semaphore { get; private set; }
 
         private SortedList<byte, IBassStreamProvider> Providers { get; set; }
 
@@ -48,41 +51,49 @@ namespace FoxTunes
         public async Task<IBassStream> CreateStream(PlaylistItem playlistItem, bool immidiate)
         {
             Logger.Write(this, LogLevel.Debug, "Attempting to create stream for playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-            foreach (var provider in this.Providers.Values)
+            await this.Semaphore.WaitAsync();
+            try
             {
-                if (!provider.CanCreateStream(this.Output, playlistItem))
+                foreach (var provider in this.Providers.Values)
                 {
-                    continue;
-                }
-                Logger.Write(this, LogLevel.Debug, "Using bass stream provider with priority {0}: {1}", provider.Priority, provider.GetType().Name);
-                for (var attempt = 0; attempt < CREATE_ATTEMPTS; attempt++)
-                {
-                    var channelHandle = await provider.CreateStream(this.Output, playlistItem);
-                    if (channelHandle != 0)
+                    if (!provider.CanCreateStream(this.Output, playlistItem))
                     {
-                        Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, channelHandle);
-                        return new BassStream(provider, channelHandle);
+                        continue;
                     }
-                    else
+                    Logger.Write(this, LogLevel.Debug, "Using bass stream provider with priority {0}: {1}", provider.Priority, provider.GetType().Name);
+                    for (var attempt = 0; attempt < CREATE_ATTEMPTS; attempt++)
                     {
-                        if (Bass.LastError == Errors.Already)
+                        var channelHandle = await provider.CreateStream(this.Output, playlistItem);
+                        if (channelHandle != 0)
                         {
-                            if (!immidiate || !this.FreeActiveStreams())
+                            Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, channelHandle);
+                            return new BassStream(provider, channelHandle);
+                        }
+                        else
+                        {
+                            if (Bass.LastError == Errors.Already)
                             {
-                                return BassStream.Empty;
+                                if (!immidiate || !this.FreeActiveStreams())
+                                {
+                                    return BassStream.Empty;
+                                }
                             }
                         }
+                        Thread.Sleep(CREATE_ATTEMPT_INTERVAL);
                     }
-                    Thread.Sleep(CREATE_ATTEMPT_INTERVAL);
+                    Logger.Write(this, LogLevel.Warn, "The bass stream provider failed.");
                 }
-                Logger.Write(this, LogLevel.Warn, "The bass stream provider failed.");
+            }
+            finally
+            {
+                this.Semaphore.Release();
             }
             return BassStream.Empty;
         }
 
         protected virtual bool FreeActiveStreams()
         {
-            var streams = BassOutputStream.ActiveStreams.ToArray();
+            var streams = BassOutputStream.ActiveStreams.Values.ToArray();
             foreach (var stream in streams)
             {
                 try

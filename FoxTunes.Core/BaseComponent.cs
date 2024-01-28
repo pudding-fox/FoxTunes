@@ -21,6 +21,18 @@ namespace FoxTunes
             //Nothing to do.
         }
 
+        protected virtual void OnPropertyChanging(string propertyName)
+        {
+            if (this.PropertyChanging == null)
+            {
+                return;
+            }
+            this.PropertyChanging(this, new PropertyChangingEventArgs(propertyName));
+        }
+
+        [field: NonSerialized]
+        public event PropertyChangingEventHandler PropertyChanging = delegate { };
+
         protected virtual void OnPropertyChanged(string propertyName)
         {
             if (this.PropertyChanged == null)

@@ -7,11 +7,13 @@ namespace FoxTunes
     {
         public const string ID = "E6D893E8-EC80-4823-A66C-286DB69A48D1";
 
-        public UnloadOutputStreamTask()
+        public UnloadOutputStreamTask(IOutputStream outputStream)
             : base(ID)
         {
-
+            this.OutputStream = outputStream;
         }
+
+        public IOutputStream OutputStream { get; private set; }
 
         public IOutput Output { get; private set; }
 
@@ -26,9 +28,8 @@ namespace FoxTunes
 
         protected override Task OnRun()
         {
-            var outputStream = this.PlaybackManager.CurrentStream;
-            Logger.Write(this, LogLevel.Debug, "Unloading output stream: {0} => {1}", outputStream.Id, outputStream.FileName);
-            return this.Output.Unload(outputStream);
+            Logger.Write(this, LogLevel.Debug, "Unloading output stream: {0} => {1}", this.OutputStream.Id, this.OutputStream.FileName);
+            return this.Output.Unload(this.OutputStream);
         }
     }
 }

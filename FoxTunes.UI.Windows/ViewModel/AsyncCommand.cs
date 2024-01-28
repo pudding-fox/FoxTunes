@@ -12,12 +12,14 @@ namespace FoxTunes.ViewModel
             this.Func = func;
         }
 
-        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<Task> func, Func<bool> predicate) : this(backgroundTaskRunner, func)
+        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<Task> func, Func<bool> predicate)
+            : this(backgroundTaskRunner, func)
         {
             this.Predicate = predicate;
         }
 
-        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<Task> func, Func<Task<bool>> predicate) : this(backgroundTaskRunner, func)
+        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<Task> func, Func<Task<bool>> predicate)
+            : this(backgroundTaskRunner, func)
         {
             this.AsyncPredicate = predicate;
         }
@@ -63,6 +65,11 @@ namespace FoxTunes.ViewModel
         {
             await this.BackgroundTaskRunner.Run(() => this.AsyncPredicate().ContinueWith(async task =>
             {
+                if (task.IsFaulted)
+                {
+                    //TODO: Logging.
+                    return;
+                }
                 if (this._CanExecute.HasValue && this._CanExecute.Value == task.Result)
                 {
                     return;
@@ -100,12 +107,14 @@ namespace FoxTunes.ViewModel
             this.Func = func;
         }
 
-        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<T, Task> func, Func<T, bool> predicate) : this(backgroundTaskRunner, func)
+        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<T, Task> func, Func<T, bool> predicate)
+            : this(backgroundTaskRunner, func)
         {
             this.Predicate = predicate;
         }
 
-        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<T, Task> func, Func<T, Task<bool>> predicate) : this(backgroundTaskRunner, func)
+        public AsyncCommand(IBackgroundTaskRunner backgroundTaskRunner, Func<T, Task> func, Func<T, Task<bool>> predicate)
+            : this(backgroundTaskRunner, func)
         {
             this.AsyncPredicate = predicate;
         }
@@ -152,6 +161,11 @@ namespace FoxTunes.ViewModel
         {
             await this.BackgroundTaskRunner.Run(() => this.AsyncPredicate((T)parameter).ContinueWith(async task =>
             {
+                if (task.IsFaulted)
+                {
+                    //TODO: Logging.
+                    return;
+                }
                 if (this._CanExecute.HasValue && this._CanExecute.Value == task.Result)
                 {
                     return;

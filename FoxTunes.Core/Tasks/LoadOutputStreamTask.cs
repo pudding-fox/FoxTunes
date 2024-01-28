@@ -29,7 +29,7 @@ namespace FoxTunes
         {
             get
             {
-                if (this.Output != null && this.Output.ShowBuffering && this.Immediate)
+                if (this.Output != null && this.Output.ShowBuffering && this.Immediate && !this.OutputStreamQueue.IsQueued(this.PlaylistItem))
                 {
                     return true;
                 }
