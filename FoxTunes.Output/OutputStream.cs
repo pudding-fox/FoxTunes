@@ -5,6 +5,13 @@ namespace FoxTunes
 {
     public abstract class OutputStream : BaseComponent, IOutputStream
     {
+        protected OutputStream(string fileName)
+        {
+            this.FileName = fileName;
+        }
+
+        public string FileName { get; private set; }
+
         public abstract long Position { get; set; }
 
         protected virtual void OnPositionChanged()

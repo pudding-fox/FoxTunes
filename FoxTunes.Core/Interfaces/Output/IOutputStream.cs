@@ -4,6 +4,8 @@ namespace FoxTunes.Interfaces
 {
     public interface IOutputStream : IBaseComponent, IDisposable
     {
+        string FileName { get; }
+
         long Position { get; set; }
 
         event EventHandler PositionChanged;

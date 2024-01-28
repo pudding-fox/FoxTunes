@@ -32,7 +32,7 @@ namespace FoxTunes.Utilities
             {
                 properties.Add(item.Name.ToLower(), item.Value);
             }
-            this.ScriptingContext.SetValue("playing", StandardComponents.Instance.Playlist.SelectedItem);
+            this.ScriptingContext.SetValue("playing", StandardManagers.Instance.Playback.CurrentStream);
             this.ScriptingContext.SetValue("item", this.PlaylistItem);
             this.ScriptingContext.SetValue("tag", metaData);
             this.ScriptingContext.SetValue("stat", properties);

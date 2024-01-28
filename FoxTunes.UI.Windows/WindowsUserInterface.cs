@@ -1,9 +1,15 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 
 namespace FoxTunes
 {
     public class WindowsUserInterface : UserInterface
     {
+        public static readonly Type[] References = new[]
+        {
+            typeof(global::System.Windows.Interactivity.Interaction)
+        };
+
         private Main Main { get; set; }
 
         public override void InitializeComponent(ICore core)

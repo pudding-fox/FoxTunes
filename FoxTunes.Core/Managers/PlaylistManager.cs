@@ -1,5 +1,7 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 
 namespace FoxTunes.Managers
@@ -20,7 +22,13 @@ namespace FoxTunes.Managers
             this.Database = core.Components.Database;
             this.PlaylistItemFactory = core.Factories.PlaylistItem;
             this.PlaybackManager = core.Managers.Playback;
+            this.PlaybackManager.CurrentStreamChanged += this.PlaybackManager_CurrentStreamChanged;
             base.InitializeComponent(core);
+        }
+
+        protected virtual void PlaybackManager_CurrentStreamChanged(object sender, EventArgs e)
+        {
+            this.UpdateCurrentItem();
         }
 
         public void AddDirectory(string directoryName)
@@ -43,37 +51,37 @@ namespace FoxTunes.Managers
         public void Next()
         {
             var index = default(int);
-            if (this.Playlist.SelectedItem == null)
+            if (this.CurrentItem == null)
             {
                 index = 0;
             }
             else
             {
-                index = this.Playlist.Items.IndexOf(this.Playlist.SelectedItem) + 1;
+                index = this.Playlist.Items.IndexOf(this.CurrentItem) + 1;
             }
             if (index >= this.Playlist.Items.Count)
             {
                 index = 0;
             }
-            this.Playlist.SelectedItem = this.Playlist.Items[index];
+            this.PlaybackManager.Load(this.Playlist.Items[index].FileName).Play();
         }
 
         public void Previous()
         {
             var index = default(int);
-            if (this.Playlist.SelectedItem == null)
+            if (this.CurrentItem == null)
             {
                 index = 0;
             }
             else
             {
-                index = this.Playlist.Items.IndexOf(this.Playlist.SelectedItem) - 1;
+                index = this.Playlist.Items.IndexOf(this.CurrentItem) - 1;
             }
             if (index < 0)
             {
                 index = this.Playlist.Items.Count - 1;
             }
-            this.Playlist.SelectedItem = this.Playlist.Items[index];
+            this.PlaybackManager.Load(this.Playlist.Items[index].FileName).Play();
         }
 
         public void Clear()
@@ -81,7 +89,50 @@ namespace FoxTunes.Managers
             this.Playlist.Items.Clear();
         }
 
-        public IEnumerable<PlaylistItem> Items
+        protected virtual void UpdateCurrentItem()
+        {
+            if (this.PlaybackManager.CurrentStream != null)
+            {
+                foreach (var item in this.Items)
+                {
+                    if (!string.Equals(item.FileName, this.PlaybackManager.CurrentStream.FileName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+                    this.CurrentItem = item;
+                    return;
+                }
+            }
+            this.CurrentItem = null;
+        }
+
+        private PlaylistItem _CurrentItem { get; set; }
+
+        public PlaylistItem CurrentItem
+        {
+            get
+            {
+                return this._CurrentItem;
+            }
+            private set
+            {
+                this._CurrentItem = value;
+                this.OnCurrentItemChanged();
+            }
+        }
+
+        protected virtual void OnCurrentItemChanged()
+        {
+            if (this.CurrentItemChanged != null)
+            {
+                this.CurrentItemChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("CurrentItem");
+        }
+
+        public event EventHandler CurrentItemChanged = delegate { };
+
+        public ObservableCollection<PlaylistItem> Items
         {
             get
             {

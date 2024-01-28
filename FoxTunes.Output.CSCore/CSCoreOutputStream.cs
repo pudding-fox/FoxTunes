@@ -1,5 +1,4 @@
 ﻿using CSCore;
-using CSCore.Codecs;
 using CSCore.Ffmpeg;
 using CSCore.SoundOut;
 using CSCore.Streams;
@@ -11,12 +10,10 @@ namespace FoxTunes
         const int UPDATE_INTERVAL = 100;
 
         public CSCoreOutputStream(string fileName)
+            : base(fileName)
         {
-            this.FileName = fileName;
             this.InitializeComponent();
         }
-
-        public string FileName { get; private set; }
 
         public IWaveSource WaveSource { get; private set; }
 

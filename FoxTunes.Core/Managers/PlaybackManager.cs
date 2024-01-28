@@ -28,22 +28,10 @@ namespace FoxTunes.Managers
             }
             set
             {
-                this.OnCurrentStreamChanging();
                 this._CurrentStream = value;
                 this.OnCurrentStreamChanged();
             }
         }
-
-        protected virtual void OnCurrentStreamChanging()
-        {
-            if (this.CurrentStreamChanging != null)
-            {
-                this.CurrentStreamChanging(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanging("CurrentStream");
-        }
-
-        public event EventHandler CurrentStreamChanging = delegate { };
 
         protected virtual void OnCurrentStreamChanged()
         {
@@ -56,9 +44,15 @@ namespace FoxTunes.Managers
 
         public event EventHandler CurrentStreamChanged = delegate { };
 
-        public void Load(string fileName)
+        public IOutputStream Load(string fileName)
         {
-            this.CurrentStream = this.Output.Load(fileName);
+            if (this.CurrentStream != null)
+            {
+                this.CurrentStream.Stop();
+                this.CurrentStream.Dispose();
+                this.CurrentStream = null;
+            }
+            return this.CurrentStream = this.Output.Load(fileName);
         }
 
         public void Unload()
