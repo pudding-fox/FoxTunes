@@ -50,10 +50,10 @@ BOOL populate_file_buffer(FILE* file_handle, BUFFER* buffer) {
 	} while (TRUE);
 }
 
-BUFFER* read_file_buffer(const char* file, QWORD offset, QWORD length) {
+BUFFER* read_file_buffer(const wchar_t* file, QWORD offset, QWORD length) {
 	BUFFER* buffer;
 	QWORD file_length;
-	FILE* file_handle = fopen(file, "rb");
+	FILE* file_handle = _wfopen(file, L"rb");
 	if (!file_handle) {
 #if _DEBUG
 		char* error = strerror(errno);

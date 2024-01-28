@@ -89,7 +89,6 @@
   <ItemGroup>
     <ClCompile Include="bass_inmemory_handler.c" />
     <ClCompile Include="buffer.c" />
-    <ClCompile Include="file_name.c" />
     <ClCompile Include="inmemory_stream.c" />
     <ClCompile Include="reader.c" />
   </ItemGroup>
@@ -99,7 +98,6 @@
     <ClInclude Include="buffer.h" />
     <ClInclude Include="inmemory_stream.h" />
     <ClInclude Include="reader.h" />
-    <ClInclude Include="file_name.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
