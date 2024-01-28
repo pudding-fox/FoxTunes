@@ -1,7 +1,6 @@
 ﻿#if X86
 using FoxTunes.Interfaces;
 using Noesis.Javascript;
-using System;
 using System.Diagnostics;
 
 namespace FoxTunes
@@ -21,6 +20,8 @@ namespace FoxTunes
             this.Context.SetParameter("Publication", new Publication());
             this.Context.SetParameter("DateHelper", new DateHelper());
             this.Context.SetParameter("NumberHelper", new NumberHelper());
+            //Note: Lower case to match tag, property etc.
+            this.Context.SetParameter("strings", StringsHelper.Strings);
             base.InitializeComponent(core);
         }
 

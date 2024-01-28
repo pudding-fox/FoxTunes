@@ -124,6 +124,22 @@ namespace FoxTunes
             }
         }
 
+        public string Rating
+        {
+            get
+            {
+                return Resources.Rating;
+            }
+        }
+
+        public string Artist_Title_BPM
+        {
+            get
+            {
+                return Resources.Artist_Title_BPM;
+            }
+        }
+
         public static ICoreScripts Instance = new JSCoreScripts();
     }
 }

@@ -141,9 +141,22 @@ namespace FoxTunes
                 });
                 set.Add(new LibraryHierarchy()
                 {
+                    Name = "Genre/Rating/Artist - Title [BPM]",
+                    Type = LibraryHierarchyType.Script,
+                    Sequence = 2,
+                    Enabled = false,
+                    Levels = new ObservableCollection<LibraryHierarchyLevel>()
+                    {
+                        new LibraryHierarchyLevel() { Sequence = 0, Script = scriptingRuntime.CoreScripts.Genre },
+                        new LibraryHierarchyLevel() { Sequence = 1, Script = scriptingRuntime.CoreScripts.Rating },
+                        new LibraryHierarchyLevel() { Sequence = 2, Script = scriptingRuntime.CoreScripts.Artist_Title_BPM }
+                    }
+                });
+                set.Add(new LibraryHierarchy()
+                {
                     Name = "Folder Structure",
                     Type = LibraryHierarchyType.FileSystem,
-                    Sequence = 2,
+                    Sequence = 3,
                     Enabled = false
                 });
                 transaction.Commit();

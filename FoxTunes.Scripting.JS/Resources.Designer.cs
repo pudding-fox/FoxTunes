@@ -90,6 +90,36 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (function () {
+        ///    var parts = [];
+        ///    if (tag.performer) {
+        ///        parts.push(tag.performer);
+        ///    }
+        ///    else if (tag.artist) {
+        ///        parts.push(tag.artist);
+        ///    }
+        ///    else {
+        ///        parts.push(strings.general_noartist);
+        ///    }
+        ///    if (tag.title) {
+        ///        parts.push(tag.title);
+        ///    }
+        ///    else {
+        ///        parts.push(strings.general_notitle);
+        ///    }
+        ///    if (tag.beatsperminute) {
+        ///        parts.push(&quot;[&quot; + tag.beatsperminute + &quot;]&quot;);
+        ///    }
+        ///    else {
+        ///        parts.push(&quot;[&quot; + strings.general_un [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Artist_Title_BPM {
+            get {
+                return ResourceManager.GetString("Artist_Title_BPM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (extension(file) || &quot;&quot;).toUpperCase();.
         /// </summary>
         internal static string Codec {
@@ -129,7 +159,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ucfirst(tag.genre) || &quot;No Genre&quot;.
+        ///   Looks up a localized string similar to ucfirst(tag.genre) || strings.general_nogenre.
         /// </summary>
         internal static string Genre {
             get {
@@ -164,6 +194,20 @@ namespace FoxTunes {
         internal static string PlayCount {
             get {
                 return ResourceManager.GetString("PlayCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (function () {
+        ///    if (tag.rating) {
+        ///        return tag.rating;
+        ///    }
+        ///    return strings.general_norating;
+        ///})().
+        /// </summary>
+        internal static string Rating {
+            get {
+                return ResourceManager.GetString("Rating", resourceCulture);
             }
         }
         

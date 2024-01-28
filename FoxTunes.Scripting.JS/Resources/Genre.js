@@ -1,1 +1,1 @@
-ucfirst(tag.genre) || "No Genre"
+ucfirst(tag.genre) || strings.general_nogenre

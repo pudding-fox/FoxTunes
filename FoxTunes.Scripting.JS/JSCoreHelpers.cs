@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using static FoxDb.Factories;
 
 namespace FoxTunes
 {
@@ -30,6 +33,39 @@ namespace FoxTunes
         public static string toFixed(float value, int digits)
         {
             return value.ToString(string.Format("N{0}", digits));
+        }
+    }
+
+    public static class StringsHelper
+    {
+        public static readonly Dictionary<string, object> Strings = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+
+        static StringsHelper()
+        {
+            try
+            {
+                var properties = typeof(Strings).GetProperties(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                foreach (var property in properties)
+                {
+                    if (property.PropertyType != typeof(string))
+                    {
+                        //Not a resource string.
+                        continue;
+                    }
+                    var key = property.Name.ToLower();
+                    if (Strings.ContainsKey(key))
+                    {
+                        //Ambiguous name.
+                        continue;
+                    }
+                    var value = property.GetValue(null, null);
+                    Strings.Add(key, value);
+                }
+            }
+            catch
+            {
+                //Don't throw during initialization, nothing can be done.
+            }
         }
     }
 }

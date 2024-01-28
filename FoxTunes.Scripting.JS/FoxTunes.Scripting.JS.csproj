@@ -10,10 +10,6 @@
     <Platforms>x86;x64</Platforms>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-
   <PropertyGroup Condition="'$(Platform)' == 'x86'">
     <DefineConstants>X86</DefineConstants>
   </PropertyGroup>
@@ -43,18 +39,31 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <CustomToolNamespace>FoxTunes</CustomToolNamespace>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <Compile Update="Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Strings.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<CustomToolNamespace>FoxTunes</CustomToolNamespace>
+			<LastGenOutput>Strings.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<Compile Update="Properties\Strings.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Strings.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<CustomToolNamespace>FoxTunes</CustomToolNamespace>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<Compile Update="Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
