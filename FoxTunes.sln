@@ -109,7 +109,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.Mod", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.Crossfade", "FoxTunes.Output.Bass.Crossfade\FoxTunes.Output.Bass.Crossfade.csproj", "{9A08E6C9-B8BE-4091-AABA-7FE961EEF222}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.UI.Windows.Dialogs", "FoxTunes.UI.Windows.Dialogs\FoxTunes.UI.Windows.Dialogs.csproj", "{6B604D8D-5706-4F62-BEB9-ABA6736EBDB8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.UI.Windows.Layout", "FoxTunes.UI.Windows.Layout\FoxTunes.UI.Windows.Layout.csproj", "{6B604D8D-5706-4F62-BEB9-ABA6736EBDB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
