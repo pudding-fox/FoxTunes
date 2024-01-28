@@ -10,55 +10,48 @@
     <UserControl.Resources>
         <ViewModel:Associations x:Key="ViewModel" Core="{Binding}"></ViewModel:Associations>
     </UserControl.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-        </Grid.RowDefinitions>
-        <ScrollViewer Grid.Row="0" >
-            <ItemsControl Grid.IsSharedSizeScope="True" ItemsSource="{Binding FileAssociations, Source={StaticResource ViewModel}}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="0,0,0,5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Label Grid.Column="0" VerticalAlignment="Center" Padding="0,0,7,0" ContentStringFormat="{}{0}:"></Label>
-                            <CheckBox Grid.Column="1" IsChecked="{Binding IsSelected}" Content="{Binding FileAssociation.Extension, Mode=OneWay}" VerticalAlignment="Center"></CheckBox>
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="This feature requires the FoxTunes.Core.Windows plugin." IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">
-            <TextBlock.Style>
-                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding FileAssociations.Count, Mode=OneWay, Source={StaticResource ViewModel}}" Value="0">
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <StackPanel.Resources>
-                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                    <Setter Property="Width" Value="60"></Setter>
-                    <Setter Property="Height" Value="30"></Setter>
-                    <Setter Property="Margin" Value="7,7,0,0"></Setter>
-                    <!-- System -->
-                    <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
-                    <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
-                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                    <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
-                    <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
-                </Style>
-            </StackPanel.Resources>
-            <Button Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
-            <Button Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Cancel</Button>
-        </StackPanel>
-    </Grid>
+    <GroupBox Grid.Row="0" Header="Associations" Padding="0,7,0,0">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <ScrollViewer Grid.Row="0" >
+                <ItemsControl Grid.IsSharedSizeScope="True" ItemsSource="{Binding FileAssociations, Source={StaticResource ViewModel}}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition SharedSizeGroup="Extension" Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" VerticalAlignment="Center" Padding="0,0,7,0" ContentStringFormat="{}{0}:"></Label>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding IsSelected}" Content="{Binding FileAssociation.Extension, Mode=OneWay}" VerticalAlignment="Center"></CheckBox>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="This feature requires the FoxTunes.Core.Windows plugin." IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding FileAssociations.Count, Mode=OneWay, Source={StaticResource ViewModel}}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button Width="70" Height="30" Margin="0,7,7,0" Command="{Binding SelectAllCommand, Mode=OneWay, Source={StaticResource ViewModel}}">All</Button>
+                <Button Width="70" Height="30" Margin="0,7,0,0" Command="{Binding SelectNoneCommand, Mode=OneWay, Source={StaticResource ViewModel}}">None</Button>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Width="70" Height="30" Margin="0,7,7,0" Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
+                <Button Width="70" Height="30" Margin="0,7,0,0" Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Cancel</Button>
+            </StackPanel>
+        </Grid>
+    </GroupBox>
 </UserControl>
