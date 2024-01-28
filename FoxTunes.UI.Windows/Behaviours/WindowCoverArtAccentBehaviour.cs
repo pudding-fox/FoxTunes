@@ -60,7 +60,7 @@ namespace FoxTunes
             var outputStream = this.PlaybackManager.CurrentStream;
             if (outputStream == null)
             {
-                await this.Refresh(WindowExtensions.DefaultAccentColor).ConfigureAwait(false);
+                await this.OnRefresh(WindowExtensions.DefaultAccentColor).ConfigureAwait(false);
                 return;
             }
             var fileData = default(IFileData);
@@ -81,21 +81,40 @@ namespace FoxTunes
                 return;
             }
             var color = this.GetAccentColor(fileName);
-            await this.Refresh(color).ConfigureAwait(false);
+            await this.OnRefresh(color).ConfigureAwait(false);
         }
 
-        protected virtual async Task Refresh(Color color)
+        protected virtual async Task OnRefresh(Color color)
         {
             var windows = new HashSet<IntPtr>();
             foreach (var window in WindowBase.Active)
             {
                 windows.Add(window.Handle);
                 var currentColor = default(Color);
-                if (AccentColors.TryGetValue(window.Handle, out currentColor) && currentColor == color)
+                if (AccentColors.TryGetValue(window.Handle, out currentColor))
                 {
-                    continue;
+                    if (currentColor == color)
+                    {
+                        //Nothing to do.
+                        continue;
+                    }
+                    await Windows.Invoke(() =>
+                    {
+                        ColorAnimation animation = new ColorAnimation(
+                            currentColor,
+                            color,
+                            new Duration(TimeSpan.FromSeconds(1))
+                        )
+                        {
+                            EasingFunction = new QuadraticEase()
+                        };
+                        window.BeginAnimation(WindowExtensions.AccentColorProperty, animation);
+                    }).ConfigureAwait(false);
                 }
-                await this.Refresh(window, currentColor, color).ConfigureAwait(false);
+                else
+                {
+                    WindowExtensions.SetAccentColor(window, color);
+                }
                 this.AccentColors[window.Handle] = color;
             }
             foreach (var handle in AccentColors.Keys.ToArray())
@@ -105,22 +124,6 @@ namespace FoxTunes
                     AccentColors.Remove(handle);
                 }
             }
-        }
-
-        protected virtual Task Refresh(WindowBase window, Color currentColor, Color newColor)
-        {
-            return Windows.Invoke(() =>
-            {
-                ColorAnimation animation = new ColorAnimation(
-                    currentColor,
-                    newColor,
-                    new Duration(TimeSpan.FromSeconds(1))
-                )
-                {
-                    EasingFunction = new QuadraticEase()
-                };
-                window.BeginAnimation(WindowExtensions.AccentColorProperty, animation);
-            });
         }
 
         protected virtual Color GetAccentColor(string fileName)

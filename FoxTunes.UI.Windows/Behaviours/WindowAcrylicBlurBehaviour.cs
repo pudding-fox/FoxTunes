@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Media;
 
 namespace FoxTunes
@@ -21,13 +20,6 @@ namespace FoxTunes
             }
         }
 
-        public WindowAcrylicBlurBehaviour()
-        {
-            this.AccentColors = new Dictionary<IntPtr, Color>();
-        }
-
-        public IDictionary<IntPtr, Color> AccentColors { get; private set; }
-
         public Color AccentColor { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -46,10 +38,7 @@ namespace FoxTunes
                 {
                     AccentColor = value.ToColor();
                 }
-                if (this.AccentColors.Any())
-                {
-                    this.Refresh();
-                }
+                this.Refresh();
             });
         }
 
@@ -59,27 +48,8 @@ namespace FoxTunes
             foreach (var window in WindowBase.Active)
             {
                 windows.Add(window.Handle);
-                var color = default(Color);
-                if (AccentColors.TryGetValue(window.Handle, out color) && color == this.AccentColor)
-                {
-                    continue;
-                }
                 WindowExtensions.EnableAcrylicBlur(window.Handle, this.AccentColor);
-                this.AccentColors[window.Handle] = this.AccentColor;
             }
-            foreach (var handle in AccentColors.Keys.ToArray())
-            {
-                if (!windows.Contains(handle))
-                {
-                    AccentColors.Remove(handle);
-                }
-            }
-        }
-
-        protected override void OnDisabled()
-        {
-            this.AccentColors.Clear();
-            base.OnDisabled();
         }
 
         public override IEnumerable<ConfigurationSection> GetConfigurationSections()
