@@ -136,7 +136,6 @@
     <Compile Include="Tasks\AddPathsToPlaylistTask.cs" />
     <Compile Include="Tasks\BackgroundTaskRunner.cs" />
     <Compile Include="Tasks\IForegroundTaskRunner.cs" />
-    <Compile Include="Tasks\PlaylistTask.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
