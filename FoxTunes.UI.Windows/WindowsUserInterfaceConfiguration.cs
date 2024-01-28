@@ -10,6 +10,10 @@ namespace FoxTunes
 
         public const string THEME_ELEMENT = "06189DEE-1168-4D96-9355-31ECC0666820";
 
+        public const string SHOW_ARTWORK_ELEMENT = "220FCE34-1C79-4B44-A5A9-5134B503B062";
+
+        public const string SHOW_LIBRARY = "E21CDA77-129F-4988-99EC-6A21EB9096D8";
+
         public const string SYSTEM_SECTION = "FE07ADAE-393F-48E8-90E3-260F28B1189E";
 
         public const string LOGGING_ELEMENT = "6FFC8459-F9D9-44CF-A3AB-42832DB04C17";
@@ -22,7 +26,11 @@ namespace FoxTunes
                     new SelectionConfigurationElement(THEME_ELEMENT, "Theme")
                     {
                         SelectedOption = themeOptions.FirstOrDefault()
-                    }.WithOptions(() => themeOptions)
+                    }.WithOptions(() => themeOptions))
+                .WithElement(
+                    new BooleanConfigurationElement(SHOW_ARTWORK_ELEMENT, "Show Artwork").WithValue(true))
+                .WithElement(
+                    new BooleanConfigurationElement(SHOW_LIBRARY, "Show Library").WithValue(true)
             );
             yield return new ConfigurationSection(SYSTEM_SECTION, "System")
                 .WithElement(

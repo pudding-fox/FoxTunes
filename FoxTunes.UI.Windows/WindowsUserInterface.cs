@@ -35,7 +35,7 @@ namespace FoxTunes
             this.Application = new Application();
             this.Application.Exit += this.OnApplicationExit;
             this.ThemeLoader.Application = this.Application;
-            this.Application.Run(new Main() { DataContext = this.Core });
+            this.Application.Run(new MainWindow() { DataContext = this.Core });
         }
 
         protected virtual void OnApplicationExit(object sender, ExitEventArgs e)
