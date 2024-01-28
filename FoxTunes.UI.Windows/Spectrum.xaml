@@ -7,11 +7,11 @@
              xmlns:Windows="clr-namespace:FoxTunes" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" 
-             SizeChanged="OnSizeChanged" 
              Background="Transparent" 
              Foreground="{DynamicResource TextBrush}"
              SnapsToDevicePixels="True">
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static Windows:SpectrumBehaviour.CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
+    <Border Name="Border" BorderBrush="{DynamicResource NormalBorderBrush}" BorderThickness="1" Padding="1"></Border>
 </UserControl>
