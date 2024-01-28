@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -36,6 +37,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
+            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(SECTION, "Appearance")
                 .WithElement(
                     new SelectionConfigurationElement(THEME_ELEMENT, "Theme").WithOptions(GetThemeOptions()))
@@ -62,16 +64,22 @@ namespace FoxTunes
                 .WithElement(
                     new IntegerConfigurationElement(SEARCH_INTERVAL_ELEMENT, "Search Interval", path: "Advanced").WithValue(1000).WithValidationRule(new IntegerValidationRule(100, 1000, 100)))
                 .WithElement(
-                    new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS, "Show Cursor Adorners", path: "Advanced").WithValue(true)
+                    new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS, "Show Cursor Adorners", path: "Advanced").WithValue(releaseType == ReleaseType.Default)
             );
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetThemeOptions()
         {
             var themes = ComponentRegistry.Instance.GetComponents<ITheme>();
+            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             foreach (var theme in themes)
             {
-                yield return new SelectionConfigurationOption(theme.Id, theme.Name, theme.Description);
+                var option = new SelectionConfigurationOption(theme.Id, theme.Name, theme.Description);
+                if (theme.ReleaseType == releaseType)
+                {
+                    option.Default();
+                }
+                yield return option;
             }
         }
 

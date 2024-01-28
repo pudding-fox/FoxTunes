@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using FoxTunes.Interfaces;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -22,8 +23,9 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
+            var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
             yield return new ConfigurationSection(SECTION, "Spectrum")
-                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(true))
+                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(releaseType == ReleaseType.Default))
                 .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, "Bars").WithOptions(GetBarsOptions())
             );
         }

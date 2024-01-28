@@ -409,6 +409,9 @@ do
 
 	cd "./release/$target/Main"
 
+	echo "Setting the release type to minimal..";
+	sed -i 's/<add key="ReleaseType" value=".*"\/>/<add key="ReleaseType" value="Minimal"\/>/' "FoxTunes.Launcher.exe.config"
+
 	"../../../.7z/7za.exe" a "FoxTunes-$TAG-$target-Minimal.zip" "*.*" -r
 
 	mv "./FoxTunes-$TAG-$target-Minimal.zip" "../../"
@@ -425,6 +428,9 @@ do
 	done
 
 	cd "./release/$target/Main"
+
+	echo "Setting the release type to default..";
+	sed -i 's/<add key="ReleaseType" value=".*"\/>/<add key="ReleaseType" value="Default"\/>/' "FoxTunes.Launcher.exe.config"
 
 	"../../../.7z/7za.exe" a "FoxTunes-$TAG-$target.zip" "*.*" -r
 

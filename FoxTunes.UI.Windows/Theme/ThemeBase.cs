@@ -1,14 +1,16 @@
-﻿using System.IO;
+﻿using FoxTunes.Interfaces;
+using System.IO;
 
 namespace FoxTunes
 {
     public abstract class ThemeBase : StandardComponent, ITheme
     {
-        protected ThemeBase(string id, string name = null, string description = null)
+        protected ThemeBase(string id, string name = null, string description = null, ReleaseType releaseType = ReleaseType.Default)
         {
             this.Id = id;
             this.Name = name;
             this.Description = description;
+            this.ReleaseType = releaseType;
         }
 
         public string Id { get; private set; }
@@ -16,6 +18,8 @@ namespace FoxTunes
         public string Name { get; private set; }
 
         public string Description { get; private set; }
+
+        public ReleaseType ReleaseType { get; }
 
         public abstract Stream ArtworkPlaceholder { get; }
 
