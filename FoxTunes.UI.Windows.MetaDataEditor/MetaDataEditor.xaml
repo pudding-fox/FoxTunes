@@ -61,7 +61,7 @@
                                                     <Setter Property="ContentTemplate">
                                                         <Setter.Value>
                                                             <DataTemplate DataType="{x:Type LocalViewModel:MetaDataEntry}">
-                                                                <CheckBox IsChecked="{Binding Value, Converter={StaticResource StringToBooleanConverter}}" IsThreeState="True" VerticalAlignment="Center"></CheckBox>
+                                                                <CheckBox IsChecked="{Binding Value, Converter={StaticResource StringToBooleanConverter}}" VerticalAlignment="Center"></CheckBox>
                                                             </DataTemplate>
                                                         </Setter.Value>
                                                     </Setter>
