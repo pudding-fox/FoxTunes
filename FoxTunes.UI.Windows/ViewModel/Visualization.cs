@@ -8,6 +8,8 @@ namespace FoxTunes.ViewModel
     {
         public IOutput Output { get; private set; }
 
+        public IOutputDataSource OutputDataSource { get; private set; }
+
         private string _StatusMessage { get; set; }
 
         public string StatusMessage
@@ -89,9 +91,16 @@ namespace FoxTunes.ViewModel
         protected override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
-            this.Output.CanGetDataChanged += this.OnCanGetDataChanged;
+            this.Output.IsStartedChanged += this.OnIsStartedChanged;
+            this.OutputDataSource = core.Components.OutputDataSource;
+            this.OutputDataSource.CanGetDataChanged += this.OnCanGetDataChanged;
             this.Update();
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnIsStartedChanged(object sender, AsyncEventArgs e)
+        {
+            var task = Windows.Invoke(this.Update);
         }
 
         protected virtual void OnCanGetDataChanged(object sender, EventArgs e)
@@ -101,7 +110,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void Update()
         {
-            if (this.Output.IsStarted && !this.Output.CanGetData)
+            if (this.Output.IsStarted && !this.OutputDataSource.CanGetData)
             {
                 this.StatusMessage = Strings.Visualization_Unavailable;
                 this.StatusMessageDetail = Strings.Visualization_UnavailableDetail;
@@ -124,7 +133,11 @@ namespace FoxTunes.ViewModel
         {
             if (this.Output != null)
             {
-                this.Output.IsStartedChanged -= this.OnCanGetDataChanged;
+                this.Output.IsStartedChanged -= this.OnIsStartedChanged;
+            }
+            if (this.OutputDataSource != null)
+            {
+                this.OutputDataSource.CanGetDataChanged -= this.OnCanGetDataChanged;
             }
             base.OnDisposing();
         }

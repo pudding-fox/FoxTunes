@@ -59,10 +59,6 @@ namespace FoxTunes.Interfaces
 
         int GetData(float[] buffer);
 
-        float[] GetBuffer(int fftSize);
-
-        int GetData(float[] buffer, int fftSize);
-
         bool CanReset { get; }
 
         void Reset();

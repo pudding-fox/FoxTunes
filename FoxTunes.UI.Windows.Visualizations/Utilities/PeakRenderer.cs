@@ -507,7 +507,7 @@ namespace FoxTunes
                 var rate = default(int);
                 var channels = default(int);
                 var format = default(OutputStreamFormat);
-                if (!this.Renderer.Output.GetDataFormat(out rate, out channels, out format))
+                if (!this.Renderer.OutputDataSource.GetDataFormat(out rate, out channels, out format))
                 {
                     return false;
                 }
@@ -515,14 +515,14 @@ namespace FoxTunes
                 switch (this.Format)
                 {
                     case OutputStreamFormat.Short:
-                        this.SampleCount = this.Renderer.Output.GetData(this.Samples16);
+                        this.SampleCount = this.Renderer.OutputDataSource.GetData(this.Samples16);
                         for (var a = 0; a < this.SampleCount; a++)
                         {
                             this.Samples32[a] = (float)this.Samples16[a] / short.MaxValue;
                         }
                         break;
                     case OutputStreamFormat.Float:
-                        this.SampleCount = this.Renderer.Output.GetData(this.Samples32);
+                        this.SampleCount = this.Renderer.OutputDataSource.GetData(this.Samples32);
                         break;
                     default:
                         throw new NotImplementedException();
@@ -549,11 +549,11 @@ namespace FoxTunes
                 switch (format)
                 {
                     case OutputStreamFormat.Short:
-                        this.Samples16 = this.Renderer.Output.GetBuffer<short>(TimeSpan.FromMilliseconds(this.Renderer.UpdateInterval));
+                        this.Samples16 = this.Renderer.OutputDataSource.GetBuffer<short>(TimeSpan.FromMilliseconds(this.Renderer.UpdateInterval));
                         this.Samples32 = new float[this.Samples16.Length];
                         break;
                     case OutputStreamFormat.Float:
-                        this.Samples32 = this.Renderer.Output.GetBuffer<float>(TimeSpan.FromMilliseconds(this.Renderer.UpdateInterval));
+                        this.Samples32 = this.Renderer.OutputDataSource.GetBuffer<float>(TimeSpan.FromMilliseconds(this.Renderer.UpdateInterval));
                         break;
                     default:
                         throw new NotImplementedException();

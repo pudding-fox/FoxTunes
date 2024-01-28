@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -79,36 +78,5 @@ namespace FoxTunes
         public event OutputStreamEventHandler Unloaded;
 
         public abstract Task Shutdown();
-
-        public abstract bool GetOutputFormat(out int rate, out int channels, out OutputStreamFormat format);
-
-        public abstract bool GetOutputChannelMap(out IDictionary<int, OutputChannel> channels);
-
-        public abstract bool CanGetData { get; }
-
-        protected virtual void OnCanGetDataChanged()
-        {
-            if (this.CanGetDataChanged == null)
-            {
-                return;
-            }
-            this.CanGetDataChanged(this, EventArgs.Empty);
-        }
-
-        public event EventHandler CanGetDataChanged;
-
-        public abstract bool GetDataFormat(out int rate, out int channels, out OutputStreamFormat format);
-
-        public abstract bool GetDataChannelMap(out IDictionary<int, OutputChannel> channels);
-
-        public abstract T[] GetBuffer<T>(TimeSpan duration) where T : struct;
-
-        public abstract int GetData(short[] buffer);
-
-        public abstract int GetData(float[] buffer);
-
-        public abstract float[] GetBuffer(int fftSize, bool individual = false);
-
-        public abstract int GetData(float[] buffer, int fftSize, bool individual = false);
     }
 }

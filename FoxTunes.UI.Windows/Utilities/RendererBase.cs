@@ -181,7 +181,7 @@ namespace FoxTunes
 
         public ThemeLoader ThemeLoader { get; private set; }
 
-        public IOutput Output { get; private set; }
+        public IOutputDataSource OutputDataSource { get; private set; }
 
         public virtual void InitializeComponent(ICore core)
         {
@@ -199,7 +199,7 @@ namespace FoxTunes
                     }
                 });
             }
-            this.Output = core.Components.Output;
+            this.OutputDataSource = core.Components.OutputDataSource;
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)

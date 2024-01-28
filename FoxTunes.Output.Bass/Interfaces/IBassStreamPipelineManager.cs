@@ -18,5 +18,7 @@ namespace FoxTunes.Interfaces
         Task FreePipeline();
 
         event EventHandler Created;
+
+        event EventHandler Destroyed;
     }
 }

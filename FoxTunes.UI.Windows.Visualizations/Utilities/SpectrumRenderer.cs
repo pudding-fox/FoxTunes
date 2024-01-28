@@ -95,7 +95,7 @@ namespace FoxTunes
                 return false;
             }
             this.RendererData = Create(
-                this.Output,
+                this.OutputDataSource,
                 width,
                 height,
                 SpectrumConfiguration.GetBars(this.Bars.Value),
@@ -350,7 +350,7 @@ namespace FoxTunes
             UpdateElementsSmooth(data.Peaks, data.PeakElements, data.Holds, data.Width, data.Height, data.Margin, holdInterval, duration, Orientation.Vertical);
         }
 
-        public static SpectrumRendererData Create(IOutput output, int width, int height, int count, int fftSize, bool showPeaks, Color[] colors, int cutOff, float preAmp)
+        public static SpectrumRendererData Create(IOutputDataSource outputDataSource, int width, int height, int count, int fftSize, bool showPeaks, Color[] colors, int cutOff, float preAmp)
         {
             if (count > width)
             {
@@ -361,13 +361,13 @@ namespace FoxTunes
             var margin = width > (count * MARGIN_MIN) ? MARGIN_ONE : MARGIN_ZERO;
             var data = new SpectrumRendererData()
             {
-                Output = output,
+                OutputDataSource = outputDataSource,
                 Width = width,
                 Height = height,
                 Margin = margin,
                 Count = count,
                 FFTSize = fftSize,
-                Samples = output.GetBuffer(fftSize),
+                Samples = outputDataSource.GetBuffer(fftSize),
                 Values = new float[count],
                 Colors = colors,
                 CutOff = cutOff,
@@ -395,7 +395,7 @@ namespace FoxTunes
 
         public class SpectrumRendererData
         {
-            public IOutput Output;
+            public IOutputDataSource OutputDataSource;
 
             public int FFTSize;
 
@@ -438,7 +438,7 @@ namespace FoxTunes
                     var rate = default(int);
                     var channels = default(int);
                     var format = default(OutputStreamFormat);
-                    if (!this.Output.GetDataFormat(out rate, out channels, out format))
+                    if (!this.OutputDataSource.GetDataFormat(out rate, out channels, out format))
                     {
                         return false;
                     }
@@ -448,7 +448,7 @@ namespace FoxTunes
                 {
                     this.FFTRange = this.Samples.Length;
                 }
-                this.SampleCount = this.Output.GetData(this.Samples, this.FFTSize);
+                this.SampleCount = this.OutputDataSource.GetData(this.Samples, this.FFTSize);
                 return this.SampleCount > 0;
             }
         }

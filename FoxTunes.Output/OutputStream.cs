@@ -97,10 +97,6 @@ namespace FoxTunes
 
         public abstract int GetData(float[] buffer);
 
-        public abstract float[] GetBuffer(int fftSize);
-
-        public abstract int GetData(float[] buffer, int fftSize);
-
         public string Description
         {
             get

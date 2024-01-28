@@ -33,6 +33,14 @@ namespace FoxTunes
             }
         }
 
+        public IOutputDataSource OutputDataSource
+        {
+            get
+            {
+                return ComponentRegistry.Instance.GetComponent<IOutputDataSource>();
+            }
+        }
+
         public IOutputEffects OutputEffects
         {
             get
