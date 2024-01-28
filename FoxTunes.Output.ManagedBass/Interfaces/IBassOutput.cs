@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IBassOutput : IConfigurableComponent, IDisposable
+    public interface IBassOutput : IOutput, IConfigurableComponent, IDisposable
     {
         int Rate { get; }
 
@@ -11,9 +10,11 @@ namespace FoxTunes.Interfaces
 
         bool Float { get; }
 
-        void FreeStream(int channelHandle);
+        IBassStreamFactory StreamFactory { get; }
 
-        Task Shutdown();
+        IBassStreamPipeline Pipeline { get; }
+
+        void FreeStream(int channelHandle);
 
         event EventHandler Init;
 

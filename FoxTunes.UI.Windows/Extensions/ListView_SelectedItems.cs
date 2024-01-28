@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace FoxTunes.Extensions
+namespace FoxTunes
 {
     public static partial class ListViewExtensions
     {

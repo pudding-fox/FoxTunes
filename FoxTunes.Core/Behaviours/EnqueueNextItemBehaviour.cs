@@ -1,7 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 
-namespace FoxTunes.Behaviours
+namespace FoxTunes
 {
     public class EnqueueNextItemBehaviour : StandardBehaviour
     {

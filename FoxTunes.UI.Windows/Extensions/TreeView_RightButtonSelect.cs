@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace FoxTunes.Extensions
+namespace FoxTunes
 {
     public static partial class TreeViewExtensions
     {
