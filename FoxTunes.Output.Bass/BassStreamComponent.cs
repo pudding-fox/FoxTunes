@@ -24,6 +24,10 @@ namespace FoxTunes
             {
                 return 0;
             }
+            protected set
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public abstract void Connect(IBassStreamComponent previous);
