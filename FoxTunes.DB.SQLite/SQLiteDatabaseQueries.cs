@@ -23,10 +23,9 @@ namespace FoxTunes
                 //TODO: Warn, failed to parse filter.
                 filterResult = null;
             }
-            if (!string.IsNullOrEmpty(sort) && !this.SortParser.TryParse(sort, out sortResult))
+            if (string.IsNullOrEmpty(sort) || !this.SortParser.TryParse(sort, out sortResult))
             {
-                //TODO: Warn, failed to parse sort.
-                sortResult = null;
+                sortResult = SortParserResult.Default;
             }
             var template = new AddLibraryHierarchyNodeToPlaylist(this.Database, filterResult, sortResult);
             return this.Database.QueryFactory.Create(
@@ -48,10 +47,9 @@ namespace FoxTunes
                 //TODO: Warn, failed to parse filter.
                 filterResult = null;
             }
-            if (!string.IsNullOrEmpty(sort) && !this.SortParser.TryParse(sort, out sortResult))
+            if (string.IsNullOrEmpty(sort) || !this.SortParser.TryParse(sort, out sortResult))
             {
-                //TODO: Warn, failed to parse sort.
-                sortResult = null;
+                sortResult = SortParserResult.Default;
             }
             var template = new AddSearchToPlaylist(this.Database, filterResult, sortResult, limit);
             return this.Database.QueryFactory.Create(
@@ -65,10 +63,9 @@ namespace FoxTunes
         public override IDatabaseQuery SequencePlaylistItems(string sort)
         {
             var sortResult = default(ISortParserResult);
-            if (!string.IsNullOrEmpty(sort) && !this.SortParser.TryParse(sort, out sortResult))
+            if (string.IsNullOrEmpty(sort) || !this.SortParser.TryParse(sort, out sortResult))
             {
-                //TODO: Warn, failed to parse sort.
-                sortResult = null;
+                sortResult = SortParserResult.Default;
             }
             var template = new PlaylistSequenceBuilder(this.Database, sortResult);
             return this.Database.QueryFactory.Create(

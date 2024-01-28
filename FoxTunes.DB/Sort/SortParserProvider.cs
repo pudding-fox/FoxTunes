@@ -12,7 +12,10 @@ namespace FoxTunes.DB.Sort
             { nameof(CommonMetaData), CommonMetaData.Lookup },
             { nameof(CustomMetaData), CustomMetaData.Lookup },
             { nameof(CommonProperties), CommonProperties.Lookup },
-            { nameof(CommonStatistics), CommonStatistics.Lookup }
+            { nameof(CommonStatistics), CommonStatistics.Lookup },
+            { nameof(FileSystemProperties), FileSystemProperties.Lookup },
+            { nameof(ExtendedMetaData), ExtendedMetaData.Lookup },
+            { nameof(MusicBrainzMetaData), MusicBrainzMetaData.Lookup }
         };
 
         public abstract bool TryParse(string sort, out ISortParserResultExpression expression);
