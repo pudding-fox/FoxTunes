@@ -340,6 +340,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Align Bottom.
+        /// </summary>
+        internal static string UIComponentGridContainer_AlignBottom {
+            get {
+                return ResourceManager.GetString("UIComponentGridContainer.AlignBottom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Align Left.
         /// </summary>
         internal static string UIComponentGridContainer_AlignLeft {
@@ -367,6 +376,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Align Top.
+        /// </summary>
+        internal static string UIComponentGridContainer_AlignTop {
+            get {
+                return ResourceManager.GetString("UIComponentGridContainer.AlignTop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Down.
+        /// </summary>
+        internal static string UIComponentGridContainer_MoveDown {
+            get {
+                return ResourceManager.GetString("UIComponentGridContainer.MoveDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Move Left.
         /// </summary>
         internal static string UIComponentGridContainer_MoveLeft {
@@ -385,11 +412,11 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Horizontal Grid.
+        ///   Looks up a localized string similar to Move Up.
         /// </summary>
-        internal static string UIComponentGridContainer_Name {
+        internal static string UIComponentGridContainer_MoveUp {
             get {
-                return ResourceManager.GetString("UIComponentGridContainer.Name", resourceCulture);
+                return ResourceManager.GetString("UIComponentGridContainer.MoveUp", resourceCulture);
             }
         }
         
@@ -399,6 +426,15 @@ namespace FoxTunes {
         internal static string UIComponentGridContainer_Remove {
             get {
                 return ResourceManager.GetString("UIComponentGridContainer.Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Horizontal Grid.
+        /// </summary>
+        internal static string UIComponentHorizontalGridContainer_Name {
+            get {
+                return ResourceManager.GetString("UIComponentHorizontalGridContainer.Name", resourceCulture);
             }
         }
         
@@ -714,6 +750,15 @@ namespace FoxTunes {
         internal static string UIComponentTabContainer_TabName {
             get {
                 return ResourceManager.GetString("UIComponentTabContainer.TabName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vertical Grid.
+        /// </summary>
+        internal static string UIComponentVerticalGridContainer_Name {
+            get {
+                return ResourceManager.GetString("UIComponentVerticalGridContainer.Name", resourceCulture);
             }
         }
         
