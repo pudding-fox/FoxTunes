@@ -34,7 +34,16 @@ namespace FoxTunes
             {
                 ThemeLoader.ThemeChanged += this.OnThemeChanged;
             }
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
             var task = this.Refresh();
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            this.Background = null;
         }
 
         protected virtual void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
@@ -49,19 +58,22 @@ namespace FoxTunes
 
         public async Task Refresh()
         {
-            var metaDataItem = default(MetaDataItem);
+            var fileName = default(string);
             var outputStream = PlaybackManager.CurrentStream;
             if (outputStream != null)
             {
-                metaDataItem = await ArtworkProvider.Find(outputStream.PlaylistItem, ArtworkType.FrontCover).ConfigureAwait(false);
+                fileName = ArtworkProvider.Find(
+                    outputStream.PlaylistItem,
+                    ArtworkType.FrontCover
+                );
             }
-            if (metaDataItem == null || !File.Exists(metaDataItem.Value))
+            if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
             {
-                var source = default(ImageSource);
-                using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
-                {
-                    source = ImageLoader.Load(stream);
-                }
+                var source = ImageLoader.Load(
+                    ThemeLoader.Theme.Id,
+                    () => ThemeLoader.Theme.ArtworkPlaceholder,
+                    true
+                );
                 var brush = new ImageBrush(source)
                 {
                     Stretch = Stretch.Uniform
@@ -75,7 +87,13 @@ namespace FoxTunes
             }
             else
             {
-                var source = ImageLoader.Load(metaDataItem.Value, true);
+                var source = ImageLoader.Load(
+                    fileName,
+                    fileName,
+                    0,
+                    0,
+                    true
+                );
                 await Windows.Invoke(() =>
                 {
                     this.Background = new ImageBrush(source)
