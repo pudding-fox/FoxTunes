@@ -61,6 +61,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enhanced Spectrum.
+        /// </summary>
+        internal static string EnhancedSpectrum_Name {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrum.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Advanced.
         /// </summary>
         internal static string General_Advanced {
@@ -84,6 +93,15 @@ namespace FoxTunes {
         internal static string General_Bars {
             get {
                 return ResourceManager.GetString("General.Bars", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Oscilloscope.
+        /// </summary>
+        internal static string Oscilloscope_Name {
+            get {
+                return ResourceManager.GetString("Oscilloscope.Name", resourceCulture);
             }
         }
         
@@ -129,6 +147,15 @@ namespace FoxTunes {
         internal static string OscilloscopeBehaviourConfiguration_Path {
             get {
                 return ResourceManager.GetString("OscilloscopeBehaviourConfiguration.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Peak Meter.
+        /// </summary>
+        internal static string PeakMeter_Name {
+            get {
+                return ResourceManager.GetString("PeakMeter.Name", resourceCulture);
             }
         }
         
@@ -246,6 +273,15 @@ namespace FoxTunes {
         internal static string Speakers_Unknown {
             get {
                 return ResourceManager.GetString("Speakers.Unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spectrum.
+        /// </summary>
+        internal static string Spectrum_Name {
+            get {
+                return ResourceManager.GetString("Spectrum.Name", resourceCulture);
             }
         }
         

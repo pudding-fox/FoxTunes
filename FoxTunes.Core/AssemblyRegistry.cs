@@ -83,6 +83,10 @@ namespace FoxTunes
 
         public Type GetReflectionType(Type type)
         {
+            if (type.Assembly.ReflectionOnly)
+            {
+                return type;
+            }
             var assembly = this.GetOrLoadReflectionAssembly(type.Assembly.Location);
             if (assembly == null)
             {
@@ -98,6 +102,10 @@ namespace FoxTunes
 
         public Type GetExecutableType(Type type)
         {
+            if (!type.Assembly.ReflectionOnly)
+            {
+                return type;
+            }
             var assembly = this.GetOrLoadExecutableAssembly(type.Assembly.Location);
             if (assembly == null)
             {

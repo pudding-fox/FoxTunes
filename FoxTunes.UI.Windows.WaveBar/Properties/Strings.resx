@@ -144,4 +144,7 @@
   <data name="WaveBarBehaviourConfiguration.Section" xml:space="preserve">
     <value>Wave Form</value>
   </data>
+  <data name="WaveFormStreamPosition.Name" xml:space="preserve">
+    <value>Wave Form Seekbar</value>
+  </data>
 </root>

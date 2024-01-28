@@ -39,7 +39,7 @@ namespace FoxTunes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.UI.Windows.LibraryBrowser.Properties.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.UI.Windows.Ratings.Properties.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,65 +61,11 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Library Browser.
+        ///   Looks up a localized string similar to Rating.
         /// </summary>
-        internal static string LibraryBrowser_Name {
+        internal static string Rating_Name {
             get {
-                return ResourceManager.GetString("LibraryBrowser.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Image Type.
-        /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_Image {
-            get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Image", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Library Browser.
-        /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_Path {
-            get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Path", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tile Size.
-        /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_Size {
-            get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Size", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to View Type.
-        /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_View {
-            get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.View", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Grid.
-        /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_View_Grid {
-            get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.View.Grid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to List.
-        /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_View_List {
-            get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.View.List", resourceCulture);
+                return ResourceManager.GetString("Rating.Name", resourceCulture);
             }
         }
     }
