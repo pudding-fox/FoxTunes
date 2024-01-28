@@ -13,32 +13,28 @@ namespace FoxTunes
             "DataStore"
         );
 
-        public static Task Write(string id, byte[] data)
+        public static bool Exists(string id, out string fileName)
+        {
+            fileName = GetFileName(id);
+            return File.Exists(fileName);
+        }
+
+        public static Task<string> Write(string id, byte[] data)
         {
             var fileName = GetFileName(id);
             Directory.CreateDirectory(Path.GetDirectoryName(fileName));
             File.WriteAllBytes(fileName, data);
-            return Task.CompletedTask;
+            return Task.FromResult(fileName);
         }
 
-        public static async Task Write(string id, Stream stream)
+        public static async Task<string> Write(string id, Stream stream)
         {
             var fileName = GetFileName(id);
             using (var file = File.OpenWrite(fileName))
             {
                 await stream.CopyToAsync(file);
             }
-        }
-
-        public static Task<Stream> Read(string id)
-        {
-            var fileName = GetFileName(id);
-            if (!File.Exists(fileName))
-            {
-                return Task.FromResult(Stream.Null);
-            }
-            var file = File.OpenRead(fileName);
-            return Task.FromResult<Stream>(file);
+            return fileName;
         }
 
         private static IEnumerable<string> GetSegments(string id)

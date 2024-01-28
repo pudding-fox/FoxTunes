@@ -10,6 +10,7 @@ namespace FoxTunes
         {
             this.MetaDatas = new ObservableCollection<MetaDataItem>();
             this.Properties = new ObservableCollection<PropertyItem>();
+            this.Images = new ObservableCollection<ImageItem>();
         }
 
         public PlaylistItem(string fileName, IMetaDataSource metaData) : this()
@@ -17,6 +18,7 @@ namespace FoxTunes
             this.FileName = fileName;
             this.MetaDatas = metaData.MetaDatas;
             this.Properties = metaData.Properties;
+            this.Images = metaData.Images;
         }
 
         public string FileName { get; set; }
@@ -24,6 +26,8 @@ namespace FoxTunes
         public ObservableCollection<MetaDataItem> MetaDatas { get; private set; }
 
         public ObservableCollection<PropertyItem> Properties { get; private set; }
+
+        public ObservableCollection<ImageItem> Images { get; private set; }
 
         public bool Equals(PlaylistItem other)
         {

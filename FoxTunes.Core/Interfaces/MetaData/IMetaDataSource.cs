@@ -7,5 +7,7 @@ namespace FoxTunes.Interfaces
         ObservableCollection<MetaDataItem> MetaDatas { get; }
 
         ObservableCollection<PropertyItem> Properties { get; }
+
+        ObservableCollection<ImageItem> Images { get; }
     }
 }

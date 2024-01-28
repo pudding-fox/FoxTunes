@@ -11,6 +11,6 @@
         <ViewModel:Artwork x:Key="ViewModel" Core="{Binding}" ImageType="FrontCover"></ViewModel:Artwork>
     </UserControl.Resources>
     <Grid>
-        <Image Source="{Binding EmbeddedImage, Converter={StaticResource ViewModel}, Mode=OneWay, Source={StaticResource ViewModel}}"></Image>
+        <Image Source="{Binding Image.FileName, Source={StaticResource ViewModel}}"></Image>
     </Grid>
 </UserControl>

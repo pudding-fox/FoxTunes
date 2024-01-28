@@ -11,26 +11,15 @@ using System.Windows.Media.Imaging;
 
 namespace FoxTunes.ViewModel
 {
-    public class Artwork : ViewModelBase, IValueConverter
+    public class Artwork : ViewModelBase
     {
         public Artwork()
         {
-            this.EmbeddedImages = new ObservableCollection<EmbeddedImage>();
         }
 
-        public IBackgroundTaskRunner BackgroundTaskRunner { get; private set; }
-
-        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
+        public IDatabase Database { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
-
-        public ObservableCollection<EmbeddedImage> EmbeddedImages { get; private set; }
-
-        protected virtual void OnEmbeddedImagesChanged()
-        {
-            this.OnPropertyChanged("EmbeddedImages");
-            this.OnEmbeddedImageChanged();
-        }
 
         private string _ImageType { get; set; }
 
@@ -54,59 +43,62 @@ namespace FoxTunes.ViewModel
                 this.ImageTypeChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("ImageType");
-            this.OnEmbeddedImageChanged();
+            this.Refresh();
         }
 
         public event EventHandler ImageTypeChanged = delegate { };
 
-        public EmbeddedImage EmbeddedImage
+        private ImageItem _Image { get; set; }
+
+        public ImageItem Image
         {
             get
             {
-                return this.EmbeddedImages.FirstOrDefault(embeddedImage => string.Equals(embeddedImage.ImageType, this.ImageType, StringComparison.OrdinalIgnoreCase));
+                return this._Image;
+            }
+            set
+            {
+                this._Image = value;
+                this.OnImageChanged();
             }
         }
 
-        protected virtual void OnEmbeddedImageChanged()
+        protected virtual void OnImageChanged()
         {
-            this.OnPropertyChanged("EmbeddedImage");
+            if (this.ImageChanged != null)
+            {
+                this.ImageChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Image");
         }
 
-        public async Task Refresh()
+        public event EventHandler ImageChanged = delegate { };
+
+        public void Refresh()
         {
-            if (this.PlaylistManager.CurrentItem == null)
+            if (this.PlaylistManager == null)
             {
-                this.EmbeddedImages = new ObservableCollection<EmbeddedImage>();
+                this.Image = null;
                 return;
             }
-            this.EmbeddedImages = new ObservableCollection<EmbeddedImage>(
-                await this.PlaylistManager.CurrentItem.GetEmbeddedImages()
-            );
-            await this.ForegroundTaskRunner.Run(this.OnEmbeddedImagesChanged);
-        }
-
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            var embeddedImage = value as EmbeddedImage;
-            if (embeddedImage == null)
+            var playlistItem = this.PlaylistManager.CurrentItem;
+            if (playlistItem == null)
             {
-                return null;
+                this.Image = null;
+                return;
             }
-            var fileName = FileMetaDataStore.GetFileName(embeddedImage.Encode().Result);
-            return new BitmapImage(new Uri(fileName));
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
+            var query =
+                from imageItem in this.Database.GetMemberQuery<PlaylistItem, ImageItem>(playlistItem, _ => _.Images)
+                where imageItem.MetaDatas.Any(metaDataItem => metaDataItem.Name == CommonImageMetaData.Type && metaDataItem.TextValue == this.ImageType)
+                select imageItem;
+            this.Image = query.FirstOrDefault();
         }
 
         protected override void OnCoreChanged()
         {
-            this.BackgroundTaskRunner = this.Core.Components.BackgroundTaskRunner;
-            this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
+            this.Database = this.Core.Components.Database;
             this.PlaylistManager = this.Core.Managers.Playlist;
-            this.PlaylistManager.CurrentItemChanged += (sender, e) => this.BackgroundTaskRunner.Run(this.Refresh);
+            this.PlaylistManager.CurrentItemChanged += (sender, e) => this.Refresh();
             base.OnCoreChanged();
         }
 
