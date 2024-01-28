@@ -3,6 +3,7 @@ using ManagedBass;
 using ManagedBass.Mix;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -128,6 +129,14 @@ namespace FoxTunes
         public abstract void Resume();
 
         public abstract void Stop();
+
+        public virtual bool CanGetData
+        {
+            get
+            {
+                return this.GetMixerChannelHandles().Any();
+            }
+        }
 
         protected abstract IEnumerable<int> GetMixerChannelHandles();
 

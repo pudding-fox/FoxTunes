@@ -249,6 +249,12 @@
   <data name="UIComponentRole.Visualization" xml:space="preserve">
     <value>Visualization</value>
   </data>
+  <data name="Visualization.Unavailable" xml:space="preserve">
+    <value>Visualization unavailable.</value>
+  </data>
+  <data name="Visualization.UnavailableDetail" xml:space="preserve">
+    <value>Mixer is required for rendering, check your output settings.</value>
+  </data>
   <data name="VisualizationBehaviourConfiguration.FFTSize" xml:space="preserve">
     <value>FFT Size</value>
   </data>

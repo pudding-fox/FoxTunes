@@ -90,6 +90,7 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "The stream properties match the device, playing directly.");
                 BassUtils.OK(BassWasapiHandler.StreamSet(previous.ChannelHandle));
+                this.ChannelHandle = previous.ChannelHandle;
             }
             this.UpdateVolume();
         }

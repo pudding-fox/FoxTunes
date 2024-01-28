@@ -10,22 +10,26 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" 
              Foreground="{DynamicResource TextBrush}"
-             SnapsToDevicePixels="True"
              MinWidth="80"
              MinHeight="30">
     <UserControl.Resources>
         <ViewModel:BrushConverter x:Key="BrushConverter"></ViewModel:BrushConverter>
-        <LocalWindows:OscilloscopeRenderer x:Key="Renderer"
-            Core="{Binding}"                                  
-            Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Oscilloscope}}}" 
-            Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Oscilloscope}}}" 
-            Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Oscilloscope}}}"></LocalWindows:OscilloscopeRenderer>
     </UserControl.Resources>
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static LocalWindows:OscilloscopeBehaviour.CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
-    <UserControl.Background>
-        <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
-    </UserControl.Background>
-    <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
+    <Windows:Visualization>
+        <Rectangle>
+            <Rectangle.Resources>
+                <LocalWindows:OscilloscopeRenderer x:Key="Renderer"
+                    Core="{Binding}"                                  
+                    Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Oscilloscope}}}" 
+                    Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Oscilloscope}}}" 
+                    Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:Oscilloscope}}}"></LocalWindows:OscilloscopeRenderer>
+            </Rectangle.Resources>
+            <Rectangle.Fill>
+                <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+    </Windows:Visualization>
 </Windows:UIComponentBase>

@@ -166,9 +166,8 @@ namespace FoxTunes
         protected virtual void Remove(BassOutputStream stream)
         {
             var effect = default(ReplayGainEffect);
-            if (this.Effects.TryGetValue(stream, out effect))
+            if (this.Effects.TryRemove(stream, out effect))
             {
-                this.Effects.Remove(stream);
                 effect.Dispose();
             }
         }

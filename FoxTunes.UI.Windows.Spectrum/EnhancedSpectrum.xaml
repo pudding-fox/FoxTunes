@@ -11,7 +11,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" 
              Foreground="{DynamicResource TextBrush}"
-             SnapsToDevicePixels="True"
              MinWidth="180"
              MinHeight="90">
     <UserControl.Resources>
@@ -23,36 +22,37 @@
     <UserControl.ContextMenu>
         <Windows:Menu Category="{Binding Source={x:Static LocalWindows:SpectrumBehaviour.ENHANCED_CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
-    <Grid>
+    <Windows:Visualization>
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="32"></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition></RowDefinition>
-                <RowDefinition Height="32"></RowDefinition>
-            </Grid.RowDefinitions>
-            <LocalWindows:Axis Grid.Column="0" Grid.Row="0" Orientation="Vertical" Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Levels}"></LocalWindows:Axis>
-            <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" Text="dB/Hz" Foreground="{DynamicResource TextBrush}">
-                <TextBlock.RenderTransform>
-                    <RotateTransform Angle="45"/>
-                </TextBlock.RenderTransform>
-            </TextBlock>
-            <Rectangle Grid.Column="1" Grid.Row="0">
-                <Rectangle.Resources>
-                    <LocalWindows:EnhancedSpectrumRenderer x:Key="Renderer"
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="32"></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition Height="32"></RowDefinition>
+                </Grid.RowDefinitions>
+                <LocalWindows:Axis Grid.Column="0" Grid.Row="0" Orientation="Vertical" Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Levels}"></LocalWindows:Axis>
+                <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" Text="dB/Hz" Foreground="{DynamicResource TextBrush}">
+                    <TextBlock.RenderTransform>
+                        <RotateTransform Angle="45"/>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+                <Rectangle Grid.Column="1" Grid.Row="0">
+                    <Rectangle.Resources>
+                        <LocalWindows:EnhancedSpectrumRenderer x:Key="Renderer"
                         Core="{Binding}"                                  
                         Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Rectangle}}}" 
                         Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Rectangle}}}" 
                         Color="{Binding Foreground, Converter={StaticResource BrushConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type LocalWindows:EnhancedSpectrum}}}"></LocalWindows:EnhancedSpectrumRenderer>
-                </Rectangle.Resources>
-                <Rectangle.Fill>
-                    <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
-                </Rectangle.Fill>
-            </Rectangle>
-            <LocalWindows:Axis Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Bands}"></LocalWindows:Axis>
+                    </Rectangle.Resources>
+                    <Rectangle.Fill>
+                        <ImageBrush ImageSource="{Binding Bitmap, Source={StaticResource Renderer}}" Viewbox="{Binding Viewbox, Source={StaticResource Renderer}}" ViewboxUnits="Absolute"></ImageBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <LocalWindows:Axis Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Foreground="{DynamicResource TextBrush}" LabelProvider="{StaticResource Bands}"></LocalWindows:Axis>
+            </Grid>
         </Grid>
-        <Rectangle Stroke="{DynamicResource NormalBorderBrush}" StrokeThickness="1"></Rectangle>
-    </Grid>
+    </Windows:Visualization>
 </Windows:UIComponentBase>
