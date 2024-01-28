@@ -6,12 +6,9 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core}">
     <UserControl.Resources>
         <ViewModel:Settings x:Key="ViewModel" Core="{Binding}"></ViewModel:Settings>
-        <Style TargetType="{x:Type TextBlock}">
-            <Setter Property="VerticalAlignment" Value="Center"></Setter>
-        </Style>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -22,20 +19,20 @@
         <ItemsControl Grid.Row="1" Grid.IsSharedSizeScope="True" ItemsSource="{Binding Components.Configuration.Sections}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <GroupBox Header="{Binding Name}">
+                    <GroupBox Header="{Binding Name}" Padding="0,7,0,0">
                         <ItemsControl ItemsSource="{Binding Elements}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid>
+                                    <Grid Margin="0,0,0,5">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition SharedSizeGroup="Value" Width="300"></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="{Binding Name}"></TextBlock>
+                                        <Label VerticalAlignment="Center" Padding="0,0,7,0" Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
                                         <ContentControl Grid.Column="1" Content="{Binding}">
                                             <ContentControl.ContentTemplate>
                                                 <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
-                                                    <ComboBox Width="250" ItemsSource="{Binding Options}" SelectedValue="{Binding SelectedOption}" DisplayMemberPath="Name"></ComboBox>
+                                                    <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding SelectedOption}" DisplayMemberPath="Name"></ComboBox>
                                                 </DataTemplate>
                                             </ContentControl.ContentTemplate>
                                         </ContentControl>
