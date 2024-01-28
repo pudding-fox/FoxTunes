@@ -26,8 +26,10 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
             <Windows:Library></Windows:Library>
+            <Windows:Artwork Grid.Row="1"></Windows:Artwork>
             <Windows:BackgroundTasks VerticalAlignment="Bottom"></Windows:BackgroundTasks>
             <Windows:Playlist Grid.Column="1" Grid.RowSpan="2"></Windows:Playlist>
         </Grid>
