@@ -20,10 +20,10 @@ namespace FoxTunes
 
         public static readonly ConcurrentDictionary<string, SingletonReentrantTaskContainer> Instances = new ConcurrentDictionary<string, SingletonReentrantTaskContainer>();
 
-        private SingletonReentrantTask(IBackgroundTask backgroundTask, string id)
+        private SingletonReentrantTask(ICancellable cancellable, string id)
         {
-            this.BackgroundTask = backgroundTask;
-            this.BackgroundTask.CancellationRequested += this.OnCancellationRequested;
+            this.Cancellable = cancellable;
+            this.Cancellable.CancellationRequested += this.OnCancellationRequested;
             this.Instance = Instances.AddOrUpdate(id, new SingletonReentrantTaskContainer(id, this), (key, value) =>
             {
                 if (!value.Instances.Add(this))
@@ -34,19 +34,19 @@ namespace FoxTunes
             });
         }
 
-        public SingletonReentrantTask(IBackgroundTask backgroundTask, string id, byte priority, Func<CancellationToken, Task> factory) : this(backgroundTask, id, TIMEOUT, priority, factory)
+        public SingletonReentrantTask(ICancellable cancellable, string id, byte priority, Func<CancellationToken, Task> factory) : this(cancellable, id, TIMEOUT, priority, factory)
         {
 
         }
 
-        public SingletonReentrantTask(IBackgroundTask backgroundTask, string id, int timeout, byte priority, Func<CancellationToken, Task> factory) : this(backgroundTask, id)
+        public SingletonReentrantTask(ICancellable cancellable, string id, int timeout, byte priority, Func<CancellationToken, Task> factory) : this(cancellable, id)
         {
             this.Timeout = timeout;
             this.Priority = priority;
             this.Factory = factory;
         }
 
-        public IBackgroundTask BackgroundTask { get; private set; }
+        public ICancellable Cancellable { get; private set; }
 
         public SingletonReentrantTaskContainer Instance { get; private set; }
 
@@ -83,7 +83,7 @@ namespace FoxTunes
                 var success = true;
                 try
                 {
-                    if (this.BackgroundTask.IsCancellationRequested)
+                    if (this.Cancellable.IsCancellationRequested)
                     {
                         Logger.Write(this, LogLevel.Trace, "Task was cancelled.");
                         return;
@@ -144,9 +144,9 @@ namespace FoxTunes
         protected virtual void OnDisposing()
         {
             var value = default(SingletonReentrantTaskContainer);
-            if (this.BackgroundTask != null)
+            if (this.Cancellable != null)
             {
-                this.BackgroundTask.CancellationRequested -= this.OnCancellationRequested;
+                this.Cancellable.CancellationRequested -= this.OnCancellationRequested;
             }
             if (!Instances.TryGetValue(this.Instance.Id, out value) || !value.Instances.Remove(this))
             {

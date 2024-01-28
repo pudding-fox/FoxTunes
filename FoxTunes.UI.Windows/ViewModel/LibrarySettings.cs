@@ -102,12 +102,18 @@ namespace FoxTunes.ViewModel
             {
                 using (var database = this.DatabaseFactory.Create())
                 {
-                    using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                    using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
                     {
-                        var libraryHierarchies = database.Set<LibraryHierarchy>(transaction);
-                        await libraryHierarchies.RemoveAsync(libraryHierarchies.Except(this.LibraryHierarchies.ItemsSource));
-                        await libraryHierarchies.AddOrUpdateAsync(this.LibraryHierarchies.ItemsSource);
-                        transaction.Commit();
+                        using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                        {
+                            var libraryHierarchies = database.Set<LibraryHierarchy>(transaction);
+                            await libraryHierarchies.RemoveAsync(libraryHierarchies.Except(this.LibraryHierarchies.ItemsSource));
+                            await libraryHierarchies.AddOrUpdateAsync(this.LibraryHierarchies.ItemsSource);
+                            transaction.Commit();
+                        }
+                    }))
+                    {
+                        await task.Run();
                     }
                 }
                 await this.Rebuild();
@@ -203,7 +209,18 @@ namespace FoxTunes.ViewModel
             await this.Clear();
             using (var database = this.DatabaseFactory.Create())
             {
-                global::FoxTunes.HierarchyManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
+                using (var task = new SingletonReentrantTask(CancellationToken.None, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, cancellationToken =>
+                {
+                    global::FoxTunes.HierarchyManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
+#if NET40
+                    return TaskEx.FromResult(false);
+#else
+                    return Task.CompletedTask;
+#endif
+                }))
+                {
+                    await task.Run();
+                }
             }
             await this.Refresh();
         }
