@@ -116,12 +116,6 @@ namespace FoxTunes
 
         protected virtual async Task Render(SpectrogramRendererData data)
         {
-            if (!PlaybackStateNotifier.IsPlaying)
-            {
-                this.Start();
-                return;
-            }
-
             var bitmap = default(WriteableBitmap);
             var success = default(bool);
             var info = default(BitmapHelper.RenderInfo);
@@ -145,7 +139,7 @@ namespace FoxTunes
             if (!success)
             {
                 //Failed to establish lock.
-                this.Start();
+                this.Restart();
                 return;
             }
 
@@ -173,7 +167,7 @@ namespace FoxTunes
             {
                 return;
             }
-            this.Start();
+            this.Restart();
         }
 
         protected override void OnElapsed(object sender, ElapsedEventArgs e)
@@ -181,14 +175,14 @@ namespace FoxTunes
             var data = this.RendererData;
             if (data == null)
             {
-                this.Start();
+                this.Restart();
                 return;
             }
             try
             {
                 if (!data.Update())
                 {
-                    this.Start();
+                    this.Restart();
                     return;
                 }
                 UpdateValues(data);
@@ -199,7 +193,7 @@ namespace FoxTunes
             {
 #if DEBUG
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrogram data: {0}", exception.Message);
-                this.Start();
+                this.Restart();
 #else
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrogram data, disabling: {0}", exception.Message);
 #endif
