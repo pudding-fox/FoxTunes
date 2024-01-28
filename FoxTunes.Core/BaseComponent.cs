@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    [Serializable]
     public abstract class BaseComponent : IBaseComponent
     {
         protected static ILogger Logger

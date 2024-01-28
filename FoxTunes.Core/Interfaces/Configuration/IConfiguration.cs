@@ -8,7 +8,7 @@ namespace FoxTunes.Interfaces
 
         ObservableCollection<ConfigurationSection> Sections { get; }
 
-        void RegisterSection(ConfigurationSection section);
+        IConfiguration WithSection(ConfigurationSection section);
 
         void Load();
 

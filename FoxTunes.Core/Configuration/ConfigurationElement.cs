@@ -2,14 +2,20 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Runtime.Serialization;
-using System.Security.Permissions;
+using System.ComponentModel;
 
 namespace FoxTunes
 {
-    [Serializable]
-    public abstract class ConfigurationElement : BaseComponent, ISerializable
+    public abstract class ConfigurationElement : INotifyPropertyChanged
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         private ConfigurationElement()
         {
             this.IsHidden = false;
@@ -141,17 +147,9 @@ namespace FoxTunes
             }
         }
 
-        public void Update(ConfigurationElement element, bool create)
-        {
-            if (!this.GetType().IsAssignableFrom(element.GetType()))
-            {
-                //Element type was changed, cannot restore settings.
-                return;
-            }
-            this.OnUpdate(element, create);
-        }
+        public abstract void InitializeComponent();
 
-        protected abstract void OnUpdate(ConfigurationElement element, bool create);
+        public abstract void Update(ConfigurationElement element);
 
         public ConfigurationElement Hide()
         {
@@ -165,6 +163,8 @@ namespace FoxTunes
             return this;
         }
 
+        public abstract bool IsModified { get; }
+
         public ConfigurationElement DependsOn(string sectionId, string elementId)
         {
             if (this.Dependencies == null)
@@ -177,25 +177,22 @@ namespace FoxTunes
 
         public abstract void Reset();
 
-        #region ISerializable
+        public abstract string GetPersistentValue();
 
-        public abstract bool IsPersistent { get; }
+        public abstract void SetPersistentValue(string value);
 
-        protected ConfigurationElement(SerializationInfo info, StreamingContext context)
+        protected virtual void OnPropertyChanged(string propertyName)
         {
-            this.Id = info.GetString(nameof(this.Id));
+            if (this.PropertyChanged == null)
+            {
+                return;
+            }
+            this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
-        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(nameof(this.Id), this.Id);
-        }
-
-        #endregion
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 
-    [Serializable]
     public abstract class ConfigurationElement<T> : ConfigurationElement
     {
         protected ConfigurationElement(string id, string name = null, string description = null, string path = null) : base(id, name, description, path)
@@ -203,11 +200,11 @@ namespace FoxTunes
 
         }
 
-        public object DefaultValue { get; private set; }
+        public T DefaultValue { get; private set; }
 
         private T _Value { get; set; }
 
-        public T Value
+        public virtual T Value
         {
             get
             {
@@ -215,12 +212,7 @@ namespace FoxTunes
             }
             set
             {
-                if (this.DefaultValue == null)
-                {
-                    Logger.Write(this, LogLevel.Trace, "Setting default value for configuration element \"{0}\": {1}", this.Name, value);
-                    this.DefaultValue = value;
-                }
-                if (object.Equals(this.Value, value))
+                if (EqualityComparer<T>.Default.Equals(this.Value, value))
                 {
                     return;
                 }
@@ -256,7 +248,14 @@ namespace FoxTunes
                 }
                 catch (Exception exception)
                 {
-                    this.OnError(exception);
+                    Logger.Write(
+                        typeof(ConfigurationElement),
+                        LogLevel.Warn,
+                        "Failed to connect configuration value \"{0}\" = \"{1}\": {2}",
+                        this.Id,
+                        Convert.ToString(this.Value),
+                        exception.Message
+                    );
                 }
             });
             handler(this, EventArgs.Empty);
@@ -264,25 +263,55 @@ namespace FoxTunes
             return this;
         }
 
+        public override void InitializeComponent()
+        {
+            Logger.Write(typeof(ConfigurationSection), LogLevel.Trace, "Setting default value for configuration element \"{0}\": {1}", this.Name, Convert.ToString(this.Value));
+            this.DefaultValue = this.Value;
+        }
+
+        public override void Update(ConfigurationElement element)
+        {
+            if (element is ConfigurationElement<T>)
+            {
+                this.Update(element as ConfigurationElement<T>);
+            }
+        }
+
+        protected virtual void Update(ConfigurationElement<T> element)
+        {
+            if (EqualityComparer<T>.Default.Equals(element.Value, default(T)))
+            {
+                return;
+            }
+            this.Value = element.Value;
+        }
+
         public override void Reset()
         {
-            this.Value = (T)Convert.ChangeType(this.DefaultValue, typeof(T));
+            this.Value = this.DefaultValue;
         }
 
-        #region ISerializable
-
-        protected ConfigurationElement(SerializationInfo info, StreamingContext context) : base(info, context)
+        public override bool IsModified
         {
-            this.Value = (T)info.GetValue(nameof(this.Value), typeof(T));
+            get
+            {
+                if (EqualityComparer<T>.Default.Equals(this.Value, this.DefaultValue))
+                {
+                    return false;
+                }
+                return true;
+            }
         }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        public override string GetPersistentValue()
         {
-            base.GetObjectData(info, context);
-            info.AddValue(nameof(this.Value), this.Value);
+            return Convert.ToString(this.Value);
         }
 
-        #endregion
+        public override void SetPersistentValue(string value)
+        {
+            this.Value = (T)Convert.ChangeType(value, typeof(T));
+        }
     }
 
     [Flags]

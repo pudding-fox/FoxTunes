@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FoxTunes
 {
@@ -14,7 +13,7 @@ namespace FoxTunes
     {
         private static readonly string ConfigurationFileName = Path.Combine(
             Publication.StoragePath,
-            "Settings.dat"
+            "Settings.xml"
         );
 
         const int TIMEOUT = 1000;
@@ -57,7 +56,7 @@ namespace FoxTunes
 
         public ObservableCollection<ConfigurationSection> Sections { get; private set; }
 
-        public void RegisterSection(ConfigurationSection section)
+        public IConfiguration WithSection(ConfigurationSection section)
         {
             if (this.Contains(section.Id))
             {
@@ -67,9 +66,10 @@ namespace FoxTunes
             {
                 this.Add(section);
             }
+            return this;
         }
 
-        private bool Contains(string id)
+        public bool Contains(string id)
         {
             return this.GetSection(id) != null;
         }
@@ -77,7 +77,6 @@ namespace FoxTunes
         private void Add(ConfigurationSection section)
         {
             Logger.Write(this, LogLevel.Debug, "Adding configuration section: {0} => {1}", section.Id, section.Name);
-            section.Error += this.OnError;
             this.Sections.Add(section);
         }
 
@@ -85,11 +84,15 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Updating configuration section: {0} => {1}", section.Id, section.Name);
             var existing = this.GetSection(section.Id);
-            existing.Update(section, true);
+            existing.Update(section);
         }
 
         public void Load()
         {
+            foreach (var section in this.Sections)
+            {
+                section.InitializeComponent();
+            }
             if (!File.Exists(ConfigurationFileName))
             {
                 Logger.Write(this, LogLevel.Debug, "Configuration file \"{0}\" does not exist.", ConfigurationFileName);
@@ -100,26 +103,25 @@ namespace FoxTunes
             {
                 using (var stream = File.OpenRead(ConfigurationFileName))
                 {
-                    var formatter = new BinaryFormatter();
-                    var sections = (IEnumerable<ConfigurationSection>)formatter.Deserialize(stream);
+                    var sections = Serializer.Load(stream);
                     foreach (var section in sections)
                     {
-                        if (!this.Contains(section.Id))
+                        if (!this.Contains(section.Key))
                         {
                             //If config was created by a component that is no longer loaded then it will be lost here.
                             //TODO: Add the config but hide it so it's preserved but not displayed.
-                            Logger.Write(this, LogLevel.Warn, "Configuration section \"{0}\" no longer exists.", section.Id);
+                            Logger.Write(this, LogLevel.Warn, "Configuration section \"{0}\" no longer exists.", section.Key);
                             continue;
                         }
+                        var existing = this.GetSection(section.Key);
                         try
                         {
-                            Logger.Write(this, LogLevel.Debug, "Loading configuration section \"{0}\".", section.Id);
-                            var existing = this.GetSection(section.Id);
-                            existing.Update(section, false);
+                            Logger.Write(this, LogLevel.Debug, "Loading configuration section \"{0}\".", section.Key);
+                            this.Load(existing, section.Value);
                         }
                         catch (Exception e)
                         {
-                            Logger.Write(this, LogLevel.Warn, "Failed to load configuration section \"{0}\": {1}", section.Id, e.Message);
+                            Logger.Write(this, LogLevel.Warn, "Failed to load configuration section \"{0}\": {1}", existing.Id, e.Message);
                         }
                     }
                 }
@@ -130,16 +132,31 @@ namespace FoxTunes
             }
         }
 
+        protected virtual void Load(ConfigurationSection section, IEnumerable<KeyValuePair<string, string>> elements)
+        {
+            foreach (var element in elements)
+            {
+                if (!section.Contains(element.Key))
+                {
+                    //If config was created by a component that is no longer loaded then it will be lost here.
+                    //TODO: Add the config but hide it so it's preserved but not displayed.
+                    Logger.Write(this, LogLevel.Warn, "Configuration element \"{0}\" no longer exists.", element.Key);
+                    continue;
+                }
+                var existing = section.GetElement(element.Key);
+                existing.SetPersistentValue(element.Value);
+            }
+        }
+
         public void Save()
         {
             this.Debouncer.Exec(() =>
             {
                 try
                 {
-                    using (var stream = File.OpenWrite(ConfigurationFileName))
+                    using (var stream = File.Create(ConfigurationFileName))
                     {
-                        var formatter = new BinaryFormatter();
-                        formatter.Serialize(stream, this.Sections.ToArray());
+                        Serializer.Save(stream, this.Sections);
                     }
                 }
                 catch (Exception e)
