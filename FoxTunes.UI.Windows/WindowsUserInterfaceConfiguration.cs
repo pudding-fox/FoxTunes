@@ -29,7 +29,7 @@ namespace FoxTunes
 
         public const string TRANSPARENCY = "NNNN0D57-6E03-4718-ACA3-AD8199F5AC75";
 
-        public const string TRANSPARENCY_PROVIDER = "NNMME002-E835-443B-9C30-6E6530215B13";
+        public const string TRANSPARENCY_PROVIDER = "NNOOE002-E835-443B-9C30-6E6530215B13";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
