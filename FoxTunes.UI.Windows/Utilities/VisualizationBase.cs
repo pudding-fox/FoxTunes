@@ -40,13 +40,10 @@ namespace FoxTunes
 
         protected virtual void OnCanGetDataChanged(object sender, EventArgs e)
         {
+            PlaybackStateNotifier.Notify -= this.OnNotify;
             if (this.Output.CanGetData)
             {
                 PlaybackStateNotifier.Notify += this.OnNotify;
-            }
-            else
-            {
-                PlaybackStateNotifier.Notify -= this.OnNotify;
             }
             this.Update();
         }

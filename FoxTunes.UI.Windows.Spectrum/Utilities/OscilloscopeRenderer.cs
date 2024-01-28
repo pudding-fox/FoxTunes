@@ -312,16 +312,6 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            PlaybackStateNotifier.Notify -= this.OnNotify;
-            lock (this.SyncRoot)
-            {
-                if (this.Timer != null)
-                {
-                    this.Timer.Elapsed -= this.OnElapsed;
-                    this.Timer.Dispose();
-                    this.Timer = null;
-                }
-            }
             if (this.Smooth != null)
             {
                 this.Smooth.ValueChanged -= this.OnValueChanged;
@@ -330,6 +320,7 @@ namespace FoxTunes
             {
                 this.SmoothingFactor.ValueChanged -= this.OnValueChanged;
             }
+            base.OnDisposing();
         }
 
         private static void Render(BitmapHelper.RenderInfo info, OscilloscopeRendererData data)
