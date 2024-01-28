@@ -4,6 +4,7 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -269,6 +270,40 @@ namespace FoxTunes
                 }, transaction).ConfigureAwait(false);
                 transaction.Commit();
             }
+        }
+
+        public static async Task SetLibraryItemImportDate(IDatabaseComponent database, LibraryItem libraryItem, DateTime importDate)
+        {
+            using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+            {
+                await SetLibraryItemImportDate(database, libraryItem, importDate, transaction);
+                transaction.Commit();
+            }
+        }
+
+        public static async Task SetLibraryItemImportDate(IDatabaseComponent database, LibraryItem libraryItem, DateTime importDate, ITransactionSource transaction)
+        {
+            var table = database.Tables.LibraryItem;
+            var builder = database.QueryFactory.Build();
+            builder.Update.SetTable(table);
+            builder.Update.AddColumn(table.Column("ImportDate"));
+            builder.Filter.AddColumn(table.PrimaryKey);
+            //This is kind of dumb but it seems that file access times "lag" a little.
+            importDate = importDate.AddSeconds(30);
+            await database.ExecuteAsync(builder, (parameters, phase) =>
+            {
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["id"] = libraryItem.Id;
+                        parameters["importDate"] = importDate.ToString(
+                            LibraryItem.DATE_FORMAT,
+                            CultureInfo.InvariantCulture
+                        );
+                        break;
+                }
+            }, transaction);
+            libraryItem.SetImportDate(importDate);
         }
 
         public static async Task SetLibraryItemStatus(IDatabaseComponent database, int libraryItemId, LibraryItemStatus status)

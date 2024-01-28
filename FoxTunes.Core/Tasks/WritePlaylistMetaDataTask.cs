@@ -159,6 +159,13 @@ namespace FoxTunes
                             playlistItem.MetaDatas,
                             metaDataItem => this.Names == null || !this.Names.Any() || this.Names.Contains(metaDataItem.Name, true)
                         ).ConfigureAwait(false);
+
+                        //Update the import date otherwise the file might be re-scanned and changes lost.
+                        var libraryItem = new LibraryItem()
+                        {
+                            Id = playlistItem.LibraryItem_Id.Value
+                        };
+                        await LibraryTaskBase.SetLibraryItemImportDate(this.Database, libraryItem, DateTime.UtcNow);
                     }
                     catch (Exception e)
                     {
