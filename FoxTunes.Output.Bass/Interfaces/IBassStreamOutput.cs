@@ -12,6 +12,10 @@
 
         bool CheckFormat(int rate, int channels);
 
+        int GetData(short[] buffer);
+
+        int GetData(float[] buffer);
+
         int GetData(float[] buffer, int fftSize);
     }
 }

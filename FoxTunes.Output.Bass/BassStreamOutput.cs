@@ -3,7 +3,6 @@ using ManagedBass;
 using ManagedBass.Mix;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace FoxTunes
 {
@@ -133,6 +132,32 @@ namespace FoxTunes
         protected abstract IEnumerable<int> GetMixerChannelHandles();
 
         private static readonly object ChannelDataSyncRoot = new object();
+
+        public virtual int GetData(short[] buffer)
+        {
+            foreach (var channelHandle in this.GetMixerChannelHandles())
+            {
+                //Critical: BassMix.ChannelGetData will trigger an access violation in a random place if called concurrently with different buffer sizes. Yes this took a long time to work out.
+                lock (ChannelDataSyncRoot)
+                {
+                    return BassMix.ChannelGetData(channelHandle, buffer, buffer.Length);
+                }
+            }
+            return 0;
+        }
+
+        public virtual int GetData(float[] buffer)
+        {
+            foreach (var channelHandle in this.GetMixerChannelHandles())
+            {
+                //Critical: BassMix.ChannelGetData will trigger an access violation in a random place if called concurrently with different buffer sizes. Yes this took a long time to work out.
+                lock (ChannelDataSyncRoot)
+                {
+                    return BassMix.ChannelGetData(channelHandle, buffer, buffer.Length);
+                }
+            }
+            return 0;
+        }
 
         public virtual int GetData(float[] buffer, int fftSize)
         {

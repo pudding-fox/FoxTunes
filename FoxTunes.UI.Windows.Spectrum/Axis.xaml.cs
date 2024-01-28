@@ -69,7 +69,7 @@ namespace FoxTunes
 
         public Axis()
         {
-            this.LabelProvider = new RangeAxisLabelProvider();
+            this.LabelProvider = new TextAxisLabelProvider();
             this.InitializeComponent();
         }
 
@@ -201,194 +201,28 @@ namespace FoxTunes
         public event EventHandler Invalidated;
     }
 
-    public class RangeAxisLabelProvider : AxisLabelProvider
-    {
-        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register(
-            "Minimum",
-            typeof(int),
-            typeof(RangeAxisLabelProvider),
-            new PropertyMetadata(0, new PropertyChangedCallback(OnMinimumChanged))
-        );
-
-        public static int GetMinimum(RangeAxisLabelProvider source)
-        {
-            return (int)source.GetValue(MinimumProperty);
-        }
-
-        public static void SetMinimum(RangeAxisLabelProvider source, int value)
-        {
-            source.SetValue(MinimumProperty, value);
-        }
-
-        public static void OnMinimumChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var provider = sender as RangeAxisLabelProvider;
-            if (provider == null)
-            {
-                return;
-            }
-            provider.OnMinimumChanged();
-        }
-
-        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register(
-            "Maximum",
-            typeof(int),
-            typeof(RangeAxisLabelProvider),
-            new PropertyMetadata(10, new PropertyChangedCallback(OnMaximumChanged))
-        );
-
-        public static int GetMaximum(RangeAxisLabelProvider source)
-        {
-            return (int)source.GetValue(MaximumProperty);
-        }
-
-        public static void SetMaximum(RangeAxisLabelProvider source, int value)
-        {
-            source.SetValue(MaximumProperty, value);
-        }
-
-        public static void OnMaximumChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var provider = sender as RangeAxisLabelProvider;
-            if (provider == null)
-            {
-                return;
-            }
-            provider.OnMaximumChanged();
-        }
-
-        public static readonly DependencyProperty IntervalProperty = DependencyProperty.Register(
-            "Interval",
-            typeof(int),
-            typeof(RangeAxisLabelProvider),
-            new PropertyMetadata(10, new PropertyChangedCallback(OnIntervalChanged))
-        );
-
-        public static int GetInterval(RangeAxisLabelProvider source)
-        {
-            return (int)source.GetValue(IntervalProperty);
-        }
-
-        public static void SetInterval(RangeAxisLabelProvider source, int value)
-        {
-            source.SetValue(IntervalProperty, value);
-        }
-
-        public static void OnIntervalChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var provider = sender as RangeAxisLabelProvider;
-            if (provider == null)
-            {
-                return;
-            }
-            provider.OnIntervalChanged();
-        }
-
-        public RangeAxisLabelProvider()
-        {
-
-        }
-
-        public int Minimum
-        {
-            get
-            {
-                return GetMinimum(this);
-            }
-            set
-            {
-                SetMinimum(this, value);
-            }
-        }
-
-        protected virtual void OnMinimumChanged()
-        {
-            this.OnInvalidated();
-            if (this.MinimumChanged != null)
-            {
-                this.MinimumChanged(this, EventArgs.Empty);
-            }
-        }
-
-        public event EventHandler MinimumChanged;
-
-        public int Maximum
-        {
-            get
-            {
-                return GetMaximum(this);
-            }
-            set
-            {
-                SetMaximum(this, value);
-            }
-        }
-
-        protected virtual void OnMaximumChanged()
-        {
-            this.OnInvalidated();
-            if (this.MaximumChanged != null)
-            {
-                this.MaximumChanged(this, EventArgs.Empty);
-            }
-        }
-
-        public event EventHandler MaximumChanged;
-
-        public int Interval
-        {
-            get
-            {
-                return GetInterval(this);
-            }
-            set
-            {
-                SetInterval(this, value);
-            }
-        }
-
-        protected virtual void OnIntervalChanged()
-        {
-            this.OnInvalidated();
-            if (this.IntervalChanged != null)
-            {
-                this.IntervalChanged(this, EventArgs.Empty);
-            }
-        }
-
-        public event EventHandler IntervalChanged;
-
-        public override IEnumerable<string> GetLabels()
-        {
-            for (var value = this.Minimum; value <= this.Maximum; value += this.Interval)
-            {
-                yield return Convert.ToString(value);
-            }
-        }
-    }
-
-    public class FixedAxisLabelProvider : AxisLabelProvider
+    public class TextAxisLabelProvider : AxisLabelProvider
     {
         public static readonly DependencyProperty ValuesProperty = DependencyProperty.Register(
             "Values",
-            typeof(Int32Collection),
-            typeof(FixedAxisLabelProvider),
+            typeof(StringCollection),
+            typeof(TextAxisLabelProvider),
             new PropertyMetadata(null, new PropertyChangedCallback(OnValuesChanged))
         );
 
-        public static Int32Collection GetValues(FixedAxisLabelProvider source)
+        public static StringCollection GetValues(TextAxisLabelProvider source)
         {
-            return (Int32Collection)source.GetValue(ValuesProperty);
+            return (StringCollection)source.GetValue(ValuesProperty);
         }
 
-        public static void SetValues(FixedAxisLabelProvider source, Int32Collection value)
+        public static void SetValues(TextAxisLabelProvider source, StringCollection value)
         {
             source.SetValue(ValuesProperty, value);
         }
 
         public static void OnValuesChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var provider = sender as FixedAxisLabelProvider;
+            var provider = sender as TextAxisLabelProvider;
             if (provider == null)
             {
                 return;
@@ -396,12 +230,12 @@ namespace FoxTunes
             provider.OnValuesChanged();
         }
 
-        public FixedAxisLabelProvider()
+        public TextAxisLabelProvider()
         {
 
         }
 
-        public Int32Collection Values
+        public StringCollection Values
         {
             get
             {
@@ -428,18 +262,9 @@ namespace FoxTunes
         {
             if (this.Values != null)
             {
-                foreach (var value in this.Values)
-                {
-                    if (value < 1000)
-                    {
-                        yield return Convert.ToString(value);
-                    }
-                    else
-                    {
-                        yield return string.Format("{0:0.##}K", (float)value / 1000);
-                    }
-                }
+                return this.Values;
             }
+            return Enumerable.Empty<string>();
         }
     }
 }

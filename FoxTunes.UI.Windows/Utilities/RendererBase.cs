@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -487,6 +488,140 @@ namespace FoxTunes
             catch
             {
                 //Nothing can be done, never throw on GC thread.
+            }
+        }
+
+        protected static void UpdateElementsFast(float[] values, Int32Rect[] elements, int width, int height, Orientation orientation)
+        {
+            if (orientation == Orientation.Horizontal)
+            {
+                var step = height / values.Length;
+                for (var a = 0; a < values.Length; a++)
+                {
+                    var barWidth = Convert.ToInt32(values[a] * width);
+                    elements[a].X = 0;
+                    elements[a].Y = a * step;
+                    elements[a].Height = step;
+                    if (barWidth > 0)
+                    {
+                        elements[a].Width = barWidth;
+                    }
+                    else
+                    {
+                        elements[a].Width = 1;
+                    }
+                }
+            }
+            else if (orientation == Orientation.Vertical)
+            {
+                var step = width / values.Length;
+                for (var a = 0; a < values.Length; a++)
+                {
+                    var barHeight = Convert.ToInt32(values[a] * height);
+                    elements[a].X = a * step;
+                    elements[a].Width = step;
+                    if (barHeight > 0)
+                    {
+                        elements[a].Height = barHeight;
+                    }
+                    else
+                    {
+                        elements[a].Height = 1;
+                    }
+                    elements[a].Y = height - elements[a].Height;
+                }
+            }
+        }
+
+        protected static void UpdateElementsSmooth(float[] values, Int32Rect[] elements, int width, int height, int smoothing, Orientation orientation)
+        {
+            if (orientation == Orientation.Horizontal)
+            {
+                var step = height / values.Length;
+                var fast = (float)width / smoothing;
+                for (var a = 0; a < values.Length; a++)
+                {
+                    var barWidth = Math.Max(Convert.ToInt32(values[a] * width), 1);
+                    elements[a].X = 0;
+                    elements[a].Y = a * step;
+                    elements[a].Height = step;
+                    var difference = Math.Abs(elements[a].Width - barWidth);
+                    if (difference > 0)
+                    {
+                        if (difference < 2)
+                        {
+                            if (barWidth > elements[a].Width)
+                            {
+                                elements[a].Width++;
+                            }
+                            else if (barWidth < elements[a].Width)
+                            {
+                                elements[a].Width--;
+                            }
+                        }
+                        else
+                        {
+                            var distance = (float)difference / barWidth;
+                            //TODO: We should use some kind of easing function.
+                            //var increment = distance * distance * distance;
+                            //var increment = 1 - Math.Pow(1 - distance, 5);
+                            var increment = distance;
+                            var smoothed = Math.Min(Math.Max(fast * increment, 1), difference);
+                            if (barWidth > elements[a].Width)
+                            {
+                                elements[a].Width = (int)Math.Min(elements[a].Width + smoothed, width);
+                            }
+                            else if (barWidth < elements[a].Width)
+                            {
+                                elements[a].Width = (int)Math.Max(elements[a].Width - smoothed, 1);
+                            }
+                        }
+                    }
+                }
+            }
+            else if (orientation == Orientation.Vertical)
+            {
+                var step = width / values.Length;
+                var fast = (float)height / smoothing;
+                for (var a = 0; a < values.Length; a++)
+                {
+                    var barHeight = Math.Max(Convert.ToInt32(values[a] * height), 1);
+                    elements[a].X = a * step;
+                    elements[a].Width = step;
+                    var difference = Math.Abs(elements[a].Height - barHeight);
+                    if (difference > 0)
+                    {
+                        if (difference < 2)
+                        {
+                            if (barHeight > elements[a].Height)
+                            {
+                                elements[a].Height++;
+                            }
+                            else if (barHeight < elements[a].Height)
+                            {
+                                elements[a].Height--;
+                            }
+                        }
+                        else
+                        {
+                            var distance = (float)difference / barHeight;
+                            //TODO: We should use some kind of easing function.
+                            //var increment = distance * distance * distance;
+                            //var increment = 1 - Math.Pow(1 - distance, 5);
+                            var increment = distance;
+                            var smoothed = Math.Min(Math.Max(fast * increment, 1), difference);
+                            if (barHeight > elements[a].Height)
+                            {
+                                elements[a].Height = (int)Math.Min(elements[a].Height + smoothed, height);
+                            }
+                            else if (barHeight < elements[a].Height)
+                            {
+                                elements[a].Height = (int)Math.Max(elements[a].Height - smoothed, 1);
+                            }
+                        }
+                    }
+                    elements[a].Y = height - elements[a].Height;
+                }
             }
         }
     }
