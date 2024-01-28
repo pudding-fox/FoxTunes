@@ -201,9 +201,6 @@
   <data name="SpectrumBehaviourConfiguration.Crest" xml:space="preserve">
     <value>Afficher le facteur de crête</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.HighCut" xml:space="preserve">
-    <value>Coupe haute</value>
-  </data>
   <data name="SpectrumBehaviourConfiguration.Hold" xml:space="preserve">
     <value>Durée de maintien</value>
   </data>

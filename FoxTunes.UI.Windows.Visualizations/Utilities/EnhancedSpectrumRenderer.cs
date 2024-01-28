@@ -520,21 +520,6 @@ namespace FoxTunes
             }
         }
 
-        public static int IndexToFrequency(int index, int fftSize, int rate)
-        {
-            return (int)Math.Floor((double)index * (double)rate / (double)fftSize);
-        }
-
-        public static int FrequencyToIndex(int frequency, int fftSize, int rate)
-        {
-            var index = (int)Math.Floor((double)fftSize * (double)frequency / (double)rate);
-            if (index > fftSize / 2 - 1)
-            {
-                index = fftSize / 2 - 1;
-            }
-            return index;
-        }
-
         public static SpectrumRendererData Create(EnhancedSpectrumRenderer renderer, int width, int height, int[] bands, int fftSize, bool showPeaks, bool showRms, bool showCrest)
         {
             var data = new SpectrumRendererData()

@@ -18,13 +18,13 @@ namespace FoxTunes
 
         public BooleanConfigurationElement ShowPeaks { get; private set; }
 
-        public BooleanConfigurationElement HighCut { get; private set; }
-
         public BooleanConfigurationElement Smooth { get; private set; }
 
         public IntegerConfigurationElement HoldInterval { get; private set; }
 
         public TextConfigurationElement ColorPalette { get; private set; }
+
+        public IntegerConfigurationElement CutOff { get; private set; }
 
         public SelectionConfigurationElement FFTSize { get; private set; }
 
@@ -39,10 +39,6 @@ namespace FoxTunes
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.PEAKS_ELEMENT
              );
-            this.HighCut = this.Configuration.GetElement<BooleanConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.HIGH_CUT_ELEMENT
-            );
             this.Smooth = this.Configuration.GetElement<BooleanConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.SMOOTH_ELEMENT
@@ -55,6 +51,10 @@ namespace FoxTunes
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.COLOR_PALETTE_ELEMENT
             );
+            this.CutOff = this.Configuration.GetElement<IntegerConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.CUT_OFF_ELEMENT
+            );
             this.Configuration.GetElement<IntegerConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
@@ -65,10 +65,10 @@ namespace FoxTunes
             );
             this.Bars.ValueChanged += this.OnValueChanged;
             this.ShowPeaks.ValueChanged += this.OnValueChanged;
-            this.HighCut.ValueChanged += this.OnValueChanged;
             this.Smooth.ValueChanged += this.OnValueChanged;
             this.HoldInterval.ValueChanged += this.OnValueChanged;
             this.ColorPalette.ValueChanged += this.OnValueChanged;
+            this.CutOff.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
             base.InitializeComponent(core);
             var task = this.CreateBitmap();
@@ -96,8 +96,8 @@ namespace FoxTunes
                 SpectrumBehaviourConfiguration.GetBars(this.Bars.Value),
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeaks.Value,
-                this.HighCut.Value,
-                SpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Color)
+                SpectrumBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Color),
+                this.CutOff.Value
             );
             return true;
         }
@@ -223,10 +223,6 @@ namespace FoxTunes
             {
                 this.ShowPeaks.ValueChanged -= this.OnValueChanged;
             }
-            if (this.HighCut != null)
-            {
-                this.HighCut.ValueChanged -= this.OnValueChanged;
-            }
             if (this.Smooth != null)
             {
                 this.Smooth.ValueChanged -= this.OnValueChanged;
@@ -234,6 +230,14 @@ namespace FoxTunes
             if (this.HoldInterval != null)
             {
                 this.HoldInterval.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.ColorPalette != null)
+            {
+                this.ColorPalette.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.CutOff != null)
+            {
+                this.CutOff.ValueChanged -= this.OnValueChanged;
             }
             if (this.FFTSize != null)
             {
@@ -320,7 +324,7 @@ namespace FoxTunes
             }
         }
 
-        public static SpectrumRendererData Create(IOutput output, int width, int height, int count, int fftSize, bool showPeaks, bool highCut, Color[] colors)
+        public static SpectrumRendererData Create(IOutput output, int width, int height, int count, int fftSize, bool showPeaks, Color[] colors, int cutOff)
         {
             if (count > width)
             {
@@ -338,20 +342,13 @@ namespace FoxTunes
                 Samples = output.GetBuffer(fftSize),
                 Values = new float[count],
                 Colors = colors,
+                CutOff = cutOff,
                 Elements = new Int32Rect[count]
             };
             if (showPeaks)
             {
                 data.Peaks = CreatePeaks(count);
                 data.Holds = new int[count];
-            }
-            if (highCut)
-            {
-                data.FFTRange = data.Samples.Length - (data.Samples.Length / 4);
-            }
-            else
-            {
-                data.FFTRange = data.Samples.Length;
             }
             return data;
         }
@@ -388,6 +385,8 @@ namespace FoxTunes
 
             public Color[] Colors;
 
+            public int CutOff;
+
             public Int32Rect[] Elements;
 
             public Int32Rect[] Peaks;
@@ -398,6 +397,21 @@ namespace FoxTunes
 
             public bool Update()
             {
+                if (this.CutOff > 0)
+                {
+                    var rate = default(int);
+                    var channels = default(int);
+                    var format = default(OutputStreamFormat);
+                    if (!this.Output.GetDataFormat(out rate, out channels, out format))
+                    {
+                        return false;
+                    }
+                    this.FFTRange = FrequencyToIndex(this.CutOff * 1000, this.FFTSize, rate);
+                }
+                else
+                {
+                    this.FFTRange = this.Samples.Length;
+                }
                 this.SampleCount = this.Output.GetData(this.Samples, this.FFTSize);
                 return this.SampleCount > 0;
             }

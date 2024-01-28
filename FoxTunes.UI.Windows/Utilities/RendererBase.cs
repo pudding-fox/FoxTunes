@@ -375,6 +375,21 @@ namespace FoxTunes
             return 1.0f - Math.Abs(dB) / Math.Abs(DB_MIN);
         }
 
+        public static int IndexToFrequency(int index, int fftSize, int rate)
+        {
+            return (int)Math.Floor((double)index * (double)rate / (double)fftSize);
+        }
+
+        public static int FrequencyToIndex(int frequency, int fftSize, int rate)
+        {
+            var index = (int)Math.Floor((double)fftSize * (double)frequency / (double)rate);
+            if (index > fftSize / 2 - 1)
+            {
+                index = fftSize / 2 - 1;
+            }
+            return index;
+        }
+
         protected static float ToCrestFactor(float value, float rms, float offset)
         {
             return Math.Min(Math.Max((value - rms) + offset, 0), 1);

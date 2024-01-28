@@ -37,11 +37,17 @@ namespace FoxTunes
 
         public const string PEAKS_ELEMENT = "DDDD7FCF-8A71-4367-8F48-4F8D8C89739C";
 
-        public const string HIGH_CUT_ELEMENT = "DDEE2ADA-C904-4AA5-82F0-F53412EF24BD";
-
         public const string HOLD_ELEMENT = "EEEE64D9-FF15-49FB-BDF4-706958576FFC";
 
         public const string COLOR_PALETTE_ELEMENT = "FFFF957D-5AEA-4706-B6D0-9C9065E76132";
+
+        public const string CUT_OFF_ELEMENT = "GGGGA5E8-4D2D-4039-A03B-305679402052";
+
+        public const int MIN_CUT_OFF = 0;
+
+        public const int MAX_CUT_OFF = 20;
+
+        public const int DEFAULT_CUT_OFF = 10;
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -49,8 +55,8 @@ namespace FoxTunes
                 .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Bars, path: Strings.SpectrumBehaviourConfiguration_Path).WithOptions(GetBarsOptions()))
                 .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)))
                 .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.SpectrumBehaviourConfiguration_Hold, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(1000).WithValidationRule(new IntegerValidationRule(500, 5000)).DependsOn(SECTION, PEAKS_ELEMENT))
-                .WithElement(new BooleanConfigurationElement(HIGH_CUT_ELEMENT, Strings.SpectrumBehaviourConfiguration_HighCut, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrumBehaviourConfiguration_ColorPalette, path: Strings.SpectrumBehaviourConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine)
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrumBehaviourConfiguration_ColorPalette, path: Strings.SpectrumBehaviourConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
+                .WithElement(new IntegerConfigurationElement(CUT_OFF_ELEMENT, Strings.SpectrumBehaviourConfiguration_MaxFrequency, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_CUT_OFF).WithValidationRule(new IntegerValidationRule(MIN_CUT_OFF, MAX_CUT_OFF))
             );
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(
                 SECTION,

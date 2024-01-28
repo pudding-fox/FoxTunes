@@ -249,11 +249,11 @@
   <data name="SpectrumBehaviourConfiguration.ColorPalette" xml:space="preserve">
     <value>Color Palette</value>
   </data>
-  <data name="SpectrumBehaviourConfiguration.HighCut" xml:space="preserve">
-    <value>High Cut</value>
-  </data>
   <data name="SpectrumBehaviourConfiguration.Hold" xml:space="preserve">
     <value>Hold Duration</value>
+  </data>
+  <data name="SpectrumBehaviourConfiguration.MaxFrequency" xml:space="preserve">
+    <value>Max Frequency (KHz)</value>
   </data>
   <data name="SpectrumBehaviourConfiguration.Path" xml:space="preserve">
     <value>Spectrum (Basic)</value>
