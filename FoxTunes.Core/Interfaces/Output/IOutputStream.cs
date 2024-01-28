@@ -7,6 +7,8 @@ namespace FoxTunes.Interfaces
     {
         int Id { get; }
 
+        string FileName { get; }
+
         PlaylistItem PlaylistItem { get; }
 
         long Position { get; set; }

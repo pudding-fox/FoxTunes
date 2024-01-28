@@ -9,6 +9,8 @@ namespace FoxTunes
 {
     public class Log4NetLogEmitter : AppenderSkeleton, ILogEmitter
     {
+        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
+
         protected override void Append(LoggingEvent loggingEvent)
         {
             this.OnLogMessage(loggingEvent);
@@ -25,7 +27,7 @@ namespace FoxTunes
             {
                 return;
             }
-            this.LogMessage(this, new LogMessageEventArgs(new LogMessage(name, level, message)));
+            this.ForegroundTaskRunner.RunAsync(() => this.LogMessage(this, new LogMessageEventArgs(new LogMessage(name, level, message))));
         }
 
         public event LogMessageEventHandler LogMessage = delegate { };
@@ -35,12 +37,11 @@ namespace FoxTunes
             return (LogLevel)Enum.Parse(typeof(LogLevel), level.Name, true);
         }
 
-
         #region IStandardComponent
 
         public void InitializeComponent(ICore core)
         {
-            //Nothing to do.
+            this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
         }
 
         public void Interlocked(Action action)

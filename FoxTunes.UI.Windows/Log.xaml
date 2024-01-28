@@ -20,7 +20,7 @@
             </Style.Triggers>
         </Style>
     </Window.Style>
-    <ListBox ItemsSource="{Binding Messages, Source={StaticResource ViewModel}}" MinWidth="300" MinHeight="200" Margin="3,6,3,3">
+    <ListBox ItemsSource="{Binding Messages, Source={StaticResource ViewModel}}" MinWidth="300" MinHeight="200">
         <ListBox.ItemTemplate>
             <DataTemplate>
                 <TextBlock>
