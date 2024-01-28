@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -17,6 +16,10 @@ namespace FoxTunes
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IMetaDataManager MetaDataManager { get; private set; }
+
+        public IHierarchyManager HierarchyManager { get; private set; }
+
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -29,6 +32,8 @@ namespace FoxTunes
         {
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
+            this.MetaDataManager = core.Managers.MetaData;
+            this.HierarchyManager = core.Managers.Hierarchy;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -49,6 +54,7 @@ namespace FoxTunes
                 if (this.Enabled.Value)
                 {
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, PICARD, "Picard", path: "Tools");
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, PICARD, "Picard", path: "Tools");
                 }
             }
         }
@@ -58,7 +64,14 @@ namespace FoxTunes
             switch (component.Id)
             {
                 case PICARD:
-                    return this.Open();
+                    switch (component.Category)
+                    {
+                        case InvocationComponent.CATEGORY_LIBRARY:
+                            return this.OpenLibrary();
+                        case InvocationComponent.CATEGORY_PLAYLIST:
+                            return this.OpenPlaylist();
+                    }
+                    break;
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -67,32 +80,40 @@ namespace FoxTunes
 #endif
         }
 
-        protected virtual async Task Open()
+        protected virtual async Task OpenLibrary()
         {
-            var item = this.LibraryManager.SelectedItem;
-            if (item == null || LibraryHierarchyNode.Empty.Equals(item))
+            if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
             {
                 return;
             }
             //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
-            var items = this.LibraryHierarchyBrowser
+            var libraryItems = this.LibraryHierarchyBrowser
                 .GetItems(this.LibraryManager.SelectedItem, false)
                 .ToArray();
-            await this.Open(items);
-            await this.Refresh(items);
+            if (!libraryItems.Any())
+            {
+                return;
+            }
+            await this.Open(libraryItems);
+            await this.MetaDataManager.Rescan(libraryItems);
+            await this.HierarchyManager.Clear(LibraryItemStatus.Import);
+            await this.HierarchyManager.Build(LibraryItemStatus.Import);
+            await this.LibraryManager.Set(LibraryItemStatus.None);
         }
 
-        protected virtual Task Refresh(IEnumerable<LibraryItem> items)
+        protected virtual async Task OpenPlaylist()
         {
-            var roots = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var item in items)
+            if (this.PlaylistManager == null || this.PlaylistManager.SelectedItems == null)
             {
-                if (!roots.Contains(item.DirectoryName))
-                {
-                    roots.Add(item.DirectoryName);
-                }
+                return;
             }
-            return this.LibraryManager.Rescan(roots, items);
+            var playlistItems = this.PlaylistManager.SelectedItems.ToArray();
+            if (!playlistItems.Any())
+            {
+                return;
+            }
+            await this.Open(playlistItems);
+            await this.MetaDataManager.Rescan(playlistItems);
         }
 
         protected virtual Task Open(IEnumerable<IFileData> items)
@@ -105,14 +126,6 @@ namespace FoxTunes
                     builder.Append(" ");
                 }
                 builder.AppendFormat("\"{0}\"", item.FileName);
-            }
-            if (builder.Length == 0)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
             }
             var process = Process.Start(this.Path.Value, builder.ToString());
             return process.WaitForExitAsync();

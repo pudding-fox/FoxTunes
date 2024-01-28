@@ -1,22 +1,22 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class WritePlaylistMetaDataTask : BackgroundTask
+    public class RefreshLibraryMetaDataTask : BackgroundTask
     {
         const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Tag | MetaDataItemType.Image;
 
-        public const string ID = "8DB1257E-5854-4F8F-BAE3-D59A45DEE998";
+        public const string ID = "C595F0CE-9DF7-43F2-9B1A-32D2F2C97F22";
 
-        public WritePlaylistMetaDataTask(IEnumerable<PlaylistItem> playlistItems)
-            : base(ID)
+        public RefreshLibraryMetaDataTask(IEnumerable<LibraryItem> libraryItems) : base(ID)
         {
-            this.PlaylistItems = playlistItems;
+            this.LibraryItems = libraryItems;
         }
 
         public override bool Visible
@@ -35,7 +35,7 @@ namespace FoxTunes
             }
         }
 
-        public IEnumerable<PlaylistItem> PlaylistItems { get; private set; }
+        public IEnumerable<LibraryItem> LibraryItems { get; private set; }
 
         public IDatabaseComponent Database { get; private set; }
 
@@ -53,9 +53,9 @@ namespace FoxTunes
 
         protected override async Task OnStarted()
         {
-            await this.SetName("Saving meta data");
+            await this.SetName("Refreshing meta data");
             await this.SetPosition(0);
-            await this.SetCount(this.PlaylistItems.Count());
+            await this.SetCount(this.LibraryItems.Count());
             await base.OnStarted();
         }
 
@@ -65,37 +65,23 @@ namespace FoxTunes
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
             {
                 var metaDataSource = this.MetaDataSourceFactory.Create();
-                foreach (var playlistItem in this.PlaylistItems)
+                foreach (var libraryItem in this.LibraryItems)
                 {
-                    await this.SetDescription(new FileInfo(playlistItem.FileName).Name);
+                    await this.SetDescription(new FileInfo(libraryItem.FileName).Name);
                     await this.SetPosition(position);
 
-                    if (!File.Exists(playlistItem.FileName))
+                    if (!File.Exists(libraryItem.FileName))
                     {
-                        Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName);
+                        Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot refresh.", libraryItem.FileName);
                         continue;
                     }
 
-                    await metaDataSource.SetMetaData(playlistItem.FileName, playlistItem.MetaDatas);
+                    libraryItem.MetaDatas = new ObservableCollection<MetaDataItem>(
+                        await metaDataSource.GetMetaData(libraryItem.FileName)
+                    );
 
-                    foreach (var metaDataItem in playlistItem.MetaDatas.ToArray())
-                    {
-                        if (!string.IsNullOrEmpty(metaDataItem.Value))
-                        {
-                            continue;
-                        }
-                        playlistItem.MetaDatas.Remove(metaDataItem);
-                    }
-
-                    if (!playlistItem.LibraryItem_Id.HasValue)
-                    {
-                        await this.WritePlaylistMetaData(playlistItem);
-                    }
-                    else
-                    {
-                        await this.WriteLibraryMetaData(playlistItem);
-                        await LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Import);
-                    }
+                    await this.WriteLibraryMetaData(libraryItem);
+                    await LibraryTaskBase.SetLibraryItemStatus(this.Database, libraryItem.Id, LibraryItemStatus.Import);
 
                     position++;
                 }
@@ -105,34 +91,7 @@ namespace FoxTunes
             }
         }
 
-        private async Task WritePlaylistMetaData(PlaylistItem playlistItem)
-        {
-            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-            {
-                await this.Database.ExecuteAsync(this.Database.Queries.ClearPlaylistMetaDataItems, (parameters, phase) =>
-                {
-                    switch (phase)
-                    {
-                        case DatabaseParameterPhase.Fetch:
-                            parameters["itemId"] = playlistItem.Id;
-                            parameters["type"] = META_DATA_TYPE;
-                            break;
-                    }
-                }, transaction);
-
-                using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddPlaylistMetaDataItem, transaction))
-                {
-                    await writer.Write(playlistItem.Id, playlistItem.MetaDatas);
-                }
-
-                if (transaction.HasTransaction)
-                {
-                    transaction.Commit();
-                }
-            }
-        }
-
-        private async Task WriteLibraryMetaData(PlaylistItem playlistItem)
+        private async Task WriteLibraryMetaData(LibraryItem libraryItem)
         {
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
@@ -141,7 +100,7 @@ namespace FoxTunes
                     switch (phase)
                     {
                         case DatabaseParameterPhase.Fetch:
-                            parameters["itemId"] = playlistItem.LibraryItem_Id.Value;
+                            parameters["itemId"] = libraryItem.Id;
                             parameters["type"] = META_DATA_TYPE;
                             break;
                     }
@@ -149,7 +108,7 @@ namespace FoxTunes
 
                 using (var writer = new MetaDataWriter(this.Database, this.Database.Queries.AddLibraryMetaDataItem, transaction))
                 {
-                    await writer.Write(playlistItem.LibraryItem_Id.Value, playlistItem.MetaDatas);
+                    await writer.Write(libraryItem.Id, libraryItem.MetaDatas);
                 }
 
                 if (transaction.HasTransaction)
