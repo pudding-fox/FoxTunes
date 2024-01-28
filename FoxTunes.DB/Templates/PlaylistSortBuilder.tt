@@ -18,9 +18,31 @@ foreach (var expression in this.Sort.Expressions)
 #>CAST(<#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(expression.Name)) #> AS int)<#
 			break;
 		case SortParserResultOperator.NullCoalesce:
-#>CASE WHEN <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(expression.Name)) #> IS NOT NULL 
-		THEN <#= this.Database.QueryFactory.Dialect.String("1") #>
-		ELSE <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(expression.Child.Name)) #>
+			var queue = new Queue<ISortParserResultExpression>();
+			var child = expression;
+			while (child != null)
+			{
+				queue.Enqueue(child);
+				child = child.Child;
+			}
+			if (queue.Count < 2)
+			{
+				//Not enough expressions.
+				continue;
+			}
+#>CASE<#
+			while (queue.Count > 1)
+			{
+				child = queue.Dequeue();
+#>
+
+	WHEN <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(child.Name)) #> IS NOT NULL 
+		THEN <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(child.Name)) #><#
+			}
+			child = queue.Dequeue();
+#>
+
+	ELSE <#= this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn(child.Name)) #>
 END<#
 			break;
 	}

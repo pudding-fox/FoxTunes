@@ -1,7 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using NUnit.Framework;
-using System.Runtime.CompilerServices;
-using System.Runtime.Versioning;
 
 namespace FoxTunes
 {
@@ -29,7 +27,7 @@ namespace FoxTunes
         }
 
         [Test]
-        public void SortParserTest002()
+        public void SortParserTest002_A()
         {
             var sort = "CustomMetaData.VariousArtists ? CommonMetaData.Artist";
             var expected = new SortParserResult(
@@ -40,6 +38,34 @@ namespace FoxTunes
                         SortParserResultOperator.NullCoalesce,
                         new SortParserResultExpression(
                             CommonMetaData.Artist
+                        )
+                    )
+                }
+            );
+            var actual = default(ISortParserResult);
+            Assert.IsTrue(this.Core.Components.SortParser.TryParse(
+                sort,
+                out actual
+            ));
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void SortParserTest002_B()
+        {
+            var sort = "CommonMetaData.IsCompilation ? CustomMetaData.VariousArtists ? CommonMetaData.Artist";
+            var expected = new SortParserResult(
+                new[]
+                {
+                    new SortParserResultExpression(
+                        CommonMetaData.IsCompilation,
+                        SortParserResultOperator.NullCoalesce,
+                        new SortParserResultExpression(
+                            CustomMetaData.VariousArtists,
+                            SortParserResultOperator.NullCoalesce,
+                            new SortParserResultExpression(
+                                CommonMetaData.Artist
+                            )
                         )
                     )
                 }
@@ -74,7 +100,7 @@ namespace FoxTunes
         }
 
         [Test]
-        public void SortParserTest004()
+        public void SortParserTest004_A()
         {
             var sort = @"CustomMetaData.VariousArtists ? CommonMetaData.Artist
 CommonMetaData.Year
@@ -89,6 +115,52 @@ CommonMetaData.Track num";
                         SortParserResultOperator.NullCoalesce,
                         new SortParserResultExpression(
                             CommonMetaData.Artist
+                        )
+                    ),
+                    new SortParserResultExpression(
+                        CommonMetaData.Year
+                    ),
+                    new SortParserResultExpression(
+                        CommonMetaData.Album
+                    ),
+                    new SortParserResultExpression(
+                        CommonMetaData.Disc,
+                        SortParserResultOperator.Numeric
+                    ),
+                    new SortParserResultExpression(
+                        CommonMetaData.Track,
+                        SortParserResultOperator.Numeric
+                    )
+                }
+            );
+            var actual = default(ISortParserResult);
+            Assert.IsTrue(this.Core.Components.SortParser.TryParse(
+                sort,
+                out actual
+            ));
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void SortParserTest004_B()
+        {
+            var sort = @"CommonMetaData.IsCompilation ? CustomMetaData.VariousArtists ? CommonMetaData.Artist
+CommonMetaData.Year
+CommonMetaData.Album
+CommonMetaData.Disc num
+CommonMetaData.Track num";
+            var expected = new SortParserResult(
+                new[]
+                {
+                    new SortParserResultExpression(
+                        CommonMetaData.IsCompilation,
+                        SortParserResultOperator.NullCoalesce,
+                        new SortParserResultExpression(
+                            CustomMetaData.VariousArtists,
+                            SortParserResultOperator.NullCoalesce,
+                            new SortParserResultExpression(
+                                CommonMetaData.Artist
+                            )
                         )
                     ),
                     new SortParserResultExpression(

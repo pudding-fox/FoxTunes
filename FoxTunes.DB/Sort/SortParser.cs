@@ -30,10 +30,9 @@ namespace FoxTunes
                 {
                     return null;
                 }
-                var lines = sort.Split(new[]
-                {
-                    Environment.NewLine
-                }, StringSplitOptions.RemoveEmptyEntries);
+                var lines = sort.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(line => line.Trim())
+                    .ToArray();
                 var success = default(bool);
                 var expressions = new List<ISortParserResultExpression>();
                 foreach (var line in lines)
@@ -99,7 +98,9 @@ namespace FoxTunes
                 expression = default(ISortParserResultExpression);
                 return false;
             }
-            var parts = sort.Split(' ');
+            var parts = sort.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(part => part.Trim())
+                .ToArray();
             if (parts.Length != 2)
             {
                 expression = default(ISortParserResultExpression);
@@ -132,42 +133,51 @@ namespace FoxTunes
 
         public override bool TryParse(string sort, out ISortParserResultExpression expression)
         {
+            expression = default(ISortParserResultExpression);
             if (string.IsNullOrEmpty(sort))
             {
-                expression = default(ISortParserResultExpression);
                 return false;
             }
-            var parts = sort.Split(' ');
-            if (parts.Length != 3)
+            var parts = sort.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(part => part.Trim())
+                .ToArray();
+            if (parts.Length < 3)
             {
-                expression = default(ISortParserResultExpression);
                 return false;
             }
-            var name1 = default(string);
-            if (!this.TryGetName(parts[0], out name1))
+            //TODO: I absolutely hate the way this works. If we really must create DSLs we should back them with proper ASTs instead of things like ISortParserResultExpression.
+            var queue = new Queue<SortParserResultExpression>();
+            for (var a = 0; a < parts.Length; a += 2)
             {
-                expression = default(ISortParserResultExpression);
-                return false;
+                var name = default(string);
+                if (!this.TryGetName(parts[a], out name))
+                {
+                    return false;
+                }
+                var @operator = default(SortParserResultOperator);
+                if (a < parts.Length - 1)
+                {
+                    if (!Operators.TryGetValue(parts[a + 1], out @operator))
+                    {
+                        return false;
+                    }
+                }
+                queue.Enqueue(new SortParserResultExpression(name, @operator));
             }
-            var @operator = default(SortParserResultOperator);
-            if (!Operators.TryGetValue(parts[1], out @operator))
+            var parent = default(SortParserResultExpression);
+            while (queue.Count > 0)
             {
-                expression = default(ISortParserResultExpression);
-                return false;
+                var child = queue.Dequeue();
+                if (expression == null)
+                {
+                    expression = child;
+                }
+                if (parent != null)
+                {
+                    parent.Child = child;
+                }
+                parent = child;
             }
-            var name2 = default(string);
-            if (!this.TryGetName(parts[2], out name2))
-            {
-                expression = default(ISortParserResultExpression);
-                return false;
-            }
-            expression = new SortParserResultExpression(
-                name1,
-                @operator,
-                new SortParserResultExpression(
-                    name2
-                )
-            );
             return true;
         }
     }
@@ -294,7 +304,7 @@ namespace FoxTunes
 
         public SortParserResultOperator Operator { get; private set; }
 
-        public ISortParserResultExpression Child { get; private set; }
+        public ISortParserResultExpression Child { get; internal set; }
 
         public virtual bool Equals(ISortParserResultExpression other)
         {
