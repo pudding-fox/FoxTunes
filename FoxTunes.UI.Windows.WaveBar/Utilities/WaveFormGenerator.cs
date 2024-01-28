@@ -241,6 +241,8 @@ namespace FoxTunes
 
             [field: NonSerialized]
             public CancellationToken CancellationToken;
+
+            public static readonly WaveFormGeneratorData Empty = new WaveFormGeneratorData();
         }
 
         [Serializable]

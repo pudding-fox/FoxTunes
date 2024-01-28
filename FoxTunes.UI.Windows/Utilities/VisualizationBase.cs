@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Timers;
-using System.Windows.Media.Animation;
 
 namespace FoxTunes
 {
@@ -38,8 +37,14 @@ namespace FoxTunes
             this.Timer = new global::System.Timers.Timer();
             this.Timer.AutoReset = false;
             this.Timer.Elapsed += this.OnElapsed;
+            PlaybackStateNotifier.IsStartedChanged += this.OnIsStartedChanged;
             PlaybackStateNotifier.IsPlayingChanged += this.OnIsPlayingChanged;
             base.InitializeComponent(core);
+            this.Update();
+        }
+
+        protected virtual void OnIsStartedChanged(object sender, EventArgs e)
+        {
             this.Update();
         }
 
@@ -106,6 +111,7 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
+            PlaybackStateNotifier.IsStartedChanged -= this.OnIsStartedChanged;
             PlaybackStateNotifier.IsPlayingChanged -= this.OnIsPlayingChanged;
             lock (this.SyncRoot)
             {
