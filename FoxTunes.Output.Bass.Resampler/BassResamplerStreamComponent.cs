@@ -29,7 +29,30 @@ namespace FoxTunes
             }
         }
 
+        public override string Name
+        {
+            get
+            {
+                return "Resampler";
+            }
+        }
+
+        public override string Description
+        {
+            get
+            {
+                return string.Format(
+                    "{0} ({1} -> {2})",
+                    this.Name,
+                    BassUtils.RateDescription(this.InputRate),
+                    BassUtils.RateDescription(this.Rate)
+                );
+            }
+        }
+
         public BassResamplerStreamComponentBehaviour Behaviour { get; private set; }
+
+        public int InputRate { get; protected set; }
 
         public override int Rate { get; protected set; }
 
@@ -52,6 +75,7 @@ namespace FoxTunes
         public override void Connect(IBassStreamComponent previous)
         {
             Logger.Write(this, LogLevel.Debug, "Creating BASS SOX stream with rate {0} => {1} and {2} channels.", previous.Rate, this.Rate, this.Channels);
+            this.InputRate = previous.Rate;
             this.ChannelHandle = BassSox.StreamCreate(this.Rate, this.Flags, previous.ChannelHandle);
             if (this.ChannelHandle == 0)
             {

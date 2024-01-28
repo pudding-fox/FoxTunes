@@ -86,6 +86,9 @@
     <Compile Include="Playback.xaml.cs">
       <DependentUpon>Playback.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PlaybackDetails.xaml.cs">
+      <DependentUpon>PlaybackDetails.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Playlist.xaml.cs">
       <DependentUpon>Playlist.xaml</DependentUpon>
     </Compile>
@@ -198,6 +201,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Playback.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PlaybackDetails.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

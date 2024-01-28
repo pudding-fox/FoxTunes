@@ -15,7 +15,7 @@ namespace FoxTunes.Interfaces
 
         T GetComponent<T>() where T : IBaseComponent;
 
-        IEnumerable<T> GetComponents<T>() where T : IBaseComponent;
+        IEnumerable<T> GetComponents<T>();
 
         void ReplaceComponents<T>(params T[] components) where T : IBaseComponent;
 
@@ -23,7 +23,7 @@ namespace FoxTunes.Interfaces
 
         void ForEach(Action<IBaseComponent> action);
 
-        void ForEach<T>(Action<T> action) where T : IBaseComponent;
+        void ForEach<T>(Action<T> action);
 
         void Clear();
     }

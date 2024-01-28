@@ -18,7 +18,10 @@
         </Style>
     </UserControl.Resources>
     <Grid>
-        <ToggleButton IsChecked="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}">
+        <ToggleButton IsChecked="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}" ToolTipService.ShowDuration="60000">
+            <ToggleButton.ToolTip>
+                <Windows:PlaybackDetails></Windows:PlaybackDetails>
+            </ToggleButton.ToolTip>
             <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">
                 <Canvas Name="Layer_1" Width="64" Height="64">
                     <Canvas >

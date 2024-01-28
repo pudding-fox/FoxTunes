@@ -24,6 +24,28 @@ namespace FoxTunes
             }
         }
 
+        public override string Name
+        {
+            get
+            {
+                return "Gapless";
+            }
+        }
+
+        public override string Description
+        {
+            get
+            {
+                return string.Format(
+                    "{0} ({1}/{2}/{3})",
+                    this.Name,
+                    BassUtils.DepthDescription(this.Flags),
+                    BassUtils.RateDescription(this.Rate),
+                    BassUtils.ChannelDescription(this.Channels)
+                );
+            }
+        }
+
         public BassGaplessStreamInputBehaviour Behaviour { get; private set; }
 
         public override int Rate { get; protected set; }

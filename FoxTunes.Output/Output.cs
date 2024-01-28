@@ -6,6 +6,10 @@ namespace FoxTunes
 {
     public abstract class Output : StandardComponent, IOutput
     {
+        public abstract string Name { get; }
+
+        public abstract string Description { get; }
+
         private bool _IsStarted { get; set; }
 
         public bool IsStarted

@@ -2,7 +2,7 @@
 
 namespace FoxTunes.Interfaces
 {
-    public interface IConfigurableComponent
+    public interface IConfigurableComponent : IBaseComponent
     {
         IEnumerable<ConfigurationSection> GetConfigurationSections();
     }

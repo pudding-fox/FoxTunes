@@ -19,6 +19,28 @@ namespace FoxTunes
             }
         }
 
+        public override string Name
+        {
+            get
+            {
+                return "Direct Sound";
+            }
+        }
+
+        public override string Description
+        {
+            get
+            {
+                return string.Format(
+                    "{0} ({1}/{2}/{3})",
+                    this.Name,
+                    BassUtils.DepthDescription(this.Flags),
+                    BassUtils.RateDescription(this.Rate),
+                    BassUtils.ChannelDescription(this.Channels)
+                );
+            }
+        }
+
         public BassDirectSoundStreamOutputBehaviour Behaviour { get; private set; }
 
         public int Device
