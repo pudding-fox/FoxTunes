@@ -224,10 +224,13 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowCursorAdornersChanged;
 
-        public virtual void Refresh()
+        public virtual Task Refresh()
         {
-            this.OnItemsChanged();
-            this.OnSelectedItemChanged();
+            return Windows.Invoke(() =>
+            {
+                this.OnItemsChanged();
+                this.OnSelectedItemChanged();
+            });
         }
 
         public virtual Task Reload()
@@ -280,7 +283,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnFilterChanged(object sender, EventArgs e)
         {
-            this.Refresh();
+            var task = this.Refresh();
             if (!string.IsNullOrEmpty(this.LibraryHierarchyBrowser.Filter))
             {
                 this.OnSearchCompleted();
@@ -301,7 +304,7 @@ namespace FoxTunes.ViewModel
         protected virtual void OnSelectedHierarchyChanged(object sender, EventArgs e)
         {
             this.OnSelectedHierarchyChanged();
-            this.Refresh();
+            var task = this.Refresh();
         }
 
         protected virtual void OnSelectedItemChanged(object sender, EventArgs e)
