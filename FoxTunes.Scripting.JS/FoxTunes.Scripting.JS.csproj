@@ -7,17 +7,27 @@
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
     <AssemblyVersion>2.1.7.0</AssemblyVersion>
+    <Platforms>x86;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\lib\msvcp100.dll" Link="msvcp100.dll">
+  <ItemGroup Condition="'$(Platform)' == 'x86'">
+    <None Include="..\lib\x86\msvcp100.dll" Link="msvcp100.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\msvcr100.dll" Link="msvcr100.dll">
+    <None Include="..\lib\x86\msvcr100.dll" Link="msvcr100.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <None Include="..\lib\x64\msvcp100.dll" Link="msvcp100.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\msvcr100.dll" Link="msvcr100.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -34,7 +44,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
@@ -43,9 +53,15 @@
     <ProjectReference Include="..\FoxTunes.Scripting\FoxTunes.Scripting.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(Platform)' == 'x86'">
     <Reference Include="Noesis.Javascript">
-      <HintPath>../lib/Noesis.Javascript.dll</HintPath>
+      <HintPath>../lib/x86/Noesis.Javascript.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <Reference Include="Noesis.Javascript">
+      <HintPath>../lib/x64/Noesis.Javascript.dll</HintPath>
     </Reference>
   </ItemGroup>
 
@@ -53,6 +69,6 @@
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>
 
- <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
-  
+  <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
+
 </Project>

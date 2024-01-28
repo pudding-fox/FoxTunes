@@ -7,6 +7,7 @@
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
     <AssemblyVersion>2.1.7.0</AssemblyVersion>
+    <Platforms>x86;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +16,9 @@
     </Reference>
     <Reference Include="ManagedBass.Cd" Condition="'$(TargetFramework)' == 'net40'">
       <HintPath>..\lib\net40\ManagedBass.Cd.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedBass.Gapless.Cd" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\ManagedBass.Gapless.Cd.dll</HintPath>
     </Reference>
   </ItemGroup>
 
@@ -25,14 +29,29 @@
     <Reference Include="ManagedBass.Cd" Condition="'$(TargetFramework)' == 'net461'">
       <HintPath>..\lib\ManagedBass.Cd.dll</HintPath>
     </Reference>
+    <Reference Include="ManagedBass.Gapless.Cd" Condition="'$(TargetFramework)' == 'net461'">
+      <HintPath>..\lib\ManagedBass.Gapless.Cd.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\lib\basscd.dll" Link="basscd.dll">
+  <ItemGroup Condition="'$(Platform)' == 'x86'">
+    <None Include="..\lib\x86\basscd.dll" Link="basscd.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x86\bass_gapless_cd.dll" Link="bass_gapless_cd.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <None Include="..\lib\x64\basscd.dll" Link="basscd.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\bass_gapless_cd.dll" Link="bass_gapless_cd.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -50,7 +69,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ManagedBass.Gapless.Cd" Version="0.1.0"></PackageReference>
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>
 

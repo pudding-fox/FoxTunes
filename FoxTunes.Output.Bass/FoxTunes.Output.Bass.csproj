@@ -7,12 +7,13 @@
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
     <AssemblyVersion>2.1.7.0</AssemblyVersion>
+    <Platforms>x86;x64</Platforms>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net461'">
     <DefineConstants>VISTA</DefineConstants>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net40'">
       <HintPath>..\lib\net40\ManagedBass.dll</HintPath>
@@ -36,53 +37,104 @@
       <HintPath>..\lib\ManagedBass.Mix.dll</HintPath>
     </Reference>
   </ItemGroup>
-  
+
   <ItemGroup>
     <Folder Include="Addon\" />
     <Folder Include="Properties\" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="..\lib\Addon\bassalac.dll" Link="Addon\bassalac.dll">
+
+  <ItemGroup Condition="'$(Platform)' == 'x86'">
+    <None Include="..\lib\x86\bassalac.dll" Link="Addon\bassalac.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\Addon\bassdsd.dll" Link="Addon\bassdsd.dll">
+    <None Include="..\lib\x86\bassdsd.dll" Link="Addon\bassdsd.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\Addon\bassflac.dll" Link="Addon\bassflac.dll">
+    <None Include="..\lib\x86\bassflac.dll" Link="Addon\bassflac.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\Addon\bassmidi.dll" Link="Addon\bassmidi.dll">
+    <None Include="..\lib\x86\bassmidi.dll" Link="Addon\bassmidi.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\Addon\bassopus.dll" Link="Addon\bassopus.dll">
+    <None Include="..\lib\x86\bassopus.dll" Link="Addon\bassopus.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\Addon\basswma.dll" Link="Addon\basswma.dll">
+    <None Include="..\lib\x86\basswma.dll" Link="Addon\basswma.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\Addon\bass_aac.dll" Link="Addon\bass_aac.dll">
+    <None Include="..\lib\x86\bass_aac.dll" Link="Addon\bass_aac.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\Addon\bass_ac3.dll" Link="Addon\bass_ac3.dll">
+    <None Include="..\lib\x86\bass_ac3.dll" Link="Addon\bass_ac3.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\Addon\bass_ape.dll" Link="Addon\bass_ape.dll">
+    <None Include="..\lib\x86\bass_ape.dll" Link="Addon\bass_ape.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\Addon\basswv.dll" Link="Addon\basswv.dll">
+    <None Include="..\lib\x86\basswv.dll" Link="Addon\basswv.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\bass.dll" Link="bass.dll">
+    <None Include="..\lib\x86\bass.dll" Link="bass.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\bassmix.dll" Link="bassmix.dll">
+    <None Include="..\lib\x86\bassmix.dll" Link="bassmix.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\bass_fx.dll" Link="bass_fx.dll">
+    <None Include="..\lib\x86\bass_fx.dll" Link="bass_fx.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\lib\bass_inmemory_handler.dll" Link="bass_inmemory_handler.dll">
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <None Include="..\lib\x64\bassalac.dll" Link="Addon\bassalac.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\bassdsd.dll" Link="Addon\bassdsd.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\bassflac.dll" Link="Addon\bassflac.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\bassmidi.dll" Link="Addon\bassmidi.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\bassopus.dll" Link="Addon\bassopus.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\basswma.dll" Link="Addon\basswma.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\bass_aac.dll" Link="Addon\bass_aac.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\bass_ac3.dll" Link="Addon\bass_ac3.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\bass_ape.dll" Link="Addon\bass_ape.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\basswv.dll" Link="Addon\basswv.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\bass.dll" Link="bass.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\bassmix.dll" Link="bassmix.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\bass_fx.dll" Link="bass_fx.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Platform)' == 'x86'">
+    <None Include="..\lib\x86\bass_inmemory_handler.dll" Link="bass_inmemory_handler.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <None Include="..\lib\x64\bass_inmemory_handler.dll" Link="bass_inmemory_handler.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

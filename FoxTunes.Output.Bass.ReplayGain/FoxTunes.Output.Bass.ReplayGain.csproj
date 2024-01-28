@@ -6,7 +6,7 @@
     <OutputPath>..\distribution\</OutputPath>
     <OutputType>WinExe</OutputType>
     <StartupObject />
-    <Platforms>x86</Platforms>
+    <Platforms>x86;x64</Platforms>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
     <AssemblyVersion>2.1.7.0</AssemblyVersion>
@@ -19,6 +19,9 @@
     <Reference Include="ManagedBass.Fx" Condition="'$(TargetFramework)' == 'net40'">
       <HintPath>..\lib\net40\ManagedBass.Fx.dll</HintPath>
     </Reference>
+    <Reference Include="ManagedBass.ReplayGain" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\ManagedBass.ReplayGain.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -28,8 +31,23 @@
     <Reference Include="ManagedBass.Fx" Condition="'$(TargetFramework)' == 'net461'">
       <HintPath>..\lib\ManagedBass.Fx.dll</HintPath>
     </Reference>
+    <Reference Include="ManagedBass.ReplayGain" Condition="'$(TargetFramework)' == 'net461'">
+      <HintPath>..\lib\ManagedBass.ReplayGain.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
+    <ItemGroup Condition="'$(Platform)' == 'x86'">
+    <None Include="..\lib\x86\bass_replay_gain.dll" Link="bass_replay_gain.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <None Include="..\lib\x64\bass_replay_gain.dll" Link="bass_replay_gain.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
@@ -45,11 +63,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Output.Bass\FoxTunes.Output.Bass.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="ManagedBass.ReplayGain" Version="0.1.0" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>
