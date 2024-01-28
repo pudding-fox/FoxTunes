@@ -107,6 +107,10 @@ namespace FoxTunes
 
         public AsyncResult<ImageBrush> Create(LibraryHierarchyNode libraryHierarchyNode)
         {
+            if (libraryHierarchyNode == null)
+            {
+                return AsyncResult<ImageBrush>.FromValue(this.FallbackValue.Value);
+            }
             var cache = string.IsNullOrEmpty(this.LibraryHierarchyBrowser.Filter);
             if (cache)
             {

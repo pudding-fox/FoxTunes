@@ -1,4 +1,5 @@
 ﻿using FoxTunes.ViewModel;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -9,6 +10,8 @@ namespace FoxTunes
 {
     public class MouseCursorAdorner : FrameworkElement
     {
+        public static readonly ThemeLoader ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+
         public static readonly DependencyProperty TemplateProperty = DependencyProperty.Register(
             "Template",
             typeof(DataTemplate),
@@ -33,12 +36,18 @@ namespace FoxTunes
             {
                 return;
             }
-            adorner.OnTemplatePropertyChanged();
+            adorner.OnTemplateChanged();
         }
 
         public MouseCursorAdorner()
         {
+            ThemeLoader.ThemeChanged += this.OnThemeChanged;
             this.DataContextChanged += this.OnDataContextChanged;
+        }
+
+        protected virtual void OnThemeChanged(object sender, EventArgs e)
+        {
+            this.Adorner = null;
         }
 
         protected virtual void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -49,10 +58,21 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnTemplatePropertyChanged()
+        public DataTemplate Template
         {
-            this.Adorner = new InternalMouseCursorAdorner(this, GetTemplate(this));
-            this.Adorner.ContentControl.Content = this.DataContext;
+            get
+            {
+                return GetTemplate(this);
+            }
+            set
+            {
+                SetTemplate(this, value);
+            }
+        }
+
+        protected virtual void OnTemplateChanged()
+        {
+            this.Adorner = null;
         }
 
         private InternalMouseCursorAdorner Adorner { get; set; }
@@ -73,9 +93,19 @@ namespace FoxTunes
             }
         }
 
+        public void Create()
+        {
+            this.Adorner = new InternalMouseCursorAdorner(this, GetTemplate(this));
+            this.Adorner.ContentControl.Content = this.DataContext;
+        }
+
         public void Show()
         {
-            if (this.Adorner == null || this.Adorner.Parent != null)
+            if (this.Adorner == null)
+            {
+                this.Create();
+            }
+            else if (this.Adorner.Parent != null)
             {
                 return;
             }

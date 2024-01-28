@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,19 +10,28 @@ namespace FoxTunes
     {
         public const string REFRESH_IMAGES = "ZAAA";
 
+        public ThemeLoader ThemeLoader { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
+            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+            this.ThemeLoader.ThemeChanged += this.OnThemeChanged;
+            this.SignalEmitter = core.Components.SignalEmitter;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<DoubleConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             ).ConnectValue(value => this.Dispatch(this.RefreshImages));
-            this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnThemeChanged(object sender, EventArgs e)
+        {
+            this.Dispatch(this.RefreshImages);
         }
 
         public IEnumerable<IInvocationComponent> Invocations
@@ -49,6 +59,45 @@ namespace FoxTunes
         private Task RefreshImages()
         {
             return this.SignalEmitter.Send(new Signal(this, CommonSignals.PluginInvocation, REFRESH_IMAGES));
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.ThemeLoader != null)
+            {
+                this.ThemeLoader.ThemeChanged += this.OnThemeChanged;
+            }
+        }
+
+        ~ImageBehaviour()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }

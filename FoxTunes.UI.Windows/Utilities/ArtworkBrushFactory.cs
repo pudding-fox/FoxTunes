@@ -101,6 +101,10 @@ namespace FoxTunes
 
         public AsyncResult<ImageBrush> Create(string fileName, int width, int height)
         {
+            if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
+            {
+                return AsyncResult<ImageBrush>.FromValue(this.FallbackValue.Value);
+            }
             var brush = default(ImageBrush);
             if (this.Store.TryGetValue(fileName, out brush))
             {
@@ -112,10 +116,6 @@ namespace FoxTunes
             }
             return new AsyncResult<ImageBrush>(this.FallbackValue.Value, this.Factory.StartNew(() =>
             {
-                if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
-                {
-                    return this.FallbackValue.Value;
-                }
                 return this.Store.GetOrAdd(
                     fileName,
                     () => this.Create(fileName, true)
