@@ -28,6 +28,7 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
+            var refreshPlaylist = default(bool);
             foreach (var playlistItem in this.PlaylistItems)
             {
                 lock (playlistItem.MetaDatas)
@@ -39,12 +40,17 @@ namespace FoxTunes
                     {
                         metaDataItem = new MetaDataItem(CommonMetaData.Rating, MetaDataItemType.Tag);
                         playlistItem.MetaDatas.Add(metaDataItem);
+                        refreshPlaylist = true;
                     }
                     metaDataItem.Value = Convert.ToString(this.Rating);
                 }
             }
-            //Send a soft playlist update so the list refreshes, this makes the task seem more responsive.
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, CommonSignalFlags.SOFT)).ConfigureAwait(false);
+            if (refreshPlaylist)
+            {
+                //We only need to refresh if a meta data entry was created rather than updated as the view model monitors the values.
+                //Send a soft playlist update so the list refreshes, this makes the task seem more responsive.
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, CommonSignalFlags.SOFT)).ConfigureAwait(false);
+            }
             await this.MetaDataManager.Save(this.PlaylistItems, true, CommonMetaData.Rating).ConfigureAwait(false);
         }
     }
