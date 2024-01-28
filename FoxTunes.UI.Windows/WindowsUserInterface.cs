@@ -64,12 +64,15 @@ namespace FoxTunes
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IEnumerable<IFileActionHandler> FileActionHandlers { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.Output = core.Components.Output;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.PlaylistManager = core.Managers.Playlist;
+            this.FileActionHandlers = ComponentRegistry.Instance.GetComponents<IFileActionHandler>();
             base.InitializeComponent(core);
         }
 
@@ -102,7 +105,7 @@ namespace FoxTunes
             });
         }
 
-        public override void Run(string message)
+        public override async void Run(string message)
         {
             var mode = default(CommandLineParser.OpenMode);
             var paths = default(IEnumerable<string>);
@@ -116,6 +119,16 @@ namespace FoxTunes
                 if (Directory.Exists(path) || this.Output.IsSupported(path))
                 {
                     this.Queue.Enqueue(path);
+                }
+                else
+                {
+                    foreach (var fileActionHandler in this.FileActionHandlers)
+                    {
+                        if (await fileActionHandler.Handle(path))
+                        {
+                            break;
+                        }
+                    }
                 }
             }
         }
