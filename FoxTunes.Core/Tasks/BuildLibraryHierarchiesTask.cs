@@ -88,8 +88,8 @@ namespace FoxTunes
                 query =
                     from libraryItem in libraryItems
                     select new LibraryHierarchyItem(
-                        this.ExecuteScript(libraryItem, libraryHierarchyLevel.DisplayScript), 
-                        this.ExecuteScript(libraryItem, libraryHierarchyLevel.SortScript), 
+                        this.ExecuteScript(libraryItem, libraryHierarchyLevel.DisplayScript),
+                        this.ExecuteScript(libraryItem, libraryHierarchyLevel.SortScript),
                         isLeaf
                     )
                     {
@@ -97,7 +97,7 @@ namespace FoxTunes
                         Items = new ObservableCollection<LibraryItem>(new[] { libraryItem })
                     };
             }
-            var libraryHierarchyItems = query.ToList();
+            var libraryHierarchyItems = this.OrderBy(query).ToList();
             if (!isLeaf)
             {
                 foreach (var libraryHierarchyItem in libraryHierarchyItems)
@@ -112,6 +112,15 @@ namespace FoxTunes
                 this.Position = this.Position + libraryHierarchyItems.Count;
             }
             return libraryHierarchyItems;
+        }
+
+        private IEnumerable<LibraryHierarchyItem> OrderBy(IEnumerable<LibraryHierarchyItem> libraryHierarchyItems)
+        {
+            var query =
+                from libraryHierarchyItem in libraryHierarchyItems
+                orderby libraryHierarchyItem.SortValue, libraryHierarchyItem.DisplayValue
+                select libraryHierarchyItem;
+            return query;
         }
 
         private Task SaveChanges()

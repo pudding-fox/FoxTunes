@@ -61,6 +61,36 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BEGIN TRANSACTION;
+        ///CREATE TABLE &quot;StatisticItems&quot; (
+        ///	`Id`	INTEGER NOT NULL,
+        ///	`Name`	text NOT NULL,
+        ///	`NumericValue`	INTEGER,
+        ///	`TextValue`	text,
+        ///	PRIMARY KEY(`Id`)
+        ///);
+        ///CREATE TABLE &quot;PropertyItems&quot; (
+        ///	`Id`	INTEGER NOT NULL,
+        ///	`Name`	text NOT NULL,
+        ///	`NumericValue`	INTEGER,
+        ///	`TextValue`	text,
+        ///	PRIMARY KEY(`Id`)
+        ///);
+        ///CREATE TABLE [PlaylistItems] ( 
+        ///  [Id] INTEGER NOT NULL 
+        ///, [FileName] TEXT NOT NULL 
+        ///, CONSTRAINT [PK_PlaylistItems] PRIMARY KEY ([Id]) 
+        ///);
+        ///CREATE TABLE [PlaylistItem_PropertyItem] ( 
+        ///  [Id] INTEGER NOT N [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Database {
+            get {
+                return ResourceManager.GetString("Database", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
         internal static byte[] SQLite_Interop_x64 {
