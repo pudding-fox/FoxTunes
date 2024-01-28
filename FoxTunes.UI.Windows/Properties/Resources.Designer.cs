@@ -134,6 +134,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Scripting {
+            get {
+                return ResourceManager.GetString("Scripting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;ControlTemplate
         ///    xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
         ///    xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
@@ -144,7 +153,7 @@ namespace FoxTunes {
         ///            &lt;RowDefinition Height=&quot;Auto&quot;&gt;&lt;/RowDefinition&gt;
         ///            &lt;RowDefinition&gt;&lt;/RowDefinition&gt;
         ///        &lt;/Grid.RowDefinitions&gt;
-        ///        &lt;Windows:Titlebar&gt;&lt;/Windo [rest of string was truncated]&quot;;.
+        ///        &lt;Windows:Titlebar&gt;&lt;/Wind [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string WindowBase {
             get {

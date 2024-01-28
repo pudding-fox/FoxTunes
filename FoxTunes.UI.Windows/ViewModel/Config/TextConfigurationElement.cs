@@ -1,5 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -51,6 +53,7 @@ namespace FoxTunes.ViewModel.Config
         {
             this.OnIsMultilineChanged();
             this.OnCanBrowseChanged();
+            this.OnCanHelpChanged();
             if (this.ElementChanged != null)
             {
                 this.ElementChanged(this, EventArgs.Empty);
@@ -189,6 +192,51 @@ namespace FoxTunes.ViewModel.Config
                 return;
             }
             this.Element.Value = result.Paths.FirstOrDefault();
+        }
+
+        public ICommand HelpCommand
+        {
+            get
+            {
+                return new Command(this.Help, () => this.CanHelp);
+            }
+        }
+
+        public bool CanHelp
+        {
+            get
+            {
+                if (this.Element == null)
+                {
+                    return false;
+                }
+                if (this.Element.Flags.HasFlag(ConfigurationElementFlags.Script))
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        protected virtual void OnCanHelpChanged()
+        {
+            if (this.CanHelpChanged != null)
+            {
+                this.CanHelpChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("CanHelp");
+        }
+
+        public event EventHandler CanHelpChanged;
+
+        public void Help()
+        {
+            var fileName = Path.Combine(
+                Path.GetTempPath(),
+                "Scripting.txt"
+            );
+            File.WriteAllText(fileName, Resources.Scripting);
+            Process.Start(fileName);
         }
 
         protected override Freezable CreateInstanceCore()

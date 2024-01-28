@@ -12,7 +12,7 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(
-                    new TextConfigurationElement(WINDOW_TITLE_SCRIPT_ELEMENT, "Window Title Script", path: "Advanced").WithValue(Resources.NowPlaying).WithFlags(ConfigurationElementFlags.MultiLine)
+                    new TextConfigurationElement(WINDOW_TITLE_SCRIPT_ELEMENT, "Window Title Script", path: "Advanced").WithValue(Resources.NowPlaying).WithFlags(ConfigurationElementFlags.Script)
             );
         }
     }
