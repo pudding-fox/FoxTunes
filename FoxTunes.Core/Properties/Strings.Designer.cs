@@ -268,6 +268,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Folder.
+        /// </summary>
+        internal static string MetaDataBehaviourConfiguration_Folder {
+            get {
+                return ResourceManager.GetString("MetaDataBehaviourConfiguration.Folder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Front Cover.
         /// </summary>
         internal static string MetaDataBehaviourConfiguration_FrontCover {

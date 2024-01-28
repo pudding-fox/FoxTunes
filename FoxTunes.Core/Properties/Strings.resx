@@ -186,6 +186,9 @@
   <data name="MetaDataBehaviourConfiguration.FileSystem" xml:space="preserve">
     <value>Filesystem</value>
   </data>
+  <data name="MetaDataBehaviourConfiguration.Folder" xml:space="preserve">
+    <value>Folder</value>
+  </data>
   <data name="MetaDataBehaviourConfiguration.FrontCover" xml:space="preserve">
     <value>Front Cover</value>
   </data>

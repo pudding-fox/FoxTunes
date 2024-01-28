@@ -18,6 +18,8 @@ namespace FoxTunes
 
         public const string LOOSE_IMAGES_BACK = "EEEEADD6-BCB5-4E5D-830E-242B8557E5CB";
 
+        public const string LOOSE_IMAGES_FOLDER = "EEFFCABF-0B44-4F19-860F-A5B97050885A";
+
         public const string IMAGES_PREFERENCE_EMBEDDED = "AAAA9180-7C4E-4038-8BA8-60D3516E64E8";
 
         public const string IMAGES_PREFERENCE_LOOSE = "BBBB2170-3E86-4255-9BC6-EF31D870741E";
@@ -67,6 +69,8 @@ namespace FoxTunes
                     new TextConfigurationElement(LOOSE_IMAGES_FRONT, Strings.MetaDataBehaviourConfiguration_FrontCover, path: Strings.General_Advanced).WithValue("front, cover, folder").DependsOn(SECTION, READ_LOOSE_IMAGES))
                 .WithElement(
                     new TextConfigurationElement(LOOSE_IMAGES_BACK, Strings.MetaDataBehaviourConfiguration_BackCover, path: Strings.General_Advanced).WithValue("back").DependsOn(SECTION, READ_LOOSE_IMAGES))
+                .WithElement(
+                    new TextConfigurationElement(LOOSE_IMAGES_FOLDER, Strings.MetaDataBehaviourConfiguration_Folder, path: Strings.General_Advanced).WithValue("covers").DependsOn(SECTION, READ_LOOSE_IMAGES))
                 .WithElement(
                     new SelectionConfigurationElement(IMAGES_PREFERENCE, Strings.MetaDataBehaviourConfiguration_Preference, path: Strings.General_Advanced).WithOptions(GetImagesPreferenceOptions()).DependsOn(SECTION, READ_EMBEDDED_IMAGES).DependsOn(SECTION, READ_LOOSE_IMAGES))
                 .WithElement(
