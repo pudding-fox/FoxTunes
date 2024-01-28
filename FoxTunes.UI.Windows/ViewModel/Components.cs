@@ -87,12 +87,12 @@ namespace FoxTunes.ViewModel
                 {
                     foreach (var innerException in (backgroundTask.Exception as AggregateException).InnerExceptions)
                     {
-                        await this.Add(new ComponentError(backgroundTask, backgroundTask.Name, innerException));
+                        await this.Add(new ComponentError(backgroundTask, innerException.Message, innerException));
                     }
                 }
                 else
                 {
-                    await this.Add(new ComponentError(backgroundTask, backgroundTask.Name, backgroundTask.Exception));
+                    await this.Add(new ComponentError(backgroundTask, backgroundTask.Exception.Message, backgroundTask.Exception));
                 }
             }
         }
