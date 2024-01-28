@@ -16,6 +16,15 @@ namespace FoxTunes
 
         public static readonly object SyncRoot = new object();
 
+        public static bool Contains(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return false;
+            }
+            return fileName.StartsWith(DataStoreDirectoryName, StringComparison.OrdinalIgnoreCase);
+        }
+
         public static bool Exists(string prefix, string id, out string fileName)
         {
             fileName = GetFileName(prefix, id);

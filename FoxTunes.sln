@@ -84,6 +84,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bass_inmemory_handler_dsd", "bass_inmemory_handler_dsd\bass_dsd_inmemory_handler.vcxproj", "{530C8EC7-66B4-4A17-9BF4-001193151FDA}"
 EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
