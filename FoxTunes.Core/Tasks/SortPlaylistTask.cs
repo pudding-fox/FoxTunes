@@ -26,7 +26,7 @@ namespace FoxTunes
             await base.OnCompleted().ConfigureAwait(false);
             if (this.Changes != 0)
             {
-                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new PlaylistUpdatedSignalState(this.Playlist))).ConfigureAwait(false);
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new PlaylistUpdatedSignalState(this.Playlist, DataSignalType.Updated))).ConfigureAwait(false);
             }
         }
     }

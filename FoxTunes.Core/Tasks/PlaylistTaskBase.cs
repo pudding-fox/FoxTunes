@@ -110,7 +110,7 @@ namespace FoxTunes
              {
                  await this.AddPlaylistItems(paths, cancellationToken).ConfigureAwait(false);
                  await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset).ConfigureAwait(false);
-                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new PlaylistUpdatedSignalState(this.Playlist))).ConfigureAwait(false);
+                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated, new PlaylistUpdatedSignalState(this.Playlist, DataSignalType.Updated))).ConfigureAwait(false);
                  await this.AddOrUpdateMetaData(cancellationToken).ConfigureAwait(false);
                  await this.SequenceItems().ConfigureAwait(false);
                  await this.SetPlaylistItemsStatus(PlaylistItemStatus.None).ConfigureAwait(false);

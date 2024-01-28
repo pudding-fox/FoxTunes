@@ -150,6 +150,10 @@ namespace FoxTunes
         public async Task RemovePlaylist()
         {
             var playlist = this.PlaylistManager.SelectedPlaylist;
+            if (playlist == null)
+            {
+                return;
+            }
             var playlists = this.PlaylistBrowser.GetPlaylists();
             if (playlists.Length > 1)
             {

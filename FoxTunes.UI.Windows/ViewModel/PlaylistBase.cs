@@ -7,14 +7,6 @@ namespace FoxTunes.ViewModel
 {
     public abstract class PlaylistBase : ViewModelBase
     {
-        const int TIMEOUT = 100;
-
-        protected PlaylistBase() : base(false)
-        {
-            this.Debouncer = new AsyncDebouncer(TIMEOUT);
-            this.InitializeComponent(Core.Instance);
-        }
-
         protected virtual string LOADING
         {
             get
@@ -38,8 +30,6 @@ namespace FoxTunes.ViewModel
                 return Strings.PlaylistBase_Empty;
             }
         }
-
-        public AsyncDebouncer Debouncer { get; private set; }
 
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
@@ -201,18 +191,7 @@ namespace FoxTunes.ViewModel
 
         public virtual Task Refresh()
         {
-            var task = new Func<Task>(async () =>
-            {
-                await this.RefreshItems().ConfigureAwait(false);
-            });
-            if (this.IsInitialized && this.Items != null)
-            {
-                return this.Debouncer.Exec(task);
-            }
-            else
-            {
-                return task();
-            }
+            return this.RefreshItems();
         }
 
         protected abstract Task<Playlist> GetPlaylist();
@@ -241,7 +220,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnActiveChanged(object sender, EventArgs e)
         {
-            this.Debouncer.Exec(this.RefreshStatus);
+            var task = this.RefreshStatus();
         }
 
         protected virtual Task OnSignal(object sender, ISignal signal)
@@ -276,7 +255,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnStateChanged(object sender, EventArgs e)
         {
-            this.Debouncer.Exec(this.RefreshStatus);
+            var task = this.RefreshStatus();
         }
 
         protected virtual async Task RefreshItems()
@@ -310,10 +289,6 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (this.Debouncer != null)
-            {
-                this.Debouncer.Dispose();
-            }
             global::FoxTunes.BackgroundTask.ActiveChanged -= this.OnActiveChanged;
             if (this.PlaylistBrowser != null)
             {
