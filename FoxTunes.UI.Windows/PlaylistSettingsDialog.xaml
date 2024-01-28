@@ -18,15 +18,17 @@
                 <x:Type TypeName="Core:PlaylistColumnType"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        <CollectionViewSource x:Key="MetaDataElements" Source="{x:Static ViewModel:MetaDataSelector.Elements}">
+        <CollectionViewSource x:Key="SupportedMetaData" Source="{Binding SupportedMetaData, Source={StaticResource ViewModel}}">
             <CollectionViewSource.SortDescriptions>
-                <scm:SortDescription PropertyName="Type"></scm:SortDescription>
+                <scm:SortDescription PropertyName="Sequence"></scm:SortDescription>
                 <scm:SortDescription PropertyName="Name"></scm:SortDescription>
             </CollectionViewSource.SortDescriptions>
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="Type"></PropertyGroupDescription>
             </CollectionViewSource.GroupDescriptions>
         </CollectionViewSource>
+        <ViewModel:MetaDataNameConverter x:Key="MetaDataNameConverter"></ViewModel:MetaDataNameConverter>
+        <ViewModel:EnumConverter x:Key="EnumConverter"/>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -164,24 +166,24 @@
                                 <RowDefinition Height="Auto"></RowDefinition>
                             </Grid.RowDefinitions>
                             <Label Grid.Column="0" Grid.Row="0">Tag</Label>
-                            <ComboBox Grid.Column="1" Grid.Row="0" ItemsSource="{Binding Source={StaticResource MetaDataElements}}" SelectedValue="{Binding Tag}" SelectedValuePath="Name" Margin="0,0,0,5">
+                            <ComboBox Grid.Column="1" Grid.Row="0"  ItemsSource="{Binding Source={StaticResource SupportedMetaData}}" SelectedValue="{Binding Tag}" SelectedValuePath="Name" Margin="0,0,0,5">
                                 <ComboBox.GroupStyle>
                                     <GroupStyle>
                                         <GroupStyle.HeaderTemplate>
                                             <DataTemplate>
-                                                <TextBlock Text="{Binding Name}" Foreground="{DynamicResource TextBrush}" Margin="4,0,0,2" TextDecorations="Underline"></TextBlock>
+                                                <TextBlock Text="{Binding Name, Converter={StaticResource EnumConverter}}" Foreground="{DynamicResource TextBrush}" Margin="4,0,0,2" TextDecorations="Underline"></TextBlock>
                                             </DataTemplate>
                                         </GroupStyle.HeaderTemplate>
                                     </GroupStyle>
                                 </ComboBox.GroupStyle>
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding Name}" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                                        <TextBlock Text="{Binding Name, Converter={StaticResource MetaDataNameConverter}}" Foreground="{DynamicResource TextBrush}"></TextBlock>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                             <Label Grid.Column="0" Grid.Row="1">Format</Label>
-                            <ComboBox Grid.Column="1" Grid.Row="1" ItemsSource="{x:Static ViewModel:MetaDataSelector.Formats}" SelectedValue="{Binding Format}" IsEditable="True"></ComboBox>
+                            <ComboBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding SupportedFormats, Source={StaticResource ViewModel}}" SelectedValue="{Binding Format}" IsEditable="True"></ComboBox>
                         </Grid>
                     </Grid>
                 </Grid>
