@@ -183,7 +183,7 @@
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                             <Label Grid.Column="0" Grid.Row="1">Format</Label>
-                            <ComboBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding SupportedFormats, Source={StaticResource ViewModel}}" SelectedValue="{Binding Format}" IsEditable="True"></ComboBox>
+                            <ComboBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding SupportedFormats, Source={StaticResource ViewModel}}" SelectedValue="{Binding Format}"></ComboBox>
                         </Grid>
                     </Grid>
                 </Grid>
