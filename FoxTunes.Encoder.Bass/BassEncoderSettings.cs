@@ -1,31 +1,21 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace FoxTunes
 {
-    public abstract class BassEncoderSettings : IBassEncoderSettings
+    public abstract class BassEncoderSettings : BaseComponent, IBassEncoderSettings
     {
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
         public const int DEPTH_AUTO = 0;
 
         public const int DEPTH_16 = 16;
 
-        public const int DEPTH_20 = 20;
-
         public const int DEPTH_24 = 24;
 
         public const int DEPTH_32 = 32;
+
+        public abstract string Name { get; }
 
         public string Executable { get; protected set; }
 
@@ -49,7 +39,7 @@ namespace FoxTunes
 
         public int Threads { get; private set; }
 
-        public virtual void InitializeComponent(ICore core)
+        public override void InitializeComponent(ICore core)
         {
             core.Components.Configuration.GetElement<SelectionConfigurationElement>(
                 BassEncoderBehaviourConfiguration.SECTION,
@@ -67,6 +57,7 @@ namespace FoxTunes
                 BassEncoderBehaviourConfiguration.SECTION,
                 BassEncoderBehaviourConfiguration.THREADS_ELEMENT
             ).ConnectValue(value => this.Threads = value);
+            base.InitializeComponent(core);
         }
 
         public abstract string GetArguments(EncoderItem encoderItem, IBassStream stream);
@@ -94,7 +85,7 @@ namespace FoxTunes
             {
                 if (encoderItem.BitsPerSample != 0)
                 {
-                    Logger.Write(this.GetType(), LogLevel.Debug, "Using meta data suggested bit depth for file \"{0}\": {1} bit", encoderItem.InputFileName, encoderItem.BitsPerSample);
+                    Logger.Write(this, LogLevel.Debug, "Using meta data suggested bit depth for file \"{0}\": {1} bit", encoderItem.InputFileName, encoderItem.BitsPerSample);
                     return encoderItem.BitsPerSample;
                 }
                 var channelInfo = default(ChannelInfo);
@@ -104,16 +95,16 @@ namespace FoxTunes
                 }
                 if (channelInfo.Flags.HasFlag(BassFlags.Float))
                 {
-                    Logger.Write(this.GetType(), LogLevel.Debug, "Using decoder bit depth for file \"{0}\": 32 bit", encoderItem.InputFileName);
+                    Logger.Write(this, LogLevel.Debug, "Using decoder bit depth for file \"{0}\": 32 bit", encoderItem.InputFileName);
                     return DEPTH_32;
                 }
                 else
                 {
-                    Logger.Write(this.GetType(), LogLevel.Debug, "Using decoder bit depth for file \"{0}\": 16 bit", encoderItem.InputFileName);
+                    Logger.Write(this, LogLevel.Debug, "Using decoder bit depth for file \"{0}\": 16 bit", encoderItem.InputFileName);
                     return DEPTH_16;
                 }
             }
-            Logger.Write(this.GetType(), LogLevel.Debug, "Using user defined bit depth for file \"{0}\": {1} bit", encoderItem.InputFileName, this.Format.Depth);
+            Logger.Write(this, LogLevel.Debug, "Using user defined bit depth for file \"{0}\": {1} bit", encoderItem.InputFileName, this.Format.Depth);
             return this.Format.Depth;
         }
 
@@ -137,14 +128,9 @@ namespace FoxTunes
             var outputLength = (long)(inputLength / (source / (float)this.GetDepth(encoderItem, stream)));
             if (inputLength != outputLength)
             {
-                Logger.Write(this.GetType(), LogLevel.Debug, "Conversion requires change of data length: {0} bytes => {1} bytes.", inputLength, outputLength);
+                Logger.Write(this, LogLevel.Debug, "Conversion requires change of data length: {0} bytes => {1} bytes.", inputLength, outputLength);
             }
             return outputLength;
-        }
-
-        public virtual IEnumerable<ConfigurationElement> GetConfigurationElements()
-        {
-            return Enumerable.Empty<ConfigurationElement>();
         }
     }
 }

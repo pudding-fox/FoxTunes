@@ -6,17 +6,22 @@ using System.IO;
 
 namespace FoxTunes
 {
-    [BassEncoder(NAME)]
-    public class FlacEncoderSettings : BassEncoderSettings
+    public class FlacEncoderSettings : BassEncoderSettings, IStandardComponent, IConfigurableComponent
     {
-        public const string NAME = "FLAC";
-
         public FlacEncoderSettings()
         {
             var directory = Path.GetDirectoryName(
                 typeof(FlacEncoderSettings).Assembly.Location
             );
             this.Executable = Path.Combine(directory, "Encoders\\flac.exe");
+        }
+
+        public override string Name
+        {
+            get
+            {
+                return "FLAC";
+            }
         }
 
         public override string Extension
@@ -86,9 +91,9 @@ namespace FoxTunes
             return depth;
         }
 
-        public override IEnumerable<ConfigurationElement> GetConfigurationElements()
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            return FlacEncoderSettingsConfiguration.GetConfigurationElements();
+            return FlacEncoderSettingsConfiguration.GetConfigurationSections(this);
         }
     }
 }

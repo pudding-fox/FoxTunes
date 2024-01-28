@@ -22,6 +22,14 @@ namespace FoxTunes
 
         public IBassEncoderSettings Settings { get; }
 
+        public override string Name
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public override string Extension
         {
             get

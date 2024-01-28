@@ -3,14 +3,15 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    public class BassEncoderSettingsFactory : StandardComponent, IConfigurableComponent
+    public class BassEncoderSettingsFactory : StandardComponent
     {
         public static IEnumerable<IBassEncoderSettings> Profiles
         {
             get
             {
-                yield return new FlacEncoderSettings();
                 yield return new AppleLosslessEncoderSettings();
+                yield return new FlacEncoderSettings();
+                yield return new WavPackEncoderSettings();
             }
         }
 
@@ -25,8 +26,8 @@ namespace FoxTunes
             this.Core = core;
             this.Configuration = core.Components.Configuration;
             this.Format = this.Configuration.GetElement<SelectionConfigurationElement>(
-                BassEncoderSettingsFactoryConfiguration.SECTION,
-                BassEncoderSettingsFactoryConfiguration.FORMAT_ELEMENT
+                BassEncoderBehaviourConfiguration.SECTION,
+                BassEncoderBehaviourConfiguration.FORMAT_ELEMENT
             );
             base.InitializeComponent(core);
         }
@@ -34,14 +35,9 @@ namespace FoxTunes
         public IBassEncoderSettings CreateSettings()
         {
             Logger.Write(this, LogLevel.Debug, "Creating settings for profile: {0}", this.Format.Value.Name);
-            var format = BassEncoderSettingsFactoryConfiguration.GetFormat(this.Format.Value);
+            var format = BassEncoderBehaviourConfiguration.GetFormat(this.Format.Value);
             format.InitializeComponent(this.Core);
             return format;
-        }
-
-        public IEnumerable<ConfigurationSection> GetConfigurationSections()
-        {
-            return BassEncoderSettingsFactoryConfiguration.GetConfigurationSections();
         }
     }
 }
