@@ -15,7 +15,7 @@
     </Windows:UIComponentBase.IsComponentEnabled>
     <GroupBox Header="Lyrics">
         <ScrollViewer  HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="5">
-            <TextBlock VerticalAlignment="Top" Text="{Binding Data, Source={StaticResource ViewModel}}" TextAlignment="Center" TextWrapping="Wrap"></TextBlock>
+            <TextBlock VerticalAlignment="Top" Text="{Binding Data, Source={StaticResource ViewModel}}" TextAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource TextBrush}"></TextBlock>
         </ScrollViewer>
     </GroupBox>
 </Windows:UIComponentBase>

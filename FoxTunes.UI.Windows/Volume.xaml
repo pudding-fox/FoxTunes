@@ -11,6 +11,69 @@
         <ViewModel:Volume x:Key="ViewModel" Core="{Binding}"></ViewModel:Volume>
     </UserControl.Resources>
     <Grid>
-        <Slider VerticalAlignment="Center" IsMoveToPointEnabled="True" Value="{Binding Value, Source={StaticResource ViewModel}}" Minimum="0" Maximum="1" SmallChange="0.01" LargeChange="0.1"></Slider>
+        <Windows:DraggableSlider x:Name="Slider" VerticalAlignment="Center" Value="{Binding Value, Source={StaticResource ViewModel}}" Minimum="0" Maximum="1" SmallChange="0.01" LargeChange="0.1">
+            <Slider.Style>
+                <Style TargetType="{x:Type Slider}">
+                    <Setter Property="Background" Value="{DynamicResource TextBrush}"/>
+                    <Setter Property="Height" Value="20"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type Slider}">
+                                <ControlTemplate.Resources>
+                                    <Style TargetType="{x:Type RepeatButton}">
+                                        <Setter Property="OverridesDefaultStyle" Value="true"/>
+                                        <Setter Property="IsTabStop" Value="false"/>
+                                        <Setter Property="Focusable" Value="false"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                                    <Border Background="{TemplateBinding Background}"/>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                    <PathGeometry x:Key="Triangle">
+                                        <PathFigure StartPoint="0,1">
+                                            <LineSegment Point="1,1"/>
+                                            <LineSegment Point="1,0"/>
+                                            <LineSegment Point="0,1"/>
+                                        </PathFigure>
+                                    </PathGeometry>
+                                </ControlTemplate.Resources>
+                                <Grid>
+                                    <Grid>
+                                        <Grid.OpacityMask>
+                                            <DrawingBrush>
+                                                <DrawingBrush.Drawing>
+                                                    <GeometryDrawing Brush="Black" Geometry="{StaticResource Triangle}"/>
+                                                </DrawingBrush.Drawing>
+                                            </DrawingBrush>
+                                        </Grid.OpacityMask>
+                                        <Track Name="PART_Track" Value="{TemplateBinding Value}">
+                                            <Track.Thumb>
+                                                <Thumb Width="10" Background="{TemplateBinding Background}">
+                                                    <Thumb.Template>
+                                                        <ControlTemplate TargetType="{x:Type Thumb}">
+                                                            <Border Background="{TemplateBinding Background}"/>
+                                                        </ControlTemplate>
+                                                    </Thumb.Template>
+                                                </Thumb>
+                                            </Track.Thumb>
+                                            <Track.DecreaseRepeatButton>
+                                                <RepeatButton Background="{TemplateBinding Background}" Command="Slider.DecreaseLarge"/>
+                                            </Track.DecreaseRepeatButton>
+                                            <Track.IncreaseRepeatButton>
+                                                <RepeatButton Background="Transparent" Command="Slider.IncreaseLarge"/>
+                                            </Track.IncreaseRepeatButton>
+                                        </Track>
+                                    </Grid>
+                                    <Path Data="{StaticResource Triangle}" Stretch="Fill" Stroke="{DynamicResource TextBrush}" StrokeThickness="1"/>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Slider.Style>
+        </Windows:DraggableSlider>
     </Grid>
 </UserControl>
