@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using ManagedBass.Sox;
 using System;
 using System.Collections.Generic;
 using System.IO;

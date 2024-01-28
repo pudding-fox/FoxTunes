@@ -665,7 +665,7 @@ namespace FoxTunes
                     }
                 ),
                 new Package(
-                    "sox",
+                    "resampler",
                     new PackageElement[]
                     {
                         "FoxTunes.Output.Bass.Resampler.dll",
