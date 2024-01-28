@@ -257,5 +257,14 @@ namespace FoxTunes {
                 return ResourceManager.GetString("TransparentTheme.Name", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opacity.
+        /// </summary>
+        internal static string TransparentThemeConfiguration_Opacity {
+            get {
+                return ResourceManager.GetString("TransparentThemeConfiguration.Opacity", resourceCulture);
+            }
+        }
     }
 }

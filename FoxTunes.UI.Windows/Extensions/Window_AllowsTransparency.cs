@@ -52,6 +52,8 @@ namespace FoxTunes
 
         private class AllowsTransparencyBehaviour : UIBehaviour
         {
+            public static bool Warned = false;
+
             private AllowsTransparencyBehaviour()
             {
                 this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
@@ -96,7 +98,11 @@ namespace FoxTunes
                 {
                     if (new WindowInteropHelper(this.Window).Handle != IntPtr.Zero)
                     {
-                        this.UserInterface.Warn(Strings.WindowExtensions_TransparencyWarning);
+                        if (!Warned)
+                        {
+                            this.UserInterface.Warn(Strings.WindowExtensions_TransparencyWarning);
+                            Warned = true;
+                        }
                         return;
                     }
                     this.Window.AllowsTransparency = allowsTransparency;

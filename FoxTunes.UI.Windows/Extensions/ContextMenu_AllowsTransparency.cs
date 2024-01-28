@@ -1,7 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Interop;
 
 namespace FoxTunes

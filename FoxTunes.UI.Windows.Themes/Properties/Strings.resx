@@ -183,4 +183,7 @@
   <data name="ColorPalette.Transparent" xml:space="preserve">
     <value>Transparent</value>
   </data>
+  <data name="TransparentThemeConfiguration.Opacity" xml:space="preserve">
+    <value>Opacity</value>
+  </data>
 </root>
