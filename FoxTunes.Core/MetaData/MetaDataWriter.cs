@@ -42,14 +42,18 @@ namespace FoxTunes
             {
                 return;
             }
-            var metaDataItemId = default(int);
-            if (!this.Store.TryGetValue(metaDataItem.Name, metaDataItem.Type, metaDataItem.Value, out metaDataItemId))
+            var metaDataItemId = metaDataItem.Id;
+            if (metaDataItemId == default(int))
             {
-                this.AddCommand.Parameters["name"] = metaDataItem.Name;
-                this.AddCommand.Parameters["type"] = metaDataItem.Type;
-                this.AddCommand.Parameters["value"] = metaDataItem.Value;
-                metaDataItemId = Convert.ToInt32(await this.AddCommand.ExecuteScalarAsync().ConfigureAwait(false));
-                this.Store.Add(metaDataItem.Name, metaDataItem.Type, metaDataItem.Value, metaDataItemId);
+                if (!this.Store.TryGetValue(metaDataItem.Name, metaDataItem.Type, metaDataItem.Value, out metaDataItemId))
+                {
+                    this.AddCommand.Parameters["name"] = metaDataItem.Name;
+                    this.AddCommand.Parameters["type"] = metaDataItem.Type;
+                    this.AddCommand.Parameters["value"] = metaDataItem.Value;
+                    metaDataItemId = Convert.ToInt32(await this.AddCommand.ExecuteScalarAsync().ConfigureAwait(false));
+                    this.Store.Add(metaDataItem.Name, metaDataItem.Type, metaDataItem.Value, metaDataItemId);
+                }
+                metaDataItem.Id = metaDataItemId;
             }
             this.UpdateCommand.Parameters["itemId"] = itemId;
             this.UpdateCommand.Parameters["metaDataItemId"] = metaDataItemId;
