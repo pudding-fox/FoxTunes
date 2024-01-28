@@ -54,6 +54,7 @@
     <Compile Include="Interfaces\Configuration\IFileAssociation.cs" />
     <Compile Include="Interfaces\Configuration\IFileAssociations.cs" />
     <Compile Include="Interfaces\Database\IDatabaseFactory.cs" />
+    <Compile Include="Interfaces\Factories\IMessageSinkFactory.cs" />
     <Compile Include="Interfaces\IInvocableComponent.cs" />
     <Compile Include="Interfaces\IInvocationComponent.cs" />
     <Compile Include="Interfaces\Database\IDatabaseComponent.cs" />
@@ -61,6 +62,8 @@
     <Compile Include="Interfaces\Database\IDatabaseTables.cs" />
     <Compile Include="Interfaces\ICoreValidator.cs" />
     <Compile Include="Interfaces\IFileData.cs" />
+    <Compile Include="Interfaces\IMessageSink.cs" />
+    <Compile Include="Interfaces\INotifyIcon.cs" />
     <Compile Include="Interfaces\IReportsProgress.cs" />
     <Compile Include="Interfaces\ISequenceableComponent.cs" />
     <Compile Include="Interfaces\Library\ILibraryHierarchyBrowser.cs" />
@@ -85,12 +88,16 @@
     <Compile Include="Managers\InputManager.cs" />
     <Compile Include="Managers\InputManagerConfiguration.cs" />
     <Compile Include="Managers\PlaylistManager.cs" />
+    <Compile Include="MessageSink.cs" />
+    <Compile Include="MessageSinkFactory.cs" />
     <Compile Include="MetaData\CommonImageTypes.cs" />
     <Compile Include="MetaData\CustomMetaData.cs" />
     <Compile Include="MetaData\Extensions.cs" />
     <Compile Include="MetaData\FileMetaDataStore.cs" />
     <Compile Include="MetaData\MetaDataInfo.cs" />
     <Compile Include="MetaData\MetaDataWriter.cs" />
+    <Compile Include="NotifyIcon.cs" />
+    <Compile Include="NotifyIconConfiguration.cs" />
     <Compile Include="Tasks\ClearLibraryHierarchiesTask.cs" />
     <Compile Include="Tasks\MovePlaylistItemsTask.cs" />
     <Compile Include="Tasks\RescanLibraryTask.cs" />

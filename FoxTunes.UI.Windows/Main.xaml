@@ -6,6 +6,7 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
@@ -58,7 +59,6 @@
                 <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
             <Windows:LibraryTree Style="{StaticResource LibraryTreeStyle}"></Windows:LibraryTree>
-            <!--<Windows:LibraryBrowser Style="{StaticResource LibraryBrowserStyle}"></Windows:LibraryBrowser>-->
             <Windows:Artwork Grid.Row="1" Style="{StaticResource ArtworkStyle}"></Windows:Artwork>
             <Windows:Playlist Grid.Column="1" Grid.RowSpan="2"></Windows:Playlist>
             <Grid Grid.ColumnSpan="2" Grid.RowSpan="2" VerticalAlignment="Bottom">
@@ -73,5 +73,15 @@
         <Windows:StreamPosition Grid.Column="1" Grid.Row="1"></Windows:StreamPosition>
         <Windows:Settings Grid.Column="2" Grid.Row="1"></Windows:Settings>
         <Windows:Components></Windows:Components>
+        <Windows:NotifyIconElement ImageSource="Images/Fox.ico" IsEnabled="{Binding ShowNotifyIcon.Value, Source={StaticResource ViewModel}}">
+            <Interactivity:Interaction.Triggers>
+                <Interactivity:EventTrigger EventName="MouseLeftButtonUp">
+                    <ViewModel:InvokeParameterizedCommandAction Command="{Binding RestoreCommand, Source={StaticResource ViewModel}}" />
+                </Interactivity:EventTrigger>
+            </Interactivity:Interaction.Triggers>
+            <Windows:NotifyIconElement.ContextMenu>
+                <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_NOTIFY_ICON}}"></Windows:Menu>
+            </Windows:NotifyIconElement.ContextMenu>
+        </Windows:NotifyIconElement>
     </Grid>
 </UserControl>

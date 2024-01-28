@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Windows;
+using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
@@ -60,6 +61,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowArtworkChanged = delegate { };
 
+        private BooleanConfigurationElement _ShowNotifyIcon { get; set; }
+
+        public BooleanConfigurationElement ShowNotifyIcon
+        {
+            get
+            {
+                return this._ShowNotifyIcon;
+            }
+            set
+            {
+                this._ShowNotifyIcon = value;
+                this.OnShowNotifyIconChanged();
+            }
+        }
+
+        protected virtual void OnShowNotifyIconChanged()
+        {
+            if (this.ShowNotifyIconChanged != null)
+            {
+                this.ShowNotifyIconChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowNotifyIcon");
+        }
+
+        public event EventHandler ShowNotifyIconChanged = delegate { };
+
         protected override void OnCoreChanged()
         {
             this.Configuration = this.Core.Components.Configuration;
@@ -71,7 +98,32 @@ namespace FoxTunes.ViewModel
               WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
               WindowsUserInterfaceConfiguration.SHOW_ARTWORK_ELEMENT
            );
+            this.ShowNotifyIcon = this.Configuration.GetElement<BooleanConfigurationElement>(
+              NotifyIconConfiguration.NOTIFY_ICON_SECTION,
+              NotifyIconConfiguration.ENABLED_ELEMENT
+            );
             base.OnCoreChanged();
+        }
+
+        public ICommand RestoreCommand
+        {
+            get
+            {
+                return new Command(this.Restore);
+            }
+        }
+
+        public void Restore()
+        {
+            if (Application.Current != null && Application.Current.MainWindow != null)
+            {
+                Application.Current.MainWindow.Show();
+                if (Application.Current.MainWindow.WindowState == WindowState.Minimized)
+                {
+                    Application.Current.MainWindow.WindowState = WindowState.Normal;
+                }
+                Application.Current.MainWindow.Activate();
+            }
         }
 
         protected override Freezable CreateInstanceCore()

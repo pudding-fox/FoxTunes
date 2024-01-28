@@ -100,6 +100,7 @@ namespace FoxTunes.ViewModel
 
         public async Task Save()
         {
+            var exception = default(Exception);
             try
             {
                 using (var database = this.DatabaseFactory.Create())
@@ -114,12 +115,14 @@ namespace FoxTunes.ViewModel
                 }
                 await this.HierarchyManager.Clear();
                 await this.HierarchyManager.Build();
+                return;
             }
             catch (Exception e)
             {
-                await this.OnError("Save", e);
-                throw;
+                exception = e;
             }
+            await this.OnError("Save", exception);
+            throw exception;
         }
 
         public ICommand RescanCommand

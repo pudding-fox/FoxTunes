@@ -2,12 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace FoxTunes
 {
-    public class TrayIconBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class TrayIconBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
     {
+        public const string QUIT = "ZZZZ";
+
+        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
+
         public bool _Enabled { get; private set; }
 
         public bool Enabled
@@ -41,65 +46,28 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
-                WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
-                TrayIconBehaviourConfiguration.TRAY_ICON_ELEMENT
+                NotifyIconConfiguration.NOTIFY_ICON_SECTION,
+                NotifyIconConfiguration.ENABLED_ELEMENT
             ).ConnectValue<bool>(value => this.Enabled = value);
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
-                WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
-                TrayIconBehaviourConfiguration.MINIMIZE_TO_TRAY_ELEMENT
+                NotifyIconConfiguration.NOTIFY_ICON_SECTION,
+                NotifyIconConfiguration.MINIMIZE_TO_TRAY_ELEMENT
             ).ConnectValue<bool>(value => this.MinimizeToTray = value);
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
-                WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
-                TrayIconBehaviourConfiguration.CLOSE_TO_TRAY_ELEMENT
+                NotifyIconConfiguration.NOTIFY_ICON_SECTION,
+                NotifyIconConfiguration.CLOSE_TO_TRAY_ELEMENT
             ).ConnectValue<bool>(value => this.CloseToTray = value);
             base.InitializeComponent(core);
         }
 
-        public IEnumerable<ConfigurationSection> GetConfigurationSections()
-        {
-            return TrayIconBehaviourConfiguration.GetConfigurationSections();
-        }
-
-        //TODO: System.Windows.Forms
-        public global::System.Windows.Forms.NotifyIcon NotifyIcon { get; private set; }
-
         protected virtual void Enable()
         {
-            if (this.NotifyIcon == null)
-            {
-                //TODO: System.Windows.Forms
-                this.NotifyIcon = new global::System.Windows.Forms.NotifyIcon();
-                //TODO: System.Drawing
-                this.NotifyIcon.Icon = new global::System.Drawing.Icon(
-                    Application.GetResourceStream(new Uri("pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico")).Stream
-                );
-                //TODO: System.Windows.Forms
-                this.NotifyIcon.ContextMenu = new global::System.Windows.Forms.ContextMenu(new[]
-                {
-                    //TODO: System.Windows.Forms
-                    new global::System.Windows.Forms.MenuItem("Quit", this.OnClose)
-                });
-                this.NotifyIcon.Click += this.OnOpen;
-                this.NotifyIcon.Visible = true;
-            }
             if (Application.Current != null && Application.Current.MainWindow != null)
             {
                 Application.Current.MainWindow.StateChanged += this.OnStateChanged;
                 Application.Current.MainWindow.Closing += this.OnClosing;
-            }
-        }
-
-        protected virtual void OnOpen(object sender, EventArgs e)
-        {
-            if (Application.Current != null && Application.Current.MainWindow != null)
-            {
-                Application.Current.MainWindow.Show();
-                if (Application.Current.MainWindow.WindowState == WindowState.Minimized)
-                {
-                    Application.Current.MainWindow.WindowState = WindowState.Normal;
-                }
-                Application.Current.MainWindow.Activate();
             }
         }
 
@@ -137,16 +105,36 @@ namespace FoxTunes
 
         protected virtual void Disable()
         {
-            if (this.NotifyIcon != null)
-            {
-                this.NotifyIcon.Dispose();
-                this.NotifyIcon = null;
-            }
             if (Application.Current != null && Application.Current.MainWindow != null)
             {
                 Application.Current.MainWindow.StateChanged -= this.OnStateChanged;
                 Application.Current.MainWindow.Closing -= this.OnClosing;
             }
+        }
+
+        public IEnumerable<IInvocationComponent> Invocations
+        {
+            get
+            {
+                if (this.Enabled)
+                {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_NOTIFY_ICON, QUIT, "Quit");
+                }
+            }
+        }
+
+        public Task InvokeAsync(IInvocationComponent component)
+        {
+            switch (component.Id)
+            {
+                case QUIT:
+                    return this.ForegroundTaskRunner.Run(() =>
+                    {
+                        this.Disable();
+                        this.OnClose(this, EventArgs.Empty);
+                    });
+            }
+            return Task.CompletedTask;
         }
 
         public bool IsDisposed { get; private set; }

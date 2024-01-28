@@ -60,7 +60,7 @@
             </TreeView.ContextMenu>
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding DisplayValue, Mode=OneWay}"/>
+                    <TextBlock Text="{Binding DisplayValue, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"/>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
