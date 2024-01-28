@@ -18,6 +18,13 @@ namespace FoxTunes
     {
         const int UPDATE_INTERVAL = 1000;
 
+        const string THUMBNAIL_PLACEHOLDER = "FoxTunes.Core.Windows.Images.fox.ico";
+
+        private static bool IsThumbnailPlaceholder(string name)
+        {
+            return string.Equals(name, THUMBNAIL_PLACEHOLDER, StringComparison.OrdinalIgnoreCase);
+        }
+
         private static readonly int WM_TASKBARCREATED;
 
         private static readonly object SyncRoot = new object();
@@ -45,6 +52,7 @@ namespace FoxTunes
             this.Callback = new HwndSourceHook(this.OnCallback);
             this.Windows = new ConcurrentDictionary<IntPtr, TaskbarButtonsWindowFlags>();
             this.ImageLists = new ConcurrentDictionary<IntPtr, IntPtr>();
+            this.Thumbnails = new ConcurrentDictionary<IntPtr, string>();
         }
 
         public Timer Timer { get; private set; }
@@ -90,6 +98,33 @@ namespace FoxTunes
         }
 
         public ConcurrentDictionary<IntPtr, IntPtr> ImageLists { get; private set; }
+
+        public ConcurrentDictionary<IntPtr, string> Thumbnails { get; private set; }
+
+        protected virtual bool HasThumbnail(IntPtr handle, string name)
+        {
+            var currentName = default(string);
+            if (!this.Thumbnails.TryGetValue(handle, out currentName))
+            {
+                return false;
+            }
+            return string.Equals(currentName, name, StringComparison.OrdinalIgnoreCase);
+        }
+
+        protected virtual bool GetThumbnail(IntPtr handle, out string name)
+        {
+            return this.Thumbnails.TryGetValue(handle, out name);
+        }
+
+        protected virtual void SetThumbnail(IntPtr handle, string name)
+        {
+            this.Thumbnails.AddOrUpdate(handle, name);
+        }
+
+        protected virtual bool RemoveThumbnail(IntPtr handle)
+        {
+            return this.Thumbnails.TryRemove(handle);
+        }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -497,7 +532,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Creating image: {0}", name);
             using (var stream = typeof(TaskbarButtonsBehaviour).Assembly.GetManifestResourceStream(name))
             {
-                return this.GetImage(stream, width, height);
+                return this.GetImage(stream, width, height, false);
             }
         }
 
@@ -507,7 +542,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Creating image: {0}", name);
             using (var stream = typeof(TaskbarButtonsBehaviour).Assembly.GetManifestResourceStream(name))
             {
-                return this.GetImage(stream, width, height);
+                return this.GetImage(stream, width, height, true);
             }
         }
 
@@ -516,18 +551,18 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Creating image: {0}", fileName);
             using (var stream = File.OpenRead(fileName))
             {
-                return this.GetImage(stream, width, height);
+                return this.GetImage(stream, width, height, true);
             }
         }
 
-        protected virtual Bitmap GetImage(Stream stream, int width, int height)
+        protected virtual Bitmap GetImage(Stream stream, int width, int height, bool scale)
         {
             var image = (Bitmap)Bitmap.FromStream(stream);
             if (image.Width != width || image.Height != height)
             {
                 try
                 {
-                    return WindowsImaging.Resize(image, width, height);
+                    return WindowsImaging.Resize(image, width, height, scale);
                 }
                 finally
                 {
@@ -817,43 +852,38 @@ namespace FoxTunes
             }
             else
             {
-                var result = default(WindowsIconicThumbnail.HResult);
-                await this.Invoke(
-                    source.Dispatcher,
-                    () => result = WindowsIconicThumbnail.DwmInvalidateIconicBitmaps(handle)
-                ).ConfigureAwait(false);
-                if (result != WindowsIconicThumbnail.HResult.Ok)
+                var name = await this.GetIconicThumbnail().ConfigureAwait(false);
+                if (!this.HasThumbnail(handle, name))
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to invalidate iconic thumbnail: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
-                    this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
-                    return false;
+                    var result = default(WindowsIconicThumbnail.HResult);
+                    await this.Invoke(
+                        source.Dispatcher,
+                        () => result = WindowsIconicThumbnail.DwmInvalidateIconicBitmaps(handle)
+                    ).ConfigureAwait(false);
+                    if (result != WindowsIconicThumbnail.HResult.Ok)
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Failed to invalidate iconic thumbnail: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                        this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
+                        return false;
+                    }
+                    Logger.Write(this, LogLevel.Debug, "Iconic thumbnail: {0}", name);
+                    this.SetThumbnail(handle, name);
                 }
             }
             return true;
         }
 
-        protected virtual async Task<bool> OnSendIconicThumbnail(IntPtr handle, int width, int height)
+        protected virtual Task<bool> OnSendIconicThumbnail(IntPtr handle, int width, int height)
         {
-            var outputStream = this.PlaybackManager.CurrentStream;
-            if (outputStream == null)
+            var name = default(string);
+            if (this.GetThumbnail(handle, out name))
             {
-                return await this.OnSendPlaceholderIconicThumbnail(handle, width, height).ConfigureAwait(false);
+                if (!IsThumbnailPlaceholder(name))
+                {
+                    return this.OnSendIconicThumbnail(handle, name, width, height);
+                }
             }
-            var fileData = default(IFileData);
-            if (outputStream.PlaylistItem.LibraryItem_Id.HasValue)
-            {
-                fileData = this.LibraryBrowser.Get(outputStream.PlaylistItem.LibraryItem_Id.Value);
-            }
-            else
-            {
-                fileData = outputStream.PlaylistItem;
-            }
-            var fileName = await this.ArtworkProvider.Find(fileData, ArtworkType.FrontCover);
-            if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
-            {
-                return await this.OnSendPlaceholderIconicThumbnail(handle, width, height).ConfigureAwait(false);
-            }
-            return await this.OnSendIconicThumbnail(handle, fileName, width, height).ConfigureAwait(false);
+            return this.OnSendPlaceholderIconicThumbnail(handle, width, height);
         }
 
         protected virtual async Task<bool> OnSendIconicThumbnail(IntPtr handle, Bitmap bitmap, int width, int height)
@@ -900,6 +930,29 @@ namespace FoxTunes
             {
                 return await this.OnSendIconicThumbnail(handle, bitmap, width, height).ConfigureAwait(false);
             }
+        }
+
+        protected virtual async Task<string> GetIconicThumbnail()
+        {
+            var outputStream = this.PlaybackManager.CurrentStream;
+            if (outputStream != null)
+            {
+                var fileData = default(IFileData);
+                if (outputStream.PlaylistItem.LibraryItem_Id.HasValue)
+                {
+                    fileData = this.LibraryBrowser.Get(outputStream.PlaylistItem.LibraryItem_Id.Value);
+                }
+                else
+                {
+                    fileData = outputStream.PlaylistItem;
+                }
+                var fileName = await this.ArtworkProvider.Find(fileData, ArtworkType.FrontCover).ConfigureAwait(false);
+                if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName))
+                {
+                    return fileName;
+                }
+            }
+            return THUMBNAIL_PLACEHOLDER;
         }
 
         protected virtual void OnSendIconicLivePreviewBitmap(IntPtr handle)
