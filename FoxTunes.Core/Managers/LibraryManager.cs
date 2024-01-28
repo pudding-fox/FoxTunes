@@ -46,6 +46,8 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IReportEmitter ReportEmitter { get; private set; }
+
         private LibraryHierarchy _SelectedHierarchy { get; set; }
 
         public LibraryHierarchy SelectedHierarchy
@@ -120,6 +122,7 @@ namespace FoxTunes
             this.DatabaseFactory = core.Factories.Database;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.ReportEmitter = core.Components.ReportEmitter;
             this.Refresh();
             base.InitializeComponent(core);
         }
@@ -312,25 +315,8 @@ namespace FoxTunes
             }
             var report = new LibraryManagerReport(warnings);
             report.InitializeComponent(this.Core);
-            this.OnReport(report);
+            this.ReportEmitter.Send(report);
         }
-
-        protected virtual Task OnReport(IReport Report)
-        {
-            if (this.Report == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var e = new ReportEventArgs(Report);
-            this.Report(this, e);
-            return e.Complete();
-        }
-
-        public event ReportEventHandler Report;
 
         public bool CanHandle(string path, FileActionType type)
         {

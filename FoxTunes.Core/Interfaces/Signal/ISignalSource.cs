@@ -2,7 +2,7 @@
 
 namespace FoxTunes.Interfaces
 {
-    public interface ISignalSource:IStandardComponent
+    public interface ISignalSource : IStandardComponent
     {
         event SignalEventHandler Signal;
     }

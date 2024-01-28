@@ -1,30 +1,28 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ReportBehaviour : StandardBehaviour, IDisposable
     {
+        public IReportEmitter ReportEmitter { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
-            ComponentRegistry.Instance.ForEach(component =>
-            {
-                if (component is IReportSource)
-                {
-                    (component as IReportSource).Report += this.OnReport;
-                }
-            });
+            this.ReportEmitter = core.Components.ReportEmitter;
+            this.ReportEmitter.Report += this.OnReport;
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnReport(object sender, ReportEventArgs e)
+        protected virtual Task OnReport(object sender, IReport report)
         {
-            var task = Windows.Invoke(() =>
+            return Windows.Invoke(() =>
             {
                 var window = new ReportWindow()
                 {
-                    Source = e.Report,
+                    Source = report,
                     ShowActivated = true,
                     Owner = Windows.ActiveWindow,
                 };
@@ -52,13 +50,10 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            ComponentRegistry.Instance.ForEach(component =>
+            if (this.ReportEmitter != null)
             {
-                if (component is IReportSource)
-                {
-                    (component as IReportSource).Report -= this.OnReport;
-                }
-            });
+                this.ReportEmitter.Report -= this.OnReport;
+            }
         }
 
         ~ReportBehaviour()

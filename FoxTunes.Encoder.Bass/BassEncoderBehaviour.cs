@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class BassEncoderBehaviour : StandardBehaviour, IBackgroundTaskSource, IReportSource, IInvocableComponent, IConfigurableComponent
+    public class BassEncoderBehaviour : StandardBehaviour, IBackgroundTaskSource, IInvocableComponent, IConfigurableComponent
     {
         public const string ENCODE = "GGGG";
 
@@ -18,6 +18,8 @@ namespace FoxTunes
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
+        public IReportEmitter ReportEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -33,6 +35,7 @@ namespace FoxTunes
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            this.ReportEmitter = core.Components.ReportEmitter;
             this.Profiles = ComponentRegistry.Instance.GetComponents<IBassEncoderSettings>().Select(
                 settings => settings.Name
             ).ToArray();
@@ -184,19 +187,8 @@ namespace FoxTunes
         {
             var report = new BassEncoderReport(encoderItems);
             report.InitializeComponent(this.Core);
-            this.OnReport(report);
+            this.ReportEmitter.Send(report);
         }
-
-        protected virtual void OnReport(IReport report)
-        {
-            if (this.Report == null)
-            {
-                return;
-            }
-            this.Report(this, new ReportEventArgs(report));
-        }
-
-        public event ReportEventHandler Report;
 
         private class EncodeTask : BackgroundTask
         {

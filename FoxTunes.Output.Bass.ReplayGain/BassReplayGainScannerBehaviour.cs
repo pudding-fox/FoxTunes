@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class BassReplayGainScannerBehaviour : StandardBehaviour, IBackgroundTaskSource, IReportSource, IInvocableComponent, IConfigurableComponent
+    public class BassReplayGainScannerBehaviour : StandardBehaviour, IBackgroundTaskSource, IInvocableComponent, IConfigurableComponent
     {
         public const string SCAN_TRACKS = "HHHH";
 
@@ -29,6 +29,8 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public IReportEmitter ReportEmitter { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public BooleanConfigurationElement Enabled { get; private set; }
@@ -44,6 +46,7 @@ namespace FoxTunes
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.PlaylistCache = core.Components.PlaylistCache;
             this.SignalEmitter = core.Components.SignalEmitter;
+            this.ReportEmitter = core.Components.ReportEmitter;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
@@ -276,19 +279,8 @@ namespace FoxTunes
         {
             var report = new BassReplayGainScannerReport(fileDatas, scannerItems);
             report.InitializeComponent(this.Core);
-            this.OnReport(report);
+            this.ReportEmitter.Send(report);
         }
-
-        protected virtual void OnReport(IReport report)
-        {
-            if (this.Report == null)
-            {
-                return;
-            }
-            this.Report(this, new ReportEventArgs(report));
-        }
-
-        public event ReportEventHandler Report;
 
         private class ScanTask : BackgroundTask
         {

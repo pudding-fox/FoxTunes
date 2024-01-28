@@ -1,19 +1,11 @@
-﻿namespace FoxTunes.Interfaces
+﻿using System.Threading.Tasks;
+
+namespace FoxTunes.Interfaces
 {
-    public interface IReportSource : IBaseComponent
+    public interface IReportSource : IStandardComponent
     {
         event ReportEventHandler Report;
     }
 
-    public delegate void ReportEventHandler(object sender, ReportEventArgs e);
-
-    public class ReportEventArgs : AsyncEventArgs
-    {
-        public ReportEventArgs(IReport report)
-        {
-            this.Report = report;
-        }
-
-        public IReport Report { get; private set; }
-    }
+    public delegate Task ReportEventHandler(object sender, IReport report);
 }
