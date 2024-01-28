@@ -136,7 +136,6 @@ namespace FoxTunes
                         data.Clear();
                     }
                     UpdateValues(data);
-                    data.LastUpdated = DateTime.UtcNow;
                 }
 
                 switch (data.Mode)
@@ -331,6 +330,12 @@ namespace FoxTunes
         {
             BitmapHelper.Clear(info);
 
+            if (data.SampleCount == 0)
+            {
+                //No data.
+                return;
+            }
+
             if (data.Elements != null)
             {
                 switch (data.Mode)
@@ -393,6 +398,7 @@ namespace FoxTunes
                     UpdateValuesSeperate(data.Samples, data.Values, data.Peaks, data.Channels, data.Width, data.SampleCount);
                     break;
             }
+            data.LastUpdated = DateTime.UtcNow;
         }
 
         private static void UpdateValuesMono(float[] samples, float[,] values, float[] peaks, int width, int count)

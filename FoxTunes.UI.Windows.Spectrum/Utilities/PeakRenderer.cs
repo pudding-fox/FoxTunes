@@ -238,8 +238,6 @@ namespace FoxTunes
                     }
                 }
 
-                data.LastUpdated = DateTime.UtcNow;
-
                 var task = this.Render();
             }
             catch (Exception exception)
@@ -285,6 +283,12 @@ namespace FoxTunes
             var orientation = rendererData.Orientation;
 
             BitmapHelper.Clear(valueRenderInfo);
+
+            if (rendererData.SampleCount == 0)
+            {
+                //No data.
+                return;
+            }
 
             if (valueElements != null)
             {
@@ -356,6 +360,7 @@ namespace FoxTunes
         private static void UpdateValues(PeakRendererData data)
         {
             UpdateValues(data.Samples, data.Values, data.Rms, data.Channels, data.SampleCount);
+            data.LastUpdated = DateTime.UtcNow;
         }
 
         private static void UpdateValues(float[,] samples, float[] values, float[] rms, int channels, int count)

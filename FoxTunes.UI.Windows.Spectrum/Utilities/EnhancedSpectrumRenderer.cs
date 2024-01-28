@@ -229,8 +229,6 @@ namespace FoxTunes
                     }
                 }
 
-                data.LastUpdated = DateTime.UtcNow;
-
                 var task = this.Render();
             }
             catch (Exception exception)
@@ -294,6 +292,12 @@ namespace FoxTunes
             var peakElements = rendererData.PeakElements;
 
             BitmapHelper.Clear(valueRenderInfo);
+
+            if (rendererData.SampleCount == 0)
+            {
+                //No data.
+                return;
+            }
 
             for (var a = 0; a < valueElements.Length; a++)
             {
@@ -380,6 +384,7 @@ namespace FoxTunes
                     }
                 }
             }
+            data.LastUpdated = DateTime.UtcNow;
         }
 
         private static void UpdateValue(SpectrumRendererData data, int band, int start, int end)
@@ -599,6 +604,8 @@ namespace FoxTunes
 
             public float[] Samples;
 
+            public int SampleCount;
+
             public float[] Values;
 
             public float ValuePeak;
@@ -629,12 +636,14 @@ namespace FoxTunes
                 {
                     return false;
                 }
-                return this.Renderer.Output.GetData(this.Samples, this.FFTSize) > 0;
+                this.SampleCount = this.Renderer.Output.GetData(this.Samples, this.FFTSize);
+                return this.SampleCount > 0;
             }
 
             public void Clear()
             {
                 Array.Clear(this.Samples, 0, this.Samples.Length);
+                this.SampleCount = 0;
             }
         }
     }
