@@ -3,12 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:Windows="clr-namespace:FoxTunes"
-             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
+             xmlns:LocalWindows="clr-namespace:FoxTunes" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
+             xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <ViewModel:SelectionProperties x:Key="ViewModel"></ViewModel:SelectionProperties>
+        <LocalViewModel:SelectionProperties x:Key="ViewModel"></LocalViewModel:SelectionProperties>
         <ViewModel:MetaDataNameConverter x:Key="MetaDataNameConverter"></ViewModel:MetaDataNameConverter>
         <ViewModel:ArtworkImageConverter x:Key="ArtworkImageConverter" Width="100" Height="100"></ViewModel:ArtworkImageConverter>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
@@ -23,7 +25,7 @@
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{x:Static ViewModel:StringResources.SelectionProperties_Tags}" Foreground="{DynamicResource TextBrush}" FontSize="20"></TextBlock>
+                        <TextBlock Grid.Column="0" Text="{x:Static LocalViewModel:StringResources.SelectionProperties_Tags}" Foreground="{DynamicResource TextBrush}" FontSize="20"></TextBlock>
                         <Rectangle Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Height="1" Stroke="{DynamicResource TextBrush}"></Rectangle>
                     </Grid>
                     <ItemsControl ItemsSource="{Binding Tags, Source={StaticResource ViewModel}}">
@@ -47,7 +49,7 @@
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{x:Static ViewModel:StringResources.SelectionProperties_Properties}" Foreground="{DynamicResource TextBrush}" FontSize="20"></TextBlock>
+                        <TextBlock Grid.Column="0" Text="{x:Static LocalViewModel:StringResources.SelectionProperties_Properties}" Foreground="{DynamicResource TextBrush}" FontSize="20"></TextBlock>
                         <Rectangle Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Height="1" Stroke="{DynamicResource TextBrush}"></Rectangle>
                     </Grid>
                     <ItemsControl ItemsSource="{Binding Properties, Source={StaticResource ViewModel}}">
@@ -71,7 +73,7 @@
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{x:Static ViewModel:StringResources.SelectionProperties_ReplayGain}" Foreground="{DynamicResource TextBrush}" FontSize="20"></TextBlock>
+                        <TextBlock Grid.Column="0" Text="{x:Static LocalViewModel:StringResources.SelectionProperties_ReplayGain}" Foreground="{DynamicResource TextBrush}" FontSize="20"></TextBlock>
                         <Rectangle Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Height="1" Stroke="{DynamicResource TextBrush}"></Rectangle>
                     </Grid>
                     <ItemsControl ItemsSource="{Binding ReplayGain, Source={StaticResource ViewModel}}">
@@ -95,7 +97,7 @@
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{x:Static ViewModel:StringResources.SelectionProperties_Location}" Foreground="{DynamicResource TextBrush}" FontSize="20"></TextBlock>
+                        <TextBlock Grid.Column="0" Text="{x:Static LocalViewModel:StringResources.SelectionProperties_Location}" Foreground="{DynamicResource TextBrush}" FontSize="20"></TextBlock>
                         <Rectangle Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Height="1" Stroke="{DynamicResource TextBrush}"></Rectangle>
                     </Grid>
                     <ItemsControl ItemsSource="{Binding FileSystem, Source={StaticResource ViewModel}}">
@@ -119,7 +121,7 @@
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{x:Static ViewModel:StringResources.SelectionProperties_Images}" Foreground="{DynamicResource TextBrush}" FontSize="20"></TextBlock>
+                        <TextBlock Grid.Column="0" Text="{x:Static LocalViewModel:StringResources.SelectionProperties_Images}" Foreground="{DynamicResource TextBrush}" FontSize="20"></TextBlock>
                         <Rectangle Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Height="1" Stroke="{DynamicResource TextBrush}"></Rectangle>
                     </Grid>
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden" Margin="4" PreviewMouseWheel="OnPreviewMouseWheel">

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Xml.Linq;
 
 namespace FoxTunes
 {
@@ -618,6 +616,14 @@ namespace FoxTunes
                     new PackageElement[]
                     {
                         "FoxTunes.UI.Windows.MetaDataEditor.dll"
+                    },
+                    PackageFlags.Default
+                ),
+                new Package(
+                    "metadataviewer",
+                    new PackageElement[]
+                    {
+                        "FoxTunes.UI.Windows.MetaDataViewer.dll"
                     },
                     PackageFlags.Default
                 ),
