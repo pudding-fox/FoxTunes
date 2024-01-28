@@ -66,7 +66,7 @@ namespace FoxTunes
                 var playlistItem = new PlaylistItem()
                 {
                     DirectoryName = directoryName,
-                    FileName = Path.Combine(fileName, this.GetFileName(fileName, a, metaData)),
+                    FileName = this.GetFileName(fileName, a, metaData),
                     Status = PlaylistItemStatus.Import
                 };
                 playlistItem.MetaDatas = metaData;
@@ -75,7 +75,7 @@ namespace FoxTunes
             return playlistItems.ToArray();
         }
 
-        private string GetFileName(string fileName, int track, IEnumerable<MetaDataItem> metaDatas)
+        protected virtual string GetFileName(string fileName, int track, IEnumerable<MetaDataItem> metaDatas)
         {
             var metaData = metaDatas.ToDictionary(
                 metaDataItem => metaDataItem.Name,
@@ -98,11 +98,11 @@ namespace FoxTunes
                     }
                     return value;
                 });
-                return string.Format("{0:00} - {1}.cda", track + 1, sanitize(title));
+                return string.Format("{0}/{1:00} - {2}.cda", fileName, track + 1, sanitize(title));
             }
             else
             {
-                return string.Format("Track {0}.cda", track + 1);
+                return string.Format("{0}/Track {0}.cda", fileName, track + 1);
             }
         }
 

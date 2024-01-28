@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
     public interface IBassStreamInput : IBassStreamComponent
     {
+        IEnumerable<Type> SupportedProviders { get; }
+
         bool PreserveBuffer { get; }
 
         bool CheckFormat(BassOutputStream stream);

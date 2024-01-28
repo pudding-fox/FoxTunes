@@ -6,6 +6,8 @@ namespace FoxTunes.Interfaces
 {
     public interface IBassStreamProvider : IBaseComponent, IDisposable
     {
+        IEnumerable<Type> SupportedInputs { get; }
+
         BassStreamProviderFlags Flags { get; }
 
         bool CanCreateStream(PlaylistItem playlistItem);

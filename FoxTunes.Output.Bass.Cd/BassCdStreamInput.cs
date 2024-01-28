@@ -16,6 +16,17 @@ namespace FoxTunes
             this.Drive = drive;
         }
 
+        public override IEnumerable<Type> SupportedProviders
+        {
+            get
+            {
+                return new[]
+                {
+                    typeof(BassCdStreamProvider)
+                };
+            }
+        }
+
         public override string Name
         {
             get
@@ -91,18 +102,6 @@ namespace FoxTunes
             }
         }
 
-        public override bool CheckFormat(BassOutputStream stream)
-        {
-            var drive = default(int);
-            var id = default(string);
-            var track = default(int);
-            if (!CdUtils.ParseUrl(stream.FileName, out drive, out id, out track))
-            {
-                return false;
-            }
-            return this.Drive == drive;
-        }
-
         public override bool Contains(BassOutputStream stream)
         {
             return this.Queue.Contains(stream.ChannelHandle);
@@ -130,6 +129,7 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", channelHandle);
                 BassGapless.ChannelRemove(channelHandle);
+                Bass.StreamFree(channelHandle);
             }
             this.ClearBuffer();
         }

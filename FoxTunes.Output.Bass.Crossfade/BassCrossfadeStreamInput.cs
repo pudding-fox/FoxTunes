@@ -81,17 +81,13 @@ namespace FoxTunes
             }
         }
 
-        public override bool CheckFormat(BassOutputStream stream)
+        protected override bool OnCheckFormat(BassOutputStream stream)
         {
             if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
             {
                 return false;
             }
-            var rate = default(int);
-            var channels = default(int);
-            var flags = default(BassFlags);
-            this.GetFormat(out rate, out channels, out flags);
-            return rate == stream.Rate && channels == stream.Channels;
+            return base.OnCheckFormat(stream);
         }
 
         public override bool Contains(BassOutputStream stream)

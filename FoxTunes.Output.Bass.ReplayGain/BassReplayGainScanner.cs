@@ -3,46 +3,27 @@ using ManagedBass;
 using ManagedBass.ReplayGain;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassReplayGainScanner : BaseComponent, IBassReplayGainScanner
+    public class BassReplayGainScanner : BassTool, IBassReplayGainScanner
     {
         const string GROUP_NONE = "None";
 
         const string GROUP_EMPTY = "Empty";
 
-        private BassReplayGainScanner()
-        {
-            this.CancellationToken = new CancellationToken();
-        }
-
-        public BassReplayGainScanner(IEnumerable<ScannerItem> scannerItems) : this()
+        public BassReplayGainScanner(IEnumerable<ScannerItem> scannerItems)
         {
             this.ScannerItems = scannerItems;
         }
 
-        public CancellationToken CancellationToken { get; private set; }
-
-        public Process Process
-        {
-            get
-            {
-                return Process.GetCurrentProcess();
-            }
-        }
-
         public IEnumerable<ScannerItem> ScannerItems { get; private set; }
-
-        public int Threads { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
+            BassUtils.OK(BassReplayGain.Init());
             core.Components.Configuration.GetElement<IntegerConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassReplayGainScannerBehaviourConfiguration.THREADS
@@ -52,32 +33,20 @@ namespace FoxTunes
 
         public void Scan()
         {
-            Logger.Write(this, LogLevel.Debug, "Initializing BASS (NoSound).");
-            Bass.Init(Bass.NoSoundDevice);
-            BassReplayGain.Init();
-            try
+            if (this.Threads > 1)
             {
-                if (this.Threads > 1)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Beginning parallel scanning with {0} threads.", this.Threads);
-                }
-                else
-                {
-                    Logger.Write(this, LogLevel.Debug, "Beginning single threaded scanning.");
-                }
-                var scannerItems = default(IEnumerable<ScannerItem>);
-                var scannerGroups = default(IEnumerable<IEnumerable<ScannerItem>>);
-                this.GetGroups(out scannerItems, out scannerGroups);
-                this.ScanTracks(scannerItems);
-                this.ScanGroups(scannerGroups);
-                Logger.Write(this, LogLevel.Debug, "Scanning completed successfully.");
+                Logger.Write(this, LogLevel.Debug, "Beginning parallel scanning with {0} threads.", this.Threads);
             }
-            finally
+            else
             {
-                Logger.Write(this, LogLevel.Debug, "Releasing BASS (NoSound).");
-                BassReplayGain.Free();
-                Bass.Free();
+                Logger.Write(this, LogLevel.Debug, "Beginning single threaded scanning.");
             }
+            var scannerItems = default(IEnumerable<ScannerItem>);
+            var scannerGroups = default(IEnumerable<IEnumerable<ScannerItem>>);
+            this.GetGroups(out scannerItems, out scannerGroups);
+            this.ScanTracks(scannerItems);
+            this.ScanGroups(scannerGroups);
+            Logger.Write(this, LogLevel.Debug, "Scanning completed successfully.");
         }
 
         protected virtual void ScanTracks(IEnumerable<ScannerItem> scannerItems)
@@ -139,23 +108,18 @@ namespace FoxTunes
         {
             var success = default(bool);
             var flags = BassFlags.Decode | BassFlags.Float;
-            var stream = this.CreateStream(scannerItem.FileName, flags);
-            if (stream.IsEmpty)
+            using (var stream = this.CreateStream(scannerItem.FileName, flags))
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to create stream for file \"{0}\": Unknown error.", scannerItem.FileName);
-                throw new InvalidOperationException(string.Format("Failed to create stream for file \"{0}\": Unknown error.", scannerItem.FileName));
-            }
-            Logger.Write(this, LogLevel.Debug, "Created stream for file \"{0}\": {1}", scannerItem.FileName, stream.ChannelHandle);
-            using (var monitor = new ChannelMonitor(scannerItem, stream))
-            {
-                try
+                if (stream.IsEmpty)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to create stream for file \"{0}\": Unknown error.", scannerItem.FileName);
+                    return;
+                }
+                Logger.Write(this, LogLevel.Debug, "Created stream for file \"{0}\": {1}", scannerItem.FileName, stream.ChannelHandle);
+                using (var monitor = new ChannelMonitor(scannerItem, stream))
                 {
                     monitor.Start();
                     success = this.ScanTrack(scannerItem, stream);
-                }
-                finally
-                {
-                    stream.Provider.FreeStream(stream.ChannelHandle);
                 }
             }
             if (this.CancellationToken.IsCancellationRequested)
@@ -217,7 +181,7 @@ namespace FoxTunes
                         if (stream.IsEmpty)
                         {
                             Logger.Write(this, LogLevel.Warn, "Failed to create stream for file \"{0}\": Unknown error.", scannerItem.FileName);
-                            throw new InvalidOperationException(string.Format("Failed to create stream for file \"{0}\": Unknown error.", scannerItem.FileName));
+                            continue;
                         }
                         Logger.Write(this, LogLevel.Debug, "Created stream for file \"{0}\": {1}", scannerItem.FileName, stream.ChannelHandle);
                         streams.Add(scannerItem, stream);
@@ -241,10 +205,9 @@ namespace FoxTunes
                 var monitors = new List<ChannelMonitor>();
                 try
                 {
-                    foreach (var scannerItem in streams.Keys)
+                    foreach (var pair in streams)
                     {
-                        var stream = streams[scannerItem];
-                        var monitor = new ChannelMonitor(scannerItem, stream);
+                        var monitor = new ChannelMonitor(pair.Key, pair.Value);
                         monitor.Start();
                         monitors.Add(monitor);
                     }
@@ -256,10 +219,9 @@ namespace FoxTunes
                     {
                         monitor.Dispose();
                     }
-                    foreach (var scannerItem in streams.Keys)
+                    foreach (var stream in streams.Values)
                     {
-                        var stream = streams[scannerItem];
-                        stream.Provider.FreeStream(stream.ChannelHandle);
+                        stream.Dispose();
                     }
                 }
                 foreach (var scannerItem in streams.Keys)
@@ -298,17 +260,16 @@ namespace FoxTunes
             {
                 return false;
             }
-            foreach (var scannerItem in group.Keys)
+            foreach (var pair in group)
             {
-                var stream = group[scannerItem];
                 foreach (var item in info.items)
                 {
-                    if (item.handle == stream.ChannelHandle)
+                    if (item.handle == pair.Value.ChannelHandle)
                     {
-                        scannerItem.ItemPeak = item.peak;
-                        scannerItem.ItemGain = item.gain;
-                        scannerItem.GroupPeak = info.peak;
-                        scannerItem.GroupGain = info.gain;
+                        pair.Key.ItemPeak = item.peak;
+                        pair.Key.ItemGain = item.gain;
+                        pair.Key.GroupPeak = info.peak;
+                        pair.Key.GroupGain = info.gain;
                         break;
                     }
                 }
@@ -339,98 +300,10 @@ namespace FoxTunes
             scannerGroups = groups.Values;
         }
 
-        public void Update()
+        protected override void OnDisposing()
         {
-            //Nothing to do.
-        }
-
-        public void Cancel()
-        {
-            if (this.CancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-            Logger.Write(this, LogLevel.Warn, "Cancellation requested, shutting down.");
-            this.CancellationToken.Cancel();
-        }
-
-        protected virtual bool CheckInput(string fileName)
-        {
-            if (!string.IsNullOrEmpty(Path.GetPathRoot(fileName)) && !File.Exists(fileName))
-            {
-                //TODO: Bad .Result
-                if (!NetworkDrive.IsRemotePath(fileName) || !NetworkDrive.ConnectRemotePath(fileName).Result)
-                {
-                    throw new FileNotFoundException(string.Format("File not found: {0}", fileName), fileName);
-                }
-            }
-            return true;
-        }
-
-        protected virtual IBassStream CreateStream(string fileName, BassFlags flags)
-        {
-            const int INTERVAL = 5000;
-            var streamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();
-            var playlistItem = new PlaylistItem()
-            {
-                FileName = fileName
-            };
-        retry:
-            if (this.CancellationToken.IsCancellationRequested)
-            {
-                return BassStream.Empty;
-            }
-            var stream = streamFactory.CreateBasicStream(
-                playlistItem,
-                flags
-            );
-            if (stream.IsEmpty)
-            {
-                if (stream.Errors == Errors.Already)
-                {
-                    Logger.Write(this, LogLevel.Trace, "Failed to create stream for file \"{0}\": Device is already in use.", fileName);
-                    Thread.Sleep(INTERVAL);
-                    goto retry;
-                }
-                throw new InvalidOperationException(string.Format("Failed to create stream for file \"{0}\".", fileName));
-            }
-            return stream;
-        }
-
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
-            //Nothing to do.
-        }
-
-        ~BassReplayGainScanner()
-        {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            try
-            {
-                this.Dispose(true);
-            }
-            catch
-            {
-                //Nothing can be done, never throw on GC thread.
-            }
+            BassReplayGain.Free();
+            base.OnDisposing();
         }
     }
 }
