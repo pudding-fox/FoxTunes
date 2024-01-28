@@ -5,7 +5,7 @@ using System.Windows.Markup;
 
 namespace FoxTunes
 {
-    public class TabControlExtensions
+    public partial class TabControlExtensions
     {
         public static readonly DependencyProperty VirtualizationModeProperty = DependencyProperty.RegisterAttached(
             "VirtualizationMode",

@@ -20,6 +20,7 @@
             ItemsSource="{Binding Items, Source={StaticResource ViewModel}, IsAsync=True}" 
             SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}" 
             DisplayMemberPath="Name"
+            Windows:TabControlExtensions.DragOverSelection="True"
             Windows:TabControlExtensions.VirtualizationMode="Disabled">
         <Interactivity:Interaction.Triggers>
             <Windows:FilteredEventTrigger EventName="DragEnter" SourceType="{x:Type TabPanel}">

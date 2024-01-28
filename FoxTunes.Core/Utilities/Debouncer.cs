@@ -44,6 +44,18 @@ namespace FoxTunes
             }
         }
 
+        public void Cancel(Action action)
+        {
+            lock (SyncRoot)
+            {
+                this.Actions.Remove(action);
+                if (this.Actions.Count == 0)
+                {
+                    this.Timer.Stop();
+                }
+            }
+        }
+
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
         {
             try
