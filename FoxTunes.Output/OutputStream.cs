@@ -85,6 +85,8 @@ namespace FoxTunes
 
         public abstract TimeSpan GetDuration(long position);
 
+        public abstract int GetData(ref float[] buffer, TimeSpan duration);
+
         public string Description
         {
             get

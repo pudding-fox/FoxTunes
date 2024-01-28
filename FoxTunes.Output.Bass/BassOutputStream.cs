@@ -236,6 +236,18 @@ namespace FoxTunes
             return TimeSpan.FromSeconds(Bass.ChannelBytes2Seconds(this.ChannelHandle, position));
         }
 
+        public override int GetData(ref float[] buffer, TimeSpan duration)
+        {
+            if (buffer == null)
+            {
+                var length = Convert.ToInt32(
+                   Bass.ChannelSeconds2Bytes(this.ChannelHandle, duration.TotalSeconds)
+               );
+                buffer = new float[length];
+            }
+            return Bass.ChannelGetData(this.ChannelHandle, buffer, buffer.Length);
+        }
+
         public override event EventHandler Ending
         {
             add
