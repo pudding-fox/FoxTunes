@@ -10,23 +10,29 @@ namespace FoxTunes
 
         public bool Enabled { get; private set; }
 
+        private int _UpdateInterval { get; set; }
+
         public int UpdateInterval
         {
             get
             {
-                if (this.Timer == null)
-                {
-                    return 0;
-                }
-                return Convert.ToInt32(this.Timer.Interval);
+                return this._UpdateInterval;
             }
-            protected set
+            set
             {
-                if (this.Timer == null)
+                this._UpdateInterval = value;
+                this.OnUpdateIntervalChanged();
+            }
+        }
+
+        protected virtual void OnUpdateIntervalChanged()
+        {
+            lock (this.SyncRoot)
+            {
+                if (this.Timer != null)
                 {
-                    return;
+                    this.Timer.Interval = this.UpdateInterval;
                 }
-                this.Timer.Interval = value;
             }
         }
 
@@ -36,6 +42,7 @@ namespace FoxTunes
         {
             this.Timer = new global::System.Timers.Timer();
             this.Timer.AutoReset = false;
+            this.Timer.Interval = this.UpdateInterval;
             this.Timer.Elapsed += this.OnElapsed;
             PlaybackStateNotifier.IsStartedChanged += this.OnIsStartedChanged;
             PlaybackStateNotifier.IsPlayingChanged += this.OnIsPlayingChanged;
