@@ -139,7 +139,7 @@ namespace FoxTunes
             }
             var id = default(string);
             var track = default(int);
-            return BassCdStreamProvider.ParseUrl(outputStream.FileName, out drive, out id, out track);
+            return BassCdUtils.ParseUrl(outputStream.FileName, out drive, out id, out track);
         }
 
         protected virtual void UpdateState(bool notify)

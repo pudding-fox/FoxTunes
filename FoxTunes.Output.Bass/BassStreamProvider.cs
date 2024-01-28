@@ -2,41 +2,21 @@
 using ManagedBass;
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [Component("1A67B4C8-7392-4487-9DDD-75E02EC4807E", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_LOW)]
     public class BassStreamProvider : StandardComponent, IBassStreamProvider
     {
-        public const byte PRIORITY_HIGH = 0;
-
-        public const byte PRIORITY_NORMAL = 100;
-
-        public const byte PRIORITY_LOW = 255;
+        public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
 
         public static readonly SyncProcedure EndProcedure = new SyncProcedure((Handle, Channel, Data, User) => Bass.ChannelStop(Handle));
-
-        public BassStreamProvider()
-        {
-            this.Semaphore = new SemaphoreSlim(1, 1);
-        }
-
-        public SemaphoreSlim Semaphore { get; private set; }
 
         public IBassOutput Output { get; private set; }
 
         public IBassStreamFactory StreamFactory { get; private set; }
 
         public IBassStreamPipelineManager PipelineManager { get; private set; }
-
-        public virtual byte Priority
-        {
-            get
-            {
-                return PRIORITY_NORMAL;
-            }
-        }
 
         public virtual BassStreamProviderFlags Flags
         {
@@ -63,57 +43,60 @@ namespace FoxTunes
             return true;
         }
 
-        public virtual Task<IBassStream> CreateStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice)
+        public virtual IBassStream CreateBasicStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
-            var flags = BassFlags.Decode;
-            if (this.Output != null && this.Output.Float)
-            {
-                flags |= BassFlags.Float;
-            }
-            return this.CreateStream(playlistItem, flags, advice);
+            var fileName = this.GetFileName(playlistItem, advice);
+            var channelHandle = Bass.CreateStream(fileName, 0, 0, flags);
+            return this.CreateBasicStream(channelHandle, advice);
         }
 
-#if NET40
-        public virtual Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
-#else
-        public virtual async Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
-#endif
+        protected virtual IBassStream CreateBasicStream(int channelHandle, IEnumerable<IBassStreamAdvice> advice)
         {
-#if NET40
-            this.Semaphore.Wait();
-#else
-            await this.Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
-            try
+            if (channelHandle == 0)
             {
-                var channelHandle = default(int);
-                var fileName = this.GetFileName(playlistItem, advice);
-                if (this.Output != null && this.Output.PlayFromMemory)
+                Logger.Write(this, LogLevel.Debug, "Failed to create stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                return BassStream.Empty;
+            }
+            var stream = default(IBassStream);
+            foreach (var advisory in advice)
+            {
+                if (advisory.Wrap(this, channelHandle, out stream))
+                {
+                    break;
+                }
+            }
+            if (stream == null)
+            {
+                stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes));
+            }
+            return stream;
+        }
+
+        public virtual IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
+        {
+            var fileName = this.GetFileName(playlistItem, advice);
+            var channelHandle = default(int);
+            if (this.Output != null && this.Output.PlayFromMemory)
+            {
+                //Synchronize as BassInMemoryHandler will create a shared buffer for the file.
+                using (KeyLock.Lock(fileName))
                 {
                     channelHandle = BassInMemoryHandler.CreateStream(fileName, 0, 0, flags);
-                    if (channelHandle == 0)
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Failed to load file into memory: {0}", fileName);
-                        channelHandle = Bass.CreateStream(fileName, 0, 0, flags);
-                    }
                 }
-                else
+                if (channelHandle == 0)
                 {
+                    Logger.Write(this, LogLevel.Warn, "Failed to load file into memory: {0}", fileName);
                     channelHandle = Bass.CreateStream(fileName, 0, 0, flags);
                 }
-#if NET40
-                return TaskEx.FromResult(this.CreateStream(channelHandle, advice));
-#else
-                return this.CreateStream(channelHandle, advice);
-#endif
             }
-            finally
+            else
             {
-                this.Semaphore.Release();
+                channelHandle = Bass.CreateStream(fileName, 0, 0, flags);
             }
+            return this.CreateInteractiveStream(channelHandle, advice);
         }
 
-        protected virtual IBassStream CreateStream(int channelHandle, IEnumerable<IBassStreamAdvice> advice)
+        protected virtual IBassStream CreateInteractiveStream(int channelHandle, IEnumerable<IBassStreamAdvice> advice)
         {
             if (channelHandle == 0)
             {

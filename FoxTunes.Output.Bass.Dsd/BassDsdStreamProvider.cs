@@ -1,10 +1,11 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes;
+using FoxTunes.Interfaces;
 using ManagedBass;
 using ManagedBass.Dsd;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -12,29 +13,31 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassDsdStreamProvider : BassStreamProvider
     {
-        public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
-
-        public override byte Priority
+        public static readonly string[] EXTENSIONS = new[]
         {
-            get
-            {
-                return PRIORITY_HIGH;
-            }
-        }
+            "dsd",
+            "dsf"
+        };
+
+        public BassDsdStreamProviderBehaviour Behaviour { get; private set; }
+
+        public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
+            this.Behaviour = ComponentRegistry.Instance.GetComponent<BassDsdStreamProviderBehaviour>();
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             base.InitializeComponent(core);
         }
 
         public override bool CanCreateStream(PlaylistItem playlistItem)
         {
-            if (!new[]
-            {
-                "dsd",
-                "dsf"
-            }.Contains(playlistItem.FileName.GetExtension(), StringComparer.OrdinalIgnoreCase))
+            //Unfortunately there's no way to determine whether DSD direct is enabled.
+            //if (this.Behaviour == null || !this.Behaviour.Enabled)
+            //{
+            //    return false;
+            //}
+            if (!EXTENSIONS.Contains(playlistItem.FileName.GetExtension(), StringComparer.OrdinalIgnoreCase))
             {
                 return false;
             }
@@ -46,69 +49,56 @@ namespace FoxTunes
             return true;
         }
 
-        public override Task<IBassStream> CreateStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice)
+        public override IBassStream CreateBasicStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
-            var flags = BassFlags.Decode | BassFlags.DSDRaw;
-            return this.CreateStream(playlistItem, flags, advice);
+            flags |= BassFlags.DSDRaw;
+            var fileName = this.GetFileName(playlistItem, advice);
+            var channelHandle = BassDsd.CreateStream(fileName, 0, 0, flags);
+            if (channelHandle != 0 && !this.IsFormatSupported(playlistItem, channelHandle))
+            {
+                this.FreeStream(playlistItem, channelHandle);
+                channelHandle = 0;
+            }
+            return this.CreateInteractiveStream(channelHandle, advice);
         }
 
-#if NET40
-        public override Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
-#else
-        public override async Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
-#endif
+        public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
-            if (!flags.HasFlag(BassFlags.DSDRaw))
+            flags |= BassFlags.DSDRaw;
+            var fileName = this.GetFileName(playlistItem, advice);
+            var channelHandle = default(int);
+            if (this.Output != null && this.Output.PlayFromMemory)
             {
-#if NET40
-                return base.CreateStream(playlistItem, flags, advice);
-#else
-                return await base.CreateStream(playlistItem, flags, advice).ConfigureAwait(false);
-#endif
+                channelHandle = BassDsdInMemoryHandler.CreateStream(fileName, 0, 0, flags);
+                if (channelHandle == 0)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to load file into memory: {0}", fileName);
+                    channelHandle = BassDsd.CreateStream(fileName, 0, 0, flags);
+                }
             }
-#if NET40
-            this.Semaphore.Wait();
-#else
-            await this.Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
-            try
+            else
             {
-                var channelHandle = default(int);
-                if (this.Output != null && this.Output.PlayFromMemory)
-                {
-                    channelHandle = BassDsdInMemoryHandler.CreateStream(playlistItem.FileName, 0, 0, flags);
-                    if (channelHandle == 0)
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Failed to load file into memory: {0}", playlistItem.FileName);
-                        channelHandle = BassDsd.CreateStream(playlistItem.FileName, 0, 0, flags);
-                    }
-                }
-                else
-                {
-                    channelHandle = BassDsd.CreateStream(playlistItem.FileName, 0, 0, flags);
-                }
-                if (channelHandle != 0)
-                {
-                    var query = this.BassStreamPipelineFactory.QueryPipeline();
-                    var channels = BassUtils.GetChannelCount(channelHandle);
-                    var rate = BassUtils.GetChannelDsdRate(channelHandle);
-                    if (query.OutputChannels < channels || !query.OutputRates.Contains(rate))
-                    {
-                        Logger.Write(this, LogLevel.Warn, "DSD format {0}:{1} is unsupported, the stream will be unloaded. This warning is expensive, please don't attempt to play unsupported DSD.", rate, channels);
-                        this.FreeStream(playlistItem, channelHandle);
-                        channelHandle = 0;
-                    }
-                }
-#if NET40
-                return TaskEx.FromResult(this.CreateStream(channelHandle, advice));
-#else
-                return this.CreateStream(channelHandle, advice);
-#endif
+                channelHandle = BassDsd.CreateStream(fileName, 0, 0, flags);
             }
-            finally
+            if (channelHandle != 0 && !this.IsFormatSupported(playlistItem, channelHandle))
             {
-                this.Semaphore.Release();
+                this.FreeStream(playlistItem, channelHandle);
+                channelHandle = 0;
             }
+            return this.CreateInteractiveStream(channelHandle, advice);
+        }
+
+        protected virtual bool IsFormatSupported(PlaylistItem playlistItem, int channelHandle)
+        {
+            var query = this.BassStreamPipelineFactory.QueryPipeline();
+            var channels = BassUtils.GetChannelCount(channelHandle);
+            var rate = BassUtils.GetChannelDsdRate(channelHandle);
+            if (query.OutputChannels < channels || !query.OutputRates.Contains(rate))
+            {
+                Logger.Write(this, LogLevel.Warn, "DSD format {0}:{1} is unsupported, the stream will be unloaded. This warning is expensive, please don't attempt to play unsupported DSD.", rate, channels);
+                return false;
+            }
+            return true;
         }
     }
 }

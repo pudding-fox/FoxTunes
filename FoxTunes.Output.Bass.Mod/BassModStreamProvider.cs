@@ -4,7 +4,6 @@ using ManagedBass;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -22,13 +21,12 @@ namespace FoxTunes
             "xm"
         };
 
+        public BassModStreamProviderBehaviour Behaviour { get; private set; }
 
-        public override byte Priority
+        public override void InitializeComponent(ICore core)
         {
-            get
-            {
-                return PRIORITY_HIGH;
-            }
+            this.Behaviour = ComponentRegistry.Instance.GetComponent<BassModStreamProviderBehaviour>();
+            base.InitializeComponent(core);
         }
 
         public override bool CanCreateStream(PlaylistItem playlistItem)
@@ -40,44 +38,23 @@ namespace FoxTunes
             return true;
         }
 
-        public override Task<IBassStream> CreateStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice)
+        public override IBassStream CreateBasicStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
-            var flags = BassFlags.Decode;
-            if (this.Output != null && this.Output.Float)
-            {
-                flags |= BassFlags.Float;
-            }
-            return this.CreateStream(playlistItem, flags, advice);
+            var fileName = this.GetFileName(playlistItem, advice);
+            var channelHandle = Bass.MusicLoad(fileName, 0, 0, flags | BassFlags.Prescan);
+            return this.CreateBasicStream(channelHandle, advice);
         }
 
-#if NET40
-        public override Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
-#else
-        public override async Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice)
-#endif
+        public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
         {
-#if NET40
-            this.Semaphore.Wait();
-#else
-            await this.Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
-            try
+            var fileName = this.GetFileName(playlistItem, advice);
+            var channelHandle = default(int);
+            if (this.Output != null && this.Output.PlayFromMemory)
             {
-                if (this.Output != null && this.Output.PlayFromMemory)
-                {
-                    Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
-                }
-                var channelHandle = Bass.MusicLoad(playlistItem.FileName, 0, 0, flags | BassFlags.Prescan);
-#if NET40
-                return TaskEx.FromResult(this.CreateStream(channelHandle, advice));
-#else
-                return this.CreateStream(channelHandle, advice);
-#endif
+                Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
             }
-            finally
-            {
-                this.Semaphore.Release();
-            }
+            channelHandle = Bass.MusicLoad(fileName, 0, 0, flags | BassFlags.Prescan);
+            return this.CreateInteractiveStream(channelHandle, advice);
         }
 
         public override void FreeStream(PlaylistItem playlistItem, int channelHandle)

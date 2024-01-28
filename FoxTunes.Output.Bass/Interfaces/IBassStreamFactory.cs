@@ -1,6 +1,5 @@
 ﻿using ManagedBass;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -14,8 +13,8 @@ namespace FoxTunes.Interfaces
 
         void Register(IBassStreamProvider provider);
 
-        Task<IBassStream> CreateStream(PlaylistItem playlistItem, bool immidiate);
+        IBassStream CreateBasicStream(PlaylistItem playlistItem, BassFlags flags);
 
-        Task<IBassStream> CreateStream(PlaylistItem playlistItem, bool immidiate, BassFlags flags);
+        IBassStream CreateInteractiveStream(PlaylistItem playlistItem, bool immidiate, BassFlags flags);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,14 +16,6 @@ namespace FoxTunes
 
         public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
 
-        public override byte Priority
-        {
-            get
-            {
-                return PRIORITY_HIGH;
-            }
-        }
-
         public BassSkipSilenceStreamAdvisorBehaviour Behaviour { get; private set; }
 
         public IMetaDataManager MetaDataManager { get; private set; }
@@ -34,32 +27,26 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public override bool Advice(IBassStreamProvider provider, PlaylistItem playlistItem, out IBassStreamAdvice advice)
+        public override void Advise(IBassStreamProvider provider, PlaylistItem playlistItem, IList<IBassStreamAdvice> advice)
         {
             if (this.Behaviour == null || !this.Behaviour.Enabled)
             {
-                advice = null;
-                return false;
+                return;
             }
 
             if (provider.GetType() != typeof(BassStreamProvider))
             {
                 Logger.Write(this, LogLevel.Warn, "Not attempting to calculate lead in/out for file \"{0}\": Provider \"{1}\" is not supported.", playlistItem.FileName, provider.GetType().Name);
-
-                advice = null;
-                return false;
+                return;
             }
 
             var leadIn = default(TimeSpan);
             var leadOut = default(TimeSpan);
             if (!this.TryGetSilence(provider, playlistItem, out leadIn, out leadOut))
             {
-                advice = null;
-                return false;
+                return;
             }
-
-            advice = new BassSkipSilenceStreamAdvice(playlistItem.FileName, leadIn, leadOut);
-            return true;
+            advice.Add(new BassSkipSilenceStreamAdvice(playlistItem.FileName, leadIn, leadOut));
         }
 
         protected virtual bool TryGetSilence(IBassStreamProvider provider, PlaylistItem playlistItem, out TimeSpan leadIn, out TimeSpan leadOut)
