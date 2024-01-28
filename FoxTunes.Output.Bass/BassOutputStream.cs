@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -24,6 +25,8 @@ namespace FoxTunes
         public IBassStreamPipelineManager Manager { get; private set; }
 
         public IBassStream Stream { get; private set; }
+
+        public IEnumerable<IBassStreamAdvice> Advice { get; private set; }
 
         public IBassStreamProvider Provider
         {

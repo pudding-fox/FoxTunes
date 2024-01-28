@@ -60,14 +60,14 @@ namespace FoxTunes
             var stream = default(IBassStream);
             foreach (var advisory in advice)
             {
-                if (advisory.Wrap(this, channelHandle, out stream))
+                if (advisory.Wrap(this, channelHandle, advice, out stream))
                 {
                     break;
                 }
             }
             if (stream == null)
             {
-                stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes));
+                stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes), advice);
             }
             return stream;
         }
@@ -106,14 +106,14 @@ namespace FoxTunes
             var stream = default(IBassStream);
             foreach (var advisory in advice)
             {
-                if (advisory.Wrap(this, channelHandle, out stream))
+                if (advisory.Wrap(this, channelHandle, advice, out stream))
                 {
                     break;
                 }
             }
             if (stream == null)
             {
-                stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes));
+                stream = new BassStream(this, channelHandle, Bass.ChannelGetLength(channelHandle, PositionFlags.Bytes), advice);
             }
             stream.RegisterSyncHandlers();
             return stream;

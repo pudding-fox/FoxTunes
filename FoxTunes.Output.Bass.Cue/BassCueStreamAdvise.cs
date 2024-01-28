@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -21,7 +22,7 @@ namespace FoxTunes
 
         public TimeSpan Length { get; private set; }
 
-        public override bool Wrap(IBassStreamProvider provider, int channelHandle, out IBassStream stream)
+        public override bool Wrap(IBassStreamProvider provider, int channelHandle, IEnumerable<IBassStreamAdvice> advice, out IBassStream stream)
         {
             var offset = default(long);
             var length = default(long);
@@ -44,7 +45,8 @@ namespace FoxTunes
                     BassSubstreamHandler.CreateStream(channelHandle, offset, length, BassFlags.AutoFree),
                     channelHandle,
                     offset,
-                    length
+                    length,
+                    advice
                 );
                 return true;
             }

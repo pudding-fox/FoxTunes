@@ -1,7 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -15,11 +15,12 @@ namespace FoxTunes
             this.Errors = Errors.OK;
         }
 
-        public BassStream(IBassStreamProvider provider, int channelHandle, long length) : this()
+        public BassStream(IBassStreamProvider provider, int channelHandle, long length, IEnumerable<IBassStreamAdvice> advice) : this()
         {
             this.Provider = provider;
             this.ChannelHandle = channelHandle;
             this.Length = length;
+            this.Advice = advice;
         }
 
         public IBassStreamProvider Provider { get; private set; }
@@ -51,6 +52,8 @@ namespace FoxTunes
                 this.OnEnding();
             }
         }
+
+        public IEnumerable<IBassStreamAdvice> Advice { get; private set; }
 
         public Errors Errors { get; private set; }
 
