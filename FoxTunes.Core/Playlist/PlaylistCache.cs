@@ -83,16 +83,11 @@ namespace FoxTunes
 
         public bool TryGetItemById(int id, out PlaylistItem result)
         {
-            foreach (var playlist in this.Playlists)
+            foreach (var pair in this.Items)
             {
-                var playlistItems = default(IndexedArray<PlaylistItem>);
-                if (!this.Items.TryGetValue(playlist, out playlistItems))
-                {
-                    continue;
-                }
                 if (this.ItemsById.GetOrAdd(
-                    playlist,
-                    key => playlistItems.By(playlistItem => playlistItem.Id, IndexedCollection.IndexType.Single)
+                    pair.Key,
+                    key => pair.Value.By(playlistItem => playlistItem.Id, IndexedCollection.IndexType.Single)
                 ).TryFind(id, out result))
                 {
                     return true;
@@ -122,16 +117,11 @@ namespace FoxTunes
         public bool TryGetItemsByLibraryId(int id, out PlaylistItem[] result)
         {
             var list = new List<PlaylistItem>();
-            foreach (var playlist in this.Playlists)
+            foreach (var pair in this.Items)
             {
-                var playlistItems = default(IndexedArray<PlaylistItem>);
-                if (!this.Items.TryGetValue(playlist, out playlistItems))
-                {
-                    continue;
-                }
                 list.AddRange(this.ItemsById.GetOrAdd(
-                    playlist,
-                    key => playlistItems.By(playlistItem => playlistItem.LibraryItem_Id.GetValueOrDefault(), IndexedCollection.IndexType.Multiple)
+                    pair.Key,
+                    key => pair.Value.By(playlistItem => playlistItem.LibraryItem_Id.GetValueOrDefault(), IndexedCollection.IndexType.Multiple)
                 ).FindAll(id));
             }
             if (!list.Any())
