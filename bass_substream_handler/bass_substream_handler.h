@@ -1,0 +1,14 @@
+#include "bass/bass.h"
+
+#ifndef BASSSUBSTREAMHANDLERDEF
+#define BASSSUBSTREAMHANDLERDEF(f) WINAPI f
+#endif
+
+__declspec(dllexport)
+BOOL BASSSUBSTREAMHANDLERDEF(BASS_SUBSTREAM_HANDLER_Init)();
+
+__declspec(dllexport)
+BOOL BASSSUBSTREAMHANDLERDEF(BASS_SUBSTREAM_HANDLER_Free)();
+
+__declspec(dllexport)
+HSTREAM BASSSUBSTREAMHANDLERDEF(BASS_SUBSTREAM_HANDLER_StreamCreate)(HSTREAM handle, QWORD offset, QWORD length, DWORD flags);

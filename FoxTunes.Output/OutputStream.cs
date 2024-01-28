@@ -51,39 +51,9 @@ namespace FoxTunes
 
         public abstract Task Stop();
 
-        protected virtual Task OnEnding()
-        {
-            if (this.Ending == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var e = new AsyncEventArgs();
-            this.Ending(this, e);
-            return e.Complete();
-        }
+        public abstract event AsyncEventHandler Ending;
 
-        public event AsyncEventHandler Ending;
-
-        protected virtual Task OnEnded()
-        {
-            if (this.Ended == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var e = new AsyncEventArgs();
-            this.Ended(this, e);
-            return e.Complete();
-        }
-
-        public event AsyncEventHandler Ended;
+        public abstract event AsyncEventHandler Ended;
 
         public virtual Task BeginSeek()
         {
