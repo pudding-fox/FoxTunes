@@ -16,7 +16,7 @@ namespace FoxTunes
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[2],
                 TestInfo.AudioFileNames[3]
-            });
+            }, false);
             this.AssertPlaylistItems(
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[2],
@@ -25,7 +25,7 @@ namespace FoxTunes
             await this.Core.Managers.Playlist.Insert(1, new[]
             {
                 TestInfo.AudioFileNames[1]
-            });
+            }, false);
             this.AssertPlaylistItems(
                 TestInfo.AudioFileNames[0],
                 TestInfo.AudioFileNames[1],

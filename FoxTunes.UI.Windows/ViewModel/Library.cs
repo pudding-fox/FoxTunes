@@ -22,6 +22,8 @@ namespace FoxTunes.ViewModel
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
 
+        public IPlaylistManager PlaylistManager { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         private LibraryHierarchy _SelectedHierarchy { get; set; }
@@ -128,6 +130,7 @@ namespace FoxTunes.ViewModel
             this.ForegroundTaskRunner = this.Core.Components.ForegroundTaskRunner;
             this.LibraryHierarchyBrowser = this.Core.Components.LibraryHierarchyBrowser;
             this.LibraryHierarchyBrowser.FilterChanged += this.OnFilterChanged;
+            this.PlaylistManager = this.Core.Managers.Playlist;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Refresh();
@@ -152,8 +155,43 @@ namespace FoxTunes.ViewModel
             {
                 case CommonSignals.HierarchiesUpdated:
                     return this.ForegroundTaskRunner.RunAsync(() => this.Reload());
+                case CommonSignals.PluginInvocation:
+                    var invocation = signal.State as IInvocationComponent;
+                    if (invocation != null)
+                    {
+                        switch (invocation.Category)
+                        {
+                            case InvocationComponent.CATEGORY_LIBRARY:
+                                switch (invocation.Id)
+                                {
+                                    case LibraryActionsBehaviour.APPEND_PLAYLIST:
+                                        return this.AddToPlaylist(this.SelectedItem, false);
+                                    case LibraryActionsBehaviour.REPLACE_PLAYLIST:
+                                        return this.AddToPlaylist(this.SelectedItem, true);
+                                }
+                                break;
+                        }
+                    }
+                    break;
             }
             return Task.CompletedTask;
+        }
+
+        public ICommand AddToPlaylistCommand
+        {
+            get
+            {
+                return new AsyncCommand(this.BackgroundTaskRunner, () => this.AddToPlaylist(this.SelectedItem, false), () => this.SelectedItem != null && this.SelectedItem.IsLeaf);
+            }
+        }
+
+        private async Task AddToPlaylist(LibraryHierarchyNode libraryHierarchyNode, bool clear)
+        {
+            if (this.SelectedItem == null)
+            {
+                return;
+            }
+            await this.PlaylistManager.Add(libraryHierarchyNode, clear);
         }
 
         public ICommand DragEnterCommand

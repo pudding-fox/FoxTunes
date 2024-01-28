@@ -1,6 +1,4 @@
-﻿using FoxDb;
-using FoxTunes.Interfaces;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -16,15 +14,9 @@ namespace FoxTunes
 
         protected override async Task OnRun()
         {
-            this.IsIndeterminate = true;
-            Logger.Write(this, LogLevel.Debug, "Clearing playlist.");
-            var query = this.Database.QueryFactory.Build();
-            query.Delete.Touch();
-            query.Source.AddTable(this.Database.Tables.PlaylistItem);
             using (var transaction = this.Database.BeginTransaction())
             {
-                this.Database.Execute(query, transaction);
-                this.CleanupMetaData(transaction);
+                this.ClearItems(transaction);
                 transaction.Commit();
             }
             await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));

@@ -4,13 +4,11 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class PlaylistActionsBehaviour : StandardBehaviour, IInvocableComponent
+    public class LibraryActionsBehaviour : StandardBehaviour, IInvocableComponent
     {
-        public const string REMOVE_PLAYLIST_ITEMS = "AAAA";
+        public const string APPEND_PLAYLIST = "AAAB";
 
-        public const string CROP_PLAYLIST_ITEMS = "AAAB";
-
-        public const string LOCATE_PLAYLIST_ITEMS = "AAAC";
+        public const string REPLACE_PLAYLIST = "AAAC";
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
@@ -19,14 +17,12 @@ namespace FoxTunes
             this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
-
         public IEnumerable<IInvocationComponent> Invocations
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, REMOVE_PLAYLIST_ITEMS, "Remove");
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CROP_PLAYLIST_ITEMS, "Crop");
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, LOCATE_PLAYLIST_ITEMS, "Locate");
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, APPEND_PLAYLIST, "Add To Playlist");
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REPLACE_PLAYLIST, "Replace Playlist");
             }
         }
 
@@ -34,9 +30,8 @@ namespace FoxTunes
         {
             switch (component.Id)
             {
-                case REMOVE_PLAYLIST_ITEMS:
-                case CROP_PLAYLIST_ITEMS:
-                case LOCATE_PLAYLIST_ITEMS:
+                case APPEND_PLAYLIST:
+                case REPLACE_PLAYLIST:
                     return this.SignalEmitter.Send(new Signal(this, CommonSignals.PluginInvocation, component));
             }
             return Task.CompletedTask;

@@ -34,6 +34,17 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        protected virtual void ClearItems(ITransactionSource transaction)
+        {
+            this.IsIndeterminate = true;
+            Logger.Write(this, LogLevel.Debug, "Clearing playlist.");
+            var query = this.Database.QueryFactory.Build();
+            query.Delete.Touch();
+            query.Source.AddTable(this.Database.Tables.PlaylistItem);
+            this.Database.Execute(query, transaction);
+            this.CleanupMetaData(transaction);
+        }
+
         protected virtual void ShiftItems(ITransactionSource transaction)
         {
             Logger.Write(this, LogLevel.Debug, "Shifting playlist items at position {0} by offset {1}.", this.Sequence, this.Offset);
@@ -64,6 +75,8 @@ namespace FoxTunes
 
         protected virtual void SequenceItems(ITransactionSource transaction)
         {
+            Logger.Write(this, LogLevel.Debug, "Sequencing playlist items.");
+            this.IsIndeterminate = true;
             var metaDataNames = MetaDataInfo.GetMetaDataNames(this.Database, transaction);
             using (var reader = this.Database.ExecuteReader(this.Database.Queries.PlaylistSequenceBuilder(metaDataNames), parameters =>
             {
@@ -95,6 +108,8 @@ namespace FoxTunes
 
         protected virtual void CleanupMetaData(ITransactionSource transaction)
         {
+            Logger.Write(this, LogLevel.Debug, "Cleaning up unused meta data.");
+            this.IsIndeterminate = true;
             var table = this.Database.Config.Table("PlaylistItem_MetaDataItem", TableFlags.None);
             var column = table.Column("PlaylistItem_Id");
             var query = this.Database.QueryFactory.Build();

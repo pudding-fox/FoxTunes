@@ -42,6 +42,14 @@
                     <EventSetter Event="PreviewMouseMove" Handler="TreeViewItem_PreviewMouseMove"></EventSetter>
                 </Style>
             </TreeView.Resources>
+            <Interactivity:Interaction.Triggers>
+                <Interactivity:EventTrigger EventName="MouseDoubleClick">
+                    <Interactivity:InvokeCommandAction Command="{Binding AddToPlaylistCommand, Source={StaticResource ViewModel}}"/>
+                </Interactivity:EventTrigger>
+            </Interactivity:Interaction.Triggers>
+            <TreeView.ContextMenu>
+                <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_LIBRARY}}"></Windows:Menu>
+            </TreeView.ContextMenu>
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                     <TextBlock Text="{Binding DisplayValue, Mode=OneWay}"/>

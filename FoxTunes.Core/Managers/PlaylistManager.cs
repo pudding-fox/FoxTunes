@@ -90,33 +90,33 @@ namespace FoxTunes.Managers
             }
         }
 
-        public Task Add(IEnumerable<string> paths)
+        public Task Add(IEnumerable<string> paths, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Adding paths to playlist.");
             var index = this.GetInsertIndex();
-            return this.Insert(index, paths);
+            return this.Insert(index, paths, clear);
         }
 
-        public Task Insert(int index, IEnumerable<string> paths)
+        public Task Insert(int index, IEnumerable<string> paths, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Inserting paths into playlist at index: {0}", index);
-            var task = new AddPathsToPlaylistTask(index, paths);
+            var task = new AddPathsToPlaylistTask(index, paths, clear);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
             return task.Run();
         }
 
-        public Task Add(LibraryHierarchyNode libraryHierarchyNode)
+        public Task Add(LibraryHierarchyNode libraryHierarchyNode, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Adding library node to playlist.");
             var index = this.GetInsertIndex();
-            return this.Insert(index, libraryHierarchyNode);
+            return this.Insert(index, libraryHierarchyNode, clear);
         }
 
-        public Task Insert(int index, LibraryHierarchyNode libraryHierarchyNode)
+        public Task Insert(int index, LibraryHierarchyNode libraryHierarchyNode, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Inserting library node into playlist at index: {0}", index);
-            var task = new AddLibraryHierarchyNodeToPlaylistTask(index, libraryHierarchyNode);
+            var task = new AddLibraryHierarchyNodeToPlaylistTask(index, libraryHierarchyNode, clear);
             task.InitializeComponent(this.Core);
             this.OnBackgroundTask(task);
             return task.Run();
