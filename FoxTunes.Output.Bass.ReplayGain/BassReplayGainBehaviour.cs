@@ -5,8 +5,6 @@ using System.Runtime.CompilerServices;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.Output)]
-    [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class BassReplayGainBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public BassReplayGainBehaviour()
