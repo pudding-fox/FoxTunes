@@ -487,6 +487,16 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            if (this.Thumbnails != null)
+            {
+                foreach (var pair in this.Thumbnails)
+                {
+                    if (pair.Value != null)
+                    {
+                        pair.Value.Dispose();
+                    }
+                }
+            }
             if (this.UserInterface != null)
             {
                 this.UserInterface.WindowCreated -= this.OnWindowCreated;

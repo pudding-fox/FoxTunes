@@ -4,13 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
-    <StackPanel>
-        <TextBlock>
-            <Run Text="{x:Static Core:Publication.Product}"></Run>
-            <Run Text="{x:Static Core:Publication.Version}"></Run>
-        </TextBlock>
-        <TextBlock Text="{Binding Components.Output.Description, Mode=OneWay, FallbackValue=FoxTunes}"></TextBlock>
-    </StackPanel>
+    <UserControl.Resources>
+        <ViewModel:PlaybackDetails x:Key="ViewModel"></ViewModel:PlaybackDetails>
+    </UserControl.Resources>
+    <TextBlock Text="{Binding Description, Source={StaticResource ViewModel}}"></TextBlock>
 </UserControl>
