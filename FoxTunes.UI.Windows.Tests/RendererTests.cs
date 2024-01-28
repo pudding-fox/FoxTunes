@@ -1,8 +1,10 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
 
 namespace FoxTunes
 {
@@ -29,6 +31,31 @@ namespace FoxTunes
                 Animate(ref value, target, min, max, smoothing);
                 actual.Add(value);
             } while (value != target);
+            Assert.IsTrue(Enumerable.SequenceEqual(expected, actual));
+        }
+
+        [Test]
+        public void ColorGradientTest()
+        {
+            var expected = new Color[]
+            {
+                (Color)ColorConverter.ConvertFromString("#FF000000"),
+                (Color)ColorConverter.ConvertFromString("#FF002000"),
+                (Color)ColorConverter.ConvertFromString("#FF004000"),
+                (Color)ColorConverter.ConvertFromString("#FF006000"),
+                (Color)ColorConverter.ConvertFromString("#FF008000"),
+                (Color)ColorConverter.ConvertFromString("#FF8EC78E"),
+                (Color)ColorConverter.ConvertFromString("#FFAAD5AA"),
+                (Color)ColorConverter.ConvertFromString("#FFC6E3C6"),
+                (Color)ColorConverter.ConvertFromString("#FFE3F1E3"),
+                (Color)ColorConverter.ConvertFromString("#FFFFFFFF")
+            };
+            var actual = new KeyValuePair<int, Color>[]
+            {
+                new KeyValuePair<int, Color>(0, Colors.Black),
+                new KeyValuePair<int, Color>(5, Colors.Green),
+                new KeyValuePair<int, Color>(10, Colors.White)
+            }.ToGradient();
             Assert.IsTrue(Enumerable.SequenceEqual(expected, actual));
         }
 

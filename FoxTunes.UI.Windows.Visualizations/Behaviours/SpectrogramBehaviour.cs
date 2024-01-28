@@ -14,12 +14,18 @@ namespace FoxTunes
 
         public SelectionConfigurationElement Mode { get; private set; }
 
+        public SelectionConfigurationElement Scale { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
             this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
                 SpectrogramBehaviourConfiguration.SECTION,
                 SpectrogramBehaviourConfiguration.MODE_ELEMENT
+            );
+            this.Scale = this.Configuration.GetElement<SelectionConfigurationElement>(
+                SpectrogramBehaviourConfiguration.SECTION,
+                SpectrogramBehaviourConfiguration.SCALE_ELEMENT
             );
             base.InitializeComponent(core);
         }
@@ -34,14 +40,31 @@ namespace FoxTunes
                         CATEGORY,
                         option.Id,
                         option.Name,
+                        path: this.Mode.Name,
                         attributes: this.Mode.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
+                }
+                foreach (var option in this.Scale.Options)
+                {
+                    yield return new InvocationComponent(
+                        CATEGORY,
+                        option.Id,
+                        option.Name,
+                        path: this.Scale.Name,
+                        attributes: this.Scale.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
                 }
             }
         }
 
         public Task InvokeAsync(IInvocationComponent component)
         {
-            this.Mode.Value = this.Mode.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id));
+            if (string.Equals(this.Mode.Name, component.Path))
+            {
+                this.Mode.Value = this.Mode.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id));
+            }
+            else if (string.Equals(this.Scale.Name, component.Path))
+            {
+                this.Scale.Value = this.Scale.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id));
+            }
             this.Configuration.Save();
 #if NET40
             return TaskEx.FromResult(false);

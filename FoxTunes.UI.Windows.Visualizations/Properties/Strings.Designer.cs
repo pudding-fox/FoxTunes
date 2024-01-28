@@ -331,6 +331,33 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Scale.
+        /// </summary>
+        internal static string SpectrogramBehaviourConfiguration_Scale {
+            get {
+                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Scale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Linear.
+        /// </summary>
+        internal static string SpectrogramBehaviourConfiguration_Scale_Linear {
+            get {
+                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Scale.Linear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Logarithmic.
+        /// </summary>
+        internal static string SpectrogramBehaviourConfiguration_Scale_Logarithmic {
+            get {
+                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.Scale.Logarithmic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Spectrum.
         /// </summary>
         internal static string Spectrum_Name {
