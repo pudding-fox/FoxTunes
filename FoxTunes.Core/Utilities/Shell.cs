@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -39,25 +40,31 @@ namespace FoxTunes
         public static void CreateShortcut(string location, string target, IDictionary<PropertyKey, string> properties = null)
         {
             var shellLink = new CShellLink();
-            var shellLinkW = (IShellLinkW)shellLink;
-            var propertyStore = (IPropertyStore)shellLink;
-            var persistFile = (IPersistFile)shellLink;
 
             try
             {
+                var shellLinkW = (IShellLinkW)shellLink;
                 shellLinkW.SetPath(target);
 
-                if (properties != null)
+                if (properties != null && properties.Count > 0)
                 {
-                    foreach (var key in properties.Keys)
+                    if (shellLink is IPropertyStore propertyStore)
                     {
-                        var value = properties[key];
-                        var property = new PropertyVariant();
-                        property.SetValue(value);
-                        propertyStore.SetValue(key, property);
+                        foreach (var key in properties.Keys)
+                        {
+                            var value = properties[key];
+                            var property = new PropertyVariant();
+                            property.SetValue(value);
+                            propertyStore.SetValue(key, property);
+                        }
+                    }
+                    else
+                    {
+                        //Properties were specified but the platform does not support them.
                     }
                 }
 
+                var persistFile = (IPersistFile)shellLink;
                 persistFile.Save(location, true);
             }
             finally
