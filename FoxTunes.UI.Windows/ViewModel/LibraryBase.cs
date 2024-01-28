@@ -423,15 +423,15 @@ namespace FoxTunes.ViewModel
             this.Dispatch(this.RefreshStatus);
         }
 
-        protected virtual void OnSelectedHierarchyChanged(object sender, EventArgs e)
+        protected virtual async void OnSelectedHierarchyChanged(object sender, EventArgs e)
         {
-            this.OnSelectedHierarchyChanged();
+            await Windows.Invoke(this.OnSelectedHierarchyChanged).ConfigureAwait(false);
             this.Dispatch(this.Refresh);
         }
 
         protected virtual void OnSelectedItemChanged(object sender, EventArgs e)
         {
-            this.OnSelectedItemChanged();
+            var task = Windows.Invoke(this.OnSelectedItemChanged);
         }
 
         protected virtual void OnCanNavigateChanged(object sender, EventArgs e)

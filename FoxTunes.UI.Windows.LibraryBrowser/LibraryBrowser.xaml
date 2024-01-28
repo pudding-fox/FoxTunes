@@ -144,7 +144,7 @@
                         Unloaded="OnUnloaded"
                         Windows:ListBoxExtensions.DragSource="True"
                         Windows:ListBoxExtensions.DragSourceInitialized="DragSourceInitialized"
-                        Windows:ListBoxExtensions.SelectedItem="True"
+                        Windows:ListBoxExtensions.EnsureSelectedItemVisible="True"
                         LocalWindows:LibraryBrowserExtensions.ItemsPanelSelector="{Binding ViewMode, Source={StaticResource ViewModel}}"
                         LocalWindows:LibraryBrowserExtensions.GridItemsPanel="{StaticResource GridItemsPanelTemplate}"
                         LocalWindows:LibraryBrowserExtensions.ListItemsPanel="{StaticResource ListItemsPanelTemplate}"

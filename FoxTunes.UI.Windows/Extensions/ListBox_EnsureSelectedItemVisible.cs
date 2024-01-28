@@ -9,52 +9,52 @@ namespace FoxTunes
 {
     public static partial class ListBoxExtensions
     {
-        private static readonly ConditionalWeakTable<ListBox, SelectedItemBehaviour> SelectedItemBehaviours = new ConditionalWeakTable<ListBox, SelectedItemBehaviour>();
+        private static readonly ConditionalWeakTable<ListBox, EnsureSelectedItemVisibleBehaviour> EnsureSelectedItemVisibleBehaviours = new ConditionalWeakTable<ListBox, EnsureSelectedItemVisibleBehaviour>();
 
-        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.RegisterAttached(
-            "SelectedItem",
+        public static readonly DependencyProperty EnsureSelectedItemVisibleProperty = DependencyProperty.RegisterAttached(
+            "EnsureSelectedItemVisible",
             typeof(bool),
             typeof(ListBoxExtensions),
-            new FrameworkPropertyMetadata(false, new PropertyChangedCallback(OnSelectedItemPropertyChanged))
+            new FrameworkPropertyMetadata(false, new PropertyChangedCallback(OnEnsureSelectedItemVisiblePropertyChanged))
         );
 
-        public static bool GetSelectedItem(ListBox source)
+        public static bool GetEnsureSelectedItemVisible(ListBox source)
         {
-            return (bool)source.GetValue(SelectedItemProperty);
+            return (bool)source.GetValue(EnsureSelectedItemVisibleProperty);
         }
 
-        public static void SetSelectedItem(ListBox source, bool value)
+        public static void SetEnsureSelectedItemVisible(ListBox source, bool value)
         {
-            source.SetValue(SelectedItemProperty, value);
+            source.SetValue(EnsureSelectedItemVisibleProperty, value);
         }
 
-        private static void OnSelectedItemPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        private static void OnEnsureSelectedItemVisiblePropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             var listBox = sender as ListBox;
             if (listBox == null)
             {
                 return;
             }
-            if (GetSelectedItem(listBox))
+            if (GetEnsureSelectedItemVisible(listBox))
             {
-                var behaviour = default(SelectedItemBehaviour);
-                if (!SelectedItemBehaviours.TryGetValue(listBox, out behaviour))
+                var behaviour = default(EnsureSelectedItemVisibleBehaviour);
+                if (!EnsureSelectedItemVisibleBehaviours.TryGetValue(listBox, out behaviour))
                 {
-                    SelectedItemBehaviours.Add(listBox, new SelectedItemBehaviour(listBox));
+                    EnsureSelectedItemVisibleBehaviours.Add(listBox, new EnsureSelectedItemVisibleBehaviour(listBox));
                 }
             }
             else
             {
-                var behaviour = default(SelectedItemBehaviour);
-                if (SelectedItemBehaviours.TryGetValue(listBox, out behaviour))
+                var behaviour = default(EnsureSelectedItemVisibleBehaviour);
+                if (EnsureSelectedItemVisibleBehaviours.TryGetValue(listBox, out behaviour))
                 {
-                    SelectedItemBehaviours.Remove(listBox);
+                    EnsureSelectedItemVisibleBehaviours.Remove(listBox);
                     behaviour.Dispose();
                 }
             }
         }
 
-        private class SelectedItemBehaviour : UIBehaviour
+        private class EnsureSelectedItemVisibleBehaviour : UIBehaviour
         {
             private static readonly PropertyInfo ItemsHost = typeof(ItemsControl).GetProperty(
                 "ItemsHost",
@@ -66,32 +66,24 @@ namespace FoxTunes
                 BindingFlags.Instance | BindingFlags.NonPublic
             );
 
+#if NET40
+
             private static readonly MethodInfo BringIndexIntoView = typeof(VirtualizingPanel).GetMethod(
                 "BringIndexIntoView",
                 BindingFlags.Instance | BindingFlags.NonPublic
             );
 
-            public SelectedItemBehaviour(ListBox listBox)
+#endif
+
+            public EnsureSelectedItemVisibleBehaviour(ListBox listBox)
             {
                 this.ListBox = listBox;
-                BindingHelper.AddHandler(this.ListBox, Selector.SelectedItemProperty, typeof(ListBox), this.OnSelectedItemChanged);
+                this.ListBox.SelectionChanged += this.OnSelectionChanged;
             }
 
             public ListBox ListBox { get; private set; }
 
-            public object SelectedItem
-            {
-                get
-                {
-                    return this.ListBox.SelectedItem;
-                }
-                set
-                {
-                    this.SelectItem(value);
-                }
-            }
-
-            protected virtual void SelectItem(object value)
+            protected virtual void EnsureVisible(object value)
             {
                 //Try the easy method.
                 var item = this.ListBox.ItemContainerGenerator.ContainerFromItem(value) as ListBoxItem;
@@ -125,7 +117,11 @@ namespace FoxTunes
                         }
                         //Tell the panel to being the index into view.
                         //This will create the item we're looking for.
+#if NET40
                         BringIndexIntoView.Invoke(panel, new object[] { index });
+#else
+                        panel.BringIndexIntoViewPublic(index);
+#endif
                     }
                     //Try the easy method (again).
                     item = this.ListBox.ItemContainerGenerator.ContainerFromItem(value) as ListBoxItem;
@@ -139,15 +135,18 @@ namespace FoxTunes
 
                 if (item != null)
                 {
-                    //Found the item, ensure it's visible and select it.
+                    //Found the item, ensure it's visible.
                     item.BringIntoView();
-                    item.IsSelected = true;
+                }
+                else
+                {
+
                 }
             }
 
-            protected virtual void OnSelectedItemChanged(object sender, EventArgs e)
+            protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
             {
-                this.SelectItem(this.ListBox.SelectedItem);
+                this.EnsureVisible(this.ListBox.SelectedItem);
             }
         }
     }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -11,6 +12,13 @@ namespace FoxTunes.ViewModel
 {
     public class LibraryBrowser : LibraryBase
     {
+        public LibraryBrowser()
+        {
+            this.Semaphore = new SemaphoreSlim(1, 1);
+        }
+
+        public SemaphoreSlim Semaphore { get; private set; }
+
         public LibraryBrowserTileProvider LibraryBrowserTileProvider { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -70,7 +78,7 @@ namespace FoxTunes.ViewModel
         {
             if (this.IsInitialized)
             {
-                var task = this.Reload();
+                this.Dispatch(this.Reload);
             }
             if (this.ScalingFactorChanged != null)
             {
@@ -100,7 +108,7 @@ namespace FoxTunes.ViewModel
         {
             if (this.IsInitialized)
             {
-                var task = this.Reload();
+                this.Dispatch(this.Reload);
             }
             if (this.TileSizeChanged != null)
             {
@@ -213,7 +221,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnCleared(object sender, EventArgs e)
         {
-            var task = this.Refresh();
+            this.Dispatch(this.Refresh);
         }
 
         public bool IsRefreshing { get; private set; }
@@ -263,7 +271,7 @@ namespace FoxTunes.ViewModel
         {
             if (!this.IsNavigating)
             {
-                var task = this.Synchronize();
+                this.Dispatch(this.Synchronize);
             }
             base.OnSelectedItemChanged(sender, e);
         }
@@ -308,6 +316,10 @@ namespace FoxTunes.ViewModel
 
         private async Task Up(IList<LibraryBrowserFrame> frames, bool updateSelection)
         {
+            if (frames.Count <= 1)
+            {
+                return;
+            }
             var frame = frames.LastOrDefault();
             if (frame == null)
             {
@@ -366,9 +378,21 @@ namespace FoxTunes.ViewModel
             return true;
         }
 
-        private Task Synchronize()
+        private async Task Synchronize()
         {
-            return this.Synchronize(this.Frames);
+#if NET40
+            this.Semaphore.Wait();
+#else
+            await this.Semaphore.WaitAsync().ConfigureAwait(false);
+#endif
+            try
+            {
+                await this.Synchronize(this.Frames).ConfigureAwait(false);
+            }
+            finally
+            {
+                this.Semaphore.Release();
+            }
         }
 
         private async Task Synchronize(IList<LibraryBrowserFrame> frames)
@@ -417,6 +441,10 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
+            if (this.Semaphore != null)
+            {
+                this.Semaphore.Dispose();
+            }
             if (this.LibraryBrowserTileProvider != null)
             {
                 this.LibraryBrowserTileProvider.Cleared -= this.OnCleared;

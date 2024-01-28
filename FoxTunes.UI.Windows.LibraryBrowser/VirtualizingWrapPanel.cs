@@ -143,6 +143,10 @@ namespace FoxTunes
                     if (itemRect.IntersectsWith(viewportRect))
                     {
                         var child = generator.GetOrCreateChild(position);
+                        if (child == null)
+                        {
+                            break;
+                        }
                         child.Measure(childAvailable);
                         childSize = this.ContainerSizeForIndex(position);
                     }
@@ -194,15 +198,7 @@ namespace FoxTunes
             foreach (UIElement child in this.InternalChildren)
             {
                 var itemContainerGenerator = this.ItemContainerGenerator as ItemContainerGenerator;
-                var index = default(int);
-                if (itemContainerGenerator != null)
-                {
-                    index = itemContainerGenerator.IndexFromContainer(child);
-                }
-                else
-                {
-                    index = this.InternalChildren.IndexOf(child);
-                }
+                var index = itemContainerGenerator.IndexFromContainer(child);
                 if (!this.ContainerLayouts.ContainsKey(index))
                 {
                     continue;
@@ -224,27 +220,13 @@ namespace FoxTunes
 
         protected virtual Size ContainerSizeForIndexCore(int index)
         {
-            var item = default(UIElement);
             var itemsOwner = ItemsControl.GetItemsOwner(this);
             var itemContainerGenerator = ItemContainerGenerator as ItemContainerGenerator;
+            var item = itemContainerGenerator.ContainerFromIndex(index) as UIElement;
 
-            if (itemsOwner == null || itemContainerGenerator == null)
+            if (item == null && index < itemsOwner.Items.Count)
             {
-                if (this.InternalChildren.Count > index)
-                {
-                    item = this.InternalChildren[index];
-                }
-            }
-            else
-            {
-                if (itemContainerGenerator.ContainerFromIndex(index) != null)
-                {
-                    item = itemContainerGenerator.ContainerFromIndex(index) as UIElement;
-                }
-                else if (itemsOwner.Items.Count > index)
-                {
-                    item = itemsOwner.Items[index] as UIElement;
-                }
+                item = itemsOwner.Items[index] as UIElement;
             }
 
             if (item != null)
@@ -445,11 +427,6 @@ namespace FoxTunes
 
             public UIElement GetOrCreateChild(int index)
             {
-                if (this.Generator == null)
-                {
-                    return this.Owner.InternalChildren[index];
-                }
-
                 if (this.GeneratorTracker == null)
                 {
                     var startPos = this.Generator.GeneratorPositionFromIndex(index);
@@ -473,13 +450,14 @@ namespace FoxTunes
                     {
                         this.Owner.InsertInternalChild(this.CurrentGenerateIndex, child);
                     }
-
                     this.Generator.PrepareItemContainer(child);
                 }
 
-                this.LastGeneratedIndex = index;
-                this.CurrentGenerateIndex++;
-
+                if (child != null)
+                {
+                    this.LastGeneratedIndex = index;
+                    this.CurrentGenerateIndex++;
+                }
                 return child;
             }
 

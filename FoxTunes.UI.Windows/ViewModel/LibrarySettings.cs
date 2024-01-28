@@ -135,7 +135,7 @@ namespace FoxTunes.ViewModel
                 }
                 {
                     //Deliberately forking so the dialog closes.
-                    this.Dispatch(this.Refresh);
+                    this.Dispatch(this.Rebuild);
                     return;
                 }
             }
