@@ -1,6 +1,7 @@
 ﻿//Content from https://github.com/sbaeumlisberger/VirtualizingWrapPanel
 #if NET40
 # else
+#pragma warning disable 612, 618
 using System;
 using System.Linq;
 using System.Windows;
