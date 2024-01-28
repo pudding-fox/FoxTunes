@@ -11,6 +11,8 @@ namespace FoxTunes.ViewModel
 {
     public class LibraryBrowser : LibraryBase
     {
+        public ArtworkGridProvider ArtworkGridProvider { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         private ObservableCollection<LibraryBrowserFrame> _Frames { get; set; }
@@ -122,21 +124,41 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
+            this.ArtworkGridProvider = ComponentRegistry.Instance.GetComponent<ArtworkGridProvider>();
+            if (this.ArtworkGridProvider != null)
+            {
+                this.ArtworkGridProvider.Cleared += this.OnCleared;
+            }
             this.Configuration = core.Components.Configuration;
             this.ScalingFactor = this.Configuration.GetElement<DoubleConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
-            this.ScalingFactor.ValueChanged += this.OnValueChanged;
+            if (this.ScalingFactor != null)
+            {
+                this.ScalingFactor.ValueChanged += this.OnValueChanged;
+            }
             this.TileSize = this.Configuration.GetElement<IntegerConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_SIZE
             );
-            this.TileSize.ValueChanged += this.OnValueChanged;
+            if (this.TileSize != null)
+            {
+                this.TileSize.ValueChanged += this.OnValueChanged;
+            }
             LayoutManager.Instance.ActiveComponentsChanged += this.OnActiveComponentsChanged;
             this.OnIsSlaveChanged();
             base.InitializeComponent(core);
 
+        }
+
+        protected virtual void OnCleared(object sender, EventArgs e)
+        {
+#if NET40
+            var task = TaskEx.Run(() => this.Refresh());
+#else
+            var task = Task.Run(() => this.Refresh());
+#endif
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
@@ -300,6 +322,18 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
+            if (this.ArtworkGridProvider != null)
+            {
+                this.ArtworkGridProvider.Cleared -= this.OnCleared;
+            }
+            if (this.ScalingFactor != null)
+            {
+                this.ScalingFactor.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.TileSize != null)
+            {
+                this.TileSize.ValueChanged -= this.OnValueChanged;
+            }
             LayoutManager.Instance.ActiveComponentsChanged -= this.OnActiveComponentsChanged;
             base.OnDisposing();
         }

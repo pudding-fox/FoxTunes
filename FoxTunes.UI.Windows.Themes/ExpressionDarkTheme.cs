@@ -1,11 +1,10 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows;
 
 namespace FoxTunes
 {
-    [Component(ID, ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [Component(ID, ComponentSlots.None)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class ExpressionDarkTheme : ThemeBase
     {
@@ -14,10 +13,13 @@ namespace FoxTunes
         public ExpressionDarkTheme()
             : base(ID, "ExpressionDark")
         {
-
+            this.ResourceDictionary = new Lazy<ResourceDictionary>(() => new ResourceDictionary()
+            {
+                Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ExpressionDark.xaml", UriKind.Relative)
+            });
         }
 
-        public ResourceDictionary ResourceDictionary { get; private set; }
+        public Lazy<ResourceDictionary> ResourceDictionary { get; private set; }
 
         public override Stream ArtworkPlaceholder
         {
@@ -29,21 +31,18 @@ namespace FoxTunes
 
         public override void Enable()
         {
-            Application.Current.Resources.MergedDictionaries.Add(this.ResourceDictionary);
+            if (this.ResourceDictionary.Value != null)
+            {
+                Application.Current.Resources.MergedDictionaries.Add(this.ResourceDictionary.Value);
+            }
         }
 
         public override void Disable()
         {
-            Application.Current.Resources.MergedDictionaries.Remove(this.ResourceDictionary);
-        }
-
-        public override void InitializeComponent(ICore core)
-        {
-            this.ResourceDictionary = new ResourceDictionary()
+            if (this.ResourceDictionary.Value != null)
             {
-                Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ExpressionDark.xaml", UriKind.Relative)
-            };
-            base.InitializeComponent(core);
+                Application.Current.Resources.MergedDictionaries.Remove(this.ResourceDictionary.Value);
+            }
         }
     }
 }
