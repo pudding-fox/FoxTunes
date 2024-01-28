@@ -135,7 +135,7 @@ namespace FoxTunes
             this.Position = 0;
         }
 
-        new public static IBassStream Error(Errors errors)
+        public static IBassStream Error(Errors errors)
         {
             return new BassStream()
             {
