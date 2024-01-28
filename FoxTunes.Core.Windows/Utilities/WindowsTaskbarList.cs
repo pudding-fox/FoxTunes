@@ -158,7 +158,7 @@ namespace FoxTunes
             HResult ThumbBarUpdateButtons(IntPtr hwnd, uint cButtons, [MarshalAs(UnmanagedType.LPArray)] ThumbButton[] pButtons);
 
             [PreserveSig]
-            void ThumbBarSetImageList(IntPtr hwnd, IntPtr himl);
+            HResult ThumbBarSetImageList(IntPtr hwnd, IntPtr himl);
 
             [PreserveSig]
             void SetOverlayIcon(IntPtr hwnd, IntPtr hIcon, [MarshalAs(UnmanagedType.LPWStr)] string pszDescription);
