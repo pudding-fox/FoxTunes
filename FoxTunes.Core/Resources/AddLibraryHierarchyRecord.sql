@@ -1,0 +1,2 @@
+﻿INSERT INTO "LibraryHierarchy" ("LibraryHierarchy_Id", "LibraryHierarchyLevel_Id", "LibraryItem_Id", "DisplayValue", "SortValue", "IsLeaf")
+VALUES (@libraryHierarchyId, @libraryHierarchyLevelId, @libraryItemId, @displayValue, @sortValue, @isLeaf)

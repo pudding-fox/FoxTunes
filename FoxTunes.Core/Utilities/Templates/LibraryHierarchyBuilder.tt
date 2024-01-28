@@ -31,71 +31,64 @@ CREATE UNIQUE INDEX "IDX_LibraryHierarchyLevelParent" ON "LibraryHierarchyLevelP
 
 DROP TABLE IF EXISTS "LibraryHierarchy";
 CREATE TEMPORARY TABLE "LibraryHierarchy"
-AS
-	WITH "VerticalMetaData"
-	AS
-	(
-		SELECT "LibraryItems"."Id", "LibraryItems"."FileName", "MetaDataItems"."Name", 
-			CASE 
-				WHEN "MetaDataItems"."NumericValue" IS NOT NULL THEN 'Numeric' 
-				WHEN "MetaDataItems"."TextValue" IS NOT NULL THEN 'Text' 
-				WHEN "MetaDataItems"."FileValue" IS NOT NULL THEN 'File' 
-			END AS "ValueType",
-				CASE 
-				WHEN "MetaDataItems"."NumericValue" IS NOT NULL THEN "MetaDataItems"."NumericValue"
-				WHEN "MetaDataItems"."TextValue" IS NOT NULL THEN "MetaDataItems"."TextValue" 
-				WHEN "MetaDataItems"."FileValue" IS NOT NULL THEN "MetaDataItems"."FileValue"
-			END AS "Value"
-		FROM "LibraryItems"
-			JOIN "LibraryItem_MetaDataItem" ON "LibraryItems"."Id" = "LibraryItem_MetaDataItem"."LibraryItem_Id"
-			JOIN "MetaDataItems" ON "MetaDataItems"."Id" = "LibraryItem_MetaDataItem"."MetaDataItem_Id"
-		ORDER BY "LibraryItems"."Id"
-	)
-	,
-	"HorizontalMetaData"
-	AS
-	(
-	<#= 
-		new PivotViewBuilder(
-			"VerticalMetaData", 
-			new[] { "Id", "FileName" }, 
-			new[] { "Name" }, 
-			new[] { "ValueType", "Value" }, 
-			this.MetaDataNames
-		).TransformText() 
-	#>
-	)
+(
+	"LibraryHierarchy_Id" INTEGER NOT NULL, 
+	"LibraryHierarchyLevel_Id" INTEGER NOT NULL, 
+	"LibraryItem_Id" INTEGER NOT NULL, 
+	"DisplayValue" text NOT NULL,
+	"SortValue" text NOT NULL,
+	"IsLeaf" bit NOT NULL
+);
 
-	SELECT "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchy_Id" AS "LibraryHierarchy_Id", "LibraryHierarchyLevels"."Id" AS "LibraryHierarchyLevel_Id", "HorizontalMetaData"."Id" AS "LibraryItem_Id",
-		EXECUTE_SCRIPT
-		(
-			"HorizontalMetaData"."FileName",
-			"LibraryHierarchyLevels"."DisplayScript"
-	<#
-		for(var index = 0; index < this.MetaDataNames.Length; index++)
-		{
-			#>,"Key_<#= index #>", "Value_<#= index #>_Value"<#
-		}
-	#>
-		) AS DisplayValue,
-		EXECUTE_SCRIPT
-		(
-			"HorizontalMetaData"."FileName",
-			"LibraryHierarchyLevels"."SortScript"
-	<#
-		for(var index = 0; index < this.MetaDataNames.Length; index++)
-		{
-			#>,"Key_<#= index #>", "Value_<#= index #>_Value"<#
-		}
-	#>
-		) AS SortValue,
-		"LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchyLevel_Id" = "LibraryHierarchyLevelLeaf"."LibraryHierarchyLevel_Id" AS "IsLeaf"
-	FROM "LibraryHierarchyLevels"
-		JOIN "LibraryHierarchy_LibraryHierarchyLevel" 
-			ON "LibraryHierarchyLevels"."Id" = "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchyLevel_Id"
-		JOIN "LibraryHierarchyLevelLeaf" 
-			ON "LibraryHierarchyLevelLeaf"."LibraryHierarchy_Id" = "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchy_Id" 
-		JOIN "HorizontalMetaData";
+WITH "VerticalMetaData"
+AS
+(
+	SELECT "LibraryItems"."Id", "LibraryItems"."FileName", "MetaDataItems"."Name", 
+		CASE 
+			WHEN "MetaDataItems"."NumericValue" IS NOT NULL THEN 'Numeric' 
+			WHEN "MetaDataItems"."TextValue" IS NOT NULL THEN 'Text' 
+			WHEN "MetaDataItems"."FileValue" IS NOT NULL THEN 'File' 
+		END AS "ValueType",
+			CASE 
+			WHEN "MetaDataItems"."NumericValue" IS NOT NULL THEN "MetaDataItems"."NumericValue"
+			WHEN "MetaDataItems"."TextValue" IS NOT NULL THEN "MetaDataItems"."TextValue" 
+			WHEN "MetaDataItems"."FileValue" IS NOT NULL THEN "MetaDataItems"."FileValue"
+		END AS "Value"
+	FROM "LibraryItems"
+		JOIN "LibraryItem_MetaDataItem" ON "LibraryItems"."Id" = "LibraryItem_MetaDataItem"."LibraryItem_Id"
+		JOIN "MetaDataItems" ON "MetaDataItems"."Id" = "LibraryItem_MetaDataItem"."MetaDataItem_Id"
+	ORDER BY "LibraryItems"."Id"
+)
+,
+"HorizontalMetaData"
+AS
+(
+<#= 
+	new PivotViewBuilder(
+		"VerticalMetaData", 
+		new[] { "Id", "FileName" }, 
+		new[] { "Name" }, 
+		new[] { "ValueType", "Value" }, 
+		this.MetaDataNames
+	).TransformText() 
+#>
+)
+
+SELECT "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchy_Id" AS "LibraryHierarchy_Id", "LibraryHierarchyLevels"."Id" AS "LibraryHierarchyLevel_Id", "HorizontalMetaData"."Id" AS "LibraryItem_Id", "HorizontalMetaData"."FileName", "LibraryHierarchyLevels"."DisplayScript", "LibraryHierarchyLevels"."SortScript"
+<#
+	for(var index = 0; index < this.MetaDataNames.Length; index++)
+	{
+		#>,"Key_<#= index #>", "Value_<#= index #>_Value"<#
+	}
+#>
+	, "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchyLevel_Id" = "LibraryHierarchyLevelLeaf"."LibraryHierarchyLevel_Id" AS "IsLeaf"
+FROM "LibraryHierarchyLevels"
+	JOIN "LibraryHierarchy_LibraryHierarchyLevel" 
+		ON "LibraryHierarchyLevels"."Id" = "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchyLevel_Id"
+	JOIN "LibraryHierarchyLevelLeaf" 
+		ON "LibraryHierarchyLevelLeaf"."LibraryHierarchy_Id" = "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchy_Id" 
+	JOIN "HorizontalMetaData";
+
 CREATE UNIQUE INDEX "IDX_LibraryHierarchy" ON "LibraryHierarchy"
 (
 	"LibraryHierarchy_Id",
@@ -142,7 +135,7 @@ DELETE FROM "LibraryHierarchyItem_LibraryItem";
 INSERT INTO "LibraryHierarchyItem_LibraryItem" ("LibraryHierarchyItem_Id", "LibraryItem_Id")
 SELECT "LibraryHierarchyItems"."Id", "LibraryHierarchy"."LibraryItem_Id"
 FROM "LibraryHierarchyItems"
-	JOIN "LibraryHierarchy" ON "LibraryHierarchy"."LibraryHierarchy_Id" 
+	JOIN "LibraryHierarchy" ON "LibraryHierarchy"."LibraryHierarchy_Id" ="LibraryHierarchyItems"."LibraryHierarchy_Id"
 		AND "LibraryHierarchy"."LibraryHierarchyLevel_Id" = "LibraryHierarchyItems"."LibraryHierarchyLevel_Id"
 		AND "LibraryHierarchy"."DisplayValue" = "LibraryHierarchyItems"."DisplayValue"
 		AND "LibraryHierarchy"."SortValue" = "LibraryHierarchyItems"."SortValue"

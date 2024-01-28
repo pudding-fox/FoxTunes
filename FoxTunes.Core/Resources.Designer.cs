@@ -109,6 +109,16 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to INSERT INTO &quot;LibraryHierarchy&quot; (&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyLevel_Id&quot;, &quot;LibraryItem_Id&quot;, &quot;DisplayValue&quot;, &quot;SortValue&quot;, &quot;IsLeaf&quot;)
+        ///VALUES (@libraryHierarchyId, @libraryHierarchyLevelId, @libraryItemId, @displayValue, @sortValue, @isLeaf).
+        /// </summary>
+        internal static string AddLibraryHierarchyRecord {
+            get {
+                return ResourceManager.GetString("AddLibraryHierarchyRecord", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to INSERT INTO &quot;LibraryItems&quot; (&quot;DirectoryName&quot;, &quot;FileName&quot;, &quot;Status&quot;) 
         ///SELECT @directoryName, @fileName, @status
         ///WHERE NOT EXISTS(SELECT * FROM &quot;LibraryItems&quot; WHERE &quot;FileName&quot; = @fileName).
@@ -217,10 +227,9 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT &quot;Id&quot;, &quot;DisplayValue&quot;, &quot;IsLeaf&quot;
+        ///   Looks up a localized string similar to SELECT &quot;Id&quot;, &quot;LibraryHierarchy_Id&quot;, &quot;DisplayValue&quot;, &quot;IsLeaf&quot;
         ///FROM &quot;LibraryHierarchyItems&quot;
-        ///JOIN LibraryHierarchyParents ON &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = LibraryHierarchyParents.&quot;Root&quot;
-        ///WHERE (@libraryHierarchyId IS NULL OR &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId)
+        ///WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
         ///	AND ((@libraryHierarchyItemId IS NULL AND &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; IS NULL) OR &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = @libraryHierarchyItemId)
         ///ORDER BY &quot;SortValue&quot;, &quot;DisplayValue&quot;.
         /// </summary>
@@ -238,13 +247,10 @@ namespace FoxTunes {
         ///(
         ///	SELECT &quot;Id&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;DisplayValue&quot;
         ///	FROM &quot;LibraryHierarchyItems&quot;
+        ///	WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
+        ///		AND ((@libraryHierarchyItemId IS NULL AND &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; IS NULL) OR &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = @libraryHierarchyItemId)
         ///	UNION ALL 
-        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;DisplayValue&quot;
-        ///	FROM &quot;LibraryHierarchyItems&quot;
-        ///		JOIN LibraryHierarchyParents ON &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = LibraryHierarchyParents.&quot;Parent_Id&quot;
-        ///),
-        ///
-        ///LibraryHierarchyChildren(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;DisplayVal [rest of string was truncated]&quot;;.
+        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;DisplayVa [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryHierarchyNodesWithFilter {
             get {

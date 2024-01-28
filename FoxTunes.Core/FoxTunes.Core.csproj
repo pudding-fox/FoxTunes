@@ -169,18 +169,21 @@
     <Compile Include="Tasks\BuildLibraryHierarchiesTask.cs" />
     <Compile Include="Tasks\ClearPlaylistTask.cs" />
     <Compile Include="Tasks\LibraryTaskBase.cs" />
+    <Compile Include="Utilities\EnumerableDataReader.cs" />
+    <Compile Include="Utilities\LibraryHierarchyPopulator.cs" />
     <Compile Include="Utilities\MetaDataPopulator.cs" />
     <Compile Include="Tasks\PlaylistTaskBase.cs" />
     <Compile Include="Tasks\IForegroundTaskRunner.cs" />
     <Compile Include="Tasks\LoadOutputStreamTask.cs" />
+    <Compile Include="Utilities\PopulatorBase.cs" />
     <Compile Include="Utilities\SQL.cs" />
-    <Compile Include="Utilities\Templates\LibraryHierarchyViewBuilder.cs">
+    <Compile Include="Utilities\Templates\LibraryHierarchyBuilder.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>LibraryHierarchyViewBuilder.tt</DependentUpon>
+      <DependentUpon>LibraryHierarchyBuilder.tt</DependentUpon>
     </Compile>
     <Compile Include="Tasks\StopOutputStreamTask.cs" />
-    <Compile Include="Utilities\Templates\LibraryHierarchyViewBuilder_Logic.cs" />
+    <Compile Include="Utilities\Templates\LibraryHierarchyBuilder_Logic.cs" />
     <Compile Include="Utilities\Templates\PivotViewBuilder.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -222,9 +225,10 @@
     <None Include="Resources\AddLibraryHierarchyNodeToPlaylist.sql" />
     <None Include="Resources\GetLibraryHierarchyMetaDataItems.sql" />
     <None Include="Resources\GetLibraryHierarchyNodesWithFilter.sql" />
-    <Content Include="Utilities\Templates\LibraryHierarchyViewBuilder.tt">
+    <None Include="Resources\AddLibraryHierarchyRecord.sql" />
+    <Content Include="Utilities\Templates\LibraryHierarchyBuilder.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>LibraryHierarchyViewBuilder.cs</LastGenOutput>
+      <LastGenOutput>LibraryHierarchyBuilder.cs</LastGenOutput>
     </Content>
     <Content Include="Utilities\Templates\PivotViewBuilder.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>

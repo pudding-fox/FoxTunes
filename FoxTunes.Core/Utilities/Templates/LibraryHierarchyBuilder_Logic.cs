@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace FoxTunes.Utilities.Templates
 {
-    public partial class LibraryHierarchyViewBuilder
+    public partial class LibraryHierarchyBuilder
     {
-        public LibraryHierarchyViewBuilder(IEnumerable<string> metaDataNames)
+        public LibraryHierarchyBuilder(IEnumerable<string> metaDataNames)
         {
             this.MetaDataNames = metaDataNames.ToArray();
         }
