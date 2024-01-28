@@ -3,6 +3,7 @@ using Noesis.Javascript;
 
 namespace FoxTunes
 {
+    [Component("8D4693E0-6416-4B33-9DE7-89116D15F5EA", ComponentSlots.ScriptingRuntime)]
     public class JSScriptingRuntime : ScriptingRuntime
     {
         public ICore Core { get; private set; }

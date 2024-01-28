@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace FoxTunes
 {
+    [Component("D892408D-471F-4D97-83B8-5BEA4227D146", ComponentSlots.Playlist)]
     public class Playlist : StandardComponent, IPlaylist
     {
         public Playlist()

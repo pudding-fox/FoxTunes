@@ -46,6 +46,8 @@
     <Compile Include="BaseFactory.cs" />
     <Compile Include="BaseLoader.cs" />
     <Compile Include="BaseManager.cs" />
+    <Compile Include="ComponentAttribute.cs" />
+    <Compile Include="ComponentSlots.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FactoryLoader.cs" />
     <Compile Include="Interfaces\Database\IPersistableSet.cs" />
