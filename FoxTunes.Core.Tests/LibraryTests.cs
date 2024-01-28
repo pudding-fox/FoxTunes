@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [TestFixture(SQLITE | TAGLIB)]
+    [TestFixture(SQLITE | FILENAME)]
     [TestFixture(SQLSERVER | TAGLIB)]
+    [TestFixture(SQLSERVER | FILENAME)]
     public class LibraryTests : DatabaseTests
     {
         public const long TAGLIB = 512;

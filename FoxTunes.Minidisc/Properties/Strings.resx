@@ -222,4 +222,7 @@
   <data name="Compression.None" xml:space="preserve">
     <value>SP</value>
   </data>
+  <data name="MinidiscBehaviour.EncoderMissing" xml:space="preserve">
+    <value>The encoder component was not found, only WAV 16/44.1 is supported.</value>
+  </data>
 </root>

@@ -11,6 +11,9 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class MinidiscBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
+        //Wav_16_44100_Settings
+        public const string ENCODER_PROFILE = "043426B6-7251-45EB-BD74-E46D6ED97A83";
+
         public const string VIEW_DISC = "AAAA";
 
         public const string SET_DISC_TITLE = "BBBB";
@@ -26,6 +29,8 @@ namespace FoxTunes
         public static readonly string TempPath = Path.Combine(Path.GetTempPath(), Publication.Product, typeof(MinidiscBehaviour).Name);
 
         public ICore Core { get; private set; }
+
+        public IEncoder Encoder { get; private set; }
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -48,6 +53,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.Encoder = ComponentRegistry.Instance.GetComponent<IEncoder>();
             this.PlaylistManager = core.Managers.Playlist;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ReportEmitter = core.Components.ReportEmitter;
@@ -292,21 +298,43 @@ namespace FoxTunes
             this.ReportEmitter.Send(report);
         }
 
-        public async Task<IDictionary<IFileData, string>> GetWaveFiles(IFileData[] fileDatas)
+        public Task<IDictionary<IFileData, string>> GetWaveFiles(IFileData[] fileDatas)
         {
             Logger.Write(this, LogLevel.Debug, "Preparing WAVE files..");
             var fileNames = new Dictionary<IFileData, string>();
-            var behaviour = ComponentRegistry.Instance.GetComponent<BassEncoderBehaviour>();
-            if (behaviour == null)
+            foreach (var fileData in fileDatas)
             {
-                Logger.Write(this, LogLevel.Warn, "The encoder was not found, cannot continue.");
-                return null;
+                try
+                {
+                    var length = default(TimeSpan);
+                    FormatValidator.Default.Validate(fileData.FileName, out length);
+                    fileNames[fileData] = fileData.FileName;
+                    Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is supported.");
+                }
+                catch
+                {
+                    Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is not supported, it requires conversion.");
+                }
             }
+            fileDatas = fileDatas.Except(fileNames.Keys).ToArray();
+            if (!fileDatas.Any())
+            {
+#if NET40
+                return TaskEx.FromResult<IDictionary<IFileData, string>>(fileNames);
+#else
+                return Task.FromResult<IDictionary<IFileData, string>>(fileNames);
+#endif
+            }
+            return this.GetWaveFiles(fileDatas, fileNames);
+        }
+
+        protected virtual async Task<IDictionary<IFileData, string>> GetWaveFiles(IFileData[] fileDatas, Dictionary<IFileData, string> fileNames)
+        {
             Logger.Write(this, LogLevel.Debug, "Encoding {0} items: WAVE 16 bit, 44.1kHz.", fileDatas.Length);
-            var encoderItems = await behaviour.Encode(
+            var encoderItems = await this.Encoder.Encode(
                 fileDatas,
-                new BassEncoderOutputPath.Fixed(TempPath),
-                Wav_16_44100_Settings.NAME,
+                this.Encoder.GetOutputPath(TempPath),
+                ENCODER_PROFILE,
                 false
             ).ConfigureAwait(false);
             Logger.Write(this, LogLevel.Debug, "Encoder completed.");
@@ -319,8 +347,7 @@ namespace FoxTunes
                 else if (encoderItem.Status != EncoderItemStatus.Complete)
                 {
                     Logger.Write(this, LogLevel.Warn, "At least one file failed to encode, aborting.");
-                    var report = new BassEncoderReport(encoderItems);
-                    report.InitializeComponent(this.Core);
+                    var report = this.Encoder.GetReport(encoderItems);
                     await this.ReportEmitter.Send(report).ConfigureAwait(false);
                     return null;
                 }
@@ -331,7 +358,7 @@ namespace FoxTunes
                     continue;
                 }
                 Logger.Write(this, LogLevel.Warn, "Encoded \"{0}\": \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
-                fileNames.Add(fileData, encoderItem.OutputFileName);
+                fileNames[fileData] = encoderItem.OutputFileName;
             }
             Logger.Write(this, LogLevel.Debug, "Encoded {0} items.", fileNames.Count);
             return fileNames;

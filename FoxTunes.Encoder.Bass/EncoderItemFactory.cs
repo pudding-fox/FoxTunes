@@ -9,12 +9,12 @@ namespace FoxTunes
     {
         public static readonly object SyncRoot = new object();
 
-        public EncoderItemFactory(IBassEncoderOutputPath outputPath)
+        public EncoderItemFactory(IEncoderOutputPath outputPath)
         {
             this.OutputPath = outputPath;
         }
 
-        public IBassEncoderOutputPath OutputPath { get; private set; }
+        public IEncoderOutputPath OutputPath { get; private set; }
 
         public BassEncoderSettingsFactory SettingsFactory { get; private set; }
 

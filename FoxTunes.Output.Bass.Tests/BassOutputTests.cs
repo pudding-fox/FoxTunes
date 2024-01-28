@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 namespace FoxTunes.Output.Bass.Tests
 {
     [Explicit]
-    [TestFixture(BassOutputTests.DEFAULT)]
-    //[TestFixture(BassOutputTests.DEFAULT | BassOutputTests.RESAMPLER)]
-    //[TestFixture(BassOutputTests.DEFAULT | BassOutputTests.ASIO)]
-    //[TestFixture(BassOutputTests.DEFAULT | BassOutputTests.RESAMPLER | BassOutputTests.ASIO)]
-    //[TestFixture(BassOutputTests.DEFAULT | BassOutputTests.RESAMPLER | BassOutputTests.WASAPI)]
+    [TestFixture(DEFAULT)]
+    [TestFixture(DEFAULT | RESAMPLER)]
+    [TestFixture(DEFAULT | ASIO)]
+    [TestFixture(DEFAULT | RESAMPLER | ASIO)]
+    [TestFixture(DEFAULT | RESAMPLER | WASAPI)]
     public class BassOutputTests : TestBase
     {
         public const long RESAMPLER = 128;
@@ -158,8 +158,7 @@ namespace FoxTunes.Output.Bass.Tests
             var outputStreams = new[]
             {
                 await this.Core.Components.Output.Load(TestInfo.PlaylistItems[2], false).ConfigureAwait(false),
-                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[3], false)
-.ConfigureAwait(false)
+                await this.Core.Components.Output.Load(TestInfo.PlaylistItems[3], false).ConfigureAwait(false)
             };
             await outputStreams[0].Play().ConfigureAwait(false);
             await this.Core.Components.Output.Preempt(outputStreams[1]).ConfigureAwait(false);

@@ -39,7 +39,7 @@ namespace FoxTunes.Encoder.Bass.Tests
             {
                 var encoderItems = await behaviour.Encode(
                     TestInfo.PlaylistItems,
-                    new BassEncoderOutputPath.Fixed(this.DirectoryName),
+                    behaviour.GetOutputPath(this.DirectoryName),
                     profile,
                     true
                 ).ConfigureAwait(false);

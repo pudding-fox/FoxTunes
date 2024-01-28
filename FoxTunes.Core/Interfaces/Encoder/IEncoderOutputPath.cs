@@ -1,6 +1,6 @@
 ﻿namespace FoxTunes.Interfaces
 {
-    public interface IBassEncoderOutputPath : IBaseComponent
+    public interface IEncoderOutputPath : IBaseComponent
     {
         string GetDirectoryName(IFileData fileData);
     }
