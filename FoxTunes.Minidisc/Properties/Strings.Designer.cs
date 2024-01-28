@@ -304,6 +304,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Rename.
+        /// </summary>
+        internal static string MinidiscReport_Rename {
+            get {
+                return ResourceManager.GetString("MinidiscReport.Rename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Time.
         /// </summary>
         internal static string MinidiscReport_Time {
@@ -336,6 +345,15 @@ namespace FoxTunes {
         internal static string MinidiscReportRow_Remove {
             get {
                 return ResourceManager.GetString("MinidiscReportRow.Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rename.
+        /// </summary>
+        internal static string MinidiscReportRow_Rename {
+            get {
+                return ResourceManager.GetString("MinidiscReportRow.Rename", resourceCulture);
             }
         }
         
@@ -381,6 +399,15 @@ namespace FoxTunes {
         internal static string TrackAction_Remove {
             get {
                 return ResourceManager.GetString("TrackAction.Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update.
+        /// </summary>
+        internal static string TrackAction_Update {
+            get {
+                return ResourceManager.GetString("TrackAction.Update", resourceCulture);
             }
         }
         
