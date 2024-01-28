@@ -28,7 +28,7 @@ namespace FoxTunes
 
         public static int GetAsioDevice(string value)
         {
-            for (var a = 0; a < BassAsio.DeviceCount; a++)
+            for (int a = 0, b = BassAsio.DeviceCount; a < b; a++)
             {
                 var deviceInfo = default(AsioDeviceInfo);
                 BassAsioUtils.OK(BassAsio.GetDeviceInfo(a, out deviceInfo));
@@ -42,7 +42,7 @@ namespace FoxTunes
 
         private static IEnumerable<SelectionConfigurationOption> GetASIODevices()
         {
-            for (var a = 0; a < BassAsio.DeviceCount; a++)
+            for (int a = 0, b = BassAsio.DeviceCount; a < b; a++)
             {
                 var deviceInfo = default(AsioDeviceInfo);
                 BassAsioUtils.OK(BassAsio.GetDeviceInfo(a, out deviceInfo));

@@ -34,7 +34,7 @@ namespace FoxTunes
 
         public override int ChannelHandle { get; protected set; }
 
-        public IEnumerable<int> Queue
+        public override IEnumerable<int> Queue
         {
             get
             {

@@ -6,13 +6,6 @@ namespace FoxTunes
 {
     public class BassGaplessStreamInputBehaviour : StandardBehaviour
     {
-        private readonly BassGaplessEventProcedure Procedure;
-
-        public BassGaplessStreamInputBehaviour()
-        {
-            this.Procedure = this.OnBassGaplessEvent;
-        }
-
         public IBassOutput Output { get; private set; }
 
         public bool IsInitialized { get; private set; }
@@ -29,9 +22,6 @@ namespace FoxTunes
         protected virtual void OnInit(object sender, EventArgs e)
         {
             BassUtils.OK(BassGapless.Init());
-            //TODO: This is required by BassCdStallPreventionBehaviour which isn't even in this library.
-            BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.BlockingEvents, true));
-            BassUtils.OK(BassGapless.EnableEvents(this.Procedure));
             this.IsInitialized = true;
             Logger.Write(this, LogLevel.Debug, "BASS GAPLESS Initialized.");
         }
@@ -39,7 +29,6 @@ namespace FoxTunes
         protected virtual void OnFree(object sender, EventArgs e)
         {
             Logger.Write(this, LogLevel.Debug, "Releasing BASS GAPLESS.");
-            BassGapless.DisableEvents();
             BassGapless.Free();
             this.IsInitialized = false;
         }
@@ -48,17 +37,6 @@ namespace FoxTunes
         {
             e.Input = new BassGaplessStreamInput(this, e.Stream);
         }
-
-        protected virtual void OnBassGaplessEvent(BassGaplessEventArgs e)
-        {
-            if (this.BassGaplessEvent == null)
-            {
-                return;
-            }
-            this.BassGaplessEvent(this, e);
-        }
-
-        public event BassGaplessEventHandler BassGaplessEvent = delegate { };
     }
 
     public delegate void BassGaplessEventHandler(object sender, BassGaplessEventArgs e);

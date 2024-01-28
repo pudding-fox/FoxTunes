@@ -5,9 +5,9 @@ namespace FoxTunes
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class ComponentAttribute : Attribute
     {
-        public const byte PRIORITY_HIGHEST = 0;
+        public const byte PRIORITY_HIGH = 0;
 
-        public const byte PRIORITY_HIGH = 100;
+        public const byte PRIORITY_NORMAL = 100;
 
         public const byte PRIORITY_LOW = 255;
 

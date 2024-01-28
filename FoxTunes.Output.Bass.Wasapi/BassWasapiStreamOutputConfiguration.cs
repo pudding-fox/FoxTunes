@@ -29,7 +29,7 @@ namespace FoxTunes
 
         public static int GetWasapiDevice(string value)
         {
-            for (var a = 0; a < BassWasapi.DeviceCount; a++)
+            for (int a = 0, b = BassWasapi.DeviceCount; a < b; a++)
             {
                 var deviceInfo = default(WasapiDeviceInfo);
                 BassUtils.OK(BassWasapi.GetDeviceInfo(a, out deviceInfo));
@@ -44,7 +44,7 @@ namespace FoxTunes
         private static IEnumerable<SelectionConfigurationOption> GetWASAPIDevices()
         {
             yield return new SelectionConfigurationOption(BassWasapi.DefaultDevice.ToString(), "Default Device").Default();
-            for (var a = 0; a < BassWasapi.DeviceCount; a++)
+            for (int a = 0, b = BassWasapi.DeviceCount; a < b; a++)
             {
                 var deviceInfo = default(WasapiDeviceInfo);
                 BassUtils.OK(BassWasapi.GetDeviceInfo(a, out deviceInfo));
