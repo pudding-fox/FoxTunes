@@ -16,6 +16,8 @@
     <UserControl.Resources>
         <LocalViewModel:LibraryBrowser x:Key="ViewModel" Core="{Binding}"></LocalViewModel:LibraryBrowser>
         <ViewModel:NegavingBooleanToVisibilityConverter x:Key="NegavingBooleanToVisibilityConverter"></ViewModel:NegavingBooleanToVisibilityConverter>
+        <ViewModel:IntegerToVisibilityConverter x:Key="IntegerToVisibilityConverter"></ViewModel:IntegerToVisibilityConverter>
+        <ViewModel:MultiVisibilityConverter x:Key="MultiVisibilityConverter"></ViewModel:MultiVisibilityConverter>
         <System:Boolean x:Key="True">True</System:Boolean>
         <System:Boolean x:Key="False">False</System:Boolean>
     </UserControl.Resources>
@@ -34,10 +36,16 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <ComboBox 
-            ItemsSource="{Binding Hierarchies, Source={StaticResource ViewModel}}" 
+            ItemsSource="{Binding Hierarchies, Mode=OneWay, Source={StaticResource ViewModel}}" 
             SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"
-            DisplayMemberPath="Name"
-            Visibility="{Binding IsSlave, Converter={StaticResource NegavingBooleanToVisibilityConverter}, Source={StaticResource ViewModel}}"/>
+            DisplayMemberPath="Name">
+            <ComboBox.Visibility>
+                <MultiBinding Converter="{StaticResource MultiVisibilityConverter}">
+                    <Binding Path="IsSlave" Source="{StaticResource ViewModel}" Converter="{StaticResource NegavingBooleanToVisibilityConverter}" Mode="OneWay"></Binding>
+                    <Binding Path="Hierarchies.Count" Source="{StaticResource ViewModel}" Converter="{StaticResource IntegerToVisibilityConverter}" ConverterParameter="1" Mode="OneWay"></Binding>
+                </MultiBinding>
+            </ComboBox.Visibility>
+        </ComboBox>
         <ItemsControl Name="ItemsControl" Grid.Row="1" ItemsSource="{Binding Frames, Source={StaticResource ViewModel}}" >
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>

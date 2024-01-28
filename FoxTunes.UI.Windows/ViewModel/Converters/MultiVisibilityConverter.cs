@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 
@@ -9,19 +10,11 @@ namespace FoxTunes.ViewModel
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var visibility = Visibility.Visible;
-            foreach(var value in values)
+            if (values.OfType<Visibility>().All(visibility => visibility == Visibility.Visible))
             {
-                if(!(value is Visibility))
-                {
-                    continue;
-                }
-                if (visibility != (Visibility)value)
-                {
-                    visibility = (Visibility)value;
-                }
+                return Visibility.Visible;
             }
-            return visibility;
+            return Visibility.Collapsed;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

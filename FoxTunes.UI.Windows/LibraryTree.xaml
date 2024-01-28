@@ -13,6 +13,7 @@
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
         <ViewModel:LibraryTree x:Key="ViewModel" Core="{Binding}" SearchCompleted="OnSearchCompleted"></ViewModel:LibraryTree>
+        <ViewModel:IntegerToVisibilityConverter x:Key="IntegerToVisibilityConverter"></ViewModel:IntegerToVisibilityConverter>
         <System:Boolean x:Key="True">True</System:Boolean>
         <System:Boolean x:Key="False">False</System:Boolean>
     </UserControl.Resources>
@@ -31,9 +32,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <ComboBox 
-            ItemsSource="{Binding Hierarchies, Source={StaticResource ViewModel}}" 
+            ItemsSource="{Binding Hierarchies, Mode=OneWay, Source={StaticResource ViewModel}}" 
             SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"
-            DisplayMemberPath="Name"/>
+            DisplayMemberPath="Name"
+            Visibility="{Binding Hierarchies.Count, ConverterParameter=1, Converter={StaticResource IntegerToVisibilityConverter}, Mode=OneWay, Source={StaticResource ViewModel}}"/>
         <TreeView x:Name="TreeView" Grid.Row="1" Margin="0,2,0,2"
                   ItemsSource="{Binding Items, Source={StaticResource ViewModel}}"
                   Windows:TreeViewExtensions.SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}"
