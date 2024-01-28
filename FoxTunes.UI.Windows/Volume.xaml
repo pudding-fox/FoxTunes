@@ -51,10 +51,10 @@
                                         </Grid.OpacityMask>
                                         <Track Name="PART_Track" Value="{TemplateBinding Value}">
                                             <Track.Thumb>
-                                                <Thumb Width="10" Background="{TemplateBinding Background}">
+                                                <Thumb Width="0">
                                                     <Thumb.Template>
                                                         <ControlTemplate TargetType="{x:Type Thumb}">
-                                                            <Border Background="{TemplateBinding Background}"/>
+                                                            <Border/>
                                                         </ControlTemplate>
                                                     </Thumb.Template>
                                                 </Thumb>
@@ -67,7 +67,7 @@
                                             </Track.IncreaseRepeatButton>
                                         </Track>
                                     </Grid>
-                                    <Path Data="{StaticResource Triangle}" Stretch="Fill" Stroke="{DynamicResource TextBrush}" StrokeThickness="1"/>
+                                    <Path Data="{StaticResource Triangle}" Stretch="Fill" Stroke="{TemplateBinding Background}" StrokeThickness="1"/>
                                 </Grid>
                             </ControlTemplate>
                         </Setter.Value>
