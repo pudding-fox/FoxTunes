@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public abstract class AsyncEventArgs<T> : EventArgs
+    public class AsyncEventArgs<T> : EventArgs
     {
         protected AsyncEventArgs()
         {
@@ -30,7 +30,11 @@ namespace FoxTunes
         }
     }
 
-    public abstract class AsyncEventArgs : AsyncEventArgs<object>
+    public delegate void AsyncEventHandler<T>(object sender, AsyncEventArgs<T> e);
+
+    public class AsyncEventArgs : AsyncEventArgs<object>
     {
     }
+
+    public delegate void AsyncEventHandler(object sender, AsyncEventArgs e);
 }

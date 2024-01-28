@@ -202,7 +202,7 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistColumnsUpdated:
-                    return this.ForegroundTaskRunner.RunAsync(() => this.Reload());
+                    return this.ForegroundTaskRunner.Run(() => this.Reload());
                 case CommonSignals.PluginInvocation:
                     var invocation = signal.State as IInvocationComponent;
                     if (invocation != null)

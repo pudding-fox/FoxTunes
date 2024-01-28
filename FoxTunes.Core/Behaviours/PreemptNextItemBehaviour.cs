@@ -36,25 +36,28 @@ namespace FoxTunes
             this.PlaybackManager.CurrentStream.Stopping += this.PlaybackManager_CurrentStream_Stopping;
         }
 
-        protected virtual void PlaybackManager_CurrentStream_Stopping(object sender, EventArgs e)
+        protected virtual async void PlaybackManager_CurrentStream_Stopping(object sender, AsyncEventArgs e)
         {
-            this.Preempt();
+            using (e.Defer())
+            {
+                await this.Preempt();
+            }
         }
 
-        public Task Preempt()
+        public async Task Preempt()
         {
-            var playlistItem = this.PlaylistManager.GetNext();
+            var playlistItem = await this.PlaylistManager.GetNext();
             if (playlistItem == null)
             {
-                return Task.CompletedTask;
+                return;
             }
             var outputStream = this.OutputStreamQueue.Peek(playlistItem);
             if (outputStream == null)
             {
-                return Task.CompletedTask;
+                return;
             }
             Logger.Write(this, LogLevel.Debug, "Current stream is about to end, pre-empting the next stream: {0} => {1}", outputStream.Id, outputStream.FileName);
-            return this.BackgroundTaskRunner.Run(async () =>
+            await this.BackgroundTaskRunner.Run(async () =>
             {
                 if (!await this.Output.Preempt(outputStream))
                 {

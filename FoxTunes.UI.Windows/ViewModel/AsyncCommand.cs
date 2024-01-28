@@ -61,38 +61,30 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual async void OnCanExecute()
+        protected virtual Task OnCanExecute()
         {
-            await this.BackgroundTaskRunner.Run(() => this.AsyncPredicate().ContinueWith(async task =>
+            return this.BackgroundTaskRunner.Run(async () =>
             {
-                if (task.IsFaulted)
-                {
-                    //TODO: Logging.
-                    return;
-                }
-                if (this._CanExecute.HasValue && this._CanExecute.Value == task.Result)
+                var canExecute = await this.AsyncPredicate();
+                if (this._CanExecute.HasValue && this._CanExecute.Value == canExecute)
                 {
                     return;
                 }
-                this._CanExecute = task.Result;
+                this._CanExecute = canExecute;
                 await InvalidateRequerySuggested();
-            }));
+            });
         }
 
-        public override void Execute(object parameter)
+        public override async void Execute(object parameter)
         {
             if (this.Func == null)
             {
                 return;
             }
             this.OnPhase(CommandPhase.Before, this.Tag, parameter);
-            this.Func().ContinueWith(async task =>
+            await this.BackgroundTaskRunner.Run(async () =>
             {
-                if (task.IsFaulted)
-                {
-                    //TODO: Logging.
-                    return;
-                }
+                await this.Func();
                 this.OnPhase(CommandPhase.After, this.Tag, parameter);
                 await InvalidateRequerySuggested();
             });
@@ -157,38 +149,30 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual async void OnCanExecute(object parameter)
+        protected virtual Task OnCanExecute(object parameter)
         {
-            await this.BackgroundTaskRunner.Run(() => this.AsyncPredicate((T)parameter).ContinueWith(async task =>
+            return this.BackgroundTaskRunner.Run(async () =>
             {
-                if (task.IsFaulted)
-                {
-                    //TODO: Logging.
-                    return;
-                }
-                if (this._CanExecute.HasValue && this._CanExecute.Value == task.Result)
+                var canExecute = await this.AsyncPredicate((T)parameter);
+                if (this._CanExecute.HasValue && this._CanExecute.Value == canExecute)
                 {
                     return;
                 }
-                this._CanExecute = task.Result;
+                this._CanExecute = canExecute;
                 await InvalidateRequerySuggested();
-            }));
+            });
         }
 
-        public override void Execute(object parameter)
+        public override async void Execute(object parameter)
         {
             if (this.Func == null)
             {
                 return;
             }
             this.OnPhase(CommandPhase.Before, this.Tag, parameter);
-            this.Func((T)parameter).ContinueWith(async task =>
+            await this.BackgroundTaskRunner.Run(async () =>
             {
-                if (task.IsFaulted)
-                {
-                    //TODO: Logging.
-                    return;
-                }
+                await this.Func((T)parameter);
                 this.OnPhase(CommandPhase.After, this.Tag, parameter);
                 await InvalidateRequerySuggested();
             });

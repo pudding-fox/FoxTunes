@@ -187,7 +187,6 @@
     <Compile Include="Utilities\PlaylistSequencePopulator.cs" />
     <Compile Include="Utilities\PopulatorBase.cs" />
     <Compile Include="Utilities\Sample.cs" />
-    <Compile Include="Tasks\StopOutputStreamTask.cs" />
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
     <Compile Include="Utilities\Shell.cs" />
     <Compile Include="Utilities\SingletonReentrantTask.cs" />

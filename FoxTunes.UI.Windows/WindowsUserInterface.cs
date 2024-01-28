@@ -81,7 +81,7 @@ namespace FoxTunes
 
         protected virtual async Task OnOpen(IEnumerable<string> paths)
         {
-            var index = this.Playlist.GetInsertIndex();
+            var index = await this.Playlist.GetInsertIndex();
             await this.Playlist.Add(paths, false);
             await this.Playlist.Play(index);
         }

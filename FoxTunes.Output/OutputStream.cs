@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -30,16 +31,18 @@ namespace FoxTunes
 
         public abstract long Position { get; set; }
 
-        protected virtual void OnPositionChanged()
+        protected virtual async Task OnPositionChanged()
         {
             if (this.PositionChanged != null)
             {
-                this.PositionChanged(this, EventArgs.Empty);
+                var e = new AsyncEventArgs();
+                this.PositionChanged(this, e);
+                await e.Complete();
             }
             this.OnPropertyChanged("Position");
         }
 
-        public event EventHandler PositionChanged = delegate { };
+        public event AsyncEventHandler PositionChanged = delegate { };
 
         public abstract long Length { get; }
 
@@ -49,127 +52,145 @@ namespace FoxTunes
 
         public abstract bool IsPlaying { get; }
 
-        protected virtual void OnIsPlayingChanged()
+        protected virtual async Task OnIsPlayingChanged()
         {
             if (this.IsPlayingChanged != null)
             {
-                this.IsPlayingChanged(this, EventArgs.Empty);
+                var e = new AsyncEventArgs();
+                this.IsPlayingChanged(this, e);
+                await e.Complete();
             }
             this.OnPropertyChanged("IsPlaying");
         }
 
-        public event EventHandler IsPlayingChanged = delegate { };
+        public event AsyncEventHandler IsPlayingChanged = delegate { };
 
         public abstract bool IsPaused { get; }
 
-        protected virtual void OnIsPausedChanged()
+        protected virtual async Task OnIsPausedChanged()
         {
             if (this.IsPausedChanged != null)
             {
-                this.IsPausedChanged(this, EventArgs.Empty);
+                var e = new AsyncEventArgs();
+                this.IsPausedChanged(this, e);
+                await e.Complete();
             }
             this.OnPropertyChanged("IsPaused");
         }
 
-        public event EventHandler IsPausedChanged = delegate { };
+        public event AsyncEventHandler IsPausedChanged = delegate { };
 
         public abstract bool IsStopped { get; }
 
-        protected virtual void OnIsStoppedChanged()
+        protected virtual async Task OnIsStoppedChanged()
         {
             if (this.IsStoppedChanged != null)
             {
-                this.IsStoppedChanged(this, EventArgs.Empty);
+                var e = new AsyncEventArgs();
+                this.IsStoppedChanged(this, e);
+                await e.Complete();
             }
             this.OnPropertyChanged("IsStopped");
         }
 
-        public event EventHandler IsStoppedChanged = delegate { };
+        public event AsyncEventHandler IsStoppedChanged = delegate { };
 
-        public abstract void Play();
+        public abstract Task Play();
 
-        protected virtual void OnPlayed(bool manual)
+        protected virtual Task OnPlayed(bool manual)
         {
             if (this.Played == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.Played(this, new PlayedEventArgs(manual));
+            var e = new PlayedEventArgs(manual);
+            this.Played(this, e);
+            return e.Complete();
         }
 
         public event PlayedEventHandler Played = delegate { };
 
-        public abstract void Pause();
+        public abstract Task Pause();
 
-        protected virtual void OnPaused()
+        protected virtual Task OnPaused()
         {
             if (this.Paused == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.Paused(this, EventArgs.Empty);
+            var e = new AsyncEventArgs();
+            this.Paused(this, e);
+            return e.Complete();
         }
 
-        public event EventHandler Paused = delegate { };
+        public event AsyncEventHandler Paused = delegate { };
 
-        public abstract void Resume();
+        public abstract Task Resume();
 
-        protected virtual void OnResumed()
+        protected virtual Task OnResumed()
         {
             if (this.Resumed == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.Resumed(this, EventArgs.Empty);
+            var e = new AsyncEventArgs();
+            this.Resumed(this, e);
+            return e.Complete();
         }
 
-        public event EventHandler Resumed = delegate { };
+        public event AsyncEventHandler Resumed = delegate { };
 
-        public abstract void Stop();
+        public abstract Task Stop();
 
-        protected virtual void OnStopping()
+        protected virtual Task OnStopping()
         {
             if (this.Stopping == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.Stopping(this, EventArgs.Empty);
+            var e = new AsyncEventArgs();
+            this.Stopping(this, e);
+            return e.Complete();
         }
 
-        public event EventHandler Stopping = delegate { };
+        public event AsyncEventHandler Stopping = delegate { };
 
-        protected virtual void OnStopped(bool manual)
+        protected virtual Task OnStopped(bool manual)
         {
             if (this.Stopped == null)
             {
-                return;
+                return Task.CompletedTask;
             }
-            this.Stopped(this, new StoppedEventArgs(manual));
+            var e = new StoppedEventArgs(manual);
+            this.Stopped(this, e);
+            return e.Complete();
         }
 
         public event StoppedEventHandler Stopped = delegate { };
 
-        public virtual void BeginSeek()
+        public virtual Task BeginSeek()
         {
-            if (this.IsPlaying)
+            if (!this.IsPlaying)
             {
-                this.Stop();
+                return Task.CompletedTask;
             }
+            return this.Stop();
         }
 
-        public virtual void EndSeek()
+        public virtual Task EndSeek()
         {
-            if (this.IsStopped)
+            if (!this.IsStopped)
             {
-                this.Play();
+                return Task.CompletedTask;
             }
+            return this.Play();
         }
 
-        protected virtual void EmitState()
+        protected virtual async Task EmitState()
         {
-            this.OnIsPlayingChanged();
-            this.OnIsPausedChanged();
-            this.OnIsStoppedChanged();
+            await this.OnIsPlayingChanged();
+            await this.OnIsPausedChanged();
+            await this.OnIsStoppedChanged();
         }
 
         public string Description

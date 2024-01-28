@@ -9,15 +9,15 @@ namespace FoxTunes.Interfaces
 
         bool Visible { get; }
 
-        event EventHandler Started;
+        event AsyncEventHandler Started;
 
-        event EventHandler Completed;
+        event AsyncEventHandler Completed;
 
         Exception Exception { get; }
 
         event EventHandler ExceptionChanged;
 
-        event EventHandler Faulted;
+        event AsyncEventHandler Faulted;
 
         Task Run();
     }

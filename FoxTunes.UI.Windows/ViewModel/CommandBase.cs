@@ -55,7 +55,7 @@ namespace FoxTunes.ViewModel
             var foregroundTaskRunner = ComponentRegistry.Instance.GetComponent<IForegroundTaskRunner>();
             if (foregroundTaskRunner != null)
             {
-                return foregroundTaskRunner.RunAsync(() => CommandManager.InvalidateRequerySuggested());
+                return foregroundTaskRunner.Run(() => CommandManager.InvalidateRequerySuggested());
             }
             else
             {

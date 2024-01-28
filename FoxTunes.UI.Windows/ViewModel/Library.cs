@@ -26,6 +26,8 @@ namespace FoxTunes.ViewModel
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        public ILibraryManager LibraryManager { get; private set; }
+
         private LibraryHierarchy _SelectedHierarchy { get; set; }
 
         public LibraryHierarchy SelectedHierarchy
@@ -133,6 +135,7 @@ namespace FoxTunes.ViewModel
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.SignalEmitter = this.Core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
+            this.LibraryManager = this.Core.Managers.Library;
             this.Refresh();
             this.OnCommandsChanged();
             base.OnCoreChanged();
@@ -140,7 +143,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnCommandsChanged()
         {
-            this.OnPropertyChanged("DragEnterCommand");
+            this.OnPropertyChanged("AddToPlaylistCommand");
             this.OnPropertyChanged("DropCommand");
         }
 
@@ -154,7 +157,7 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.HierarchiesUpdated:
-                    return this.ForegroundTaskRunner.RunAsync(() => this.Reload());
+                    return this.ForegroundTaskRunner.Run(() => this.Reload());
                 case CommonSignals.PluginInvocation:
                     var invocation = signal.State as IInvocationComponent;
                     if (invocation != null)
@@ -234,7 +237,7 @@ namespace FoxTunes.ViewModel
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
                     var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                    return this.Core.Managers.Library.Add(paths);
+                    return this.LibraryManager.Add(paths);
                 }
             }
             catch (Exception exception)

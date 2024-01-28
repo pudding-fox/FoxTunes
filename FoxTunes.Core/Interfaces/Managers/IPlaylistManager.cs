@@ -30,11 +30,11 @@ namespace FoxTunes.Interfaces
 
         bool CanNavigate { get; }
 
-        PlaylistItem GetNext();
+        Task<PlaylistItem> GetNext();
 
-        PlaylistItem GetPrevious();
+        Task<PlaylistItem> GetPrevious();
 
-        int GetInsertIndex();
+        Task<int> GetInsertIndex();
 
         Task Next();
 

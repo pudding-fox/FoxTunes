@@ -50,7 +50,7 @@ namespace FoxTunes
                 0,
                 new[]
                 {
-                    this.GetPlaylistItem(TestInfo.AudioFileNames[2])
+                    await this.GetPlaylistItem(TestInfo.AudioFileNames[2])
                 }
             );
             this.AssertPlaylistItems(
@@ -62,7 +62,7 @@ namespace FoxTunes
                 2,
                 new[]
                 {
-                    this.GetPlaylistItem(TestInfo.AudioFileNames[2])
+                    await this.GetPlaylistItem(TestInfo.AudioFileNames[2])
                 }
             );
             this.AssertPlaylistItems(
@@ -72,10 +72,12 @@ namespace FoxTunes
             );
         }
 
-        protected virtual PlaylistItem GetPlaylistItem(string fileName)
+        protected virtual Task<PlaylistItem> GetPlaylistItem(string fileName)
         {
             return this.Core.Components.Database.AsQueryable<PlaylistItem>()
-                .FirstOrDefault(playlistItem => playlistItem.FileName == fileName);
+                .Where(playlistItem => playlistItem.FileName == fileName)
+                .Take(1)
+                .WithAsyncEnumerator(enumerator => enumerator.FirstOrDefault());
         }
 
         protected virtual void AssertPlaylistItems(params string[] fileNames)

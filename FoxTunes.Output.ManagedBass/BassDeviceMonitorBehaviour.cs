@@ -97,6 +97,7 @@ namespace FoxTunes
             }
             Logger.Write(this, LogLevel.Debug, "The default playback device was changed: {0} => {1} => {2}", e.Flow.Value, e.Role.Value, e.Device);
             Logger.Write(this, LogLevel.Debug, "Restarting the output.");
+            //TODO: Bad awaited Task.
             this.BackgroundTaskRunner.Run(() => this.Restart());
         }
 
@@ -148,7 +149,7 @@ namespace FoxTunes
             }
             if (playlistItem != null)
             {
-                await this.ForegroundTaskRunner.RunAsync(async () =>
+                await this.ForegroundTaskRunner.Run(async () =>
                 {
                     await this.PlaylistManager.Play(playlistItem);
                     if (this.PlaybackManager.CurrentStream != null && position > 0)

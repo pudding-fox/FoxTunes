@@ -2,6 +2,7 @@
 using ManagedBass;
 using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -124,24 +125,24 @@ namespace FoxTunes
 
         protected virtual void NotificationSource_Updated(object sender, BassNotificationSourceEventArgs e)
         {
-            this.ForegroundTaskRunner.RunAsync(() => this.OnPositionChanged());
+            this.ForegroundTaskRunner.Run(() => this.OnPositionChanged());
         }
 
         protected virtual void NotificationSource_Stopping(object sender, BassNotificationSourceEventArgs e)
         {
-            this.ForegroundTaskRunner.RunAsync(() =>
+            this.ForegroundTaskRunner.Run(async () =>
             {
-                this.EmitState();
-                this.OnStopping();
+                await this.EmitState();
+                await this.OnStopping();
             });
         }
 
         protected virtual void NotificationSource_Stopped(object sender, BassNotificationSourceEventArgs e)
         {
-            this.ForegroundTaskRunner.RunAsync(() =>
+            this.ForegroundTaskRunner.Run(async () =>
             {
-                this.EmitState();
-                this.OnStopped(false);
+                await this.EmitState();
+                await this.OnStopped(false);
             });
         }
 
@@ -181,40 +182,40 @@ namespace FoxTunes
             }
         }
 
-        public override void Play()
+        public override async Task Play()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
             this.Output.GetOrCreatePipeline(this).Play();
-            this.ForegroundTaskRunner.RunAsync(() => this.EmitState());
-            this.OnPlayed(true);
+            await this.ForegroundTaskRunner.Run(() => this.EmitState());
+            await this.OnPlayed(true);
         }
 
-        public override void Pause()
+        public override async Task Pause()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
             this.Output.GetOrCreatePipeline(this).Pause();
-            this.ForegroundTaskRunner.RunAsync(() => this.EmitState());
-            this.OnPaused();
+            await this.ForegroundTaskRunner.Run(() => this.EmitState());
+            await this.OnPaused();
         }
 
-        public override void Resume()
+        public override async Task Resume()
         {
             if (!this.Output.IsStarted)
             {
                 throw BassOutputStreamException.StaleStream;
             }
             this.Output.GetOrCreatePipeline(this).Resume();
-            this.ForegroundTaskRunner.RunAsync(() => this.EmitState());
-            this.OnResumed();
+            await this.ForegroundTaskRunner.Run(() => this.EmitState());
+            await this.OnResumed();
         }
 
-        public override void Stop()
+        public override async Task Stop()
         {
             if (!this.Output.IsStarted)
             {
@@ -224,13 +225,13 @@ namespace FoxTunes
             {
                 this.Output.Pipeline.Stop();
             }
-            this.ForegroundTaskRunner.RunAsync(() => this.EmitState());
-            this.OnStopped(true);
+            await this.ForegroundTaskRunner.Run(() => this.EmitState());
+            await this.OnStopped(true);
         }
 
         protected virtual void ChannelSyncEnd(int handle, int channel, int data, IntPtr user)
         {
-            this.ForegroundTaskRunner.RunAsync(() => this.EmitState());
+            this.ForegroundTaskRunner.Run(() => this.EmitState());
             this.OnStopped(false);
         }
 
