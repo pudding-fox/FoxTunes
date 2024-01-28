@@ -177,7 +177,7 @@ namespace FoxTunes
                 {
                     UpdateElementsFast(data.Values, data.Elements, data.Width, data.Height, Orientation.Vertical);
                 }
-                if (this.ShowPeaks.Value)
+                if (data.Peaks != null)
                 {
                     var duration = Convert.ToInt32(
                         Math.Min(
@@ -186,8 +186,8 @@ namespace FoxTunes
                         )
                     );
                     UpdateElementsSmooth(data.Elements, data.Peaks, data.Holds, data.Width, data.Height, this.HoldInterval.Value, duration, Orientation.Vertical);
-                    data.LastUpdated = DateTime.UtcNow;
                 }
+                data.LastUpdated = DateTime.UtcNow;
 
                 var task = this.Render(data);
             }
