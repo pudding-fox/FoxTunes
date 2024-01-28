@@ -40,7 +40,7 @@ namespace FoxTunes
             "Background",
             typeof(Brush),
             typeof(RendererBase),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.SubPropertiesDoNotAffectRender)
+            new FrameworkPropertyMetadata(Brushes.Transparent, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.SubPropertiesDoNotAffectRender)
         );
 
         public Brush GetBackground(RendererBase source)
@@ -57,6 +57,7 @@ namespace FoxTunes
             typeof(RendererBase),
             new FrameworkPropertyMetadata(SystemColors.ControlTextBrush, FrameworkPropertyMetadataOptions.Inherits)
         );
+
 
         public Brush GetForeground(RendererBase source)
         {
@@ -286,7 +287,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                var info = BitmapHelper.CreateRenderInfo(bitmap, this.Color);
+                var info = BitmapHelper.CreateRenderInfo(bitmap, IntPtr.Zero);
                 BitmapHelper.Clear(ref info);
                 bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
@@ -798,6 +799,63 @@ namespace FoxTunes
                 color.Shade(contrast),
                 color
             };
+        }
+
+        public static Color[] ToPalette(this string value)
+        {
+            var lines = value
+                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(line => line.Trim())
+                .ToArray();
+            var colors = new List<KeyValuePair<int, Color>>();
+            foreach (var line in lines)
+            {
+                var parts = line
+                    .Split(new[] { ':' }, 2)
+                    .Select(part => part.Trim())
+                    .ToArray();
+                var index = default(int);
+                var color = default(Color);
+                if (parts.Length == 2)
+                {
+                    if (!int.TryParse(parts[0], out index))
+                    {
+                        index = colors.Count * 10;
+                    }
+                    color = parts[1].ToColor();
+                }
+                else
+                {
+                    index = colors.Count * 10;
+                    color = parts[0].ToColor();
+                }
+                colors.Add(new KeyValuePair<int, Color>(index, color));
+            }
+            switch (colors.Count)
+            {
+                case 0:
+                    return new Color[] { };
+                case 1:
+                    return new Color[] { colors[0].Value };
+                default:
+                    return colors
+                        .OrderBy(color => color.Key)
+                        .ToArray()
+                        .ToGradient();
+            }
+        }
+
+        public static Color ToColor(this string value)
+        {
+            try
+            {
+                return (Color)ColorConverter.ConvertFromString(value);
+            }
+            catch
+            {
+                //Failed to parse the color.
+                return Colors.Red;
+            }
         }
 
         public static Color[] ToGradient(this KeyValuePair<int, Color>[] colors)

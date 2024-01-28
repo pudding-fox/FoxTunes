@@ -33,7 +33,7 @@ namespace FoxTunes
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(ORIENTATION, Strings.PeakMeterBehaviourConfiguration_Orientation, path: Strings.PeakMeterBehaviourConfiguration_Path).WithOptions(GetOrientationOptions()))
                 .WithElement(new BooleanConfigurationElement(PEAKS, Strings.SpectrumBehaviourConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.PeakMeterBehaviourConfiguration_Path, Strings.General_Advanced)))
-                .WithElement(new BooleanConfigurationElement(RMS, Strings.SpectrumBehaviourConfiguration_Rms, path: string.Format("{0}/{1}", Strings.PeakMeterBehaviourConfiguration_Path, Strings.General_Advanced)))
+                .WithElement(new BooleanConfigurationElement(RMS, Strings.EnhancedSpectrumBehaviourConfiguration_Rms, path: string.Format("{0}/{1}", Strings.PeakMeterBehaviourConfiguration_Path, Strings.General_Advanced)))
                 .WithElement(new IntegerConfigurationElement(HOLD, Strings.SpectrumBehaviourConfiguration_Hold, path: string.Format("{0}/{1}", Strings.PeakMeterBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(1000).WithValidationRule(new IntegerValidationRule(500, 5000)).DependsOn(SECTION, PEAKS)
             );
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(

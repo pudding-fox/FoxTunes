@@ -70,6 +70,42 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bands.
+        /// </summary>
+        internal static string EnhancedSpectrumBehaviourConfiguration_Bands {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.Bands", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Crest Factor.
+        /// </summary>
+        internal static string EnhancedSpectrumBehaviourConfiguration_Crest {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.Crest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spectrum.
+        /// </summary>
+        internal static string EnhancedSpectrumBehaviourConfiguration_Path {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show RMS.
+        /// </summary>
+        internal static string EnhancedSpectrumBehaviourConfiguration_Rms {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrumBehaviourConfiguration.Rms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Advanced.
         /// </summary>
         internal static string General_Advanced {
@@ -403,16 +439,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Bands.
-        /// </summary>
-        internal static string SpectrumBehaviourConfiguration_Bands {
-            get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Bands", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Bars (Basic).
+        ///   Looks up a localized string similar to Bars.
         /// </summary>
         internal static string SpectrumBehaviourConfiguration_Bars {
             get {
@@ -421,11 +448,11 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Show Crest Factor.
+        ///   Looks up a localized string similar to Color Palette.
         /// </summary>
-        internal static string SpectrumBehaviourConfiguration_Crest {
+        internal static string SpectrumBehaviourConfiguration_ColorPalette {
             get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Crest", resourceCulture);
+                return ResourceManager.GetString("SpectrumBehaviourConfiguration.ColorPalette", resourceCulture);
             }
         }
         
@@ -448,7 +475,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Spectrum.
+        ///   Looks up a localized string similar to Spectrum (Basic).
         /// </summary>
         internal static string SpectrumBehaviourConfiguration_Path {
             get {
@@ -462,15 +489,6 @@ namespace FoxTunes {
         internal static string SpectrumBehaviourConfiguration_Peaks {
             get {
                 return ResourceManager.GetString("SpectrumBehaviourConfiguration.Peaks", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Show RMS.
-        /// </summary>
-        internal static string SpectrumBehaviourConfiguration_Rms {
-            get {
-                return ResourceManager.GetString("SpectrumBehaviourConfiguration.Rms", resourceCulture);
             }
         }
     }

@@ -13,7 +13,7 @@
              MinWidth="160"
              MinHeight="30">
     <UserControl.ContextMenu>
-        <Windows:Menu Category="{Binding Source={x:Static LocalWindows:SpectrumBehaviour.BASIC_CATEGORY}}"></Windows:Menu>
+        <Windows:Menu Category="{Binding Source={x:Static LocalWindows:SpectrumBehaviour.CATEGORY}}"></Windows:Menu>
     </UserControl.ContextMenu>
     <Windows:Visualization>
         <LocalWindows:SpectrumRenderer></LocalWindows:SpectrumRenderer>

@@ -1,5 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
+using System.Text;
+using System.Windows.Media;
 
 namespace FoxTunes
 {
@@ -33,36 +35,22 @@ namespace FoxTunes
 
         public const string BARS_1024_OPTION = "DDDD3900-E91F-4FAB-A687-EA23065F4ECA";
 
-        public const string BANDS_ELEMENT = "AABBF573-83D3-498E-BEF8-F1DB5A329B9D";
-
-        public const string BANDS_10_OPTION = "AAAA058C-2C96-4540-9ABE-10A584A17CE4";
-
-        public const string BANDS_14_OPTION = "BBBB2B6D-E6FE-43F1-8358-AEE0299F0F8E";
-
-        public const string BANDS_21_OPTION = "CCCCC739-B777-474B-B4A8-F96375254FAC";
-
-        public const string BANDS_31_OPTION = "DDDD0A9D-0512-4F9F-903D-9AC33A9C6CFD";
-
         public const string PEAKS_ELEMENT = "DDDD7FCF-8A71-4367-8F48-4F8D8C89739C";
-
-        public const string RMS_ELEMENT = "DDDEE2B6A-188E-4FF4-A277-37D140D49C45";
-
-        public const string CREST_ELEMENT = "DEEEFFB9-2014-4004-94F9-E566874317ED";
 
         public const string HIGH_CUT_ELEMENT = "DDEE2ADA-C904-4AA5-82F0-F53412EF24BD";
 
         public const string HOLD_ELEMENT = "EEEE64D9-FF15-49FB-BDF4-706958576FFC";
 
+        public const string COLOR_PALETTE_ELEMENT = "FFFF957D-5AEA-4706-B6D0-9C9065E76132";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Bars, path: Strings.SpectrumBehaviourConfiguration_Path).WithOptions(GetBarsOptions()))
-                .WithElement(new SelectionConfigurationElement(BANDS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Bands, path: Strings.SpectrumBehaviourConfiguration_Path).WithOptions(GetBandsOptions()))
                 .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)))
-                .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.SpectrumBehaviourConfiguration_Rms, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)))
-                .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.SpectrumBehaviourConfiguration_Crest, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(false))
                 .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.SpectrumBehaviourConfiguration_Hold, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(1000).WithValidationRule(new IntegerValidationRule(500, 5000)).DependsOn(SECTION, PEAKS_ELEMENT))
-                .WithElement(new BooleanConfigurationElement(HIGH_CUT_ELEMENT, Strings.SpectrumBehaviourConfiguration_HighCut, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true)
+                .WithElement(new BooleanConfigurationElement(HIGH_CUT_ELEMENT, Strings.SpectrumBehaviourConfiguration_HighCut, path: string.Format("{0}/{1}", Strings.SpectrumBehaviourConfiguration_Path, Strings.General_Advanced)).WithValue(true))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrumBehaviourConfiguration_ColorPalette, path: Strings.SpectrumBehaviourConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine)
             );
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<SelectionConfigurationElement>(
                 SECTION,
@@ -77,22 +65,16 @@ namespace FoxTunes
                 SECTION,
                 PEAKS_ELEMENT
             );
-            var rms = configuration.GetElement<BooleanConfigurationElement>(
-                SECTION,
-                RMS_ELEMENT
-            );
             switch (option.Id)
             {
                 default:
                 case VisualizationBehaviourConfiguration.QUALITY_HIGH_OPTION:
                     Logger.Write(typeof(SpectrumBehaviourConfiguration), LogLevel.Debug, "Using high quality profile.");
                     peaks.Value = true;
-                    rms.Value = true;
                     break;
                 case VisualizationBehaviourConfiguration.QUALITY_LOW_OPTION:
                     Logger.Write(typeof(SpectrumBehaviourConfiguration), LogLevel.Debug, "Using low quality profile.");
                     peaks.Value = false;
-                    rms.Value = false;
                     break;
             }
         }
@@ -130,114 +112,7 @@ namespace FoxTunes
             }
         }
 
-        private static IEnumerable<SelectionConfigurationOption> GetBandsOptions()
-        {
-            yield return new SelectionConfigurationOption(BANDS_10_OPTION, "10");
-            yield return new SelectionConfigurationOption(BANDS_14_OPTION, "14").Default();
-            yield return new SelectionConfigurationOption(BANDS_21_OPTION, "21");
-            yield return new SelectionConfigurationOption(BANDS_31_OPTION, "31");
-        }
-
-        public static int[] GetBands(SelectionConfigurationOption option)
-        {
-            switch (option.Id)
-            {
-                case BANDS_10_OPTION:
-                    return new[]
-                    {
-                        20,
-                        50,
-                        100,
-                        200,
-                        500,
-                        1000,
-                        2000,
-                        5000,
-                        10000,
-                        20000
-                    };
-                default:
-                case BANDS_14_OPTION:
-                    return new[]
-                    {
-                        20,
-                        50,
-                        100,
-                        200,
-                        500,
-                        1000,
-                        1400,
-                        2000,
-                        3000,
-                        5000,
-                        7500,
-                        10000,
-                        17000,
-                        20000
-                    };
-                case BANDS_21_OPTION:
-                    return new[]
-                    {
-                        20,
-                        35,
-                        50,
-                        70,
-                        100,
-                        160,
-                        200,
-                        360,
-                        500,
-                        760,
-                        1000,
-                        1400,
-                        2000,
-                        2600,
-                        3000,
-                        5000,
-                        7500,
-                        10000,
-                        13000,
-                        17000,
-                        20000
-                    };
-                case BANDS_31_OPTION:
-                    return new[]
-                    {
-                        20,
-                        35,
-                        50,
-                        70,
-                        100,
-                        120,
-                        160,
-                        200,
-                        300,
-                        360,
-                        440,
-                        500,
-                        600,
-                        760,
-                        1000,
-                        1200,
-                        1400,
-                        1600,
-                        2000,
-                        2600,
-                        3000,
-                        3600,
-                        4000,
-                        5000,
-                        7500,
-                        10000,
-                        12000,
-                        14000,
-                        17000,
-                        20000
-                    };
-            }
-        }
-
-        public static int GetWidthForBars(SelectionConfigurationOption option)
+        public static int GetWidth(SelectionConfigurationOption option)
         {
             switch (option.Id)
             {
@@ -259,20 +134,26 @@ namespace FoxTunes
             }
         }
 
-        public static int GetWidthForBands(SelectionConfigurationOption option)
+        public static string GetDefaultColorPalette()
         {
-            switch (option.Id)
+            var builder = new StringBuilder();
+            return builder.ToString();
+        }
+
+        public static Color[] GetColorPalette(string value, Color color)
+        {
+            if (!string.IsNullOrEmpty(value))
             {
-                default:
-                case BANDS_10_OPTION:
-                    return 280;
-                case BANDS_14_OPTION:
-                    return 364;
-                case BANDS_21_OPTION:
-                    return 516;
-                case BANDS_31_OPTION:
-                    return 728;
+                try
+                {
+                    return value.ToPalette();
+                }
+                catch
+                {
+                    //Nothing can be done.
+                }
             }
+            return new[] { color };
         }
     }
 }

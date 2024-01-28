@@ -112,7 +112,7 @@ namespace FoxTunes
                 {
                     if (bitmap.TryLock(LockTimeout))
                     {
-                        var info = BitmapHelper.CreateRenderInfo(bitmap, this.Color);
+                        var info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.CreatePalette(0, data.Colors));
                         lock (history)
                         {
                             Restore(info, data, history);
@@ -148,7 +148,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                info = BitmapHelper.CreateRenderInfo(bitmap, data.Colors);
+                info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.CreatePalette(0, data.Colors));
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
             if (!success)

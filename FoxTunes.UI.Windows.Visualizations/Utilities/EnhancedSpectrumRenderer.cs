@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
@@ -33,20 +32,20 @@ namespace FoxTunes
         {
             this.Configuration = core.Components.Configuration;
             this.Bands = this.Configuration.GetElement<SelectionConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.BANDS_ELEMENT
+                EnhancedSpectrumBehaviourConfiguration.SECTION,
+                EnhancedSpectrumBehaviourConfiguration.BANDS_ELEMENT
             );
             this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
                 SpectrumBehaviourConfiguration.SECTION,
                 SpectrumBehaviourConfiguration.PEAKS_ELEMENT
              );
             this.ShowRms = this.Configuration.GetElement<BooleanConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.RMS_ELEMENT
+                EnhancedSpectrumBehaviourConfiguration.SECTION,
+                EnhancedSpectrumBehaviourConfiguration.RMS_ELEMENT
              );
             this.ShowCrestFactor = this.Configuration.GetElement<BooleanConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.CREST_ELEMENT
+                EnhancedSpectrumBehaviourConfiguration.SECTION,
+                EnhancedSpectrumBehaviourConfiguration.CREST_ELEMENT
             );
             this.Smooth = this.Configuration.GetElement<BooleanConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
@@ -94,7 +93,7 @@ namespace FoxTunes
                 this,
                 width,
                 height,
-                SpectrumBehaviourConfiguration.GetBands(this.Bands.Value),
+                EnhancedSpectrumBehaviourConfiguration.GetBands(this.Bands.Value),
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeaks.Value,
                 this.ShowRms.Value,
@@ -129,16 +128,16 @@ namespace FoxTunes
                 if (data.RmsElements != null)
                 {
                     var colors = this.Color.ToPair(SHADE);
-                    valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, colors[0]);
-                    rmsRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, colors[1]);
+                    valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.CreatePalette(0, colors[0]));
+                    rmsRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.CreatePalette(0, colors[1]));
                     if (data.CrestPoints != null)
                     {
-                        crestRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, Colors.Red);
+                        crestRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.CreatePalette(0, Colors.Red));
                     }
                 }
                 else
                 {
-                    valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, this.Color);
+                    valueRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.CreatePalette(0, this.Color));
                 }
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
@@ -242,7 +241,7 @@ namespace FoxTunes
 
         protected override int GetPixelWidth(double width)
         {
-            var bands = SpectrumBehaviourConfiguration.GetBands(this.Bands.Value);
+            var bands = EnhancedSpectrumBehaviourConfiguration.GetBands(this.Bands.Value);
             return base.GetPixelWidth(bands.Length * (Convert.ToInt32(width) / bands.Length));
         }
 

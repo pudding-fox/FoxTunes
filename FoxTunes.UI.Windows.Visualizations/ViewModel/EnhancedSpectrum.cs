@@ -50,11 +50,11 @@ namespace FoxTunes.ViewModel
         protected override void InitializeComponent(ICore core)
         {
             core.Components.Configuration.GetElement<SelectionConfigurationElement>(
-                SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.BANDS_ELEMENT
+                EnhancedSpectrumBehaviourConfiguration.SECTION,
+                EnhancedSpectrumBehaviourConfiguration.BANDS_ELEMENT
             ).ConnectValue(value =>
             {
-                var bands = SpectrumBehaviourConfiguration.GetBands(value).Select(
+                var bands = EnhancedSpectrumBehaviourConfiguration.GetBands(value).Select(
                     band => band < 1000 ? Convert.ToString(band) : string.Format("{0:0.##}K", (float)band / 1000)
                 );
                 this.Bands = new StringCollection(bands);
