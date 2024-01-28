@@ -43,14 +43,32 @@ namespace FoxTunes
 
         public RateLimiter RateLimiter { get; private set; }
 
-        public async Task<IEnumerable<Release>> GetReleases(string artist, string album)
+        public async Task<IEnumerable<Release>> GetReleases(string artist, string album, bool master)
         {
-            var url = string.Format(
-                "{0}/database/search?type=master&artist={1}&release_title={2}",
-                this.BaseUrl,
-                Uri.EscapeDataString(artist),
-                Uri.EscapeDataString(album)
-            );
+            var url = default(string);
+            if (master)
+            {
+                url = string.Format(
+                    "{0}/database/search?type=master&artist={1}&release_title={2}",
+                    this.BaseUrl,
+                    Uri.EscapeDataString(artist),
+                    Uri.EscapeDataString(album)
+                );
+            }
+            else
+            {
+                url = string.Format(
+                    "{0}/database/search?query={1}",
+                    this.BaseUrl,
+                    Uri.EscapeDataString(
+                        string.Format(
+                            "{0} - {1}",
+                            artist,
+                            album
+                        )
+                    )
+                );
+            }
             Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
             var request = this.CreateRequest(url);
             using (var response = (HttpWebResponse)request.GetResponse())
