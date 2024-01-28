@@ -139,12 +139,6 @@
   <data name="Genre" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\genre.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="LastPlayed" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\lastplayed.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="PlayCount" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\playcount.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
   <data name="Rating" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\rating.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>

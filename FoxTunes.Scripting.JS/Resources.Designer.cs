@@ -169,36 +169,6 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to (function () {
-        ///    var lastplayed = tag.lastplayed;
-        ///    if (!lastplayed) {
-        ///        return &quot;Unknown&quot;;
-        ///    }
-        ///    return DateHelper.toLocaleDateString(lastplayed) || &quot;Unknown&quot;;
-        ///})().
-        /// </summary>
-        internal static string LastPlayed {
-            get {
-                return ResourceManager.GetString("LastPlayed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to (function () {
-        ///	var playcount = tag.playcount;
-        ///	if (!playcount) {
-        ///		return 0;
-        ///	}
-        ///	return playcount;
-        ///})().
-        /// </summary>
-        internal static string PlayCount {
-            get {
-                return ResourceManager.GetString("PlayCount", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to (function () {
         ///    if (tag.rating) {
         ///        return tag.rating;
         ///    }

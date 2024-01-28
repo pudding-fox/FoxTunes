@@ -20,10 +20,6 @@
 
         string Year_Album { get; }
 
-        string PlayCount { get; }
-
-        string LastPlayed { get; }
-
         string Rating { get; }
 
         string Artist_Title_BPM { get; }
