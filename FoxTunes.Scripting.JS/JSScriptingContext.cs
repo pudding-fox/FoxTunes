@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Linq;
@@ -23,6 +24,8 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Engine.Execute(Resources.utils, throwExceptionOnError: true);
+            this.Engine.RegisterType<DateHelper>(memberSecurity: ScriptMemberSecurity.Locked);
+            this.Engine.GlobalObject.SetProperty(typeof(DateHelper));
             base.InitializeComponent(core);
         }
 
@@ -55,7 +58,12 @@ namespace FoxTunes
 
         public override object GetValue(string name)
         {
-            return this.Engine.GlobalObject.GetProperty(name);
+            var result = this.Engine.GlobalObject.GetProperty(name);
+            if (result.IsUndefined)
+            {
+                return null;
+            }
+            return result.Value;
         }
 
         [DebuggerNonUserCode]
@@ -63,11 +71,16 @@ namespace FoxTunes
         {
             try
             {
-                return this.Engine.Execute(script, throwExceptionOnError: true);
+                var result = this.Engine.Execute(script, throwExceptionOnError: true);
+                if (result.IsUndefined)
+                {
+                    return null;
+                }
+                return result.Value;
             }
             catch (V8ExecutionErrorException e)
             {
-                throw;
+                throw new ScriptingException(e.Message);
             }
         }
 

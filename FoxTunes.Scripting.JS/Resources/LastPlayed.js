@@ -3,5 +3,5 @@
     if (!lastplayed) {
         return "Unknown";
     }
-    return toLocaleDateString(lastplayed) || "Unknown";
+    return DateHelper.toLocaleDateString(lastplayed) || "Unknown";
 })()
