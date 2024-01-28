@@ -39,6 +39,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Lyrics { get; private set; }
 
+        public BooleanConfigurationElement Popularimeter { get; private set; }
+
         public IArtworkProvider ArtworkProvider { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -68,6 +70,10 @@ namespace FoxTunes
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.READ_LYRICS_TAGS
             );
+            this.Popularimeter = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.READ_POPULARIMETER_TAGS
+            );
             this.ArtworkProvider = core.Components.ArtworkProvider;
             base.InitializeComponent(core);
         }
@@ -94,6 +100,10 @@ namespace FoxTunes
                     if (file.Properties != null)
                     {
                         this.AddProperties(metaData, file.Properties);
+                    }
+                    if (this.Popularimeter.Value)
+                    {
+                        this.Try(() => PopularimeterManager.Read(this, metaData, file), this.ErrorHandler);
                     }
                     if (this.EmbeddedImages.Value)
                     {
@@ -143,7 +153,7 @@ namespace FoxTunes
                     switch (metaDataItem.Type)
                     {
                         case MetaDataItemType.Tag:
-                            this.SetTag(metaDataItem, file.Tag);
+                            this.SetTag(metaDataItem, file, file.Tag);
                             break;
                         case MetaDataItemType.Image:
                             if (file.InvariantStartPosition > MAX_TAG_SIZE)
@@ -337,8 +347,7 @@ namespace FoxTunes
                     }
                     metaData.Add(new MetaDataItem(Enum.GetName(typeof(ArtworkType), type), MetaDataItemType.Image)
                     {
-                        Value = await this.ImportImage(tag, picture, type, false)
-.ConfigureAwait(false)
+                        Value = await this.ImportImage(tag, picture, type, false).ConfigureAwait(false)
                     });
                     types.Add(type);
                 }
@@ -411,7 +420,7 @@ namespace FoxTunes
             return result;
         }
 
-        private void SetTag(MetaDataItem metaDataItem, Tag tag)
+        private void SetTag(MetaDataItem metaDataItem, File file, Tag tag)
         {
             switch (metaDataItem.Name)
             {
@@ -438,6 +447,10 @@ namespace FoxTunes
                     break;
                 case CommonMetaData.Performer:
                     tag.Performers = new[] { metaDataItem.Value };
+                    break;
+                case CommonMetaData.PlayCount:
+                case CommonMetaData.Rating:
+                    PopularimeterManager.Write(this, metaDataItem, file);
                     break;
                 case CommonMetaData.Title:
                     tag.Title = metaDataItem.Value;
@@ -582,6 +595,196 @@ namespace FoxTunes
                 return artworkType;
             }
             return ArtworkType.Unknown;
+        }
+
+        public static class PopularimeterManager
+        {
+            const string USER = "ft";
+
+            public static void Read(TagLibMetaDataSource source, IList<MetaDataItem> metaData, File file)
+            {
+                if (file.TagTypes.HasFlag(TagTypes.Id3v2))
+                {
+                    var tag = GetTag<global::TagLib.Id3v2.Tag>(file, TagTypes.Id3v2);
+                    if (tag == null)
+                    {
+                        return;
+                    }
+                    foreach (var frame in tag.GetFrames<global::TagLib.Id3v2.PopularimeterFrame>())
+                    {
+                        if (frame.Rating != 0)
+                        {
+                            source.AddTag(metaData, CommonMetaData.Rating, Format(frame.User, frame.Rating));
+                        }
+                        if (frame.PlayCount != 0)
+                        {
+                            source.AddTag(metaData, CommonMetaData.PlayCount, Format(frame.User, frame.PlayCount));
+                        }
+                    }
+                }
+                else
+                {
+                    var rating = GetCustomTag(CommonMetaData.Rating, file);
+                    if (!string.IsNullOrEmpty(rating))
+                    {
+                        source.AddTag(metaData, CommonMetaData.Rating, Format(USER, rating));
+                    }
+                    var playCount = GetCustomTag(CommonMetaData.PlayCount, file);
+                    if (!string.IsNullOrEmpty(playCount))
+                    {
+                        source.AddTag(metaData, CommonMetaData.Rating, Format(USER, playCount));
+                    }
+                }
+            }
+
+            public static void Write(TagLibMetaDataSource source, MetaDataItem metaDataItem, File file)
+            {
+                var user = default(string);
+                var value = default(string);
+                if (!Parse(metaDataItem, out user, out value))
+                {
+                    return;
+                }
+                if (file.TagTypes.HasFlag(TagTypes.Id3v2))
+                {
+                    var tag = GetTag<global::TagLib.Id3v2.Tag>(file, TagTypes.Id3v2);
+                    foreach (var frame in tag.GetFrames<global::TagLib.Id3v2.PopularimeterFrame>())
+                    {
+                        frame.User = user;
+                        switch (metaDataItem.Name)
+                        {
+                            case CommonMetaData.Rating:
+                                frame.Rating = Convert.ToByte(value);
+                                break;
+                            case CommonMetaData.PlayCount:
+                                frame.PlayCount = Convert.ToUInt64(value);
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    SetCustomTag(metaDataItem.Name, metaDataItem.Value, file);
+                }
+            }
+
+            private static string Format(string user, object value)
+            {
+                return string.Format("{0}:{1}", user, value);
+            }
+
+            private static bool Parse(MetaDataItem metaDataItem, out string user, out string value)
+            {
+                if (string.IsNullOrEmpty(metaDataItem.Value))
+                {
+                    user = default(string);
+                    value = default(string);
+                    return false;
+                }
+                var parts = metaDataItem.Value.Split(':');
+                if (parts.Length != 2)
+                {
+                    user = default(string);
+                    value = default(string);
+                    return false;
+                }
+                user = parts[0];
+                value = parts[1];
+                return true;
+            }
+
+            private static T GetTag<T>(File file, TagTypes tagTypes) where T : Tag
+            {
+                return file.GetTag(tagTypes) as T;
+            }
+
+            private static string GetCustomTag(string name, File file)
+            {
+                var key = default(string);
+                switch (name)
+                {
+                    case CommonMetaData.PlayCount:
+                        key = "play_count";
+                        break;
+                    default:
+                        key = name.ToLower();
+                        break;
+                }
+                if (file.TagTypes.HasFlag(TagTypes.Apple))
+                {
+                    var tag = GetTag<global::TagLib.Mpeg4.AppleTag>(file, TagTypes.Apple);
+                    if (tag != null)
+                    {
+                        return tag.GetDashBox("com.apple.iTunes", key);
+                    }
+                }
+                else if (file.TagTypes.HasFlag(TagTypes.Xiph))
+                {
+                    var tag = GetTag<global::TagLib.Ogg.XiphComment>(file, TagTypes.Xiph);
+                    if (tag != null)
+                    {
+                        return tag.GetFirstField(key);
+                    }
+                }
+                else if (file.TagTypes.HasFlag(TagTypes.Ape))
+                {
+                    var tag = GetTag<global::TagLib.Ape.Tag>(file, TagTypes.Ape);
+                    if (tag != null)
+                    {
+                        var item = tag.GetItem(key);
+                        if (item != null)
+                        {
+                            return item.ToStringArray().FirstOrDefault();
+                        }
+                    }
+                }
+                //Not implemented.
+                return null;
+            }
+
+            private static void SetCustomTag(string name, string value, File file)
+            {
+                var key = default(string);
+                switch (name)
+                {
+                    case CommonMetaData.PlayCount:
+                        key = "play_count";
+                        break;
+                    default:
+                        key = name.ToLower();
+                        break;
+                }
+                if (file.TagTypes.HasFlag(TagTypes.Apple))
+                {
+                    const string PREFIX = "\0\0\0\0";
+                    const string MEAN = "com.apple.iTunes";
+                    var apple = GetTag<global::TagLib.Mpeg4.AppleTag>(file, TagTypes.Apple);
+                    if (apple != null)
+                    {
+                        while (apple.GetDashBox(MEAN, key) != null)
+                        {
+                            apple.SetDashBox(MEAN, key, string.Empty);
+                        }
+                        apple.SetDashBox(PREFIX + MEAN, PREFIX + key, value);
+                    }
+                }
+                else if (file.TagTypes.HasFlag(TagTypes.Xiph))
+                {
+                    var xiph = GetTag<global::TagLib.Ogg.XiphComment>(file, TagTypes.Xiph);
+                    if (xiph != null)
+                    {
+                        xiph.SetField(key, new[] { value });
+                    }
+                }
+                else if (file.TagTypes.HasFlag(TagTypes.Ape))
+                {
+                    var ape = GetTag<global::TagLib.Ape.Tag>(file, TagTypes.Ape);
+                    if (ape != null)
+                    {
+                        ape.SetValue(key, value);
+                    }
+                }
+            }
         }
     }
 }

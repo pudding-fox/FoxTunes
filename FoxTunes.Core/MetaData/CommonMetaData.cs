@@ -30,6 +30,8 @@ namespace FoxTunes
         public const string MusicIpId = "MusicIpId";
         public const string Performer = "Performer";
         public const string Pictures = "Pictures";
+        public const string PlayCount = "PlayCount";
+        public const string Rating = "Rating";
         public const string Title = "Title";
         public const string Track = "Track";
         public const string TrackCount = "TrackCount";
