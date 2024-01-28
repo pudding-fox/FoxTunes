@@ -94,6 +94,7 @@ namespace FoxTunes
                     if (channelHandle == 0)
                     {
                         Logger.Write(this, LogLevel.Warn, "Failed to load file into memory: {0}", fileName);
+                        channelHandle = Bass.CreateStream(fileName, 0, 0, flags);
                     }
                 }
                 else
