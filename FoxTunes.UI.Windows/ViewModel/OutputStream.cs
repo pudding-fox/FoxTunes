@@ -114,7 +114,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return this.InnerOutputStream.GetDuration(this.Remaining).ToString(@"mm\:ss");
+                return ToTimeStamp(this.InnerOutputStream.GetDuration(this.Remaining));
             }
         }
 
@@ -141,7 +141,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return this.InnerOutputStream.GetDuration(this.Length).ToString(@"mm\:ss");
+                return ToTimeStamp(this.InnerOutputStream.GetDuration(this.Length));
             }
         }
 
@@ -215,6 +215,18 @@ namespace FoxTunes.ViewModel
         protected override Freezable CreateInstanceCore()
         {
             return new OutputStream(null);
+        }
+
+        public static string ToTimeStamp(TimeSpan value)
+        {
+            if (value.TotalHours < 1)
+            {
+                return value.ToString(@"mm\:ss");
+            }
+            else
+            {
+                return value.ToString(@"hh\:mm\:ss");
+            }
         }
     }
 }
