@@ -11,7 +11,7 @@ namespace FoxTunes
     [Component("E0318CB1-57A0-4DC3-AA8D-F6E100F86190", ComponentSlots.Output)]
     public class BassOutput : Output, IBassOutput
     {
-        const int LOCK_TIMEOUT = 10000;
+        const int START_STOP_TIMEOUT = 10000;
 
         static BassOutput()
         {
@@ -21,6 +21,13 @@ namespace FoxTunes
         const int START_ATTEMPTS = 5;
 
         const int START_ATTEMPT_INTERVAL = 400;
+
+        public BassOutput()
+        {
+            this.Semaphore = new SemaphoreSlim(1, 1);
+        }
+
+        public SemaphoreSlim Semaphore { get; private set; }
 
         public override string Name
         {
@@ -135,12 +142,30 @@ namespace FoxTunes
 
         public override Task Start()
         {
-            return this.PerformCritical(LOCK_TIMEOUT, async () =>
+            return this.Start(false);
+        }
+
+        protected virtual async Task Start(bool force)
+        {
+            if (!await this.Semaphore.WaitAsync(START_STOP_TIMEOUT))
             {
-                if (this.IsStarted)
-                {
-                    await this.Shutdown();
-                }
+                throw new InvalidOperationException(string.Format("{0} is already starting.", this.GetType().Name));
+            }
+            try
+            {
+                await this.OnStart(force);
+            }
+            finally
+            {
+                this.Semaphore.Release();
+            }
+        }
+
+        protected virtual async Task OnStart(bool force)
+        {
+            if (force || !this.IsStarted)
+            {
+                await this.OnShutdown(false);
                 var exception = default(Exception);
                 for (var a = 1; a <= START_ATTEMPTS; a++)
                 {
@@ -156,7 +181,7 @@ namespace FoxTunes
                         exception = e;
                         Logger.Write(this, LogLevel.Warn, "Failed to start BASS: {0}", e.Message);
                     }
-                    await this.Shutdown(true);
+                    await this.OnShutdown(true);
                     Thread.Sleep(START_ATTEMPT_INTERVAL);
                 }
                 if (this.IsStarted)
@@ -168,7 +193,7 @@ namespace FoxTunes
                 {
                     throw exception;
                 }
-            });
+            }
         }
 
         public override Task Shutdown()
@@ -176,35 +201,48 @@ namespace FoxTunes
             return this.Shutdown(false);
         }
 
-        protected virtual Task Shutdown(bool force)
+        protected virtual async Task Shutdown(bool force)
         {
-            return this.PerformCritical(LOCK_TIMEOUT, async () =>
+            if (!await this.Semaphore.WaitAsync(START_STOP_TIMEOUT))
             {
-                if (force || this.IsStarted)
+                throw new InvalidOperationException(string.Format("{0} is already stopping.", this.GetType().Name));
+            }
+            try
+            {
+                await this.OnShutdown(force);
+            }
+            finally
+            {
+                this.Semaphore.Release();
+            }
+        }
+
+        protected virtual async Task OnShutdown(bool force)
+        {
+            if (force || this.IsStarted)
+            {
+                var exception = default(Exception);
+                Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
+                try
                 {
-                    var exception = default(Exception);
-                    Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
-                    try
-                    {
-                        this.FreePipeline();
-                        this.OnFree();
-                        Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Write(this, LogLevel.Error, "Failed to stop BASS: {0}", e.Message);
-                        exception = e;
-                    }
-                    finally
-                    {
-                        this.IsStarted = false;
-                    }
-                    if (exception != null)
-                    {
-                        await this.OnError(exception);
-                    }
+                    this.FreePipeline();
+                    this.OnFree();
+                    Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
                 }
-            });
+                catch (Exception e)
+                {
+                    Logger.Write(this, LogLevel.Error, "Failed to stop BASS: {0}", e.Message);
+                    exception = e;
+                }
+                finally
+                {
+                    this.IsStarted = false;
+                }
+                if (exception != null)
+                {
+                    await this.OnError(exception);
+                }
+            }
         }
 
         protected virtual void OnInit()
