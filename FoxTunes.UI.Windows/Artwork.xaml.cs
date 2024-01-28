@@ -51,10 +51,6 @@ namespace FoxTunes
             if (outputStream != null)
             {
                 metaDataItem = await ArtworkProvider.Find(outputStream.PlaylistItem, ArtworkType.FrontCover);
-                if (metaDataItem == null)
-                {
-                    metaDataItem = await ArtworkProvider.Find(outputStream.PlaylistItem.FileName, ArtworkType.FrontCover);
-                }
             }
             if (metaDataItem == null || !File.Exists(metaDataItem.Value))
             {

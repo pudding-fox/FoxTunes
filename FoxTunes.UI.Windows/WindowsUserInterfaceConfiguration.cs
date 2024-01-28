@@ -48,11 +48,11 @@ namespace FoxTunes
                 .WithElement(
                     new SelectionConfigurationElement(BOTTOM_RIGHT_ELEMENT, "Bottom Right", path: "Layout").WithOptions(GetControlOptions(BOTTOM_RIGHT_ELEMENT)))
                 .WithElement(
-                    new DoubleConfigurationElement(UI_SCALING_ELEMENT, "Scaling Factor", path: "Advanced").WithValue(1.0).WithValidationRule(new DoubleValidationRule(0.5, 10)))
+                    new DoubleConfigurationElement(UI_SCALING_ELEMENT, "Scaling Factor", path: "Advanced").WithValue(1.0).WithValidationRule(new DoubleValidationRule(1, 4, 0.4)))
                 .WithElement(
                     new IntegerConfigurationElement(MARQUEE_INTERVAL_ELEMENT, "Marquee Interval", path: "Advanced").WithValue(50).WithValidationRule(new IntegerValidationRule(10, 1000)))
                 .WithElement(
-                    new DoubleConfigurationElement(MARQUEE_STEP_ELEMENT, "Marquee Step", path: "Advanced").WithValue(0.75).WithValidationRule(new DoubleValidationRule(0.50, 10)))
+                    new DoubleConfigurationElement(MARQUEE_STEP_ELEMENT, "Marquee Step", path: "Advanced").WithValue(0.80).WithValidationRule(new DoubleValidationRule(0.80, 10, 0.4)))
                 .WithElement(
                     new BooleanConfigurationElement(EXTEND_GLASS_ELEMENT, "Extend Glass").WithValue(false)
             );

@@ -49,8 +49,7 @@ namespace FoxTunes.ViewModel.Config
         {
             this.OnMinValueChanged();
             this.OnMaxValueChanged();
-            this.OnSmallChangeChanged();
-            this.OnLargeChangeChanged();
+            this.OnStepChanged();
             if (this.ElementChanged != null)
             {
                 this.ElementChanged(this, EventArgs.Empty);
@@ -112,7 +111,7 @@ namespace FoxTunes.ViewModel.Config
 
         public event EventHandler MaxValueChanged;
 
-        public double SmallChange
+        public double Step
         {
             get
             {
@@ -120,42 +119,23 @@ namespace FoxTunes.ViewModel.Config
                 {
                     foreach (var validationRule in this.Element.ValidationRules.OfType<DoubleValidationRule>())
                     {
-                        return Math.Round((validationRule.MaxValue - validationRule.MinValue) / 10, 1);
+                        return validationRule.Step;
                     }
                 }
                 return 0.1;
             }
         }
 
-        protected virtual void OnSmallChangeChanged()
+        protected virtual void OnStepChanged()
         {
-            if (this.SmallChangeChanged != null)
+            if (this.StepChanged != null)
             {
-                this.SmallChangeChanged(this, EventArgs.Empty);
+                this.StepChanged(this, EventArgs.Empty);
             }
-            this.OnPropertyChanged("SmallChange");
+            this.OnPropertyChanged("Step");
         }
 
-        public event EventHandler SmallChangeChanged;
-
-        public double LargeChange
-        {
-            get
-            {
-                return this.SmallChange * 2;
-            }
-        }
-
-        protected virtual void OnLargeChangeChanged()
-        {
-            if (this.LargeChangeChanged != null)
-            {
-                this.LargeChangeChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("LargeChange");
-        }
-
-        public event EventHandler LargeChangeChanged;
+        public event EventHandler StepChanged;
 
         protected override Freezable CreateInstanceCore()
         {

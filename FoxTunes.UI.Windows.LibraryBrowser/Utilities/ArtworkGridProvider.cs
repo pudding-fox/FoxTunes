@@ -121,13 +121,14 @@ namespace FoxTunes
             {
                 return;
             }
-            var source = ImageLoader.Load(fileName, decodePixelWidth, decodePixelHeight);
+            var region = this.GetRegion(context, position, count, decodePixelWidth, decodePixelHeight);
+            var decode = (int)Math.Max(region.Width, region.Height);
+            var source = ImageLoader.Load(fileName, decode, decode);
             if (source == null)
             {
                 //Image failed to load, nothing can be done.
                 return;
             }
-            var region = this.GetRegion(context, position, count, decodePixelWidth, decodePixelHeight);
             if (region.Width != region.Height)
             {
                 source = this.CropImage(source, region, decodePixelWidth, decodePixelHeight);

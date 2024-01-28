@@ -2,15 +2,18 @@
 {
     public class IntegerValidationRule : ValidationRule
     {
-        public IntegerValidationRule(int minValue, int maxValue)
+        public IntegerValidationRule(int minValue, int maxValue, int step = 1)
         {
             this.MinValue = minValue;
             this.MaxValue = maxValue;
+            this.Step = step;
         }
 
         public int MinValue { get; private set; }
 
         public int MaxValue { get; private set; }
+
+        public int Step { get; private set; }
 
         public override bool Validate(object value, out string message)
         {

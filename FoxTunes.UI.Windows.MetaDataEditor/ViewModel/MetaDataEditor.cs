@@ -230,6 +230,7 @@ namespace FoxTunes.ViewModel
                 image.Save();
             }
             await this.MetaDataManager.Save(this.PlaylistItems);
+            await this.HierarchyManager.Clear(LibraryItemStatus.Import);
             await this.HierarchyManager.Build(LibraryItemStatus.Import);
             await this.LibraryManager.Set(LibraryItemStatus.None);
             this.Cancel();

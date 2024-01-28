@@ -18,9 +18,9 @@
         Maximum="{Binding MaxValue, Mode=OneWay, Source={StaticResource ViewModel}}" 
         ToolTip="{Binding Value}" 
         IsSnapToTickEnabled="True" 
-        SmallChange="{Binding SmallChange, Mode=OneWay, Source={StaticResource ViewModel}}"
-        LargeChange="{Binding LargeChange, Mode=OneWay, Source={StaticResource ViewModel}}"
-        TickFrequency="0.1"
+        SmallChange="{Binding Step, Mode=OneWay, Source={StaticResource ViewModel}}"
+        LargeChange="{Binding Step, Mode=OneWay, Source={StaticResource ViewModel}}"
+        TickFrequency="{Binding Step, Mode=OneWay, Source={StaticResource ViewModel}}"
         KeyUp="OnKeyUp"
         Thumb.DragCompleted="OnDragCompleted"/>
 </UserControl>

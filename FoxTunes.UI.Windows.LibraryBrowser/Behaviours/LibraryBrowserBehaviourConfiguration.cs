@@ -10,7 +10,7 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(WindowsUserInterfaceConfiguration.SECTION, "Appearance")
                 .WithElement(
-                    new IntegerConfigurationElement(LIBRARY_BROWSER_TILE_SIZE, "Library Tile Size", path: "Advanced").WithValue(150).WithValidationRule(new IntegerValidationRule(50, 300))
+                    new IntegerConfigurationElement(LIBRARY_BROWSER_TILE_SIZE, "Library Tile Size", path: "Advanced").WithValue(160).WithValidationRule(new IntegerValidationRule(60, 300, 4))
             );
         }
     }

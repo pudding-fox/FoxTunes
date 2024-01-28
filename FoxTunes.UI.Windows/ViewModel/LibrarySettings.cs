@@ -135,7 +135,7 @@ namespace FoxTunes.ViewModel
 
         public async Task Rebuild()
         {
-            await this.HierarchyManager.Clear();
+            await this.HierarchyManager.Clear(null);
             await this.HierarchyManager.Build(null);
         }
 
@@ -170,7 +170,7 @@ namespace FoxTunes.ViewModel
 
         public async Task Clear()
         {
-            await this.HierarchyManager.Clear();
+            await this.HierarchyManager.Clear(null);
             await this.LibraryManager.Clear();
         }
 
