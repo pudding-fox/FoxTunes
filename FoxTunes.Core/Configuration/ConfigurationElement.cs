@@ -129,6 +129,11 @@ namespace FoxTunes
 
         public void Update(ConfigurationElement element)
         {
+            if (!this.GetType().IsAssignableFrom(element.GetType()))
+            {
+                //Element type was changed, cannot restore settings.
+                return;
+            }
             this.Name = element.Name;
             this.Description = element.Description;
             this.Path = element.Path;
