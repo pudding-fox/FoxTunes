@@ -19,11 +19,16 @@
         </Grid.RowDefinitions>
         <Grid Grid.ColumnSpan="3">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition Width=".35*"></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
             <Windows:Library></Windows:Library>
-            <Windows:Playlist Grid.Column="1"></Windows:Playlist>
+            <Windows:BackgroundTasks Grid.Row="1"></Windows:BackgroundTasks>
+            <Windows:Playlist Grid.Column="1" Grid.RowSpan="2"></Windows:Playlist>
         </Grid>
         <Windows:Playback Grid.Row="1" ></Windows:Playback>
         <Windows:StreamPosition Grid.Column="1" Grid.Row="1"></Windows:StreamPosition>

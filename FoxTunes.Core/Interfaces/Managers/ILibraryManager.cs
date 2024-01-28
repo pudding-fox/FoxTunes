@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace FoxTunes.Interfaces
 {
-    public interface ILibraryManager : IStandardManager
+    public interface ILibraryManager : IStandardManager, IBackgroundTaskSource
     {
         void Add(IEnumerable<string> paths);
 

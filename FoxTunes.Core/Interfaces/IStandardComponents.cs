@@ -15,5 +15,9 @@
         IOutput Output { get; }
 
         IScriptingRuntime ScriptingRuntime { get; }
+
+        IBackgroundTaskRunner BackgroundTaskRunner { get; }
+
+        IForegroundTaskRunner ForegroundTaskRunner { get; }
     }
 }

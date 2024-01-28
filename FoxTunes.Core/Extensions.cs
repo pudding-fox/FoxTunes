@@ -28,5 +28,23 @@ namespace FoxTunes
         {
             return type.GetCustomAttributes(typeof(T), inherit).OfType<T>();
         }
+
+        public static IEnumerable<T> Do<T>(this IEnumerable<T> sequence, Action action)
+        {
+            foreach (var element in sequence)
+            {
+                action();
+                yield return element;
+            }
+        }
+
+        public static IEnumerable<T> Do<T>(this IEnumerable<T> sequence, Action<T> action)
+        {
+            foreach (var element in sequence)
+            {
+                action(element);
+                yield return element;
+            }
+        }
     }
 }
