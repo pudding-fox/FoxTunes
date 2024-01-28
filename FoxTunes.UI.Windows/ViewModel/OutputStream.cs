@@ -49,12 +49,8 @@ namespace FoxTunes.ViewModel
             }
             set
             {
-                if (this.IsSeeking)
-                {
-                    this._Position = value;
-                    return;
-                }
-                var task = this.Seek(value);
+                this._Position = value;
+                this.IsSeeking = true;
             }
         }
 
@@ -189,6 +185,10 @@ namespace FoxTunes.ViewModel
 
         public async Task BeginSeek()
         {
+            if (this.IsSeeking)
+            {
+                return;
+            }
             await this.InnerOutputStream.BeginSeek().ConfigureAwait(false);
             this._Position = this.Position;
             this.IsSeeking = true;
@@ -201,16 +201,6 @@ namespace FoxTunes.ViewModel
                 return;
             }
             await this.InnerOutputStream.Seek(this.Position).ConfigureAwait(false);
-            await this.InnerOutputStream.EndSeek().ConfigureAwait(false);
-            this.IsSeeking = false;
-        }
-
-        public async Task Seek(long position)
-        {
-            this._Position = position;
-            this.IsSeeking = true;
-            await this.InnerOutputStream.BeginSeek().ConfigureAwait(false);
-            await this.InnerOutputStream.Seek(position).ConfigureAwait(false);
             await this.InnerOutputStream.EndSeek().ConfigureAwait(false);
             this.IsSeeking = false;
         }
