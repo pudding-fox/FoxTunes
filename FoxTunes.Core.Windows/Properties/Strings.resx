@@ -145,15 +145,15 @@
     <value>Previous</value>
   </data>
   <data name="TaskbarButtonsBehaviourConfiguration.Enabled" xml:space="preserve">
-    <value>Enabled</value>
-  </data>
-  <data name="TaskbarButtonsBehaviourConfiguration.Progress" xml:space="preserve">
-    <value>Progress</value>
-  </data>
-  <data name="TaskbarButtonsBehaviourConfiguration.Section" xml:space="preserve">
     <value>Taskbar Buttons</value>
   </data>
-  <data name="TaskbarButtonsBehaviourConfiguration.Thumbnail" xml:space="preserve">
-    <value>Thumbnail</value>
+  <data name="TaskbarProgressBehaviourConfiguration.Enabled" xml:space="preserve">
+    <value>Taskbar Progress</value>
+  </data>
+  <data name="TaskbarThumbnailBehaviourConfiguration.Enabled" xml:space="preserve">
+    <value>Taskbar Thumbnail</value>
+  </data>
+  <data name="WindowsConfiguration.Section" xml:space="preserve">
+    <value>Windows 7</value>
   </data>
 </root>

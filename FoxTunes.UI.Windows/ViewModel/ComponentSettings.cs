@@ -189,7 +189,7 @@ namespace FoxTunes.ViewModel
             return Windows.Invoke(() =>
             {
                 this.Pages.Clear();
-                foreach (var section in this.Configuration.Sections.OrderBy(section => section.Id))
+                foreach (var section in this.Configuration.Sections.OrderBy(section => section.Name))
                 {
                     if (section.Flags.HasFlag(ConfigurationSectionFlags.System))
                     {
