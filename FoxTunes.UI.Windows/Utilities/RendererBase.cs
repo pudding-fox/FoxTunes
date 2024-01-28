@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -164,13 +165,18 @@ namespace FoxTunes
             renderer.OnColorChanged();
         }
 
+        const int TIMEOUT = 100;
+
         public RendererBase(bool initialize = true)
         {
+            this.Debouncer = new AsyncDebouncer(TIMEOUT);
             if (initialize && Core.Instance != null)
             {
                 this.InitializeComponent(Core.Instance);
             }
         }
+
+        public AsyncDebouncer Debouncer { get; private set; }
 
         public WriteableBitmap Bitmap
         {
@@ -209,7 +215,7 @@ namespace FoxTunes
 
         protected virtual void OnWidthChanged()
         {
-            var task = this.CreateBitmap();
+            this.Debouncer.Exec(this.CreateBitmap);
             if (this.WidthChanged != null)
             {
                 this.WidthChanged(this, EventArgs.Empty);
@@ -233,7 +239,7 @@ namespace FoxTunes
 
         protected virtual void OnHeightChanged()
         {
-            var task = this.CreateBitmap();
+            this.Debouncer.Exec(this.CreateBitmap);
             if (this.HeightChanged != null)
             {
                 this.HeightChanged(this, EventArgs.Empty);
@@ -337,17 +343,22 @@ namespace FoxTunes
                     height * this.ScalingFactor.Value
                 );
 
-                this.Bitmap = new WriteableBitmap(
-                    Convert.ToInt32(size.Width),
-                    Convert.ToInt32(size.Height),
-                    96,
-                    96,
-                    PixelFormats.Pbgra32,
-                    null
-                );
+                this.Bitmap = this.CreateBitmap(size);
 
                 this.CreateViewBox();
             });
+        }
+
+        protected virtual WriteableBitmap CreateBitmap(Size size)
+        {
+            return new WriteableBitmap(
+                Convert.ToInt32(size.Width),
+                Convert.ToInt32(size.Height),
+                96,
+                96,
+                PixelFormats.Pbgra32,
+                null
+            );
         }
 
         protected abstract void CreateViewBox();
