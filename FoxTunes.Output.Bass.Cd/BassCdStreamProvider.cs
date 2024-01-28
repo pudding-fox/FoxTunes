@@ -100,6 +100,11 @@ namespace FoxTunes
             return this.CreateInteractiveStream(channelHandle, advice, flags);
         }
 
+        public override void FreeStream(int channelHandle)
+        {
+            //Nothing to do, CD streams are re-cycled.
+        }
+
         protected virtual void AssertDiscId(int drive, string expected)
         {
             var actual = default(string);
