@@ -24,6 +24,8 @@ namespace FoxTunes
 
         public const string IMAGES_PREFERENCE_LOOSE = "BBBB2170-3E86-4255-9BC6-EF31D870741E";
 
+        public const string MAX_IMAGE_SIZE = "EEFFD218-2EF5-4256-A6FE-A9266BBEEC72";
+
         public const string COPY_IMAGES_ELEMENT = "FFFFA875-8195-49AF-A1A4-2EAB2294A6D8";
 
         public const string READ_EXTENDED_TAGS = "GGGG9A48-2D0A-4FFA-9749-4592BDFFF5DE";
@@ -62,6 +64,8 @@ namespace FoxTunes
                     new TextConfigurationElement(LOOSE_IMAGES_BACK, "Back Cover", path: "Advanced").WithValue("back").DependsOn(SECTION, ENABLE_ELEMENT).DependsOn(SECTION, READ_LOOSE_IMAGES))
                 .WithElement(
                     new SelectionConfigurationElement(IMAGES_PREFERENCE, "Images Preference", path: "Advanced").WithOptions(GetImagesPreferenceOptions()).DependsOn(SECTION, ENABLE_ELEMENT).DependsOn(SECTION, READ_EMBEDDED_IMAGES).DependsOn(SECTION, READ_LOOSE_IMAGES))
+                .WithElement(
+                    new IntegerConfigurationElement(MAX_IMAGE_SIZE, "Max Image Size (MB)", path: "Advanced").WithValue(4).WithValidationRule(new IntegerValidationRule(1, 16)).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(
                     new BooleanConfigurationElement(COPY_IMAGES_ELEMENT, "Copy Images", path: "Advanced").WithValue(true).DependsOn(SECTION, ENABLE_ELEMENT))
                 .WithElement(

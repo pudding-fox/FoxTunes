@@ -21,9 +21,6 @@ namespace FoxTunes
         //10MB
         public static int MAX_TAG_SIZE = 10240000;
 
-        //2MB
-        public static int MAX_IMAGE_SIZE = 2048000;
-
         public TagLibMetaDataSource()
         {
             this.Warnings = new ConcurrentDictionary<string, IList<string>>(StringComparer.OrdinalIgnoreCase);
@@ -63,6 +60,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement CopyImages { get; private set; }
 
+        public IntegerConfigurationElement MaxImageSize { get; private set; }
+
         public BooleanConfigurationElement Extended { get; private set; }
 
         public BooleanConfigurationElement MusicBrainz { get; private set; }
@@ -96,6 +95,10 @@ namespace FoxTunes
             this.CopyImages = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.COPY_IMAGES_ELEMENT
+            );
+            this.MaxImageSize = this.Configuration.GetElement<IntegerConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.MAX_IMAGE_SIZE
             );
             this.Extended = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
@@ -430,9 +433,10 @@ namespace FoxTunes
                     {
                         continue;
                     }
-                    if (picture.Data.Count > MAX_IMAGE_SIZE)
+                    if (picture.Data.Count > this.MaxImageSize.Value * 1024000)
                     {
-                        Logger.Write(this, LogLevel.Warn, "Not importing image from file \"{0}\" due to size: {1} > {2}", file.Name, picture.Data.Count, MAX_IMAGE_SIZE);
+                        Logger.Write(this, LogLevel.Warn, "Not importing image from file \"{0}\" due to size.");
+                        this.AddWarning(file.Name, string.Format("Not importing image from file \"{0}\" due to size: {1} > {2}", file.Name, picture.Data.Count, this.MaxImageSize.Value * 1024000));
                         continue;
                     }
                     metaData.Add(new MetaDataItem(Enum.GetName(typeof(ArtworkType), type), MetaDataItemType.Image)

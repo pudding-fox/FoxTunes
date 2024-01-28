@@ -48,7 +48,7 @@ namespace FoxTunes
 
         private Task RefreshImages()
         {
-            return this.SignalEmitter.Send(new Signal(this, CommonSignals.PluginInvocation, ImageBehaviour.REFRESH_IMAGES));
+            return this.SignalEmitter.Send(new Signal(this, CommonSignals.ImagesUpdated));
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

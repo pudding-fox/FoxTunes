@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -10,9 +11,9 @@ namespace FoxTunes
     {
         const int CACHE_SIZE = 5120;
 
-        const int MAX_LENGTH = 1024000;
-
         const string DELIMITER = ",";
+
+        public static readonly object SyncRoot = new object();
 
         public static readonly string[] EXTENSIONS = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".bin" };
 
@@ -23,6 +24,8 @@ namespace FoxTunes
 
         public Cache Store { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public bool Enabled { get; private set; }
@@ -31,8 +34,12 @@ namespace FoxTunes
 
         public string[] Back { get; private set; }
 
+        public int MaxSize { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
+            this.SignalEmitter = core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
@@ -46,7 +53,26 @@ namespace FoxTunes
                MetaDataBehaviourConfiguration.SECTION,
                MetaDataBehaviourConfiguration.LOOSE_IMAGES_BACK
            ).ConnectValue(value => this.Back = this.Parse(value));
+            this.Configuration.GetElement<IntegerConfigurationElement>(
+               MetaDataBehaviourConfiguration.SECTION,
+               MetaDataBehaviourConfiguration.MAX_IMAGE_SIZE
+            ).ConnectValue(value => this.MaxSize = value * 1024000);
             base.InitializeComponent(core);
+        }
+
+        protected virtual Task OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.ImagesUpdated:
+                    this.Store.Clear();
+                    break;
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         protected virtual string[] Parse(string value)
@@ -67,48 +93,52 @@ namespace FoxTunes
             {
                 return null;
             }
-            var directoryName = Path.GetDirectoryName(path);
+            lock (SyncRoot)
             {
-                var fileName = default(string);
-                if (this.Store.TryGetValue(directoryName, type, out fileName))
+                var directoryName = Path.GetDirectoryName(path);
                 {
-                    return fileName;
-                }
-            }
-            var names = default(string[]);
-            switch (type)
-            {
-                case ArtworkType.FrontCover:
-                    names = this.Front;
-                    break;
-                case ArtworkType.BackCover:
-                    names = this.Back;
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-            try
-            {
-                foreach (var name in names)
-                {
-                    foreach (var fileName in FileSystemHelper.EnumerateFiles(directoryName, string.Format("{0}.*", name), FileSystemHelper.SearchOption.None))
+                    var fileName = default(string);
+                    if (this.Store.TryGetValue(directoryName, type, out fileName))
                     {
-                        var info = new FileInfo(fileName);
-                        if (!EXTENSIONS.Contains(info.Extension, true))
+                        return fileName;
+                    }
+                }
+                var names = default(string[]);
+                switch (type)
+                {
+                    case ArtworkType.FrontCover:
+                        names = this.Front;
+                        break;
+                    case ArtworkType.BackCover:
+                        names = this.Back;
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+                try
+                {
+                    foreach (var name in names)
+                    {
+                        foreach (var fileName in FileSystemHelper.EnumerateFiles(directoryName, string.Format("{0}.*", name), FileSystemHelper.SearchOption.None))
                         {
-                            continue;
-                        }
-                        if (info.Length <= MAX_LENGTH)
-                        {
-                            this.Store.Add(directoryName, type, fileName);
-                            return fileName;
+                            var info = new FileInfo(fileName);
+                            if (!EXTENSIONS.Contains(info.Extension, true))
+                            {
+                                continue;
+                            }
+                            if (info.Length <= this.MaxSize)
+                            {
+                                this.Store.Add(directoryName, type, fileName);
+                                return fileName;
+                            }
                         }
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                Logger.Write(this, LogLevel.Warn, "Error locating artwork of type {0} in {1}: {2}", Enum.GetName(typeof(ArtworkType), type), path, e.Message);
+                catch (Exception e)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Error locating artwork of type {0} in {1}: {2}", Enum.GetName(typeof(ArtworkType), type), path, e.Message);
+                }
+                this.Store.Add(directoryName, type, null);
             }
             return null;
         }
@@ -150,6 +180,11 @@ namespace FoxTunes
             {
                 var key = new Key(path, type);
                 return this.Store.TryGetValue(key, out fileName);
+            }
+
+            public void Clear()
+            {
+                this.Store.Clear();
             }
 
             public class Key : IEquatable<Key>

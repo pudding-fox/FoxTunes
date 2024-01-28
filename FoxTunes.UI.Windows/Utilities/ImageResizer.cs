@@ -28,13 +28,8 @@ namespace FoxTunes
         {
             switch (signal.Name)
             {
-                case CommonSignals.PluginInvocation:
-                    switch (signal.State as string)
-                    {
-                        case ImageBehaviour.REFRESH_IMAGES:
-                            this.Clear();
-                            break;
-                    }
+                case CommonSignals.ImagesUpdated:
+                    this.Clear();
                     break;
             }
 #if NET40

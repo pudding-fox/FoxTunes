@@ -90,13 +90,8 @@ namespace FoxTunes
         {
             switch (signal.Name)
             {
-                case CommonSignals.PluginInvocation:
-                    switch (signal.State as string)
-                    {
-                        case ImageBehaviour.REFRESH_IMAGES:
-                            return this.Reset();
-                    }
-                    break;
+                case CommonSignals.ImagesUpdated:
+                    return this.Reset();
             }
 #if NET40
             return TaskEx.FromResult(false);
