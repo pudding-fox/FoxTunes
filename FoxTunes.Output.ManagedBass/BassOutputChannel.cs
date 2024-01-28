@@ -68,12 +68,8 @@ namespace FoxTunes
             BassUtils.OK(BassGapless.Init());
             try
             {
-                this.ChannelHandle = BassGapless.StreamCreate(this.Rate, this.Channels, this.Flags);
-                if (this.ChannelHandle == 0)
-                {
-                    BassUtils.Throw();
-                }
-                this.IsStarted = true;
+                this.CreateChannel();
+                this.OnChannelStarted();
             }
             catch
             {
@@ -82,10 +78,36 @@ namespace FoxTunes
             }
         }
 
+        protected virtual void CreateChannel()
+        {
+            this.ChannelHandle = BassGapless.StreamCreate(this.Rate, this.Channels, this.Flags);
+            if (this.ChannelHandle == 0)
+            {
+                BassUtils.Throw();
+            }
+        }
+
+        protected virtual void OnChannelStarted()
+        {
+            this.IsStarted = true;
+        }
+
         protected virtual void StopChannel()
         {
+            this.FreeChannel();
             //Ignore errors.
             BassGapless.Free();
+            this.OnChannelStopped();
+        }
+
+        protected virtual void FreeChannel()
+        {
+            //Ignore errors.
+            Bass.StreamFree(this.ChannelHandle);
+        }
+
+        protected virtual void OnChannelStopped()
+        {
             this.IsStarted = false;
         }
 
@@ -101,6 +123,13 @@ namespace FoxTunes
         public bool Contains(BassOutputStream outputStream)
         {
             return this.Queue.Contains(outputStream.ChannelHandle);
+        }
+
+        public int Position(BassOutputStream outputStream)
+        {
+            var count = default(int);
+            var channelHandles = BassGapless.GetChannels(out count);
+            return channelHandles.IndexOf(outputStream.ChannelHandle);
         }
 
         public void Enqueue(BassOutputStream outputStream)
@@ -148,6 +177,11 @@ namespace FoxTunes
                 {
                     throw new ApplicationException("Cannot play with current configuration.");
                 }
+            }
+            else if (this.Position(outputStream) == 0)
+            {
+                //Nothing to do, already playing.
+                return;
             }
             else
             {

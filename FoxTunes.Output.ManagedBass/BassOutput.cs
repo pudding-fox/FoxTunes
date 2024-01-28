@@ -198,7 +198,7 @@ namespace FoxTunes
                         this.StartWASAPI();
                         break;
                 }
-                this.OutputChannel = new BassOutputChannel(this);
+                this.OutputChannel = BassOutputChannelFactory.Instance.Create(this);
                 this.OutputChannel.InitializeComponent(this.Core);
                 this.OutputChannel.Error += this.OutputChannel_Error;
                 this.IsStarted = true;
