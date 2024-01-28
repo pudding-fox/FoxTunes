@@ -251,6 +251,11 @@ namespace FoxTunes
             return source.EnsureHandle();
         }
 
+        public static Size GetElementPixelSize(this FrameworkElement element, Size size)
+        {
+            return element.GetElementPixelSize(size.Width, size.Height);
+        }
+
         public static Size GetElementPixelSize(this FrameworkElement element, double width, double height)
         {
             var presentationSource = PresentationSource.FromVisual(element);

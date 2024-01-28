@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Runtime.Remoting.Channels;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Media.Imaging;
@@ -9,6 +8,8 @@ namespace FoxTunes
 {
     public class OscilloscopeRenderer : VisualizationBase
     {
+        public IConfiguration Configuration { get; private set; }
+
         public OscilloscopeRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement Mode { get; private set; }
@@ -19,7 +20,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            base.InitializeComponent(core);
+            this.Configuration = core.Components.Configuration;
             this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
                 OscilloscopeBehaviourConfiguration.SECTION,
                 OscilloscopeBehaviourConfiguration.MODE_ELEMENT
@@ -39,6 +40,7 @@ namespace FoxTunes
             this.Mode.ValueChanged += this.OnValueChanged;
             this.Duration.ValueChanged += this.OnValueChanged;
             this.Smooth.ValueChanged += this.OnValueChanged;
+            base.InitializeComponent(core);
             var task = this.CreateBitmap();
         }
 

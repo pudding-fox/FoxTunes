@@ -11,6 +11,8 @@ namespace FoxTunes
 {
     public class SpectrogramRenderer : VisualizationBase
     {
+        public IConfiguration Configuration { get; private set; }
+
         public SpectrogramRendererData RendererData { get; private set; }
 
         public SpectrogramRendererHistory RendererHistory { get; private set; }
@@ -29,7 +31,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            base.InitializeComponent(core);
+            this.Configuration = core.Components.Configuration;
             this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
                 SpectrogramBehaviourConfiguration.SECTION,
                 SpectrogramBehaviourConfiguration.MODE_ELEMENT
@@ -64,6 +66,7 @@ namespace FoxTunes
             this.ColorPalette.ValueChanged += this.OnValueChanged;
             this.History.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
+            base.InitializeComponent(core);
             var task = this.CreateBitmap();
         }
 

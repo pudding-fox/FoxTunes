@@ -552,9 +552,6 @@
   <data name="WindowsUserInterfaceConfiguration.MarqueeStep" xml:space="preserve">
     <value>Marquee Step</value>
   </data>
-  <data name="WindowsUserInterfaceConfiguration.Scaling" xml:space="preserve">
-    <value>Facteur d'échelle</value>
-  </data>
   <data name="WindowsUserInterfaceConfiguration.Section" xml:space="preserve">
     <value>Apparence</value>
   </data>

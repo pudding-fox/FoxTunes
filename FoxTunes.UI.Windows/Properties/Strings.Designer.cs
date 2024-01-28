@@ -1411,15 +1411,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Scaling Factor.
-        /// </summary>
-        internal static string WindowsUserInterfaceConfiguration_Scaling {
-            get {
-                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Scaling", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Appearance.
         /// </summary>
         internal static string WindowsUserInterfaceConfiguration_Section {

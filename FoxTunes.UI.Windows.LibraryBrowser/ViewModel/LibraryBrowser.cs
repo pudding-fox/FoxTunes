@@ -57,36 +57,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler FramesChanged;
 
-        private double _ScalingFactor { get; set; }
-
-        public double ScalingFactor
-        {
-            get
-            {
-                return this._ScalingFactor;
-            }
-            set
-            {
-                this._ScalingFactor = value;
-                this.OnScalingFactorChanged();
-            }
-        }
-
-        protected virtual void OnScalingFactorChanged()
-        {
-            if (this.IsInitialized)
-            {
-                this.Dispatch(this.Reload);
-            }
-            if (this.ScalingFactorChanged != null)
-            {
-                this.ScalingFactorChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ScalingFactor");
-        }
-
-        public event EventHandler ScalingFactorChanged;
-
         private int _TileSize { get; set; }
 
         public int TileSize
@@ -172,10 +142,6 @@ namespace FoxTunes.ViewModel
         protected override void InitializeComponent(ICore core)
         {
             this.Configuration = core.Components.Configuration;
-            this.Configuration.GetElement<DoubleConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
-            ).ConnectValue(value => this.ScalingFactor = value);
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_SIZE

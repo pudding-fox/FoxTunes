@@ -13,8 +13,6 @@ namespace FoxTunes
 
         public const string LAYOUT_ELEMENT = "BBBB9A67-F909-49EA-A4D3-6E26659A5797";
 
-        public const string UI_SCALING_ELEMENT = "IIIIFB85-BA70-4412-87BA-E4DC58AD9BA8";
-
         public const string MARQUEE_INTERVAL_ELEMENT = "JJJJ685A-4D15-4AE1-B7AD-3E5786CB8EDB";
 
         public const string MARQUEE_STEP_ELEMENT = "KKKKDCB3-69C3-4F73-966C-6A7738E359A1";
@@ -30,8 +28,6 @@ namespace FoxTunes
                     new SelectionConfigurationElement(THEME_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Theme).WithOptions(GetThemeOptions()))
                 .WithElement(
                     new SelectionConfigurationElement(LAYOUT_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Layout).WithOptions(GetLayoutOptions()))
-                .WithElement(
-                    new DoubleConfigurationElement(UI_SCALING_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Scaling, path: Strings.General_Advanced).WithValue(1.0).WithValidationRule(new DoubleValidationRule(1, 4, 0.4)))
                 .WithElement(
                     new IntegerConfigurationElement(MARQUEE_INTERVAL_ELEMENT, Strings.WindowsUserInterfaceConfiguration_MarqueeInterval, path: Strings.General_Advanced).WithValue(50).WithValidationRule(new IntegerValidationRule(10, 1000)))
                 .WithElement(
