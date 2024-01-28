@@ -456,6 +456,9 @@
   <data name="ProfilesBehaviourConfiguration.Section" xml:space="preserve">
     <value>Profiles</value>
   </data>
+  <data name="ProfileSelector.Name" xml:space="preserve">
+    <value>Profile Selector</value>
+  </data>
   <data name="Report.Close" xml:space="preserve">
     <value>Close</value>
   </data>

@@ -113,8 +113,14 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            LayoutPresetBehaviour.ActivePresetChanged -= this.OnActivePresetChanged;
-            LayoutDesignerBehaviour.IsDesigningChanged -= this.OnIsDesigningChanged;
+            if (LayoutPresetBehaviour != null)
+            {
+                LayoutPresetBehaviour.ActivePresetChanged -= this.OnActivePresetChanged;
+            }
+            if (LayoutDesignerBehaviour != null)
+            {
+                LayoutDesignerBehaviour.IsDesigningChanged -= this.OnIsDesigningChanged;
+            }
             base.OnDisposing();
         }
     }

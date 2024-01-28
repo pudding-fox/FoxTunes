@@ -1078,6 +1078,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Profile Selector.
+        /// </summary>
+        internal static string ProfileSelector_Name {
+            get {
+                return ResourceManager.GetString("ProfileSelector.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Close.
         /// </summary>
         internal static string Report_Close {

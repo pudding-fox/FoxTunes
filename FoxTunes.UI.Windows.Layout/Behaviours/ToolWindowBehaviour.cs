@@ -56,6 +56,7 @@ namespace FoxTunes
 
         protected virtual async Task Load()
         {
+            var value = this.Element.Value;
             if (this.IsLoaded)
             {
                 if (!this.HasChanges())
@@ -68,7 +69,7 @@ namespace FoxTunes
             {
                 this.IsLoaded = true;
             }
-            if (string.IsNullOrEmpty(this.Element.Value))
+            if (string.IsNullOrEmpty(value))
             {
                 Logger.Write(this, LogLevel.Debug, "No config to load.");
                 return;
@@ -76,7 +77,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Loading config..");
             try
             {
-                using (var stream = new MemoryStream(Encoding.Default.GetBytes(this.Element.Value)))
+                using (var stream = new MemoryStream(Encoding.Default.GetBytes(value)))
                 {
                     var configs = Serializer.LoadWindows(stream);
                     foreach (var config in configs)
