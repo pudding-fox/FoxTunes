@@ -4,7 +4,7 @@ namespace FoxTunes
 {
     public static class NotifyIconConfiguration
     {
-        public const string NOTIFY_ICON_SECTION = "F9B3FAE5-87BD-486F-9C23-B8B11A8FDAA9";
+        public const string SECTION = "F9B3FAE5-87BD-486F-9C23-B8B11A8FDAA9";
 
         public const string ENABLED_ELEMENT = "82D11AC8-7D75-43C9-9E99-FF69EC5D8040";
 
@@ -14,7 +14,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(NOTIFY_ICON_SECTION, "Tray Icon")
+            yield return new ConfigurationSection(SECTION, "Tray Icon")
                 .WithElement(
                     new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false))
                 .WithElement(
@@ -22,20 +22,20 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(CLOSE_TO_TRAY_ELEMENT, "Close To Tray").WithValue(false)
             );
-            StandardComponents.Instance.Configuration.GetElement(NOTIFY_ICON_SECTION, ENABLED_ELEMENT).ConnectValue<bool>(mode => UpdateConfiguration(mode));
+            StandardComponents.Instance.Configuration.GetElement(SECTION, ENABLED_ELEMENT).ConnectValue<bool>(mode => UpdateConfiguration(mode));
         }
 
         private static void UpdateConfiguration(bool mode)
         {
             if (mode)
             {
-                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(NOTIFY_ICON_SECTION, MINIMIZE_TO_TRAY_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(NOTIFY_ICON_SECTION, CLOSE_TO_TRAY_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, MINIMIZE_TO_TRAY_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, CLOSE_TO_TRAY_ELEMENT).Show();
             }
             else
             {
-                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(NOTIFY_ICON_SECTION, MINIMIZE_TO_TRAY_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(NOTIFY_ICON_SECTION, CLOSE_TO_TRAY_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, MINIMIZE_TO_TRAY_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, CLOSE_TO_TRAY_ELEMENT).Hide();
             }
         }
     }

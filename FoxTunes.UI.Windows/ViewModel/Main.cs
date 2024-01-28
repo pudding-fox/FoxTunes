@@ -143,23 +143,23 @@ namespace FoxTunes.ViewModel
         {
             this.Configuration = this.Core.Components.Configuration;
             this.ShowLibrary = this.Configuration.GetElement<BooleanConfigurationElement>(
-               WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
+               WindowsUserInterfaceConfiguration.SECTION,
                WindowsUserInterfaceConfiguration.SHOW_LIBRARY_ELEMENT
             );
             this.ShowArtwork = this.Configuration.GetElement<BooleanConfigurationElement>(
-              WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
+              WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.SHOW_ARTWORK_ELEMENT
            );
             this.ShowNotifyIcon = this.Configuration.GetElement<BooleanConfigurationElement>(
-              NotifyIconConfiguration.NOTIFY_ICON_SECTION,
+              NotifyIconConfiguration.SECTION,
               NotifyIconConfiguration.ENABLED_ELEMENT
             );
             this.ScalingFactor = this.Configuration.GetElement<TextConfigurationElement>(
-              WindowsUserInterfaceConfiguration.APPEARANCE_SECTION,
+              WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
             this.MiniPlayer = this.Configuration.GetElement<BooleanConfigurationElement>(
-              MiniPlayerBehaviourConfiguration.MINI_PLAYER_SECTION,
+              MiniPlayerBehaviourConfiguration.SECTION,
               MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT
             );
             base.InitializeComponent(core);

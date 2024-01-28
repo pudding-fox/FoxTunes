@@ -5,7 +5,7 @@ namespace FoxTunes
 {
     public static class MiniPlayerBehaviourConfiguration
     {
-        public const string MINI_PLAYER_SECTION = "F3E58830-97C0-4BA2-9E07-3EC27E3D4418";
+        public const string SECTION = "F3E58830-97C0-4BA2-9E07-3EC27E3D4418";
 
         public const string ENABLED_ELEMENT = "19BBF9DF-2F0C-4F6B-BC9F-0BFC142EBD57";
 
@@ -17,7 +17,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(MINI_PLAYER_SECTION, "Mini Player")
+            yield return new ConfigurationSection(SECTION, "Mini Player")
                 .WithElement(
                     new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false))
                 .WithElement(

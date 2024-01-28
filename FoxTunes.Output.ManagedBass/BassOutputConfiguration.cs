@@ -4,7 +4,7 @@ namespace FoxTunes
 {
     public static class BassOutputConfiguration
     {
-        public const string OUTPUT_SECTION = "8399D051-81BC-41A6-940D-36E6764213D2";
+        public const string SECTION = "8399D051-81BC-41A6-940D-36E6764213D2";
 
         public const string RATE_ELEMENT = "0452A558-F1ED-41B1-A3DC-95158E01003C";
 
@@ -38,7 +38,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(OUTPUT_SECTION, "Output")
+            yield return new ConfigurationSection(SECTION, "Output")
                 .WithElement(new SelectionConfigurationElement(RATE_ELEMENT, "Rate")
                     .WithOption(new SelectionConfigurationOption(RATE_044100_OPTION, "44100"), true)
                     .WithOption(new SelectionConfigurationOption(RATE_048000_OPTION, "48000"))

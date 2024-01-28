@@ -4,7 +4,7 @@ namespace FoxTunes
 {
     public static class InputManagerConfiguration
     {
-        public const string KEYBOARD_SHORTCUTS_SECTION = "4B5B0E73-8000-484E-8F68-77E11FC8AD45";
+        public const string SECTION = "4B5B0E73-8000-484E-8F68-77E11FC8AD45";
 
         public const string ENABLED_ELEMENT = "D60E41A0-976D-4573-8758-984AACBD235B";
 
@@ -18,7 +18,7 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(KEYBOARD_SHORTCUTS_SECTION, "Keyboard Shortcuts")
+            yield return new ConfigurationSection(SECTION, "Keyboard Shortcuts")
                 .WithElement(
                     new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false))
                 .WithElement(
@@ -35,7 +35,7 @@ namespace FoxTunes
                         .WithValue("MediaStop")
             );
             StandardComponents.Instance.Configuration.GetElement(
-                KEYBOARD_SHORTCUTS_SECTION,
+                SECTION,
                 ENABLED_ELEMENT
             ).ConnectValue<bool>(enabled => UpdateConfiguration(enabled));
         }
@@ -44,17 +44,17 @@ namespace FoxTunes
         {
             if (enabled)
             {
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, PLAY_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, PREVIOUS_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, NEXT_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, STOP_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, PLAY_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, PREVIOUS_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, NEXT_ELEMENT).Show();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, STOP_ELEMENT).Show();
             }
             else
             {
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, PLAY_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, PREVIOUS_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, NEXT_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(KEYBOARD_SHORTCUTS_SECTION, STOP_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, PLAY_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, PREVIOUS_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, NEXT_ELEMENT).Hide();
+                StandardComponents.Instance.Configuration.GetElement<TextConfigurationElement>(SECTION, STOP_ELEMENT).Hide();
             }
         }
     }

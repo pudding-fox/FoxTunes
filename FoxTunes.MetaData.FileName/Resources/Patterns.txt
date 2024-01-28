@@ -1,0 +1,1 @@
+﻿.*DIR(?<artist>[^DIR]+)DIR(?<album>[^DIR]+)DIR(?:(?<disc>\d+)SEP(?=\d))?((?<track>\d+)SEP)?(?<title>.+?)\.[^\.]+$

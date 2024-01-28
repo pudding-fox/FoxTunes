@@ -13,12 +13,12 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(BassOutputConfiguration.OUTPUT_SECTION, "Output")
+            yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
                 .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.MODE_ELEMENT, "Mode")
                     .WithOption(new SelectionConfigurationOption(MODE_DS_OPTION, "Direct Sound"), true))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_DS_DEVICE, "Device")
                     .WithOptions(() => GetDSDevices()));
-            StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.OUTPUT_SECTION, BassOutputConfiguration.MODE_ELEMENT).ConnectValue<string>(mode => UpdateConfiguration(mode));
+            StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, BassOutputConfiguration.MODE_ELEMENT).ConnectValue<string>(mode => UpdateConfiguration(mode));
         }
 
         public static int GetDsDevice(string value)
@@ -59,10 +59,10 @@ namespace FoxTunes
             switch (mode)
             {
                 case MODE_DS_OPTION:
-                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.OUTPUT_SECTION, ELEMENT_DS_DEVICE).Show();
+                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.SECTION, ELEMENT_DS_DEVICE).Show();
                     break;
                 default:
-                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.OUTPUT_SECTION, ELEMENT_DS_DEVICE).Hide();
+                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.SECTION, ELEMENT_DS_DEVICE).Hide();
                     break;
             }
         }

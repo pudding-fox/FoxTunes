@@ -17,13 +17,13 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(BassOutputConfiguration.OUTPUT_SECTION, "Output")
+            yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
                 .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.MODE_ELEMENT, "Mode")
                     .WithOption(new SelectionConfigurationOption(MODE_ASIO_OPTION, "ASIO")))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_ASIO_DEVICE, "Device")
                     .WithOptions(() => GetASIODevices()))
                 .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct").WithValue(false));
-            StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.OUTPUT_SECTION, BassOutputConfiguration.MODE_ELEMENT).ConnectValue<string>(mode => UpdateConfiguration(mode));
+            StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, BassOutputConfiguration.MODE_ELEMENT).ConnectValue<string>(mode => UpdateConfiguration(mode));
         }
 
         public static int GetAsioDevice(string value)
@@ -56,12 +56,12 @@ namespace FoxTunes
             switch (mode)
             {
                 case MODE_ASIO_OPTION:
-                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.OUTPUT_SECTION, ELEMENT_ASIO_DEVICE).Show();
-                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.OUTPUT_SECTION, DSD_RAW_ELEMENT).Show();
+                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.SECTION, ELEMENT_ASIO_DEVICE).Show();
+                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.SECTION, DSD_RAW_ELEMENT).Show();
                     break;
                 default:
-                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.OUTPUT_SECTION, ELEMENT_ASIO_DEVICE).Hide();
-                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.OUTPUT_SECTION, DSD_RAW_ELEMENT).Hide();
+                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.SECTION, ELEMENT_ASIO_DEVICE).Hide();
+                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.SECTION, DSD_RAW_ELEMENT).Hide();
                     break;
             }
         }

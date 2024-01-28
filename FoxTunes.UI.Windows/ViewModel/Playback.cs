@@ -214,19 +214,19 @@ namespace FoxTunes.ViewModel
             this.Core.Components.Output.IsStartedChanged += (sender, e) => Command.InvalidateRequerySuggested();
             this.Configuration = this.Core.Components.Configuration;
             this.Configuration.GetElement<TextConfigurationElement>(
-                InputManagerConfiguration.KEYBOARD_SHORTCUTS_SECTION,
+                InputManagerConfiguration.SECTION,
                 InputManagerConfiguration.PLAY_ELEMENT
             ).ConnectValue<string>(value => this.PlayCommandBinding = value);
             this.Configuration.GetElement<TextConfigurationElement>(
-                InputManagerConfiguration.KEYBOARD_SHORTCUTS_SECTION,
+                InputManagerConfiguration.SECTION,
                 InputManagerConfiguration.PREVIOUS_ELEMENT
             ).ConnectValue<string>(value => this.PreviousCommandBinding = value);
             this.Configuration.GetElement<TextConfigurationElement>(
-                InputManagerConfiguration.KEYBOARD_SHORTCUTS_SECTION,
+                InputManagerConfiguration.SECTION,
                 InputManagerConfiguration.NEXT_ELEMENT
             ).ConnectValue<string>(value => this.NextCommandBinding = value);
             this.Configuration.GetElement<TextConfigurationElement>(
-                InputManagerConfiguration.KEYBOARD_SHORTCUTS_SECTION,
+                InputManagerConfiguration.SECTION,
                 InputManagerConfiguration.STOP_ELEMENT
             ).ConnectValue<string>(value => this.StopCommandBinding = value);
             this.OnCommandsChanged();

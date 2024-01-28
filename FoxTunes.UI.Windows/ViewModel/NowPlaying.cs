@@ -104,7 +104,7 @@ namespace FoxTunes.ViewModel
             this.ScriptingContext = this.ScriptingRuntime.CreateContext();
             this.Configuration = this.Core.Components.Configuration;
             this.Configuration.GetElement<TextConfigurationElement>(
-                MiniPlayerBehaviourConfiguration.MINI_PLAYER_SECTION,
+                MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.NOW_PLAYING_SCRIPT_ELEMENT
             ).ConnectValue<string>(value => this.DisplayScript = value);
             this.Refresh();

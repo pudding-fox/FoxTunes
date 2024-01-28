@@ -51,8 +51,8 @@ namespace FoxTunes
 
         public override IDatabaseQuery BuildLibraryHierarchies(IEnumerable<string> metaDataNames)
         {
-            var playlistSequenceBuilder = new LibraryHierarchyBuilder(this.Database, metaDataNames);
-            return this.Database.QueryFactory.Create(playlistSequenceBuilder.TransformText());
+            var libraryHierarchyBuilder = new LibraryHierarchyBuilder(this.Database, metaDataNames);
+            return this.Database.QueryFactory.Create(libraryHierarchyBuilder.TransformText());
         }
 
         public override IDatabaseQuery EndBuildLibraryHierarchies

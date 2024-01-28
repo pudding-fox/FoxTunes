@@ -119,11 +119,11 @@ namespace FoxTunes
             this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
-                MiniPlayerBehaviourConfiguration.MINI_PLAYER_SECTION,
+                MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT
             ).ConnectValue<bool>(value => this.Enabled = value);
             this.Configuration.GetElement<BooleanConfigurationElement>(
-                MiniPlayerBehaviourConfiguration.MINI_PLAYER_SECTION,
+                MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.TOPMOST_ELEMENT
             ).ConnectValue<bool>(value => this.Topmost = value);
         }

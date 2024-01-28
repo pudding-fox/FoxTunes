@@ -17,14 +17,14 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(BassOutputConfiguration.OUTPUT_SECTION, "Output")
+            yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
                 .WithElement(new SelectionConfigurationElement(BassOutputConfiguration.MODE_ELEMENT, "Mode")
                     .WithOption(new SelectionConfigurationOption(MODE_WASAPI_OPTION, "WASAPI")))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_WASAPI_DEVICE, "Device")
                     .WithOptions(() => GetWASAPIDevices()))
                 .WithElement(new BooleanConfigurationElement(ELEMENT_WASAPI_EXCLUSIVE, "Exclusive").WithValue(false))
                 .WithElement(new BooleanConfigurationElement(ELEMENT_WASAPI_EVENT, "Event").WithValue(false));
-            StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.OUTPUT_SECTION, BassOutputConfiguration.MODE_ELEMENT).ConnectValue<string>(mode => UpdateConfiguration(mode));
+            StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, BassOutputConfiguration.MODE_ELEMENT).ConnectValue<string>(mode => UpdateConfiguration(mode));
         }
 
         public static int GetWasapiDevice(string value)
@@ -62,14 +62,14 @@ namespace FoxTunes
             switch (mode)
             {
                 case MODE_WASAPI_OPTION:
-                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.OUTPUT_SECTION, ELEMENT_WASAPI_DEVICE).Show();
-                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.OUTPUT_SECTION, ELEMENT_WASAPI_EXCLUSIVE).Show();
-                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.OUTPUT_SECTION, ELEMENT_WASAPI_EVENT).Show();
+                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.SECTION, ELEMENT_WASAPI_DEVICE).Show();
+                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.SECTION, ELEMENT_WASAPI_EXCLUSIVE).Show();
+                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.SECTION, ELEMENT_WASAPI_EVENT).Show();
                     break;
                 default:
-                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.OUTPUT_SECTION, ELEMENT_WASAPI_DEVICE).Hide();
-                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.OUTPUT_SECTION, ELEMENT_WASAPI_EXCLUSIVE).Hide();
-                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.OUTPUT_SECTION, ELEMENT_WASAPI_EVENT).Hide();
+                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(BassOutputConfiguration.SECTION, ELEMENT_WASAPI_DEVICE).Hide();
+                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.SECTION, ELEMENT_WASAPI_EXCLUSIVE).Hide();
+                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.SECTION, ELEMENT_WASAPI_EVENT).Hide();
                     break;
             }
         }

@@ -272,19 +272,19 @@ namespace FoxTunes
             this.Core = core;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<SelectionConfigurationElement>(
-                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.RATE_ELEMENT
             ).ConnectValue<string>(value => this.Rate = BassOutputConfiguration.GetRate(value));
             this.Configuration.GetElement<BooleanConfigurationElement>(
-                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.ENFORCE_RATE_ELEMENT
             ).ConnectValue<bool>(value => this.EnforceRate = value);
             this.Configuration.GetElement<SelectionConfigurationElement>(
-                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.DEPTH_ELEMENT
             ).ConnectValue<string>(value => this.Float = BassOutputConfiguration.GetFloat(value));
             this.Configuration.GetElement<BooleanConfigurationElement>(
-                BassOutputConfiguration.OUTPUT_SECTION,
+                BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.PLAY_FROM_RAM_ELEMENT
             ).ConnectValue<bool>(value => this.PlayFromMemory = value);
             this.StreamFactory = ComponentRegistry.Instance.GetComponent<IBassStreamFactory>();

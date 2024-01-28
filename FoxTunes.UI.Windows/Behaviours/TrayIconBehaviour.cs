@@ -49,15 +49,15 @@ namespace FoxTunes
         {
             this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
-                NotifyIconConfiguration.NOTIFY_ICON_SECTION,
+                NotifyIconConfiguration.SECTION,
                 NotifyIconConfiguration.ENABLED_ELEMENT
             ).ConnectValue<bool>(value => this.Enabled = value);
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
-                NotifyIconConfiguration.NOTIFY_ICON_SECTION,
+                NotifyIconConfiguration.SECTION,
                 NotifyIconConfiguration.MINIMIZE_TO_TRAY_ELEMENT
             ).ConnectValue<bool>(value => this.MinimizeToTray = value);
             ComponentRegistry.Instance.GetComponent<IConfiguration>().GetElement<BooleanConfigurationElement>(
-                NotifyIconConfiguration.NOTIFY_ICON_SECTION,
+                NotifyIconConfiguration.SECTION,
                 NotifyIconConfiguration.CLOSE_TO_TRAY_ELEMENT
             ).ConnectValue<bool>(value => this.CloseToTray = value);
             base.InitializeComponent(core);
