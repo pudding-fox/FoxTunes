@@ -221,6 +221,7 @@
     <None Include="Resources\GetLibraryHierarchyNodes.sql" />
     <None Include="Resources\AddLibraryHierarchyNodeToPlaylist.sql" />
     <None Include="Resources\GetLibraryHierarchyMetaDataItems.sql" />
+    <None Include="Resources\GetLibraryHierarchyNodesWithFilter.sql" />
     <Content Include="Utilities\Templates\LibraryHierarchyViewBuilder.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>LibraryHierarchyViewBuilder.cs</LastGenOutput>

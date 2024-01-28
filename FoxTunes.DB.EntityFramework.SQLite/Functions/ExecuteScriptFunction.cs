@@ -20,13 +20,14 @@ namespace FoxTunes.Functions
             {
                 ScriptingContext = StandardComponents.Instance.ScriptingRuntime.CreateContext();
             }
-            var script = args[0] as string;
+            var fileName = args[0] as string;
+            var script = args[1] as string;
             if (string.IsNullOrEmpty(script))
             {
                 return string.Empty;
             }
             var metaData = new Dictionary<string, string>();
-            for (var a = 1; a < args.Length; a += 2)
+            for (var a = 2; a < args.Length; a += 2)
             {
                 var name = (args[a] as string).ToLower();
                 if (metaData.ContainsKey(name))
@@ -37,8 +38,16 @@ namespace FoxTunes.Functions
                 var value = args[a + 1] as string;
                 metaData.Add(name, value);
             }
+            ScriptingContext.SetValue("fileName", fileName);
             ScriptingContext.SetValue("tag", metaData);
-            return ScriptingContext.Run(script);
+            try
+            {
+                return ScriptingContext.Run(script);
+            }
+            catch (ScriptingException e)
+            {
+                return e.Message;
+            }
         }
     }
 }

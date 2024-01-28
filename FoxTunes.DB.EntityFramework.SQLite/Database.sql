@@ -55,10 +55,10 @@ CREATE TABLE "LibraryHierarchyLevels" (
 );
 INSERT INTO `LibraryHierarchyLevels` VALUES (1,'(function(){if(tag.__ft_variousartists) { return "Various Artists"; } return  tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist||"No Artist";})()',NULL);
 INSERT INTO `LibraryHierarchyLevels` VALUES (2,'(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(" - ");}return "No Album";})()',NULL);
-INSERT INTO `LibraryHierarchyLevels` VALUES (3,'(function(){if(tag.title){var parts=[];if(tag.disccount != 1 && tag.disc){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return item.FileName;})()',NULL);
+INSERT INTO `LibraryHierarchyLevels` VALUES (3,'(function(){if(tag.title){var parts=[];if(tag.disccount != 1 && tag.disc){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return fileName;})()',NULL);
 INSERT INTO `LibraryHierarchyLevels` VALUES (4,'ucfirst(tag.firstgenre)||"No Genre"',NULL);
 INSERT INTO `LibraryHierarchyLevels` VALUES (5,'(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(" - ");}return "No Album";})()',NULL);
-INSERT INTO `LibraryHierarchyLevels` VALUES (6,'(function(){if(tag.title){var parts=[];if(tag.disccount != 1 && tag.disc){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return item.FileName;})()',NULL);
+INSERT INTO `LibraryHierarchyLevels` VALUES (6,'(function(){if(tag.title){var parts=[];if(tag.disccount != 1 && tag.disc){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(" - ");}return fileName;})()',NULL);
 CREATE TABLE [LibraryHierarchyItems](
     [Id] INTEGER CONSTRAINT [sqlite_master_PK_LibraryHierarchyItems] PRIMARY KEY NOT NULL, 
     [Parent_Id] INTEGER REFERENCES LibraryHierarchyItems([Id]) ON DELETE CASCADE, 
@@ -121,8 +121,7 @@ ON [LibraryHierarchyItems](
 CREATE UNIQUE INDEX `IDX_LibraryHierarchyItem_LibraryItem` ON `LibraryHierarchyItem_LibraryItem` (`LibraryHierarchyItem_Id` ,`LibraryItem_Id` );
 CREATE INDEX [IDX_LibraryHierarchyItem]
 ON [LibraryHierarchyItems](
+	[Parent_Id],
     [LibraryHierarchy_Id], 
-    [LibraryHierarchyLevel_Id], 
-    [DisplayValue], 
-    [SortValue]);
+    [LibraryHierarchyLevel_Id]);
 COMMIT;

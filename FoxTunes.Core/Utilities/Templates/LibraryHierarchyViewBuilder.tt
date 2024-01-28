@@ -9,7 +9,7 @@ AS
 	WITH "VerticalMetaData"
 	AS
 	(
-		SELECT "LibraryItems"."Id", "MetaDataItems"."Name", 
+		SELECT "LibraryItems"."Id", "LibraryItems"."FileName", "MetaDataItems"."Name", 
 			CASE 
 				WHEN "MetaDataItems"."NumericValue" IS NOT NULL THEN 'Numeric' 
 				WHEN "MetaDataItems"."TextValue" IS NOT NULL THEN 'Text' 
@@ -32,7 +32,7 @@ AS
 	<#= 
 		new PivotViewBuilder(
 			"VerticalMetaData", 
-			new[] { "Id" }, 
+			new[] { "Id", "FileName" }, 
 			new[] { "Name" }, 
 			new[] { "ValueType", "Value" }, 
 			this.MetaDataNames
@@ -43,6 +43,7 @@ AS
 	SELECT "LibraryHierarchy_LibraryHierarchyLevel"."LibraryHierarchy_Id" AS "LibraryHierarchy_Id", "LibraryHierarchyLevels"."Id" AS "LibraryHierarchyLevel_Id", "HorizontalMetaData"."Id" AS "LibraryItem_Id",
 		EXECUTE_SCRIPT
 		(
+			"HorizontalMetaData"."FileName",
 			"LibraryHierarchyLevels"."DisplayScript"
 	<#
 		for(var index = 0; index < this.MetaDataNames.Length; index++)
@@ -53,6 +54,7 @@ AS
 		) AS DisplayValue,
 		EXECUTE_SCRIPT
 		(
+			"HorizontalMetaData"."FileName",
 			"LibraryHierarchyLevels"."SortScript"
 	<#
 		for(var index = 0; index < this.MetaDataNames.Length; index++)

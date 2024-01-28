@@ -48,26 +48,36 @@ namespace FoxTunes
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy)
         {
-            var parameters = default(IDbParameterCollection);
-            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyNodes, new[] { "libraryHierarchyId", "libraryHierarchyItemId", "filter" }, out parameters))
+            using (var command = this.GetCommand(libraryHierarchy.Id))
             {
-                parameters["libraryHierarchyId"] = libraryHierarchy.Id;
-                parameters["libraryHierarchyItemId"] = DBNull.Value;
-                parameters["filter"] = this.GetFilter();
                 return this.GetNodes(command).ToArray();
             }
         }
 
         public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyNode libraryHierarchyNode)
         {
-            var parameters = default(IDbParameterCollection);
-            using (var command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyNodes, new[] { "libraryHierarchyId", "libraryHierarchyItemId", "filter" }, out parameters))
+            using (var command = this.GetCommand(libraryHierarchyNode.LibraryHierarchyId, libraryHierarchyNode.Id))
             {
-                parameters["libraryHierarchyId"] = DBNull.Value;
-                parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
-                parameters["filter"] = this.GetFilter();
                 return this.GetNodes(command).ToArray();
             }
+        }
+
+        private IDbCommand GetCommand(int libraryHierarchyId, int? libraryHierarchyItemId = null)
+        {
+            var command = default(IDbCommand);
+            var parameters = default(IDbParameterCollection);
+            if (string.IsNullOrEmpty(this.Filter))
+            {
+                command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyNodes, new[] { "libraryHierarchyId", "libraryHierarchyItemId" }, out parameters);
+            }
+            else
+            {
+                command = this.DataManager.ReadContext.Connection.CreateCommand(Resources.GetLibraryHierarchyNodesWithFilter, new[] { "libraryHierarchyId", "libraryHierarchyItemId", "filter" }, out parameters);
+                parameters["filter"] = this.GetFilter();
+            }
+            parameters["libraryHierarchyId"] = libraryHierarchyId;
+            parameters["libraryHierarchyItemId"] = libraryHierarchyItemId.HasValue ? (object)libraryHierarchyItemId.Value : DBNull.Value;
+            return command;
         }
 
         private IEnumerable<LibraryHierarchyNode> GetNodes(IDbCommand command)
@@ -77,9 +87,10 @@ namespace FoxTunes
                 while (reader.Read())
                 {
                     var id = reader.GetInt32(0);
-                    var value = reader.GetString(1);
-                    var isLeaf = reader.GetBoolean(2);
-                    var libraryHierarchyNode = new LibraryHierarchyNode(id, value, isLeaf);
+                    var libraryHierarchyId = reader.GetInt32(1);
+                    var value = reader.GetString(2);
+                    var isLeaf = reader.GetBoolean(3);
+                    var libraryHierarchyNode = new LibraryHierarchyNode(id, libraryHierarchyId, value, isLeaf);
                     libraryHierarchyNode.InitializeComponent(this.Core);
                     yield return libraryHierarchyNode;
                 }
