@@ -7,6 +7,7 @@
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Extensions="clr-namespace:FoxTunes.Extensions"
+             xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:Utilities="clr-namespace:FoxTunes.Utilities"
              x:Class="FoxTunes.Library"
              mc:Ignorable="d" 
@@ -14,6 +15,14 @@
     <UserControl.Resources>
         <ViewModel:Library x:Key="ViewModel" Core="{Binding}"></ViewModel:Library>
     </UserControl.Resources>
+    <Interactivity:Interaction.Triggers>
+        <Interactivity:EventTrigger EventName="DragEnter">
+            <ViewModel:InvokeParameterizedCommandAction Command="{Binding DragEnterCommand, Source={StaticResource ViewModel}}" />
+        </Interactivity:EventTrigger>
+        <Interactivity:EventTrigger EventName="Drop">
+            <ViewModel:InvokeParameterizedCommandAction Command="{Binding DropCommand, Source={StaticResource ViewModel}}" />
+        </Interactivity:EventTrigger>
+    </Interactivity:Interaction.Triggers>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>

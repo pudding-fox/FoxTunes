@@ -24,35 +24,6 @@ namespace FoxTunes
             InitializeComponent();
         }
 
-        public ICore Core
-        {
-            get
-            {
-                return this.DataContext as ICore;
-            }
-        }
-
-        protected override void OnDragEnter(DragEventArgs e)
-        {
-            var effects = DragDropEffects.None;
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                effects = DragDropEffects.Copy;
-            }
-            e.Effects = effects;
-            base.OnDragEnter(e);
-        }
-
-        protected override void OnDrop(DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                this.AddToLibrary(paths);
-            }
-            base.OnDrop(e);
-        }
-
         private void DoDragDrop()
         {
             this.DragInitialized = true;
@@ -70,11 +41,6 @@ namespace FoxTunes
                 this.DragInitialized = false;
                 this.MouseCursorAdorner.Hide();
             }
-        }
-
-        private void AddToLibrary(IEnumerable<string> paths)
-        {
-            this.Core.Managers.Library.Add(paths);
         }
 
         private void TreeView_Selected(object sender, RoutedEventArgs e)
