@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -28,6 +29,26 @@ namespace FoxTunes
             }
         }
 
+        public IEnumerable<string> Roots
+        {
+            get
+            {
+                var roots = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var path in this.Paths)
+                {
+                    if (Directory.Exists(path))
+                    {
+                        roots.Add(path);
+                    }
+                    else if (File.Exists(path))
+                    {
+                        roots.Add(Path.GetDirectoryName(path));
+                    }
+                }
+                return roots;
+            }
+        }
+
         public IEnumerable<string> Paths { get; private set; }
 
         protected override async Task OnStarted()
@@ -43,7 +64,7 @@ namespace FoxTunes
             {
                 throw new InvalidOperationException("Cannot add to library, meta data extraction is disabled.");
             }
-            await this.AddRoots(this.Paths);
+            await this.AddRoots(this.Roots);
             await this.AddPaths(this.Paths, true);
         }
 
