@@ -8,8 +8,6 @@ namespace FoxTunes
 {
     public class LibraryItem : PersistableComponent, IFileData
     {
-        public const string DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
-
         public string DirectoryName { get; set; }
 
         public string FileName { get; set; }
@@ -38,12 +36,12 @@ namespace FoxTunes
             {
                 return default(DateTime);
             }
-            return DateTime.ParseExact(this.ImportDate, DATE_FORMAT, CultureInfo.InvariantCulture);
+            return DateTime.ParseExact(this.ImportDate, Constants.DATE_FORMAT, CultureInfo.InvariantCulture);
         }
 
         public void SetImportDate(DateTime value)
         {
-            this.ImportDate = value.ToString(DATE_FORMAT, CultureInfo.InvariantCulture);
+            this.ImportDate = value.ToString(Constants.DATE_FORMAT, CultureInfo.InvariantCulture);
         }
 
         public override bool Equals(IPersistableComponent other)

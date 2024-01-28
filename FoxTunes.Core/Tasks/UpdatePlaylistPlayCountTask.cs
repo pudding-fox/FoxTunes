@@ -11,8 +11,6 @@ namespace FoxTunes
     {
         public const string ID = "3489F57E-0C2D-48EC-AD28-A5C1F9167778";
 
-        public const string DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
-
         public UpdatePlaylistPlayCountTask(PlaylistItem playlistItem) : base(ID)
         {
             this.PlaylistItem = playlistItem;
@@ -90,7 +88,7 @@ namespace FoxTunes
             //TODO: I can't work out what the standard is for this value.
             //TODO: I've seen DateTime.ToFileTime() but that seems a little too windows-ish.
             //TODO: Using yyyy/MM/dd HH:mm:ss for now.
-            metaDataItem.Value = DateTime.UtcNow.ToString(DATE_FORMAT, CultureInfo.InvariantCulture);
+            metaDataItem.Value = DateTime.UtcNow.ToString(Constants.DATE_FORMAT, CultureInfo.InvariantCulture);
         }
     }
 }
