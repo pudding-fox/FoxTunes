@@ -222,25 +222,7 @@ namespace FoxTunes
 
         protected virtual async Task RemoveItems(IEnumerable<PlaylistItem> playlistItems)
         {
-            using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
-            {
-                using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
-                {
-                    foreach (var playlistItem in playlistItems)
-                    {
-                        playlistItem.Status = PlaylistItemStatus.Remove;
-                    }
-                    var set = this.Database.Set<PlaylistItem>(transaction);
-                    await set.AddOrUpdateAsync(playlistItems).ConfigureAwait(false);
-                    if (transaction.HasTransaction)
-                    {
-                        transaction.Commit();
-                    }
-                }
-            }))
-            {
-                await task.Run().ConfigureAwait(false);
-            }
+            await this.SetPlaylistItemsStatus(playlistItems, PlaylistItemStatus.Remove).ConfigureAwait(false);
             await this.RemoveItems(PlaylistItemStatus.Remove).ConfigureAwait(false);
         }
 
@@ -434,6 +416,32 @@ namespace FoxTunes
                             break;
                     }
                 }, transaction).ConfigureAwait(false);
+                transaction.Commit();
+            }
+        }
+
+        protected virtual async Task SetPlaylistItemsStatus(IEnumerable<PlaylistItem> playlistItems, PlaylistItemStatus status)
+        {
+            var query = this.Database.QueryFactory.Build();
+            query.Update.SetTable(this.Database.Tables.PlaylistItem);
+            query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));
+            query.Filter.AddColumn(this.Database.Tables.PlaylistItem.PrimaryKey);
+            using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
+            {
+                foreach (var playlistItem in playlistItems)
+                {
+                    await this.Database.ExecuteAsync(query, (parameters, phase) =>
+                    {
+                        switch (phase)
+                        {
+                            case DatabaseParameterPhase.Fetch:
+                                parameters["id"] = playlistItem.Id;
+                                parameters["status"] = status;
+                                break;
+                        }
+                    }, transaction).ConfigureAwait(false);
+                    playlistItem.Status = status;
+                }
                 transaction.Commit();
             }
         }
