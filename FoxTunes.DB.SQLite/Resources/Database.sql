@@ -17,7 +17,7 @@ CREATE TABLE [LibraryItems] (
 
 CREATE TABLE [PlaylistItems](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
-	[LibraryItem_Id] INTEGER NULL REFERENCES LibraryItems([Id]),
+	[LibraryItem_Id] INTEGER NULL,
     [Sequence] bigint NOT NULL, 
     [DirectoryName] text NOT NULL COLLATE NOCASE, 
     [FileName] text NOT NULL COLLATE NOCASE, 
@@ -32,21 +32,21 @@ CREATE TABLE [LibraryHierarchies] (
 
 CREATE TABLE [LibraryHierarchyLevels] (
 	[Id]	INTEGER PRIMARY KEY NOT NULL,
-	[LibraryHierarchy_Id]  INTEGER NULL REFERENCES LibraryHierarchies([Id]),
+	[LibraryHierarchy_Id]  INTEGER NULL,
 	[Sequence] INTEGER NOT NULL,
 	[Script]	TEXT NOT NULL COLLATE NOCASE);
 
 CREATE TABLE [LibraryHierarchyItems](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
-	[Parent_Id] INTEGER NULL REFERENCES LibraryHierarchyItems([Id]),
-    [LibraryHierarchy_Id] bigint NOT NULL REFERENCES LibraryHierarchies([Id]),
+	[Parent_Id] INTEGER NULL,
+    [LibraryHierarchy_Id] bigint NOT NULL,
     [Value] text NOT NULL COLLATE NOCASE, 
     [IsLeaf] bit NOT NULL);
 
 CREATE TABLE [PlaylistItem_MetaDataItem](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
-    [PlaylistItem_Id] INTEGER NOT NULL REFERENCES PlaylistItems([Id]),
-    [MetaDataItem_Id] INTEGER NOT NULL REFERENCES MetaDataItems([Id]));
+    [PlaylistItem_Id] INTEGER NOT NULL,
+    [MetaDataItem_Id] INTEGER NOT NULL);
 
 CREATE TABLE [PlaylistColumns] ( 
   [Id] INTEGER PRIMARY KEY NOT NULL, 
@@ -61,56 +61,96 @@ CREATE TABLE [PlaylistColumns] (
 
 CREATE TABLE [LibraryItem_MetaDataItem](
     [Id] INTEGER PRIMARY KEY NOT NULL, 
-    [LibraryItem_Id] INTEGER NOT NULL REFERENCES LibraryItems([Id]),
-    [MetaDataItem_Id] INTEGER NOT NULL REFERENCES MetaDataItems([Id]));
+    [LibraryItem_Id] INTEGER NOT NULL,
+    [MetaDataItem_Id] INTEGER NOT NULL);
 
 CREATE TABLE [LibraryHierarchyItem_LibraryItem] (
 	[Id]	INTEGER PRIMARY KEY NOT NULL,
-	[LibraryHierarchyItem_Id] INTEGER NOT NULL REFERENCES LibraryHierarchyItems([Id]),
-	[LibraryItem_Id] INTEGER NOT NULL REFERENCES LibraryItems([Id]) 
+	[LibraryHierarchyItem_Id] INTEGER NOT NULL,
+	[LibraryItem_Id] INTEGER NOT NULL
 );
 
-CREATE INDEX [IDX_MetaDataItems_Name] ON [MetaDataItems](
-	[Name]
+CREATE INDEX [IDX_LibraryHierarchies_1] ON [LibraryHierarchies](
+	[Enabled]
 );
 
-CREATE INDEX [IDX_MetaDataItems_Value] ON [MetaDataItems](
-	[Value]
-);
-
-CREATE INDEX [IDX_LibraryHierarchyItems_Parent_Id] ON [LibraryHierarchyItems](
-	[Parent_Id]
-);
-
-CREATE INDEX [IDX_LibraryHierarchyLevels_LibraryHierarchy_Id] ON [LibraryHierarchyLevels](
+CREATE INDEX [IDX_LibraryHierarchyLevels_1] ON [LibraryHierarchyLevels](
 	[LibraryHierarchy_Id]
 );
 
-CREATE INDEX [IDX_PlaylistItem_LibraryItem_Id_Status] ON [PlaylistItems](
-	[LibraryItem_Id],
-	[Status]
+CREATE INDEX [IDX_LibraryHierarchyItems_1] ON [LibraryHierarchyItems](
+	[Parent_Id],
+	[LibraryHierarchy_Id]
 );
 
-CREATE INDEX [IDX_PlaylistItem_MetaDataItem_PlaylistItem_Id] ON [PlaylistItem_MetaDataItem](
+CREATE INDEX [IDX_LibraryHierarchyItems_2] ON [LibraryHierarchyItems](
+	[Parent_Id],
+	[LibraryHierarchy_Id],
+	[Value],
+	[IsLeaf]
+);
+
+CREATE INDEX [IDX_PlaylistItem_MetaDataItem_1] ON [PlaylistItem_MetaDataItem](
 	[PlaylistItem_Id]
 );
 
-CREATE INDEX [IDX_PlaylistItem_MetaDataItem_MetaDataItem_Id] ON [PlaylistItem_MetaDataItem](
+CREATE INDEX [IDX_PlaylistItem_MetaDataItem_2] ON [PlaylistItem_MetaDataItem](
 	[MetaDataItem_Id]
 );
 
-CREATE INDEX [IDX_LibraryItem_MetaDataItem_LibraryItem_Id] ON [LibraryItem_MetaDataItem](
+CREATE INDEX [IDX_PlaylistItem_MetaDataItem_3] ON [PlaylistItem_MetaDataItem](
+	[PlaylistItem_Id],
+	[MetaDataItem_Id]
+);
+
+CREATE INDEX [IDX_LibraryItem_MetaDataItem_1] ON [LibraryItem_MetaDataItem](
 	[LibraryItem_Id]
 );
 
-CREATE INDEX [IDX_LibraryItem_MetaDataItem_MetaDataItem_Id] ON [LibraryItem_MetaDataItem](
+CREATE INDEX [IDX_LibraryItem_MetaDataItem_2] ON [LibraryItem_MetaDataItem](
 	[MetaDataItem_Id]
 );
 
-CREATE INDEX [IDX_LibraryHierarchyItems_LibraryHierarchy_Id)] ON [LibraryHierarchyItems](
-	[LibraryHierarchy_Id]
+CREATE INDEX [IDX_LibraryItem_MetaDataItem_3] ON [LibraryItem_MetaDataItem](
+	[LibraryItem_Id],
+	[MetaDataItem_Id]
 );
 
-CREATE INDEX [IXD_LibraryHierarchyItem_LibraryItem_LibraryHierarchyItem_Id] ON [LibraryHierarchyItem_LibraryItem](
+CREATE INDEX [IDX_PlaylistColumns_1] ON [PlaylistColumns](
+	[Enabled]
+);
+
+CREATE INDEX [IDX_LibraryItems_1] ON [LibraryItems](
+	[FileName]
+);
+
+CREATE INDEX [IDX_LibraryItems_2] ON [LibraryItems](
+	[Status]
+);
+
+CREATE INDEX [IDX_LibraryHierarchyItem_LibraryItem_1] ON [LibraryHierarchyItem_LibraryItem](
 	[LibraryHierarchyItem_Id]
+);
+
+CREATE INDEX [IDX_LibraryHierarchyItem_LibraryItem_2] ON [LibraryHierarchyItem_LibraryItem](
+	[LibraryItem_Id]
+);
+
+CREATE INDEX [IDX_LibraryHierarchyItem_LibraryItem_3] ON [LibraryHierarchyItem_LibraryItem](
+	[LibraryHierarchyItem_Id],
+	[LibraryItem_Id]
+);
+
+CREATE INDEX [IDX_PlaylistItems_1] ON [PlaylistItems](
+	[LibraryItem_Id]
+);
+
+CREATE INDEX [IDX_PlaylistItems_2] ON [PlaylistItems](
+	[Status]
+);
+
+CREATE INDEX [IDX_MetaDataItems_1] ON [MetaDataItems](
+	[Name],
+	[Type],
+	[Value]
 );
