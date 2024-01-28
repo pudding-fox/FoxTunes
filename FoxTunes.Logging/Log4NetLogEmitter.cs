@@ -99,7 +99,7 @@ namespace FoxTunes
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public event ComponentOutputErrorEventHandler Error = delegate { };
+        public event ComponentOutputErrorEventHandler Error;
 
         #endregion
     }

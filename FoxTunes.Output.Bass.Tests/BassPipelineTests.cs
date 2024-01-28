@@ -6,7 +6,6 @@ namespace FoxTunes.Output.Bass.Tests
     [TestFixture]
     public class BassPipelineTests : TestBase
     {
-
         [Test]
         public async Task CanCreateStream()
         {

@@ -45,6 +45,8 @@ namespace FoxTunes
 
         public abstract int Rate { get; }
 
+        public abstract int Depth { get; }
+
         public abstract int Channels { get; }
 
         public abstract bool IsPlaying { get; }

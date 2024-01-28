@@ -5,36 +5,34 @@ using System;
 
 namespace FoxTunes
 {
-    public class BassDefaultStreamOutput : BassStreamOutput
+    public class BassDirectSoundStreamOutput : BassStreamOutput
     {
-        public static void Init(IBassOutput output)
+        public BassDirectSoundStreamOutput(BassDirectSoundStreamOutputBehaviour behaviour, BassOutputStream stream)
         {
-            BassUtils.OK(Bass.Configure(Configuration.UpdateThreads, 1));
-            BassUtils.OK(Bass.Init(output.DirectSoundDevice, output.Rate));
-            Logger.Write(typeof(BassDefaultStreamOutput), LogLevel.Debug, "BASS Initialized.");
+            this.Behaviour = behaviour;
+            this.Rate = behaviour.Output.Rate;
+            this.Depth = stream.Depth;
+            this.Channels = stream.Channels;
+            this.Flags = BassFlags.Default;
+            if (this.Behaviour.Output.Float)
+            {
+                this.Flags |= BassFlags.Float;
+            }
         }
 
-        public static void Free()
-        {
-            //Nothing to do.
-        }
+        public BassDirectSoundStreamOutputBehaviour Behaviour { get; private set; }
 
-        public BassDefaultStreamOutput(int rate, int channels, BassFlags flags)
-        {
-            this.Rate = rate;
-            this.Channels = channels;
-            this.Flags = flags & ~BassFlags.Decode;
-        }
-
-        public override BassStreamOutputCapability Capabilities
+        public int Device
         {
             get
             {
-                return BassStreamOutputCapability.None;
+                return BassDirectSoundDevice.Device;
             }
         }
 
         public override int Rate { get; protected set; }
+
+        public override int Depth { get; protected set; }
 
         public override int Channels { get; protected set; }
 
@@ -94,6 +92,10 @@ namespace FoxTunes
 
         public override void Play()
         {
+            if (this.IsPlaying)
+            {
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Playing channel: {0}", this.ChannelHandle);
             try
             {
@@ -107,6 +109,10 @@ namespace FoxTunes
 
         public override void Pause()
         {
+            if (this.IsPaused)
+            {
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Pausing channel: {0}", this.ChannelHandle);
             try
             {
@@ -120,6 +126,10 @@ namespace FoxTunes
 
         public override void Resume()
         {
+            if (this.IsPlaying)
+            {
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Resuming channel: {0}", this.ChannelHandle);
             try
             {
@@ -133,6 +143,10 @@ namespace FoxTunes
 
         public override void Stop()
         {
+            if (this.IsStopped)
+            {
+                return;
+            }
             Logger.Write(this, LogLevel.Debug, "Stopping channel: {0}", this.ChannelHandle);
             try
             {

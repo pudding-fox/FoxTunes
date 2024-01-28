@@ -37,11 +37,7 @@
       <HintPath>..\packages\Expression.Blend.Sdk.1.0.2\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -50,6 +46,9 @@
     </Compile>
     <Compile Include="BackgroundTasks.xaml.cs">
       <DependentUpon>BackgroundTasks.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components.xaml.cs">
+      <DependentUpon>Components.xaml</DependentUpon>
     </Compile>
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Extensions\GridView_ColumnsSource.cs" />
@@ -113,6 +112,7 @@
     <Compile Include="ViewModel\Artwork.cs" />
     <Compile Include="ViewModel\BackgroundTasks.cs" />
     <Compile Include="ViewModel\AsyncCommand.cs" />
+    <Compile Include="ViewModel\Components.cs" />
     <Compile Include="ViewModel\Converters\DataGridSelectedItemConverter.cs" />
     <Compile Include="Utilities\PlaylistGridViewColumnFactory.cs" />
     <Compile Include="ViewModel\InvokeParameterizedCommandAction.cs" />
@@ -158,6 +158,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </None>
+    <Page Include="Components.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LibraryBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

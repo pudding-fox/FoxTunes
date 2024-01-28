@@ -1,15 +1,9 @@
-﻿using FoxTunes.Interfaces;
-using ManagedBass;
-using ManagedBass.Asio;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace FoxTunes
 {
     public static class BassOutputConfiguration
     {
-        public const int ASIO_NO_DEVICE = -1;
-
         public const string OUTPUT_SECTION = "8399D051-81BC-41A6-940D-36E6764213D2";
 
         public const string RATE_ELEMENT = "0452A558-F1ED-41B1-A3DC-95158E01003C";
@@ -38,19 +32,7 @@ namespace FoxTunes
 
         public const string DEPTH_32_OPTION = "889573F2-2E08-4F2B-B94E-DAA945D96497";
 
-        public const string ELEMENT_DS_DEVICE = "CBF8D4A5-4DD5-4985-A373-565335084B80";
-
-        public const string ELEMENT_ASIO_DEVICE = "2E20B9CE-96FC-4FBB-8956-84B9A7E3FEB3";
-
         public const string MODE_ELEMENT = "76096B39-2F8A-4667-9C03-9742FF2D1EA7";
-
-        public const string MODE_DS_OPTION = "F8691348-069B-4763-89CF-5ACBE53E9F75";
-
-        public const string MODE_ASIO_OPTION = "598987DA-EE55-467A-B2F5-61480F2F12F6";
-
-        public const string DSD_RAW_ELEMENT = "9044043A-8A30-42A0-B2CB-3DE379636DD6";
-
-        public const string RESAMPLER_ELEMENT = "91D65C85-178C-470D-A977-C54350875AB3";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -67,62 +49,9 @@ namespace FoxTunes
                 .WithElement(new SelectionConfigurationElement(DEPTH_ELEMENT, "Depth")
                     .WithOption(new SelectionConfigurationOption(DEPTH_16_OPTION, "16bit"), true)
                     .WithOption(new SelectionConfigurationOption(DEPTH_32_OPTION, "32bit floating point")))
-                .WithElement(new SelectionConfigurationElement(ELEMENT_DS_DEVICE, "Device")
-                    .WithOptions(() => GetDSDevices()))
-                .WithElement(new SelectionConfigurationElement(ELEMENT_ASIO_DEVICE, "Device")
-                    .WithOptions(() => GetASIODevices()))
-                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, "Mode")
-                    .WithOption(new SelectionConfigurationOption(MODE_DS_OPTION, "Direct Sound"), true)
-                    .WithOption(new SelectionConfigurationOption(MODE_ASIO_OPTION, "ASIO")))
-                .WithElement(new BooleanConfigurationElement(DSD_RAW_ELEMENT, "DSD Direct").WithValue(false))
-                .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, "Enforce Rate").WithValue(false))
-                .WithElement(new BooleanConfigurationElement(RESAMPLER_ELEMENT, "High Quality Resampler").WithValue(false)
+                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, "Mode"))
+                .WithElement(new BooleanConfigurationElement(ENFORCE_RATE_ELEMENT, "Enforce Rate").WithValue(false)
             );
-            StandardComponents.Instance.Configuration.GetElement(OUTPUT_SECTION, MODE_ELEMENT).ConnectValue<string>(mode => UpdateDevices(mode));
-        }
-
-        private static IEnumerable<SelectionConfigurationOption> GetDSDevices()
-        {
-            yield return new SelectionConfigurationOption(Bass.DefaultDevice.ToString(), "Default Device").Default();
-            for (var a = 0; a < Bass.DeviceCount; a++)
-            {
-                var deviceInfo = default(DeviceInfo);
-                BassUtils.OK(Bass.GetDeviceInfo(a, out deviceInfo));
-                LogManager.Logger.Write(typeof(BassOutputConfiguration), LogLevel.Debug, "DS Device: {0} => {1} => {2}", a, deviceInfo.Name, deviceInfo.Driver);
-                if (!deviceInfo.IsEnabled)
-                {
-                    continue;
-                }
-                yield return new SelectionConfigurationOption(deviceInfo.Name, deviceInfo.Name, deviceInfo.Driver);
-            }
-        }
-
-        private static IEnumerable<SelectionConfigurationOption> GetASIODevices()
-        {
-            for (var a = 0; a < BassAsio.DeviceCount; a++)
-            {
-                var deviceInfo = default(AsioDeviceInfo);
-                BassUtils.OK(BassAsio.GetDeviceInfo(a, out deviceInfo));
-                LogManager.Logger.Write(typeof(BassOutputConfiguration), LogLevel.Debug, "ASIO Device: {0} => {1} => {2}", a, deviceInfo.Name, deviceInfo.Driver);
-                yield return new SelectionConfigurationOption(deviceInfo.Name, deviceInfo.Name, deviceInfo.Driver);
-            }
-        }
-        
-        private static void UpdateDevices(string mode)
-        {
-            switch (mode)
-            {
-                case MODE_DS_OPTION:
-                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_DS_DEVICE).Show();
-                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_ASIO_DEVICE).Hide();
-                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(OUTPUT_SECTION, DSD_RAW_ELEMENT).Hide();
-                    break;
-                case MODE_ASIO_OPTION:
-                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_DS_DEVICE).Hide();
-                    StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(OUTPUT_SECTION, ELEMENT_ASIO_DEVICE).Show();
-                    StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(OUTPUT_SECTION, DSD_RAW_ELEMENT).Show();
-                    break;
-            }
         }
 
         public static int GetRate(string value)
@@ -159,49 +88,6 @@ namespace FoxTunes
                 case DEPTH_32_OPTION:
                     return true;
             }
-        }
-
-        public static BassOutputMode GetMode(string value)
-        {
-            switch (value)
-            {
-                default:
-                case MODE_DS_OPTION:
-                    return BassOutputMode.DirectSound;
-                case MODE_ASIO_OPTION:
-                    return BassOutputMode.ASIO;
-            }
-        }
-
-        public static int GetDsDevice(string value)
-        {
-            if (!string.Equals(value, Bass.DefaultDevice.ToString()))
-            {
-                for (var a = 0; a < Bass.DeviceCount; a++)
-                {
-                    var deviceInfo = default(DeviceInfo);
-                    BassUtils.OK(Bass.GetDeviceInfo(a, out deviceInfo));
-                    if (string.Equals(deviceInfo.Name, value, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return a;
-                    }
-                }
-            }
-            return Bass.DefaultDevice;
-        }
-
-        public static int GetAsioDevice(string value)
-        {
-            for (var a = 0; a < BassAsio.DeviceCount; a++)
-            {
-                var deviceInfo = default(AsioDeviceInfo);
-                BassUtils.OK(BassAsio.GetDeviceInfo(a, out deviceInfo));
-                if (string.Equals(deviceInfo.Name, value, StringComparison.OrdinalIgnoreCase))
-                {
-                    return a;
-                }
-            }
-            return ASIO_NO_DEVICE;
         }
     }
 }

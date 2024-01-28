@@ -1,30 +1,67 @@
 ﻿using FoxTunes.Interfaces;
-using ManagedBass;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace FoxTunes
 {
-    public class BassStreamPipelineFactory : BaseComponent, IBassStreamPipelineFactory
+    public class BassStreamPipelineFactory : StandardComponent, IBassStreamPipelineFactory
     {
-        public BassStreamPipelineFactory(IBassOutput output)
+        protected virtual void OnQueryingPipeline(QueryingPipelineEventArgs e)
         {
-            this.Output = output;
+            if (this.QueryingPipeline == null)
+            {
+                return;
+            }
+            this.QueryingPipeline(this, e);
         }
 
-        public IBassOutput Output { get; private set; }
+        public event QueryingPipelineEventHandler QueryingPipeline = delegate { };
 
-        public IBassStreamPipeline CreatePipeline(bool dsd, int rate, int channels)
+        protected virtual void OnCreatingPipeline(CreatingPipelineEventArgs e)
         {
+            if (this.CreatingPipeline == null)
+            {
+                return;
+            }
+            this.CreatingPipeline(this, e);
+        }
+
+        public event CreatingPipelineEventHandler CreatingPipeline = delegate { };
+
+        public IBassStreamPipelineQueryResult QueryPipeline()
+        {
+            var e = new QueryingPipelineEventArgs();
+            this.OnQueryingPipeline(e);
+            return new BassStreamPipelineQueryResult(e.InputCapabilities, e.OutputCapabilities, e.OutputRates, e.OutputChannels);
+        }
+
+        public IBassStreamPipeline CreatePipeline(BassOutputStream stream)
+        {
+            var input = default(IBassStreamInput);
+            var components = default(IEnumerable<IBassStreamComponent>);
+            var output = default(IBassStreamOutput);
+            this.CreatePipeline(stream, out input, out components, out output);
             var pipeline = new BassStreamPipeline(
-                this.GetInput(dsd, rate, channels),
-                this.GetComponents(dsd, rate, channels).ToArray(),
-                this.GetOutput(dsd, rate, channels)
+                input,
+                components,
+                output
             );
             try
             {
                 pipeline.Connect();
+                if (Logger.IsDebugEnabled(this))
+                {
+                    if (components.Any())
+                    {
+                        Logger.Write(
+                            this,
+                            LogLevel.Debug,
+                            "Connected pipeline: {0}",
+                            string.Join(" => ", pipeline.All.Select(component => string.Format("\"{0}\"", component.GetType().Name)))
+                        );
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -35,46 +72,20 @@ namespace FoxTunes
             return pipeline;
         }
 
-        protected virtual IBassStreamInput GetInput(bool dsd, int rate, int channels)
+        protected virtual void CreatePipeline(BassOutputStream stream, out IBassStreamInput input, out IEnumerable<IBassStreamComponent> components, out IBassStreamOutput output)
         {
-            var flags = this.Output.Flags;
-            if (dsd)
+            var e = new CreatingPipelineEventArgs(this.QueryPipeline(), stream);
+            this.OnCreatingPipeline(e);
+            input = e.Input;
+            components = e.Components;
+            output = e.Output;
+            if (input == null)
             {
-                flags |= BassFlags.DSDRaw;
+                throw new NotImplementedException("Failed to locate a suitable pipeline input.");
             }
-            return new BassGaplessStreamInput(rate, channels, flags);
-        }
-
-        protected virtual IEnumerable<IBassStreamComponent> GetComponents(bool dsd, int rate, int channels)
-        {
-            if (!dsd && this.Output.Resampler)
+            if (output == null)
             {
-                if (this.Output.EnforceRate && this.Output.Rate != rate)
-                {
-                    yield return new BassResamplerStreamComponent(this.Output.Rate, channels, this.Output.Flags);
-                }
-            }
-        }
-
-        protected virtual IBassStreamOutput GetOutput(bool dsd, int rate, int channels)
-        {
-            var flags = this.Output.Flags;
-            if (dsd)
-            {
-                flags |= BassFlags.DSDRaw;
-            }
-            else if (this.Output.EnforceRate && this.Output.Rate != rate)
-            {
-                rate = this.Output.Rate;
-            }
-            switch (this.Output.Mode)
-            {
-                case BassOutputMode.DirectSound:
-                    return new BassDefaultStreamOutput(rate, channels, flags);
-                case BassOutputMode.ASIO:
-                    return new BassAsioStreamOutput(this.Output.AsioDevice, rate, channels, flags);
-                default:
-                    throw new NotImplementedException();
+                throw new NotImplementedException("Failed to locate a suitable pipeline output.");
             }
         }
     }

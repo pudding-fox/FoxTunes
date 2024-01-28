@@ -1,5 +1,4 @@
 ﻿using ManagedBass;
-using ManagedBass.Asio;
 using System;
 using System.Collections.Generic;
 
@@ -34,7 +33,7 @@ namespace FoxTunes
         {
             if (!result)
             {
-                if (Bass.LastError != Errors.OK || BassAsio.LastError != Errors.OK)
+                if (Bass.LastError != Errors.OK)
                 {
                     Throw();
                 }
@@ -46,7 +45,7 @@ namespace FoxTunes
         {
             if (result == 0)
             {
-                if (Bass.LastError != Errors.OK || BassAsio.LastError != Errors.OK)
+                if (Bass.LastError != Errors.OK)
                 {
                     Throw();
                 }
@@ -59,10 +58,6 @@ namespace FoxTunes
             if (Bass.LastError != Errors.OK)
             {
                 throw new ApplicationException(Enum.GetName(typeof(Errors), Bass.LastError));
-            }
-            if (BassAsio.LastError != Errors.OK)
-            {
-                throw new ApplicationException(Enum.GetName(typeof(Errors), BassAsio.LastError));
             }
         }
 
@@ -88,7 +83,7 @@ namespace FoxTunes
             return Convert.ToInt32(Bass.ChannelGetAttribute(channelHandle, ChannelAttribute.DSDRate));
         }
 
-        public static Enum GetChannelFlags(int channelHandle)
+        public static BassFlags GetChannelFlags(int channelHandle)
         {
             var channelInfo = default(ChannelInfo);
             OK(Bass.ChannelGetInfo(channelHandle, out channelInfo));

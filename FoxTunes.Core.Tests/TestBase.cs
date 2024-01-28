@@ -32,7 +32,7 @@ namespace FoxTunes
         [SetUp]
         public virtual void SetUp()
         {
-            this.Core = new Core();
+            this.Core = new TestCore();
             this.Core.Load();
         }
 

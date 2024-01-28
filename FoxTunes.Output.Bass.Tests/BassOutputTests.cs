@@ -13,9 +13,11 @@ namespace FoxTunes.Output.Bass.Tests
 
         public const long ASIO = 256;
 
+        public static int RATE = 48000;
+
         public static int DS_DEVICE = -1;
 
-        public static int ASIO_DEVICE = 0;
+        public static int ASIO_DEVICE = 2;
 
         public BassOutputTests(long configuration)
             : base(configuration)
@@ -29,26 +31,32 @@ namespace FoxTunes.Output.Bass.Tests
             var output = this.Core.Components.Output as BassOutput;
             if (output == null)
             {
-                Assert.Ignore("Requires \"{0}\".", typeof(BassOutput).FullName);
+                Assert.Ignore("Requires \"{0}\".", typeof(BassOutput).Name);
             }
+            var resampler = ComponentRegistry.Instance.GetComponent<BassResamplerStreamComponentBehaviour>();
+            var ds = ComponentRegistry.Instance.GetComponent<BassDirectSoundStreamOutputBehaviour>();
+            var asio = ComponentRegistry.Instance.GetComponent<BassAsioStreamOutputBehaviour>();
             if ((this.Configuration & RESAMPLER) != 0)
             {
-                output.Resampler = true;
+                resampler.Enabled = true;
             }
             else
             {
-                output.Resampler = false;
+                resampler.Enabled = false;
             }
             if ((this.Configuration & ASIO) != 0)
             {
-                output.Mode = BassOutputMode.ASIO;
-                output.AsioDevice = ASIO_DEVICE;
+                asio.Enabled = true;
+                asio.AsioDevice = ASIO_DEVICE;
+                ds.Enabled = false;
             }
             else
             {
-                output.Mode = BassOutputMode.DirectSound;
-                output.DirectSoundDevice = DS_DEVICE;
+                ds.Enabled = true;
+                ds.DirectSoundDevice = DS_DEVICE;
+                asio.Enabled = false;
             }
+            output.Rate = RATE;
         }
 
         [Test]

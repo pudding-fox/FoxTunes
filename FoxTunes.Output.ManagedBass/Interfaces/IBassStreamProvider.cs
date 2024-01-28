@@ -4,8 +4,8 @@
     {
         byte Priority { get; }
 
-        bool CanCreateStream(PlaylistItem playlistItem);
+        bool CanCreateStream(IBassOutput output, PlaylistItem playlistItem);
 
-        int CreateStream(PlaylistItem playlistItem);
+        int CreateStream(IBassOutput output, PlaylistItem playlistItem);
     }
 }

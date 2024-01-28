@@ -4,9 +4,11 @@ using System;
 
 namespace FoxTunes
 {
-    public abstract class BassStreamComponent : BaseComponent, IBassStreamComponent
+    public abstract class BassStreamInput : BaseComponent, IBassStreamInput
     {
         public abstract int Rate { get; protected set; }
+
+        public abstract int Depth { get; protected set; }
 
         public abstract int Channels { get; protected set; }
 
@@ -40,6 +42,18 @@ namespace FoxTunes
 
         public event EventHandler Invalidate = delegate { };
 
+        public abstract bool CheckFormat(int rate, int channels);
+
+        public abstract bool Contains(int channelHandle);
+
+        public abstract int Position(int channelHandle);
+
+        public abstract bool Add(int channelHandle);
+
+        public abstract bool Remove(int channelHandle);
+
+        public abstract void Reset();
+
         public bool IsDisposed { get; private set; }
 
         public void Dispose()
@@ -60,7 +74,7 @@ namespace FoxTunes
 
         protected abstract void OnDisposing();
 
-        ~BassStreamComponent()
+        ~BassStreamInput()
         {
             Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             this.Dispose(true);

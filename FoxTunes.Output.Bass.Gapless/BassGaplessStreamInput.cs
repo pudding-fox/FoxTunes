@@ -8,14 +8,28 @@ namespace FoxTunes
 {
     public class BassGaplessStreamInput : BassStreamInput
     {
-        public BassGaplessStreamInput(int rate, int channels, BassFlags flags)
+        public BassGaplessStreamInput(BassGaplessStreamInputBehaviour behaviour, BassOutputStream stream)
         {
-            this.Rate = rate;
-            this.Channels = channels;
-            this.Flags = flags;
+            this.Behaviour = behaviour;
+            this.Rate = stream.Rate;
+            this.Depth = stream.Depth;
+            this.Channels = stream.Channels;
+            this.Flags = BassFlags.Decode;
+            if (BassUtils.GetChannelDsdRaw(stream.ChannelHandle))
+            {
+                this.Flags |= BassFlags.DSDRaw;
+            }
+            else if (behaviour.Output.Float)
+            {
+                this.Flags |= BassFlags.Float;
+            }
         }
 
+        public BassGaplessStreamInputBehaviour Behaviour { get; private set; }
+
         public override int Rate { get; protected set; }
+
+        public override int Depth { get; protected set; }
 
         public override int Channels { get; protected set; }
 
@@ -42,8 +56,6 @@ namespace FoxTunes
 
         public override void Connect(IBassStreamComponent previous)
         {
-            Logger.Write(this, LogLevel.Debug, "Initializing BASS GAPLESS.");
-            BassUtils.OK(BassGapless.Init());
             BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.KeepAlive, true));
             Logger.Write(this, LogLevel.Debug, "Creating BASS GAPLESS stream with rate {0} and {1} channels.", this.Rate, this.Channels);
             this.ChannelHandle = BassGapless.StreamCreate(this.Rate, this.Channels, this.Flags);
@@ -111,8 +123,6 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Freeing BASS GAPLESS stream: {0}", this.ChannelHandle);
                 BassUtils.OK(Bass.StreamFree(this.ChannelHandle));
             }
-            Logger.Write(this, LogLevel.Debug, "Releasing BASS GAPLESS.");
-            BassUtils.OK(BassGapless.Free());
         }
     }
 }

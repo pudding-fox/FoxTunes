@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -9,7 +10,7 @@ namespace FoxTunes.Interfaces
         event ComponentOutputErrorEventHandler Error;
     }
 
-    public delegate void ComponentOutputErrorEventHandler(object sender, ComponentOutputErrorEventArgs e);
+    public delegate Task ComponentOutputErrorEventHandler(object sender, ComponentOutputErrorEventArgs e);
 
     public class ComponentOutputErrorEventArgs : EventArgs
     {
