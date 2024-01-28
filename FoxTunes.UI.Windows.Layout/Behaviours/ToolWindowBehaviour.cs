@@ -348,13 +348,13 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnSaving(object sender, EventArgs e)
+        protected virtual void OnSaving(object sender, OrderedEventArgs e)
         {
             if (!this.IsLoaded)
             {
                 return;
             }
-            this.Save();
+            e.Add(this.Save, OrderedEventArgs.PRIORITY_LOW);
         }
 
         public IEnumerable<string> InvocationCategories

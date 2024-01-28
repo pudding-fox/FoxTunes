@@ -142,10 +142,13 @@ namespace FoxTunes
             {
                 return;
             }
-            this.Saving(this, EventArgs.Empty);
+            using (var e = OrderedEventArgs.Begin())
+            {
+                this.Saving(this, e);
+            }
         }
 
-        public event EventHandler Saving;
+        public event OrderedEventHandler Saving;
 
         protected virtual void OnSaved()
         {

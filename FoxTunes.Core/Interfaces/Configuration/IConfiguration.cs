@@ -27,7 +27,7 @@ namespace FoxTunes.Interfaces
 
         void Save(string profile);
 
-        event EventHandler Saving;
+        event OrderedEventHandler Saving;
 
         event EventHandler Saved;
 
