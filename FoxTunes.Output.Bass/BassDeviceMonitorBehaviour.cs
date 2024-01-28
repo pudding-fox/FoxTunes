@@ -19,29 +19,16 @@ namespace FoxTunes
             Role.Multimedia
         };
 
-        public static readonly TimeSpan TIMEOUT = TimeSpan.FromMilliseconds(100);
-
-        private BassDeviceMonitorBehaviour()
-        {
-            this.Debouncer = new Debouncer(TIMEOUT);
-        }
-
-        protected BassDeviceMonitorBehaviour(string id) : this()
+        protected BassDeviceMonitorBehaviour(string id)
         {
             this.Id = id;
         }
-
-        public Debouncer Debouncer { get; private set; }
 
         public string Id { get; private set; }
 
         public IBassOutput Output { get; private set; }
 
-        public IPlaylistManager PlaylistManager { get; private set; }
-
-        public IPlaybackManager PlaybackManager { get; private set; }
-
-        public IErrorEmitter ErrorEmitter { get; private set; }
+        public IOutputDeviceManager OutputDeviceManager { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -66,9 +53,7 @@ namespace FoxTunes
             this.Output = core.Components.Output as IBassOutput;
             this.Output.Init += this.OnInit;
             this.Output.Free += this.OnFree;
-            this.PlaylistManager = core.Managers.Playlist;
-            this.PlaybackManager = core.Managers.Playback;
-            this.ErrorEmitter = core.Components.ErrorEmitter;
+            this.OutputDeviceManager = core.Managers.OutputDevice;
             this.Configuration = core.Components.Configuration;
             this.EnabledElement = this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.SECTION,
@@ -133,16 +118,13 @@ namespace FoxTunes
 
         protected virtual void OnDefaultDeviceChanged(object sender, NotificationClientEventArgs e)
         {
-            this.Debouncer.Exec(() =>
+            if (!this.RestartRequired(e.Flow, e.Role, e.Device))
             {
-                if (!this.RestartRequired(e.Flow, e.Role, e.Device))
-                {
-                    return;
-                }
-                Logger.Write(this, LogLevel.Debug, "The default playback device was changed: {0} => {1} => {2}", e.Flow.Value, e.Role.Value, e.Device);
-                Logger.Write(this, LogLevel.Debug, "Restarting the output.");
-                var task = this.Restart();
-            });
+                return;
+            }
+            Logger.Write(this, LogLevel.Debug, "The default playback device was changed: {0} => {1} => {2}", e.Flow.Value, e.Role.Value, e.Device);
+            Logger.Write(this, LogLevel.Debug, "Restarting the output.");
+            this.OutputDeviceManager.Restart();
         }
 
         protected virtual void OnPropertyValueChanged(object sender, NotificationClientEventArgs e)
@@ -167,56 +149,6 @@ namespace FoxTunes
             return true;
         }
 
-        public async Task Restart()
-        {
-            if (!this.Output.IsStarted)
-            {
-                return;
-            }
-            var position = default(long);
-            var paused = default(bool);
-            var playlistItem = default(PlaylistItem);
-            var outputStream = this.PlaybackManager.CurrentStream;
-            if (outputStream != null)
-            {
-                position = outputStream.Position;
-                paused = outputStream.IsPaused;
-                playlistItem = outputStream.PlaylistItem;
-            }
-            try
-            {
-                await this.Output.Shutdown().ConfigureAwait(false);
-                await this.Output.Start().ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                await this.ErrorEmitter.Send(this, e).ConfigureAwait(false);
-                return;
-            }
-            if (playlistItem != null)
-            {
-                try
-                {
-                    await this.PlaylistManager.Play(playlistItem).ConfigureAwait(false);
-                    if (this.PlaybackManager.CurrentStream != null)
-                    {
-                        if (position > 0)
-                        {
-                            await this.PlaybackManager.CurrentStream.Seek(position).ConfigureAwait(false);
-                        }
-                        if (paused)
-                        {
-                            await this.PlaybackManager.CurrentStream.Pause().ConfigureAwait(false);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    await this.ErrorEmitter.Send(this, e).ConfigureAwait(false);
-                }
-            }
-        }
-
         public bool IsDisposed { get; private set; }
 
         public void Dispose()
@@ -237,10 +169,6 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            if (this.Debouncer != null)
-            {
-                this.Debouncer.Dispose();
-            }
             if (this.Output != null)
             {
                 this.Output.Init -= this.OnInit;

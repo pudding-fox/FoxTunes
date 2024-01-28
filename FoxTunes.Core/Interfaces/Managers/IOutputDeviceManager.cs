@@ -14,5 +14,7 @@ namespace FoxTunes.Interfaces
         event EventHandler DeviceChanged;
 
         void Refresh();
+
+        void Restart();
     }
 }
