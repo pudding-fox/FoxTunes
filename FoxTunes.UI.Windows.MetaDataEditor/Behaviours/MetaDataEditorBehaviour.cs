@@ -31,6 +31,7 @@ namespace FoxTunes
             {
                 if (this.Enabled)
                 {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, EDIT_METADATA, "Tag");
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, EDIT_METADATA, "Tag");
                 }
             }

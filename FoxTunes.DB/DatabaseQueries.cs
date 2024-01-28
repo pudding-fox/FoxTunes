@@ -114,6 +114,18 @@ namespace FoxTunes
             }
         }
 
+        public IDatabaseQuery GetLibraryMetaData
+        {
+            get
+            {
+                return this.Database.QueryFactory.Create(
+                    Resources.GetLibraryMetaData,
+                    new DatabaseQueryParameter("libraryItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                    new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+                );
+            }
+        }
+
         public abstract IDatabaseQuery GetLibraryHierarchyMetaData { get; }
 
         public IDatabaseQuery GetLibraryHierarchyNodes

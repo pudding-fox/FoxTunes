@@ -39,6 +39,10 @@ namespace FoxTunes
                      dialog.InitialDirectory = Path.GetDirectoryName(options.Path);
                      dialog.FileName = options.Path;
                  }
+                 else if (Directory.Exists(options.Path))
+                 {
+                     dialog.InitialDirectory = options.Path;
+                 }
                  var window = this.GetActiveWindow();
                  var success = dialog.ShowDialog(window);
                  return new BrowseResult(dialog.FileNames, success.GetValueOrDefault());
@@ -117,7 +121,10 @@ namespace FoxTunes
                         string.Join(
                             ";",
                             filter.Extensions.Select(
-                                extension => string.Format("*.{0}", extension)
+                                extension => string.Format(
+                                    "*.{0}",
+                                    extension.TrimStart('.')
+                                )
                             )
                         )
                     )

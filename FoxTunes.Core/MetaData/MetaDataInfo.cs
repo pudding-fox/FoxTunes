@@ -78,6 +78,20 @@ namespace FoxTunes
             }
         }
 
+        public static IDatabaseReader GetMetaData(IDatabaseComponent database, LibraryItem libraryItem, MetaDataItemType metaDataItemType, ITransactionSource transaction = null)
+        {
+            return database.ExecuteReader(database.Queries.GetLibraryMetaData, (parameters, phase) =>
+            {
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["libraryItemId"] = libraryItem.Id;
+                        parameters["type"] = metaDataItemType;
+                        break;
+                }
+            }, transaction);
+        }
+
         public static IDatabaseReader GetMetaData(IDatabaseComponent database, LibraryHierarchyNode libraryHierarchyNode, MetaDataItemType metaDataItemType, ITransactionSource transaction = null)
         {
             return database.ExecuteReader(database.Queries.GetLibraryHierarchyMetaData, (parameters, phase) =>

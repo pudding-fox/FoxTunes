@@ -34,7 +34,6 @@ namespace FoxTunes.ViewModel
 
         public MetaDataEditor()
         {
-            this.PlaylistItems = Enumerable.Empty<PlaylistItem>();
             this.Tags = new ObservableCollection<MetaDataEntry>();
             this.Images = new ObservableCollection<MetaDataEntry>();
         }
@@ -43,7 +42,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return this.PlaylistItems != null && this.PlaylistItems.Any();
+                return this.Tags.Any() || this.Images.Any();
             }
         }
 
@@ -57,8 +56,6 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler HasItemsChanged;
-
-        private IEnumerable<PlaylistItem> PlaylistItems { get; set; }
 
         private ObservableCollection<MetaDataEntry> _Tags { get; set; }
 
@@ -120,6 +117,8 @@ namespace FoxTunes.ViewModel
 
         public IHierarchyManager HierarchyManager { get; private set; }
 
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -128,6 +127,7 @@ namespace FoxTunes.ViewModel
             this.LibraryManager = core.Managers.Library;
             this.MetaDataManager = core.Managers.MetaData;
             this.HierarchyManager = core.Managers.Hierarchy;
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             base.InitializeComponent(core);
@@ -141,13 +141,15 @@ namespace FoxTunes.ViewModel
                     var invocation = signal.State as IInvocationComponent;
                     if (invocation != null)
                     {
-                        switch (invocation.Category)
+                        switch (invocation.Id)
                         {
-                            case InvocationComponent.CATEGORY_PLAYLIST:
-                                switch (invocation.Id)
+                            case MetaDataEditorBehaviour.EDIT_METADATA:
+                                switch (invocation.Category)
                                 {
-                                    case MetaDataEditorBehaviour.EDIT_METADATA:
-                                        return this.Refresh();
+                                    case InvocationComponent.CATEGORY_LIBRARY:
+                                        return this.EditLibrary();
+                                    case InvocationComponent.CATEGORY_PLAYLIST:
+                                        return this.EditPlaylist();
                                 }
                                 break;
                         }
@@ -161,7 +163,28 @@ namespace FoxTunes.ViewModel
 #endif
         }
 
-        public Task Refresh()
+        public Task EditLibrary()
+        {
+            if (this.LibraryManager == null || this.LibraryManager.SelectedItem == null)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            return this.SetItems(
+                this.GetItems(
+                    //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
+                    this.LibraryHierarchyBrowser.GetItems(
+                        this.LibraryManager.SelectedItem,
+                        true
+                    ).ToArray()
+                )
+            );
+        }
+
+        public Task EditPlaylist()
         {
             if (this.PlaylistManager == null || this.PlaylistManager.SelectedItems == null)
             {
@@ -171,29 +194,23 @@ namespace FoxTunes.ViewModel
                 return Task.CompletedTask;
 #endif
             }
-            this.PlaylistItems = this.PlaylistManager.SelectedItems.ToArray();
-            var items = this.GetItems();
-            return Windows.Invoke(() =>
-            {
-                this.Tags = new ObservableCollection<MetaDataEntry>(items[MetaDataItemType.Tag]);
-                this.Images = new ObservableCollection<MetaDataEntry>(items[MetaDataItemType.Image]);
-                this.OnHasItemsChanged();
-            });
+            return this.SetItems(
+                this.GetItems(
+                    this.PlaylistManager.SelectedItems.ToArray()
+                )
+            );
         }
 
-        protected IDictionary<MetaDataItemType, IEnumerable<MetaDataEntry>> GetItems()
+        protected IDictionary<MetaDataItemType, IEnumerable<MetaDataEntry>> GetItems(IEnumerable<IFileData> sources)
         {
             var result = new Dictionary<MetaDataItemType, IEnumerable<MetaDataEntry>>();
             result[MetaDataItemType.Tag] = TAGS.Select(name => new MetaDataEntry(name, MetaDataItemType.Tag)).ToArray();
             result[MetaDataItemType.Image] = IMAGES.Select(name => new MetaDataEntry(name, MetaDataItemType.Image)).ToArray();
-            foreach (var playlistItem in this.PlaylistItems)
+            foreach (var key in result.Keys)
             {
-                foreach (var key in result.Keys)
+                foreach (var metaDataEntry in result[key])
                 {
-                    foreach (var metaDataEntry in result[key])
-                    {
-                        metaDataEntry.AddPlaylistItem(playlistItem);
-                    }
+                    metaDataEntry.SetSources(sources);
                 }
             }
             foreach (var key in result.Keys)
@@ -207,6 +224,16 @@ namespace FoxTunes.ViewModel
             return result;
         }
 
+        protected virtual Task SetItems(IDictionary<MetaDataItemType, IEnumerable<MetaDataEntry>> items)
+        {
+            return Windows.Invoke(() =>
+            {
+                this.Tags = new ObservableCollection<MetaDataEntry>(items[MetaDataItemType.Tag]);
+                this.Images = new ObservableCollection<MetaDataEntry>(items[MetaDataItemType.Image]);
+                this.OnHasItemsChanged();
+            });
+        }
+
         public ICommand SaveCommand
         {
             get
@@ -217,19 +244,33 @@ namespace FoxTunes.ViewModel
 
         public async Task Save()
         {
-            if (this.PlaylistItems == null)
+            var sources = new HashSet<IFileData>();
+            if (this.Tags != null)
             {
-                return;
+                foreach (var tag in this.Tags)
+                {
+                    tag.Save();
+                    sources.AddRange(tag.GetSources());
+                }
             }
-            foreach (var tag in this.Tags)
+            if (this.Images != null)
             {
-                tag.Save();
+                foreach (var image in this.Images)
+                {
+                    image.Save();
+                    sources.AddRange(image.GetSources());
+                }
             }
-            foreach (var image in this.Images)
+            var libraryItems = sources.OfType<LibraryItem>().ToArray();
+            if (libraryItems.Any())
             {
-                image.Save();
+                await this.MetaDataManager.Save(libraryItems);
             }
-            await this.MetaDataManager.Save(this.PlaylistItems);
+            var playlistItems = sources.OfType<PlaylistItem>().ToArray();
+            if (playlistItems.Any())
+            {
+                await this.MetaDataManager.Save(playlistItems);
+            }
             await this.HierarchyManager.Clear(LibraryItemStatus.Import);
             await this.HierarchyManager.Build(LibraryItemStatus.Import);
             await this.LibraryManager.Set(LibraryItemStatus.None);
@@ -246,7 +287,8 @@ namespace FoxTunes.ViewModel
 
         public void Cancel()
         {
-            this.PlaylistItems = Enumerable.Empty<PlaylistItem>();
+            this.Tags = new ObservableCollection<MetaDataEntry>();
+            this.Images = new ObservableCollection<MetaDataEntry>();
             this.OnHasItemsChanged();
         }
 

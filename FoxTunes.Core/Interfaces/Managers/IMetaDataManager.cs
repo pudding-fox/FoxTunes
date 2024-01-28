@@ -5,6 +5,8 @@ namespace FoxTunes.Interfaces
 {
     public interface IMetaDataManager : IStandardManager, IBackgroundTaskSource
     {
+        Task Save(IEnumerable<LibraryItem> libraryItems);
+
         Task Save(IEnumerable<PlaylistItem> playlistItems);
     }
 }
