@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -30,6 +31,10 @@ namespace FoxTunes
 
         protected override Task OnRun()
         {
+            if (!this.MetaDataSourceFactory.Enabled)
+            {
+                throw new InvalidOperationException("Cannot add to library, meta data extraction is disabled.");
+            }
             return this.AddPaths(this.Paths);
         }
 

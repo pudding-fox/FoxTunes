@@ -54,9 +54,12 @@ namespace FoxTunes
                 await this.AddItems(paths);
                 await this.ShiftItems(QueryOperator.GreaterOrEqual, this.Sequence, this.Offset);
                 await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated));
-                await this.AddOrUpdateMetaData(cancellationToken);
-                await this.UpdateVariousArtists();
-                await this.SequenceItems();
+                if (this.MetaDataSourceFactory.Enabled)
+                {
+                    await this.AddOrUpdateMetaData(cancellationToken);
+                    await this.UpdateVariousArtists();
+                    await this.SequenceItems();
+                }
                 await this.SetPlaylistItemsStatus(PlaylistItemStatus.None);
             }))
             {

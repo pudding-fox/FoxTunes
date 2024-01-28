@@ -100,6 +100,11 @@ namespace FoxTunes
                     continue;
                 }
                 var path = match.Value;
+                if (string.IsNullOrEmpty(path))
+                {
+                    continue;
+                }
+                path = path.Trim();
                 if ((File.Exists(path) && this.Output.IsSupported(path)) || Directory.Exists(path))
                 {
                     var task = this.Queue.Enqueue(path);
