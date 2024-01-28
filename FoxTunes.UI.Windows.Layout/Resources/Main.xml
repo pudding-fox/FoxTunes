@@ -12,6 +12,7 @@
             </UIComponentConfiguration>
             <UIComponentConfiguration Id="a5324207-8ccb-45d9-957e-98a4ebd2c0ad" Component="3ACC518E-9A7C-4ACD-8299-318C8BBB2D47" />
             <MetaDataEntry Id="2a70871e-3a93-4db1-81fc-02e753eb6bec" Name="DockLocation" Value="Top" />
+            <MetaDataEntry Id="fa050773-e12f-419e-b068-f82d0ec4c40e" Name="Collapse" Value="True" />
           </UIComponentConfiguration>
           <UIComponentConfiguration Id="4c2a79dc-eea2-4cf4-a25c-f026fb15a352" Component="5D6C1128-B84F-4748-941D-C5DE341B6C49" />
           <MetaDataEntry Id="d02b2714-e5ff-452b-8369-12c14774a878" Name="DockLocation" Value="Bottom" />
