@@ -2,7 +2,6 @@
 using ManagedBass;
 using System;
 using System.IO;
-using System.Linq;
 
 namespace FoxTunes
 {
@@ -32,92 +31,7 @@ namespace FoxTunes
 
         public abstract IBassEncoderFormat Format { get; }
 
-        public IFileSystemBrowser FileSystemBrowser { get; private set; }
-
-        public BassEncoderOutputDestination Destination { get; private set; }
-
-        private string _BrowseFolder { get; set; }
-
-        public bool GetBrowseFolder(string fileName, out string directoryName)
-        {
-            if (string.IsNullOrEmpty(this._BrowseFolder))
-            {
-                var options = new BrowseOptions(
-                    "Save As",
-                    Path.GetDirectoryName(fileName),
-                    Enumerable.Empty<BrowseFilter>(),
-                    BrowseFlags.Folder
-                );
-                var result = this.FileSystemBrowser.Browse(options);
-                if (!result.Success)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Save As folder browse dialog was cancelled.");
-                    directoryName = null;
-                    return false;
-                }
-                this._BrowseFolder = result.Paths.FirstOrDefault();
-                Logger.Write(this, LogLevel.Debug, "Browse folder: {0}", this._BrowseFolder);
-            }
-            directoryName = this._BrowseFolder;
-            return true;
-        }
-
-        public string SpecificFolder { get; private set; }
-
-        public override void InitializeComponent(ICore core)
-        {
-            this.FileSystemBrowser = core.Components.FileSystemBrowser;
-            core.Components.Configuration.GetElement<SelectionConfigurationElement>(
-                BassEncoderBehaviourConfiguration.SECTION,
-                BassEncoderBehaviourConfiguration.DESTINATION_ELEMENT
-            ).ConnectValue(value => this.Destination = BassEncoderBehaviourConfiguration.GetDestination(value));
-            core.Components.Configuration.GetElement<TextConfigurationElement>(
-                BassEncoderBehaviourConfiguration.SECTION,
-                BassEncoderBehaviourConfiguration.DESTINATION_LOCATION_ELEMENT
-            ).ConnectValue(value => this.SpecificFolder = value);
-            base.InitializeComponent(core);
-        }
-
         public abstract string GetArguments(EncoderItem encoderItem, IBassStream stream);
-
-        public virtual bool TryGetOutput(string inputFileName, out string outputFileName)
-        {
-            var name = Path.GetFileNameWithoutExtension(inputFileName);
-            var directoryName = default(string);
-            switch (this.Destination)
-            {
-                default:
-                case BassEncoderOutputDestination.Browse:
-                    if (!this.GetBrowseFolder(inputFileName, out directoryName))
-                    {
-                        outputFileName = default(string);
-                        return false;
-                    }
-                    break;
-                case BassEncoderOutputDestination.Source:
-                    directoryName = Path.GetDirectoryName(inputFileName);
-                    break;
-                case BassEncoderOutputDestination.Specific:
-                    directoryName = this.SpecificFolder;
-                    break;
-            }
-            if (!this.CanWrite(directoryName))
-            {
-                throw new InvalidOperationException(string.Format("Cannot output to path \"{0}\" please check encoder settings.", directoryName));
-            }
-            outputFileName = Path.Combine(directoryName, string.Format("{0}.{1}", name, this.Extension));
-            return true;
-        }
-
-        protected virtual bool CanWrite(string directoryName)
-        {
-            var uri = default(Uri);
-            if (!Uri.TryCreate(directoryName, UriKind.Absolute, out uri))
-            {
-                return false;
-            }
-            return string.Equals(uri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase);
-        }
 
         public virtual int GetDepth(EncoderItem encoderItem, IBassStream stream)
         {

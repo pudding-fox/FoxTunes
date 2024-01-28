@@ -11,8 +11,6 @@ namespace FoxTunes
 {
     public class BassEncoder : BaseComponent, IBassEncoder
     {
-        public static readonly object SyncRoot = new object();
-
         static BassEncoder()
         {
             BassPluginLoader.Instance.Load();
@@ -89,12 +87,6 @@ namespace FoxTunes
                         Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\" due to output file \"{1}\" does not exist.", encoderItem.InputFileName, encoderItem.OutputFileName);
                         encoderItem.Status = EncoderItemStatus.Failed;
                         encoderItem.AddError(string.Format("Input file \"{0}\" does not exist.", encoderItem.OutputFileName));
-                        return;
-                    }
-                    if (!this.GetOutput(settings, encoderItem))
-                    {
-                        Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\" due to cancellation.", encoderItem.InputFileName);
-                        encoderItem.Status = EncoderItemStatus.Cancelled;
                         return;
                     }
                     if (!this.CheckOutput(encoderItem.OutputFileName))
@@ -317,25 +309,6 @@ namespace FoxTunes
                 }
             }
             return true;
-        }
-
-        protected virtual bool GetOutput(IBassEncoderSettings settings, EncoderItem encoderItem)
-        {
-            lock (SyncRoot)
-            {
-                if (this.CancellationToken.IsCancellationRequested)
-                {
-                    return false;
-                }
-                var fileName = default(string);
-                if (!settings.TryGetOutput(encoderItem.InputFileName, out fileName))
-                {
-                    this.Cancel();
-                    return false;
-                }
-                encoderItem.OutputFileName = fileName;
-                return true;
-            }
         }
 
         protected virtual bool CheckOutput(string fileName)

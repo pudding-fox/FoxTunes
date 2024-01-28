@@ -101,7 +101,19 @@ namespace FoxTunes
 
         public async Task Encode(PlaylistItem[] playlistItems, string profile)
         {
-            using (var task = new EncodePlaylistItemsTask(this, playlistItems, profile))
+            var factory = new EncoderItemFactory();
+            factory.InitializeComponent(this.Core);
+            var encoderItems = default(EncoderItem[]);
+            try
+            {
+                encoderItems = factory.Create(playlistItems, profile);
+            }
+            catch (OperationCanceledException)
+            {
+                //Browse dialog was cancelled.
+                return;
+            }
+            using (var task = new EncodePlaylistItemsTask(this, playlistItems, encoderItems))
             {
                 task.InitializeComponent(this.Core);
                 this.OnBackgroundTask(task);
@@ -150,14 +162,11 @@ namespace FoxTunes
                 this.CancellationToken = new CancellationToken();
             }
 
-            public EncodePlaylistItemsTask(BassEncoderBehaviour behaviour, PlaylistItem[] playlistItems, string profile) : this()
+            public EncodePlaylistItemsTask(BassEncoderBehaviour behaviour, PlaylistItem[] playlistItems, EncoderItem[] encoderItems) : this()
             {
                 this.Behaviour = behaviour;
                 this.PlaylistItems = playlistItems;
-                this.EncoderItems = playlistItems
-                    .OrderBy(playlistItem => playlistItem.FileName)
-                    .Select(playlistItem => EncoderItem.FromPlaylistItem(playlistItem, profile))
-                    .ToArray();
+                this.EncoderItems = encoderItems;
             }
 
             public override bool Visible
