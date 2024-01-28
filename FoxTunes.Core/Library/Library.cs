@@ -28,6 +28,7 @@ namespace FoxTunes
             this.LibraryItemQuery = this.Database.GetQuery<LibraryItem>();
             this.LibraryItemQuery.Include("MetaDatas");
             this.LibraryItemQuery.Include("Properties");
+            this.LibraryItemQuery.Include("Images");
             this.LibraryItemQuery.Include("Statistics");
             this.LibraryHierarchySet = this.Database.GetSet<LibraryHierarchy>();
             this.LibraryHierarchyQuery = this.Database.GetQuery<LibraryHierarchy>();

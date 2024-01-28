@@ -65,15 +65,35 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                if (this._Items == null && this.Database.CanQuery(this.LibraryHierarchyItem))
+                if (this._Items == null && this.Database != null && this.Database.CanQuery(this.LibraryHierarchyItem))
                 {
                     var query = this.Database.GetMemberQuery<LibraryHierarchyItem, LibraryItem>(this.LibraryHierarchyItem, _ => _.Items);
                     query.Include("MetaDatas");
                     query.Include("Properties");
+                    query.Include("Images");
                     query.Include("Statistics");
                     this._Items = new ObservableCollection<LibraryItem>(query);
                 }
                 return this._Items;
+            }
+        }
+
+        private ObservableCollection<ImageItem> _Images { get; set; }
+
+        public ObservableCollection<ImageItem> Images
+        {
+            get
+            {
+                if (this.Items != null)
+                {
+                    var query =
+                        from imageItem in this.Items.SelectMany(_ => _.Images)
+                        group imageItem by imageItem.FileName into imageItems
+                        select imageItems.FirstOrDefault();
+                    //Return a maximum of 5 images.
+                    this._Images = new ObservableCollection<ImageItem>(query.Take(5));
+                }
+                return this._Images;
             }
         }
 
