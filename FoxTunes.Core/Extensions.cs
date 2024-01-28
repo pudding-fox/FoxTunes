@@ -94,6 +94,15 @@ namespace FoxTunes
             return (T)Convert.ChangeType(value, typeof(T));
         }
 
+        public static string IfNullOrEmpty(this string value, string alternative)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+            return alternative;
+        }
+
         private class DbParameterCollection : IDbParameterCollection
         {
             public DbParameterCollection(IDataParameterCollection parameters)

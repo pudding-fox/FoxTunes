@@ -216,19 +216,20 @@ namespace FoxTunes
 
         private void AddImages(Tag tag)
         {
-            this.AddImage(CommonMetaData.Pictures, tag.Pictures).Wait();
+            this.AddImage(tag, CommonMetaData.Pictures).Wait();
         }
 
-        private async Task AddImage(string name, IPicture[] values)
+        private async Task AddImage(Tag tag, string name)
         {
-            if (values == null)
+            if (tag.Pictures == null)
             {
                 return;
             }
-            foreach (var value in values)
+            foreach (var value in tag.Pictures)
             {
-                var id = global::System.IO.Path.GetDirectoryName(this.FileName);
-                this.AddImage(await this.AddImage(value, id), value);
+                var type = Enum.GetName(typeof(PictureType), value.Type);
+                var id = this.GetImageId(tag, value, type);
+                this.AddImage(await this.AddImage(value, id), type, value);
             }
         }
 
@@ -258,9 +259,23 @@ namespace FoxTunes
             return fileName;
         }
 
-        private void AddImage(string fileName, IPicture value)
+#pragma warning disable 612, 618
+        private string GetImageId(Tag tag, IPicture value, string type)
         {
-            this.MetaDatas.Add(new MetaDataItem(Enum.GetName(typeof(PictureType), value.Type), MetaDataItemType.Image) { FileValue = fileName });
+            return string.Format(
+                "{0}_{1}_{2}",
+                tag.FirstAlbumArtist
+                    .IfNullOrEmpty(tag.FirstAlbumArtistSort)
+                    .IfNullOrEmpty(tag.FirstArtist),
+                tag.Album,
+                type
+            );
+        }
+#pragma warning restore 612, 618
+
+        private void AddImage(string fileName, string type, IPicture value)
+        {
+            this.MetaDatas.Add(new MetaDataItem(type, MetaDataItemType.Image) { FileValue = fileName });
         }
     }
 
