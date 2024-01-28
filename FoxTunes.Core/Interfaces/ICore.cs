@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxDb.Interfaces;
+using System;
 
 namespace FoxTunes.Interfaces
 {
@@ -11,5 +12,7 @@ namespace FoxTunes.Interfaces
         IStandardFactories Factories { get; }
 
         void Load();
+
+        void CreateDefaultData(IDatabase database);
     }
 }

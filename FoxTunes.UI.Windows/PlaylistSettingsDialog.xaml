@@ -85,22 +85,12 @@
                 </Grid>
             </Grid>
         </GroupBox>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
+            <Button Width="60" Height="30" Margin="0,7,0,0" Command="{Binding ResetCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Reset</Button>
+        </StackPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <StackPanel.Resources>
-                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                    <Setter Property="Width" Value="60"></Setter>
-                    <Setter Property="Height" Value="30"></Setter>
-                    <Setter Property="Margin" Value="7,7,0,0"></Setter>
-                    <!-- System -->
-                    <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
-                    <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
-                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                    <Setter Property="BorderBrush" Value="{DynamicResource NormalBorderBrush}" />
-                    <Setter Property="Template" Value="{DynamicResource ButtonTemplate}" />
-                </Style>
-            </StackPanel.Resources>
-            <Button Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
-            <Button Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Cancel</Button>
+            <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
+            <Button Width="60" Height="30" Margin="7,7,0,0" Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Cancel</Button>
         </StackPanel>
     </Grid>
 </UserControl>

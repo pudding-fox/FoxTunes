@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb.Interfaces;
+using FoxTunes.Interfaces;
 using System;
 
 namespace FoxTunes
@@ -39,8 +40,8 @@ namespace FoxTunes
             try
             {
                 this.LoadComponents();
-                this.LoadManagers();
                 this.LoadFactories();
+                this.LoadManagers();
                 this.LoadBehaviours();
                 this.LoadConfiguration();
                 this.InitializeComponents();
@@ -104,6 +105,12 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Warn, "Failed to initialize component {0}: {1}", component.GetType().Name, e.Message);
                 }
             });
+        }
+
+        public void CreateDefaultData(IDatabase database)
+        {
+            PlaylistManager.CreateDefaultData(database, this.Components.ScriptingRuntime.CoreScripts);
+            HierarchyManager.CreateDefaultData(database, this.Components.ScriptingRuntime.CoreScripts);
         }
 
         public bool IsDisposed { get; private set; }

@@ -117,38 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Artist" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\artist.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="Artist_Album" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\artist_album.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="Disk_Track_Title" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\disk_track_title.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="Duration" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\duration.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="Genre" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\genre.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="Playing" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\playing.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="PlaylistSortValues" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\playlistsortvalues.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="Title_Performer" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\title_performer.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="Track" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\track.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="utils" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\utils.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="Year_Album" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>resources\year_album.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
 </root>

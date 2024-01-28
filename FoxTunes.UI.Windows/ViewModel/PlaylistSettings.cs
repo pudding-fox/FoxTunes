@@ -82,7 +82,24 @@ namespace FoxTunes.ViewModel
 
         public void Cancel()
         {
-            this.Refresh();
+            var task = this.Refresh();
+        }
+
+        public ICommand ResetCommand
+        {
+            get
+            {
+                return new Command(this.Reset);
+            }
+        }
+
+        public void Reset()
+        {
+            using (var database = this.DatabaseFactory.Create())
+            {
+                PlaylistManager.CreateDefaultData(database, ComponentRegistry.Instance.GetComponent<IScriptingRuntime>().CoreScripts);
+            }
+            var task = this.Refresh();
         }
 
         public override void InitializeComponent(ICore core)
@@ -111,7 +128,7 @@ namespace FoxTunes.ViewModel
                     item2.Sequence = temp;
                 }
             };
-            this.Refresh();
+            var task = this.Refresh();
             base.InitializeComponent(core);
         }
 

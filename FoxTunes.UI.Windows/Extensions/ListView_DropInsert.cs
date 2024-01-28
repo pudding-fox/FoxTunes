@@ -171,11 +171,17 @@ namespace FoxTunes
             protected virtual void Add()
             {
                 AdornerLayer.GetAdornerLayer(this.ListView).Add(this.Adorner);
+                SetDropInsertActive(this.ListView, true);
+                SetDropInsertItem(this.ListView, null);
+                SetDropInsertOffset(this.ListView, 0);
             }
 
             protected virtual void Remove()
             {
                 AdornerLayer.GetAdornerLayer(this.ListView).Remove(this.Adorner);
+                SetDropInsertActive(this.ListView, false);
+                SetDropInsertItem(this.ListView, null);
+                SetDropInsertOffset(this.ListView, 0);
             }
 
             protected virtual void UpdateDropInsertIndex(Point point)
@@ -189,7 +195,6 @@ namespace FoxTunes
                 if (listViewItem != null)
                 {
                     var offset = this.ListView.TranslatePoint(point, listViewItem).Y < (listViewItem.ActualHeight / 2) ? 0 : 1;
-                    SetDropInsertActive(this.ListView, true);
                     SetDropInsertItem(this.ListView, listViewItem);
                     SetDropInsertValue(this.ListView, listViewItem.DataContext);
                     SetDropInsertOffset(this.ListView, offset);

@@ -1,0 +1,1 @@
+playing != null && item.Id == playing.Id && item.FileName == playing.FileName ? "\u2022" : ""

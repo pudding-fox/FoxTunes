@@ -62,14 +62,91 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to (function () {
+        ///    if (tag.__ft_variousartists) {
+        ///        return &quot;Various Artists&quot;;
+        ///    }
+        ///    return tag.albumartist || tag.artist || &quot;No Artist&quot;;
+        ///})().
+        /// </summary>
+        internal static string Artist {
+            get {
+                return ResourceManager.GetString("Artist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (function () {
+        ///    var parts = [tag.albumartist || tag.artist || &quot;No Artist&quot;];
+        ///    if (tag.album) {
+        ///        parts.push(tag.album);
+        ///    }
+        ///    return parts.join(&quot; - &quot;);
+        ///})().
+        /// </summary>
+        internal static string Artist_Album {
+            get {
+                return ResourceManager.GetString("Artist_Album", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (function () {
+        ///    if (tag.title) {
+        ///        var parts = [];
+        ///        if (parseInt(tag.disccount) != 1 &amp;&amp; parseInt(tag.disc)) {
+        ///            parts.push(tag.disc);
+        ///        }
+        ///        if (tag.track) {
+        ///            parts.push(zeropad(tag.track, 2));
+        ///        }
+        ///        parts.push(tag.title);
+        ///        return parts.join(&quot; - &quot;);
+        ///    } return fileName;
+        ///})().
+        /// </summary>
+        internal static string Disk_Track_Title {
+            get {
+                return ResourceManager.GetString("Disk_Track_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to timestamp(property.duration).
+        /// </summary>
+        internal static string Duration {
+            get {
+                return ResourceManager.GetString("Duration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ucfirst(tag.genre) || &quot;No Genre&quot;.
+        /// </summary>
+        internal static string Genre {
+            get {
+                return ResourceManager.GetString("Genre", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to playing != null &amp;&amp; item.Id == playing.Id &amp;&amp; item.FileName == playing.FileName ? &quot;\u2022&quot; : &quot;&quot;.
+        /// </summary>
+        internal static string Playing {
+            get {
+                return ResourceManager.GetString("Playing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (function () {
         ///  var parts = [];
         ///
         ///  if (tag.__ft_variousartists) {
         ///    parts.push(&quot;Various Artists&quot;);
         ///  }
         ///  else {
-        ///    if (tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist) {
-        ///      parts.push(tag.firstalbumartist || tag.firstalbumartistsort || tag.firstartist);
+        ///    if (tag.firstalbumartist || tag.firstartist) {
+        ///      parts.push(tag.firstalbumartist || tag.firstartist);
         ///    }
         ///  }
         ///
@@ -86,11 +163,55 @@ namespace FoxTunes {
         ///  }
         ///
         ///  if (tag.track) {
-        ///    p [rest of string was truncated]&quot;;.
+        ///    parts.push(zeropad(tag.track, 2));
+        ///  }
+        ///
+        ///  parts.push(f [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PlaylistSortValues {
             get {
                 return ResourceManager.GetString("PlaylistSortValues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (function () {
+        ///    var parts = [];
+        ///    if (tag.title) {
+        ///        parts.push(tag.title);
+        ///    }
+        ///    if (tag.performer &amp;&amp; tag.performer != (tag.albumartist || tag.artist)) {
+        ///        parts.push(tag.performer);
+        ///    }
+        ///    if (parts.length) {
+        ///        return parts.join(&quot; - &quot;);
+        ///    }
+        ///    else {
+        ///        return filename(item.FileName);
+        ///    }
+        ///})().
+        /// </summary>
+        internal static string Title_Performer {
+            get {
+                return ResourceManager.GetString("Title_Performer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (function () {
+        ///    var parts = [];
+        ///    if (tag.disccount != 1 &amp;&amp; tag.disc) {
+        ///        parts.push(tag.disc);
+        ///    }
+        ///    if (tag.track) {
+        ///        parts.push(zeropad(tag.track, 2));
+        ///    }
+        ///    return parts.join(&quot; - &quot;);
+        ///})().
+        /// </summary>
+        internal static string Track {
+            get {
+                return ResourceManager.GetString("Track", resourceCulture);
             }
         }
         
@@ -128,6 +249,25 @@ namespace FoxTunes {
         internal static string utils {
             get {
                 return ResourceManager.GetString("utils", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (function () {
+        ///    if (tag.album) {
+        ///        var parts = [];
+        ///        if (tag.year) {
+        ///            parts.push(tag.year);
+        ///        }
+        ///        parts.push(tag.album);
+        ///        return parts.join(&quot; - &quot;);
+        ///    }
+        ///    return &quot;No Album&quot;;
+        ///})().
+        /// </summary>
+        internal static string Year_Album {
+            get {
+                return ResourceManager.GetString("Year_Album", resourceCulture);
             }
         }
     }

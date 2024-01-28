@@ -1,0 +1,1 @@
+ucfirst(tag.genre) || "No Genre"

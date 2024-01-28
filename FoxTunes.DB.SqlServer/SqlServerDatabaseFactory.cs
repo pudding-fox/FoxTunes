@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace FoxTunes
 {
-    [Component("ECF542D9-ABB3-4E82-8045-7E13F1727695", ComponentSlots.Database)]
+    [Component("ECF542D9-ABB3-4E82-8045-7E13F1727695", ComponentSlots.Database, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class SqlServerDatabaseFactory : DatabaseFactory
     {
         protected override IDatabaseComponent OnCreate()
@@ -29,6 +29,7 @@ namespace FoxTunes
             catch (SqlException)
             {
                 this.CreateDatabase(database);
+                this.Core.CreateDefaultData(database);
             }
             base.Configure(database);
         }
