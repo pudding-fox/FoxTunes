@@ -10,6 +10,14 @@ namespace FoxTunes
             {
                 return new TimeSpanFormatter(format);
             }
+            if (DecibelFormatter.CanFormat(format))
+            {
+                return new DecibelFormatter(format);
+            }
+            if (FloatFormatter.CanFormat(format))
+            {
+                return new FloatFormatter(format);
+            }
             return new StringFormatter(format);
         }
 
@@ -72,6 +80,64 @@ namespace FoxTunes
             public static bool CanFormat(string format)
             {
                 return string.Equals(format, CommonFormats.TimeSpan, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        public class DecibelFormatter : FormatterBase
+        {
+            public DecibelFormatter(string format) : base(format)
+            {
+
+            }
+
+            public override object GetValue(object value)
+            {
+                var parsed = default(float);
+                if (!float.TryParse(Convert.ToString(value), out parsed))
+                {
+                    return value;
+                }
+
+                if (float.IsNaN(parsed))
+                {
+                    return value;
+                }
+
+                return string.Format("{0}{1:0.00}dB", parsed > 0 ? "+" : string.Empty, parsed);
+            }
+
+            public static bool CanFormat(string format)
+            {
+                return string.Equals(format, CommonFormats.Decibel, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        public class FloatFormatter : FormatterBase
+        {
+            public FloatFormatter(string format) : base(format)
+            {
+
+            }
+
+            public override object GetValue(object value)
+            {
+                var parsed = default(float);
+                if (!float.TryParse(Convert.ToString(value), out parsed))
+                {
+                    return value;
+                }
+
+                if (float.IsNaN(parsed))
+                {
+                    return value;
+                }
+
+                return parsed.ToString("0.00");
+            }
+
+            public static bool CanFormat(string format)
+            {
+                return string.Equals(format, CommonFormats.Float, StringComparison.OrdinalIgnoreCase);
             }
         }
     }

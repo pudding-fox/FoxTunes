@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -208,82 +208,6 @@ namespace FoxTunes {
         internal static string Rating {
             get {
                 return ResourceManager.GetString("Rating", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to (function () {
-        ///    var gain = tag.replaygainalbumgain;
-        ///    if (!gain) {
-        ///        return gain;
-        ///    }
-        ///    var parsed = NumberHelper.parseFloat(gain);
-        ///    if (isNaN(parsed)) {
-        ///        return gain;
-        ///    }
-        ///    return (parsed &gt; 0 ? &quot;+&quot; : &quot;&quot;) + NumberHelper.toFixed(parsed, 2) + &quot;dB&quot;;
-        ///})().
-        /// </summary>
-        internal static string ReplayGainAlbumGain {
-            get {
-                return ResourceManager.GetString("ReplayGainAlbumGain", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to (function () {
-        ///    var peak = tag.replaygainalbumpeak;
-        ///    if (!peak) {
-        ///        return peak;
-        ///    }
-        ///    var parsed = NumberHelper.parseFloat(peak);
-        ///    if (isNaN(parsed)) {
-        ///        return peak;
-        ///    }
-        ///    return NumberHelper.toFixed(parsed, 6);
-        ///})().
-        /// </summary>
-        internal static string ReplayGainAlbumPeak {
-            get {
-                return ResourceManager.GetString("ReplayGainAlbumPeak", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to (function () {
-        ///    var gain = tag.replaygaintrackgain;
-        ///    if (!gain) {
-        ///        return gain;
-        ///    }
-        ///    var parsed = NumberHelper.parseFloat(gain);
-        ///    if (isNaN(parsed)) {
-        ///        return gain;
-        ///    }
-        ///    return (parsed &gt; 0 ? &quot;+&quot; : &quot;&quot;) + NumberHelper.toFixed(parsed, 2) + &quot;dB&quot;;
-        ///})().
-        /// </summary>
-        internal static string ReplayGainTrackGain {
-            get {
-                return ResourceManager.GetString("ReplayGainTrackGain", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to (function () {
-        ///    var peak = tag.replaygaintrackpeak;
-        ///    if (!peak) {
-        ///        return peak;
-        ///    }
-        ///    var parsed = NumberHelper.parseFloat(peak);
-        ///    if (isNaN(parsed)) {
-        ///        return peak;
-        ///    }
-        ///    return NumberHelper.toFixed(parsed, 6);
-        ///})().
-        /// </summary>
-        internal static string ReplayGainTrackPeak {
-            get {
-                return ResourceManager.GetString("ReplayGainTrackPeak", resourceCulture);
             }
         }
         
