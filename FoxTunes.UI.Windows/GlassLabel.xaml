@@ -4,16 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Windows="clr-namespace:FoxTunes"
-             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <ViewModel:GlassLabel x:Key="ViewModel" 
-            Core="{Binding}" 
-            Section="{Binding Section, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:GlassLabel}}}" 
-            Element="{Binding Element, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:GlassLabel}}}">
-        </ViewModel:GlassLabel>
-    </UserControl.Resources>
     <Label Content="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:GlassLabel}}}">
         <Label.Style>
             <Style TargetType="{x:Type Label}">
@@ -25,7 +17,7 @@
                     </Setter.Value>
                 </Setter>
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsGlassEnabled, Source={StaticResource ViewModel}}" Value="True">
+                    <DataTrigger Binding="{Binding IsGlassEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:GlassLabel}}}" Value="True">
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type Label}">
