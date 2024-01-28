@@ -27,6 +27,7 @@ namespace FoxTunes
             if (currentDisc != null)
             {
                 Logger.Write(this, LogLevel.Debug, "Current disc \"{0}\" has {1} tracks.", currentDisc.Title, currentDisc.Tracks.Count);
+                this.Name = string.Format("{0}: {1}", Strings.EraseMinidiscTask_Name, currentDisc.Title);
                 Logger.Write(this, LogLevel.Debug, "Erasing..");
                 var updatedDisc = currentDisc.Clone();
                 updatedDisc.Title = string.Empty;
