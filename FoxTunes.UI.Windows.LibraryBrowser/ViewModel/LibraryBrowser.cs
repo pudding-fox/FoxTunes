@@ -185,9 +185,9 @@ namespace FoxTunes.ViewModel
                 this.Up();
                 return;
             }
-            if (this.AddToPlaylistCommand.CanExecute(null))
+            if (this.AddToPlaylistCommand.CanExecute(false))
             {
-                this.AddToPlaylistCommand.Execute(null);
+                this.AddToPlaylistCommand.Execute(false);
                 return;
             }
             if (this.SelectedItem == null || LibraryHierarchyNode.Empty.Equals(this.SelectedItem))
