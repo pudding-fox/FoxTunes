@@ -410,59 +410,5 @@ namespace FoxTunes {
                 return ResourceManager.GetString("RoyaleTheme.Name", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string SystemTheme_ColorPalette_Default_Description {
-            get {
-                return ResourceManager.GetString("SystemTheme.ColorPalette.Default.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Default.
-        /// </summary>
-        internal static string SystemTheme_ColorPalette_Default_Name {
-            get {
-                return ResourceManager.GetString("SystemTheme.ColorPalette.Default.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string SystemTheme_ColorPalette_Gradient1_Description {
-            get {
-                return ResourceManager.GetString("SystemTheme.ColorPalette.Gradient1.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Default (Gradient).
-        /// </summary>
-        internal static string SystemTheme_ColorPalette_Gradient1_Name {
-            get {
-                return ResourceManager.GetString("SystemTheme.ColorPalette.Gradient1.Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string SystemTheme_Description {
-            get {
-                return ResourceManager.GetString("SystemTheme.Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to System.
-        /// </summary>
-        internal static string SystemTheme_Name {
-            get {
-                return ResourceManager.GetString("SystemTheme.Name", resourceCulture);
-            }
-        }
     }
 }

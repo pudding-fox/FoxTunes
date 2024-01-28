@@ -5,7 +5,9 @@ using System.Windows;
 
 namespace FoxTunes
 {
+    [Component(ID)]
     [WindowsUserInterfaceDependency]
+    [ComponentPreference(ReleaseType.Minimal)]
     public class ClassicTheme : ThemeBase
     {
         public const string ID = "B55D8409-A389-4FF0-88FC-D1B0D88D81C7";
@@ -39,7 +41,7 @@ namespace FoxTunes
 
         public override Stream GetArtworkPlaceholder()
         {
-            return typeof(SystemTheme).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Themes.Images.System_Artwork.png");
+            return typeof(ClassicTheme).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Themes.Images.System_Artwork.png");
         }
 
         public static IEnumerable<IColorPalette> GetColorPalettes()
