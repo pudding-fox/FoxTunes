@@ -22,15 +22,16 @@ namespace FoxTunes
             return LayoutManager.Instance.GetComponent(configuration.Component);
         }
 
-        public FrameworkElement CreateControl(UIComponentConfiguration configuration)
+        public FrameworkElement CreateControl(UIComponentConfiguration configuration, out UIComponentBase component)
         {
             var type = this.GetComponentType(configuration.Component);
             if (type == null || type == LayoutManager.PLACEHOLDER)
             {
                 //A plugin was uninstalled.
+                component = null;
                 return null;
             }
-            var component = ComponentActivator.Instance.Activate<UIComponentBase>(type);
+            component = ComponentActivator.Instance.Activate<UIComponentBase>(type);
             if (component is IUIComponentPanel panel)
             {
                 panel.Component = configuration;
