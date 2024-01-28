@@ -180,6 +180,11 @@ LOG="
 FoxTunes.Logging.dll
 "
 
+REPLAYGAIN="
+FoxTunes.Output.Bass.ReplayGain.dll
+bass_fx.dll
+"
+
 MINIMAL="
 bass
 conf
@@ -199,6 +204,7 @@ eq
 librarybrowser
 logger
 metadataeditor
+replaygain
 sox
 tools
 wasapi
@@ -238,6 +244,7 @@ do
 	mkdir -p "./release/$target/Plugins/librarybrowser"
 	mkdir -p "./release/$target/Plugins/logger"
 	mkdir -p "./release/$target/Plugins/metadataeditor"
+	mkdir -p "./release/$target/Plugins/replaygain"
 	mkdir -p "./release/$target/Plugins/simplemetadata"
 	mkdir -p "./release/$target/Plugins/sox"
 	mkdir -p "./release/$target/Plugins/sqlite"
@@ -437,6 +444,14 @@ do
     do
             echo $file
             cp "./distribution/$target/$file" "./release/$target/Plugins/wpf"
+    done
+	echo
+
+	echo "Creating plugin: replaygain"
+	for file in $REPLAYGAIN
+    do
+            echo $file
+            cp "./distribution/$target/$file" "./release/$target/Plugins/replaygain"
     done
 	echo
 
