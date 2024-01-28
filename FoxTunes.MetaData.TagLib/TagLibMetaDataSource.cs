@@ -68,13 +68,7 @@ namespace FoxTunes
 
         protected virtual bool IsSupported(string fileName)
         {
-            var extension = Path.GetExtension(fileName);
-            if (string.IsNullOrEmpty(extension))
-            {
-                return false;
-            }
-            extension = extension.Substring(1).ToLower(CultureInfo.InvariantCulture);
-            var mimeType = string.Format("taglib/{0}", extension);
+            var mimeType = string.Format("taglib/{0}", fileName.GetExtension());
             return FileTypes.AvailableTypes.ContainsKey(mimeType);
         }
 

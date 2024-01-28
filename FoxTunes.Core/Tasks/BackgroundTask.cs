@@ -242,14 +242,15 @@ namespace FoxTunes
                         }
                         Semaphore.Release();
                     });
+                    return;
                 }
                 catch (Exception e)
                 {
                     Logger.Write(this, LogLevel.Error, "Background task failed: {0}", e.Message);
                     this.Exception = e;
-                    await this.OnFaulted();
-                    Semaphore.Release();
                 }
+                await this.OnFaulted();
+                Semaphore.Release();
             });
         }
 

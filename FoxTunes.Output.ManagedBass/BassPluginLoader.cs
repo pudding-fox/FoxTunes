@@ -44,7 +44,12 @@ namespace FoxTunes
                 return;
             }
             var plugins = new List<PluginInfo>();
-            foreach (var fileName in Directory.EnumerateFiles(Path.Combine(ComponentScanner.Instance.Location, DIRECTORY_NAME_ADDON), FILE_NAME_MASK))
+            var directoryName = Path.Combine(ComponentScanner.Instance.Location, DIRECTORY_NAME_ADDON);
+            if (!Directory.Exists(directoryName))
+            {
+                return;
+            }
+            foreach (var fileName in Directory.EnumerateFiles(directoryName, FILE_NAME_MASK))
             {
                 if (Blacklist.Contains(Path.GetFileName(fileName), true))
                 {

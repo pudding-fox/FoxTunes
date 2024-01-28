@@ -1,23 +1,19 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
-using ManagedBass.Dsd;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     [Component("E0318CB1-57A0-4DC3-AA8D-F6E100F86190", ComponentSlots.Output)]
-    public class BassOutput : Output, IConfigurableComponent, IDisposable
+    public class BassOutput : Output, IBassOutput
     {
         public ICore Core { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
-        public BassOutputChannel OutputChannel { get; private set; }
+        public IBassStreamPipeline Pipeline { get; private set; }
 
         private int _Rate { get; set; }
 
@@ -75,7 +71,7 @@ namespace FoxTunes
             {
                 return this._Mode;
             }
-            private set
+            set
             {
                 this._Mode = value;
                 Logger.Write(this, LogLevel.Debug, "Mode = {0}", Enum.GetName(typeof(BassOutputMode), this.Mode));
@@ -91,7 +87,7 @@ namespace FoxTunes
             {
                 return this._DirectSoundDevice;
             }
-            private set
+            set
             {
                 this._DirectSoundDevice = value;
                 Logger.Write(this, LogLevel.Debug, "Direct Sound Device = {0}", this.DirectSoundDevice);
@@ -107,7 +103,7 @@ namespace FoxTunes
             {
                 return this._AsioDevice;
             }
-            private set
+            set
             {
                 this._AsioDevice = value;
                 Logger.Write(this, LogLevel.Debug, "ASIO Device = {0}", this.AsioDevice);
@@ -132,18 +128,18 @@ namespace FoxTunes
         }
 
 
-        private bool _SoxResampler { get; set; }
+        private bool _Resampler { get; set; }
 
-        public bool SoxResampler
+        public bool Resampler
         {
             get
             {
-                return this._SoxResampler;
+                return this._Resampler;
             }
-            private set
+            set
             {
-                this._SoxResampler = value;
-                Logger.Write(this, LogLevel.Debug, "Sox = {0}", this.SoxResampler);
+                this._Resampler = value;
+                Logger.Write(this, LogLevel.Debug, "Resampler = {0}", this.Resampler);
                 this.Shutdown();
             }
         }
@@ -173,15 +169,12 @@ namespace FoxTunes
                 switch (this.Mode)
                 {
                     case BassOutputMode.DirectSound:
-                        this.StartDirectSound();
+                        BassDefaultStreamOutput.Init(this);
                         break;
                     case BassOutputMode.ASIO:
-                        this.StartASIO();
+                        BassAsioStreamOutput.Init(this);
                         break;
                 }
-                this.OutputChannel = BassOutputChannelFactory.Instance.Create(this);
-                this.OutputChannel.InitializeComponent(this.Core);
-                this.OutputChannel.Error += this.OutputChannel_Error;
                 this.IsStarted = true;
                 Logger.Write(this, LogLevel.Debug, "Started BASS.");
             }
@@ -191,20 +184,6 @@ namespace FoxTunes
                 this.OnError(e);
                 throw;
             }
-        }
-
-        private void StartDirectSound()
-        {
-            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 1));
-            BassUtils.OK(Bass.Init(this.DirectSoundDevice, this.Rate));
-            Logger.Write(this, LogLevel.Debug, "BASS Initialized.");
-        }
-
-        private void StartASIO()
-        {
-            BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.UpdateThreads, 0));
-            BassUtils.OK(Bass.Init(Bass.NoSoundDevice));
-            Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
         }
 
         public override Task Shutdown()
@@ -219,11 +198,7 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
                 try
                 {
-                    if (this.OutputChannel != null)
-                    {
-                        this.OutputChannel.Dispose();
-                        this.OutputChannel = null;
-                    }
+                    this.FreePipeline();
                     Bass.Free();
                     Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
                 }
@@ -280,22 +255,16 @@ namespace FoxTunes
             ).ConnectValue<string>(value => this.Float = BassOutputConfiguration.GetFloat(value));
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 BassOutputConfiguration.OUTPUT_SECTION,
-                BassOutputConfiguration.SOX_RESAMPLER_ELEMENT
-            ).ConnectValue<bool>(value => this.SoxResampler = value);
+                BassOutputConfiguration.RESAMPLER_ELEMENT
+            ).ConnectValue<bool>(value => this.Resampler = value);
             base.InitializeComponent(core);
         }
 
         public override bool IsSupported(string fileName)
         {
-            var extension = Path.GetExtension(fileName);
-            if (string.IsNullOrEmpty(extension))
-            {
-                return false;
-            }
-            extension = extension.Substring(1);
             return BassUtils
                 .GetInputFormats()
-                .Any(format => string.Equals(format, extension, StringComparison.OrdinalIgnoreCase));
+                .Contains(fileName.GetExtension(), true);
         }
 
         public override Task<IOutputStream> Load(PlaylistItem playlistItem)
@@ -312,45 +281,8 @@ namespace FoxTunes
 
         public int CreateStream(PlaylistItem playlistItem)
         {
-            Logger.Write(this, LogLevel.Debug, "Creating stream from file {0}", playlistItem.FileName);
-            var channelHandle = default(int);
-            if (this.IsDsd(playlistItem) && this.DsdDirect && this.OutputChannel.CanPlayDSD)
-            {
-                Logger.Write(this, LogLevel.Debug, "Creating DSD stream from file {0}", playlistItem.FileName);
-                channelHandle = BassDsd.CreateStream(playlistItem.FileName, 0, 0, BassFlags.Decode | BassFlags.DSDRaw);
-                if (channelHandle != 0)
-                {
-                    var rate = BassUtils.GetChannelPcmRate(channelHandle);
-                    var channels = BassUtils.GetChannelCount(channelHandle);
-                    if (!this.OutputChannel.CheckFormat(rate, channels))
-                    {
-                        Logger.Write(this, LogLevel.Warn, "The output reported that DSD RAW with rate {0} and {1} channels could not be played. Are you sure you have a DSD capable device?", rate, channels);
-                        this.FreeStream(channelHandle);
-                        channelHandle = 0;
-                    }
-                }
-            }
-            if (channelHandle == 0)
-            {
-                channelHandle = Bass.CreateStream(playlistItem.FileName, 0, 0, this.Flags);
-            }
-            if (channelHandle == 0)
-            {
-                BassUtils.Throw();
-            }
-            Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, channelHandle);
-            return channelHandle;
-        }
-
-        private bool IsDsd(PlaylistItem playlistItem)
-        {
-            var extension = Path.GetExtension(playlistItem.FileName);
-            if (string.IsNullOrEmpty(extension))
-            {
-                return false;
-            }
-            extension = extension.Substring(1).ToLower(CultureInfo.InvariantCulture);
-            return new[] { "dsd", "dsf" }.Contains(extension, StringComparer.OrdinalIgnoreCase);
+            var factory = new BassStreamFactory(this);
+            return factory.CreateStream(playlistItem);
         }
 
         public void FreeStream(int channelHandle)
@@ -359,17 +291,21 @@ namespace FoxTunes
             Bass.StreamFree(channelHandle); //Not checking result code as it contains an error if the application is shutting down.
         }
 
-        public override Task Preempt(IOutputStream stream)
+        public override Task<bool> Preempt(IOutputStream stream)
         {
             var outputStream = stream as BassOutputStream;
-            if (this.IsStarted && this.OutputChannel.IsStarted)
+            if (this.IsStarted && this.Pipeline != null)
             {
-                if (this.OutputChannel.CanPlay(outputStream))
+                if (this.Pipeline.Input.CheckFormat(outputStream.Rate, outputStream.Channels))
                 {
-                    Logger.Write(this, LogLevel.Debug, "Pre-empting playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
-                    if (!this.OutputChannel.QueueContains(outputStream))
+                    if (this.Pipeline.Input.Add(outputStream.ChannelHandle))
                     {
-                        this.OutputChannel.Enqueue(outputStream);
+                        Logger.Write(this, LogLevel.Debug, "Pre-empted playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+                        return Task.FromResult(true);
+                    }
+                    else
+                    {
+                        //Probably already in the queue.
                     }
                 }
                 else
@@ -381,13 +317,78 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Not yet started, cannot pre-empt playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
             }
-            return Task.CompletedTask;
+            return Task.FromResult(false);
         }
 
         public override Task Unload(IOutputStream stream)
         {
+            var outputStream = stream as BassOutputStream;
+            if (this.IsStarted && this.Pipeline != null)
+            {
+                if (this.Pipeline.Input.Contains(outputStream.ChannelHandle))
+                {
+                    var current = this.Pipeline.Input.Position(outputStream.ChannelHandle) == 0;
+                    if (current)
+                    {
+                        this.Pipeline.Stop();
+                    }
+                    this.Pipeline.Input.Remove(outputStream.ChannelHandle);
+                    if (current)
+                    {
+                        this.Pipeline.ClearBuffer();
+                    }
+                }
+            }
             stream.Dispose();
             return Task.CompletedTask;
+        }
+
+        public IBassStreamPipeline GetOrCreatePipeline(IOutputStream stream)
+        {
+            if (this.Pipeline == null)
+            {
+                lock (BassStreamPipeline.SyncRoot)
+                {
+                    this.Pipeline = this.CreatePipeline(stream);
+                }
+            }
+            else
+            {
+                var outputStream = stream as BassOutputStream;
+                if (!this.Pipeline.Input.CheckFormat(outputStream.Rate, outputStream.Channels))
+                {
+                    this.FreePipeline();
+                    return this.GetOrCreatePipeline(stream);
+                }
+            }
+            return this.Pipeline;
+        }
+
+        protected virtual IBassStreamPipeline CreatePipeline(IOutputStream stream)
+        {
+            var outputStream = stream as BassOutputStream;
+            var factory = new BassStreamPipelineFactory(this);
+            var dsd = BassUtils.GetChannelDsdRaw(outputStream.ChannelHandle);
+            var rate = dsd
+                ? BassUtils.GetChannelDsdRate(outputStream.ChannelHandle)
+                : BassUtils.GetChannelPcmRate(outputStream.ChannelHandle);
+            var channels = BassUtils.GetChannelCount(outputStream.ChannelHandle);
+            var pipeline = factory.CreatePipeline(dsd, rate, channels);
+            pipeline.Input.Add(outputStream.ChannelHandle);
+            return pipeline;
+        }
+
+        protected virtual void FreePipeline()
+        {
+            var pipeline = this.Pipeline;
+            if (pipeline != null)
+            {
+                this.Pipeline = null;
+                lock (BassStreamPipeline.SyncRoot)
+                {
+                    pipeline.Dispose();
+                }
+            }
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
