@@ -14,6 +14,8 @@ namespace FoxTunes.Interfaces
         IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyCacheKey key, Func<IEnumerable<LibraryHierarchyNode>> factory);
 
         void Evict(LibraryHierarchyCacheKey key);
+
+        void Reset();
     }
 
     public class LibraryHierarchyCacheKey : IEquatable<LibraryHierarchyCacheKey>

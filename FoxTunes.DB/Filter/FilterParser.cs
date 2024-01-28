@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace FoxTunes
 {
-    public class FilterParser : StandardComponent, IFilterParser
+    public class FilterParser : StandardComponent, IFilterParser, IConfigurableComponent
     {
         public FilterParser()
         {
@@ -63,21 +63,45 @@ namespace FoxTunes
             return string.IsNullOrEmpty(filter);
         }
 
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return FilterParserConfiguration.GetConfigurationSections();
+        }
+
         public class DefaultFilterParserProvider : FilterParserProvider
         {
-            public static readonly IEnumerable<string> Names = new[]
-            {
-                CommonMetaData.Artist,
-                CommonMetaData.Album,
-                CommonMetaData.Title
-            };
-
             public override byte Priority
             {
                 get
                 {
                     return PRIORITY_LOW;
                 }
+            }
+
+            public ILibraryHierarchyCache LibraryHierarchyCache { get; private set; }
+
+            public IConfiguration Configuration { get; private set; }
+
+            public IEnumerable<string> SearchNames { get; private set; }
+
+            public override void InitializeComponent(ICore core)
+            {
+                this.LibraryHierarchyCache = core.Components.LibraryHierarchyCache;
+                this.Configuration = core.Components.Configuration;
+                this.Configuration.GetElement<TextConfigurationElement>(
+                    FilterParserConfiguration.SECTION,
+                    FilterParserConfiguration.SEARCH_NAMES
+                ).ConnectValue(value =>
+                {
+                    var reset = this.SearchNames != null;
+                    this.SearchNames = FilterParserConfiguration.GetSearchNames(value);
+                    if (reset)
+                    {
+                        //As the results of searches are now different we should clear the cache.
+                        this.LibraryHierarchyCache.Reset();
+                    }
+                });
+                base.InitializeComponent(core);
             }
 
             public override bool TryParse(ref string filter, out IFilterParserResultGroup result)
@@ -95,12 +119,10 @@ namespace FoxTunes
             protected virtual IFilterParserResultGroup Parse(string filter)
             {
                 filter = string.Format("{0}{1}{0}", FilterParserResultEntry.WILDCARD, filter.Trim());
-                return new FilterParserResultGroup(new[]
-                {
-                    new FilterParserResultEntry(CommonMetaData.Artist, FilterParserEntryOperator.Match, filter),
-                    new FilterParserResultEntry(CommonMetaData.Album, FilterParserEntryOperator.Match, filter),
-                    new FilterParserResultEntry(CommonMetaData.Title, FilterParserEntryOperator.Match, filter)
-                }, FilterParserGroupOperator.Or);
+                var entries = this.SearchNames.Select(
+                    name => new FilterParserResultEntry(name, FilterParserEntryOperator.Match, filter)
+                ).ToArray();
+                return new FilterParserResultGroup(entries, FilterParserGroupOperator.Or);
             }
         }
 
