@@ -219,6 +219,30 @@
   <data name="UIComponentStackContainer.Name" xml:space="preserve">
     <value>Stack Grid</value>
   </data>
+  <data name="UIComponentTabContainer.Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="UIComponentTabContainer.MoveLeft" xml:space="preserve">
+    <value>Move Left</value>
+  </data>
+  <data name="UIComponentTabContainer.MoveRight" xml:space="preserve">
+    <value>Move Right</value>
+  </data>
+  <data name="UIComponentTabContainer.Name" xml:space="preserve">
+    <value>Tabs</value>
+  </data>
+  <data name="UIComponentTabContainer.NewTab" xml:space="preserve">
+    <value>New Tab</value>
+  </data>
+  <data name="UIComponentTabContainer.Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="UIComponentTabContainer.Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="UIComponentTabContainer.TabName" xml:space="preserve">
+    <value>Tab Name</value>
+  </data>
   <data name="UIComponentVerticalSplitContainer.CollapseLeft" xml:space="preserve">
     <value>Collapse Left</value>
   </data>

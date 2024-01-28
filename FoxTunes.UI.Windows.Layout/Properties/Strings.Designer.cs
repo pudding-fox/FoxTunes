@@ -367,6 +367,78 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        internal static string UIComponentTabContainer_Add {
+            get {
+                return ResourceManager.GetString("UIComponentTabContainer.Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Left.
+        /// </summary>
+        internal static string UIComponentTabContainer_MoveLeft {
+            get {
+                return ResourceManager.GetString("UIComponentTabContainer.MoveLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Right.
+        /// </summary>
+        internal static string UIComponentTabContainer_MoveRight {
+            get {
+                return ResourceManager.GetString("UIComponentTabContainer.MoveRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tabs.
+        /// </summary>
+        internal static string UIComponentTabContainer_Name {
+            get {
+                return ResourceManager.GetString("UIComponentTabContainer.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Tab.
+        /// </summary>
+        internal static string UIComponentTabContainer_NewTab {
+            get {
+                return ResourceManager.GetString("UIComponentTabContainer.NewTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        internal static string UIComponentTabContainer_Remove {
+            get {
+                return ResourceManager.GetString("UIComponentTabContainer.Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rename.
+        /// </summary>
+        internal static string UIComponentTabContainer_Rename {
+            get {
+                return ResourceManager.GetString("UIComponentTabContainer.Rename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tab Name.
+        /// </summary>
+        internal static string UIComponentTabContainer_TabName {
+            get {
+                return ResourceManager.GetString("UIComponentTabContainer.TabName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Collapse Left.
         /// </summary>
         internal static string UIComponentVerticalSplitContainer_CollapseLeft {
