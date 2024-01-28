@@ -56,3 +56,11 @@ function filename(value) {
     var parts = value.split('\\');
     return parts[parts.length - 1].replace(/\.[^/.]+$/, '');
 }
+
+function extension(value) {
+    if (!value) {
+        return value;
+    }
+    var parts = value.split('.');
+    return parts[parts.length - 1];
+}

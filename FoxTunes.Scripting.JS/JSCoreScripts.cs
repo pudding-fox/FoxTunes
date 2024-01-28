@@ -44,6 +44,14 @@ namespace FoxTunes
             }
         }
 
+        public string Codec
+        {
+            get
+            {
+                return Resources.Codec;
+            }
+        }
+
         public string Playing
         {
             get

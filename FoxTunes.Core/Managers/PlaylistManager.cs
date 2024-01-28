@@ -607,6 +607,7 @@ namespace FoxTunes
                 set.Add(new PlaylistColumn() { Name = "Track no", Sequence = 2, Script = scripts.Track });
                 set.Add(new PlaylistColumn() { Name = "Title / track artist", Sequence = 3, Script = scripts.Title_Performer });
                 set.Add(new PlaylistColumn() { Name = "Duration", Sequence = 4, Script = scripts.Duration });
+                set.Add(new PlaylistColumn() { Name = "Codec", Sequence = 5, Script = scripts.Codec });
                 transaction.Commit();
             }
         }

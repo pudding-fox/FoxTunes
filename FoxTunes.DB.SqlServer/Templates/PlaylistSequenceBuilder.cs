@@ -65,58 +65,139 @@ AS
             #line hidden
             this.Write("\r\n)\r\n\r\nUPDATE \"PlaylistItems\"\r\nSET \"Sequence\" = \"Sequence\" + (\"RowNumber\" - 1)\r\nF" +
                     "ROM \"PlaylistItems\"\r\n\tJOIN\r\n\t(\r\n\t\tSELECT \"HorizontalMetaData\".\"Id\", ROW_NUMBER()" +
-                    " OVER \r\n\t\t(\r\n\t\t\tORDER BY CASE \r\n\t\t\t\tWHEN ");
+                    " OVER \r\n\t\t(\r\n\t\t\tORDER BY \r\n");
             
             #line 47 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+
+	if (this.HasColumn(CustomMetaData.VariousArtists) && this.HasColumn("Artist"))
+	{
+
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\tCASE \r\n\t\t\t\tWHEN ");
+            
+            #line 52 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("__FT_VariousArtists"))));
             
             #line default
             #line hidden
             this.Write(" IS NOT NULL THEN ");
             
-            #line 47 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+            #line 52 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String("1")));
             
             #line default
             #line hidden
             this.Write("\r\n\t\t\t\tELSE ");
             
-            #line 48 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+            #line 53 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Artist"))));
             
             #line default
             #line hidden
-            this.Write(" \r\n\t\t\tEND, \r\n\t\t\t");
+            this.Write(" \r\n\t\t\tEND, \r\n");
             
-            #line 50 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+            #line 55 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+
+	}
+	else if (this.HasColumn("Artist"))
+	{
+
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t");
+            
+            #line 60 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Artist"))));
+            
+            #line default
+            #line hidden
+            this.Write(",\r\n");
+            
+            #line 61 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+
+	}
+	if (this.HasColumn("Year"))
+	{
+
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t");
+            
+            #line 66 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Year"))));
             
             #line default
             #line hidden
-            this.Write(", \r\n\t\t\t");
+            this.Write(", \r\n");
             
-            #line 51 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+            #line 67 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+
+	}
+	if (this.HasColumn("Album"))
+	{
+
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t");
+            
+            #line 72 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Album"))));
             
             #line default
             #line hidden
-            this.Write(", \r\n\t\t\tCAST(");
+            this.Write(", \r\n");
             
-            #line 52 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+            #line 73 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+
+	}
+	if (this.HasColumn("Disc"))
+	{
+
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\tCAST(");
+            
+            #line 78 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Disc"))));
             
             #line default
             #line hidden
-            this.Write(" AS int), \r\n\t\t\tCAST(");
+            this.Write(" AS int), \r\n");
             
-            #line 53 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+            #line 79 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+
+	}
+	if (this.HasColumn("Track"))
+	{
+
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\tCAST(");
+            
+            #line 84 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.Identifier("HorizontalMetaData", this.GetColumn("Track"))));
             
             #line default
             #line hidden
-            this.Write(" AS int), \r\n\t\t\t\"HorizontalMetaData\".\"FileName\"\r\n\t\t) AS \"RowNumber\"\r\n\t\tFROM \"Horiz" +
-                    "ontalMetaData\"\r\n\t) AS \"PlaylistItemsRowNumber\" \r\n\t\tON \"PlaylistItems\".\"Id\" = \"Pl" +
-                    "aylistItemsRowNumber\".\"Id\"");
+            this.Write(" AS int), \r\n");
+            
+            #line 85 "C:\Source\FoxTunes\FoxTunes.DB.SqlServer\Templates\PlaylistSequenceBuilder.tt"
+
+	}
+
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\"HorizontalMetaData\".\"FileName\"\r\n\t\t) AS \"RowNumber\"\r\n\t\tFROM \"HorizontalMetaDat" +
+                    "a\"\r\n\t) AS \"PlaylistItemsRowNumber\" \r\n\t\tON \"PlaylistItems\".\"Id\" = \"PlaylistItemsR" +
+                    "owNumber\".\"Id\"");
             return this.GenerationEnvironment.ToString();
         }
     }

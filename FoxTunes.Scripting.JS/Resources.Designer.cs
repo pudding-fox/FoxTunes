@@ -90,6 +90,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (extension(item.FileName) || &quot;&quot;).toUpperCase();.
+        /// </summary>
+        internal static string Codec {
+            get {
+                return ResourceManager.GetString("Codec", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (function () {
         ///    if (tag.title) {
         ///        var parts = [];

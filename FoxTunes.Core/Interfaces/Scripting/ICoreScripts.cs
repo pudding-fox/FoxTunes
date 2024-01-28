@@ -10,6 +10,8 @@
 
         string Duration { get; }
 
+        string Codec { get; }
+
         string Genre { get; }
 
         string Playing { get; }

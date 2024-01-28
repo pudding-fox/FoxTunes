@@ -39,5 +39,17 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Border>
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Drop files anywhere." IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Managers.Playlist.CanNavigate, Mode=OneWay}" Value="False">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
     </Grid>
 </UserControl>
