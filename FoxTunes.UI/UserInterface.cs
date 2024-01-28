@@ -20,15 +20,26 @@ namespace FoxTunes
 
         public abstract void Restart();
 
-        protected virtual void OnWindowCreated(IntPtr handle)
+        protected virtual void OnWindowCreated(IntPtr handle, UserInterfaceWindowRole role)
         {
             if (this.WindowCreated == null)
             {
                 return;
             }
-            this.WindowCreated(this, new UserInterfaceWindowCreatedEvent(handle));
+            this.WindowCreated(this, new UserInterfaceWindowEventArgs(handle, role));
         }
 
-        public event UserInterfaceWindowCreatedEventHandler WindowCreated;
+        public event UserInterfaceWindowEventHandler WindowCreated;
+
+        protected virtual void OnWindowDestroyed(IntPtr handle, UserInterfaceWindowRole role)
+        {
+            if (this.WindowDestroyed == null)
+            {
+                return;
+            }
+            this.WindowDestroyed(this, new UserInterfaceWindowEventArgs(handle, role));
+        }
+
+        public event UserInterfaceWindowEventHandler WindowDestroyed;
     }
 }
