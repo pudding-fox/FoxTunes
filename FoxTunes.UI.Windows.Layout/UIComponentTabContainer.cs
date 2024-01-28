@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace FoxTunes
 {
-    [UIComponent("67A0F63C-DC86-4B4E-91E1-290B71822853", role: UIComponentRole.Container)]
+    [UIComponent("67A0F63C-DC86-4B4E-91E1-290B71822853", children: UIComponentAttribute.UNLIMITED_CHILDREN, role: UIComponentRole.Container)]
     public class UIComponentTabContainer : UIComponentPanel, IDisposable
     {
         const string ADD = "AAAA";
@@ -33,6 +35,15 @@ namespace FoxTunes
         }
 
         public global::System.Windows.Controls.TabControl TabControl { get; private set; }
+
+        protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is TabPanel)
+            {
+                var task = this.Add();
+            }
+            base.OnMouseDoubleClick(e);
+        }
 
         protected override void OnConfigurationChanged()
         {

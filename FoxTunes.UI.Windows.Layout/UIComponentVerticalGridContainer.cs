@@ -11,7 +11,7 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for UIComponentVerticalGridContainer.xaml
     /// </summary>
-    [UIComponent("18778C90-06B8-49E6-B0AF-8EFB8C12E2F1", role: UIComponentRole.Container)]
+    [UIComponent("18778C90-06B8-49E6-B0AF-8EFB8C12E2F1", children: UIComponentAttribute.UNLIMITED_CHILDREN, role: UIComponentRole.Container)]
     public partial class UIComponentVerticalGridContainer : UIComponentGridContainer
     {
         const string ADD = "AAAA";

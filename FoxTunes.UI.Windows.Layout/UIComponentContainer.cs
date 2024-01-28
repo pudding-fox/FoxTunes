@@ -65,7 +65,24 @@ namespace FoxTunes
                     }
                     else
                     {
-                        newComponent.Children.AddRange(oldComponent.Children);
+                        var children = default(IEnumerable<UIComponentConfiguration>);
+                        switch (newComponent.Component.Children)
+                        {
+                            case UIComponent.NO_CHILDREN:
+                                break;
+                            case UIComponent.UNLIMITED_CHILDREN:
+                                children = oldComponent.Children;
+                                break;
+                            default:
+                                children = oldComponent.Children.Take(
+                                    newComponent.Component.Children
+                                );
+                                break;
+                        }
+                        if (children != null)
+                        {
+                            newComponent.Children.AddRange(children);
+                        }
                     }
                 }
                 if (!newComponent.MetaData.Any())
@@ -290,6 +307,14 @@ namespace FoxTunes
                             continue;
                         }
                         yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, REPLACE, alternative.Name, path: Strings.UIComponentContainer_Replace, attributes: attributes);
+                        attributes = InvocationComponent.ATTRIBUTE_NONE;
+                    }
+                    foreach (var alternative in LayoutManager.Instance.GetComponents(UIComponentRole.Container))
+                    {
+                        if (string.Equals(this.Configuration.Component.Id, alternative.Id, StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
                         yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, WRAP, alternative.Name, path: Strings.UIComponentContainer_Wrap, attributes: attributes);
                         attributes = InvocationComponent.ATTRIBUTE_NONE;
                     }
