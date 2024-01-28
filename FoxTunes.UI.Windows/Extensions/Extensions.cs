@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
 
 namespace FoxTunes
@@ -76,6 +77,12 @@ namespace FoxTunes
                 window.Topmost = false;
             }
             window.Focus();
+        }
+
+        public static IntPtr GetHandle(this Window window)
+        {
+            var source = new WindowInteropHelper(window);
+            return source.EnsureHandle();
         }
     }
 }

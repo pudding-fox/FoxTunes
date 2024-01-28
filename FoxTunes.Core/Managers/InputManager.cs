@@ -1,7 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace FoxTunes
 {
@@ -9,10 +9,10 @@ namespace FoxTunes
     {
         public InputManager()
         {
-            this.Registrations = new ConditionalWeakTable<Tuple<int, int>, Action>();
+            this.Registrations = new ConcurrentDictionary<Tuple<int, int>, Action>();
         }
 
-        public ConditionalWeakTable<Tuple<int, int>, Action> Registrations { get; private set; }
+        public ConcurrentDictionary<Tuple<int, int>, Action> Registrations { get; private set; }
 
         public bool _Enabled { get; private set; }
 
@@ -54,13 +54,24 @@ namespace FoxTunes
             {
                 this.RemoveInputHook(modifiers, keys);
             }
-            this.Registrations.Add(key, action);
+            this.Registrations.TryAdd(key, action);
         }
 
         public void RemoveInputHook(int modifiers, int keys)
         {
             var key = new Tuple<int, int>(modifiers, keys);
-            this.Registrations.Remove(key);
+            this.Registrations.TryRemove(key);
+        }
+
+        protected virtual void OnInputEvent(int modifiers, int keys)
+        {
+            var value = default(Action);
+            if (!this.Registrations.TryGetValue(new Tuple<int, int>(modifiers, keys), out value))
+            {
+                return;
+            }
+            Logger.Write(this, LogLevel.Debug, "Executing global keyboard shortcut: {0} => {1}", modifiers, keys);
+            value();
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
