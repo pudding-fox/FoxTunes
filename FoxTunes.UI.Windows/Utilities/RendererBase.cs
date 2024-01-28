@@ -780,14 +780,7 @@ namespace FoxTunes
 
         public static Color WithAlpha(this Color color, int alpha)
         {
-            if (alpha > 0)
-            {
-                color.A += Convert.ToByte(alpha);
-            }
-            else if (alpha < 0)
-            {
-                color.A -= Convert.ToByte(Math.Abs(alpha));
-            }
+            color.A = Convert.ToByte(Math.Max(Math.Min(color.A + alpha, byte.MaxValue), byte.MinValue));
             return color;
         }
 
