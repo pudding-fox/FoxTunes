@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     public abstract class BaseLoader<T> : BaseComponent, IBaseLoader<T> where T : IBaseComponent
     {
-        public virtual IEnumerable<T> Load()
+        public virtual IEnumerable<T> Load(ICore core)
         {
             var components = new List<T>();
             foreach (var type in ComponentScanner.Instance.GetComponents(typeof(T)))

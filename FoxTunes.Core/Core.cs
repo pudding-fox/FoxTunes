@@ -6,9 +6,15 @@ namespace FoxTunes
 {
     public class Core : BaseComponent, ICore
     {
-        public Core()
+        public Core(CoreFlags flags)
         {
+            this.Flags = flags;
             ComponentRegistry.Instance.Clear();
+            ComponentResolver.Slots.Clear();
+            if (this.Flags.HasFlag(CoreFlags.Headless))
+            {
+                ComponentResolver.Slots.Add(ComponentSlots.UserInterface, ComponentSlots.Blocked);
+            }
         }
 
         public IStandardComponents Components
@@ -34,6 +40,8 @@ namespace FoxTunes
                 return StandardFactories.Instance;
             }
         }
+
+        public CoreFlags Flags { get; private set; }
 
         public void Load()
         {
@@ -67,22 +75,22 @@ namespace FoxTunes
 
         protected virtual void LoadComponents()
         {
-            ComponentRegistry.Instance.AddComponents(ComponentLoader.Instance.Load());
+            ComponentRegistry.Instance.AddComponents(ComponentLoader.Instance.Load(this));
         }
 
         protected virtual void LoadManagers()
         {
-            ComponentRegistry.Instance.AddComponents(ManagerLoader.Instance.Load());
+            ComponentRegistry.Instance.AddComponents(ManagerLoader.Instance.Load(this));
         }
 
         protected virtual void LoadFactories()
         {
-            ComponentRegistry.Instance.AddComponents(FactoryLoader.Instance.Load());
+            ComponentRegistry.Instance.AddComponents(FactoryLoader.Instance.Load(this));
         }
 
         protected virtual void LoadBehaviours()
         {
-            ComponentRegistry.Instance.AddComponents(BehaviourLoader.Instance.Load());
+            ComponentRegistry.Instance.AddComponents(BehaviourLoader.Instance.Load(this));
         }
 
         protected virtual void LoadConfiguration()

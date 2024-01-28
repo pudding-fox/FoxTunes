@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.IO;
 using System.Windows;
 
@@ -10,10 +11,7 @@ namespace FoxTunes
         public ExpressionDarkTheme()
             : base("3E9EFE8C-5245-4F8B-97D1-EB47CC70E373", "ExpressionDark")
         {
-            this.ResourceDictionary = new ResourceDictionary()
-            {
-                Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ExpressionDark.xaml", UriKind.Relative)
-            };
+
         }
 
         public ResourceDictionary ResourceDictionary { get; private set; }
@@ -34,6 +32,18 @@ namespace FoxTunes
         public override void Disable()
         {
             Application.Current.Resources.MergedDictionaries.Remove(this.ResourceDictionary);
+        }
+
+        public override void InitializeComponent(ICore core)
+        {
+            if (!(core.Flags.HasFlag(CoreFlags.Headless)))
+            {
+                this.ResourceDictionary = new ResourceDictionary()
+                {
+                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ExpressionDark.xaml", UriKind.Relative)
+                };
+            }
+            base.InitializeComponent(core);
         }
     }
 }

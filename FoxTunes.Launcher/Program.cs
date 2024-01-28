@@ -1,5 +1,5 @@
-﻿using System;
-using System.Reflection;
+﻿using FoxTunes.Interfaces;
+using System;
 
 namespace FoxTunes.Launcher
 {
@@ -26,7 +26,7 @@ namespace FoxTunes.Launcher
                     client.Send(Environment.CommandLine).Wait();
                     return;
                 }
-                using (var core = new Core())
+                using (var core = new Core(CoreFlags.None))
                 {
                     AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
                     {

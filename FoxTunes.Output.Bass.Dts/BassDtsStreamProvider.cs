@@ -36,6 +36,11 @@ namespace FoxTunes
             {
                 flags |= BassFlags.Float;
             }
+            return this.CreateStream(playlistItem, flags);
+        }
+
+        public override Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
+        {
             if (this.Output.PlayFromMemory)
             {
                 Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");

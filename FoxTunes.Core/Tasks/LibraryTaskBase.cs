@@ -96,7 +96,9 @@ namespace FoxTunes
                 using (var libraryPopulator = new LibraryPopulator(this.Database, this.PlaybackManager, this.Visible, transaction))
                 {
                     libraryPopulator.InitializeComponent(this.Core);
-                    await this.WithPopulator(libraryPopulator, async () => await libraryPopulator.Populate(paths, cancellationToken));
+                    await this.WithSubTask(libraryPopulator,
+                        async () => await libraryPopulator.Populate(paths, cancellationToken)
+                    );
                 }
                 transaction.Commit();
             }
@@ -112,7 +114,9 @@ namespace FoxTunes
                 using (var metaDataPopulator = new MetaDataPopulator(this.Database, this.Database.Queries.AddLibraryMetaDataItem, this.Visible, transaction))
                 {
                     metaDataPopulator.InitializeComponent(this.Core);
-                    await this.WithPopulator(metaDataPopulator, async () => await metaDataPopulator.Populate(query, cancellationToken));
+                    await this.WithSubTask(metaDataPopulator,
+                        async () => await metaDataPopulator.Populate(query, cancellationToken)
+                    );
                 }
                 transaction.Commit();
             }
@@ -148,7 +152,9 @@ namespace FoxTunes
             using (var libraryHierarchyPopulator = new LibraryHierarchyPopulator(this.Database, this.Visible, transaction))
             {
                 libraryHierarchyPopulator.InitializeComponent(this.Core);
-                await this.WithPopulator(libraryHierarchyPopulator, async () => await libraryHierarchyPopulator.Populate(status, cancellationToken, transaction));
+                await this.WithSubTask(libraryHierarchyPopulator,
+                    async () => await libraryHierarchyPopulator.Populate(status, cancellationToken, transaction)
+                );
             }
         }
 

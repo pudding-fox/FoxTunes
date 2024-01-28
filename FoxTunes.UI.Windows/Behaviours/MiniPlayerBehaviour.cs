@@ -118,17 +118,20 @@ namespace FoxTunes
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
             );
-            this.ScalingFactor.ConnectValue(value =>
+            if (this.ScalingFactor != null)
             {
-                if (this.IsInitialized && Windows.IsMiniWindowCreated && Windows.MiniWindow.SizeToContent == SizeToContent.WidthAndHeight)
+                this.ScalingFactor.ConnectValue(value =>
                 {
-                    //Auto size goes to shit when the scaling factor is changed.
-                    Windows.MiniWindow.SizeToContent = SizeToContent.Manual;
-                    Windows.MiniWindow.Width = 0;
-                    Windows.MiniWindow.Height = 0;
-                    Windows.MiniWindow.SizeToContent = SizeToContent.WidthAndHeight;
-                }
-            });
+                    if (this.IsInitialized && Windows.IsMiniWindowCreated && Windows.MiniWindow.SizeToContent == SizeToContent.WidthAndHeight)
+                    {
+                        //Auto size goes to shit when the scaling factor is changed.
+                        Windows.MiniWindow.SizeToContent = SizeToContent.Manual;
+                        Windows.MiniWindow.Width = 0;
+                        Windows.MiniWindow.Height = 0;
+                        Windows.MiniWindow.SizeToContent = SizeToContent.WidthAndHeight;
+                    }
+                });
+            }
             base.InitializeComponent(core);
         }
 

@@ -1,8 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
-using System.Collections.Concurrent;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -54,17 +52,22 @@ namespace FoxTunes
             return true;
         }
 
-#if NET40
         public virtual Task<int> CreateStream(PlaylistItem playlistItem)
-#else
-        public virtual async Task<int> CreateStream(PlaylistItem playlistItem)
-#endif
         {
             var flags = BassFlags.Decode;
             if (this.Output.Float)
             {
                 flags |= BassFlags.Float;
             }
+            return this.CreateStream(playlistItem, flags);
+        }
+
+#if NET40
+        public virtual Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
+#else
+        public virtual async Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags)
+#endif
+        {
 #if NET40
             this.Semaphore.Wait();
 #else

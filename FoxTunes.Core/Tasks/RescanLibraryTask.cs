@@ -77,7 +77,7 @@ namespace FoxTunes
                     using (var libraryUpdater = new LibraryUpdater(this.Database, predicate, action, this.Visible, transaction))
                     {
                         libraryUpdater.InitializeComponent(this.Core);
-                        await this.WithPopulator(libraryUpdater,
+                        await this.WithSubTask(libraryUpdater,
                             async () => await libraryUpdater.Populate(cancellationToken)
                         );
                     }

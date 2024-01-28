@@ -95,6 +95,40 @@ namespace FoxTunes
             return BassStream.Empty;
         }
 
+        public async Task<IBassStream> CreateStream(PlaylistItem playlistItem, bool immidiate, BassFlags flags)
+        {
+#if NET40
+            this.Semaphore.Wait();
+#else
+            await this.Semaphore.WaitAsync();
+#endif
+            try
+            {
+                foreach (var provider in this.Providers.Values)
+                {
+                    if (!provider.CanCreateStream(playlistItem))
+                    {
+                        continue;
+                    }
+                    var channelHandle = await provider.CreateStream(playlistItem, flags);
+                    if (channelHandle != 0)
+                    {
+                        return new BassStream(provider, channelHandle);
+                    }
+                    else
+                    {
+                        BassUtils.Throw();
+                    }
+                    Thread.Sleep(CREATE_ATTEMPT_INTERVAL);
+                }
+            }
+            finally
+            {
+                this.Semaphore.Release();
+            }
+            return BassStream.Empty;
+        }
+
         protected virtual bool FreeActiveStreams()
         {
             var streams = BassOutputStream.ActiveStreams.Values.ToArray();

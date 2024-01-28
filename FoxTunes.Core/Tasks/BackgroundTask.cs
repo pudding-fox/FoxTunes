@@ -392,29 +392,29 @@ namespace FoxTunes
             this.OnCancellationRequested();
         }
 
-        protected virtual async Task WithPopulator(PopulatorBase populator, Func<Task> func)
+        protected virtual async Task WithSubTask(IReportsProgress task, Func<Task> func)
         {
-            var nameChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetName(populator.Name); });
-            var descriptionChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetDescription(populator.Description); });
-            var positionChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetPosition(populator.Position); });
-            var countChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetCount(populator.Count); });
-            var isIndeterminateChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetIsIndeterminate(populator.IsIndeterminate); });
-            populator.NameChanged += nameChanged;
-            populator.DescriptionChanged += descriptionChanged;
-            populator.PositionChanged += positionChanged;
-            populator.CountChanged += countChanged;
-            populator.IsIndeterminateChanged += isIndeterminateChanged;
+            var nameChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetName(task.Name); });
+            var descriptionChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetDescription(task.Description); });
+            var positionChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetPosition(task.Position); });
+            var countChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetCount(task.Count); });
+            var isIndeterminateChanged = new AsyncEventHandler(async (sender, e) => { using (e.Defer()) await this.SetIsIndeterminate(task.IsIndeterminate); });
+            task.NameChanged += nameChanged;
+            task.DescriptionChanged += descriptionChanged;
+            task.PositionChanged += positionChanged;
+            task.CountChanged += countChanged;
+            task.IsIndeterminateChanged += isIndeterminateChanged;
             try
             {
                 await func();
             }
             finally
             {
-                populator.NameChanged -= nameChanged;
-                populator.DescriptionChanged -= descriptionChanged;
-                populator.PositionChanged -= positionChanged;
-                populator.CountChanged -= countChanged;
-                populator.IsIndeterminateChanged -= isIndeterminateChanged;
+                task.NameChanged -= nameChanged;
+                task.DescriptionChanged -= descriptionChanged;
+                task.PositionChanged -= positionChanged;
+                task.CountChanged -= countChanged;
+                task.IsIndeterminateChanged -= isIndeterminateChanged;
             }
         }
 

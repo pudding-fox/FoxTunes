@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    public class LayoutManager : StandardComponent
+    public class LayoutManager : StandardComponent, IDisposable
     {
         public static readonly Type PLACEHOLDER = typeof(object);
 
@@ -270,18 +270,95 @@ namespace FoxTunes
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.BOTTOM_RIGHT_ELEMENT
             );
-            this.TopLeft.ValueChanged += this.OnLayoutUpdated;
-            this.BottomLeft.ValueChanged += this.OnLayoutUpdated;
-            this.TopCenter.ValueChanged += this.OnLayoutUpdated;
-            this.BottomCenter.ValueChanged += this.OnLayoutUpdated;
-            this.TopRight.ValueChanged += this.OnLayoutUpdated;
-            this.BottomRight.ValueChanged += this.OnLayoutUpdated;
+            if (this.TopLeft != null)
+            {
+                this.TopLeft.ValueChanged += this.OnLayoutUpdated;
+            }
+            if (this.BottomLeft != null)
+            {
+                this.BottomLeft.ValueChanged += this.OnLayoutUpdated;
+            }
+            if (this.TopCenter != null)
+            {
+                this.TopCenter.ValueChanged += this.OnLayoutUpdated;
+            }
+            if (this.BottomCenter != null)
+            {
+                this.BottomCenter.ValueChanged += this.OnLayoutUpdated;
+            }
+            if (this.TopRight != null)
+            {
+                this.TopRight.ValueChanged += this.OnLayoutUpdated;
+            }
+            if (this.BottomRight != null)
+            {
+                this.BottomRight.ValueChanged += this.OnLayoutUpdated;
+            }
             base.InitializeComponent(core);
         }
 
         protected virtual void OnLayoutUpdated(object sender, EventArgs e)
         {
             this.OnActiveComponentsChanged();
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.TopLeft != null)
+            {
+                this.TopLeft.ValueChanged -= this.OnLayoutUpdated;
+            }
+            if (this.BottomLeft != null)
+            {
+                this.BottomLeft.ValueChanged -= this.OnLayoutUpdated;
+            }
+            if (this.TopCenter != null)
+            {
+                this.TopCenter.ValueChanged -= this.OnLayoutUpdated;
+            }
+            if (this.BottomCenter != null)
+            {
+                this.BottomCenter.ValueChanged -= this.OnLayoutUpdated;
+            }
+            if (this.TopRight != null)
+            {
+                this.TopRight.ValueChanged -= this.OnLayoutUpdated;
+            }
+            if (this.BottomRight != null)
+            {
+                this.BottomRight.ValueChanged -= this.OnLayoutUpdated;
+            }
+        }
+
+        ~LayoutManager()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
 
         public static LayoutManager Instance { get; private set; }
