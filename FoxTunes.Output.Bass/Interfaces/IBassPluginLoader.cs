@@ -8,5 +8,9 @@ namespace FoxTunes.Interfaces
         IEnumerable<string> Extensions { get; }
 
         bool IsSupported(string extension);
+
+        bool IsLoaded { get; }
+
+        event EventHandler IsLoadedChanged;
     }
 }
