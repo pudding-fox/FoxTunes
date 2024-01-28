@@ -99,8 +99,7 @@ namespace FoxTunes
                 var directoryName = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     Company,
-                    Product,
-                    Version
+                    Product
                 );
                 if (!Directory.Exists(directoryName))
                 {
