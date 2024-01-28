@@ -184,6 +184,8 @@ namespace FoxTunes.ViewModel
         {
             if (this.PlaylistManager != null)
             {
+                this.PlaylistManager.CurrentPlaylistChanged -= this.OnCurrentPlaylistChanged;
+                this.PlaylistManager.SelectedPlaylistChanged -= this.OnSelectedPlaylistChanged;
                 this.PlaylistManager.CurrentItemChanged -= this.OnCurrentItemChanged;
             }
             if (this.ScriptingContext != null)

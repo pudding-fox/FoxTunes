@@ -4,21 +4,21 @@ using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public class TabPlaylist : DefaultPlaylist
+    public class TabPlaylist : GridPlaylist
     {
         public static readonly DependencyProperty PlaylistProperty = DependencyProperty.Register(
             "Playlist",
             typeof(Playlist),
-            typeof(DefaultPlaylist),
+            typeof(TabPlaylist),
             new PropertyMetadata(new PropertyChangedCallback(OnPlaylistChanged))
         );
 
-        public static Playlist GetPlaylist(DefaultPlaylist source)
+        public static Playlist GetPlaylist(TabPlaylist source)
         {
             return (Playlist)source.GetValue(PlaylistProperty);
         }
 
-        public static void SetPlaylist(DefaultPlaylist source, Playlist value)
+        public static void SetPlaylist(TabPlaylist source, Playlist value)
         {
             source.SetValue(PlaylistProperty, value);
         }
@@ -62,6 +62,11 @@ namespace FoxTunes.ViewModel
             var playlist = default(Playlist);
             await Windows.Invoke(() => playlist = this.Playlist).ConfigureAwait(false);
             return playlist;
+        }
+
+        protected override Freezable CreateInstanceCore()
+        {
+            return new TabPlaylist();
         }
     }
 }
