@@ -87,7 +87,7 @@ namespace FoxTunes
                 BassUtils.Throw();
             }
             Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
-            BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default | BassFlags.MixerBuffer));
+            BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default | BassFlags.MixerBuffer | BassFlags.MixerDownMix));
             this.MixerChannelHandles.Add(previous.ChannelHandle);
             this.UpdateVolume();
         }
@@ -123,6 +123,11 @@ namespace FoxTunes
                         Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", rate, nearestRate);
                         rate = nearestRate;
                     }
+                }
+                if (BassDirectSoundDevice.Info.Outputs < channels)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Stream channel count {0} isn't supported by the device, falling back to {1} channels.", channels, BassDirectSoundDevice.Info.Outputs);
+                    channels = BassDirectSoundDevice.Info.Outputs;
                 }
             }
             flags = flags & ~BassFlags.Decode;
