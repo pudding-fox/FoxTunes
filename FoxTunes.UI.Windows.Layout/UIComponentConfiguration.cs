@@ -10,8 +10,14 @@ namespace FoxTunes
         public UIComponentConfiguration()
         {
             this.Id = Guid.NewGuid();
+            this.Component = UIComponent.None;
             this.Children = new ObservableCollection<UIComponentConfiguration>();
             this.MetaData = new ConcurrentDictionary<string, string>();
+        }
+
+        public UIComponentConfiguration(UIComponent component) : this()
+        {
+            this.Component = component;
         }
 
         public Guid Id { get; private set; }

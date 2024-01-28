@@ -176,26 +176,14 @@ namespace FoxTunes
 
         protected override void OnConfigurationChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.UpdateMetaData();
-                this.UpdateChildren();
-            }
+            this.UpdateMetaData();
+            this.UpdateChildren();
             base.OnConfigurationChanged();
         }
 
         protected virtual void UpdateChildren()
         {
-            if (this.Configuration.Children == null)
-            {
-                this.Configuration.Children = new ObservableCollection<UIComponentConfiguration>()
-                {
-                    new UIComponentConfiguration(),
-                    new UIComponentConfiguration()
-                };
-                return;
-            }
-            for (var a = this.Configuration.Children.Count; a < 2; a++)
+            while (this.Configuration.Children.Count < 2)
             {
                 this.Configuration.Children.Add(new UIComponentConfiguration());
             }
@@ -239,10 +227,7 @@ namespace FoxTunes
 
         protected virtual void OnContentComponentChanged()
         {
-            if (this.Configuration != null && this.Configuration.Children.Count >= 1 && this.ContentComponent != null)
-            {
-                this.Configuration.Children[0] = this.ContentComponent;
-            }
+            this.Configuration.Children[0] = this.ContentComponent;
             if (this.ContentComponentChanged != null)
             {
                 this.ContentComponentChanged(this, EventArgs.Empty);
@@ -266,10 +251,7 @@ namespace FoxTunes
 
         protected virtual void OnDockComponentChanged()
         {
-            if (this.Configuration != null && this.Configuration.Children.Count >= 2 && this.DockComponent != null)
-            {
-                this.Configuration.Children[1] = this.DockComponent;
-            }
+            this.Configuration.Children[1] = this.DockComponent;
             if (this.DockComponentChanged != null)
             {
                 this.DockComponentChanged(this, EventArgs.Empty);
@@ -316,13 +298,10 @@ namespace FoxTunes
 
         protected virtual void OnDockLocationChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.Configuration.MetaData.AddOrUpdate(
-                    nameof(this.DockLocation),
-                    this.DockLocation
-                );
-            }
+            this.Configuration.MetaData.AddOrUpdate(
+                nameof(this.DockLocation),
+                this.DockLocation
+            );
             if (this.DockLocationChanged != null)
             {
                 this.DockLocationChanged(this, EventArgs.Empty);
@@ -346,13 +325,10 @@ namespace FoxTunes
 
         protected virtual void OnCollapseChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.Configuration.MetaData.AddOrUpdate(
-                    nameof(this.Collapse),
-                    Convert.ToString(this.Collapse)
-                );
-            }
+            this.Configuration.MetaData.AddOrUpdate(
+                nameof(this.Collapse),
+                Convert.ToString(this.Collapse)
+            );
             if (this.CollapseChanged != null)
             {
                 this.CollapseChanged(this, EventArgs.Empty);

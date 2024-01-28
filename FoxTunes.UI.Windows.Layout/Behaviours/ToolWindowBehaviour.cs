@@ -755,7 +755,7 @@ namespace FoxTunes
             {
                 return instance.Title;
             }
-            if (instance.Component != null && instance.Component.Component != null)
+            if (!instance.Component.Component.IsEmpty)
             {
                 return instance.Component.Component.Name;
             }

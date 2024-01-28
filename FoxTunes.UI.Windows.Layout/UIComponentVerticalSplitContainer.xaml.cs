@@ -344,26 +344,14 @@ namespace FoxTunes
 
         protected override void OnConfigurationChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.UpdateMetaData();
-                this.UpdateChildren();
-            }
+            this.UpdateMetaData();
+            this.UpdateChildren();
             base.OnConfigurationChanged();
         }
 
         protected virtual void UpdateChildren()
         {
-            if (this.Configuration.Children == null)
-            {
-                this.Configuration.Children = new ObservableCollection<UIComponentConfiguration>()
-                {
-                    new UIComponentConfiguration(),
-                    new UIComponentConfiguration()
-                };
-                return;
-            }
-            for (var a = this.Configuration.Children.Count; a < 2; a++)
+            while (this.Configuration.Children.Count < 2)
             {
                 this.Configuration.Children.Add(new UIComponentConfiguration());
             }
@@ -425,10 +413,7 @@ namespace FoxTunes
 
         protected virtual void OnLeftComponentChanged()
         {
-            if (this.Configuration != null && this.Configuration.Children.Count >= 1 && this.LeftComponent != null)
-            {
-                this.Configuration.Children[0] = this.LeftComponent;
-            }
+            this.Configuration.Children[0] = this.LeftComponent;
             if (this.LeftComponentChanged != null)
             {
                 this.LeftComponentChanged(this, EventArgs.Empty);
@@ -452,10 +437,7 @@ namespace FoxTunes
 
         protected virtual void OnRightComponentChanged()
         {
-            if (this.Configuration != null && this.Configuration.Children.Count >= 2 && this.RightComponent != null)
-            {
-                this.Configuration.Children[1] = this.RightComponent;
-            }
+            this.Configuration.Children[1] = this.RightComponent;
             if (this.RightComponentChanged != null)
             {
                 this.RightComponentChanged(this, EventArgs.Empty);
@@ -527,13 +509,10 @@ namespace FoxTunes
 
         protected virtual void OnSplitterDistanceChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.Configuration.MetaData.AddOrUpdate(
-                    nameof(this.SplitterDistance),
-                    this.SplitterDistance
-                );
-            }
+            this.Configuration.MetaData.AddOrUpdate(
+                nameof(this.SplitterDistance),
+                this.SplitterDistance
+            );
             if (this.SplitterDistanceChanged != null)
             {
                 this.SplitterDistanceChanged(this, EventArgs.Empty);
@@ -557,13 +536,10 @@ namespace FoxTunes
 
         protected virtual void OnSplitterDirectionChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.Configuration.MetaData.AddOrUpdate(
-                    nameof(this.SplitterDirection),
-                    this.SplitterDirection
-                );
-            }
+            this.Configuration.MetaData.AddOrUpdate(
+                nameof(this.SplitterDirection),
+                this.SplitterDirection
+            );
             this.UpdateBindings();
             if (this.SplitterDirectionChanged != null)
             {

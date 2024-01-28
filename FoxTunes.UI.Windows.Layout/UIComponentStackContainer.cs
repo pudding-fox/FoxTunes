@@ -53,10 +53,7 @@ namespace FoxTunes
 
         protected override void OnConfigurationChanged()
         {
-            if (this.Configuration != null)
-            {
-                this.UpdateChildren();
-            }
+            this.UpdateChildren();
             base.OnConfigurationChanged();
         }
 
@@ -64,7 +61,7 @@ namespace FoxTunes
         {
             this.Grid.Children.Clear();
             this.Grid.ColumnDefinitions.Clear();
-            if (this.Configuration.Children != null && this.Configuration.Children.Count > 0)
+            if (this.Configuration.Children.Count > 0)
             {
                 foreach (var component in this.Configuration.Children)
                 {
@@ -85,10 +82,7 @@ namespace FoxTunes
             {
                 var component = new UIComponentConfiguration();
                 this.AddComponent(component, Fill, Fill);
-                this.Configuration.Children = new ObservableCollection<UIComponentConfiguration>()
-                {
-                    component
-                };
+                this.Configuration.Children.Add(component);
             }
         }
 
@@ -149,7 +143,7 @@ namespace FoxTunes
                 var verticalAlignment = default(string);
                 var container = UIComponentDesignerOverlay.Container;
 
-                if (container != null && container.Configuration != null)
+                if (container != null)
                 {
                     if (!container.Configuration.MetaData.TryGetValue(HorizontalAlignment, out horizontalAlignment))
                     {
@@ -331,10 +325,6 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                if (container.Configuration == null)
-                {
-                    container.Configuration = new UIComponentConfiguration();
-                }
                 container.Configuration.MetaData.AddOrUpdate(HorizontalAlignment, Fill);
                 container.Configuration.MetaData.AddOrUpdate(VerticalAlignment, Fill);
                 this.UpdateChildren();
@@ -345,10 +335,6 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                if (container.Configuration == null)
-                {
-                    container.Configuration = new UIComponentConfiguration();
-                }
                 container.Configuration.MetaData.AddOrUpdate(HorizontalAlignment, alignment);
                 this.UpdateChildren();
             });
@@ -358,10 +344,6 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                if (container.Configuration == null)
-                {
-                    container.Configuration = new UIComponentConfiguration();
-                }
                 container.Configuration.MetaData.AddOrUpdate(VerticalAlignment, alignment);
                 this.UpdateChildren();
             });
