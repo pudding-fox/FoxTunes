@@ -139,11 +139,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                var position = e.GetPosition(null);
-                if (position.X < 0 || position.Y < 0)
-                {
-                    return;
-                }
+                var position = e.GetPosition(this.ListView);
                 this.DragStartPosition = position;
             }
 
@@ -163,7 +159,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                var position = e.GetPosition(null);
+                var position = e.GetPosition(this.ListView);
                 if (this.ShouldInitializeDrag(e.OriginalSource, position))
                 {
                     this.DragStartPosition = default(Point);
