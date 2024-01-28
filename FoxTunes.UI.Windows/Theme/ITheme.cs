@@ -29,7 +29,6 @@ namespace FoxTunes
     [Flags]
     public enum ThemeFlags : byte
     {
-        None = 0,
-        RequiresTransparency = 1
+        None = 0
     }
 }

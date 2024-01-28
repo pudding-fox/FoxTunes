@@ -28,7 +28,9 @@ namespace FoxTunes
 
         public const int MAX_TIMER_FREQUENCY = 1000;
 
-        public const string ACCENT_COLOR = "2A835DBB-8ACE-4FFC-B975-9131D4D82947";
+        public const string TRANSPARENCY = "NNNN0D57-6E03-4718-ACA3-AD8199F5AC75";
+
+        public const string ACCENT_COLOR = "OOOO5DBB-8ACE-4FFC-B975-9131D4D82947";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -44,7 +46,11 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Cursors, path: Strings.General_Advanced).WithValue(Publication.ReleaseType == ReleaseType.Default))
                 .WithElement(
-                    new IntegerConfigurationElement(TIMER_FREQUENCY, Strings.WindowsUserInterfaceConfiguration_TimerFrequency, path: Strings.General_Advanced).WithValue(DEFAULT_TIMER_FREQUENCY).WithValidationRule(new IntegerValidationRule(MIN_TIMER_FREQUENCY, MAX_TIMER_FREQUENCY))
+                    new IntegerConfigurationElement(TIMER_FREQUENCY, Strings.WindowsUserInterfaceConfiguration_TimerFrequency, path: Strings.General_Advanced).WithValue(DEFAULT_TIMER_FREQUENCY).WithValidationRule(new IntegerValidationRule(MIN_TIMER_FREQUENCY, MAX_TIMER_FREQUENCY)))
+                .WithElement(
+                    new BooleanConfigurationElement(TRANSPARENCY, Strings.WindowsUserInterfaceConfiguration_Transparency))
+                .WithElement(
+                    new TextConfigurationElement(ACCENT_COLOR, Strings.WindowsUserInterfaceConfiguration_AccentColor).DependsOn(SECTION, TRANSPARENCY)
             );
         }
 

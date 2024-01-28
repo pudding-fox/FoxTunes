@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.IO.Packaging;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,8 +18,6 @@ namespace FoxTunes
 {
     public abstract class LibraryBrowserBase : ConfigurableUIComponentBase
     {
-        public static readonly ThemeLoader ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
-
         protected override void CreateMenu()
         {
             var menu = new Menu()
@@ -35,6 +34,8 @@ namespace FoxTunes
 
         public SelectionConfigurationElement ImageMode { get; private set; }
 
+        public BooleanConfigurationElement Transparency { get; private set; }
+
         protected override void OnConfigurationChanged()
         {
             if (this.Configuration != null)
@@ -46,6 +47,10 @@ namespace FoxTunes
                 this.ImageMode = this.Configuration.GetElement<SelectionConfigurationElement>(
                     LibraryBrowserBaseConfiguration.SECTION,
                     LibraryBrowserBaseConfiguration.TILE_IMAGE
+                );
+                this.Transparency = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    WindowsUserInterfaceConfiguration.SECTION,
+                    WindowsUserInterfaceConfiguration.TRANSPARENCY
                 );
                 this.TileSize.ValueChanged += this.OnValueChanged;
                 this.ImageMode.ValueChanged += this.OnValueChanged;
@@ -185,7 +190,7 @@ namespace FoxTunes
             var activeListBox = this.GetActiveListBox();
             var inactiveListBox = this.GetInactiveListBox();
             activeListBox.Effect = null;
-            if (ThemeLoader.Theme.Flags.HasFlag(ThemeFlags.RequiresTransparency))
+            if (this.Transparency.Value)
             {
                 if (inactiveListBox != null)
                 {

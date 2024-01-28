@@ -1519,6 +1519,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Accent Color.
+        /// </summary>
+        internal static string WindowsUserInterfaceConfiguration_AccentColor {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.AccentColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Counters.
         /// </summary>
         internal static string WindowsUserInterfaceConfiguration_Counters {
@@ -1587,6 +1596,15 @@ namespace FoxTunes {
         internal static string WindowsUserInterfaceConfiguration_TimerFrequency {
             get {
                 return ResourceManager.GetString("WindowsUserInterfaceConfiguration.TimerFrequency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Transparency.
+        /// </summary>
+        internal static string WindowsUserInterfaceConfiguration_Transparency {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.Transparency", resourceCulture);
             }
         }
     }

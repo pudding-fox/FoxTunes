@@ -1,10 +1,12 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace FoxTunes
 {
@@ -56,7 +58,6 @@ namespace FoxTunes
 
             private AllowsTransparencyBehaviour()
             {
-                this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
                 this.UserInterface = ComponentRegistry.Instance.GetComponent<IUserInterface>();
                 this.Configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
             }
@@ -65,13 +66,19 @@ namespace FoxTunes
             {
                 this.Window = window;
                 this.Window.Loaded += this.OnLoaded;
-                if (this.ThemeLoader != null)
-                {
-                    this.ThemeLoader.ThemeChanged += this.OnThemeChanged;
-                    this.Refresh();
-                }
                 if (this.Configuration != null)
                 {
+                    this.Configuration.GetElement<BooleanConfigurationElement>(
+                        WindowsUserInterfaceConfiguration.SECTION,
+                        WindowsUserInterfaceConfiguration.TRANSPARENCY
+                    ).ConnectValue(value =>
+                    {
+                        this.Enabled = value;
+                        if (this.Window != null)
+                        {
+                            this.EnableTransparency(value);
+                        }
+                    });
                     this.Configuration.GetElement<TextConfigurationElement>(
                         WindowsUserInterfaceConfiguration.SECTION,
                         WindowsUserInterfaceConfiguration.ACCENT_COLOR
@@ -85,7 +92,7 @@ namespace FoxTunes
                         {
                             this.AccentColor = value.ToColor();
                         }
-                        if (this.Window != null)
+                        if (this.Window != null && this.Enabled)
                         {
                             this.EnableBlur();
                         }
@@ -93,11 +100,11 @@ namespace FoxTunes
                 }
             }
 
-            public ThemeLoader ThemeLoader { get; private set; }
-
             public IUserInterface UserInterface { get; private set; }
 
             public IConfiguration Configuration { get; private set; }
+
+            public bool Enabled { get; private set; }
 
             public Color AccentColor { get; private set; }
 
@@ -112,15 +119,9 @@ namespace FoxTunes
                 this.EnableBlur();
             }
 
-            protected virtual void OnThemeChanged(object sender, EventArgs e)
+            public virtual void EnableTransparency(bool enable)
             {
-                this.Refresh();
-            }
-
-            public void Refresh()
-            {
-                var allowsTransparency = this.ThemeLoader.Theme.Flags.HasFlag(ThemeFlags.RequiresTransparency);
-                if (this.Window.AllowsTransparency != allowsTransparency)
+                if (this.Window.AllowsTransparency != enable)
                 {
                     if (new WindowInteropHelper(this.Window).Handle != IntPtr.Zero)
                     {
@@ -131,7 +132,7 @@ namespace FoxTunes
                         }
                         return;
                     }
-                    this.Window.AllowsTransparency = allowsTransparency;
+                    this.Window.AllowsTransparency = enable;
                 }
             }
 
@@ -146,15 +147,6 @@ namespace FoxTunes
                 {
                     WindowExtensions.EnableBlur(windowHelper.Handle);
                 }
-            }
-
-            protected override void OnDisposing()
-            {
-                if (this.ThemeLoader != null)
-                {
-                    this.ThemeLoader.ThemeChanged -= this.OnThemeChanged;
-                }
-                base.OnDisposing();
             }
         }
 

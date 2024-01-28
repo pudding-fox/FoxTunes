@@ -29,14 +29,6 @@ namespace FoxTunes
             }
         }
 
-        public override ThemeFlags Flags
-        {
-            get
-            {
-                return ThemeFlags.RequiresTransparency;
-            }
-        }
-
         public IntegerConfigurationElement Opacity { get; private set; }
 
         public override void InitializeComponent(ICore core)
