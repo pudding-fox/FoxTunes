@@ -152,7 +152,7 @@ namespace FoxTunes
             {
                 try
                 {
-                    return value.ToPalette();
+                    return value.ToColorStops().ToGradient();
                 }
                 catch
                 {

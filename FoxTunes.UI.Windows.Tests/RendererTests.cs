@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Windows.Media;
 
 namespace FoxTunes
 {
-    [TestFixture]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class RendererTests : RendererBase
     {
         public RendererTests() : base(false)
@@ -48,11 +49,11 @@ namespace FoxTunes
                 (Color)ColorConverter.ConvertFromString("#FFE3F1E3"),
                 (Color)ColorConverter.ConvertFromString("#FFFFFFFF")
             };
-            var actual = new KeyValuePair<int, Color>[]
+            var actual = new ColorStop[]
             {
-                new KeyValuePair<int, Color>(0, Colors.Black),
-                new KeyValuePair<int, Color>(5, Colors.Green),
-                new KeyValuePair<int, Color>(10, Colors.White)
+                new ColorStop(0, Colors.Black),
+                new ColorStop(5, Colors.Green),
+                new ColorStop(10, Colors.White)
             }.ToGradient();
             Assert.IsTrue(Enumerable.SequenceEqual(expected, actual));
         }
