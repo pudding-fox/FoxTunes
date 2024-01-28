@@ -92,15 +92,36 @@ namespace FoxTunes
         {
             if (Connection == null)
             {
+                var create = false;
                 if (!File.Exists(DatabaseFileName))
                 {
-                    Logger.Write(this, LogLevel.Fatal, "Failed to locate the database: {0}", DatabaseFileName);
-                    throw new FileNotFoundException("Failed to locate the database.", DatabaseFileName);
+                    Logger.Write(this, LogLevel.Warn, "Failed to locate the database: {0}", DatabaseFileName);
+                    create = true;
                 }
                 Logger.Write(this, LogLevel.Debug, "Connecting to database: {0}", this.ConnectionString);
                 Connection = new SQLiteConnection(this.ConnectionString);
+                if (create)
+                {
+                    this.CreateDatabase();
+                }
             }
             return Connection;
+        }
+
+        private void CreateDatabase()
+        {
+            Logger.Write(this, LogLevel.Debug, "Creating database: {0}", this.ConnectionString);
+            switch (Connection.State)
+            {
+                case ConnectionState.Closed:
+                    Connection.Open();
+                    break;
+            }
+            using (var command = Connection.CreateCommand())
+            {
+                command.CommandText = Resources.Database;
+                command.ExecuteNonQuery();
+            }
         }
     }
 }
