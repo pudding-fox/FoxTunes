@@ -72,18 +72,22 @@ namespace FoxTunes
                 {
                     return;
                 }
-                var scrollViewer = this.ListView.FindChild<ScrollViewer>();
-                if (scrollViewer != null)
-                {
-                    if (scrollViewer.ScrollToItemOffset<ListViewItem>(index, this.OnItemLoaded))
-                    {
-                        this.ListView.UpdateLayout();
-                    }
-                }
-                var item = this.ListView.ItemContainerGenerator.ContainerFromItem(value) as ListViewItem;
+                var item = this.ListView.ItemContainerGenerator.ContainerFromItem(value) as ListBoxItem;
                 if (item != null)
                 {
                     item.BringIntoView();
+                }
+                else
+                {
+                    var scrollViewer = this.ListView.FindChild<ScrollViewer>();
+                    if (scrollViewer != null)
+                    {
+                        if (scrollViewer.ScrollToItemOffset<ListBoxItem>(index, this.OnItemLoaded))
+                        {
+                            this.ListView.UpdateLayout();
+                            item = this.ListView.ItemContainerGenerator.ContainerFromItem(value) as ListBoxItem;
+                        }
+                    }
                 }
             }
 

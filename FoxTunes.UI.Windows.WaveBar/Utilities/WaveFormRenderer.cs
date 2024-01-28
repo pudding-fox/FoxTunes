@@ -76,17 +76,7 @@ namespace FoxTunes
                 this.Logarithmic.ValueChanged += this.OnValueChanged;
                 this.Smoothing.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
-#if NET40
-                var task = TaskEx.Run(async () =>
-#else
-                var task = Task.Run(async () =>
-#endif
-                {
-                    if (this.PlaybackManager.CurrentStream != null)
-                    {
-                        await this.Update(this.PlaybackManager.CurrentStream).ConfigureAwait(false);
-                    }
-                });
+                this.OnCurrentStreamChanged(this, EventArgs.Empty);
             }
             base.OnConfigurationChanged();
         }
@@ -148,7 +138,7 @@ namespace FoxTunes
             var generatorData = this.GeneratorData;
             if (generatorData == null)
             {
-                return false;
+                generatorData = WaveFormGenerator.WaveFormGeneratorData.Empty;
             }
             var mode = WaveFormStreamPositionConfiguration.GetMode(this.Mode.Value);
             this.RendererData = Create(
@@ -319,15 +309,18 @@ namespace FoxTunes
             var data = this.GeneratorData;
             if (data != null)
             {
-                var valuesPerElement = Convert.ToInt32(
-                    Math.Ceiling(
-                        Math.Max(
-                            (float)data.Capacity / width,
-                            1
+                if (data.Capacity > 0)
+                {
+                    var valuesPerElement = Convert.ToInt32(
+                        Math.Ceiling(
+                            Math.Max(
+                                (float)data.Capacity / width,
+                                1
+                            )
                         )
-                    )
-                );
-                width = data.Capacity / valuesPerElement;
+                    );
+                    width = data.Capacity / valuesPerElement;
+                }
             }
             return base.GetPixelWidth(width);
         }
@@ -376,7 +369,7 @@ namespace FoxTunes
                 UpdateViewMono(generatorData, rendererData);
                 UpdateMono(rendererData);
             }
-            else
+            else if (rendererData.Channels > 1)
             {
                 UpdateViewSeperate(generatorData, rendererData);
                 UpdateSeperate(rendererData);
@@ -670,7 +663,7 @@ namespace FoxTunes
             var valuesPerElement = generatorData.Capacity / width;
             if (valuesPerElement == 0)
             {
-                return null;
+                valuesPerElement = 1;
             }
             var data = new WaveFormRendererData()
             {
