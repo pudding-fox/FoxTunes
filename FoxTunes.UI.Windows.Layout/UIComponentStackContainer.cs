@@ -170,52 +170,52 @@ namespace FoxTunes
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     ADD,
-                    "Add"
+                    Strings.UIComponentStackContainer_Add
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     REMOVE,
-                    "Remove"
+                    Strings.UIComponentStackContainer_Remove
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     MOVE_UP,
-                    "Move Up",
+                    Strings.UIComponentStackContainer_MoveUp,
                     attributes: InvocationComponent.ATTRIBUTE_SEPARATOR
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     MOVE_DOWN,
-                    "Move Down"
+                    Strings.UIComponentStackContainer_MoveDown
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     FILL,
-                    "Fill",
+                    Strings.UIComponentStackContainer_Fill,
                     attributes: (byte)((isFill ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     ALIGN_LEFT,
-                    "Align Left",
+                    Strings.UIComponentStackContainer_AlignLeft,
                     attributes: (byte)((string.Equals(horizontalAlignment, AlignLeft, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     ALIGN_RIGHT,
-                    "Align Right",
+                    Strings.UIComponentStackContainer_AlignRight,
                     attributes: string.Equals(horizontalAlignment, AlignRight, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     ALIGN_TOP,
-                    "Align Top",
+                    Strings.UIComponentStackContainer_AlignTop,
                     attributes: (byte)((string.Equals(verticalAlignment, AlignTop, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     ALIGN_BOTTOM,
-                    "Align Bottom",
+                    Strings.UIComponentStackContainer_AlignBottom,
                     attributes: string.Equals(verticalAlignment, AlignBottom, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
             }
