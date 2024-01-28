@@ -249,27 +249,33 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async Task GetRating(IEnumerable<PlaylistItem> playlistItems, Dictionary<byte, InvocationComponent> invocationComponents)
+        protected virtual async Task GetRating(PlaylistItem[] playlistItems, Dictionary<byte, InvocationComponent> invocationComponents)
         {
-            if (playlistItems.Count() > ListViewExtensions.MAX_SELECTED_ITEMS)
+            if (playlistItems.Length > ListViewExtensions.MAX_SELECTED_ITEMS)
             {
                 //This would result in too many parameters.
+                Logger.Write(this, LogLevel.Debug, "Cannot determining rating for {0} playlist items, max is {1}.", playlistItems.Length, ListViewExtensions.MAX_SELECTED_ITEMS);
                 return;
             }
+            Logger.Write(this, LogLevel.Debug, "Determining rating for {0} playlist items.", playlistItems.Length);
             var rating = default(byte);
             var ratings = await this.MetaDataBrowser.GetMetaDatasAsync(playlistItems, MetaDataItemType.Tag, CommonStatistics.Rating).ConfigureAwait(false);
             switch (ratings.Length)
             {
                 case 0:
+                    Logger.Write(this, LogLevel.Debug, "{0} playlist items have no rating.", playlistItems.Length);
                     rating = 0;
                     break;
                 case 1:
                     if (!byte.TryParse(ratings[0].Value, out rating))
                     {
+                        Logger.Write(this, LogLevel.Warn, "{0} playlist items have rating \"{1}\" which is in an unknown format.", playlistItems.Length, rating);
                         return;
                     }
+                    Logger.Write(this, LogLevel.Debug, "{0} playlist items have rating {1}.", playlistItems.Length, rating);
                     break;
                 default:
+                    Logger.Write(this, LogLevel.Debug, "{0} playlist items have multiple ratings.", playlistItems.Length);
                     return;
             }
             foreach (var key in invocationComponents.Keys)

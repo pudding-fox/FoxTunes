@@ -12,7 +12,7 @@ namespace FoxTunes.ViewModel
             {
                 if (this.Configuration == null)
                 {
-                    return null;
+                    return string.Empty;
                 }
                 if (string.IsNullOrEmpty(this.Configuration.Title))
                 {
