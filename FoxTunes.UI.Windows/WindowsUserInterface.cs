@@ -25,6 +25,7 @@ namespace FoxTunes
             global::FoxTunes.Windows.Registrations.Add(new global::FoxTunes.Windows.WindowRegistration(MainWindow.ID, MainWindow.ROLE, () => new MainWindow()));
             //Common dialogs.
             global::FoxTunes.Windows.Registrations.Add(new global::FoxTunes.Windows.WindowRegistration(EqualizerWindow.ID, UserInterfaceWindowRole.None, () => new EqualizerWindow()));
+            global::FoxTunes.Windows.Registrations.Add(new global::FoxTunes.Windows.WindowRegistration(InputBox.ID, UserInterfaceWindowRole.None, () => new InputBox()));
             global::FoxTunes.Windows.Registrations.Add(new global::FoxTunes.Windows.WindowRegistration(PlaylistManagerWindow.ID, UserInterfaceWindowRole.None, () => new PlaylistManagerWindow()));
             global::FoxTunes.Windows.Registrations.Add(new global::FoxTunes.Windows.WindowRegistration(SettingsWindow.ID, UserInterfaceWindowRole.None, () => new SettingsWindow()));
             global::FoxTunes.Windows.Registrations.Add(new global::FoxTunes.Windows.WindowRegistration(TempoWindow.ID, UserInterfaceWindowRole.None, () => new TempoWindow()));
