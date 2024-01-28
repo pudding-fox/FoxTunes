@@ -9,9 +9,36 @@ namespace FoxTunes
     {
         private static readonly TimeSpan UPDATE_INTERVAL = TimeSpan.FromMilliseconds(500);
 
+        public static readonly IOutput Output;
+
         public static readonly IPlaybackManager PlaybackManager;
 
         public static readonly DispatcherTimer Timer;
+
+        private static bool _IsStarted { get; set; }
+
+        public static bool IsStarted
+        {
+            get
+            {
+                return _IsStarted;
+            }
+            private set
+            {
+                _IsStarted = value;
+                OnIsStartedChanged();
+            }
+        }
+
+        private static void OnIsStartedChanged()
+        {
+            if (IsStartedChanged != null)
+            {
+                IsStartedChanged(typeof(PlaybackStateNotifier), EventArgs.Empty);
+            }
+        }
+
+        public static event EventHandler IsStartedChanged;
 
         private static bool _IsPlaying { get; set; }
 
@@ -65,16 +92,28 @@ namespace FoxTunes
 
         static PlaybackStateNotifier()
         {
+            Output = ComponentRegistry.Instance.GetComponent<IOutput>();
             PlaybackManager = ComponentRegistry.Instance.GetComponent<IPlaybackManager>();
-            if (PlaybackManager == null)
+            if (Output == null || PlaybackManager == null)
             {
                 return;
             }
+            Output.IsStartedChanged += OnIsStartedChanged;
             PlaybackManager.CurrentStreamChanged += OnCurrentStreamChanged;
             Timer = new DispatcherTimer(DispatcherPriority.Background);
             Timer.Interval = UPDATE_INTERVAL;
             Timer.Start();
             Timer.Tick += OnTick;
+        }
+
+        private static void OnIsStartedChanged(object sender, AsyncEventArgs e)
+        {
+            //Critical: Don't block in this event handler, it causes a deadlock.
+#if NET40
+            var task = TaskEx.Run(() => Windows.Invoke(() => Update()));
+#else
+            var task = Task.Run(() => Windows.Invoke(() => Update()));
+#endif
         }
 
         private static void OnCurrentStreamChanged(object sender, EventArgs e)
@@ -101,6 +140,7 @@ namespace FoxTunes
 
         private static void Update()
         {
+            IsStarted = Output.IsStarted;
             var isPlaying = default(bool);
             var isPaused = default(bool);
             var outputStream = PlaybackManager.CurrentStream;

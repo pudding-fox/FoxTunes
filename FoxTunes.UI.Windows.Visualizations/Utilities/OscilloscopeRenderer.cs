@@ -315,6 +315,14 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
+            if (this.Mode != null)
+            {
+                this.Mode.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.Duration != null)
+            {
+                this.Duration.ValueChanged -= this.OnValueChanged;
+            }
             if (this.Smooth != null)
             {
                 this.Smooth.ValueChanged -= this.OnValueChanged;

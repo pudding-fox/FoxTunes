@@ -86,8 +86,11 @@ namespace FoxTunes
                 }
             }
 
-            this.GeneratorData = this.Generator.Generate(stream);
-            this.GeneratorData.Updated += this.OnUpdated;
+            if (stream != null)
+            {
+                this.GeneratorData = this.Generator.Generate(stream);
+                this.GeneratorData.Updated += this.OnUpdated;
+            }
 
             await this.RefreshBitmap().ConfigureAwait(false);
         }
