@@ -11,6 +11,15 @@ namespace FoxTunes
     [Component("ECF542D9-ABB3-4E82-8045-7E13F1727695", ComponentSlots.Database, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class SqlServerDatabaseFactory : DatabaseFactory
     {
+        public override DatabaseFactoryFlags Flags
+        {
+            get
+            {
+                //Don't automatically mess with database servers.
+                return DatabaseFactoryFlags.ConfirmCreate;
+            }
+        }
+
         protected override bool OnTest(IDatabase database)
         {
             try

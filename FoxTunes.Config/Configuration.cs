@@ -22,7 +22,7 @@ namespace FoxTunes
         public Configuration()
         {
             this.Debouncer = new Debouncer(TIMEOUT);
-            this.Load();
+            this.Sections = new ObservableCollection<ConfigurationSection>();
         }
 
         public Debouncer Debouncer { get; private set; }
@@ -85,29 +85,48 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Updating configuration section: {0} => {1}", section.Id, section.Name);
             var existing = this.GetSection(section.Id);
-            existing.Update(section);
+            existing.Update(section, true);
         }
 
         public void Load()
         {
-            this.Sections = new ObservableCollection<ConfigurationSection>();
             if (!File.Exists(ConfigurationFileName))
             {
+                Logger.Write(this, LogLevel.Debug, "Configuration file \"{0}\" does not exist.", ConfigurationFileName);
                 return;
             }
+            Logger.Write(this, LogLevel.Debug, "Loading configuration from file \"{0}\".", ConfigurationFileName);
             try
             {
                 using (var stream = File.OpenRead(ConfigurationFileName))
                 {
                     var formatter = new BinaryFormatter();
-                    this.Sections = new ObservableCollection<ConfigurationSection>(
-                        (IEnumerable<ConfigurationSection>)formatter.Deserialize(stream)
-                    );
+                    var sections = (IEnumerable<ConfigurationSection>)formatter.Deserialize(stream);
+                    foreach (var section in sections)
+                    {
+                        if (!this.Contains(section.Id))
+                        {
+                            //If config was created by a component that is no longer loaded then it will be lost here.
+                            //TODO: Add the config but hide it so it's preserved but not displayed.
+                            Logger.Write(this, LogLevel.Warn, "Configuration section \"{0}\" no longer exists.", section.Id);
+                            continue;
+                        }
+                        try
+                        {
+                            Logger.Write(this, LogLevel.Debug, "Loading configuration section \"{0}\".", section.Id);
+                            var existing = this.GetSection(section.Id);
+                            existing.Update(section, false);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Write(this, LogLevel.Warn, "Failed to load configuration section \"{0}\": {1}", section.Id, e.Message);
+                        }
+                    }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                //Nothing can be done.
+                Logger.Write(this, LogLevel.Warn, "Failed to load configuration: {0}", e.Message);
             }
         }
 

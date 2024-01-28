@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
 
 namespace FoxTunes
 {
@@ -17,7 +19,6 @@ namespace FoxTunes
             }
         }
 
-        [field: NonSerialized]
         public event EventHandler Invoked;
 
         public CommandConfigurationElement WithHandler(Action action)
@@ -41,5 +42,33 @@ namespace FoxTunes
         {
             //Nothing to do.
         }
+
+        protected override void OnUpdate(ConfigurationElement element, bool create)
+        {
+            //Nothing to do.
+        }
+
+        #region ISerializable
+
+        public override bool IsPersistent
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        protected CommandConfigurationElement(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+
+        }
+
+        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+        }
+
+        #endregion
     }
 }

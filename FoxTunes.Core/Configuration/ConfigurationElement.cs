@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
 
 namespace FoxTunes
 {
     [Serializable]
-    public abstract class ConfigurationElement : BaseComponent
+    public abstract class ConfigurationElement : BaseComponent, ISerializable
     {
         private ConfigurationElement()
         {
@@ -54,10 +56,8 @@ namespace FoxTunes
             this.OnPropertyChanged("IsHidden");
         }
 
-        [field: NonSerialized]
         public event EventHandler IsHiddenChanged;
 
-        [field: NonSerialized]
         private ObservableCollection<ValidationRule> _ValidationRules;
 
         public ObservableCollection<ValidationRule> ValidationRules
@@ -82,7 +82,6 @@ namespace FoxTunes
             this.OnPropertyChanged("ValidationRules");
         }
 
-        [field: NonSerialized]
         public event EventHandler ValidationRulesChanged;
 
         public ConfigurationElement WithValidationRule(ValidationRule validationRule)
@@ -119,7 +118,6 @@ namespace FoxTunes
             this.OnPropertyChanged("Flags");
         }
 
-        [field: NonSerialized]
         public event EventHandler FlagsChanged;
 
         public ConfigurationElement WithFlags(ConfigurationElementFlags flags)
@@ -128,7 +126,6 @@ namespace FoxTunes
             return this;
         }
 
-        [NonSerialized]
         private IDictionary<string, ISet<string>> _Dependencies;
 
         public IDictionary<string, ISet<string>> Dependencies
@@ -143,27 +140,17 @@ namespace FoxTunes
             }
         }
 
-        public void Update(ConfigurationElement element)
+        public void Update(ConfigurationElement element, bool create)
         {
             if (!this.GetType().IsAssignableFrom(element.GetType()))
             {
                 //Element type was changed, cannot restore settings.
                 return;
             }
-            this.Name = element.Name;
-            this.Description = element.Description;
-            this.Path = element.Path;
-            this.IsHidden = element.IsHidden;
-            this.ValidationRules = element.ValidationRules;
-            this.Flags = element.Flags;
-            this.Dependencies = element.Dependencies;
-            this.OnUpdate(element);
+            this.OnUpdate(element, create);
         }
 
-        protected virtual void OnUpdate(ConfigurationElement element)
-        {
-            //Nothing to do.
-        }
+        protected abstract void OnUpdate(ConfigurationElement element, bool create);
 
         public ConfigurationElement Hide()
         {
@@ -188,6 +175,23 @@ namespace FoxTunes
         }
 
         public abstract void Reset();
+
+        #region ISerializable
+
+        public abstract bool IsPersistent { get; }
+
+        protected ConfigurationElement(SerializationInfo info, StreamingContext context)
+        {
+            this.Id = info.GetString(nameof(this.Id));
+        }
+
+        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(this.Id), this.Id);
+        }
+
+        #endregion
     }
 
     [Serializable]
@@ -232,7 +236,6 @@ namespace FoxTunes
             this.OnPropertyChanged("Value");
         }
 
-        [field: NonSerialized]
         public event EventHandler ValueChanged;
 
         public ConfigurationElement<T> WithValue(T value)
@@ -263,6 +266,21 @@ namespace FoxTunes
         {
             this.Value = (T)Convert.ChangeType(this.DefaultValue, typeof(T));
         }
+
+        #region ISerializable
+
+        protected ConfigurationElement(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+            this.Value = (T)info.GetValue(nameof(this.Value), typeof(T));
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue(nameof(this.Value), this.Value);
+        }
+
+        #endregion
     }
 
     [Flags]

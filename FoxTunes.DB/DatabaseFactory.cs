@@ -11,6 +11,8 @@ namespace FoxTunes
 
         public IConfig Config { get; private set; }
 
+        public abstract DatabaseFactoryFlags Flags { get; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;

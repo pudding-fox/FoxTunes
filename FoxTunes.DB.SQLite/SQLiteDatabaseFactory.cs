@@ -8,9 +8,17 @@ using System.IO;
 
 namespace FoxTunes
 {
-    [Component("13A75018-8A24-413D-A731-C558C8FAF08F", ComponentSlots.Database, priority: ComponentAttribute.PRIORITY_HIGH)]
+    [Component("13A75018-8A24-413D-A731-C558C8FAF08F", ComponentSlots.Database, priority: ComponentAttribute.PRIORITY_HIGH, @default: true)]
     public class SQLiteDatabaseFactory : DatabaseFactory
     {
+        public override DatabaseFactoryFlags Flags
+        {
+            get
+            {
+                return DatabaseFactoryFlags.None;
+            }
+        }
+
         protected override bool OnTest(IDatabase database)
         {
             if (!File.Exists(SQLiteDatabase.FileName))
