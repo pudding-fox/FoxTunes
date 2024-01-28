@@ -445,10 +445,6 @@ namespace FoxTunes.ViewModel
                 {
                     effects = DragDropEffects.Copy;
                 }
-                if (ShellIDListHelper.GetDataPresent(e.Data))
-                {
-                    effects = DragDropEffects.Copy;
-                }
             }
             catch (Exception exception)
             {
@@ -474,11 +470,6 @@ namespace FoxTunes.ViewModel
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
                     var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                    this.Value = paths.FirstOrDefault();
-                }
-                if (ShellIDListHelper.GetDataPresent(e.Data))
-                {
-                    var paths = ShellIDListHelper.GetData(e.Data);
                     this.Value = paths.FirstOrDefault();
                 }
             }

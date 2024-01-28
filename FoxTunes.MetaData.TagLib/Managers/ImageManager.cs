@@ -1,9 +1,9 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TagLib;
-using System.Linq;
 
 namespace FoxTunes
 {
@@ -209,7 +209,33 @@ namespace FoxTunes
 
         public static async Task Write(TagLibMetaDataSource source, MetaDataItem metaDataItem, File file)
         {
-            //TODO: Always writing embedded images regardless of settings.
+            var embedded = source.EmbeddedImages.Value;
+            var loose = source.LooseImages.Value;
+            if (embedded && loose)
+            {
+                switch (MetaDataBehaviourConfiguration.GetImagesPreference(source.ImagesPreference.Value))
+                {
+                    default:
+                    case ImagePreference.Embedded:
+                        await WriteEmbedded(source, metaDataItem, file).ConfigureAwait(false);
+                        break;
+                    case ImagePreference.Loose:
+                        WriteLoose(source, metaDataItem, file);
+                        break;
+                }
+            }
+            else if (embedded)
+            {
+                await WriteEmbedded(source, metaDataItem, file).ConfigureAwait(false);
+            }
+            else if (loose)
+            {
+                WriteLoose(source, metaDataItem, file);
+            }
+        }
+
+        private static async Task WriteEmbedded(TagLibMetaDataSource source, MetaDataItem metaDataItem, File file)
+        {
             var index = default(int);
             var pictures = new List<IPicture>(file.Tag.Pictures);
             if (HasImage(metaDataItem.Name, file.Tag, pictures, out index))
@@ -230,6 +256,26 @@ namespace FoxTunes
             file.Tag.Pictures = pictures.ToArray();
         }
 
+        private static void WriteLoose(TagLibMetaDataSource source, MetaDataItem metaDataItem, File file)
+        {
+            var fileName = default(string);
+            if (HasImage(metaDataItem.Name, file, out fileName))
+            {
+                if (!string.IsNullOrEmpty(metaDataItem.Value))
+                {
+                    ReplaceImage(metaDataItem, fileName);
+                }
+                else
+                {
+                    RemoveImage(metaDataItem, fileName);
+                }
+            }
+            else if (!string.IsNullOrEmpty(metaDataItem.Value))
+            {
+                AddImage(metaDataItem, file);
+            }
+        }
+
         private static bool HasImage(string name, Tag tag, IList<IPicture> pictures, out int index)
         {
             var type = GetArtworkType(name);
@@ -245,9 +291,26 @@ namespace FoxTunes
             return false;
         }
 
+        private static bool HasImage(string name, File file, out string fileName)
+        {
+            var type = GetArtworkType(name);
+            fileName = ArtworkProvider.Find(file.Name, type);
+            return !string.IsNullOrEmpty(fileName) && global::System.IO.File.Exists(fileName);
+        }
+
         private static async Task AddImage(MetaDataItem metaDataItem, File file, IList<IPicture> pictures)
         {
             pictures.Add(await CreateImage(metaDataItem, file).ConfigureAwait(false));
+        }
+
+        private static void AddImage(MetaDataItem metaDataItem, File file)
+        {
+            var type = GetArtworkType(metaDataItem.Name);
+            //TODO: Assuming that the file name has the correct extension and not .bin
+            var extension = global::System.IO.Path.GetExtension(metaDataItem.Value);
+            var fileName = ArtworkProvider.GetFileName(file.Name, extension, type);
+            global::System.IO.File.Copy(metaDataItem.Value, fileName, true);
+            ArtworkProvider.Reset(file.Name, type);
         }
 
         private static async Task ReplaceImage(MetaDataItem metaDataItem, File file, IList<IPicture> pictures, int index)
@@ -255,9 +318,23 @@ namespace FoxTunes
             pictures[index] = await CreateImage(metaDataItem, file).ConfigureAwait(false);
         }
 
+        private static void ReplaceImage(MetaDataItem metaDataItem, string fileName)
+        {
+            var type = GetArtworkType(metaDataItem.Name);
+            global::System.IO.File.Copy(metaDataItem.Value, fileName, true);
+            ArtworkProvider.Reset(fileName, type);
+        }
+
         private static void RemoveImage(MetaDataItem metaDataItem, Tag tag, IList<IPicture> pictures, int index)
         {
             pictures.RemoveAt(index);
+        }
+
+        private static void RemoveImage(MetaDataItem metaDataItem, string fileName)
+        {
+            var type = GetArtworkType(metaDataItem.Name);
+            global::System.IO.File.Delete(fileName);
+            ArtworkProvider.Reset(fileName, type);
         }
 
         private static async Task<IPicture> CreateImage(MetaDataItem metaDataItem, File file)
@@ -266,6 +343,7 @@ namespace FoxTunes
             var picture = new Picture(metaDataItem.Value)
             {
                 Type = GetPictureType(type),
+                //TODO: Assuming that the file name has the correct extension and not .bin
                 MimeType = MimeMapping.Instance.GetMimeType(metaDataItem.Value)
             };
             metaDataItem.Value = await ImportImage(file, picture, type, true).ConfigureAwait(false);
