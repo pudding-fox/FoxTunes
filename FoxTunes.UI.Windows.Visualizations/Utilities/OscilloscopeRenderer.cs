@@ -8,6 +8,14 @@ namespace FoxTunes
 {
     public class OscilloscopeRenderer : VisualizationBase
     {
+        protected override bool LoadColorPalette
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public OscilloscopeRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement Mode { get; private set; }
@@ -66,7 +74,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, this.Colors));
+                info = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, this.Color));
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
             if (!success)

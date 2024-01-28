@@ -53,6 +53,21 @@ namespace FoxTunes
             source.SetValue(BackgroundProperty, value);
         }
 
+        public static readonly DependencyProperty ForegroundProperty = Control.ForegroundProperty.AddOwner(
+            typeof(RendererBase),
+            new FrameworkPropertyMetadata(SystemColors.ControlTextBrush, FrameworkPropertyMetadataOptions.Inherits)
+        );
+
+        public Brush GetForeground(RendererBase source)
+        {
+            return (Brush)source.GetValue(ForegroundProperty);
+        }
+
+        public void SetForeground(RendererBase source, Brush value)
+        {
+            source.SetValue(ForegroundProperty, value);
+        }
+
         protected RendererBase(bool initialize = true)
         {
             if (initialize && Core.Instance != null)
@@ -70,6 +85,18 @@ namespace FoxTunes
             set
             {
                 SetBackground(this, value);
+            }
+        }
+
+        public Brush Foreground
+        {
+            get
+            {
+                return GetForeground(this);
+            }
+            set
+            {
+                SetForeground(this, value);
             }
         }
 
@@ -97,11 +124,31 @@ namespace FoxTunes
             }
         }
 
+        public Color Color
+        {
+            get
+            {
+                if (this.Foreground is SolidColorBrush brush)
+                {
+                    return brush.Color;
+                }
+                return global::System.Windows.Media.Colors.Transparent;
+            }
+        }
+
         public Color[] Colors { get; private set; }
 
         protected virtual void OnColorsChanged()
         {
             var task = this.CreateData();
+        }
+
+        protected virtual bool LoadColorPalette
+        {
+            get
+            {
+                return true;
+            }
         }
 
         public PixelSizeConverter PixelSizeConverter { get; private set; }
@@ -113,16 +160,19 @@ namespace FoxTunes
         public virtual void InitializeComponent(ICore core)
         {
             this.PixelSizeConverter = ComponentRegistry.Instance.GetComponent<PixelSizeConverter>();
-            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
-            this.ThemeLoader.ConnectTheme(theme =>
+            if (this.LoadColorPalette)
             {
-                var raise = this.Colors != null;
-                this.Colors = theme.ColorPalettes.First().Value.ToColorStops().ToGradient();
-                if (raise)
+                this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+                this.ThemeLoader.ConnectTheme(theme =>
                 {
-                    this.OnColorsChanged();
-                }
-            });
+                    var raise = this.Colors != null;
+                    this.Colors = theme.ColorPalettes.First().Value.ToColorStops().ToGradient();
+                    if (raise)
+                    {
+                        this.OnColorsChanged();
+                    }
+                });
+            }
             this.Output = core.Components.Output;
         }
 
@@ -813,12 +863,12 @@ namespace FoxTunes
             return result;
         }
 
-        public static Color[] MirrorGradient(this Color[] colors)
+        public static Color[] MirrorGradient(this Color[] colors, bool invert)
         {
             return new[]
             {
-                colors,
-                colors.Reverse()
+                invert ? colors.Reverse() : colors,
+                invert ? colors : colors.Reverse()
             }.SelectMany(a => a).ToArray();
         }
 

@@ -71,7 +71,7 @@ namespace FoxTunes
             {
                 try
                 {
-                    return value.ToColorStops().ToGradient().MirrorGradient();
+                    return value.ToColorStops().ToGradient().MirrorGradient(true);
                 }
                 catch
                 {

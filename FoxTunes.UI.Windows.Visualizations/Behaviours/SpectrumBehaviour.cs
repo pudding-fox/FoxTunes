@@ -11,6 +11,8 @@ namespace FoxTunes
     {
         public const string CATEGORY = "3DF40656-FDD5-4B98-A25C-66DDFFD66CA0";
 
+        public ThemeLoader ThemeLoader { get; private set; }
+
         public IUserInterface UserInterface { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -23,8 +25,11 @@ namespace FoxTunes
 
         public SelectionConfigurationElement FFTSize { get; private set; }
 
+        public TextConfigurationElement ColorPalette { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
+            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
             this.UserInterface = core.Components.UserInterface;
             this.Configuration = core.Components.Configuration;
             this.Bars = this.Configuration.GetElement<SelectionConfigurationElement>(
@@ -42,6 +47,10 @@ namespace FoxTunes
             this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
+            );
+            this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.COLOR_PALETTE_ELEMENT
             );
             base.InitializeComponent(core);
         }
@@ -68,6 +77,10 @@ namespace FoxTunes
                         attributes: this.Bars.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
+                foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette))
+                {
+                    yield return component;
+                }
                 yield return new InvocationComponent(
                     CATEGORY,
                     this.Peaks.Id,
@@ -82,6 +95,10 @@ namespace FoxTunes
             if (string.Equals(component.Id, this.Peaks.Id, StringComparison.OrdinalIgnoreCase))
             {
                 this.Peaks.Toggle();
+            }
+            else if (this.ThemeLoader.SelectColorPalette(this.ColorPalette, component))
+            {
+                //Nothing to do.
             }
             else
             {
