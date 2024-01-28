@@ -47,10 +47,14 @@ jobs:
 
     - name: Package
       run: |
-        ./release.sh
+        ./release.sh nightly
+        ./package.sh nightly
       shell: bash
 
     - uses: actions/upload-artifact@v2
       with:
         name: packages
-        path: ./release/*.zip
+        path: |
+          ./release/SigningCert.cer
+          ./release/*.zip
+          ./release/*.appx
