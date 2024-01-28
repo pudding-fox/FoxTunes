@@ -1,7 +1,11 @@
 ﻿using FoxTunes.Interfaces;
+using FoxTunes.ViewModel;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace FoxTunes
 {
@@ -10,6 +14,12 @@ namespace FoxTunes
     /// </summary>
     public partial class Library : UserControl
     {
+        private LibraryNode SelectedNode { get; set; }
+
+        private Point DragStartPosition { get; set; }
+
+        private bool DragInitialized { get; set; }
+
         public Library()
         {
             InitializeComponent();
@@ -43,6 +53,42 @@ namespace FoxTunes
                 this.Core.Components.Database.SaveChanges();
             }
             base.OnDrop(e);
+        }
+
+        protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            this.DragStartPosition = e.GetPosition(null);
+            base.OnPreviewMouseLeftButtonDown(e);
+        }
+
+        protected override void OnPreviewMouseMove(MouseEventArgs e)
+        {
+            if (e.LeftButton != MouseButtonState.Pressed || this.DragInitialized || this.SelectedNode == null)
+            {
+                return;
+            }
+            var position = e.GetPosition(null);
+            if (Math.Abs(position.X - this.DragStartPosition.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(position.Y - this.DragStartPosition.Y) > SystemParameters.MinimumVerticalDragDistance)
+            {
+                this.DoDragDrop();
+            }
+            base.OnPreviewMouseMove(e);
+        }
+
+        private void DoDragDrop()
+        {
+            this.DragInitialized = true;
+            DragDrop.DoDragDrop(
+                this, 
+                this.SelectedNode.LibraryItems, 
+                DragDropEffects.Copy
+            );
+            this.DragInitialized = false;
+        }
+
+        private void TreeView_Selected(object sender, RoutedEventArgs e)
+        {
+            this.SelectedNode = (e.OriginalSource as TreeViewItem).DataContext as LibraryNode;
         }
     }
 }

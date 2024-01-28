@@ -12,10 +12,11 @@ namespace FoxTunes.ViewModel
 
         }
 
-        public LibraryNode(string header, IEnumerable<LibraryNode> items)
+        public LibraryNode(string header, IEnumerable<LibraryItem> libraryItems, IEnumerable<LibraryNode> libraryNodes)
         {
             this.Header = header;
-            this.Items = new ObservableCollection<LibraryNode>(items);
+            this.LibraryItems = new ObservableCollection<LibraryItem>(libraryItems);
+            this.LibraryNodes = new ObservableCollection<LibraryNode>(libraryNodes);
         }
 
         private string _Header { get; set; }
@@ -44,7 +45,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler HeaderChanged = delegate { };
 
-        public ObservableCollection<LibraryNode> Items { get; private set; }
+        public ObservableCollection<LibraryItem> LibraryItems { get; private set; }
+
+        public ObservableCollection<LibraryNode> LibraryNodes { get; private set; }
 
         protected override Freezable CreateInstanceCore()
         {

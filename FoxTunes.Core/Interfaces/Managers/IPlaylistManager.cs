@@ -7,6 +7,8 @@ namespace FoxTunes.Interfaces
     {
         void Add(IEnumerable<string> paths);
 
+        void Add(IEnumerable<LibraryItem> libraryItems);
+
         void Next();
 
         void Previous();
