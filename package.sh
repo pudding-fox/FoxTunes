@@ -11,12 +11,9 @@ SIGNTOOL="$(realpath ./.msix/signtool.exe)"
 RAIMUSOFT_CER="$(realpath ./.msix/RaimuSoft.cer)"
 RAIMUSOFT_PFX="$(realpath ./.msix/RaimuSoft.pfx)"
 
-PLATFORM="
-x86
-"
-
 TARGET="
 net462
+net48
 "
 
 if [ -z "$1" ]
@@ -49,35 +46,30 @@ rm -f ./release/*.appx
 rm -f ./release/*.cer
 cp "$RAIMUSOFT_CER" "./release/SigningCert.cer"
 
-for platform in $PLATFORM
+for target in $TARGET
 do
-	for target in $TARGET
-	do
 
-	cd "./release/$platform/$target"
+cd "./release/$target"
 
-	echo "Creating manifest.."
-	cp "../../../FoxTunes.Manifest.xml" "./main/AppxManifest.xml"
+echo "Creating manifest.."
+cp "../../FoxTunes.Manifest.xml" "./main/AppxManifest.xml"
 
-	echo "Creating assets.."
-	mkdir -p "./main/Assets"
-	cp ../../../Assets/* "main/Assets/"
+echo "Creating assets.."
+mkdir -p "./main/Assets"
+cp ../../Assets/* "main/Assets/"
 
-	echo "Creating msix package.."
-	"$MAKEMSIX" pack -d "main" -p "FoxTunes-$version-$target-$platform.appx"
-	cp "./FoxTunes-$version-$target-$platform.appx" "../../FoxTunes-$version-$target-$platform.appx"
+echo "Creating msix package.."
+"$MAKEMSIX" pack -d "main" -p "FoxTunes-$version-$target.appx"
+cp "./FoxTunes-$version-$target.appx" "../FoxTunes-$version-$target.appx"
 
-	echo "Signing msix package.."
-	cp "$RAIMUSOFT_PFX" "./SigningCert.pfx"
-	"$SIGNTOOL" sign //fd SHA256 //a //f SigningCert.pfx "FoxTunes-$version-$target-$platform.appx"
-	cp "./FoxTunes-$version-$target-$platform.appx" "../../FoxTunes-$version-$target-$platform-Signed.appx"
+echo "Signing msix package.."
+cp "$RAIMUSOFT_PFX" "./SigningCert.pfx"
+"$SIGNTOOL" sign //fd SHA256 //a //f SigningCert.pfx "FoxTunes-$version-$target.appx"
+cp "./FoxTunes-$version-$target.appx" "../FoxTunes-$version-$target-Signed.appx"
 
-	cd ..
-	cd ..
-	cd ..
+cd ..
+cd ..
 
-	done
-	echo
 done
 echo
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IBassPluginLoader : IBaseComponent, IDisposable
+    public interface IBassLoader : IBaseComponent, IDisposable
     {
         IEnumerable<string> Extensions { get; }
 

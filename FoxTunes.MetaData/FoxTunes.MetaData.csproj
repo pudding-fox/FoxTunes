@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFrameworks>net40;net462;net48</TargetFrameworks>
     <AssemblyName>FoxTunes.MetaData</AssemblyName>
-    <OutputPath>..\distribution\$(Platform)\</OutputPath>
+    <OutputPath>..\distribution\</OutputPath>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
     <AssemblyVersion>2.4.0.0</AssemblyVersion>
-    <Platforms>x86;x64</Platforms>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

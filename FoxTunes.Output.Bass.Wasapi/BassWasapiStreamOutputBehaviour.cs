@@ -2,6 +2,7 @@
 using ManagedBass;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace FoxTunes
 {
@@ -9,6 +10,20 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassWasapiStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(BassWasapiStreamOutputBehaviour).Assembly.Location);
+            }
+        }
+
+        public BassWasapiStreamOutputBehaviour()
+        {
+            Loader.Load(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", "basswasapi.dll"));
+            Loader.Load(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", "bass_wasapi_handler.dll"));
+        }
+
         public ICore Core { get; private set; }
 
         public IBassOutput Output { get; private set; }

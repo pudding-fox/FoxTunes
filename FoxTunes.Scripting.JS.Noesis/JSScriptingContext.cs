@@ -1,5 +1,4 @@
-﻿#if X86
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using Noesis.Javascript;
 using System.Diagnostics;
 
@@ -16,7 +15,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Context.Run(Resources.utils);
+            this.Context.Run(JSCoreScripts.Instance.Utils);
             this.Context.SetParameter("Publication", new Publication());
             this.Context.SetParameter("DateHelper", new DateHelper());
             this.Context.SetParameter("NumberHelper", new NumberHelper());
@@ -85,4 +84,3 @@ namespace FoxTunes
         }
     }
 }
-#endif

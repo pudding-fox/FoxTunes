@@ -2,6 +2,7 @@
 using ManagedBass;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -11,6 +12,20 @@ namespace FoxTunes
     public class BassAsioStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IDisposable
     {
         public const string SETTINGS = "ZZZZ";
+
+        public static string Location
+        {
+            get
+            {
+                return Path.GetDirectoryName(typeof(BassAsioStreamOutputBehaviour).Assembly.Location);
+            }
+        }
+
+        public BassAsioStreamOutputBehaviour()
+        {
+            Loader.Load(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", "bassasio.dll"));
+            Loader.Load(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", "bass_asio_handler.dll"));
+        }
 
         public ICore Core { get; private set; }
 

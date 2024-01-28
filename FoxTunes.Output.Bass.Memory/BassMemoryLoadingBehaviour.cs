@@ -20,7 +20,7 @@ namespace FoxTunes
             this.Handler = new BassMemoryProgressHandler(this.UpdateProgress);
         }
 
-        public IBassPluginLoader BassPluginLoader { get; private set; }
+        public IBassLoader BassLoader { get; private set; }
 
         public ICore Core { get; private set; }
 
@@ -28,14 +28,14 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.BassPluginLoader = ComponentRegistry.Instance.GetComponent<IBassPluginLoader>();
-            if (this.BassPluginLoader.IsLoaded)
+            this.BassLoader = ComponentRegistry.Instance.GetComponent<IBassLoader>();
+            if (this.BassLoader.IsLoaded)
             {
                 this.OnIsLoadedChanged(this, EventArgs.Empty);
             }
             else
             {
-                this.BassPluginLoader.IsLoadedChanged += this.OnIsLoadedChanged;
+                this.BassLoader.IsLoadedChanged += this.OnIsLoadedChanged;
             }
             this.Core = core;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
@@ -44,7 +44,7 @@ namespace FoxTunes
 
         protected virtual void OnIsLoadedChanged(object sender, EventArgs e)
         {
-            if (this.BassPluginLoader.IsLoaded)
+            if (this.BassLoader.IsLoaded)
             {
                 try
                 {
@@ -139,9 +139,9 @@ namespace FoxTunes
                     pair.Value.Dispose();
                 }
             }
-            if (this.BassPluginLoader != null)
+            if (this.BassLoader != null)
             {
-                this.BassPluginLoader.IsLoadedChanged -= this.OnIsLoadedChanged;
+                this.BassLoader.IsLoadedChanged -= this.OnIsLoadedChanged;
             }
         }
 

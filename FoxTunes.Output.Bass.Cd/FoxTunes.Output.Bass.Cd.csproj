@@ -3,11 +3,11 @@
 	<PropertyGroup>
 		<TargetFrameworks>net40;net462;net48</TargetFrameworks>
 		<AssemblyName>FoxTunes.Output.Bass.Cd</AssemblyName>
-		<OutputPath>..\distribution\$(Platform)\</OutputPath>
+		<OutputPath>..\distribution\</OutputPath>
 		<SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
 		<SkipValidatePackageReferences>true</SkipValidatePackageReferences>
 		<AssemblyVersion>2.4.0.0</AssemblyVersion>
-		<Platforms>x86;x64</Platforms>
+		<Platforms>AnyCPU</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -28,14 +28,14 @@
 		</Reference>
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Platform)' == 'x86'">
-		<None Include="..\lib\x86\basscd.dll" Link="Addon\basscd.dll">
+	<ItemGroup>
+		<None Include="..\lib\x86\basscd.dll" Link="x86\Addon\basscd.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Platform)' == 'x64'">
-		<None Include="..\lib\x64\basscd.dll" Link="Addon\basscd.dll">
+	<ItemGroup>
+		<None Include="..\lib\x64\basscd.dll" Link="x64\Addon\basscd.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

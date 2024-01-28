@@ -148,7 +148,7 @@
   <data name="Track" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\track.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="utils" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Utils" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>resources\utils.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="Year_Album" type="System.Resources.ResXFileRef, System.Windows.Forms">

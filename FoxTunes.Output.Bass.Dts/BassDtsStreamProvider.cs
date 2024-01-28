@@ -26,8 +26,8 @@ namespace FoxTunes
 
         public BassDtsStreamProvider()
         {
-            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
-            BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_dts.dll"));
+            BassLoader.AddPath(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", BassLoader.DIRECTORY_NAME_ADDON));
+            BassLoader.AddPath(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", "bass_dts.dll"));
         }
 
         public override bool CanCreateStream(PlaylistItem playlistItem)

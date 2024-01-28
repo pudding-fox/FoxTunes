@@ -19,8 +19,8 @@ namespace FoxTunes
 
         public BassCrossfadeStreamInputBehaviour()
         {
-            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
-            BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_crossfade.dll"));
+            BassLoader.AddPath(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", BassLoader.DIRECTORY_NAME_ADDON));
+            BassLoader.AddPath(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", "bass_crossfade.dll"));
         }
 
         public ICore Core { get; private set; }

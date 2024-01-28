@@ -13,5 +13,14 @@ namespace FoxTunes
         public int Major { get; set; }
 
         public int Minor { get; set; }
+
+        public ProcessorArchitecture Architecture { get; set; }
+    }
+
+    public enum ProcessorArchitecture : byte
+    {
+        None,
+        X86,
+        X64
     }
 }

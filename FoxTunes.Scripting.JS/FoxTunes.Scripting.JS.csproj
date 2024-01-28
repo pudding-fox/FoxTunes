@@ -1,43 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net40;net462;net48</TargetFrameworks>
-    <AssemblyName>FoxTunes.Scripting.JS</AssemblyName>
-    <OutputPath>..\distribution\$(Platform)\</OutputPath>
-    <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
-    <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
-    <AssemblyVersion>2.4.0.0</AssemblyVersion>
-    <Platforms>x86;x64</Platforms>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Platform)' == 'x86'">
-    <DefineConstants>X86</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Platform)' == 'x64'">
-    <DefineConstants>X64</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(Platform)' == 'x86'">
-    <None Include="..\lib\x86\msvcr100.dll" Link="msvcr100.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\lib\x86\msvcp100.dll" Link="msvcp100.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(Platform)' == 'x64'">
-    <None Include="..\lib\x64\msvcr100.dll" Link="msvcr100.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\lib\x64\msvcp100.dll" Link="msvcp100.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\lib\x64\V8_Net_Proxy_x64.dll" Link="V8_Net_Proxy_x64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net40;net462;net48</TargetFrameworks>
+		<AssemblyName>FoxTunes.Scripting.JS</AssemblyName>
+		<OutputPath>..\distribution\</OutputPath>
+		<SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
+		<SkipValidatePackageReferences>true</SkipValidatePackageReferences>
+		<AssemblyVersion>2.4.0.0</AssemblyVersion>
+		<Platforms>AnyCPU</Platforms>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<EmbeddedResource Update="Properties\Strings.resx">
@@ -65,31 +36,19 @@
 		</Compile>
 	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FoxTunes.Scripting\FoxTunes.Scripting.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FoxTunes.Scripting\FoxTunes.Scripting.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Noesis.Javascript" Condition="'$(Platform)' == 'x86'">
-      <HintPath>../lib/net40/Noesis.Javascript.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
+		<PackageReference Include="Microsoft.Bcl.Build" Version="1.0.14" Condition="'$(TargetFramework)' == 'net40'" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="V8.Net" Condition="'$(Platform)' == 'x64'">
-      <HintPath>../lib/net40/V8.Net.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
-    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.14" Condition="'$(TargetFramework)' == 'net40'" />
-  </ItemGroup>
-
-  <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
+	<Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
 
 </Project>

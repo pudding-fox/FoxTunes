@@ -1,5 +1,4 @@
-﻿#if X64
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,7 +29,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.Engine.Execute(Resources.utils, throwExceptionOnError: true);
+            this.Engine.Execute(JSCoreScripts.Instance.Utils, throwExceptionOnError: true);
             this.Engine.RegisterType(typeof(Publication), memberSecurity: ScriptMemberSecurity.Locked);
             this.Engine.GlobalObject.SetProperty(typeof(Publication));
             this.Engine.RegisterType<DateHelper>(memberSecurity: ScriptMemberSecurity.Locked);
@@ -126,4 +125,3 @@ namespace FoxTunes
         }
     }
 }
-#endif
