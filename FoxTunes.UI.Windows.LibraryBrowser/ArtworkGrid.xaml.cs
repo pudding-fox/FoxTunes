@@ -19,47 +19,39 @@ namespace FoxTunes
 
         public static TaskFactory Factory = new TaskFactory(Scheduler);
 
-        public static readonly ArtworkGridProvider Provider = new ArtworkGridProvider();
+        public static Lazy<Size> PixelSize;
 
-        private static readonly ISignalEmitter SignalEmitter = ComponentRegistry.Instance.GetComponent<ISignalEmitter>();
+        public static readonly DoubleConfigurationElement ScalingFactor;
 
-        public static Lazy<Size> PixelSize { get; set; }
+        public static readonly ArtworkGridProvider ArtworkGridProvider = ComponentRegistry.Instance.GetComponent<ArtworkGridProvider>();
 
         static ArtworkGrid()
         {
-            if (SignalEmitter != null)
+            var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
+            if (configuration != null)
             {
-                SignalEmitter.Signal += (sender, e) =>
-                {
-                    switch (e.Name)
-                    {
-                        case CommonSignals.HierarchiesUpdated:
-                            Provider.Clear();
-                            break;
-                    }
-#if NET40
-                    return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-                };
+                ScalingFactor = configuration.GetElement<DoubleConfigurationElement>(
+                    WindowsUserInterfaceConfiguration.SECTION,
+                    WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
+                );
+            }
+            if (ArtworkGridProvider != null)
+            {
+                ArtworkGridProvider.Cleared += (sender, e) => PixelSize = null;
             }
         }
 
         public ArtworkGrid()
         {
             this.InitializeComponent();
-            if (PixelSize == null)
-            {
-                PixelSize = new Lazy<Size>(() => this.GetElementPixelSize());
-            }
         }
 
         public int DecodePixelWidth
         {
             get
             {
-                return (int)PixelSize.Value.Width;
+                this.EnsurePixelSize();
+                return (int)(PixelSize.Value.Width * ScalingFactor.Value);
             }
         }
 
@@ -67,7 +59,16 @@ namespace FoxTunes
         {
             get
             {
-                return (int)PixelSize.Value.Height;
+                this.EnsurePixelSize();
+                return (int)(PixelSize.Value.Height * ScalingFactor.Value);
+            }
+        }
+
+        protected virtual void EnsurePixelSize()
+        {
+            if (PixelSize == null)
+            {
+                PixelSize = new Lazy<Size>(() => this.GetElementPixelSize());
             }
         }
 
@@ -95,7 +96,7 @@ namespace FoxTunes
                     width = this.DecodePixelWidth;
                     height = this.DecodePixelHeight;
                 });
-                var source = Provider.CreateImageSource(libraryHierarchyNode, width, height);
+                var source = ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, width, height);
                 await Windows.Invoke(() => this.Background = new ImageBrush(source)
                 {
                     Stretch = Stretch.Uniform
