@@ -228,15 +228,15 @@ namespace FoxTunes
 
         protected virtual void EncodeWithResampler(EncoderItem encoderItem, IBassStream stream, IBassEncoderTool settings)
         {
-            using (var resamplerProcess = this.CreateResamplerProcess(encoderItem, stream, new SoxEncoderSettings(settings)))
+            using (var resampler = ResamplerFactory.Create(encoderItem, stream, settings))
             {
                 using (var encoderProcess = this.CreateEncoderProcess(encoderItem, stream, settings))
                 {
                     var success = true;
-                    this.EncodeWithResampler(encoderItem, stream, resamplerProcess, encoderProcess);
-                    if (this.WaitForExit(resamplerProcess))
+                    this.EncodeWithResampler(encoderItem, stream, resampler.Process, encoderProcess);
+                    if (this.WaitForExit(resampler.Process))
                     {
-                        if (resamplerProcess.ExitCode != 0)
+                        if (resampler.Process.ExitCode != 0)
                         {
                             success = false;
                         }
@@ -313,11 +313,11 @@ namespace FoxTunes
 
         protected virtual void EncodeWithResampler(EncoderItem encoderItem, IBassStream stream, IBassEncoderHandler settings)
         {
-            using (var resamplerProcess = this.CreateResamplerProcess(encoderItem, stream, new SoxEncoderSettings(settings)))
+            using (var resampler = ResamplerFactory.Create(encoderItem, stream, settings))
             {
                 var channelReader = new ChannelReader(encoderItem, stream);
-                var resamplerReader = new ProcessReader(resamplerProcess);
-                var resamplerWriter = new ProcessWriter(resamplerProcess);
+                var resamplerReader = new ProcessReader(resampler.Process);
+                var resamplerWriter = new ProcessWriter(resampler.Process);
                 var encoderWriter = settings.GetWriter(encoderItem, stream);
                 var threads = new[]
                 {
@@ -334,7 +334,7 @@ namespace FoxTunes
                         this.Try(() => resamplerReader.CopyTo(encoderWriter,this.CancellationToken), this.GetErrorHandler(encoderItem));
                     })
                     {
-                        Name = string.Format("ProcessReader(\"{0}\", {1})", encoderItem.InputFileName, resamplerProcess.Id),
+                        Name = string.Format("ProcessReader(\"{0}\", {1})", encoderItem.InputFileName, resampler.Process.Id),
                         IsBackground = true
                     }
                 };
@@ -434,24 +434,6 @@ namespace FoxTunes
             return stream;
         }
 
-        protected virtual Process CreateResamplerProcess(EncoderItem encoderItem, IBassStream stream, IBassEncoderTool settings)
-        {
-            Logger.Write(this, LogLevel.Debug, "Creating resampler process for file \"{0}\".", encoderItem.InputFileName);
-            var arguments = settings.GetArguments(encoderItem, stream);
-            var process = this.CreateProcess(
-                encoderItem,
-                stream,
-                settings.Executable,
-                settings.Directory,
-                arguments,
-                true,
-                true,
-                true
-            );
-            Logger.Write(this, LogLevel.Debug, "Created resampler process for file \"{0}\": \"{1}\" {2}", encoderItem.InputFileName, settings.Executable, arguments);
-            return process;
-        }
-
         protected virtual Process CreateEncoderProcess(EncoderItem encoderItem, IBassStream stream, IBassEncoderTool settings)
         {
             Logger.Write(this, LogLevel.Debug, "Creating encoder process for file \"{0}\".", encoderItem.InputFileName);
@@ -496,16 +478,19 @@ namespace FoxTunes
             {
                 //Nothing can be done, probably access denied.
             }
-            process.ErrorDataReceived += (sender, e) =>
+            if (redirectStandardError)
             {
-                if (string.IsNullOrEmpty(e.Data))
+                process.ErrorDataReceived += (sender, e) =>
                 {
-                    return;
-                }
-                Logger.Write(this, LogLevel.Trace, "{0}: {1}", executable, e.Data);
-                encoderItem.AddError(e.Data);
-            };
-            process.BeginErrorReadLine();
+                    if (string.IsNullOrEmpty(e.Data))
+                    {
+                        return;
+                    }
+                    Logger.Write(this, LogLevel.Trace, "{0}: {1}", executable, e.Data);
+                    encoderItem.AddError(e.Data);
+                };
+                process.BeginErrorReadLine();
+            }
             return process;
         }
 
