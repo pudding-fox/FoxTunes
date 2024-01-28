@@ -686,7 +686,7 @@ namespace FoxTunes
 
             public static Color[] GetPeak(Color[] background, bool showRms, Color[] colors)
             {
-                var transparency = background.Length > 1;
+                var transparency = background.Length > 1 || background.FirstOrDefault().A != 255;
                 if (transparency)
                 {
                     if (showRms)
@@ -714,7 +714,7 @@ namespace FoxTunes
 
             public static Color[] GetRms(Color[] background, bool showPeak, Color[] colors)
             {
-                var transparency = background.Length > 1;
+                var transparency = background.Length > 1 || background.FirstOrDefault().A != 255;
                 if (transparency)
                 {
                     if (showPeak)

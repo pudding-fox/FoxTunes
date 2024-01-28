@@ -75,7 +75,7 @@ BOOL blend_color(ColorPalette* palette, INT32 position, BYTE* buffer) {
 		color3.Blue = ((color2.Blue * color2.Alpha) + (color1.Blue * (255 - color2.Alpha))) / 255;
 		color3.Green = ((color2.Green * color2.Alpha) + (color1.Green * (255 - color2.Alpha))) / 255;
 		color3.Red = ((color2.Red * color2.Alpha) + (color1.Red * (255 - color2.Alpha))) / 255;
-		color3.Alpha = 0xff;
+		color3.Alpha = color1.Alpha + (color2.Alpha * (255 - color1.Alpha) / 255);
 		memset(buffer + 0, color3.Blue, 1);
 		memset(buffer + 1, color3.Green, 1);
 		memset(buffer + 2, color3.Red, 1);
