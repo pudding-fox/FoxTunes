@@ -10,9 +10,10 @@ namespace FoxTunes.ViewModel
     {
         const int TIMEOUT = 100;
 
-        protected PlaylistBase()
+        protected PlaylistBase() : base(false)
         {
             this.Debouncer = new AsyncDebouncer(TIMEOUT);
+            this.InitializeComponent(Core.Instance);
         }
 
         protected virtual string LOADING
@@ -236,7 +237,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnActiveChanged(object sender, EventArgs e)
         {
-            this.Dispatch(this.RefreshStatus);
+            this.Debouncer.Exec(this.RefreshStatus);
         }
 
         protected virtual async Task OnSignal(object sender, ISignal signal)
@@ -263,7 +264,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnStateChanged(object sender, EventArgs e)
         {
-            this.Dispatch(this.RefreshStatus);
+            this.Debouncer.Exec(this.RefreshStatus);
         }
 
         protected virtual async Task RefreshItems()
@@ -299,7 +300,7 @@ namespace FoxTunes.ViewModel
             global::FoxTunes.BackgroundTask.ActiveChanged -= this.OnActiveChanged;
             if (this.PlaylistBrowser != null)
             {
-                this.PlaylistBrowser.StateChanged += this.OnStateChanged;
+                this.PlaylistBrowser.StateChanged -= this.OnStateChanged;
             }
             if (this.SignalEmitter != null)
             {
