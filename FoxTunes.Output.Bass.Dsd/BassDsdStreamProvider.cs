@@ -15,26 +15,6 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Output)]
     public class BassDsdStreamProvider : BassStreamProvider
     {
-        public static string Location
-        {
-            get
-            {
-                return Path.GetDirectoryName(typeof(BassDsdStreamProvider).Assembly.Location);
-            }
-        }
-
-        public static readonly string[] EXTENSIONS = new[]
-        {
-            "dsd",
-            "dsf"
-        };
-
-        public BassDsdStreamProvider()
-        {
-            BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
-            BassPluginLoader.AddExtensions(EXTENSIONS);
-        }
-
         public BassDsdBehaviour Behaviour { get; private set; }
 
         public IBassStreamPipelineFactory BassStreamPipelineFactory { get; private set; }
@@ -48,7 +28,7 @@ namespace FoxTunes
 
         public override bool CanCreateStream(PlaylistItem playlistItem)
         {
-            if (!EXTENSIONS.Contains(playlistItem.FileName.GetExtension(), StringComparer.OrdinalIgnoreCase))
+            if (!BassDsdBehaviour.EXTENSIONS.Contains(playlistItem.FileName.GetExtension(), StringComparer.OrdinalIgnoreCase))
             {
                 return false;
             }
@@ -76,7 +56,7 @@ namespace FoxTunes
             var channelHandle = default(int);
             if (this.Behaviour.Memory)
             {
-                Logger.Write(this, LogLevel.Debug, "Creating memory stream for channel: {0}", channelHandle);
+                Logger.Write(this, LogLevel.Debug, "Creating memory stream for file: {0}", fileName);
                 channelHandle = BassMemory.Dsd.CreateStream(fileName, 0, 0, BassFlags.Decode | BassFlags.DSDRaw);
                 if (channelHandle != 0)
                 {

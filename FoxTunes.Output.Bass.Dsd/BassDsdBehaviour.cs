@@ -18,10 +18,18 @@ namespace FoxTunes
             }
         }
 
+        public static readonly string[] EXTENSIONS = new[]
+        {
+            "dff",
+            "dsd",
+            "dsf"
+        };
+
         public BassDsdBehaviour()
         {
             BassPluginLoader.AddPath(Path.Combine(Location, "Addon"));
             BassPluginLoader.AddPath(Path.Combine(Loader.FolderName, "bass_memory_dsd.dll"));
+            BassPluginLoader.AddExtensions(EXTENSIONS);
         }
 
         public ICore Core { get; private set; }
