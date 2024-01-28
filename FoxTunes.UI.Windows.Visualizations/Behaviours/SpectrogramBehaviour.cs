@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -59,7 +58,7 @@ namespace FoxTunes
                         path: this.Scale.Name,
                         attributes: this.Scale.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE);
                 }
-                for (var value = this.Smoothing.MinValue; value <= this.Smoothing.MaxValue; value++)
+                for (var value = SpectrogramBehaviourConfiguration.SMOOTHING_MIN; value <= SpectrogramBehaviourConfiguration.SMOOTHING_MAX; value++)
                 {
                     yield return new InvocationComponent(
                         CATEGORY,
@@ -90,7 +89,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    this.Smoothing.Value = 0;
+                    this.Smoothing.Value = SpectrogramBehaviourConfiguration.SMOOTHING_DEFAULT;
                 }
             }
             this.Configuration.Save();

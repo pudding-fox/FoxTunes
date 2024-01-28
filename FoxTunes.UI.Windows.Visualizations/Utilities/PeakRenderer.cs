@@ -151,7 +151,7 @@ namespace FoxTunes
             });
         }
 
-        protected virtual async Task Render()
+        protected virtual async Task Render(PeakRendererData data)
         {
             const byte SHADE = 30;
 
@@ -192,19 +192,30 @@ namespace FoxTunes
                 return;
             }
 
-            Render(valueRenderInfo, rmsRenderInfo, this.RendererData);
+            try
+            {
+                Render(valueRenderInfo, rmsRenderInfo, data);
+            }
+            catch (Exception e)
+            {
+#if DEBUG
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render peaks: {0}", e.Message);
+#else
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render peaks, disabling: {0}", e.Message);
+                success = false;
+#endif
+            }
 
             await Windows.Invoke(() =>
             {
-                if (!object.ReferenceEquals(this.Bitmap, bitmap))
-                {
-                    return;
-                }
-
                 bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
+            if (!success)
+            {
+                return;
+            }
             this.Start();
         }
 
@@ -256,11 +267,16 @@ namespace FoxTunes
                     data.LastUpdated = DateTime.UtcNow;
                 }
 
-                var task = this.Render();
+                var task = this.Render(data);
             }
             catch (Exception exception)
             {
+#if DEBUG
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update peak data: {0}", exception.Message);
+                this.Start();
+#else
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update peak data, disabling: {0}", exception.Message);
+#endif
             }
         }
 
@@ -293,18 +309,24 @@ namespace FoxTunes
             }
         }
 
-        private static void Render(BitmapHelper.RenderInfo valueRenderInfo, BitmapHelper.RenderInfo rmsRenderInfo, PeakRendererData rendererData)
+        private static void Render(BitmapHelper.RenderInfo valueRenderInfo, BitmapHelper.RenderInfo rmsRenderInfo, PeakRendererData data)
         {
-            var valueElements = rendererData.ValueElements;
-            var rmsElements = rendererData.RmsElements;
-            var peakElements = rendererData.PeakElements;
-            var orientation = rendererData.Orientation;
+            var valueElements = data.ValueElements;
+            var rmsElements = data.RmsElements;
+            var peakElements = data.PeakElements;
+            var orientation = data.Orientation;
 
             BitmapHelper.Clear(valueRenderInfo);
 
-            if (rendererData.SampleCount == 0)
+            if (data.SampleCount == 0)
             {
                 //No data.
+                return;
+            }
+
+            if (valueRenderInfo.Width != data.Width || valueRenderInfo.Height != data.Height)
+            {
+                //Bitmap does not match data.
                 return;
             }
 

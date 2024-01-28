@@ -23,9 +23,15 @@ namespace FoxTunes
 
         public const string BARS_64_OPTION = "CCCC9524-BC5A-48C0-8210-921B204307FC";
 
-        public const string BARS_128_OPTION = "DDDD558E-7B9C-4101-992A-709B87756991";
+        //Had to these keys to keep the order of a context menu.... Looks like 128 came after 256 for some time.
 
-        public const string BARS_256_OPTION = "DDDD0FC1-592E-4EC6-9CCD-5182935AD12E";
+        public const string BARS_128_OPTION = "DDDD058E-7B9C-4101-992A-709B87756991";
+
+        public const string BARS_256_OPTION = "DDDD1FC1-592E-4EC6-9CCD-5182935AD12E";
+
+        public const string BARS_512_OPTION = "DDDD2C33-9BCB-4A3A-ADD3-C26E2725CE31";
+
+        public const string BARS_1024_OPTION = "DDDD3900-E91F-4FAB-A687-EA23065F4ECA";
 
         public const string BANDS_ELEMENT = "AABBF573-83D3-498E-BEF8-F1DB5A329B9D";
 
@@ -98,6 +104,8 @@ namespace FoxTunes
             yield return new SelectionConfigurationOption(BARS_64_OPTION, "64");
             yield return new SelectionConfigurationOption(BARS_128_OPTION, "128");
             yield return new SelectionConfigurationOption(BARS_256_OPTION, "256");
+            yield return new SelectionConfigurationOption(BARS_512_OPTION, "512");
+            yield return new SelectionConfigurationOption(BARS_1024_OPTION, "1024");
         }
 
         public static int GetBars(SelectionConfigurationOption option)
@@ -115,6 +123,10 @@ namespace FoxTunes
                     return 128;
                 case BARS_256_OPTION:
                     return 256;
+                case BARS_512_OPTION:
+                    return 512;
+                case BARS_1024_OPTION:
+                    return 1024;
             }
         }
 
@@ -240,6 +252,10 @@ namespace FoxTunes
                     return 256;
                 case BARS_256_OPTION:
                     return 256;
+                case BARS_512_OPTION:
+                    return 512;
+                case BARS_1024_OPTION:
+                    return 1024;
             }
         }
 
