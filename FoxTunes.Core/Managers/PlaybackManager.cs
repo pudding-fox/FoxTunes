@@ -35,15 +35,15 @@ namespace FoxTunes
         {
             using (e.Defer())
             {
-                Logger.Write(this, LogLevel.Debug, "Output stream is about to change, pre-empting the next stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
-                if (!await this.Output.Preempt(e.OutputStream).ConfigureAwait(false))
-                {
-                    Logger.Write(this, LogLevel.Debug, "Preempt failed for stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
-                }
-                Logger.Write(this, LogLevel.Debug, "Output stream de-queued, loading it: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
                 var exception = default(Exception);
                 try
                 {
+                    Logger.Write(this, LogLevel.Debug, "Output stream is about to change, pre-empting the next stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
+                    if (!await this.Output.Preempt(e.OutputStream).ConfigureAwait(false))
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Preempt failed for stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
+                    }
+                    Logger.Write(this, LogLevel.Debug, "Output stream de-queued, loading it: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
                     await this.SetCurrentStream(e.OutputStream).ConfigureAwait(false);
                 }
                 catch (Exception ex)
