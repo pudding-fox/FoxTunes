@@ -64,7 +64,7 @@ namespace FoxTunes
             "Component",
             typeof(UIComponentConfiguration),
             typeof(UIComponentPanel),
-            new PropertyMetadata(new PropertyChangedCallback(OnComponentChanged))
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnComponentChanged))
         );
 
         public static UIComponentConfiguration GetComponent(UIComponentPanel source)
