@@ -34,7 +34,7 @@ namespace FoxTunes
 
         public WaveFormGenerator.WaveFormGeneratorData GetOrCreate(IOutputStream stream, int resolution, Func<WaveFormGenerator.WaveFormGeneratorData> factory)
         {
-            var key = new Key(string.Empty, resolution);
+            var key = new Key(stream.FileName, resolution);
             return this.Store.GetOrAdd(key, () =>
             {
                 if (this.Enabled.Value)
