@@ -24,7 +24,7 @@
         <System:Boolean x:Key="True">True</System:Boolean>
         <System:Boolean x:Key="False">False</System:Boolean>
         <ItemsPanelTemplate x:Key="GridItemsPanelTemplate">
-            <WrapPanel Orientation="Horizontal" IsItemsHost="True"></WrapPanel>
+            <LocalWindows:VirtualizingWrapPanel IsItemsHost="True"></LocalWindows:VirtualizingWrapPanel>
         </ItemsPanelTemplate>
         <ItemsPanelTemplate x:Key="ListItemsPanelTemplate">
             <VirtualizingStackPanel IsItemsHost="True"></VirtualizingStackPanel>
@@ -144,6 +144,7 @@
                         Unloaded="OnUnloaded"
                         Windows:ListBoxExtensions.DragSource="True"
                         Windows:ListBoxExtensions.DragSourceInitialized="DragSourceInitialized"
+                        Windows:ListBoxExtensions.SelectedItem="True"
                         LocalWindows:LibraryBrowserExtensions.ItemsPanelSelector="{Binding ViewMode, Source={StaticResource ViewModel}}"
                         LocalWindows:LibraryBrowserExtensions.GridItemsPanel="{StaticResource GridItemsPanelTemplate}"
                         LocalWindows:LibraryBrowserExtensions.ListItemsPanel="{StaticResource ListItemsPanelTemplate}"
