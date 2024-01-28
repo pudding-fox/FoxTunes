@@ -48,6 +48,7 @@ namespace FoxTunes.ViewModel
         public Task Refresh()
         {
             var items = global::FoxTunes.BackgroundTask.Active
+                .Where(backgroundTask => backgroundTask.Visible)
                 .Select(backgroundTask => new BackgroundTask(backgroundTask))
                 .ToArray();
             return Windows.Invoke(() => this.Items = new ObservableCollection<BackgroundTask>(items));
