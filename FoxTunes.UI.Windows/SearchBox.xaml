@@ -12,15 +12,19 @@
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <TextBox Text="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:SearchBox}}, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"></TextBox>
+        <TextBox x:Name="TextBox" Text="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:SearchBox}}, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"></TextBox>
         <TextBlock Text="Search" Opacity="0.5" FontStyle="Italic" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="Visibility" Value="Collapsed"></Setter>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:SearchBox}}}" Value="{x:Static System:String.Empty}">
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsFocused, ElementName=TextBox, Mode=OneWay}" Value="False"></Condition>
+                                <Condition Binding="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:SearchBox}}}" Value="{x:Static System:String.Empty}"></Condition>
+                            </MultiDataTrigger.Conditions>
                             <Setter Property="Visibility" Value="Visible"></Setter>
-                        </DataTrigger>
+                        </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
             </TextBlock.Style>
