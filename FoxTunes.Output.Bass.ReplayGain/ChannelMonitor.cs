@@ -54,8 +54,8 @@ namespace FoxTunes
 
         protected virtual void Update()
         {
-            var length = Bass.ChannelGetLength(this.Stream.ChannelHandle);
-            var position = Bass.ChannelGetPosition(this.Stream.ChannelHandle);
+            var length = this.Stream.Length;
+            var position = this.Stream.Position;
             if (position == length)
             {
                 this.ScannerItem.Progress = ScannerItem.PROGRESS_COMPLETE;

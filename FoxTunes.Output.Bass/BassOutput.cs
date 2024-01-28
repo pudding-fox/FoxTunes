@@ -366,7 +366,7 @@ namespace FoxTunes
             {
                 return null;
             }
-            var outputStream = new BassOutputStream(this, this.PipelineManager, stream.Provider, playlistItem, stream.ChannelHandle);
+            var outputStream = new BassOutputStream(this, this.PipelineManager, stream, playlistItem);
             outputStream.InitializeComponent(this.Core);
             this.OnLoaded(outputStream);
             return outputStream;

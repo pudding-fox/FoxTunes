@@ -7,13 +7,12 @@ namespace FoxTunes
 {
     public class BassOutputStream : OutputStream
     {
-        public BassOutputStream(IBassOutput output, IBassStreamPipelineManager manager, IBassStreamProvider provider, PlaylistItem playlistItem, int channelHandle)
+        public BassOutputStream(IBassOutput output, IBassStreamPipelineManager manager, IBassStream stream, PlaylistItem playlistItem)
             : base(playlistItem)
         {
             this.Output = output;
             this.Manager = manager;
-            this.Provider = provider;
-            this.ChannelHandle = channelHandle;
+            this.Stream = stream;
             if (!BassOutputStreams.Add(this))
             {
                 //TODO: Warn.
@@ -24,9 +23,15 @@ namespace FoxTunes
 
         public IBassStreamPipelineManager Manager { get; private set; }
 
-        public IBassStreamProvider Provider { get; private set; }
+        public IBassStream Stream { get; private set; }
 
-        public int ChannelHandle { get; private set; }
+        public int ChannelHandle
+        {
+            get
+            {
+                return this.Stream.ChannelHandle;
+            }
+        }
 
         public BassNotificationSource NotificationSource { get; private set; }
 
@@ -44,7 +49,7 @@ namespace FoxTunes
 
         protected virtual long GetPosition()
         {
-            var position = Bass.ChannelGetPosition(this.ChannelHandle);
+            var position = this.Stream.Position;
             this.Manager.WithPipeline(pipeline =>
             {
                 if (pipeline != null)
@@ -76,11 +81,15 @@ namespace FoxTunes
             {
                 position = this.Length - 1;
             }
-            BassUtils.OK(Bass.ChannelSetPosition(this.ChannelHandle, position));
-            if (position > this.NotificationSource.EndingPosition)
+            this.Stream.Position = position;
+            this.NotificationSource.Check();
+        }
+
+        public long Offset
+        {
+            get
             {
-                Logger.Write(this, LogLevel.Debug, "Channel {0} was manually seeked past the \"Ending\" sync, raising it manually.", this.ChannelHandle);
-                this.NotificationSource.OnEnding();
+                return this.Stream.Offset;
             }
         }
 
@@ -88,7 +97,7 @@ namespace FoxTunes
         {
             get
             {
-                return Bass.ChannelGetLength(this.ChannelHandle);
+                return this.Stream.Length;
             }
         }
 
@@ -239,7 +248,7 @@ namespace FoxTunes
             }
             try
             {
-                this.Provider.FreeStream(this.PlaylistItem, this.ChannelHandle);
+                this.Stream.Provider.FreeStream(this.PlaylistItem, this.ChannelHandle);
             }
             finally
             {
@@ -248,7 +257,6 @@ namespace FoxTunes
                     //TODO: Warn.
                 }
             }
-            this.ChannelHandle = 0;
         }
     }
 }

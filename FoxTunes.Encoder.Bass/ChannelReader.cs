@@ -45,9 +45,7 @@ namespace FoxTunes
 
         protected virtual void Update()
         {
-            var position = Bass.ChannelGetPosition(this.Stream.ChannelHandle, PositionFlags.Bytes);
-            var length = Bass.ChannelGetLength(this.Stream.ChannelHandle, PositionFlags.Bytes);
-            this.EncoderItem.Progress = (int)((position / (double)length) * EncoderItem.PROGRESS_COMPLETE);
+            this.EncoderItem.Progress = (int)((this.Stream.Position / (double)this.Stream.Length) * EncoderItem.PROGRESS_COMPLETE);
         }
     }
 }

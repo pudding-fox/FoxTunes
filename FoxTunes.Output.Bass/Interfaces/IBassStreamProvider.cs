@@ -1,10 +1,11 @@
 ﻿using ManagedBass;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IBassStreamProvider : IDisposable
+    public interface IBassStreamProvider : IBaseComponent, IDisposable
     {
         byte Priority { get; }
 
@@ -12,9 +13,9 @@ namespace FoxTunes.Interfaces
 
         bool CanCreateStream(PlaylistItem playlistItem);
 
-        Task<int> CreateStream(PlaylistItem playlistItem);
+        Task<IBassStream> CreateStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice);
 
-        Task<int> CreateStream(PlaylistItem playlistItem, BassFlags flags);
+        Task<IBassStream> CreateStream(PlaylistItem playlistItem, BassFlags flags, IEnumerable<IBassStreamAdvice> advice);
 
         void FreeStream(PlaylistItem playlistItem, int channelHandle);
     }

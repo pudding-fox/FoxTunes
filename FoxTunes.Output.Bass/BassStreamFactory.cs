@@ -13,12 +13,23 @@ namespace FoxTunes
         public BassStreamFactory()
         {
             this.Semaphore = new SemaphoreSlim(1, 1);
+            this.Advisors = new SortedList<byte, IBassStreamAdvisor>(new PriorityComparer());
             this.Providers = new SortedList<byte, IBassStreamProvider>(new PriorityComparer());
         }
 
         public SemaphoreSlim Semaphore { get; private set; }
 
+        private SortedList<byte, IBassStreamAdvisor> Advisors { get; set; }
+
         private SortedList<byte, IBassStreamProvider> Providers { get; set; }
+
+        IEnumerable<IBassStreamAdvisor> IBassStreamFactory.Advisors
+        {
+            get
+            {
+                return this.Advisors.Values;
+            }
+        }
 
         IEnumerable<IBassStreamProvider> IBassStreamFactory.Providers
         {
@@ -39,10 +50,28 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        public void Register(IBassStreamAdvisor advisor)
+        {
+            this.Advisors.Add(advisor.Priority, advisor);
+            Logger.Write(this, LogLevel.Debug, "Registered bass stream advisor with priority {0}: {1}", advisor.Priority, advisor.GetType().Name);
+        }
+
         public void Register(IBassStreamProvider provider)
         {
             this.Providers.Add(provider.Priority, provider);
             Logger.Write(this, LogLevel.Debug, "Registered bass stream provider with priority {0}: {1}", provider.Priority, provider.GetType().Name);
+        }
+
+        public IEnumerable<IBassStreamAdvice> GetAdvice(PlaylistItem playlistItem)
+        {
+            foreach (var advisor in this.Advisors.Values)
+            {
+                var advice = default(IBassStreamAdvice);
+                if (advisor.Advice(playlistItem, out advice))
+                {
+                    yield return advice;
+                }
+            }
         }
 
         public IEnumerable<IBassStreamProvider> GetProviders(PlaylistItem playlistItem)
@@ -60,17 +89,19 @@ namespace FoxTunes
 #endif
             try
             {
-                foreach (var provider in this.GetProviders(playlistItem))
+                var advice = this.GetAdvice(playlistItem).ToArray();
+                var providers = this.GetProviders(playlistItem).ToArray();
+                foreach (var provider in providers)
                 {
                     //We will try twice if we get BASS_ERROR_ALREADY.
                     for (var a = 0; a < 2; a++)
                     {
                         Logger.Write(this, LogLevel.Debug, "Using bass stream provider with priority {0}: {1}", provider.Priority, provider.GetType().Name);
-                        var channelHandle = await provider.CreateStream(playlistItem).ConfigureAwait(false);
-                        if (channelHandle != 0)
+                        var stream = await provider.CreateStream(playlistItem, advice).ConfigureAwait(false);
+                        if (stream.ChannelHandle != 0)
                         {
-                            Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, channelHandle);
-                            return new BassStream(provider, channelHandle);
+                            Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, stream.ChannelHandle);
+                            return stream;
                         }
                         if (Bass.LastError == Errors.Already)
                         {
@@ -111,16 +142,18 @@ namespace FoxTunes
 #endif
             try
             {
-                foreach (var provider in this.Providers.Values)
+                var advice = this.GetAdvice(playlistItem).ToArray();
+                var providers = this.GetProviders(playlistItem).ToArray();
+                foreach (var provider in providers)
                 {
                     if (!provider.CanCreateStream(playlistItem))
                     {
                         continue;
                     }
-                    var channelHandle = await provider.CreateStream(playlistItem, flags).ConfigureAwait(false);
-                    if (channelHandle != 0)
+                    var stream = await provider.CreateStream(playlistItem, flags, advice).ConfigureAwait(false);
+                    if (stream.ChannelHandle != 0)
                     {
-                        return new BassStream(provider, channelHandle);
+                        return stream;
                     }
                     else
                     {

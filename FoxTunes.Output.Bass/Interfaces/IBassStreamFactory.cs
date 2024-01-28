@@ -6,11 +6,13 @@ namespace FoxTunes.Interfaces
 {
     public interface IBassStreamFactory : IBaseComponent
     {
+        IEnumerable<IBassStreamAdvisor> Advisors { get; }
+
         IEnumerable<IBassStreamProvider> Providers { get; }
 
-        void Register(IBassStreamProvider provider);
+        void Register(IBassStreamAdvisor advisor);
 
-        IEnumerable<IBassStreamProvider> GetProviders(PlaylistItem playlistItem);
+        void Register(IBassStreamProvider provider);
 
         Task<IBassStream> CreateStream(PlaylistItem playlistItem, bool immidiate);
 

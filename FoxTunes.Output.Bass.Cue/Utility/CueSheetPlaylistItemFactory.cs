@@ -1,5 +1,4 @@
-﻿using FoxDb;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -23,37 +22,41 @@ namespace FoxTunes
         public PlaylistItem[] Create(CueSheet cueSheet)
         {
             var playlistItems = new List<PlaylistItem>();
-            var tracks = cueSheet.Tracks;
-            var trackPairs = CueSheet.GetTrackPairs(tracks);
             var directoryName = Path.GetDirectoryName(cueSheet.FileName);
-            for (var position = 0; position < trackPairs.GetLength(0); position++)
+            for (var a = 0; a < cueSheet.Files.Length; a++)
             {
-                var currentTrack = trackPairs[position, 0];
-                var nextTrack = trackPairs[position, 1];
-                var trackPosition = currentTrack.Index.Time;
-                var file = cueSheet.GetFile(currentTrack);
-                var fileName = default(string);
-                if (nextTrack != null)
+                var file = cueSheet.Files[a];
+                for (var b = 0; b < file.Tracks.Length; b++)
                 {
-                    var trackLength = CueSheet.GetTrackLength(currentTrack, nextTrack);
-                    fileName = BassCueStreamProvider.CreateUrl(Path.Combine(directoryName, file.Path), trackPosition, trackLength);
+                    var fileName = default(string);
+                    if (b + 1 < file.Tracks.Length)
+                    {
+                        fileName = BassCueStreamAdvisor.CreateUrl(
+                            Path.Combine(directoryName, file.Path),
+                            file.Tracks[b].Index.Time,
+                            CueSheet.GetTrackLength(file.Tracks[b], file.Tracks[b + 1])
+                        );
+                    }
+                    else
+                    {
+                        fileName = BassCueStreamAdvisor.CreateUrl(
+                            Path.Combine(directoryName, file.Path),
+                            file.Tracks[b].Index.Time
+                        );
+                    }
+                    var playlistItem = new PlaylistItem()
+                    {
+                        DirectoryName = directoryName,
+                        FileName = fileName
+                    };
+                    playlistItem.MetaDatas = this.GetMetaData(cueSheet, file.Tracks[b]);
+                    playlistItems.Add(playlistItem);
                 }
-                else
-                {
-                    fileName = BassCueStreamProvider.CreateUrl(Path.Combine(directoryName, file.Path), trackPosition);
-                }
-                var playlistItem = new PlaylistItem()
-                {
-                    DirectoryName = directoryName,
-                    FileName = fileName
-                };
-                playlistItem.MetaDatas = this.GetMetaData(cueSheet, tracks, currentTrack);
-                playlistItems.Add(playlistItem);
             }
             return playlistItems.ToArray();
         }
 
-        protected virtual MetaDataItem[] GetMetaData(CueSheet cueSheet, CueSheetTrack[] cueSheetTracks, CueSheetTrack cueSheetTrack)
+        protected virtual MetaDataItem[] GetMetaData(CueSheet cueSheet, CueSheetTrack cueSheetTrack)
         {
             var metaDataItems = new List<MetaDataItem>();
             foreach (var tag in cueSheet.Tags)
@@ -89,10 +92,6 @@ namespace FoxTunes
             metaDataItems.Add(new MetaDataItem(CommonMetaData.Track, MetaDataItemType.Tag)
             {
                 Value = cueSheetTrack.Number
-            });
-            metaDataItems.Add(new MetaDataItem(CommonMetaData.TrackCount, MetaDataItemType.Tag)
-            {
-                Value = Convert.ToString(cueSheetTracks.Length)
             });
             //TODO: We could create the CommonProperties.Duration for all but the last track in each file. 
             //TODO: Without understanding the file format we can't determine the length of the last track.

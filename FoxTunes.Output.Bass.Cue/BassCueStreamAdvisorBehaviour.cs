@@ -3,13 +3,12 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassCueStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent, IDisposable
+    public class BassCueStreamAdvisorBehaviour : StandardBehaviour, IConfigurableComponent, IBackgroundTaskSource, IInvocableComponent, IDisposable
     {
         public const string OPEN_CUE = "FFGG";
 
@@ -43,15 +42,15 @@ namespace FoxTunes
             this.FileSystemBrowser = core.Components.FileSystemBrowser;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<BooleanConfigurationElement>(
-                BassCueStreamProviderBehaviourConfiguration.SECTION,
-                BassCueStreamProviderBehaviourConfiguration.ENABLED_ELEMENT
+                BassCueStreamAdvisorBehaviourConfiguration.SECTION,
+                BassCueStreamAdvisorBehaviourConfiguration.ENABLED_ELEMENT
             ).ConnectValue(value => this.Enabled = value);
             base.InitializeComponent(core);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            return BassCueStreamProviderBehaviourConfiguration.GetConfigurationSections();
+            return BassCueStreamAdvisorBehaviourConfiguration.GetConfigurationSections();
         }
 
         public IEnumerable<IInvocationComponent> Invocations
@@ -140,7 +139,7 @@ namespace FoxTunes
             //Nothing to do.
         }
 
-        ~BassCueStreamProviderBehaviour()
+        ~BassCueStreamAdvisorBehaviour()
         {
             Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
