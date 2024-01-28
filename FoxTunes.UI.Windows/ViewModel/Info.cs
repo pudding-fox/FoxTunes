@@ -28,6 +28,8 @@ namespace FoxTunes.ViewModel
 
         public IPlaybackManager PlaybackManager { get; private set; }
 
+        public ISignalEmitter SignalEmitter { get; private set; }
+
         private bool _HasData { get; set; }
 
         public bool HasData
@@ -354,6 +356,8 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("BitsPerSample");
         }
 
+        public event EventHandler BitsPerSampleChanged;
+
         private string _Bitrate { get; set; }
 
         public string Bitrate
@@ -408,12 +412,12 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler BitrateChanged;
 
-        public event EventHandler BitsPerSampleChanged;
-
         public override void InitializeComponent(ICore core)
         {
             this.PlaybackManager = this.Core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
+            this.SignalEmitter = this.Core.Components.SignalEmitter;
+            this.SignalEmitter.Signal += this.OnSignal;
             var task = this.Refresh();
             base.InitializeComponent(core);
         }
@@ -425,6 +429,20 @@ namespace FoxTunes.ViewModel
             var task = TaskEx.Run(() => this.Refresh());
 #else
             var task = Task.Run(() => this.Refresh());
+#endif
+        }
+
+        protected virtual Task OnSignal(object sender, ISignal signal)
+        {
+            switch (signal.Name)
+            {
+                case CommonSignals.MetaDataUpdated:
+                    return this.Refresh();
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
 #endif
         }
 

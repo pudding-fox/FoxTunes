@@ -31,19 +31,10 @@ namespace FoxTunes
 
         public IScriptingContext ScriptingContext { get; private set; }
 
-        public GridViewColumn Create(PlaylistColumn column)
+        public PlaylistGridViewColumn Create(PlaylistColumn column)
         {
             this.EnsureScriptingContext();
-            var gridViewColumn = default(GridViewColumn);
-            if (column.IsDynamic)
-            {
-                gridViewColumn = new RefreshableGridViewColumn();
-            }
-            else
-            {
-                gridViewColumn = new GridViewColumn();
-            }
-            gridViewColumn.Header = column.Name;
+            var gridViewColumn = new PlaylistGridViewColumn(column);
             switch (column.Type)
             {
                 case PlaylistColumnType.Script:
@@ -104,16 +95,12 @@ namespace FoxTunes
 
         public event PlaylistColumnEventHandler PositionChanged;
 
-        public void Refresh(GridViewColumn column)
+        public void Refresh(PlaylistGridViewColumn column)
         {
             this.Suspended = true;
             try
             {
-                var refreshable = column as RefreshableGridViewColumn;
-                if (refreshable != null)
-                {
-                    refreshable.Refresh();
-                }
+                column.Refresh();
                 if (double.IsNaN(column.Width))
                 {
                     column.Width = column.ActualWidth;

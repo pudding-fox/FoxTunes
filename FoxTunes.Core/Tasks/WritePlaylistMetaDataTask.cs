@@ -1,5 +1,6 @@
 ﻿using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -50,12 +51,15 @@ namespace FoxTunes
 
         public IMetaDataManager MetaDataManager { get; private set; }
 
+        public IPlaylistCache PlaylistCache { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Database = core.Factories.Database.Create();
             this.MetaDataManager = core.Managers.MetaData;
+            this.PlaylistCache = core.Components.PlaylistCache;
             this.SignalEmitter = core.Components.SignalEmitter;
             base.InitializeComponent(core);
         }
@@ -99,6 +103,8 @@ namespace FoxTunes
                         await LibraryTaskBase.SetLibraryItemStatus(this.Database, playlistItem.LibraryItem_Id.Value, LibraryItemStatus.Import).ConfigureAwait(false);
                     }
 
+                    this.UpdatePlaylistCache(playlistItem);
+
                     if (this.WriteToFiles)
                     {
                         if (!await this.MetaDataManager.Synchronize(new[] { playlistItem }, this.Names.ToArray()).ConfigureAwait(false))
@@ -112,6 +118,25 @@ namespace FoxTunes
             }))
             {
                 await task.Run().ConfigureAwait(false);
+            }
+        }
+
+        protected virtual void UpdatePlaylistCache(PlaylistItem playlistItem)
+        {
+            var cachedPlaylistItem = default(PlaylistItem);
+            if (this.PlaylistCache.TryGetItemById(playlistItem.Id, out cachedPlaylistItem))
+            {
+                if (!object.ReferenceEquals(playlistItem, cachedPlaylistItem))
+                {
+                    lock (playlistItem.MetaDatas)
+                    {
+                        lock (cachedPlaylistItem.MetaDatas)
+                        {
+                            cachedPlaylistItem.MetaDatas.Clear();
+                            cachedPlaylistItem.MetaDatas.AddRange(playlistItem.MetaDatas);
+                        }
+                    }
+                }
             }
         }
 

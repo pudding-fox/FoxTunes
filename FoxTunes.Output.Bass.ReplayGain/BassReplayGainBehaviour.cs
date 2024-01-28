@@ -249,24 +249,38 @@ namespace FoxTunes
             try
             {
                 var info = default(ReplayGainInfo);
-                if (!BassReplayGain.Process(stream.ChannelHandle, out info))
+                if (BassReplayGain.Process(stream.ChannelHandle, out info))
+                {
+                    Logger.Write(this, LogLevel.Debug, "Calculated track replay gain for file \"{0}\": {1}dB", stream.FileName, ReplayGainEffect.GetVolume(info.gain));
+                    gain = info.gain;
+                    peak = info.peak;
+                    mode = ReplayGainMode.Track;
+                    return true;
+                }
+                else
                 {
                     Logger.Write(this, LogLevel.Warn, "Failed to calculate track replay gain for file \"{0}\".", stream.FileName);
-                    gain = 0;
-                    peak = 0;
-                    mode = ReplayGainMode.None;
-                    return false;
                 }
-                Logger.Write(this, LogLevel.Debug, "Calculated track replay gain for file \"{0}\": {1}dB", stream.FileName, ReplayGainEffect.GetVolume(info.gain));
-                gain = info.gain;
-                peak = info.peak;
-                mode = ReplayGainMode.Track;
-                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to calculate track replay gain for file \"{0}\": {1}", stream.FileName, e.Message);
             }
             finally
             {
-                stream.Position = 0;
+                try
+                {
+                    stream.Position = 0;
+                }
+                catch
+                {
+                    //Nothing can be done, output was likely shut down.
+                }
             }
+            gain = 0;
+            peak = 0;
+            mode = ReplayGainMode.None;
+            return false;
         }
 
         protected virtual async Task UpdateMetaData(BassOutputStream stream, float gain, float peak, ReplayGainMode mode)

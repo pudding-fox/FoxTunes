@@ -298,28 +298,14 @@ namespace FoxTunes.ViewModel
                 }
             }
             var libraryItems = sources.OfType<LibraryItem>().ToArray();
-            var refreshPlaylist = default(bool);
+            var playlistItems = sources.OfType<PlaylistItem>().ToArray();
             if (libraryItems.Any())
             {
                 await this.MetaDataManager.Save(libraryItems, true, true).ConfigureAwait(false);
-                foreach (var libraryItem in libraryItems)
-                {
-                    refreshPlaylist = this.PlaylistCache.Contains(playlistItem => playlistItem.LibraryItem_Id == libraryItem.Id);
-                    if (refreshPlaylist)
-                    {
-                        break;
-                    }
-                }
             }
-            var playlistItems = sources.OfType<PlaylistItem>().ToArray();
             if (playlistItems.Any())
             {
                 await this.MetaDataManager.Save(playlistItems, true, true).ConfigureAwait(false);
-                refreshPlaylist = true;
-            }
-            if (refreshPlaylist)
-            {
-                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistUpdated)).ConfigureAwait(false);
             }
             await this.HierarchyManager.Clear(LibraryItemStatus.Import).ConfigureAwait(false);
             await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
