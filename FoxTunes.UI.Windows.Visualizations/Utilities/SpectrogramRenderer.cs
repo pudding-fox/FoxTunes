@@ -1,7 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Runtime.Remoting.Channels;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -14,16 +12,11 @@ namespace FoxTunes
     {
         const double FACTOR = 262140; //4.0 * 65535.0
 
-        public Color[] ColorPalette = new KeyValuePair<int, Color>[]
-        {
-            new KeyValuePair<int, Color>(0, Colors.Black),
-            new KeyValuePair<int, Color>(25, Colors.Gray),
-            new KeyValuePair<int, Color>(100, Colors.White)
-        }.ToGradient();
-
         public SpectrogramRendererData RendererData { get; private set; }
 
         public SelectionConfigurationElement Mode { get; private set; }
+
+        public TextConfigurationElement ColorPalette { get; private set; }
 
         public SelectionConfigurationElement FFTSize { get; private set; }
 
@@ -34,6 +27,10 @@ namespace FoxTunes
                 SpectrogramBehaviourConfiguration.SECTION,
                 SpectrogramBehaviourConfiguration.MODE_ELEMENT
             );
+            this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                SpectrogramBehaviourConfiguration.SECTION,
+                SpectrogramBehaviourConfiguration.COLOR_PALETTE_ELEMENT
+            );
             this.Configuration.GetElement<IntegerConfigurationElement>(
                VisualizationBehaviourConfiguration.SECTION,
                VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
@@ -43,6 +40,7 @@ namespace FoxTunes
                VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
             );
             this.Mode.ValueChanged += this.OnValueChanged;
+            this.ColorPalette.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
             var task = this.CreateBitmap();
         }
@@ -64,6 +62,7 @@ namespace FoxTunes
                 bitmap.PixelWidth,
                 bitmap.PixelHeight,
                 VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
+                SpectrogramBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value),
                 SpectrogramBehaviourConfiguration.GetMode(this.Mode.Value)
             );
             this.Viewbox = new Rect(0, 0, this.RendererData.Width, this.RendererData.Height);
@@ -83,6 +82,7 @@ namespace FoxTunes
                     bitmap.PixelWidth,
                     bitmap.PixelHeight,
                     VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
+                    SpectrogramBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value),
                     SpectrogramBehaviourConfiguration.GetMode(this.Mode.Value)
                 );
             });
@@ -90,6 +90,12 @@ namespace FoxTunes
 
         protected virtual async Task Render()
         {
+            if (!PlaybackStateNotifier.IsPlaying)
+            {
+                this.Start();
+                return;
+            }
+
             var bitmap = default(WriteableBitmap);
             var success = default(bool);
             var info = default(BitmapHelper.RenderInfo);
@@ -117,7 +123,7 @@ namespace FoxTunes
                 return;
             }
 
-            Render(info, this.RendererData, this.ColorPalette);
+            Render(info, this.RendererData);
 
             await Windows.Invoke(() =>
             {
@@ -180,12 +186,11 @@ namespace FoxTunes
             base.OnDisposing();
         }
 
-        private static void Render(BitmapHelper.RenderInfo info, SpectrogramRendererData data, Color[] colors)
+        private static void Render(BitmapHelper.RenderInfo info, SpectrogramRendererData data)
         {
             if (data.SampleCount == 0)
             {
                 //No data.
-                BitmapHelper.Clear(info);
                 return;
             }
 
@@ -195,19 +200,20 @@ namespace FoxTunes
             {
                 default:
                 case SpectrogramRendererMode.Mono:
-                    RenderMono(info, data, colors);
+                    RenderMono(info, data);
                     break;
                 case SpectrogramRendererMode.Seperate:
-                    RenderSeperate(info, data, colors);
+                    RenderSeperate(info, data);
                     break;
             }
         }
 
-        private static void RenderMono(BitmapHelper.RenderInfo info, SpectrogramRendererData data, Color[] colors)
+        private static void RenderMono(BitmapHelper.RenderInfo info, SpectrogramRendererData data)
         {
             var x = data.Width - 1;
             var h = data.Height - 1;
             var values = data.Values;
+            var colors = data.Colors;
             for (var y = 0; y < data.Height; y++)
             {
                 var value1 = (double)values[0, h - y] / FACTOR;
@@ -220,13 +226,14 @@ namespace FoxTunes
             }
         }
 
-        private static void RenderSeperate(BitmapHelper.RenderInfo info, SpectrogramRendererData data, Color[] colors)
+        private static void RenderSeperate(BitmapHelper.RenderInfo info, SpectrogramRendererData data)
         {
             var x = data.Width - 1;
             var h = (data.Height - 1) / data.Channels;
+            var values = data.Values;
+            var colors = data.Colors;
             for (var channel = 0; channel < data.Channels; channel++)
             {
-                var values = data.Values;
                 var offset = channel * h;
                 for (var y = 0; y < h; y++)
                 {
@@ -309,7 +316,7 @@ namespace FoxTunes
             }
         }
 
-        public static SpectrogramRendererData Create(IOutput output, int width, int height, int fftSize, SpectrogramRendererMode mode)
+        public static SpectrogramRendererData Create(IOutput output, int width, int height, int fftSize, Color[] colors, SpectrogramRendererMode mode)
         {
             var data = new SpectrogramRendererData()
             {
@@ -317,6 +324,7 @@ namespace FoxTunes
                 Width = width,
                 Height = height,
                 FFTSize = fftSize,
+                Colors = colors,
                 Mode = mode
             };
             return data;
@@ -343,6 +351,8 @@ namespace FoxTunes
             public int SampleCount;
 
             public int[,] Values;
+
+            public Color[] Colors;
 
             public SpectrogramRendererMode Mode;
 

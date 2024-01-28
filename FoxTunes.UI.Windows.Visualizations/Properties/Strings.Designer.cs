@@ -286,6 +286,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Color Palette.
+        /// </summary>
+        internal static string SpectrogramBehaviourConfiguration_ColorPalette {
+            get {
+                return ResourceManager.GetString("SpectrogramBehaviourConfiguration.ColorPalette", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mode.
         /// </summary>
         internal static string SpectrogramBehaviourConfiguration_Mode {

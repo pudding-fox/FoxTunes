@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows.Media;
 
 namespace FoxTunes
 {
@@ -15,10 +19,13 @@ namespace FoxTunes
 
         public const string MODE_SEPERATE_OPTION = "CCCC8D37-067D-4A43-8AE8-7AD000E3E176";
 
+        public const string COLOR_PALETTE_ELEMENT = "BBBBBAFC-0C99-4329-9DA2-C041E674597E";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
-                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_Mode, path: Strings.SpectrogramBehaviourConfiguration_Path).WithOptions(GetModeOptions())
+                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_Mode, path: Strings.SpectrogramBehaviourConfiguration_Path).WithOptions(GetModeOptions()))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrogramBehaviourConfiguration_ColorPalette, path: Strings.SpectrogramBehaviourConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine)
             );
         }
 
@@ -38,6 +45,69 @@ namespace FoxTunes
                 case MODE_SEPERATE_OPTION:
                     return SpectrogramRendererMode.Seperate;
             }
+        }
+
+        public static string GetDefaultColorPalette()
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine("0:Black");
+            builder.AppendLine("25:Gray");
+            builder.AppendLine("100:White");
+            return builder.ToString();
+        }
+
+        public static Color[] GetColorPalette()
+        {
+            return GetColorPalette(GetDefaultColorPalette());
+        }
+
+        public static Color[] GetColorPalette(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return GetColorPalette();
+            }
+            var lines = value
+                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(line => line.Trim())
+                .ToArray();
+            var colors = new List<KeyValuePair<int, Color>>();
+            foreach (var line in lines)
+            {
+                var parts = line
+                    .Split(new[] { ':' }, 2)
+                    .Select(part => part.Trim())
+                    .ToArray();
+                if (parts.Length != 2)
+                {
+                    continue;
+                }
+                var index = default(int);
+                if (!int.TryParse(parts[0], out index))
+                {
+                    index = colors.Count * 10;
+                }
+                var color = default(Color);
+                try
+                {
+                    color = (Color)ColorConverter.ConvertFromString(parts[1]);
+                }
+                catch
+                {
+                    //Failed to parse the color.
+                    color = Colors.Red;
+                }
+                colors.Add(new KeyValuePair<int, Color>(index, color));
+            }
+            if (colors.Count < 2)
+            {
+                //Need at least two colors.
+                return GetColorPalette();
+            }
+            return colors
+                .OrderBy(color => color.Key)
+                .ToArray()
+                .ToGradient();
         }
     }
 }
