@@ -23,6 +23,8 @@ namespace FoxTunes
 
         public const string CATEGORY_SETTINGS = "F51F1E76-255F-45A0-A053-9D57EDECE326";
 
+        public const string CATEGORY_STREAM_POSITION = "5E4B02B6-9C09-4BAA-8936-F14D43CB0885";
+
         public const byte ATTRIBUTE_NONE = 0;
 
         public const byte ATTRIBUTE_SEPARATOR = 1;

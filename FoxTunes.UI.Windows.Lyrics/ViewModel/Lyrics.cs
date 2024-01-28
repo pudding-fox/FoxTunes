@@ -238,7 +238,7 @@ namespace FoxTunes.ViewModel
         {
             if (names != null && names.Any())
             {
-                if (!names.Contains(CommonMetaData.Lyrics, true))
+                if (!names.Contains(CommonMetaData.Lyrics, StringComparer.OrdinalIgnoreCase))
                 {
 #if NET40
                     return TaskEx.FromResult(false);

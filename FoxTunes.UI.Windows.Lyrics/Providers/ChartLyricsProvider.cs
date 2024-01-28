@@ -70,7 +70,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                //TODO: Warn.
+                Logger.Write(this, LogLevel.Warn, "Failed to fetch lyrics: {0}", e.Message);
             }
             return LyricsResult.Fail;
         }

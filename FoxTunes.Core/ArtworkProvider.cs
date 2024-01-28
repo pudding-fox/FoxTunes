@@ -122,7 +122,7 @@ namespace FoxTunes
                         foreach (var fileName in FileSystemHelper.EnumerateFiles(directoryName, string.Format("{0}.*", name), FileSystemHelper.SearchOption.None))
                         {
                             var info = new FileInfo(fileName);
-                            if (!EXTENSIONS.Contains(info.Extension, true))
+                            if (!EXTENSIONS.Contains(info.Extension, StringComparer.OrdinalIgnoreCase))
                             {
                                 continue;
                             }

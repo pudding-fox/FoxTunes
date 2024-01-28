@@ -21,7 +21,9 @@ namespace FoxTunes
 
         public const string EXTEND_GLASS_ELEMENT = "LLLL7881-D4F6-484C-8E4E-E3CD5802F8B5";
 
-        public const string SHOW_CURSOR_ADORNERS = "NNNN7E23-A1E4-4BB6-9291-B553F4F7AD12";
+        public const string SHOW_CURSOR_ADORNERS_ELEMENT = "NNNN7E23-A1E4-4BB6-9291-B553F4F7AD12";
+
+
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
@@ -40,7 +42,7 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(EXTEND_GLASS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Glass, path: Strings.General_Advanced).WithValue(false))
                 .WithElement(
-                    new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS, Strings.WindowsUserInterfaceConfiguration_Cursors, path: Strings.General_Advanced).WithValue(releaseType == ReleaseType.Default)
+                    new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Cursors, path: Strings.General_Advanced).WithValue(releaseType == ReleaseType.Default)
             );
         }
 

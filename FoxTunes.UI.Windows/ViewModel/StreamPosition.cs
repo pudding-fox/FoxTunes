@@ -10,6 +10,34 @@ namespace FoxTunes.ViewModel
     {
         public IPlaybackManager PlaybackManager { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        private BooleanConfigurationElement _ShowCounters { get; set; }
+
+        public BooleanConfigurationElement ShowCounters
+        {
+            get
+            {
+                return this._ShowCounters;
+            }
+            set
+            {
+                this._ShowCounters = value;
+                this.OnShowCountersChanged();
+            }
+        }
+
+        protected virtual void OnShowCountersChanged()
+        {
+            if (this.ShowCountersChanged != null)
+            {
+                this.ShowCountersChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowCounters");
+        }
+
+        public event EventHandler ShowCountersChanged;
+
         private OutputStream _CurrentStream { get; set; }
 
         public OutputStream CurrentStream
@@ -88,6 +116,11 @@ namespace FoxTunes.ViewModel
         {
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
+            this.Configuration = core.Components.Configuration;
+            this.ShowCounters = this.Configuration.GetElement<BooleanConfigurationElement>(
+                StreamPositionBehaviourConfiguration.SECTION,
+                StreamPositionBehaviourConfiguration.SHOW_COUNTERS_ELEMENT
+            );
             this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
