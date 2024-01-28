@@ -126,7 +126,7 @@ namespace FoxTunes
         private Task SaveChanges()
         {
             this.Name = "Saving changes";
-            this.Position = this.Count;
+            this.IsIndeterminate = true;
             Logger.Write(this, LogLevel.Debug, "Saving changes to library.");
             return this.Database.Interlocked(() => this.Database.WithAutoDetectChanges(async () => await this.Database.SaveChangesAsync()));
         }

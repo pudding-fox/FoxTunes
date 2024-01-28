@@ -136,6 +136,26 @@ namespace FoxTunes
 
         public event EventHandler CountChanged = delegate { };
 
+        protected bool IsIndeterminate
+        {
+            get
+            {
+                return this.Position == 0 && this.Count == 0;
+            }
+            set
+            {
+                if (value)
+                {
+                    this.Position = 0;
+                    this.Count = 0;
+                }
+                else
+                {
+                    //Nothing to do.
+                }
+            }
+        }
+
         public Task Run()
         {
             Logger.Write(this, LogLevel.Debug, "Running background task.");
