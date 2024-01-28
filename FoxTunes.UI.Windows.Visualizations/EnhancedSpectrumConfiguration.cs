@@ -52,8 +52,8 @@ namespace FoxTunes
         private static IEnumerable<SelectionConfigurationOption> GetBandsOptions()
         {
             yield return new SelectionConfigurationOption(BANDS_10_OPTION, "10");
-            yield return new SelectionConfigurationOption(BANDS_20_OPTION, "20").Default();
-            yield return new SelectionConfigurationOption(BANDS_40_OPTION, "40");
+            yield return new SelectionConfigurationOption(BANDS_20_OPTION, "20");
+            yield return new SelectionConfigurationOption(BANDS_40_OPTION, "40").Default();
             yield return new SelectionConfigurationOption(BANDS_80_OPTION, "80");
             yield return new SelectionConfigurationOption(BANDS_160_OPTION, "160");
         }
