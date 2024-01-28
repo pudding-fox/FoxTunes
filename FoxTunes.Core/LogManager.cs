@@ -5,11 +5,21 @@ namespace FoxTunes
 {
     public static class LogManager
     {
+        private static ILogger _Logger { get; set; }
+
         public static ILogger Logger
         {
             get
             {
-                return ComponentRegistry.Instance.GetComponent<ILogger>() ?? new NullLogger();
+                if (_Logger == null)
+                {
+                    _Logger = ComponentRegistry.Instance.GetComponent<ILogger>();
+                    if (_Logger == null)
+                    {
+                        return NullLogger.Instance;
+                    }
+                }
+                return _Logger;
             }
         }
 
@@ -74,6 +84,8 @@ namespace FoxTunes
             {
                 //Nothing to do.
             }
+
+            public static readonly ILogger Instance = new NullLogger();
         }
     }
 }

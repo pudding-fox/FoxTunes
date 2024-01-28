@@ -11,6 +11,8 @@ namespace FoxTunes
     [Component("3DC2C04A-CE99-4416-BC27-068E8AC02F56", ComponentSlots.Logger, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class Log4NetLogger : StandardComponent, ILogger, IConfigurableComponent
     {
+        public bool Enabled { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public bool IsDebugEnabled(IBaseComponent component)
@@ -70,6 +72,10 @@ namespace FoxTunes
 
         public void Write(Type type, LogLevel level, string message, params object[] args)
         {
+            if (!this.Enabled)
+            {
+                return;
+            }
             var logger = global::log4net.LogManager.GetLogger(type);
             switch (level)
             {
@@ -122,6 +128,7 @@ namespace FoxTunes
                 {
                     DisableFileAppender();
                 }
+                this.Enabled = value;
             });
             base.InitializeComponent(core);
         }
