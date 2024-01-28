@@ -127,6 +127,10 @@ namespace FoxTunes
                     Colors.Black
                 };
             }
+            if (valueColors.Length > 1)
+            {
+                return valueColors;
+            }
             return backgroundColors.Concat(valueColors).ToArray().ToGradient(1000);
         }
     }
