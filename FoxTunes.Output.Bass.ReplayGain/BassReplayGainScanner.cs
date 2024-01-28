@@ -17,6 +17,11 @@ namespace FoxTunes
 
         const string GROUP_EMPTY = "Empty";
 
+        static BassReplayGainScanner()
+        {
+            BassPluginLoader.Instance.Load();
+        }
+
         private BassReplayGainScanner()
         {
             this.CancellationToken = new CancellationToken();
