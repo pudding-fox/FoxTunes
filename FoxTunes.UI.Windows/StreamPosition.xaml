@@ -16,11 +16,11 @@
     <Grid>
         <Slider VerticalAlignment="Center" IsMoveToPointEnabled="True" Value="{Binding CurrentStream.Position, Source={StaticResource ViewModel}}" Maximum="{Binding CurrentStream.Length, Mode=OneWay, Source={StaticResource ViewModel}}" ToolTip="{Binding CurrentStream.Description, Mode=OneWay, Source={StaticResource ViewModel}}">
             <Interactivity:Interaction.Triggers>
-                <Interactivity:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=BeginSeekCommand}"></Interactivity:InvokeCommandAction>
+                <Interactivity:EventTrigger EventName="PreviewMouseDown">
+                    <ViewModel:InvokeParameterizedCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=BeginSeekCommand}"></ViewModel:InvokeParameterizedCommandAction>
                 </Interactivity:EventTrigger>
-                <Interactivity:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=EndSeekCommand}"></Interactivity:InvokeCommandAction>
+                <Interactivity:EventTrigger EventName="PreviewMouseUp">
+                    <ViewModel:InvokeParameterizedCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=EndSeekCommand}"></ViewModel:InvokeParameterizedCommandAction>
                 </Interactivity:EventTrigger>
             </Interactivity:Interaction.Triggers>
         </Slider>
