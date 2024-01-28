@@ -27,10 +27,19 @@ namespace FoxTunes
             Semaphore = new SemaphoreSlim(1, 1);
         }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public BooleanConfigurationElement CopyImages { get; private set; }
+
         public IArtworkProvider ArtworkProvider { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
+            this.Configuration = core.Components.Configuration;
+            this.CopyImages = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.COPY_IMAGES_ELEMENT
+            );
             this.ArtworkProvider = core.Components.ArtworkProvider;
             base.InitializeComponent(core);
         }
@@ -47,6 +56,7 @@ namespace FoxTunes
             try
             {
                 var collect = default(bool);
+                var images = default(bool);
                 using (var file = this.Create(fileName))
                 {
                     if (file.Tag != null)
@@ -65,9 +75,9 @@ namespace FoxTunes
                     else
                     {
                         var pictures = file.Tag.Pictures;
-                        if (pictures == null || !await this.AddImages(metaData, CommonMetaData.Pictures, file, file.Tag, pictures))
+                        if (pictures != null)
                         {
-                            await this.AddImages(metaData, file);
+                            images = await this.AddImages(metaData, CommonMetaData.Pictures, file, file.Tag, pictures);
                         }
                     }
                 }
@@ -75,6 +85,10 @@ namespace FoxTunes
                 {
                     //If we encountered a large meta data section (>10MB) then we need to try to reclaim the memory.
                     GC.Collect();
+                }
+                if (!images)
+                {
+                    await this.AddImages(metaData, fileName);
                 }
             }
             catch (UnsupportedFormatException)
@@ -92,15 +106,44 @@ namespace FoxTunes
         {
             try
             {
+                var collect = default(bool);
                 using (var file = this.Create(fileName))
                 {
-                    await this.SetMetaDatas(metaData, file.Tag);
+                    foreach (var metaDataItem in metaData)
+                    {
+                        switch (metaDataItem.Type)
+                        {
+                            case MetaDataItemType.Tag:
+                                this.SetTag(metaDataItem, file.Tag);
+                                break;
+                            case MetaDataItemType.Image:
+                                if (file.InvariantStartPosition > MAX_TAG_SIZE)
+                                {
+                                    Logger.Write(this, LogLevel.Warn, "Not exporting images to file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, MAX_TAG_SIZE);
+                                    collect = true;
+                                }
+                                else
+                                {
+                                    await this.SetImage(metaDataItem, file.Tag);
+                                }
+                                break;
+                        }
+                    }
                     file.Save();
+                }
+                if (collect)
+                {
+                    //If we encountered a large meta data section (>10MB) then we need to try to reclaim the memory.
+                    GC.Collect();
                 }
             }
             catch (UnsupportedFormatException)
             {
                 Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
+            }
+            catch (Exception e)
+            {
+                Logger.Write(this, LogLevel.Warn, "Failed to write meta data: {0} => {1}", fileName, e.Message);
             }
         }
 
@@ -108,16 +151,6 @@ namespace FoxTunes
         {
             var mimeType = string.Format("taglib/{0}", fileName.GetExtension());
             return FileTypes.AvailableTypes.ContainsKey(mimeType);
-        }
-
-        protected virtual bool IsSupported(File file, Tag tag, IPicture picture)
-        {
-            if (picture.Data.Data.Length > MAX_IMAGE_SIZE)
-            {
-                Logger.Write(this, LogLevel.Warn, "Not importing image from file \"{0}\" due to size: {1} > {2}", file.Name, picture.Data.Data.Length, MAX_IMAGE_SIZE);
-                return false;
-            }
-            return true;
         }
 
         protected virtual File Create(string fileName)
@@ -219,7 +252,7 @@ namespace FoxTunes
             metaData.Add(new MetaDataItem(name, MetaDataItemType.Property) { Value = value.Trim() });
         }
 
-        private async Task AddImages(List<MetaDataItem> metaData, File file)
+        private async Task AddImages(List<MetaDataItem> metaData, string fileName)
         {
             foreach (var type in new[] { ArtworkType.FrontCover, ArtworkType.BackCover })
             {
@@ -227,9 +260,13 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                var metaDataItem = await this.ArtworkProvider.Find(file.Name, type);
+                var metaDataItem = await this.ArtworkProvider.Find(fileName, type);
                 if (metaDataItem != null)
                 {
+                    if (this.CopyImages.Value)
+                    {
+                        metaDataItem.Value = await this.ImportImage(metaDataItem.Value, metaDataItem.Value, false);
+                    }
                     metaData.Add(metaDataItem);
                 }
             }
@@ -251,8 +288,9 @@ namespace FoxTunes
                     {
                         continue;
                     }
-                    if (!this.IsSupported(file, tag, picture))
+                    if (picture.Data.Count > MAX_IMAGE_SIZE)
                     {
+                        Logger.Write(this, LogLevel.Warn, "Not importing image from file \"{0}\" due to size: {1} > {2}", file.Name, picture.Data.Count, MAX_IMAGE_SIZE);
                         continue;
                     }
                     metaData.Add(new MetaDataItem(Enum.GetName(typeof(ArtworkType), type), MetaDataItemType.Image)
@@ -271,14 +309,14 @@ namespace FoxTunes
 
         private async Task<string> ImportImage(Tag tag, IPicture picture, ArtworkType type, bool overwrite)
         {
-            return await this.AddImage(picture, picture.Data.Checksum.ToString(), overwrite);
+            return await this.ImportImage(picture, picture.Data.Checksum.ToString(), overwrite);
         }
 
-        private async Task<string> AddImage(IPicture value, string id, bool overwrite)
+        private async Task<string> ImportImage(IPicture value, string id, bool overwrite)
         {
             var prefix = this.GetType().Name;
-            var fileName = default(string);
-            if (overwrite || !FileMetaDataStore.Exists(prefix, id, out fileName))
+            var result = default(string);
+            if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
             {
 #if NET40
                 Semaphore.Wait();
@@ -287,7 +325,7 @@ namespace FoxTunes
 #endif
                 try
                 {
-                    if (overwrite || !FileMetaDataStore.Exists(prefix, id, out fileName))
+                    if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
                     {
                         return await FileMetaDataStore.WriteAsync(prefix, id, value.Data.Data);
                     }
@@ -297,23 +335,33 @@ namespace FoxTunes
                     Semaphore.Release();
                 }
             }
-            return fileName;
+            return result;
         }
 
-        private async Task SetMetaDatas(IEnumerable<MetaDataItem> metaDataItems, Tag tag)
+        private async Task<string> ImportImage(string fileName, string id, bool overwrite)
         {
-            foreach (var metaDataItem in metaDataItems)
+            var prefix = this.GetType().Name;
+            var result = default(string);
+            if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
             {
-                switch (metaDataItem.Type)
+#if NET40
+                Semaphore.Wait();
+#else
+                await Semaphore.WaitAsync();
+#endif
+                try
                 {
-                    case MetaDataItemType.Tag:
-                        this.SetTag(metaDataItem, tag);
-                        break;
-                    case MetaDataItemType.Image:
-                        await this.SetImage(metaDataItem, tag);
-                        break;
+                    if (overwrite || !FileMetaDataStore.Exists(prefix, id, out result))
+                    {
+                        return await FileMetaDataStore.WriteAsync(prefix, id, fileName);
+                    }
+                }
+                finally
+                {
+                    Semaphore.Release();
                 }
             }
+            return result;
         }
 
         private void SetTag(MetaDataItem metaDataItem, Tag tag)

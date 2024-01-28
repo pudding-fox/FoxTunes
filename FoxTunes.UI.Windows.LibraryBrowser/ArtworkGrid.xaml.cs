@@ -65,39 +65,25 @@ namespace FoxTunes
             }
         }
 
-        public Task Refresh()
+        public async Task Refresh()
         {
-            var libraryHierarchyNode = this.DataContext as LibraryHierarchyNode;
-            if (this.Background != null || libraryHierarchyNode == null)
+            var width = default(int);
+            var height = default(int);
+            var libraryHierarchyNode = default(LibraryHierarchyNode);
+            await Windows.Invoke(() =>
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                width = this.DecodePixelWidth;
+                height = this.DecodePixelHeight;
+                libraryHierarchyNode = this.DataContext as LibraryHierarchyNode;
+            });
+            if (!libraryHierarchyNode.IsMetaDatasLoaded)
+            {
+                await libraryHierarchyNode.LoadMetaDatasAsync();
             }
-#if NET40
-            return TaskEx.Run(async () =>
-#else
-            return Task.Run(async () =>
-#endif
+            var source = ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, width, height);
+            await Windows.Invoke(() => this.Background = new ImageBrush(source)
             {
-                if (!libraryHierarchyNode.IsMetaDatasLoaded)
-                {
-                    await libraryHierarchyNode.LoadMetaDatasAsync();
-                }
-                var width = default(int);
-                var height = default(int);
-                await Windows.Invoke(() =>
-                {
-                    width = this.DecodePixelWidth;
-                    height = this.DecodePixelHeight;
-                });
-                var source = ArtworkGridProvider.CreateImageSource(libraryHierarchyNode, width, height);
-                await Windows.Invoke(() => this.Background = new ImageBrush(source)
-                {
-                    Stretch = Stretch.Uniform
-                });
+                Stretch = Stretch.Uniform
             });
         }
     }

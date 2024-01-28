@@ -9,6 +9,8 @@ namespace FoxTunes
     [UIComponent("FB75ECEC-A89A-4DAD-BA8D-9DB43F3DE5E3", UIComponentSlots.TOP_CENTER, "Library Browser")]
     public partial class LibraryBrowser : UIComponentBase
     {
+        public static readonly ArtworkGridLoader ArtworkGridLoader = ComponentRegistry.Instance.GetComponent<ArtworkGridLoader>();
+
         public LibraryBrowser()
         {
             this.InitializeComponent();
@@ -76,7 +78,14 @@ namespace FoxTunes
             {
                 return;
             }
-            var task = artworkGrid.Refresh();
+            if (e.IsItemVisible && artworkGrid.Background == null)
+            {
+                ArtworkGridLoader.Load(artworkGrid);
+            }
+            else
+            {
+                ArtworkGridLoader.Cancel(artworkGrid);
+            }
         }
     }
 }
