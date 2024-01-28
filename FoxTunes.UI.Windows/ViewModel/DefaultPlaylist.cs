@@ -234,7 +234,7 @@ namespace FoxTunes.ViewModel
             {
                 case CommonSignals.PlaylistUpdated:
                     var playlists = signal.State as IEnumerable<Playlist>;
-                    if (playlists != null)
+                    if (playlists != null && playlists.Any())
                     {
                         var playlist = await this.GetPlaylist().ConfigureAwait(false);
                         if (playlist != null && playlists.Contains(playlist))

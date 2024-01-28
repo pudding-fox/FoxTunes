@@ -242,16 +242,7 @@ namespace FoxTunes
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    await this.Database.ExecuteAsync(this.Database.Queries.RemovePlaylistItems, (parameters, phase) =>
-                    {
-                        switch (phase)
-                        {
-                            case DatabaseParameterPhase.Fetch:
-                                parameters["playlistId"] = this.Playlist.Id;
-                                parameters["status"] = status;
-                                break;
-                        }
-                    }, transaction).ConfigureAwait(false);
+                    await RemovePlaylistItems(this.Database, this.Playlist.Id, status, transaction).ConfigureAwait(false);
                     transaction.Commit();
                 }
             }))
@@ -445,6 +436,20 @@ namespace FoxTunes
             }
             action(playlistItem);
             await UpdatePlaylistItem(database, playlistItem, transaction).ConfigureAwait(false);
+        }
+
+        public static Task RemovePlaylistItems(IDatabaseComponent database, int playlistId, PlaylistItemStatus status, ITransactionSource transaction)
+        {
+            return database.ExecuteAsync(database.Queries.RemovePlaylistItems, (parameters, phase) =>
+            {
+                switch (phase)
+                {
+                    case DatabaseParameterPhase.Fetch:
+                        parameters["playlistId"] = playlistId;
+                        parameters["status"] = status;
+                        break;
+                }
+            }, transaction);
         }
 
         protected override void OnDisposing()

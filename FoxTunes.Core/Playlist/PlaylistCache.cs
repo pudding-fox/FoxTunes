@@ -41,7 +41,7 @@ namespace FoxTunes
             {
                 case CommonSignals.PlaylistUpdated:
                     var playlists = signal.State as IEnumerable<Playlist>;
-                    if (playlists != null)
+                    if (playlists != null && playlists.Any())
                     {
                         foreach (var playlist in playlists)
                         {

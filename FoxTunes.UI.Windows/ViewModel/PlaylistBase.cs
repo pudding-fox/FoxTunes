@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Media.Animation;
 
 namespace FoxTunes.ViewModel
 {
@@ -70,34 +71,47 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ItemsChanged;
 
+        protected virtual async Task<string> GetStatusMessage()
+        {
+            if (this.PlaylistBrowser == null || this.PlaylistManager == null || this.Items == null)
+            {
+                return LOADING;
+            }
+            if (this.Items.Count > 0)
+            {
+                return null;
+            }
+            switch (this.PlaylistBrowser.State)
+            {
+                case PlaylistBrowserState.Loading:
+                    return LOADING;
+            }
+            var playlist = await this.GetPlaylist().ConfigureAwait(false);
+            var isUpdating = global::FoxTunes.BackgroundTask.Active
+                    .OfType<PlaylistTaskBase>()
+                    .Any(task => task.Playlist == playlist);
+            if (isUpdating)
+            {
+                return UPDATING;
+            }
+            else
+            {
+                return EMPTY;
+            }
+        }
+
+        private string _StatusMessage { get; set; }
+
         public virtual string StatusMessage
         {
             get
             {
-                if (this.PlaylistBrowser == null || this.PlaylistManager == null || this.Items == null)
-                {
-                    return LOADING;
-                }
-                if (this.Items.Count > 0)
-                {
-                    return null;
-                }
-                switch (this.PlaylistBrowser.State)
-                {
-                    case PlaylistBrowserState.Loading:
-                        return LOADING;
-                }
-                var isUpdating = global::FoxTunes.BackgroundTask.Active
-                        .OfType<PlaylistTaskBase>()
-                        .Any();
-                if (isUpdating)
-                {
-                    return UPDATING;
-                }
-                else
-                {
-                    return EMPTY;
-                }
+                return this._StatusMessage;
+            }
+            set
+            {
+                this._StatusMessage = value;
+                this.OnStatusMessageChanged();
             }
         }
 
@@ -135,13 +149,14 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler HasStatusMessageChanged;
 
-        protected virtual Task RefreshStatus()
+        protected virtual async Task RefreshStatus()
         {
-            return Windows.Invoke(() =>
+            var statusMessage = await this.GetStatusMessage().ConfigureAwait(false);
+            await Windows.Invoke(() =>
             {
-                this.OnStatusMessageChanged();
+                this.StatusMessage = statusMessage;
                 this.OnHasStatusMessageChanged();
-            });
+            }).ConfigureAwait(false);
         }
 
         protected abstract Task<Playlist> GetPlaylist();
@@ -173,7 +188,7 @@ namespace FoxTunes.ViewModel
             {
                 case CommonSignals.PlaylistUpdated:
                     var playlists = signal.State as IEnumerable<Playlist>;
-                    if (playlists != null)
+                    if (playlists != null && playlists.Any())
                     {
                         var playlist = await this.GetPlaylist().ConfigureAwait(false);
                         if (playlist == null || playlists.Contains(playlist))

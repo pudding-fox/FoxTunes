@@ -101,7 +101,7 @@ namespace FoxTunes
                     if (this.Playlist != null)
                     {
                         var playlists = signal.State as IEnumerable<Playlist>;
-                        if (playlists == null || playlists.Contains(this.Playlist))
+                        if (playlists == null || !playlists.Any() || playlists.Contains(this.Playlist))
                         {
                             return this.Refresh();
                         }

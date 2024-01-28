@@ -86,6 +86,12 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        public virtual Task Reload(IEnumerable<Playlist> playlists)
+        {
+            //TODO: Be more selective.
+            return this.Reload();
+        }
+
         public virtual async Task Reload()
         {
             await this.RefreshItems().ConfigureAwait(false);
@@ -112,7 +118,15 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    return this.Reload();
+                    var playlists = signal.State as IEnumerable<Playlist>;
+                    if (playlists != null && playlists.Any())
+                    {
+                        return this.Reload(playlists);
+                    }
+                    else
+                    {
+                        return this.Reload();
+                    }
             }
 #if NET40
             return TaskEx.FromResult(false);
