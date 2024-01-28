@@ -7,6 +7,6 @@ namespace FoxTunes.Interfaces
     {
         Task Run(Action action);
 
-        Task Run(Task task);
+        Task Run(Func<Task> func);
     }
 }

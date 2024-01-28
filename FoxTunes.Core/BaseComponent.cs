@@ -24,7 +24,7 @@ namespace FoxTunes
         {
             if (this.Semaphore == null)
             {
-                this.Semaphore = new SemaphoreSlim(1);
+                this.Semaphore = new SemaphoreSlim(1, 1);
             }
         }
 

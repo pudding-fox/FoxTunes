@@ -29,12 +29,12 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected override Task OnRun()
+        protected override async Task OnRun()
         {
             this.Name = "Buffering";
             this.Description = new FileInfo(this.PlaylistItem.FileName).Name;
             Logger.Write(this, LogLevel.Debug, "Loading play list item into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
-            return this.OutputStreamQueue.Interlocked(async () =>
+            await this.OutputStreamQueue.Interlocked(async () =>
             {
                 if (this.OutputStreamQueue.IsQueued(this.PlaylistItem))
                 {
@@ -49,7 +49,14 @@ namespace FoxTunes
                 var outputStream = await this.Output.Load(this.PlaylistItem);
                 Logger.Write(this, LogLevel.Debug, "Play list item loaded into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
                 this.OutputStreamQueue.Enqueue(outputStream, this.Immediate);
-                Logger.Write(this, LogLevel.Debug, "Output stream added to the queue: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+                if (this.Immediate)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Immediate load was requested, output stream was automatically de-queued: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Debug, "Output stream added to the queue: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+                }
             });
         }
     }

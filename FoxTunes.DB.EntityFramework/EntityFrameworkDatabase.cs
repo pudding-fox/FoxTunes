@@ -182,16 +182,16 @@ namespace FoxTunes
         public override bool CanQuery<T>(T item)
         {
             var entry = this.DbContext.Entry(item);
-            return entry.State != EntityState.Detached;
+            return entry.State != EntityState.Added && entry.State != EntityState.Detached;
         }
 
         public override IDatabaseQuery<TMember> GetMemberQuery<T, TMember>(T item, Expression<Func<T, TMember>> member)
         {
-            var entry = this.DbContext.Entry(item);
-            if (entry.State == EntityState.Detached)
+            if (!this.CanQuery(item))
             {
                 throw new InvalidOperationException("Item is untracked, cannot query.");
             }
+            var entry = this.DbContext.Entry(item);
             return new WrappedDbQuery<TMember>(
                 this.DbContext,
                 this.DbContext.Set<TMember>(),
@@ -201,11 +201,11 @@ namespace FoxTunes
 
         public override IDatabaseQuery<TMember> GetMemberQuery<T, TMember>(T item, Expression<Func<T, ICollection<TMember>>> member)
         {
-            var entry = this.DbContext.Entry(item);
-            if (entry.State == EntityState.Detached)
+            if (!this.CanQuery(item))
             {
                 throw new InvalidOperationException("Item is untracked, cannot query.");
             }
+            var entry = this.DbContext.Entry(item);
             return new WrappedDbQuery<TMember>(
                 this.DbContext,
                 this.DbContext.Set<TMember>(),
