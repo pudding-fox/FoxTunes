@@ -1438,6 +1438,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Restart required to enable/disable transparency..
+        /// </summary>
+        internal static string WindowExtensions_TransparencyWarning {
+            get {
+                return ResourceManager.GetString("WindowExtensions.TransparencyWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Counters.
         /// </summary>
         internal static string WindowsUserInterfaceConfiguration_Counters {

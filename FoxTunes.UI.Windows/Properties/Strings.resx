@@ -576,6 +576,9 @@
   <data name="Volume.Name" xml:space="preserve">
     <value>Volume</value>
   </data>
+  <data name="WindowExtensions.TransparencyWarning" xml:space="preserve">
+    <value>Restart required to enable/disable transparency.</value>
+  </data>
   <data name="WindowsUserInterfaceConfiguration.Counters" xml:space="preserve">
     <value>Show Counters</value>
   </data>

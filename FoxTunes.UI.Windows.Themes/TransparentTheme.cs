@@ -24,6 +24,14 @@ namespace FoxTunes
             }
         }
 
+        public override ThemeFlags Flags
+        {
+            get
+            {
+                return ThemeFlags.RequiresTransparency;
+            }
+        }
+
         public override ResourceDictionary GetResourceDictionary()
         {
             return new ResourceDictionary()

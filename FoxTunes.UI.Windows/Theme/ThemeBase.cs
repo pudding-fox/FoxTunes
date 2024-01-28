@@ -42,6 +42,14 @@ namespace FoxTunes
 
         public IEnumerable<IColorPalette> ColorPalettes { get; private set; }
 
+        public virtual ThemeFlags Flags
+        {
+            get
+            {
+                return ThemeFlags.None;
+            }
+        }
+
         public IConfiguration Configuration { get; private set; }
 
         public override void InitializeComponent(ICore core)

@@ -78,6 +78,7 @@ namespace FoxTunes
         {
             this.WindowStyle = WindowStyle.None;
             this.Background = Brushes.Transparent;
+            WindowExtensions.SetAllowsTransparency(this, true);
             if (this.ApplyTemplate)
             {
                 this.Template = TemplateFactory.Template;

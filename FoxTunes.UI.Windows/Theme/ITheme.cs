@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -18,8 +19,17 @@ namespace FoxTunes
 
         IEnumerable<IColorPalette> ColorPalettes { get; }
 
+        ThemeFlags Flags { get; }
+
         void Enable();
 
         void Disable();
+    }
+
+    [Flags]
+    public enum ThemeFlags : byte
+    {
+        None = 0,
+        RequiresTransparency = 1
     }
 }
