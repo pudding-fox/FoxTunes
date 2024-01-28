@@ -9,7 +9,8 @@
     <StartupObject />
     <Platforms>x86</Platforms>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
-    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
+    <AssemblyVersion>2.1.1.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
