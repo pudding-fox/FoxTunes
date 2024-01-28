@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 
 namespace FoxTunes
@@ -16,8 +17,6 @@ namespace FoxTunes
     public class LibraryBrowserTileBrushFactory : StandardComponent, IDisposable
     {
         public LibraryBrowserTileProvider LibraryBrowserTileProvider { get; private set; }
-
-        public PixelSizeConverter PixelSizeConverter { get; private set; }
 
         public ImageLoader ImageLoader { get; private set; }
 
@@ -36,7 +35,6 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.LibraryBrowserTileProvider = ComponentRegistry.Instance.GetComponent<LibraryBrowserTileProvider>();
-            this.PixelSizeConverter = ComponentRegistry.Instance.GetComponent<PixelSizeConverter>();
             this.ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
             this.PlaceholderBrushFactory = ComponentRegistry.Instance.GetComponent<ArtworkPlaceholderBrushFactory>();
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
@@ -88,10 +86,9 @@ namespace FoxTunes
             }
         }
 
-        public Wrapper<ImageBrush> Create(LibraryHierarchyNode libraryHierarchyNode, int width, int height, LibraryBrowserImageMode mode)
+        public Wrapper<ImageBrush> Create(LibraryHierarchyNode libraryHierarchyNode, LibraryBrowserTile libraryBrowserTile)
         {
-            this.PixelSizeConverter.Convert(ref width, ref height);
-            var placeholder = this.PlaceholderBrushFactory.Create(width, height);
+            var placeholder = this.PlaceholderBrushFactory.Create(libraryBrowserTile.Width, libraryBrowserTile.Height);
             if (libraryHierarchyNode == null)
             {
                 return AsyncResult<ImageBrush>.FromValue(placeholder);
@@ -103,16 +100,15 @@ namespace FoxTunes
                 var metaDataItems = new Func<MetaDataItem[]>(
                     () => LibraryHierarchyNodeConverter.Instance.Convert(libraryHierarchyNode).Result.MetaDatas.ToArray()
                 );
-                return this.Create(libraryHierarchyNode, metaDataItems, width, height, mode, cache);
+                return this.Create(libraryHierarchyNode, metaDataItems, libraryBrowserTile.Width, libraryBrowserTile.Height, libraryBrowserTile.Mode, cache);
             });
             if (cache)
             {
-                var key = new Tuple<LibraryHierarchyNode, LibraryBrowserImageMode>(libraryHierarchyNode, mode);
                 var value = new Func<Task<ImageBrush>>(() => this.Factory.StartNew(
-                    () => this.Store.GetOrAdd(key, width, height, factory)
+                    () => this.Store.GetOrAdd(new Tuple<LibraryHierarchyNode, LibraryBrowserImageMode>(libraryHierarchyNode, libraryBrowserTile.Mode), libraryBrowserTile.Width, libraryBrowserTile.Height, factory)
                 ));
                 var brush = default(ImageBrush);
-                if (this.Store.TryGetValue(key, width, height, out brush))
+                if (this.Store.TryGetValue(new Tuple<LibraryHierarchyNode, LibraryBrowserImageMode>(libraryHierarchyNode, libraryBrowserTile.Mode), libraryBrowserTile.Width, libraryBrowserTile.Height, out brush))
                 {
                     return new MonitoringAsyncResult<ImageBrush>(libraryHierarchyNode, brush, value);
                 }
@@ -216,6 +212,33 @@ namespace FoxTunes
             catch
             {
                 //Nothing can be done, never throw on GC thread.
+            }
+        }
+
+        public class LibraryBrowserTile
+        {
+            public static readonly PixelSizeConverter Converter = ComponentRegistry.Instance.GetComponent<PixelSizeConverter>();
+
+            public int Width { get; private set; }
+
+            public int Height { get; private set; }
+
+            public LibraryBrowserImageMode Mode { get; private set; }
+
+            public bool IsEmpty
+            {
+                get
+                {
+                    return this.Width == 0 || this.Height == 0 || this.Mode == LibraryBrowserImageMode.None;
+                }
+            }
+
+            public void Update(double width, double height, LibraryBrowserImageMode mode)
+            {
+                var size = Converter.Convert(new Size(width, height));
+                this.Width = Convert.ToInt32(width);
+                this.Height = Convert.ToInt32(height);
+                this.Mode = mode;
             }
         }
     }

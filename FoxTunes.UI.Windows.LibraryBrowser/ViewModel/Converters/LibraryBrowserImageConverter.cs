@@ -36,28 +36,6 @@ namespace FoxTunes.ViewModel
             libraryBrowserImageConverter.OnWidthChanged();
         }
 
-        public double Width
-        {
-            get
-            {
-                return global::System.Convert.ToDouble(this.GetValue(WidthProperty));
-            }
-            set
-            {
-                this.SetValue(WidthProperty, value);
-            }
-        }
-
-        protected virtual void OnWidthChanged()
-        {
-            if (this.WidthChanged != null)
-            {
-                this.WidthChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Width");
-        }
-
-        public event EventHandler WidthChanged;
 
         public static readonly DependencyProperty HeightProperty = DependencyProperty.Register(
             "Height",
@@ -86,29 +64,6 @@ namespace FoxTunes.ViewModel
             libraryBrowserImageConverter.OnHeightChanged();
         }
 
-        public double Height
-        {
-            get
-            {
-                return global::System.Convert.ToDouble(this.GetValue(HeightProperty));
-            }
-            set
-            {
-                this.SetValue(HeightProperty, value);
-            }
-        }
-
-        protected virtual void OnHeightChanged()
-        {
-            if (this.HeightChanged != null)
-            {
-                this.HeightChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Height");
-        }
-
-        public event EventHandler HeightChanged;
-
         public static readonly DependencyProperty ModeProperty = DependencyProperty.Register(
             "Mode",
             typeof(LibraryBrowserImageMode),
@@ -136,6 +91,61 @@ namespace FoxTunes.ViewModel
             libraryBrowserImageConverter.OnModeChanged();
         }
 
+        public LibraryBrowserImageConverter()
+        {
+            this.LibraryBrowserTile = new LibraryBrowserTileBrushFactory.LibraryBrowserTile();
+        }
+
+        public LibraryBrowserTileBrushFactory.LibraryBrowserTile LibraryBrowserTile { get; private set; }
+
+        public double Width
+        {
+            get
+            {
+                return global::System.Convert.ToDouble(this.GetValue(WidthProperty));
+            }
+            set
+            {
+                this.SetValue(WidthProperty, value);
+            }
+        }
+
+        protected virtual void OnWidthChanged()
+        {
+            this.LibraryBrowserTile.Update(this.Width, this.Height, this.Mode);
+            if (this.WidthChanged != null)
+            {
+                this.WidthChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Width");
+        }
+
+        public event EventHandler WidthChanged;
+
+        public double Height
+        {
+            get
+            {
+                return global::System.Convert.ToDouble(this.GetValue(HeightProperty));
+            }
+            set
+            {
+                this.SetValue(HeightProperty, value);
+            }
+        }
+
+        protected virtual void OnHeightChanged()
+        {
+            this.LibraryBrowserTile.Update(this.Width, this.Height, this.Mode);
+            if (this.HeightChanged != null)
+            {
+                this.HeightChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Height");
+        }
+
+        public event EventHandler HeightChanged;
+
         public LibraryBrowserImageMode Mode
         {
             get
@@ -150,6 +160,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnModeChanged()
         {
+            this.LibraryBrowserTile.Update(this.Width, this.Height, this.Mode);
             if (this.ModeChanged != null)
             {
                 this.ModeChanged(this, EventArgs.Empty);
@@ -165,19 +176,13 @@ namespace FoxTunes.ViewModel
             {
                 return null;
             }
-            if (double.IsNaN(this.Width) || double.IsNaN(this.Height) || this.Width == 0 || this.Height == 0)
+            if (this.LibraryBrowserTile.IsEmpty)
             {
                 return null;
             }
             if (value is LibraryHierarchyNode libraryHierarchyNode)
             {
-                var size = global::System.Convert.ToInt32(Math.Max(this.Width, this.Height));
-                return Factory.Create(
-                    libraryHierarchyNode,
-                    size,
-                    size,
-                    this.Mode
-                );
+                return Factory.Create(libraryHierarchyNode, this.LibraryBrowserTile);
             }
             return value;
         }
