@@ -60,16 +60,6 @@ namespace FoxTunes
             var task = this.ExpandAll(view.OfType<LibraryHierarchyNode>());
         }
 
-        protected virtual void OnSelected(object sender, RoutedEventArgs e)
-        {
-            var treeViewItem = sender as TreeViewItem;
-            if (treeViewItem == null)
-            {
-                return;
-            }
-            treeViewItem.BringIntoView();
-        }
-
         protected virtual void OnExpanded(object sender, RoutedEventArgs e)
         {
             var treeViewItem = sender as TreeViewItem;

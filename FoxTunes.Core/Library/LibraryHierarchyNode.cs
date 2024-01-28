@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [Table(Name = "LibraryHierarchyItems")]
-    public class LibraryHierarchyNode : PersistableComponent, ISelectable, IExpandable
+    public class LibraryHierarchyNode : PersistableComponent, ISelectable, IExpandable, IHierarchical
     {
         const MetaDataItemType META_DATA_TYPE = MetaDataItemType.Image;
 
@@ -181,6 +181,26 @@ namespace FoxTunes
 
         public event EventHandler IsSelectedChanged;
 
+        #region IHierarchical
+
+        IHierarchical IHierarchical.Parent
+        {
+            get
+            {
+                return this.Parent;
+            }
+        }
+
+        IEnumerable<IHierarchical> IHierarchical.Children
+        {
+            get
+            {
+                return this.Children;
+            }
+        }
+
+        #endregion
+
         public override void InitializeComponent(ICore core)
         {
             this.DatabaseFactory = core.Factories.Database;
@@ -198,6 +218,10 @@ namespace FoxTunes
 
         public virtual void LoadChildren()
         {
+            if (this.IsChildrenLoaded)
+            {
+                return;
+            }
             this.Children = new ObservableCollection<LibraryHierarchyNode>(this.LibraryHierarchyBrowser.GetNodes(this));
             this.IsChildrenLoaded = true;
         }
@@ -209,6 +233,14 @@ namespace FoxTunes
 
         public virtual Task LoadChildrenAsync(ICollectionLoader<LibraryHierarchyNode> collectionLoader)
         {
+            if (this.IsChildrenLoaded)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
             return collectionLoader.Load(
                 () => this.LibraryHierarchyBrowser.GetNodes(this),
                 children =>
@@ -221,6 +253,10 @@ namespace FoxTunes
 
         public virtual void LoadMetaDatas()
         {
+            if (this.IsMetaDatasLoaded)
+            {
+                return;
+            }
             this.MetaDatas = new ObservableCollection<MetaDataItem>(this.GetMetaDatas());
             this.IsMetaDatasLoaded = true;
         }
@@ -282,6 +318,10 @@ namespace FoxTunes
             return this.Equals(obj as LibraryHierarchyNode);
         }
 
-        public static readonly LibraryHierarchyNode Empty = new LibraryHierarchyNode();
+        public static readonly LibraryHierarchyNode Empty = new LibraryHierarchyNode()
+        {
+            IsChildrenLoaded = true,
+            IsMetaDatasLoaded = true
+        };
     }
 }
