@@ -222,7 +222,7 @@ namespace FoxTunes
                 {
                     var brush = this.Foreground;
                     var pen = new Pen(this.Foreground, 0.4);
-                    for (var a = 0; a < ElementCount; a++)
+                    for (var a = 0; a < this.ElementCount; a++)
                     {
                         drawingContext.DrawRectangle(
                             brush,
@@ -234,7 +234,7 @@ namespace FoxTunes
                                 this.Elements[a, 3]
                             )
                         );
-                        if (showPeaks && this.Elements[a, 1] > this.Peaks[a, 1])
+                        if (showPeaks)
                         {
                             drawingContext.DrawRectangle(
                                 brush,
@@ -293,7 +293,14 @@ namespace FoxTunes
                         {
                             UpdateSmooth(data);
                         }
-                        UpdatePeaks(data);
+                        if (ShowPeaks == null || !ShowPeaks.Value)
+                        {
+                            //Nothing to do.
+                        }
+                        else
+                        {
+                            UpdatePeaks(data);
+                        }
                         this.LastUpdated = DateTime.UtcNow;
                         this.HasData = true;
                     }
@@ -320,6 +327,17 @@ namespace FoxTunes
                 }
                 this.Weight = (float)16 / this.ElementCount;
                 this.Step = this.Dimentions[0] / ElementCount;
+                for (var a = 0; a < this.ElementCount; a++)
+                {
+                    this.Elements[a, 0] = a * this.Step;
+                    this.Elements[a, 1] = this.Dimentions[1];
+                    this.Elements[a, 2] = this.Step;
+                    this.Elements[a, 3] = 1;
+                    this.Peaks[a, 0] = a * this.Step;
+                    this.Peaks[a, 1] = this.Dimentions[1];
+                    this.Peaks[a, 2] = this.Step;
+                    this.Peaks[a, 3] = 1;
+                }
             }
 
             private static void UpdateFast(SpectrumData data)
@@ -428,14 +446,6 @@ namespace FoxTunes
                         data.Elements[a, 3] = 0;
                     }
                     data.Elements[a, 1] = data.Height - data.Elements[a, 3];
-                    if (data.Elements[a, 1] < data.Peaks[a, 1])
-                    {
-                        data.Peaks[a, 0] = a * data.Step;
-                        data.Peaks[a, 2] = data.Step;
-                        data.Peaks[a, 3] = 1;
-                        data.Peaks[a, 1] = data.Elements[a, 1];
-                        data.Holds[a] = data.HoldInterval + ROLLOFF_INTERVAL;
-                    }
                 }
             }
 
@@ -444,7 +454,15 @@ namespace FoxTunes
                 var fast = data.Height / 4;
                 for (int a = 0; a < data.ElementCount; a++)
                 {
-                    if (data.Elements[a, 1] > data.Peaks[a, 1] && data.Peaks[a, 1] < data.Height - 1)
+                    if (data.Elements[a, 1] < data.Peaks[a, 1])
+                    {
+                        data.Peaks[a, 0] = a * data.Step;
+                        data.Peaks[a, 2] = data.Step;
+                        data.Peaks[a, 3] = 1;
+                        data.Peaks[a, 1] = data.Elements[a, 1];
+                        data.Holds[a] = data.HoldInterval + ROLLOFF_INTERVAL;
+                    }
+                    else if (data.Elements[a, 1] > data.Peaks[a, 1] && data.Peaks[a, 1] < data.Height - 1)
                     {
                         if (data.Holds[a] > 0)
                         {
