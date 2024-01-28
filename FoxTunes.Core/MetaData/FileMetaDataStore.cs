@@ -14,6 +14,8 @@ namespace FoxTunes
             "DataStore"
         );
 
+        public static readonly object SyncRoot = new object();
+
         public static bool Exists(string id, out string fileName)
         {
             fileName = GetFileName(id);
