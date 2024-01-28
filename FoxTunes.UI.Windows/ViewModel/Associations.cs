@@ -66,10 +66,13 @@ namespace FoxTunes.ViewModel
             }
             this.FileAssociations.Clear();
             this.FileAssociations.AddRange(
-                this.Output.SupportedExtensions.Select(extension => new Association(
-                    fileAssociations.Create(extension),
-                    extensions.Contains(extension)
-                ))
+                this.Output.SupportedExtensions
+                    .OrderBy(extension => extension)
+                    .Select(extension => new Association(
+                        fileAssociations.Create(extension),
+                        extensions.Contains(extension)
+                    )
+                )
             );
         }
 

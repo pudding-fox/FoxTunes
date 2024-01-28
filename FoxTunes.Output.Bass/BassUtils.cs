@@ -36,9 +36,10 @@ namespace FoxTunes
 
         public static IEnumerable<string> GetInputFormats()
         {
+            var formats = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var format in BUILT_IN_FORMATS)
             {
-                yield return format;
+                formats.Add(format);
             }
             foreach (var plugin in BassPluginLoader.Instance.Plugins)
             {
@@ -46,10 +47,11 @@ namespace FoxTunes
                 {
                     foreach (var extension in format.FileExtensions.Split(';'))
                     {
-                        yield return extension.TrimStart('*', '.');
+                        formats.Add(extension.TrimStart('*', '.'));
                     }
                 }
             }
+            return formats;
         }
 
         public static bool IsSupported(string extension)
