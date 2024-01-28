@@ -10,6 +10,14 @@ namespace FoxTunes.ViewModel
 {
     public class Associations : ViewModelBase
     {
+        public bool Supported
+        {
+            get
+            {
+                return Publication.IsPortable;
+            }
+        }
+
         public IOutput Output { get; private set; }
 
         public ObservableCollection<Association> FileAssociations { get; private set; }
@@ -44,7 +52,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void Refresh()
         {
-            if (!Publication.IsPortable)
+            if (!this.Supported)
             {
                 return;
             }
@@ -76,7 +84,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(() => this.SelectAll(true));
+                return new Command(() => this.SelectAll(true), () => this.Supported);
             }
         }
 
@@ -84,7 +92,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(() => this.SelectAll(false));
+                return new Command(() => this.SelectAll(false), () => this.Supported);
             }
         }
 
@@ -100,7 +108,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(this.Save);
+                return new Command(this.Save, () => this.Supported);
             }
         }
 
@@ -128,7 +136,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(this.Cancel);
+                return new Command(this.Cancel, () => this.Supported);
             }
         }
 
