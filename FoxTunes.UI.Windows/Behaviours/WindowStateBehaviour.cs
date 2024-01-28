@@ -15,27 +15,28 @@ namespace FoxTunes
         public WindowStateBehaviour()
         {
             this.Behaviours = new ConcurrentDictionary<Window, MinMaxBehaviour>();
-            Windows.MainWindowCreated += this.OnWindowCreated;
-            Windows.SettingsWindowCreated += this.OnWindowCreated;
         }
 
         public ConcurrentDictionary<Window, MinMaxBehaviour> Behaviours { get; private set; }
 
-        protected virtual void OnWindowCreated(object sender, EventArgs e)
+        public IUserInterface UserInterface { get; private set; }
+
+        public override void InitializeComponent(ICore core)
         {
-            var window = sender as Window;
+            this.UserInterface = core.Components.UserInterface;
+            this.UserInterface.WindowCreated += this.OnWindowCreated;
+            this.UserInterface.WindowDestroyed += this.OnWindowDestroyed;
+            base.InitializeComponent(core);
+        }
+
+        protected virtual void OnWindowCreated(object sender, UserInterfaceWindowEventArgs e)
+        {
+            var window = GetWindow(e.Window.Handle);
             if (window == null)
             {
                 return;
             }
-            window.Loaded += this.OnLoaded;
-            window.Closed += this.OnClosed;
-        }
-
-        protected virtual void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            var window = sender as Window;
-            if (window == null)
+            if (window.ResizeMode != ResizeMode.CanResize && window.ResizeMode != ResizeMode.CanResizeWithGrip)
             {
                 return;
             }
@@ -47,9 +48,9 @@ namespace FoxTunes
             behaviour.Enable();
         }
 
-        protected virtual void OnClosed(object sender, EventArgs e)
+        protected virtual void OnWindowDestroyed(object sender, UserInterfaceWindowEventArgs e)
         {
-            var window = sender as Window;
+            var window = GetWindow(e.Window.Handle);
             if (window == null)
             {
                 return;
@@ -60,6 +61,20 @@ namespace FoxTunes
                 return;
             }
             behaviour.Dispose();
+        }
+
+        public static Window GetWindow(IntPtr handle)
+        {
+            var windows = Application.Current.Windows;
+            for (var a = 0; a < windows.Count; a++)
+            {
+                var window = windows[a];
+                if (window.GetHandle() == handle)
+                {
+                    return window;
+                }
+            }
+            return null;
         }
 
         public class MinMaxBehaviour : IDisposable
