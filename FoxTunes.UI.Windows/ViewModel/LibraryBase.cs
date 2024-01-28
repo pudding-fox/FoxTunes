@@ -172,6 +172,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SearchIntervalChanged;
 
+        private SearchCommitBehaviour _SearchCommitBehaviour { get; set; }
+
+        public virtual SearchCommitBehaviour SearchCommitBehaviour
+        {
+            get
+            {
+                return this._SearchCommitBehaviour;
+            }
+            set
+            {
+                this._SearchCommitBehaviour = value;
+                this.OnSearchCommitBehaviourChanged();
+            }
+        }
+
+        protected virtual void OnSearchCommitBehaviourChanged()
+        {
+            if (this.SearchCommitBehaviourChanged != null)
+            {
+                this.SearchCommitBehaviourChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SearchCommitBehaviour");
+        }
+
+        public event EventHandler SearchCommitBehaviourChanged;
+
         private bool _ShowCursorAdorners { get; set; }
 
         public virtual bool ShowCursorAdorners
@@ -236,9 +262,13 @@ namespace FoxTunes.ViewModel
             this.LibraryManager.SelectedItemChanged += this.OnSelectedItemChanged;
             this.Configuration = this.Core.Components.Configuration;
             this.Configuration.GetElement<IntegerConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                WindowsUserInterfaceConfiguration.SEARCH_INTERVAL_ELEMENT
+                SearchBehaviourConfiguration.SECTION,
+                SearchBehaviourConfiguration.SEARCH_INTERVAL_ELEMENT
             ).ConnectValue(value => this.SearchInterval = value);
+            this.Configuration.GetElement<SelectionConfigurationElement>(
+                SearchBehaviourConfiguration.SECTION,
+                SearchBehaviourConfiguration.SEARCH_COMMIT_ELEMENT
+            ).ConnectValue(option => this.SearchCommitBehaviour = SearchBehaviourConfiguration.GetCommitBehaviour(option));
             this.Configuration.GetElement<BooleanConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 WindowsUserInterfaceConfiguration.SHOW_CURSOR_ADORNERS
@@ -401,6 +431,29 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler SelectedHierarchyChanged;
+
+        public ICommand SearchCommitCommand
+        {
+            get
+            {
+                return CommandFactory.Instance.CreateCommand(this.SearchCommit);
+            }
+        }
+
+        public Task SearchCommit()
+        {
+            var clear = default(bool);
+            switch (this.SearchCommitBehaviour)
+            {
+                case SearchCommitBehaviour.Replace:
+                    clear = true;
+                    break;
+                case SearchCommitBehaviour.Append:
+                    clear = false;
+                    break;
+            }
+            return this.PlaylistManager.Add(this.Items, clear);
+        }
 
         protected override void Dispose(bool disposing)
         {

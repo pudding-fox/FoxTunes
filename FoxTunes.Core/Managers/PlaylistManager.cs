@@ -228,6 +228,24 @@ namespace FoxTunes
             }
         }
 
+        public async Task Add(IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
+        {
+            Logger.Write(this, LogLevel.Debug, "Adding library nodes to playlist.");
+            var index = await this.GetInsertIndex();
+            await this.Insert(index, libraryHierarchyNodes, clear);
+        }
+
+        public async Task Insert(int index, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
+        {
+            Logger.Write(this, LogLevel.Debug, "Inserting library nodes into playlist at index: {0}", index);
+            using (var task = new AddLibraryHierarchyNodesToPlaylistTask(index, libraryHierarchyNodes, clear))
+            {
+                task.InitializeComponent(this.Core);
+                await this.OnBackgroundTask(task);
+                await task.Run();
+            }
+        }
+
         public async Task Move(IEnumerable<PlaylistItem> playlistItems)
         {
             Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items.");

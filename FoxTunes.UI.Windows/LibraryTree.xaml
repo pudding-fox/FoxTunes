@@ -88,7 +88,13 @@
         <Windows:SearchBox 
             Grid.Row="2" 
             SearchText="{Binding Components.LibraryHierarchyBrowser.Filter, UpdateSourceTrigger=PropertyChanged}" 
-            Interval="{Binding SearchInterval, Source={StaticResource ViewModel}}"/>
+            Interval="{Binding SearchInterval, Source={StaticResource ViewModel}}">
+            <Interactivity:Interaction.Triggers>
+                <Interactivity:EventTrigger EventName="Commit">
+                    <ViewModel:InvokeParameterizedCommandAction Command="{Binding SearchCommitCommand, Source={StaticResource ViewModel}}" />
+                </Interactivity:EventTrigger>
+            </Interactivity:Interaction.Triggers>
+        </Windows:SearchBox>
         <Windows:MouseCursorAdorner x:Name="MouseCursorAdorner" Visibility="{Binding ShowCursorAdorners, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}">
             <Windows:MouseCursorAdorner.Template>
                 <DataTemplate>
