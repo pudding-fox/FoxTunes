@@ -11,7 +11,13 @@ namespace FoxTunes
     {
         private ComponentScanner()
         {
-
+            this._FileNames = new Lazy<IEnumerable<string>>(() =>
+            {
+                return Enumerable.Concat(
+                    Directory.EnumerateFiles(this.Location, "FoxTunes*.dll", SearchOption.AllDirectories),
+                    Directory.EnumerateFiles(this.Location, "FoxTunes*.exe", SearchOption.AllDirectories)
+                ).ToArray();
+            });
         }
 
         public string Location
@@ -22,14 +28,13 @@ namespace FoxTunes
             }
         }
 
+        private Lazy<IEnumerable<string>> _FileNames { get; set; }
+
         public IEnumerable<string> FileNames
         {
             get
             {
-                return Enumerable.Concat(
-                    Directory.EnumerateFiles(this.Location, "FoxTunes*.dll", SearchOption.AllDirectories),
-                    Directory.EnumerateFiles(this.Location, "FoxTunes*.exe", SearchOption.AllDirectories)
-                );
+                return this._FileNames.Value;
             }
         }
 

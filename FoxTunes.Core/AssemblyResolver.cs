@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
@@ -33,23 +32,6 @@ namespace FoxTunes
             AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= this.OnReflectionOnlyAssemblyResolve;
         }
 
-        public IEnumerable<string> GetFiles(string directoryName)
-        {
-            //Prefer assemblies in the base directory.
-            foreach (var fileName in Directory.EnumerateFiles(ComponentScanner.Instance.Location, "*.dll"))
-            {
-                yield return fileName;
-            }
-            //If the requesting assembly is in another folder then check that too.
-            if (Directory.Exists(directoryName) && !string.Equals(Path.GetFullPath(ComponentScanner.Instance.Location), Path.GetFullPath(directoryName)))
-            {
-                foreach (var fileName in Directory.EnumerateFiles(directoryName, "*.dll"))
-                {
-                    yield return fileName;
-                }
-            }
-        }
-
         protected virtual Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)
         {
             var fileName = default(string);
@@ -70,18 +52,12 @@ namespace FoxTunes
             {
                 //Nothing to do.
             }
-            var directoryName = default(string);
-            //If the requesting assembly can be determined then begin looking there.
-            if (args.RequestingAssembly != null && File.Exists(args.RequestingAssembly.Location))
-            {
-                directoryName = Path.GetDirectoryName(args.RequestingAssembly.Location);
-            }
-            else
-            {
-                directoryName = ComponentScanner.Instance.Location;
-            }
             var fileName = default(string);
-            if (this.TryResolve(directoryName, args.Name, true, out fileName))
+            //TODO: We're setting the tryLoad parameter to true.
+            //TODO: If the resolve fails for some reason a standard Assembly.Load will be attempted.
+            //TODO: As we're trying to do a reflection only load this is obviously wrong.
+            //TODO: It happens that the only libs that fall into this trap are framework assemblies so it's OK for now.
+            if (this.TryResolve(ComponentScanner.Instance.Location, args.Name, true, out fileName))
             {
                 var assembly = AssemblyRegistry.Instance.GetOrLoadReflectionAssembly(fileName);
                 //Load immidiate references.
@@ -104,7 +80,7 @@ namespace FoxTunes
 
         protected virtual bool TryResolve(string directoryName, string name, bool tryLoad, out string result)
         {
-            foreach (var fileName in this.GetFiles(directoryName))
+            foreach (var fileName in FileSystemHelper.EnumerateFiles(directoryName, "*.dll", SearchOption.AllDirectories))
             {
                 var assemblyName = AssemblyRegistry.Instance.GetAssemblyName(fileName);
                 if (assemblyName == null)

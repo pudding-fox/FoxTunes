@@ -17,7 +17,7 @@ namespace FoxTunes
                 {
                     try
                     {
-                        stack.PushRange(Directory.EnumerateDirectories(path, searchPattern, SearchOption.TopDirectoryOnly));
+                        stack.PushRange(Directory.EnumerateDirectories(path, "*", SearchOption.TopDirectoryOnly));
                     }
                     catch
                     {

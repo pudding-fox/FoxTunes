@@ -83,12 +83,32 @@ namespace FoxTunes
 
         public Type GetReflectionType(Type type)
         {
-            return this.GetOrLoadReflectionAssembly(type.Assembly.Location).GetType(type.FullName);
+            var assembly = this.GetOrLoadReflectionAssembly(type.Assembly.Location);
+            if (assembly == null)
+            {
+                throw new AssemblyRegistryException(string.Format("Failed to get reflection only assembly: {0}", type.Assembly.Location));
+            }
+            var reflection = assembly.GetType(type.FullName);
+            if (reflection == null)
+            {
+                throw new AssemblyRegistryException(string.Format("Failed to get reflection only type: {0}", type.FullName));
+            }
+            return reflection;
         }
 
         public Type GetExecutableType(Type type)
         {
-            return this.GetOrLoadExecutableAssembly(type.Assembly.Location).GetType(type.FullName);
+            var assembly = this.GetOrLoadExecutableAssembly(type.Assembly.Location);
+            if (assembly == null)
+            {
+                throw new AssemblyRegistryException(string.Format("Failed to get executable assembly: {0}", type.Assembly.Location));
+            }
+            var reflection = assembly.GetType(type.FullName);
+            if (reflection == null)
+            {
+                throw new AssemblyRegistryException(string.Format("Failed to get executable type: {0}", type.FullName));
+            }
+            return reflection;
         }
 
         public static readonly IAssemblyRegistry Instance = new AssemblyRegistry();
