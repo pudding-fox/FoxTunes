@@ -207,7 +207,7 @@ namespace FoxTunes
             }
             try
             {
-                if (!data.Update())
+                if (!this.VisualizationDataSource.Update(data))
                 {
                     this.Restart();
                     return;
@@ -485,11 +485,11 @@ namespace FoxTunes
         {
             var data = new SpectrogramRendererData()
             {
-                OutputDataSource = outputDataSource,
                 Width = width,
                 Height = height,
                 FFTSize = fftSize,
                 Colors = colors,
+                Elements = new Int32Pixel[height],
                 Mode = mode,
                 Scale = scale,
                 Smoothing = smoothing
@@ -497,25 +497,11 @@ namespace FoxTunes
             return data;
         }
 
-        public class SpectrogramRendererData
+        public class SpectrogramRendererData : FFTVisualizationData
         {
-            public IOutputDataSource OutputDataSource;
-
             public int Width;
 
             public int Height;
-
-            public int Rate;
-
-            public int Channels;
-
-            public OutputStreamFormat Format;
-
-            public int FFTSize;
-
-            public float[] Samples;
-
-            public int SampleCount;
 
             public float[,] Values;
 
@@ -529,60 +515,20 @@ namespace FoxTunes
 
             public int Smoothing;
 
-            public bool Initialized;
-
-            public bool Update()
+            public override void OnAllocated()
             {
-                var rate = default(int);
-                var channels = default(int);
-                var format = default(OutputStreamFormat);
-                if (!this.OutputDataSource.GetDataFormat(out rate, out channels, out format))
-                {
-                    return false;
-                }
-                this.Update(rate, channels, format);
-                var individual = default(bool);
-                switch (this.Mode)
-                {
-                    default:
-                    case SpectrogramRendererMode.Mono:
-                        individual = false;
-                        break;
-                    case SpectrogramRendererMode.Seperate:
-                        individual = true;
-                        break;
-                }
-                this.SampleCount = this.OutputDataSource.GetData(this.Samples, this.FFTSize, individual);
-                return this.SampleCount > 0;
-            }
-
-            private void Update(int rate, int channels, OutputStreamFormat format)
-            {
-                if (this.Rate == rate && this.Channels == channels && this.Format == format && this.Initialized)
-                {
-                    return;
-                }
-
-                this.Rate = rate;
-                this.Channels = channels;
-                this.Format = format;
-                this.Initialized = true;
-
                 //TODO: Only realloc if required.
                 switch (this.Mode)
                 {
                     default:
                     case SpectrogramRendererMode.Mono:
-                        this.Samples = this.OutputDataSource.GetBuffer(this.FFTSize, false);
                         this.Values = new float[1, this.Height];
                         break;
                     case SpectrogramRendererMode.Seperate:
-                        this.Samples = this.OutputDataSource.GetBuffer(this.FFTSize, true);
                         this.Values = new float[this.Channels, this.Height];
                         break;
                 }
-
-                this.Elements = new Int32Pixel[this.Height];
+                base.OnAllocated();
             }
         }
 
