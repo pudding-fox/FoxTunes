@@ -29,10 +29,10 @@
             <Windows:FilteredEventTrigger EventName="DragOver" SourceType="{x:Type TabPanel}">
                 <ViewModel:InvokeParameterizedCommandAction Command="{Binding DragOverCommand, Source={StaticResource ViewModel}}" />
             </Windows:FilteredEventTrigger>
-            <Windows:FilteredEventTrigger EventName="Drop" SourceType="{x:Type TabPanel}">
+            <Windows:FilteredEventTrigger EventName="Drop" SourceType="{x:Type TabPanel}" ExactMatch="True">
                 <ViewModel:InvokeParameterizedCommandAction Command="{Binding DropCommand, Source={StaticResource ViewModel}}" />
             </Windows:FilteredEventTrigger>
-            <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type TabPanel}">
+            <Windows:FilteredEventTrigger EventName="MouseDoubleClick" SourceType="{x:Type TabPanel}" ExactMatch="True">
                 <Interactivity:InvokeCommandAction Command="{Binding AddPlaylistCommand, Source={StaticResource ViewModel}}" />
             </Windows:FilteredEventTrigger>
         </Interactivity:Interaction.Triggers>

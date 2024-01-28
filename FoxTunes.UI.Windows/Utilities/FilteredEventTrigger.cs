@@ -56,6 +56,56 @@ namespace FoxTunes
 
         public event EventHandler SourceTypeChanged;
 
+        public static readonly DependencyProperty ExactMatchProperty = DependencyProperty.Register(
+           "ExactMatch",
+           typeof(bool),
+           typeof(FilteredEventTrigger),
+           new PropertyMetadata(false, new PropertyChangedCallback(OnExactMatchChanged))
+       );
+
+        public static bool GetExactMatch(FilteredEventTrigger source)
+        {
+            return (bool)source.GetValue(ExactMatchProperty);
+        }
+
+        public static void SetExactMatch(FilteredEventTrigger source, bool value)
+        {
+            source.SetValue(ExactMatchProperty, value);
+        }
+
+        public static void OnExactMatchChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var filteredEventTrigger = sender as FilteredEventTrigger;
+            if (filteredEventTrigger == null)
+            {
+                return;
+            }
+            filteredEventTrigger.OnExactMatchChanged();
+        }
+
+        public bool ExactMatch
+        {
+            get
+            {
+                return (bool)this.GetValue(ExactMatchProperty);
+            }
+            set
+            {
+                this.SetValue(ExactMatchProperty, value);
+            }
+        }
+
+        protected virtual void OnExactMatchChanged()
+        {
+            if (this.ExactMatchChanged != null)
+            {
+                this.ExactMatchChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ExactMatch");
+        }
+
+        public event EventHandler ExactMatchChanged;
+
         protected override void OnEvent(EventArgs e)
         {
             if (this.SourceType != null)
@@ -66,10 +116,20 @@ namespace FoxTunes
                     var dependencyObject = routedEventArgs.OriginalSource as DependencyObject;
                     if (dependencyObject != null)
                     {
-                        var ancestor = dependencyObject.FindAncestor(this.SourceType);
-                        if (ancestor == null)
+                        if (this.ExactMatch)
                         {
-                            return;
+                            if (!this.SourceType.IsAssignableFrom(dependencyObject.GetType()))
+                            {
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            var ancestor = dependencyObject.FindAncestor(this.SourceType);
+                            if (ancestor == null)
+                            {
+                                return;
+                            }
                         }
                     }
                 }
