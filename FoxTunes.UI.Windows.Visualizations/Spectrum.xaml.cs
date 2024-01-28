@@ -45,8 +45,6 @@ namespace FoxTunes
                     SpectrumConfiguration.SECTION,
                     SpectrumConfiguration.BARS_ELEMENT
                 );
-                this.Bars.ValueChanged += this.OnBarsChanged;
-                this.MinWidth = SpectrumConfiguration.GetWidth(this.Bars.Value);
                 this.Peaks = this.Configuration.GetElement<BooleanConfigurationElement>(
                     SpectrumConfiguration.SECTION,
                     SpectrumConfiguration.PEAKS_ELEMENT
@@ -65,15 +63,6 @@ namespace FoxTunes
                 );
             }
             base.OnConfigurationChanged();
-        }
-
-        protected virtual void OnBarsChanged(object sender, EventArgs e)
-        {
-            var task = Windows.Invoke(() =>
-             {
-                 //Fix the width so all 2d math is integer.
-                 this.MinWidth = SpectrumConfiguration.GetWidth(this.Bars.Value);
-             });
         }
 
         public override IEnumerable<string> InvocationCategories

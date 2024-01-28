@@ -214,6 +214,8 @@ namespace FoxTunes
                 return 0;
             }
             var min = SpectrumConfiguration.GetWidth(this.Bars.Value);
+            //TODO: Side effect from getter.
+            this.MinWidth = min;
             var bars = SpectrumConfiguration.GetBars(this.Bars.Value);
             return base.GetPixelWidth(Math.Max(bars * (Convert.ToInt32(width) / bars), min));
         }

@@ -350,6 +350,10 @@ namespace FoxTunes
 
         protected virtual void OnSaving(object sender, EventArgs e)
         {
+            if (!this.IsLoaded)
+            {
+                return;
+            }
             this.Save();
         }
 

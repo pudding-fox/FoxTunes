@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace FoxTunes
 {
@@ -74,13 +76,30 @@ namespace FoxTunes
             }
         }
 
-        protected override void OnClosing(CancelEventArgs e)
+        public void UpdateBounds()
         {
             var viewModel = this.TryFindResource("ViewModel") as global::FoxTunes.ViewModel.ToolWindow;
             if (viewModel != null)
             {
                 viewModel.Bounds = this.RestoreBounds;
             }
+        }
+
+        protected override void OnLocationChanged(EventArgs e)
+        {
+            this.UpdateBounds();
+            base.OnLocationChanged(e);
+        }
+
+        protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
+        {
+            this.UpdateBounds();
+            base.OnRenderSizeChanged(sizeInfo);
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            this.UpdateBounds();
             base.OnClosing(e);
         }
     }
