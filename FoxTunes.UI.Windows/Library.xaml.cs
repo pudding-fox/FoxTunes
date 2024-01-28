@@ -1,8 +1,6 @@
 ﻿using FoxTunes.Interfaces;
-using FoxTunes.ViewModel;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,7 +12,7 @@ namespace FoxTunes
     /// </summary>
     public partial class Library : UserControl
     {
-        private LibraryNode SelectedNode { get; set; }
+        private LibraryHierarchyItem SelectedNode { get; set; }
 
         private Point DragStartPosition { get; set; }
 
@@ -59,7 +57,7 @@ namespace FoxTunes
             this.DragInitialized = true;
             DragDrop.DoDragDrop(
                 this,
-                this.SelectedNode.LibraryItems,
+                this.SelectedNode.Items,
                 DragDropEffects.Copy
             );
             this.DragInitialized = false;
@@ -67,7 +65,7 @@ namespace FoxTunes
 
         private void TreeView_Selected(object sender, RoutedEventArgs e)
         {
-            this.SelectedNode = (e.OriginalSource as TreeViewItem).DataContext as LibraryNode;
+            this.SelectedNode = (e.OriginalSource as TreeViewItem).DataContext as LibraryHierarchyItem;
         }
 
         private void TreeViewItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)

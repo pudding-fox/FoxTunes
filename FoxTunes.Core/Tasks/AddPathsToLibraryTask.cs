@@ -80,7 +80,7 @@ namespace FoxTunes
             for (var a = 0; a < fileNames.Count; )
             {
                 var fileName = fileNames[a];
-                if (this.Library.Set.Any(libraryItem => libraryItem.FileName == fileName))
+                if (this.Library.LibraryItemSet.Any(libraryItem => libraryItem.FileName == fileName))
                 {
                     fileNames.RemoveAt(a);
                 }
@@ -112,7 +112,7 @@ namespace FoxTunes
                 select this.LibraryItemFactory.Create(fileName);
             foreach (var libraryItem in query)
             {
-                this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Library.Set.Add(libraryItem)));
+                this.ForegroundTaskRunner.Run(() => this.Database.Interlocked(() => this.Library.LibraryItemSet.Add(libraryItem)));
                 if (position % interval == 0)
                 {
                     this.SetDescription(Path.GetFileName(libraryItem.FileName));

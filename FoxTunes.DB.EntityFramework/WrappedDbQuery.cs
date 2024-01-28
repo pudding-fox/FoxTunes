@@ -64,6 +64,11 @@ namespace FoxTunes
             this.Query = this.Query.Include(path);
         }
 
+        public void Include<TProperty>(Expression<Func<T, TProperty>> path)
+        {
+            this.Query = this.Query.Include(path) as DbQuery<T>;
+        }
+
         public event NotifyCollectionChangedEventHandler CollectionChanged
         {
             add

@@ -4,36 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
+             xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              x:Class="FoxTunes.Library"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}" AllowDrop="True">
     <UserControl.Resources>
-        <ViewModel:Library x:Key="ViewModel" Core="{Binding}">
-            <ViewModel:Library.Hierarchies>
-                <ViewModel:LibraryHierarchy Name="Artist/Album/Title">
-                    <ViewModel:LibraryHierarchy.Levels>
-                        <ViewModel:LibraryHierarchyLevel Script="tag.firstalbumartist||tag.firstalbumartistsort||tag.firstartist||&quot;No Artist&quot;"/>
-                        <ViewModel:LibraryHierarchyLevel Script="(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(&quot; - &quot;);}return &quot;No Album&quot;;})()"/>
-                        <ViewModel:LibraryHierarchyLevel Script="(function(){if(tag.title){var parts=[];if(tag.disccount != 1 &amp;&amp; tag.disc){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(&quot; - &quot;);}return item.FileName;})()"/>
-                    </ViewModel:LibraryHierarchy.Levels>
-                </ViewModel:LibraryHierarchy>
-                <ViewModel:LibraryHierarchy Name="Genre/Album/Title">
-                    <ViewModel:LibraryHierarchy.Levels>
-                        <ViewModel:LibraryHierarchyLevel Script="tag.firstgenre||&quot;No Genre&quot;"/>
-                        <ViewModel:LibraryHierarchyLevel Script="(function(){if(tag.album){var parts=[];if(tag.year){parts.push(tag.year);}parts.push(tag.album);return parts.join(&quot; - &quot;);}return &quot;No Album&quot;;})()"/>
-                        <ViewModel:LibraryHierarchyLevel Script="(function(){if(tag.title){var parts=[];if(tag.disccount != 1 &amp;&amp; tag.disc){parts.push(tag.disc);}if(tag.track){parts.push(zeropad(tag.track,2));}parts.push(tag.title);return parts.join(&quot; - &quot;);}return item.FileName;})()"/>
-                    </ViewModel:LibraryHierarchy.Levels>
-                </ViewModel:LibraryHierarchy>
-            </ViewModel:Library.Hierarchies>
-        </ViewModel:Library>
-        <ViewModel:LibraryHierarchyProvider x:Key="HierarchyProvider" Core="{Binding}" Hierarchy="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}"/>
+        <ViewModel:Library x:Key="ViewModel" Core="{Binding}"></ViewModel:Library>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -41,8 +24,9 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <TextBlock VerticalAlignment="Center" Padding="0,0,7,0" ><Run Text="View Mode:"/></TextBlock>
-        <ComboBox Grid.Column="1" ItemsSource="{Binding Hierarchies, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}" SelectedIndex="0" DisplayMemberPath="Name"/>
-        <TreeView x:Name="TreeView" Grid.ColumnSpan="2" Grid.Row="1" ItemsSource="{Binding LibraryNodes, Source={StaticResource HierarchyProvider}}">
+        <ComboBox Grid.Column="1" ItemsSource="{Binding Components.Library.LibraryHierarchyQuery}" SelectedValue="{Binding SelectedHierarchy, Source={StaticResource ViewModel}}" SelectedIndex="0" DisplayMemberPath="Name"/>
+        <Windows:LibraryHierarchies Grid.Column="2"></Windows:LibraryHierarchies>
+        <TreeView x:Name="TreeView" Grid.ColumnSpan="3" Grid.Row="1" ItemsSource="{Binding Items, Source={StaticResource ViewModel}}">
             <TreeView.Resources>
                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <EventSetter Event="Selected" Handler="TreeView_Selected"></EventSetter>
@@ -51,12 +35,12 @@
                 </Style>
             </TreeView.Resources>
             <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type ViewModel:LibraryNode}" ItemsSource="{Binding LibraryNodes}">
-                    <TextBlock Text="{Binding Header}"/>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                    <TextBlock Text="{Binding DisplayValue, Mode=OneWay}"/>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
         <TextBlock Grid.Row="2" VerticalAlignment="Center" Padding="0,0,7,0" ><Run Text="Filter:"/></TextBlock>
-        <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Filter, Source={StaticResource HierarchyProvider}, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        <TextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2"></TextBox>
     </Grid>
 </UserControl>

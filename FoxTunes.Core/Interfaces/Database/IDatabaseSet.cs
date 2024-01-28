@@ -15,6 +15,14 @@ namespace FoxTunes.Interfaces
 
         IEnumerable<T> AddRange(IEnumerable<T> items);
 
+        T Update(T item);
+
+        IEnumerable<T> UpdateRange(IEnumerable<T> items);
+
+        T Remove(T item);
+
+        IEnumerable<T> RemoveRange(IEnumerable<T> items);
+
         T this[int index] { get; }
 
         int IndexOf(T item);

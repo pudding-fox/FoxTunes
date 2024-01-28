@@ -56,6 +56,12 @@
     <Compile Include="Library.xaml.cs">
       <DependentUpon>Library.xaml</DependentUpon>
     </Compile>
+    <Compile Include="LibraryHierarchies.xaml.cs">
+      <DependentUpon>LibraryHierarchies.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LibraryHierarchiesDialog.xaml.cs">
+      <DependentUpon>LibraryHierarchiesDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
@@ -79,16 +85,12 @@
     <Compile Include="Theme\IThemeLoader.cs" />
     <Compile Include="Theme\ThemeBase.cs" />
     <Compile Include="Theme\ThemeLoader.cs" />
-    <Compile Include="Utilities\LibraryItemScriptRunner.cs" />
     <Compile Include="ViewModel\BackgroundTasks.cs" />
     <Compile Include="ViewModel\Library.cs" />
-    <Compile Include="ViewModel\LibraryHierarchy.cs" />
-    <Compile Include="ViewModel\LibraryHierarchyLevel.cs" />
-    <Compile Include="ViewModel\LibraryHierarchyProvider.cs" />
-    <Compile Include="ViewModel\LibraryNode.cs" />
+    <Compile Include="ViewModel\LibraryHierarchies.cs" />
+    <Compile Include="ViewModel\RenderableLibraryHierarchyItem.cs" />
     <Compile Include="WindowsForegroundTaskRunner.cs" />
     <Compile Include="WindowsUserInterfaceConfiguration.cs" />
-    <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
     <Compile Include="ViewModel\Command.cs" />
     <Compile Include="ViewModel\Playback.cs" />
     <Compile Include="ViewModel\Playlist.cs" />
@@ -118,6 +120,14 @@
       <SubType>Designer</SubType>
     </None>
     <Page Include="Library.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibraryHierarchies.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibraryHierarchiesDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -155,6 +165,9 @@
   <ItemGroup>
     <Resource Include="Images\Fox.ico" />
     <None Include="Images\Fox.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Utilities\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

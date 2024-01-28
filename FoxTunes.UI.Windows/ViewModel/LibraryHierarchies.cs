@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Windows;
-using FoxTunes.Interfaces;
 using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public class Settings : ViewModelBase
+    public class LibraryHierarchies : ViewModelBase
     {
         private bool _SettingsVisible { get; set; }
 
@@ -37,16 +36,12 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command<IConfiguration>(
-                    configuration => configuration.Save(),
-                    configuration => configuration != null
-                );
+                return null;
             }
         }
-
         protected override Freezable CreateInstanceCore()
         {
-            return new Settings();
+            return new LibraryHierarchies();
         }
     }
 }
