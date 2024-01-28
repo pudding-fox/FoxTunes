@@ -93,7 +93,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Output.Bass.Parame
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.Tools", "FoxTunes.Tools\FoxTunes.Tools.csproj", "{D96F5FF5-DDCE-42A4-BCA6-C1451292F003}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.DB.Tests", "FoxTunes.DB.Tests\FoxTunes.DB.Tests.csproj", "{FC149D49-34A3-4AF7-9EB8-59FDFEBCEC81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.DB.Tests", "FoxTunes.DB.Tests\FoxTunes.DB.Tests.csproj", "{FC149D49-34A3-4AF7-9EB8-59FDFEBCEC81}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -563,7 +563,6 @@ Global
 		{FC149D49-34A3-4AF7-9EB8-59FDFEBCEC81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC149D49-34A3-4AF7-9EB8-59FDFEBCEC81}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FC149D49-34A3-4AF7-9EB8-59FDFEBCEC81}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{FC149D49-34A3-4AF7-9EB8-59FDFEBCEC81}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{FC149D49-34A3-4AF7-9EB8-59FDFEBCEC81}.Release|x86.ActiveCfg = Release|Any CPU
 		{FC149D49-34A3-4AF7-9EB8-59FDFEBCEC81}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection

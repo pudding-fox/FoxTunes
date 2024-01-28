@@ -13,7 +13,7 @@ namespace FoxTunes
     public class Configuration : StandardComponent, IConfiguration
     {
         private static readonly string ConfigurationFileName = Path.Combine(
-            Path.GetDirectoryName(typeof(Configuration).Assembly.Location),
+            Publication.StoragePath,
             "Settings.dat"
         );
 

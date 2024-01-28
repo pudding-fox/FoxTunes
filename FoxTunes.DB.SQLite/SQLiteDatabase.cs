@@ -1,6 +1,5 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
-using FoxDb.Utility;
 using FoxTunes.Interfaces;
 using System.Data;
 using System.Data.SQLite;
@@ -11,7 +10,7 @@ namespace FoxTunes
     public class SQLiteDatabase : Database
     {
         public static readonly string FileName = Path.Combine(
-            Path.GetDirectoryName(typeof(SQLiteDatabase).Assembly.Location),
+            Publication.StoragePath,
             "Database.db"
         );
 
