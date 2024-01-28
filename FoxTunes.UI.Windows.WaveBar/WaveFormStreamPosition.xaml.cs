@@ -25,6 +25,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Rms { get; private set; }
 
+        public BooleanConfigurationElement Logarithmic { get; private set; }
+
         public TextConfigurationElement ColorPalette { get; private set; }
 
         protected override void InitializeComponent(ICore core)
@@ -44,6 +46,10 @@ namespace FoxTunes
                 this.Rms = this.Configuration.GetElement<BooleanConfigurationElement>(
                     WaveFormStreamPositionConfiguration.SECTION,
                     WaveFormStreamPositionConfiguration.RMS_ELEMENT
+                );
+                this.Logarithmic = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    WaveFormStreamPositionConfiguration.SECTION,
+                    WaveFormStreamPositionConfiguration.DB_ELEMENT
                 );
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     WaveFormStreamPositionConfiguration.SECTION,
@@ -85,6 +91,12 @@ namespace FoxTunes
                     this.Rms.Name,
                     attributes: this.Rms.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
+                yield return new InvocationComponent(
+                    CATEGORY,
+                    this.Logarithmic.Id,
+                    this.Logarithmic.Name,
+                    attributes: this.Logarithmic.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                );
                 foreach (var invocationComponent in base.Invocations)
                 {
                     yield return invocationComponent;
@@ -101,6 +113,10 @@ namespace FoxTunes
             else if (string.Equals(this.Rms.Name, component.Name))
             {
                 this.Rms.Toggle();
+            }
+            else if (string.Equals(this.Logarithmic.Name, component.Name))
+            {
+                this.Logarithmic.Toggle();
             }
             else if (this.ThemeLoader.SelectColorPalette(this.ColorPalette, component))
             {

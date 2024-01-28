@@ -25,6 +25,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Rms { get; private set; }
 
+        public BooleanConfigurationElement Logarithmic { get; private set; }
+
         public TextConfigurationElement ColorPalette { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -51,6 +53,10 @@ namespace FoxTunes
                     WaveFormStreamPositionConfiguration.SECTION,
                     WaveFormStreamPositionConfiguration.RMS_ELEMENT
                 );
+                this.Logarithmic = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    WaveFormStreamPositionConfiguration.SECTION,
+                    WaveFormStreamPositionConfiguration.DB_ELEMENT
+                );
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     WaveFormStreamPositionConfiguration.SECTION,
                     WaveFormStreamPositionConfiguration.COLOR_PALETTE_ELEMENT
@@ -58,6 +64,7 @@ namespace FoxTunes
                 this.Mode.ValueChanged += this.OnValueChanged;
                 this.Resolution.ValueChanged += this.OnValueChanged;
                 this.Rms.ValueChanged += this.OnValueChanged;
+                this.Logarithmic.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
 #if NET40
                 var task = TaskEx.Run(async () =>
@@ -139,6 +146,7 @@ namespace FoxTunes
                 width,
                 height,
                 this.Rms.Value,
+                this.Logarithmic.Value,
                 mode,
                 this.GetColorPalettes(this.ColorPalette.Value, this.Rms.Value, generatorData.Channels, this.Colors, mode)
             );
@@ -336,6 +344,10 @@ namespace FoxTunes
             {
                 this.Rms.ValueChanged -= this.OnValueChanged;
             }
+            if (this.Logarithmic != null)
+            {
+                this.Logarithmic.ValueChanged -= this.OnValueChanged;
+            }
             if (this.ColorPalette != null)
             {
                 this.ColorPalette.ValueChanged -= this.OnValueChanged;
@@ -379,6 +391,7 @@ namespace FoxTunes
         {
             var center = rendererData.Height / 2.0f;
             var factor = rendererData.NormalizedPeak;
+            var logarithmic = rendererData.Logarithmic;
 
             if (factor == 0)
             {
@@ -425,8 +438,16 @@ namespace FoxTunes
                     topValue /= (valuesPerElement * generatorData.Channels);
                     bottomValue /= (valuesPerElement * generatorData.Channels);
 
-                    topValue /= factor;
-                    bottomValue /= factor;
+                    if (logarithmic)
+                    {
+                        topValue = ToDecibelFixed(topValue);
+                        bottomValue = ToDecibelFixed(bottomValue);
+                    }
+                    else
+                    {
+                        topValue /= factor;
+                        bottomValue /= factor;
+                    }
 
                     topValue = Math.Min(topValue, 1);
                     bottomValue = Math.Min(bottomValue, 1);
@@ -457,7 +478,14 @@ namespace FoxTunes
                     }
                     value /= (valuesPerElement * generatorData.Channels);
 
-                    value /= factor;
+                    if (logarithmic)
+                    {
+                        value = ToDecibelFixed(value);
+                    }
+                    else
+                    {
+                        value /= factor;
+                    }
 
                     value = Math.Min(value, 1);
 
@@ -478,6 +506,7 @@ namespace FoxTunes
         private static void UpdateSeperate(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
         {
             var factor = rendererData.NormalizedPeak / generatorData.Channels;
+            var logarithmic = rendererData.Logarithmic;
 
             if (factor == 0)
             {
@@ -527,8 +556,16 @@ namespace FoxTunes
                         topValue /= (valuesPerElement * generatorData.Channels);
                         bottomValue /= (valuesPerElement * generatorData.Channels);
 
-                        topValue /= factor;
-                        bottomValue /= factor;
+                        if (logarithmic)
+                        {
+                            topValue = ToDecibelFixed(topValue);
+                            bottomValue = ToDecibelFixed(bottomValue);
+                        }
+                        else
+                        {
+                            topValue /= factor;
+                            bottomValue /= factor;
+                        }
 
                         topValue = Math.Min(topValue, 1);
                         bottomValue = Math.Min(bottomValue, 1);
@@ -556,7 +593,14 @@ namespace FoxTunes
                         }
                         value /= (valuesPerElement * generatorData.Channels);
 
-                        value /= factor;
+                        if (logarithmic)
+                        {
+                            value = ToDecibelFixed(value);
+                        }
+                        else
+                        {
+                            value /= factor;
+                        }
 
                         value = Math.Min(value, 1);
 
@@ -580,6 +624,7 @@ namespace FoxTunes
             var data = generatorData.Data;
             var valuesPerElement = rendererData.ValuesPerElement;
             var peak = rendererData.NormalizedPeak;
+            var logarithmic = rendererData.Logarithmic;
 
             var position = rendererData.Position;
             while (position < rendererData.Capacity)
@@ -609,6 +654,11 @@ namespace FoxTunes
                     }
                 }
                 value /= (valuesPerElement * generatorData.Channels);
+
+                if (logarithmic)
+                {
+                    value = ToDecibelFixed(value);
+                }
 
                 peak = Math.Max(peak, value);
 
@@ -665,7 +715,7 @@ namespace FoxTunes
             }
         }
 
-        public static WaveFormRendererData Create(WaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height, bool rms, WaveFormRendererMode mode, IDictionary<string, IntPtr> colors)
+        public static WaveFormRendererData Create(WaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height, bool rms, bool logarithmic, WaveFormRendererMode mode, IDictionary<string, IntPtr> colors)
         {
             var valuesPerElement = generatorData.Capacity / width;
             if (valuesPerElement == 0)
@@ -676,6 +726,7 @@ namespace FoxTunes
             {
                 Width = width,
                 Height = height,
+                Logarithmic = logarithmic,
                 ValuesPerElement = valuesPerElement,
                 Colors = colors,
                 Position = 0,
@@ -710,6 +761,8 @@ namespace FoxTunes
             public int Width;
 
             public int Height;
+
+            public bool Logarithmic;
 
             public int ValuesPerElement;
 

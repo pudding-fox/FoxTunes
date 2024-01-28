@@ -79,6 +79,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Logarithmic (dB).
+        /// </summary>
+        internal static string BandedWaveFormStreamPositionConfiguration_DB {
+            get {
+                return ResourceManager.GetString("BandedWaveFormStreamPositionConfiguration.DB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wave Form (Three Band).
         /// </summary>
         internal static string BandedWaveFormStreamPositionConfiguration_Section {
@@ -138,6 +147,15 @@ namespace FoxTunes {
         internal static string WaveFormStreamPositionConfiguration_ColorPalette {
             get {
                 return ResourceManager.GetString("WaveFormStreamPositionConfiguration.ColorPalette", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Logarithmic (dB).
+        /// </summary>
+        internal static string WaveFormStreamPositionConfiguration_DB {
+            get {
+                return ResourceManager.GetString("WaveFormStreamPositionConfiguration.DB", resourceCulture);
             }
         }
         

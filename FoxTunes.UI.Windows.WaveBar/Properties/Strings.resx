@@ -159,4 +159,10 @@
   <data name="BandedWaveFormStreamPositionConfiguration.Section" xml:space="preserve">
     <value>Wave Form (Three Band)</value>
   </data>
+  <data name="BandedWaveFormStreamPositionConfiguration.DB" xml:space="preserve">
+    <value>Logarithmic (dB)</value>
+  </data>
+  <data name="WaveFormStreamPositionConfiguration.DB" xml:space="preserve">
+    <value>Logarithmic (dB)</value>
+  </data>
 </root>

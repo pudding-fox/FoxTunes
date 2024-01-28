@@ -29,6 +29,8 @@ namespace FoxTunes
 
         public IntegerConfigurationElement Resolution { get; private set; }
 
+        public BooleanConfigurationElement Logarithmic { get; private set; }
+
         public TextConfigurationElement ColorPalette { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -47,11 +49,16 @@ namespace FoxTunes
                     WaveFormGeneratorConfiguration.SECTION,
                     WaveFormGeneratorConfiguration.RESOLUTION_ELEMENT
                 );
+                this.Logarithmic = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    BandedWaveFormStreamPositionConfiguration.SECTION,
+                    BandedWaveFormStreamPositionConfiguration.DB_ELEMENT
+                );
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     BandedWaveFormStreamPositionConfiguration.SECTION,
                     BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_ELEMENT
                 );
                 this.Resolution.ValueChanged += this.OnValueChanged;
+                this.Logarithmic.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
 #if NET40
                 var task = TaskEx.Run(async () =>
@@ -131,6 +138,7 @@ namespace FoxTunes
                 generatorData,
                 width,
                 height,
+                this.Logarithmic.Value,
                 this.GetColorPalettes(this.ColorPalette.Value, this.Colors)
             );
             if (this.RendererData == null)
@@ -317,6 +325,10 @@ namespace FoxTunes
             {
                 this.Resolution.ValueChanged -= this.OnValueChanged;
             }
+            if (this.Logarithmic != null)
+            {
+                this.Logarithmic.ValueChanged -= this.OnValueChanged;
+            }
             if (this.ColorPalette != null)
             {
                 this.ColorPalette.ValueChanged -= this.OnValueChanged;
@@ -353,6 +365,7 @@ namespace FoxTunes
         {
             var center = rendererData.Height / 2.0f;
             var factor = rendererData.NormalizedPeak;
+            var logarithmic = rendererData.Logarithmic;
 
             if (factor == 0)
             {
@@ -400,9 +413,18 @@ namespace FoxTunes
                     midValue /= valuesPerElement;
                     highValue /= valuesPerElement;
 
-                    lowValue /= factor;
-                    midValue /= factor;
-                    highValue /= factor;
+                    if (logarithmic)
+                    {
+                        lowValue = ToDecibelFixed(lowValue);
+                        midValue = ToDecibelFixed(midValue);
+                        highValue = ToDecibelFixed(highValue);
+                    }
+                    else
+                    {
+                        lowValue /= factor;
+                        midValue /= factor;
+                        highValue /= factor;
+                    }
 
                     lowValue = Math.Min(lowValue, 1);
                     midValue = Math.Min(midValue, 1);
@@ -448,6 +470,7 @@ namespace FoxTunes
             var data = generatorData.Data;
             var valuesPerElement = rendererData.ValuesPerElement;
             var peak = rendererData.NormalizedPeak;
+            var logarithmic = rendererData.Logarithmic;
 
             var position = rendererData.Position;
             while (position < rendererData.Capacity)
@@ -477,6 +500,11 @@ namespace FoxTunes
                     );
                 }
                 value /= valuesPerElement;
+
+                if (logarithmic)
+                {
+                    value = ToDecibelFixed(value);
+                }
 
                 peak = Math.Max(peak, value);
 
@@ -541,7 +569,7 @@ namespace FoxTunes
             }
         }
 
-        public static WaveFormRendererData Create(BandedWaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height, IDictionary<string, IntPtr> colors)
+        public static WaveFormRendererData Create(BandedWaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height, bool logarithmic, IDictionary<string, IntPtr> colors)
         {
             var valuesPerElement = generatorData.Capacity / width;
             if (valuesPerElement == 0)
@@ -552,6 +580,7 @@ namespace FoxTunes
             {
                 Width = width,
                 Height = height,
+                Logarithmic = logarithmic,
                 ValuesPerElement = valuesPerElement,
                 Colors = colors,
                 LowElements = new Int32Rect[width],
@@ -569,6 +598,8 @@ namespace FoxTunes
             public int Width;
 
             public int Height;
+
+            public bool Logarithmic;
 
             public int ValuesPerElement;
 

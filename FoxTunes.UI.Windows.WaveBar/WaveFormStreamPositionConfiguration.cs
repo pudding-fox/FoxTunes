@@ -18,6 +18,8 @@ namespace FoxTunes
 
         public const string RMS_ELEMENT = "ABBB7F57-6B6B-4A51-A75F-83F4735CE464";
 
+        public const string DB_ELEMENT = "BBBB7F57-6B6B-4A51-A75F-83F4735CE464";
+
         public const string COLOR_PALETTE_ELEMENT = "CCCC7E5A-ECA1-4D45-92C1-82B9EF4F8228";
 
         public const string COLOR_PALETTE_THEME = "THEME";
@@ -33,6 +35,7 @@ namespace FoxTunes
             yield return new ConfigurationSection(SECTION, Strings.WaveFormStreamPositionConfiguration_Section)
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.WaveFormStreamPositionConfiguration_Mode).WithOptions(GetModeOptions()))
                 .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.WaveFormStreamPositionConfiguration_RMS).WithValue(true))
+                .WithElement(new BooleanConfigurationElement(DB_ELEMENT, Strings.WaveFormStreamPositionConfiguration_DB).WithValue(false))
                 .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.WaveFormStreamPositionConfiguration_ColorPalette).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine)
             );
         }

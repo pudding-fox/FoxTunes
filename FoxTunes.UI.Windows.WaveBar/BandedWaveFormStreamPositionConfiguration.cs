@@ -10,7 +10,9 @@ namespace FoxTunes
     {
         public const string SECTION = "17D020D2-B9E9-400D-98EB-B730F1E7BBB5";
 
-        public const string COLOR_PALETTE_ELEMENT = "AAAA579D-F617-41CD-9007-6B0402BBE1AD";
+        public const string DB_ELEMENT = "AAAA7F57-6B6B-4A51-A75F-83F4735CE464";
+
+        public const string COLOR_PALETTE_ELEMENT = "ZZZZ579D-F617-41CD-9007-6B0402BBE1AD";
 
         public const string COLOR_PALETTE_THEME = "THEME";
 
@@ -25,6 +27,7 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.BandedWaveFormStreamPositionConfiguration_Section)
+                .WithElement(new BooleanConfigurationElement(DB_ELEMENT, Strings.BandedWaveFormStreamPositionConfiguration_DB).WithValue(false))
                 .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.BandedWaveFormStreamPositionConfiguration_ColorPalette).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine)
             );
         }
