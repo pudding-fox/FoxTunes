@@ -53,24 +53,6 @@ namespace FoxTunes
             }
         }
 
-        public TrayIconBehaviour()
-        {
-            Windows.ActiveWindowChanging += (sender, e) =>
-            {
-                if (this.Enabled)
-                {
-                    this.Disable();
-                }
-            };
-            Windows.ActiveWindowChanged += (sender, e) =>
-            {
-                if (this.Enabled)
-                {
-                    this.Enable();
-                }
-            };
-        }
-
         public INotifyIcon NotifyIcon { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -128,6 +110,70 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
+        protected virtual void AddWindowHooks()
+        {
+            Windows.MainWindowCreated += this.OnWindowCreated;
+            Windows.MainWindowClosed += this.OnWindowClosed;
+            Windows.MiniWindowCreated += this.OnWindowCreated;
+            Windows.MiniWindowClosed += this.OnWindowClosed;
+            Logger.Write(this, LogLevel.Debug, "Registered window events.");
+            if (Windows.IsMainWindowCreated)
+            {
+                this.AddWindowHooks(Windows.MainWindow);
+            }
+            if (Windows.IsMiniWindowCreated)
+            {
+                this.AddWindowHooks(Windows.MiniWindow);
+            }
+        }
+
+        protected virtual void AddWindowHooks(Window window)
+        {
+            window.StateChanged += this.OnStateChanged;
+            window.Closing += this.OnClosing;
+            Logger.Write(this, LogLevel.Debug, "Registered window events: {0}/{1}", window.GetType().Name, window.Title);
+        }
+
+        protected virtual void RemoveWindowHooks()
+        {
+            Windows.MainWindowCreated -= this.OnWindowCreated;
+            Windows.MainWindowClosed -= this.OnWindowClosed;
+            Windows.MiniWindowCreated -= this.OnWindowCreated;
+            Windows.MiniWindowClosed -= this.OnWindowClosed;
+            Logger.Write(this, LogLevel.Debug, "Unregistered window events.");
+            if (Windows.IsMainWindowCreated)
+            {
+                this.RemoveWindowHooks(Windows.MainWindow);
+            }
+            if (Windows.IsMiniWindowCreated)
+            {
+                this.RemoveWindowHooks(Windows.MiniWindow);
+            }
+        }
+
+        protected virtual void RemoveWindowHooks(Window window)
+        {
+            window.StateChanged -= this.OnStateChanged;
+            window.Closing -= this.OnClosing;
+            Logger.Write(this, LogLevel.Debug, "Unregistered window events: {0}/{1}", window.GetType().Name, window.Title);
+        }
+
+        protected virtual void OnWindowCreated(object sender, EventArgs e)
+        {
+            if (sender is Window window)
+            {
+                this.AddWindowHooks(window);
+            }
+        }
+
+        protected virtual void OnWindowClosed(object sender, EventArgs e)
+        {
+            if (sender is Window window)
+            {
+                this.RemoveWindowHooks(window);
+            }
+        }
+
         protected virtual void Enable()
         {
             this.NotifyIcon.Icon = Icon.Handle;
@@ -136,12 +182,9 @@ namespace FoxTunes
             {
                 this.NotifyIcon.MessageSink.MouseLeftButtonUp += this.OnMouseLeftButtonUp;
                 this.NotifyIcon.MessageSink.MouseRightButtonUp += this.OnMouseRightButtonUp;
+                Logger.Write(this, LogLevel.Debug, "Registered message sink events.");
             }
-            if (Windows.ActiveWindow != null)
-            {
-                Windows.ActiveWindow.StateChanged += this.OnStateChanged;
-                Windows.ActiveWindow.Closing += this.OnClosing;
-            }
+            this.AddWindowHooks();
         }
 
         protected virtual void Disable()
@@ -153,25 +196,27 @@ namespace FoxTunes
                 {
                     this.NotifyIcon.MessageSink.MouseLeftButtonUp -= this.OnMouseLeftButtonUp;
                     this.NotifyIcon.MessageSink.MouseRightButtonUp -= this.OnMouseRightButtonUp;
+                    Logger.Write(this, LogLevel.Debug, "Unregistered message sink events.");
                 }
             }
-            if (Windows.ActiveWindow != null)
-            {
-                Windows.ActiveWindow.StateChanged -= this.OnStateChanged;
-                Windows.ActiveWindow.Closing -= this.OnClosing;
-            }
+            this.RemoveWindowHooks();
         }
 
         protected virtual void OnMouseLeftButtonUp(object sender, EventArgs e)
         {
+            var window = Windows.ActiveWindow;
+            if (window == null)
+            {
+                return;
+            }
             var task = Windows.Invoke(() =>
             {
-                Windows.ActiveWindow.Show();
-                if (Windows.ActiveWindow.WindowState == WindowState.Minimized)
+                window.Show();
+                if (window.WindowState == WindowState.Minimized)
                 {
-                    Windows.ActiveWindow.WindowState = WindowState.Normal;
+                    window.WindowState = WindowState.Normal;
                 }
-                Windows.ActiveWindow.BringToFront();
+                window.BringToFront();
             });
         }
 
@@ -211,11 +256,12 @@ namespace FoxTunes
         {
             if (this.MinimizeToTray)
             {
-                if (Windows.ActiveWindow != null)
+                if (sender is Window window)
                 {
-                    if (Windows.ActiveWindow.WindowState == WindowState.Minimized)
+                    if (window.WindowState == WindowState.Minimized)
                     {
-                        Windows.ActiveWindow.Hide();
+                        Logger.Write(this, LogLevel.Debug, "MinimizeToTray: Hiding window: {0}/{1}", window.GetType().Name, window.Title);
+                        window.Hide();
                     }
                 }
             }
@@ -225,8 +271,12 @@ namespace FoxTunes
         {
             if (this.CloseToTray)
             {
-                e.Cancel = true;
-                Windows.ActiveWindow.Hide();
+                if (sender is Window window)
+                {
+                    e.Cancel = true;
+                    Logger.Write(this, LogLevel.Debug, "CloseToTray: Hiding window: {0}/{1}", window.GetType().Name, window.Title);
+                    window.Hide();
+                }
             }
         }
 
