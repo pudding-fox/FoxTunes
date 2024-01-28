@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
@@ -8,11 +9,22 @@ namespace FoxTunes
 
         public const string ENABLED_ELEMENT = "AAAA5AF6-A76C-4FB9-B783-ECB772AE1E54";
 
+        public static bool IsPlatformSupported
+        {
+            get
+            {
+                return Environment.OSVersion.Version.Major >= 6;
+            }
+        }
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "Taskbar Buttons")
-                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false)
-            );
+            if (IsPlatformSupported)
+            {
+                yield return new ConfigurationSection(SECTION, "Taskbar Buttons")
+                    .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false)
+                );
+            }
         }
     }
 }
