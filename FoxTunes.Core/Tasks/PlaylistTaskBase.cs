@@ -353,8 +353,6 @@ namespace FoxTunes
             {
                 case PlaylistColumnType.Tag:
                     return this.SortItemsByMetaData(MetaDataItemType.Tag, playlistColumn.Tag, descending);
-                case PlaylistColumnType.Property:
-                    return this.SortItemsByMetaData(MetaDataItemType.Property, playlistColumn.Property, descending);
                 case PlaylistColumnType.Script:
                     return this.SortItemsByScript(playlistColumn.Script, descending);
             }
