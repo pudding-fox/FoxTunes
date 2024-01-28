@@ -105,3 +105,31 @@ function content(value) {
     }
     return value.data;
 }
+
+function bitrate(sampleRate, depth, channels) {
+    sampleRate = parseInt(sampleRate ?? "44100");
+    depth = parseInt(depth ?? "16");
+    channels = parseInt(channels ?? "2");
+    return parseInt((sampleRate * depth * channels) / 1000) + " kbps";
+}
+
+function samplerate(sampleRate) {
+    return (sampleRate ?? 44100) + " Hz";
+}
+
+function channeldescription(channels) {
+    switch (parseInt(channels ?? 2))
+    {
+        case 1:
+            return "mono";
+        case 2:
+            return "stereo";
+        case 4:
+            return "quad";
+        case 6:
+            return "5.1";
+        case 8:
+            return "7.1";
+    }
+    return channels + " channels";
+}

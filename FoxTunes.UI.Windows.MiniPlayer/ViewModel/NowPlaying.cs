@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public class NowPlaying : ViewModelBase
+    public class NowPlaying : ViewModelBase, IConfigurationTarget
     {
         public IPlaybackManager PlaybackManager { get; private set; }
 
@@ -14,7 +14,47 @@ namespace FoxTunes.ViewModel
 
         public IScriptingContext ScriptingContext { get; private set; }
 
-        public IConfiguration Configuration { get; private set; }
+        private IConfiguration _Configuration { get; set; }
+
+        public IConfiguration Configuration
+        {
+            get
+            {
+                return this._Configuration;
+            }
+            set
+            {
+                this._Configuration = value;
+                this.OnConfigurationChanged();
+            }
+        }
+
+        protected virtual void OnConfigurationChanged()
+        {
+            if (this.Configuration != null)
+            {
+                this.Configuration.GetElement<TextConfigurationElement>(
+                    NowPlayingConfiguration.SECTION,
+                    NowPlayingConfiguration.NOW_PLAYING_SCRIPT_ELEMENT
+                ).ConnectValue(async value => await this.SetScript(value).ConfigureAwait(false));
+                this.MarqueeInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
+                  WindowsUserInterfaceConfiguration.SECTION,
+                  WindowsUserInterfaceConfiguration.MARQUEE_INTERVAL_ELEMENT
+                );
+                this.MarqueeStep = this.Configuration.GetElement<DoubleConfigurationElement>(
+                  WindowsUserInterfaceConfiguration.SECTION,
+                  WindowsUserInterfaceConfiguration.MARQUEE_STEP_ELEMENT
+                );
+                this.Dispatch(this.Refresh);
+            }
+            if (this.ConfigurationChanged != null)
+            {
+                this.ConfigurationChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Configuration");
+        }
+
+        public event EventHandler ConfigurationChanged;
 
         private IntegerConfigurationElement _MarqueeInterval { get; set; }
 
@@ -181,20 +221,6 @@ namespace FoxTunes.ViewModel
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
             this.ScriptingContext = this.ScriptingRuntime.CreateContext();
-            this.Configuration = core.Components.Configuration;
-            this.Configuration.GetElement<TextConfigurationElement>(
-                MiniPlayerBehaviourConfiguration.SECTION,
-                MiniPlayerBehaviourConfiguration.NOW_PLAYING_SCRIPT_ELEMENT
-            ).ConnectValue(async value => await this.SetScript(value).ConfigureAwait(false));
-            this.MarqueeInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
-              WindowsUserInterfaceConfiguration.SECTION,
-              WindowsUserInterfaceConfiguration.MARQUEE_INTERVAL_ELEMENT
-            );
-            this.MarqueeStep = this.Configuration.GetElement<DoubleConfigurationElement>(
-              WindowsUserInterfaceConfiguration.SECTION,
-              WindowsUserInterfaceConfiguration.MARQUEE_STEP_ELEMENT
-            );
-            this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
 
