@@ -141,6 +141,7 @@ do
 	mkdir -p "./release/$target/Plugins/sox"
 	mkdir -p "./release/$target/Plugins/wasapi"
 	mkdir -p "./release/$target/Plugins/sqlserver"
+	mkdir -p "./release/$target/Plugins/metadata"
 
 	echo "Creating main package.."
 

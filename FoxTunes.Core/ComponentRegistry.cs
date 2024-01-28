@@ -40,6 +40,11 @@ namespace FoxTunes
             return this.GetComponents(type).FirstOrDefault();
         }
 
+        public IBaseComponent GetComponent(string slot)
+        {
+            return this.GetComponents(slot).FirstOrDefault();
+        }
+
         public IEnumerable<IBaseComponent> GetComponents(Type type)
         {
             foreach (var component in this.Components)
@@ -48,6 +53,23 @@ namespace FoxTunes
                 {
                     yield return component;
                 }
+            }
+        }
+
+        public IEnumerable<IBaseComponent> GetComponents(string slot)
+        {
+            foreach (var component in this.Components)
+            {
+                var attribute = component.GetType().GetCustomAttribute<ComponentAttribute>();
+                if (attribute == null)
+                {
+                    continue;
+                }
+                if (!string.Equals(attribute.Slot, slot, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                yield return component;
             }
         }
 

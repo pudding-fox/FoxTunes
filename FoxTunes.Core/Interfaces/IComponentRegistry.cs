@@ -11,7 +11,11 @@ namespace FoxTunes.Interfaces
 
         IBaseComponent GetComponent(Type type);
 
+        IBaseComponent GetComponent(string slot);
+
         IEnumerable<IBaseComponent> GetComponents(Type type);
+
+        IEnumerable<IBaseComponent> GetComponents(string slot);
 
         T GetComponent<T>() where T : IBaseComponent;
 
