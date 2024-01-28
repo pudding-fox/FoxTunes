@@ -27,13 +27,5 @@ namespace FoxTunes.Interfaces
         int Rate { get; set; }
 
         event EventHandler RateChanged;
-
-        bool AAFilter { get; set; }
-
-        event EventHandler AAFilterChanged;
-
-        byte AAFilterLength { get; set; }
-
-        event EventHandler AAFilterLengthChanged;
     }
 }

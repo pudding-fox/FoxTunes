@@ -45,7 +45,7 @@ namespace FoxTunes
                     this.OutputEffects.Tempo.Value,
                     this.OutputEffects.Tempo.Pitch,
                     MetaDataInfo.SampleRateDescription(rate),
-                    this.OutputEffects.Tempo.AAFilter ? string.Format(", aa filter {0} taps", this.OutputEffects.Tempo.AAFilterLength) : string.Empty
+                    this.AAFilter.Value ? string.Format(", aa filter {0} taps", this.AAFilterLength.Value) : string.Empty
                 );
             }
         }
@@ -78,6 +78,14 @@ namespace FoxTunes
 
         public IOutputEffects OutputEffects { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public BooleanConfigurationElement AAFilter { get; private set; }
+
+        public IntegerConfigurationElement AAFilterLength { get; private set; }
+
+        public BooleanConfigurationElement Fast { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.OutputEffects = core.Components.OutputEffects;
@@ -85,11 +93,25 @@ namespace FoxTunes
             {
                 this.OutputEffects.Tempo.EnabledChanged += this.OnEnabledChanged;
                 this.OutputEffects.Tempo.ValueChanged += this.OnValueChanged;
-                this.OutputEffects.Tempo.PitchChanged += this.OnPitchChanged;
-                this.OutputEffects.Tempo.RateChanged += this.OnRateChanged;
-                this.OutputEffects.Tempo.AAFilterChanged += this.OnAAFilterChanged;
-                this.OutputEffects.Tempo.AAFilterLengthChanged += this.OnAAFilterLengthChanged;
+                this.OutputEffects.Tempo.PitchChanged += this.OnValueChanged;
+                this.OutputEffects.Tempo.RateChanged += this.OnValueChanged;
             }
+            this.Configuration = core.Components.Configuration;
+            this.AAFilter = this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassOutputTempoStreamComponentBehaviourConfiguration.AA_FILTER
+            );
+            this.AAFilterLength = this.Configuration.GetElement<IntegerConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassOutputTempoStreamComponentBehaviourConfiguration.AA_FILTER_LENGTH
+            );
+            this.Fast = this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassOutputTempoStreamComponentBehaviourConfiguration.FAST
+            );
+            this.AAFilter.ValueChanged += this.OnValueChanged;
+            this.AAFilterLength.ValueChanged += this.OnValueChanged;
+            this.Fast.ValueChanged += this.OnValueChanged;
             base.InitializeComponent(core);
         }
 
@@ -117,46 +139,6 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void OnPitchChanged(object sender, EventArgs e)
-        {
-            if (this.IsActive)
-            {
-                this.Update();
-            }
-            else
-            {
-                this.Stop();
-            }
-        }
-
-        protected virtual void OnRateChanged(object sender, EventArgs e)
-        {
-            if (this.IsActive)
-            {
-                this.Update();
-            }
-            else
-            {
-                this.Stop();
-            }
-        }
-
-        protected virtual void OnAAFilterChanged(object sender, EventArgs e)
-        {
-            if (this.IsActive)
-            {
-                this.Update();
-            }
-        }
-
-        protected virtual void OnAAFilterLengthChanged(object sender, EventArgs e)
-        {
-            if (this.IsActive)
-            {
-                this.Update();
-            }
-        }
-
         protected virtual void Update()
         {
             var rate = GetTempoFrequency(this.Rate, this.OutputEffects.Tempo.Rate);
@@ -167,13 +149,14 @@ namespace FoxTunes
                 this.OutputEffects.Tempo.Value,
                 this.OutputEffects.Tempo.Pitch,
                 MetaDataInfo.SampleRateDescription(rate),
-                this.OutputEffects.Tempo.AAFilter ? string.Format(", aa filter {0} taps", this.OutputEffects.Tempo.AAFilterLength) : string.Empty
+                this.AAFilter.Value ? string.Format(", aa filter {0} taps", this.AAFilterLength) : string.Empty
             );
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Tempo, this.OutputEffects.Tempo.Value));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Pitch, this.OutputEffects.Tempo.Pitch));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, rate));
-            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoUseAAFilter, this.OutputEffects.Tempo.AAFilter ? 1 : 0));
-            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoAAFilterLength, this.OutputEffects.Tempo.AAFilterLength));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoUseAAFilter, this.AAFilter.Value ? 1 : 0));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoAAFilterLength, this.AAFilterLength.Value));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoUseQuickAlgorithm, this.Fast.Value ? 0 : 1));
         }
 
         protected virtual void Stop()
@@ -184,6 +167,7 @@ namespace FoxTunes
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, 0));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoUseAAFilter, 1));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoAAFilterLength, 32));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoUseQuickAlgorithm, 0));
         }
 
         public override void Connect(IBassStreamComponent previous)
@@ -207,10 +191,20 @@ namespace FoxTunes
             {
                 this.OutputEffects.Tempo.EnabledChanged -= this.OnEnabledChanged;
                 this.OutputEffects.Tempo.ValueChanged -= this.OnValueChanged;
-                this.OutputEffects.Tempo.PitchChanged -= this.OnPitchChanged;
-                this.OutputEffects.Tempo.RateChanged -= this.OnRateChanged;
-                this.OutputEffects.Tempo.AAFilterChanged -= this.OnAAFilterChanged;
-                this.OutputEffects.Tempo.AAFilterLengthChanged -= this.OnAAFilterLengthChanged;
+                this.OutputEffects.Tempo.PitchChanged -= this.OnValueChanged;
+                this.OutputEffects.Tempo.RateChanged -= this.OnValueChanged;
+            }
+            if (this.AAFilter != null)
+            {
+                this.AAFilter.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.AAFilterLength != null)
+            {
+                this.AAFilterLength.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.Fast != null)
+            {
+                this.Fast.ValueChanged -= this.OnValueChanged;
             }
             this.Stop();
         }
