@@ -285,12 +285,18 @@ namespace FoxTunes
 
         private string GetCachePrefix(LibraryHierarchyNode libraryHierarchyNode)
         {
-            return Path.Combine(PREFIX, libraryHierarchyNode.Id.ToString());
+            var hashCode = string.Concat(
+                libraryHierarchyNode.Id,
+                libraryHierarchyNode.Value
+            ).GetDeterministicHashCode();
+            return Path.Combine(PREFIX, Math.Abs(hashCode).ToString());
         }
 
         private string GetCacheId(int width, int height)
         {
-            return (width * height).GetHashCode().ToString();
+            return Math.Abs(
+                (width * height).GetHashCode()
+            ).ToString();
         }
 
         private bool ReadFromCache(LibraryHierarchyNode libraryHierarchyNode, int width, int height, out string fileName)
