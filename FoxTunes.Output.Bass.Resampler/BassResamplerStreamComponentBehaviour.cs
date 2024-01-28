@@ -79,19 +79,15 @@ namespace FoxTunes
 
         protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
         {
-            if (!this.Enabled || this.Output.Rate == e.Stream.Rate)
+            if (!this.Enabled)
             {
                 return;
             }
-            if (!this.Output.EnforceRate && e.Query.OutputRates.Contains(e.Stream.Rate))
+            if (!BassResamplerStreamComponent.ShouldCreateResampler(this, e.Stream, e.Query))
             {
                 return;
             }
-            if (BassUtils.GetChannelDsdRaw(e.Stream.ChannelHandle))
-            {
-                return;
-            }
-            var component = new BassResamplerStreamComponent(this, e.Stream);
+            var component = new BassResamplerStreamComponent(this, e.Stream, e.Query);
             component.InitializeComponent(this.Core);
             e.Components.Add(component);
         }

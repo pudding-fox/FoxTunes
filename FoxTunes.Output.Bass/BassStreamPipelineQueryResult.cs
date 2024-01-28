@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -20,5 +21,19 @@ namespace FoxTunes
         public IEnumerable<int> OutputRates { get; private set; }
 
         public int OutputChannels { get; private set; }
+
+        public int GetNearestRate(int rate)
+        {
+            //Find the closest supported rate.
+            foreach (var supportedRate in this.OutputRates)
+            {
+                if (supportedRate >= rate)
+                {
+                    return supportedRate;
+                }
+            }
+            //Ah. The minimum supported rate is not enough.
+            return this.OutputRates.LastOrDefault();
+        }
     }
 }

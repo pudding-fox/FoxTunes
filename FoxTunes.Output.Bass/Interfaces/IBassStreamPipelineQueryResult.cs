@@ -11,5 +11,7 @@ namespace FoxTunes.Interfaces
         IEnumerable<int> OutputRates { get; }
 
         int OutputChannels { get; }
+
+        int GetNearestRate(int rate);
     }
 }
