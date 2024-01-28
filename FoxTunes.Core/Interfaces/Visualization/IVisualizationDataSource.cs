@@ -53,6 +53,8 @@ namespace FoxTunes.Interfaces
 
     public class FFTVisualizationData : VisualizationData
     {
+        public TimeSpan Interval;
+
         public int FFTSize;
 
         public float[] Samples;

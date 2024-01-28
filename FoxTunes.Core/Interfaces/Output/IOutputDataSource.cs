@@ -26,5 +26,7 @@ namespace FoxTunes.Interfaces
         float[] GetBuffer(int fftSize, bool individual = false);
 
         int GetData(float[] buffer, int fftSize, bool individual = false);
+
+        TimeSpan GetDuration(int length);
     }
 }
