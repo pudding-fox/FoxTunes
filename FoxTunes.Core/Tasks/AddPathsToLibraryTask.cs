@@ -40,6 +40,7 @@ namespace FoxTunes
         protected override void OnRun()
         {
             this.EnumerateFiles();
+            this.SanitizeFiles();
             this.AddFiles();
             this.SaveChanges();
         }
@@ -63,6 +64,36 @@ namespace FoxTunes
                     fileNames.Add(path);
                 }
                 this.SetPosition(this.Position + 1);
+            }
+            this.FileNames = fileNames;
+            this.SetPosition(this.Count);
+        }
+
+        private void SanitizeFiles()
+        {
+            var fileNames = this.FileNames.ToList();
+            this.SetName("Preparing file list");
+            this.SetPosition(0);
+            this.SetCount(fileNames.Count);
+            var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
+            var position = 0;
+            for (var a = 0; a < fileNames.Count; )
+            {
+                var fileName = fileNames[a];
+                if (this.Library.Set.Any(libraryItem => libraryItem.FileName == fileName))
+                {
+                    fileNames.RemoveAt(a);
+                }
+                else
+                {
+                    a++;
+                }
+                if (position % interval == 0)
+                {
+                    this.SetDescription(new FileInfo(fileName).Name);
+                    this.SetPosition(position);
+                }
+                position++;
             }
             this.FileNames = fileNames;
             this.SetPosition(this.Count);
