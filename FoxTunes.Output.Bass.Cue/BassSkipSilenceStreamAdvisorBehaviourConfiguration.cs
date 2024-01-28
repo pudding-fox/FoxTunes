@@ -17,8 +17,8 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
-                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Skip Silence", path: "Advanced").WithValue(false))
-                .WithElement(new SelectionConfigurationElement(SENSITIVITY_ELEMENT, "Silence Sensitivity", path: "Advanced")
+                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled", path: "Skip Silence").WithValue(false))
+                .WithElement(new SelectionConfigurationElement(SENSITIVITY_ELEMENT, "Sensitivity", path: "Skip Silence")
                     .WithOptions(GetSensitivityOptions())
                     .DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT)
             );
