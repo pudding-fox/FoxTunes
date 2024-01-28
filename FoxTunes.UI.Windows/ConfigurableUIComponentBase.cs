@@ -15,17 +15,24 @@ namespace FoxTunes
 
         public ConfigurableUIComponentBase()
         {
-            var menu = new Menu();
-            menu.Components = new ObservableCollection<IInvocableComponent>()
+            this.Loaded += this.OnLoaded;
+        }
+
+        protected virtual void CreateMenu()
+        {
+            var menu = new Menu()
             {
-                this
+                Components = new ObservableCollection<IInvocableComponent>()
+                {
+                    this
+                }
             };
             this.ContextMenu = menu;
-            this.Loaded += this.OnLoaded;
         }
 
         protected virtual void OnLoaded(object sender, RoutedEventArgs e)
         {
+            this.CreateMenu();
             if (this.Configuration != null)
             {
                 this.ApplyConfiguration();

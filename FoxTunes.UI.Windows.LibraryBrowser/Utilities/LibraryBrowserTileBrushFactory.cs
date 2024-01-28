@@ -29,8 +29,6 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public SelectionConfigurationElement ImageMode { get; private set; }
-
         public TaskFactory Factory { get; private set; }
 
         public ImageBrushCache<Tuple<LibraryHierarchyNode, LibraryBrowserImageMode>> Store { get; private set; }
@@ -45,10 +43,6 @@ namespace FoxTunes
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = core.Components.Configuration;
-            this.ImageMode = this.Configuration.GetElement<SelectionConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_IMAGE
-            );
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 ImageBehaviourConfiguration.SECTION,
                 ImageLoaderConfiguration.THREADS
@@ -94,10 +88,9 @@ namespace FoxTunes
             }
         }
 
-        public Wrapper<ImageBrush> Create(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
+        public Wrapper<ImageBrush> Create(LibraryHierarchyNode libraryHierarchyNode, int width, int height, LibraryBrowserImageMode mode)
         {
             this.PixelSizeConverter.Convert(ref width, ref height);
-            var mode = LibraryBrowserBehaviourConfiguration.GetLibraryImage(this.ImageMode.Value);
             var placeholder = this.PlaceholderBrushFactory.Create(width, height);
             if (libraryHierarchyNode == null)
             {
@@ -110,7 +103,7 @@ namespace FoxTunes
                 var metaDataItems = new Func<MetaDataItem[]>(
                     () => LibraryHierarchyNodeConverter.Instance.Convert(libraryHierarchyNode).Result.MetaDatas.ToArray()
                 );
-                return this.Create(libraryHierarchyNode, metaDataItems, width, height, cache);
+                return this.Create(libraryHierarchyNode, metaDataItems, width, height, mode, cache);
             });
             if (cache)
             {
@@ -128,7 +121,7 @@ namespace FoxTunes
             return new MonitoringAsyncResult<ImageBrush>(libraryHierarchyNode, placeholder, () => this.Factory.StartNew(factory));
         }
 
-        protected virtual ImageBrush Create(LibraryHierarchyNode libraryHierarchyNode, Func<MetaDataItem[]> metaDataItems, int width, int height, bool cache)
+        protected virtual ImageBrush Create(LibraryHierarchyNode libraryHierarchyNode, Func<MetaDataItem[]> metaDataItems, int width, int height, LibraryBrowserImageMode mode, bool cache)
         {
             Logger.Write(this, LogLevel.Debug, "Creating brush: {0}x{1}", width, height);
             var source = this.LibraryBrowserTileProvider.CreateImageSource(
@@ -136,6 +129,7 @@ namespace FoxTunes
                 metaDataItems,
                 width,
                 height,
+                mode,
                 cache
             );
             if (source == null)

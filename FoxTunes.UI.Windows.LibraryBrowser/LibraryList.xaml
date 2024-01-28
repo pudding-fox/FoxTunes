@@ -15,7 +15,7 @@
              d:DesignHeight="300" d:DesignWidth="300" AllowDrop="True">
     <UserControl.Resources>
         <LocalViewModel:LibraryBrowser x:Key="ViewModel"></LocalViewModel:LibraryBrowser>
-        <LocalViewModel:LibraryBrowserImageConverter x:Key="LibraryBrowserImageConverter" Width="{Binding ListTileSize, Source={StaticResource ViewModel}}" Height="{Binding ListTileSize, Source={StaticResource ViewModel}}"></LocalViewModel:LibraryBrowserImageConverter>
+        <LocalViewModel:LibraryBrowserImageConverter x:Key="LibraryBrowserImageConverter" Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Mode="{Binding ImageMode, Source={StaticResource ViewModel}}"></LocalViewModel:LibraryBrowserImageConverter>
         <ViewModel:LibraryHierarchyNodeConverter x:Key="LibraryHierarchyNodeConverter"></ViewModel:LibraryHierarchyNodeConverter>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <System:Boolean x:Key="True">True</System:Boolean>
@@ -66,15 +66,12 @@
                             <KeyBinding Key="Return" Modifiers="Ctrl" Command="{Binding AddToPlaylistCommand, Source={StaticResource ViewModel}}" CommandParameter="{StaticResource True}"></KeyBinding>
                             <KeyBinding Key="Backspace" Command="{Binding BrowseCommand, Source={StaticResource ViewModel}}" CommandParameter="{StaticResource True}"></KeyBinding>
                         </ListBox.InputBindings>
-                        <ListBox.ContextMenu>
-                            <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_LIBRARY}}"></Windows:Menu>
-                        </ListBox.ContextMenu>
                         <ListBox.ItemTemplateSelector>
                             <LocalWindows:LibraryBrowserTemplateSelector>
                                 <LocalWindows:LibraryBrowserTemplateSelector.UpTemplate>
                                     <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
                                         <StackPanel Orientation="Horizontal">
-                                            <Border Width="{Binding ListTileSize, Source={StaticResource ViewModel}}" Height="{Binding ListTileSize, Source={StaticResource ViewModel}}" BorderBrush="{DynamicResource TextBrush}" BorderThickness="1" Opacity=".50" Margin="0,0,4,0">
+                                            <Border Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" BorderBrush="{DynamicResource TextBrush}" BorderThickness="1" Opacity=".50" Margin="0,0,4,0">
                                                 <Viewbox  Stretch="Uniform">
                                                     <Canvas Width="48" Height="48">
                                                         <Path>
@@ -97,7 +94,7 @@
                                 <LocalWindows:LibraryBrowserTemplateSelector.DefaultTemplate>
                                     <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
                                         <StackPanel Orientation="Horizontal">
-                                            <Windows:AsyncImage DataContext="{Binding Converter={StaticResource LibraryBrowserImageConverter}, Mode=OneWay}" Width="{Binding ListTileSize, Source={StaticResource ViewModel}}" Height="{Binding ListTileSize, Source={StaticResource ViewModel}}" Source="{Binding Value, FallbackValue={StaticResource Transparent}}" Margin="0,0,4,0"></Windows:AsyncImage>
+                                            <Windows:AsyncImage DataContext="{Binding Converter={StaticResource LibraryBrowserImageConverter}, Mode=OneWay}" Width="{Binding TileSize, Source={StaticResource ViewModel}}" Height="{Binding TileSize, Source={StaticResource ViewModel}}" Source="{Binding Value, FallbackValue={StaticResource Transparent}}" Margin="0,0,4,0"></Windows:AsyncImage>
                                             <TextBlock VerticalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
                                         </StackPanel>
                                     </DataTemplate>
