@@ -22,6 +22,7 @@
                 <Windows:Spectrum Margin="2,0,2,0" Opacity="0.5"></Windows:Spectrum>
             </StackPanel>
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Windows:Volume Width="80" Margin="4,0,4,0"></Windows:Volume>
                 <Windows:MiniPlayer Margin="0,0,2,0"></Windows:MiniPlayer>
                 <Windows:Settings ></Windows:Settings>
             </StackPanel>
