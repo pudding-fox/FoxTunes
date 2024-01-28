@@ -10,6 +10,8 @@ namespace FoxTunes
 {
     public class SpectrumRenderer : VisualizationBase
     {
+        const int MARGIN_MIN = 4;
+
         const int MARGIN_ZERO = 0;
 
         const int MARGIN_ONE = 1;
@@ -354,7 +356,7 @@ namespace FoxTunes
                 return null;
             }
 
-            var margin = width > (count * 10) ? MARGIN_ONE : MARGIN_ZERO;
+            var margin = width > (count * MARGIN_MIN) ? MARGIN_ONE : MARGIN_ZERO;
             var data = new SpectrumRendererData()
             {
                 Output = output,

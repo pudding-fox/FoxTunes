@@ -10,6 +10,8 @@ namespace FoxTunes
 {
     public class EnhancedSpectrumRenderer : VisualizationBase
     {
+        const int MARGIN_MIN = 4;
+
         const int MARGIN_ZERO = 0;
 
         const int MARGIN_ONE = 1;
@@ -534,7 +536,7 @@ namespace FoxTunes
 
         public static SpectrumRendererData Create(EnhancedSpectrumRenderer renderer, int width, int height, int[] bands, int fftSize, bool showPeaks, bool showRms, bool showCrest, Color[] colors)
         {
-            var margin = width > (bands.Length * 4) ? MARGIN_ONE : MARGIN_ZERO;
+            var margin = width > (bands.Length * MARGIN_MIN) ? MARGIN_ONE : MARGIN_ZERO;
             var data = new SpectrumRendererData()
             {
                 Renderer = renderer,
