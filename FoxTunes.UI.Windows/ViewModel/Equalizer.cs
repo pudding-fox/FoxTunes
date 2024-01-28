@@ -152,6 +152,10 @@ namespace FoxTunes.ViewModel
                 this.Effects.Equalizer.PresetChanged += this.OnPresetChanged;
             }
             this.Bands = new List<EqualizerBand>(this.GetBands());
+            foreach (var band in this.Bands)
+            {
+                band.ValueChanged += this.OnValueChanged;
+            }
             //TODO: Bad .Wait().
             this.Refresh().Wait();
             base.OnCoreChanged();
@@ -185,6 +189,11 @@ namespace FoxTunes.ViewModel
         protected virtual void OnPresetChanged(object sender, EventArgs e)
         {
             this.Dispatch(this.Refresh);
+        }
+
+        protected virtual void OnValueChanged(object sender, EventArgs e)
+        {
+            var task = Windows.Invoke(this.OnPresetChanged);
         }
 
         protected virtual Task Refresh()
@@ -278,6 +287,13 @@ namespace FoxTunes.ViewModel
                 this.Effects.Equalizer.EnabledChanged -= this.OnEnabledChanged;
                 this.Effects.Equalizer.PresetsChanged -= this.OnPresetsChanged;
                 this.Effects.Equalizer.PresetChanged -= this.OnPresetChanged;
+            }
+            if (this.Bands != null)
+            {
+                foreach (var band in this.Bands)
+                {
+                    band.ValueChanged -= this.OnValueChanged;
+                }
             }
             base.OnDisposing();
         }
