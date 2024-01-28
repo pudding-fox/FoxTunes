@@ -10,12 +10,15 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Effects;
 using System.Windows.Threading;
 
 namespace FoxTunes
 {
     public abstract class LibraryBrowserBase : ConfigurableUIComponentBase
     {
+        public static readonly ThemeLoader ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+
         protected override void CreateMenu()
         {
             var menu = new Menu()
@@ -98,6 +101,23 @@ namespace FoxTunes
             return listBox;
         }
 
+        public ListBox GetInactiveListBox()
+        {
+            var itemsControl = this.GetItemsControl();
+            if (itemsControl == null || itemsControl.Items.Count < 2)
+            {
+                return null;
+            }
+            var container = itemsControl.ItemContainerGenerator.ContainerFromIndex(itemsControl.Items.Count - 2) as ContentPresenter;
+            if (container == null)
+            {
+                return null;
+            }
+            container.ApplyTemplate();
+            var listBox = container.ContentTemplate.FindName("ListBox", container) as ListBox;
+            return listBox;
+        }
+
         protected virtual void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var listBox = sender as ListBox;
@@ -120,11 +140,13 @@ namespace FoxTunes
 
         protected virtual void OnListBoxLoaded(object sender, RoutedEventArgs e)
         {
+            this.ApplyBlur();
             this.FixFocus();
         }
 
         protected virtual void OnListBoxUnloaded(object sender, RoutedEventArgs e)
         {
+            this.ApplyBlur();
             this.FixFocus();
         }
 
@@ -156,6 +178,23 @@ namespace FoxTunes
                 return;
             }
             Keyboard.Focus(container);
+        }
+
+        protected virtual void ApplyBlur()
+        {
+            var activeListBox = this.GetActiveListBox();
+            var inactiveListBox = this.GetInactiveListBox();
+            activeListBox.Effect = null;
+            if (ThemeLoader.Theme.Flags.HasFlag(ThemeFlags.RequiresTransparency))
+            {
+                if (inactiveListBox != null)
+                {
+                    inactiveListBox.Effect = new BlurEffect()
+                    {
+                        Radius = 20
+                    };
+                }
+            }
         }
 
         protected virtual void DragSourceInitialized(object sender, ListBoxExtensions.DragSourceInitializedEventArgs e)
