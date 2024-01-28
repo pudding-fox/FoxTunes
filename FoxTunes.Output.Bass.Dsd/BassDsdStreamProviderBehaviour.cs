@@ -1,71 +1,53 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass.Dsd;
-using System;
+using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassDsdStreamProviderBehaviour : StandardBehaviour, IDisposable
+    public class BassDsdStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent
     {
-        public IBassOutput Output { get; private set; }
+        public int Rate
+        {
+            get
+            {
+                return BassDsd.DefaultFrequency;
+            }
+            set
+            {
+                BassDsd.DefaultFrequency = value;
+                Logger.Write(this, LogLevel.Debug, "DSD to PCM sample rate: {0}", MetaDataInfo.SampleRateDescription(BassDsd.DefaultFrequency));
+            }
+        }
+
+        public int Gain
+        {
+            get
+            {
+                return BassDsd.DefaultGain;
+            }
+            set
+            {
+                BassDsd.DefaultGain = value;
+                Logger.Write(this, LogLevel.Debug, "DSD to PCM gain: +{0}dB", BassDsd.DefaultGain);
+            }
+        }
 
         public override void InitializeComponent(ICore core)
         {
-            this.Output = core.Components.Output as IBassOutput;
-            this.Output.Init += this.OnInit;
-            this.Output.Free += this.OnFree;
+            core.Components.Configuration.GetElement<SelectionConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassDsdStreamProviderBehaviourConfiguration.DSD_RATE_ELEMENT
+            ).ConnectValue(value => this.Rate = BassDsdStreamProviderBehaviourConfiguration.GetRate(value));
+            core.Components.Configuration.GetElement<IntegerConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassDsdStreamProviderBehaviourConfiguration.DSD_GAIN_ELEMENT
+            ).ConnectValue(value => this.Gain = value);
             base.InitializeComponent(core);
         }
 
-        protected virtual void OnInit(object sender, EventArgs e)
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            BassDsd.DefaultFrequency = this.Output.Rate;
-            Logger.Write(this, LogLevel.Debug, "BASS DSD Initialized.");
-        }
-
-        protected virtual void OnFree(object sender, EventArgs e)
-        {
-            //Nothing to do.
-        }
-
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
-        {
-            if (this.Output != null)
-            {
-                this.Output.Init -= this.OnInit;
-                this.Output.Free -= this.OnFree;
-            }
-        }
-
-        ~BassDsdStreamProviderBehaviour()
-        {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            try
-            {
-                this.Dispose(true);
-            }
-            catch
-            {
-                //Nothing can be done, never throw on GC thread.
-            }
+            return BassDsdStreamProviderBehaviourConfiguration.GetConfigurationSections();
         }
     }
 }
