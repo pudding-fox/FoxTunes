@@ -64,6 +64,34 @@ namespace FoxTunes
             await this.Core.Managers.Library.Clear(null).ConfigureAwait(false);
         }
 
+        [Test]
+        public void CanNormalizeLibraryRoots()
+        {
+            var currentPaths = new[]
+            {
+                @"C:\a",
+                @"C:\1\2\3",
+                @"C:\1\2",
+                @"C:\1"
+            };
+            var newPaths = new[]
+            {
+                @"D:\a",
+                @"D:\1\2\3",
+                @"D:\1\2",
+                @"D:\1"
+            };
+            var expected = new[]
+            {
+                @"C:\a",
+                @"C:\1",
+                @"D:\a",
+                @"D:\1"
+            };
+            var actual = LibraryRoot.Normalize(currentPaths, newPaths).ToArray();
+            Assert.AreEqual(expected, actual);
+        }
+
         protected virtual void AssertLibraryItems(params string[] fileNames)
         {
             using (var database = this.Core.Factories.Database.Create())
