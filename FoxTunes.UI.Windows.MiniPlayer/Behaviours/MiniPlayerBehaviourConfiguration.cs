@@ -7,8 +7,6 @@ namespace FoxTunes
     {
         public const string SECTION = "F3E58830-97C0-4BA2-9E07-3EC27E3D4418";
 
-        public const string NOW_PLAYING_SCRIPT_ELEMENT = "BBBB78F3-B32F-4A8C-B566-9A8B39A896C7";
-
         public const string TOPMOST_ELEMENT = "CCCC7F71-A506-48DF-9420-E6926465FFDC";
 
         public const string SHOW_ARTWORK_ELEMENT = "FFFFB3A4-E59D-46CE-B80A-86EAB9427108";

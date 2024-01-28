@@ -1,4 +1,4 @@
-﻿<Windows:UIComponentBase x:Class="FoxTunes.NowPlaying"
+﻿<Windows:ConfigurableUIComponentBase x:Class="FoxTunes.NowPlaying"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -26,4 +26,4 @@
             </Style>
         </LocalWindows:Marquee.Style>
     </LocalWindows:Marquee>
-</Windows:UIComponentBase>
+</Windows:ConfigurableUIComponentBase>

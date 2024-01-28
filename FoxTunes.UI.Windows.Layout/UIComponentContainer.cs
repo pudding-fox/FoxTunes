@@ -311,10 +311,6 @@ namespace FoxTunes
                     }
                     foreach (var alternative in LayoutManager.Instance.GetComponents(UIComponentRole.Container))
                     {
-                        if (string.Equals(this.Configuration.Component.Id, alternative.Id, StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
                         yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, WRAP, alternative.Name, path: Strings.UIComponentContainer_Wrap, attributes: attributes);
                         attributes = InvocationComponent.ATTRIBUTE_NONE;
                     }
