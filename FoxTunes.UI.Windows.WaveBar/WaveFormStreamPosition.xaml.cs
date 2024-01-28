@@ -15,8 +15,6 @@ namespace FoxTunes
 
         const int RESOLUTION = 1;
 
-        const int INTERVAL = 100;
-
         public static readonly SelectionConfigurationElement Mode;
 
         public static readonly DoubleConfigurationElement ScalingFactor;
@@ -67,48 +65,57 @@ namespace FoxTunes
 
                 if (this.Renderer == null)
                 {
-                    this.Renderer = new WaveFormRenderer(
-                        RESOLUTION,
-                        INTERVAL
-                    );
+                    this.Renderer = new WaveFormRenderer(RESOLUTION);
                     this.Renderer.InitializeComponent(core);
                 }
 
-                var width = this.ActualWidth;
-                var height = this.ActualHeight;
-                if (width < this.MinWidth || double.IsNaN(width) || height == 0 || double.IsNaN(height))
-                {
-                    //We need proper dimentions.
-                    return;
-                }
-
-                var color = default(Color);
-                if (this.Foreground is SolidColorBrush brush)
-                {
-                    color = brush.Color;
-                }
-                else
-                {
-                    color = Colors.Black;
-                }
-
-                var size = Windows.ActiveWindow.GetElementPixelSize(
-                    width * ScalingFactor.Value,
-                    height * ScalingFactor.Value
-                );
-
-                this.Renderer.Create(
-                    Convert.ToInt32(size.Width),
-                    Convert.ToInt32(size.Height),
-                    color,
-                    WaveBarBehaviourConfiguration.GetMode(Mode.Value)
-                );
-
-                this.Background = new ImageBrush()
-                {
-                    ImageSource = this.Renderer.Bitmap
-                };
+                this.UpdateBitmap();
             });
+        }
+
+        protected virtual void UpdateBitmap()
+        {
+            var width = this.ActualWidth;
+            var height = this.ActualHeight;
+            if (width < this.MinWidth || double.IsNaN(width) || height == 0 || double.IsNaN(height))
+            {
+                //We need proper dimentions.
+                return;
+            }
+
+            var size = Windows.ActiveWindow.GetElementPixelSize(
+                width * ScalingFactor.Value,
+                height * ScalingFactor.Value
+            );
+
+            this.UpdateBitmap(size);
+        }
+
+        protected virtual void UpdateBitmap(Size size)
+        {
+            var color = default(Color);
+            if (this.Foreground is SolidColorBrush brush)
+            {
+                color = brush.Color;
+            }
+            else
+            {
+                color = Colors.Black;
+            }
+
+            var bitmap = this.Renderer.CreateBitmap(
+                Convert.ToInt32(size.Width),
+                Convert.ToInt32(size.Height),
+                color,
+                WaveBarBehaviourConfiguration.GetMode(Mode.Value)
+            );
+
+            this.Background = new ImageBrush()
+            {
+                ImageSource = bitmap
+            };
+
+            this.Dispatch(this.Renderer.Update);
         }
 
         protected virtual void OnLoaded(object sender, RoutedEventArgs e)
@@ -122,17 +129,29 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Debug, "Unloaded, releasing current renderer.");
                 this.Background = null;
-                this.Renderer.Dispose();
-                this.Renderer = null;
             }
         }
 
         protected virtual void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (this.Renderer != null)
+            if (this.Renderer != null && this.Renderer.Bitmap != null)
             {
-                if (this.Renderer.Data.Width == this.ActualWidth && this.Renderer.Data.Height == this.ActualHeight)
+                var width = this.ActualWidth;
+                var height = this.ActualHeight;
+                if (width < this.MinWidth || double.IsNaN(width) || height == 0 || double.IsNaN(height))
                 {
+                    //We need proper dimentions.
+                    return;
+                }
+
+                var size = Windows.ActiveWindow.GetElementPixelSize(
+                    width * ScalingFactor.Value,
+                    height * ScalingFactor.Value
+                );
+
+                if (this.Renderer.Bitmap.Width == size.Width && this.Renderer.Bitmap.Height == size.Height)
+                {
+                    //Nothing to do.
                     return;
                 }
             }
@@ -162,10 +181,6 @@ namespace FoxTunes
             if (this.Debouncer != null)
             {
                 this.Debouncer.Dispose();
-            }
-            if (this.Renderer != null)
-            {
-                this.Renderer.Dispose();
             }
         }
 

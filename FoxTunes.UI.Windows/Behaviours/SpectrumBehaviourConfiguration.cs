@@ -174,12 +174,12 @@ namespace FoxTunes
             switch (option.Id)
             {
                 case FFT_512_OPTION:
-                    return 256;
-                case FFT_1024_OPTION:
                     return 512;
+                case FFT_1024_OPTION:
+                    return 1024;
                 default:
                 case FFT_2048_OPTION:
-                    return 1024;
+                    return 2048;
             }
         }
 

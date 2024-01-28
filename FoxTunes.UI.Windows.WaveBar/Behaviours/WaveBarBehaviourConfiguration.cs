@@ -23,8 +23,7 @@ namespace FoxTunes
 
         private static IEnumerable<SelectionConfigurationOption> GetModeOptions()
         {
-            yield return new SelectionConfigurationOption(MODE_MONO_OPTION, "Mono");
-            yield return new SelectionConfigurationOption(MODE_STEREO_OPTION, "Stereo").Default();
+            yield return new SelectionConfigurationOption(MODE_MONO_OPTION, "Mono").Default();
             yield return new SelectionConfigurationOption(MODE_SEPERATE_OPTION, "Seperate");
         }
 
@@ -32,11 +31,9 @@ namespace FoxTunes
         {
             switch (option.Id)
             {
+                default:
                 case MODE_MONO_OPTION:
                     return WaveFormRendererMode.Mono;
-                default:
-                case MODE_STEREO_OPTION:
-                    return WaveFormRendererMode.Stereo;
                 case MODE_SEPERATE_OPTION:
                     return WaveFormRendererMode.Seperate;
             }

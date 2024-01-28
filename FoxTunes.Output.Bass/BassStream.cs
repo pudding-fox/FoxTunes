@@ -15,12 +15,13 @@ namespace FoxTunes
             this.Errors = Errors.OK;
         }
 
-        public BassStream(IBassStreamProvider provider, int channelHandle, long length, IEnumerable<IBassStreamAdvice> advice) : this()
+        public BassStream(IBassStreamProvider provider, int channelHandle, long length, IEnumerable<IBassStreamAdvice> advice, BassFlags flags) : this()
         {
             this.Provider = provider;
             this.ChannelHandle = channelHandle;
             this.Length = length;
             this.Advice = advice;
+            this.Flags = flags;
         }
 
         public IBassStreamProvider Provider { get; private set; }
@@ -54,6 +55,8 @@ namespace FoxTunes
         }
 
         public IEnumerable<IBassStreamAdvice> Advice { get; private set; }
+
+        public BassFlags Flags { get; private set; }
 
         public Errors Errors { get; private set; }
 

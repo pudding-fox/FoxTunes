@@ -12,6 +12,6 @@
 
         bool CheckFormat(int rate, int channels);
 
-        int GetData(float[] buffer);
+        int GetData(float[] buffer, int fftSize, bool interleaved);
     }
 }

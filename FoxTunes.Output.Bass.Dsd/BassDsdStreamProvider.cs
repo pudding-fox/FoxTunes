@@ -59,7 +59,7 @@ namespace FoxTunes
                 this.FreeStream(playlistItem, channelHandle);
                 channelHandle = 0;
             }
-            return this.CreateInteractiveStream(channelHandle, advice);
+            return this.CreateInteractiveStream(channelHandle, advice, flags);
         }
 
         public override IBassStream CreateInteractiveStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
@@ -85,7 +85,7 @@ namespace FoxTunes
                 this.FreeStream(playlistItem, channelHandle);
                 channelHandle = 0;
             }
-            return this.CreateInteractiveStream(channelHandle, advice);
+            return this.CreateInteractiveStream(channelHandle, advice, flags);
         }
 
         protected virtual bool IsFormatSupported(PlaylistItem playlistItem, int channelHandle)

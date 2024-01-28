@@ -386,7 +386,12 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "The stream is already loaded: {0} => {1}", playlistItem.Id, playlistItem.FileName);
             }
             Logger.Write(this, LogLevel.Debug, "Loading stream: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-            var stream = this.StreamFactory.CreateInteractiveStream(playlistItem, immidiate, BassFlags.Default);
+            var flags = BassFlags.Default;
+            if (this.Float)
+            {
+                flags |= BassFlags.Float;
+            }
+            var stream = this.StreamFactory.CreateInteractiveStream(playlistItem, immidiate, flags);
             if (stream.IsEmpty)
             {
                 return null;
@@ -399,7 +404,12 @@ namespace FoxTunes
 
         public override Task<IOutputStream> Duplicate(IOutputStream stream)
         {
-            var result = this.StreamFactory.CreateBasicStream(stream.PlaylistItem, BassFlags.Default | BassFlags.Float);
+            var flags = BassFlags.Default;
+            if (this.Float)
+            {
+                flags |= BassFlags.Float;
+            }
+            var result = this.StreamFactory.CreateBasicStream(stream.PlaylistItem, flags);
             if (result.IsEmpty)
             {
                 return null;
@@ -494,14 +504,37 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Unloaded stream for file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
         }
 
-        public override int GetData(float[] buffer)
+        public override float[] GetBuffer(int fftSize)
+        {
+            var length = default(uint);
+            switch (fftSize)
+            {
+                case BassFFT.FFT256:
+                    length = BassFFT.FFT256_SIZE;
+                    break;
+                case BassFFT.FFT512:
+                    length = BassFFT.FFT512_SIZE;
+                    break;
+                case BassFFT.FFT1024:
+                    length = BassFFT.FFT1024_SIZE;
+                    break;
+                case BassFFT.FFT2048:
+                    length = BassFFT.FFT2048_SIZE;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            return new float[length];
+        }
+
+        public override int GetData(float[] buffer, int fftSize, bool interleaved)
         {
             var result = default(int);
             this.PipelineManager.WithPipeline(pipeline =>
             {
                 if (pipeline != null)
                 {
-                    result = pipeline.Output.GetData(buffer);
+                    result = pipeline.Output.GetData(buffer, fftSize, interleaved);
                 }
             });
             return result;

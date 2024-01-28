@@ -85,7 +85,17 @@ namespace FoxTunes
 
         public abstract TimeSpan GetDuration(long position);
 
-        public abstract int GetData(ref float[] buffer, TimeSpan duration);
+        public abstract OutputStreamFormat Format { get; }
+
+        public abstract T[] GetBuffer<T>(TimeSpan duration) where T : struct;
+
+        public abstract int GetData(short[] buffer);
+
+        public abstract int GetData(float[] buffer);
+
+        public abstract float[] GetBuffer(int fftSize);
+
+        public abstract int GetData(float[] buffer, int fftSize, bool interleaved);
 
         public string Description
         {

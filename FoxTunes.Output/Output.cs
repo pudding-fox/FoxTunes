@@ -79,6 +79,8 @@ namespace FoxTunes
 
         public abstract Task Shutdown();
 
-        public abstract int GetData(float[] buffer);
+        public abstract float[] GetBuffer(int fftSize);
+
+        public abstract int GetData(float[] buffer, int fftSize, bool interleaved);
     }
 }

@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     public class BassSubstream : BassStream
     {
-        public BassSubstream(IBassStreamProvider provider, int channelHandle, int innerChannelHandle, long offset, long length, IEnumerable<IBassStreamAdvice> advice) : base(provider, channelHandle, length, advice)
+        public BassSubstream(IBassStreamProvider provider, int channelHandle, int innerChannelHandle, long offset, long length, IEnumerable<IBassStreamAdvice> advice, BassFlags flags) : base(provider, channelHandle, length, advice, flags)
         {
             this.InnerChannelHandle = innerChannelHandle;
             this.Offset = offset;

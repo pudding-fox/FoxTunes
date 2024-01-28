@@ -38,7 +38,9 @@ namespace FoxTunes.Interfaces
 
         Task Shutdown();
 
-        int GetData(float[] buffer);
+        float[] GetBuffer(int fftSize);
+
+        int GetData(float[] buffer, int fftSize, bool interleaved);
     }
 
     public delegate void OutputStreamEventHandler(object sender, OutputStreamEventArgs e);

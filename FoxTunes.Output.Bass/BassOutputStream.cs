@@ -236,16 +236,100 @@ namespace FoxTunes
             return TimeSpan.FromSeconds(Bass.ChannelBytes2Seconds(this.ChannelHandle, position));
         }
 
-        public override int GetData(ref float[] buffer, TimeSpan duration)
+        public override OutputStreamFormat Format
         {
-            if (buffer == null)
+            get
             {
-                var length = Convert.ToInt32(
-                   Bass.ChannelSeconds2Bytes(this.ChannelHandle, duration.TotalSeconds)
-               );
-                buffer = new float[length];
+                if (this.Stream.Flags.HasFlag(BassFlags.Float))
+                {
+                    return OutputStreamFormat.Float;
+                }
+                else
+                {
+                    return OutputStreamFormat.Short;
+                }
             }
-            return Bass.ChannelGetData(this.ChannelHandle, buffer, buffer.Length);
+        }
+
+        public override T[] GetBuffer<T>(TimeSpan duration)
+        {
+
+            var length = Convert.ToInt32(
+                Bass.ChannelSeconds2Bytes(this.ChannelHandle, duration.TotalSeconds)
+            );
+            if (typeof(T) == typeof(short))
+            {
+                length /= sizeof(short);
+            }
+            else if (typeof(T) == typeof(float))
+            {
+                length /= sizeof(float);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+            return new T[length];
+        }
+
+        public override int GetData(short[] buffer)
+        {
+            return Bass.ChannelGetData(this.ChannelHandle, buffer, buffer.Length * sizeof(short));
+        }
+
+        public override int GetData(float[] buffer)
+        {
+            return Bass.ChannelGetData(this.ChannelHandle, buffer, buffer.Length * sizeof(float));
+        }
+
+        public override float[] GetBuffer(int fftSize)
+        {
+            var length = default(int);
+            switch (fftSize)
+            {
+                case BassFFT.FFT256:
+                    length = BassFFT.FFT256_SIZE;
+                    break;
+                case BassFFT.FFT512:
+                    length = BassFFT.FFT512_SIZE;
+                    break;
+                case BassFFT.FFT1024:
+                    length = BassFFT.FFT1024_SIZE;
+                    break;
+                case BassFFT.FFT2048:
+                    length = BassFFT.FFT2048_SIZE;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            return new float[length];
+        }
+
+        public override int GetData(float[] buffer, int fftSize, bool interleaved)
+        {
+            var length = (uint)buffer.Length;
+            switch (fftSize)
+            {
+                case BassFFT.FFT256:
+                    length |= BassFFT.FFT256_MASK;
+                    break;
+                case BassFFT.FFT512:
+                    length |= BassFFT.FFT512_MASK;
+                    break;
+                case BassFFT.FFT1024:
+                    length |= BassFFT.FFT1024_MASK;
+                    break;
+                case BassFFT.FFT2048:
+                    length |= BassFFT.FFT2048_MASK;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            if (interleaved)
+            {
+                length |= BassFFT.FFT_INDIVIDUAL_MASK;
+            }
+            return Bass.ChannelGetData(this.ChannelHandle, buffer, unchecked((int)length));
         }
 
         public override event EventHandler Ending
