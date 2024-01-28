@@ -229,6 +229,14 @@ WAVEBAR="
 FoxTunes.UI.Windows.WaveBar.dll
 "
 
+RATINGS="
+FoxTunes.UI.Windows.Ratings
+"
+
+STATISTICS="
+FoxTunes.Statistics
+"
+
 MINIMAL="
 bass
 conf
@@ -250,9 +258,11 @@ eq
 librarybrowser
 logger
 metadataeditor
+ratings
 replaygain
 sox
 spectrum
+statistics
 tools
 wasapi
 wavebar
@@ -303,12 +313,14 @@ do
 		mkdir -p "./release/$platform/$target/Plugins/metadataeditor"
 		mkdir -p "./release/$platform/$target/Plugins/mod"
 		mkdir -p "./release/$platform/$target/Plugins/mod/addon"
+		mkdir -p "./release/$platform/$target/Plugins/ratings"
 		mkdir -p "./release/$platform/$target/Plugins/replaygain"
 		mkdir -p "./release/$platform/$target/Plugins/simplemetadata"
 		mkdir -p "./release/$platform/$target/Plugins/sox"
 		mkdir -p "./release/$platform/$target/Plugins/spectrum"
 		mkdir -p "./release/$platform/$target/Plugins/sqlite"
 		mkdir -p "./release/$platform/$target/Plugins/sqlserver"
+		mkdir -p "./release/$platform/$target/Plugins/statistics"
 		mkdir -p "./release/$platform/$target/Plugins/taglibmetadata"
 		mkdir -p "./release/$platform/$target/Plugins/tools"
 		mkdir -p "./release/$platform/$target/Plugins/wasapi"
@@ -575,6 +587,22 @@ do
 		do
 				echo $file
 				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/wavebar"
+		done
+		echo
+
+		echo "Creating plugin: ratings"
+		for file in $RATINGS
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/ratings"
+		done
+		echo
+
+		echo "Creating plugin: statistics"
+		for file in $STATISTICS
+		do
+				echo $file
+				cp "./distribution/$platform/$target/$file" "./release/$platform/$target/Plugins/statistics"
 		done
 		echo
 
