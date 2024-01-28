@@ -83,6 +83,7 @@ namespace FoxTunes
                 }
                 var id = pair.Key.Substring(PREFIX.Length);
                 var value = pair.Value;
+                this.Load(id, value);
             }
         }
 
@@ -171,6 +172,10 @@ namespace FoxTunes
             }
             foreach (var element in this.Elements.Values)
             {
+                if (!element.IsModified)
+                {
+                    continue;
+                }
                 var key = string.Concat(PREFIX, element.Id);
                 var value = element.GetPersistentValue();
                 this.Component.MetaData.TryAdd(key, value);
