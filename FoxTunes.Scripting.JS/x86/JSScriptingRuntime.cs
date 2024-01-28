@@ -1,5 +1,6 @@
-﻿using FoxTunes.Interfaces;
-using V8.Net;
+﻿#if X86
+using FoxTunes.Interfaces;
+using Noesis.Javascript;
 
 namespace FoxTunes
 {
@@ -25,9 +26,10 @@ namespace FoxTunes
         public override IScriptingContext CreateContext()
         {
             Logger.Write(this, LogLevel.Debug, "Creating javascript scripting context.");
-            var context = new JSScriptingContext(new V8Engine());
+            var context = new JSScriptingContext(new JavascriptContext());
             context.InitializeComponent(this.Core);
             return context;
         }
     }
 }
+#endif

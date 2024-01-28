@@ -14,13 +14,30 @@
     <Folder Include="Properties\" />
   </ItemGroup>
 
+  <PropertyGroup Condition="'$(Platform)' == 'x86'">
+    <DefineConstants>X86</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Platform)' == 'x64'">
+    <DefineConstants>X64</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup Condition="'$(Platform)' == 'x86'">
-    <None Include="..\lib\x64\V8_Net_Proxy_x86.dll" Link="V8_Net_Proxy_x86.dll">
+    <None Include="..\lib\x86\msvcr100.dll" Link="msvcr100.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x86\msvcp100.dll" Link="msvcp100.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  
+
   <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <None Include="..\lib\x64\msvcr100.dll" Link="msvcr100.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\lib\x64\msvcp100.dll" Link="msvcp100.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="..\lib\x64\V8_Net_Proxy_x64.dll" Link="V8_Net_Proxy_x64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -48,7 +65,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="V8.Net">
+    <Reference Include="Noesis.Javascript" Condition="'$(Platform)' == 'x86'">
+      <HintPath>../lib/x86/Noesis.Javascript.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="V8.Net" Condition="'$(Platform)' == 'x64'">
       <HintPath>../lib/V8.Net.dll</HintPath>
     </Reference>
   </ItemGroup>
