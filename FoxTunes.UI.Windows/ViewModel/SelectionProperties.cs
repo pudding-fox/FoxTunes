@@ -38,7 +38,8 @@ namespace FoxTunes.ViewModel
             CommonProperties.AudioChannels,
             CommonProperties.AudioSampleRate,
             CommonProperties.BitsPerSample,
-            CommonProperties.Duration
+            CommonProperties.Duration,
+            CodecValueProvider.NAME
         };
 
         private static readonly string[] FILESYSTEM = new[]
@@ -58,7 +59,10 @@ namespace FoxTunes.ViewModel
         private static readonly IDictionary<string, ValueProvider> PROVIDERS = new Dictionary<string, ValueProvider>(StringComparer.OrdinalIgnoreCase)
         {
             { CountValueProvider.NAME, CountValueProvider.Instance },
+            { CommonProperties.AudioBitrate, BitrateValueProvider.Instance },
+            { CommonProperties.AudioSampleRate, SamplerateValueProvider.Instance },
             { CommonProperties.Duration, NumericMetaDataValueProvider.Instance },
+            { CodecValueProvider.NAME, CodecValueProvider.Instance },
             { FileSystemProperties.FileName, FileSystemValueProvider.Instance },
             { FileSystemProperties.DirectoryName, FileSystemValueProvider.Instance },
             { FileSystemProperties.FileSize, FileSystemValueProvider.Instance },
@@ -500,8 +504,8 @@ namespace FoxTunes.ViewModel
                 var value = default(string);
                 if (metaData != null && metaData.TryGetValue(name, out value) && !string.IsNullOrEmpty(value))
                 {
-                    var numeric = default(int);
-                    if (int.TryParse(value, out numeric))
+                    var numeric = default(long);
+                    if (long.TryParse(value, out numeric))
                     {
                         return numeric;
                     }
@@ -564,6 +568,58 @@ namespace FoxTunes.ViewModel
             }
 
             public static readonly ValueProvider Instance = new CountValueProvider();
+        }
+
+        public class CodecValueProvider : ValueProvider
+        {
+            public const string NAME = "Codec";
+
+            public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
+            {
+                return fileData.FileName.GetExtension().ToUpper();
+            }
+
+            public static readonly ValueProvider Instance = new CodecValueProvider();
+        }
+
+        public class BitrateValueProvider : ValueProvider
+        {
+            public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
+            {
+                var value = Convert.ToInt32(NumericMetaDataValueProvider.Instance.GetValue(fileData, metaData, name));
+                if (value == 0)
+                {
+                    var sampleRate = Convert.ToInt32(NumericMetaDataValueProvider.Instance.GetValue(fileData, metaData, CommonProperties.AudioSampleRate));
+                    var bitPerSample = Convert.ToInt32(NumericMetaDataValueProvider.Instance.GetValue(fileData, metaData, CommonProperties.BitsPerSample));
+                    var channels = Convert.ToInt32(NumericMetaDataValueProvider.Instance.GetValue(fileData, metaData, CommonProperties.AudioChannels));
+                    if (sampleRate != 0 && bitPerSample != 0 && channels != 0)
+                    {
+                        value = (sampleRate * bitPerSample * channels) / 1000;
+                    }
+                    else
+                    {
+                        return Strings.SelectionProperties_NoValue;
+                    }
+                }
+                return MetaDataInfo.BitRateDescription(value);
+            }
+
+            public static readonly ValueProvider Instance = new BitrateValueProvider();
+        }
+
+        public class SamplerateValueProvider : ValueProvider
+        {
+            public override object GetValue(IFileData fileData, IDictionary<string, string> metaData, string name)
+            {
+                var value = Convert.ToInt32(NumericMetaDataValueProvider.Instance.GetValue(fileData, metaData, name));
+                if (value == 0)
+                {
+                    return Strings.SelectionProperties_NoValue;
+                }
+                return MetaDataInfo.SampleRateDescription(value);
+            }
+
+            public static readonly ValueProvider Instance = new SamplerateValueProvider();
         }
 
         public abstract class ValueAggregator
