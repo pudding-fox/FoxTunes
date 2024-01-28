@@ -5,6 +5,7 @@ using System.Threading;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -48,8 +49,7 @@ namespace FoxTunes
 
             var interval = Math.Max(Convert.ToInt32(this.Count * 0.01), 1);
             var position = 0;
-
-            reader.AsParallel().ForAll(record =>
+            Parallel.ForEach(reader, this.ParallelOptions, record =>
             {
                 var command = this.GetOrAddCommand();
                 command.Parameters["libraryHierarchyId"] = record["LibraryHierarchy_Id"];

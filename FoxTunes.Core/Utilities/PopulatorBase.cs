@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -118,6 +119,17 @@ namespace FoxTunes
         }
 
         public event EventHandler IsIndeterminateChanged = delegate { };
+
+        public ParallelOptions ParallelOptions
+        {
+            get
+            {
+                return new ParallelOptions()
+                {
+                    MaxDegreeOfParallelism = Environment.ProcessorCount
+                };
+            }
+        }
 
         public bool IsDisposed { get; private set; }
 
