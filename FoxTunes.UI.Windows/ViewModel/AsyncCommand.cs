@@ -43,6 +43,7 @@ namespace FoxTunes.ViewModel
             {
                 if (this.BackgroundTaskRunner != null)
                 {
+                    //TODO: Bad .Wait()
                     this.BackgroundTaskRunner.Run(() => this.AsyncPredicate().ContinueWith(async task =>
                     {
                         if (this.CanExecute.HasValue && this.CanExecute.Value == task.Result)
@@ -158,6 +159,7 @@ namespace FoxTunes.ViewModel
             {
                 if (this.BackgroundTaskRunner != null)
                 {
+                    //TODO: Bad .Wait()
                     this.BackgroundTaskRunner.Run(() => this.AsyncPredicate((T)parameter).ContinueWith(async task =>
                     {
                         if (this.CanExecute.HasValue && this.CanExecute.Value == task.Result)

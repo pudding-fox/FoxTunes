@@ -236,6 +236,7 @@ namespace FoxTunes
 
         private void AddImages(Tag tag)
         {
+            //TODO: Bad .Wait()
             this.AddImage(tag, CommonMetaData.Pictures).Wait();
         }
 

@@ -48,6 +48,14 @@ namespace FoxTunes
 
         public static int Device { get; private set; }
 
+        public static bool IsDefaultDevice
+        {
+            get
+            {
+                return Device == BassWasapi.DefaultDevice;
+            }
+        }
+
         public static bool Exclusive { get; private set; }
 
         public static bool EventDriven { get; private set; }
