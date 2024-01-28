@@ -57,11 +57,7 @@ namespace FoxTunes
             //Have to copy as cannot pass out parameter to lambda expression.
             var _leadIn = leadIn;
             var _leadOut = leadOut;
-#if NET40
-            var task = TaskEx.Run(() => this.UpdateMetaData(playlistItem, _leadIn, _leadOut));
-#else
-            var task = Task.Run(() => this.UpdateMetaData(playlistItem, _leadIn, _leadOut));
-#endif
+            this.Dispatch(() => this.UpdateMetaData(playlistItem, _leadIn, _leadOut));
             return true;
         }
 

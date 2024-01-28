@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class DelayedCallback
+    public class DelayedCallback : BaseComponent
     {
         public DelayedCallback(Action action, TimeSpan delay)
         {
@@ -24,12 +24,9 @@ namespace FoxTunes
                 return;
             }
             this.Enabled = true;
-#if NET40
-            var task = TaskEx.Run(async () =>
-#else
-            var task = Task.Run(async () =>
-#endif
+            this.Dispatch(async () =>
             {
+                //TODO: Double check locking without synchronization.
                 if (!this.Enabled)
                 {
                     return;

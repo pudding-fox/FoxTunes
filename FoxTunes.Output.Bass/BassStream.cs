@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassStream : IBassStream
+    public class BassStream : BaseComponent, IBassStream
     {
         public const int ENDING_THRESHOLD = 5;
 
@@ -84,11 +84,7 @@ namespace FoxTunes
         protected virtual void OnEnding(int Handle, int Channel, int Data, IntPtr User)
         {
             //Critical: Don't block in this call back, it glitches playback.
-#if NET40
-            var task = TaskEx.Run(this.OnEnding);
-#else
-            var task = Task.Run(this.OnEnding);
-#endif
+            this.Dispatch(this.OnEnding);
         }
 
         protected virtual void OnEnding()
@@ -104,11 +100,7 @@ namespace FoxTunes
         protected virtual void OnEnded(int Handle, int Channel, int Data, IntPtr User)
         {
             //Critical: Don't block in this call back, it glitches playback.
-#if NET40
-            var task = TaskEx.Run(this.OnEnded);
-#else
-            var task = Task.Run(this.OnEnded);
-#endif
+            this.Dispatch(this.OnEnded);
         }
 
         protected virtual void OnEnded()
@@ -134,7 +126,7 @@ namespace FoxTunes
             this.Position = 0;
         }
 
-        public static IBassStream Error(Errors errors)
+        new public static IBassStream Error(Errors errors)
         {
             return new BassStream()
             {
