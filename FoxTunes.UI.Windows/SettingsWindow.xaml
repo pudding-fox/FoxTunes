@@ -39,6 +39,9 @@
             <TabItem Header="Playlist">
                 <Windows:PlaylistSettingsDialog></Windows:PlaylistSettingsDialog>
             </TabItem>
+            <TabItem Header="Folders">
+                <Windows:LibraryRootsDialog></Windows:LibraryRootsDialog>
+            </TabItem>
             <TabItem Header="File Types">
                 <Windows:AssociationsDialog></Windows:AssociationsDialog>
             </TabItem>
