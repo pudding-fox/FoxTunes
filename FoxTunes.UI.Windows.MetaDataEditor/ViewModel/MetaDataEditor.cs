@@ -126,6 +126,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnCountChanged()
         {
+            this.OnStatusMessageChanged();
             if (this.CountChanged != null)
             {
                 this.CountChanged(this, EventArgs.Empty);
@@ -134,6 +135,59 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler CountChanged;
+
+        private bool _IsSaving { get; set; }
+
+        public bool IsSaving
+        {
+            get
+            {
+                return this._IsSaving;
+            }
+            set
+            {
+                this._IsSaving = value;
+                this.OnIsSavingChanged();
+            }
+        }
+
+        protected virtual void OnIsSavingChanged()
+        {
+            this.OnStatusMessageChanged();
+            if (this.IsSavingChanged != null)
+            {
+                this.IsSavingChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("IsSaving");
+        }
+
+        public event EventHandler IsSavingChanged;
+
+        public string StatusMessage
+        {
+            get
+            {
+                if (this.IsSaving)
+                {
+                    return string.Format("Updating {0} tracks", this.Count);
+                }
+                else
+                {
+                    return string.Format("Editing {0} tracks", this.Count);
+                }
+            }
+        }
+
+        protected virtual void OnStatusMessageChanged()
+        {
+            if (this.StatusMessageChanged != null)
+            {
+                this.StatusMessageChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("StatusMessage");
+        }
+
+        public event EventHandler StatusMessageChanged;
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
@@ -274,7 +328,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand(this.Save);
+                return CommandFactory.Instance.CreateCommand(this.Save, () => !this.IsSaving);
             }
         }
 
@@ -308,19 +362,27 @@ namespace FoxTunes.ViewModel
             }
             var libraryItems = sources.OfType<LibraryItem>().ToArray();
             var playlistItems = sources.OfType<PlaylistItem>().ToArray();
-            if (libraryItems.Any())
+            await Windows.Invoke(() => this.IsSaving = true).ConfigureAwait(false);
+            try
             {
-                await this.MetaDataManager.Save(libraryItems, true, true, names.ToArray()).ConfigureAwait(false);
+                if (libraryItems.Any())
+                {
+                    await this.MetaDataManager.Save(libraryItems, true, true, names.ToArray()).ConfigureAwait(false);
+                }
+                if (playlistItems.Any())
+                {
+                    await this.MetaDataManager.Save(playlistItems, true, true, names.ToArray()).ConfigureAwait(false);
+                }
+                if (libraryItems.Any() || playlistItems.Any(playlistItem => playlistItem.LibraryItem_Id.HasValue))
+                {
+                    await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
+                    await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
+                    await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
+                }
             }
-            if (playlistItems.Any())
+            finally
             {
-                await this.MetaDataManager.Save(playlistItems, true, true, names.ToArray()).ConfigureAwait(false);
-            }
-            if (libraryItems.Any() || playlistItems.Any(playlistItem => playlistItem.LibraryItem_Id.HasValue))
-            {
-                await this.HierarchyManager.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
-                await this.HierarchyManager.Build(LibraryItemStatus.Import).ConfigureAwait(false);
-                await this.LibraryManager.Set(LibraryItemStatus.None).ConfigureAwait(false);
+                await Windows.Invoke(() => this.IsSaving = false).ConfigureAwait(false);
             }
             await this.Cancel().ConfigureAwait(false);
         }
@@ -329,7 +391,7 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand(this.Cancel);
+                return CommandFactory.Instance.CreateCommand(this.Cancel, () => !this.IsSaving);
             }
         }
 
