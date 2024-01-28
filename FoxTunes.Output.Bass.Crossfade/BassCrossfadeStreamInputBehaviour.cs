@@ -109,6 +109,19 @@ namespace FoxTunes
             }
         }
 
+        public bool Mix
+        {
+            get
+            {
+                return BassCrossfade.Mix;
+            }
+            set
+            {
+                BassCrossfade.Mix = value;
+                Logger.Write(this, LogLevel.Debug, "Mix = {0}", this.Mix);
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
@@ -138,6 +151,10 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassCrossfadeStreamInputConfiguration.TYPE_OUT_ELEMENT
             ).ConnectValue(option => this.OutType = BassCrossfadeStreamInputConfiguration.GetType(option));
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassCrossfadeStreamInputConfiguration.MIX_ELEMENT
+            ).ConnectValue(value => this.Mix = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             if (this.BassStreamPipelineFactory != null)
             {
