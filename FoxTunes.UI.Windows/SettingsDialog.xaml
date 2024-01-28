@@ -127,7 +127,7 @@
             <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding ResetPageCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.SettingsDialog_ResetPage}"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Width="70" Height="30" Margin="0,7,0,0" Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="{x:Static ViewModel:StringResources.SettingsDialog_Save}"/>
+            <Button Width="70" Height="30" Margin="0,7,0,0" Windows:ButtonExtensions.Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Windows:ButtonExtensions.CommandBehaviour="{x:Static Windows:ButtonExtensions.COMMAND_BEHAVIOUR_DISMISS}" Content="{x:Static ViewModel:StringResources.SettingsDialog_Save}"/>
         </StackPanel>
     </Grid>
 </UserControl>
