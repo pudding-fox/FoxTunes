@@ -170,7 +170,7 @@ namespace FoxTunes
             if (status.HasValue)
             {
                 var queryable = this.Database.AsQueryable<LibraryItem>(transaction);
-                return queryable.Count(libraryItem => libraryItem.Status == status.Value);
+                return queryable.Count(libraryItem => libraryItem.Status == status.Value && libraryItem.MetaDatas.Any());
             }
             var set = this.Database.Set<LibraryItem>(transaction);
             return await set.CountAsync;

@@ -11,7 +11,7 @@ AS
 	FROM "LibraryItems"
 		LEFT JOIN "LibraryItem_MetaDataItem" ON "LibraryItems"."Id" = "LibraryItem_MetaDataItem"."LibraryItem_Id"
 		LEFT JOIN "MetaDataItems" ON "MetaDataItems"."Id" = "LibraryItem_MetaDataItem"."MetaDataItem_Id"
-	WHERE @status IS NULL OR "LibraryItems"."Status" = @status
+	WHERE @status IS NULL OR "LibraryItems"."Status" = @status AND "MetaDataItems"."Id" IS NOT NULL
 )
 ,
 "HorizontalMetaData"
