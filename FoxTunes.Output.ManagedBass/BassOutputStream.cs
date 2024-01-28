@@ -141,7 +141,10 @@ namespace FoxTunes
             {
                 throw BassOutputStreamException.StaleStream;
             }
-            this.Output.MasterChannel.SetPrimaryChannel(this.ChannelHandle);
+            if (this.Output.MasterChannel.GetPrimaryChannel() != this.ChannelHandle)
+            {
+                this.Output.MasterChannel.SetPrimaryChannel(this.ChannelHandle);
+            }
             if (!this.Output.MasterChannel.IsPlaying)
             {
                 this.Output.MasterChannel.Play();

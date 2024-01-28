@@ -18,7 +18,7 @@ namespace FoxTunes
 
         public BassMasterChannelConfig Config { get; private set; }
 
-        public bool IsStarted { get; private set; }
+        public bool IsStarted { get; protected set; }
 
         public virtual BassFlags Flags
         {
@@ -33,12 +33,9 @@ namespace FoxTunes
             }
         }
 
-        public void StartStream(BassMasterChannelConfig config)
+        protected virtual void StartStream(BassMasterChannelConfig config)
         {
-            if (this.ChannelHandle != 0)
-            {
-                this.FreeStream();
-            }
+            this.StopStream();
             this.Config = config;
             this.ChannelHandle = BASS_StreamCreateGaplessMaster(config.EffectiveRate, config.Channels, this.Flags, IntPtr.Zero);
             if (this.ChannelHandle == 0)
@@ -46,27 +43,25 @@ namespace FoxTunes
                 BassUtils.Throw();
             }
             Logger.Write(this, LogLevel.Debug, "Created master stream {0}/{1}: {2}.", config.EffectiveRate, this.Output.Float ? "Float" : "16", this.ChannelHandle);
-            this.OnStartedStream();
             this.IsStarted = true;
         }
 
-        protected virtual void OnStartedStream()
+        protected virtual void StopStream()
         {
-            //Nothing to do;
-        }
-
-        public void FreeStream()
-        {
-            this.OnFreeingStream();
-            Logger.Write(this, LogLevel.Debug, "Stopping master stream: {0}", this.ChannelHandle);
-            Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
-            this.ChannelHandle = 0;
-            this.IsStarted = false;
-        }
-
-        protected virtual void OnFreeingStream()
-        {
-            //Nothing to do.
+            if (!this.IsStarted)
+            {
+                return;
+            }
+            try
+            {
+                Logger.Write(this, LogLevel.Debug, "Stopping master stream: {0}", this.ChannelHandle);
+                Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
+                this.ChannelHandle = 0;
+            }
+            finally
+            {
+                this.IsStarted = false;
+            }
         }
 
         public virtual int GetPrimaryChannel()
@@ -217,7 +212,7 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            this.FreeStream();
+            this.StopStream();
         }
 
         ~BassMasterChannel()
@@ -298,9 +293,7 @@ namespace FoxTunes
         public override int GetHashCode()
         {
             var hashCode = default(int);
-            hashCode += this.DsdDirect.GetHashCode();
-            hashCode += this.PcmRate.GetHashCode();
-            hashCode += this.DsdRate.GetHashCode();
+            hashCode += this.EffectiveRate.GetHashCode();
             hashCode += this.Channels.GetHashCode();
             return hashCode;
         }

@@ -23,15 +23,14 @@ DWORD CALLBACK GaplessProc(HSTREAM handle, void *buffer, DWORD length, void *use
 DWORD CALLBACK AsioGaplessProc(BOOL input, DWORD channel, void *buffer, DWORD length, void *user)
 {
 	DWORD result;
-	if (channelPrimary != 0 && BASS_ChannelIsActive(channelPrimary)) {
-		result = BASS_ChannelGetData(channelPrimary, buffer, length);
+	if (channelMaster != 0 && BASS_ChannelIsActive(channelMaster)) {
+		result = BASS_ChannelGetData(channelMaster, buffer, length);
+		if (result == -1) {
+			result = 0;
+		}
 	}
-	else if (channelSecondary != 0 && BASS_ChannelIsActive(channelSecondary)) {
-		result = BASS_ChannelGetData(channelSecondary, buffer, length);
-		channelPrimary = channelSecondary;
-		channelSecondary = 0;
-	}
-	else {
+	else
+	{
 		result = 0;
 	}
 	return result;
@@ -39,15 +38,14 @@ DWORD CALLBACK AsioGaplessProc(BOOL input, DWORD channel, void *buffer, DWORD le
 
 DWORD CALLBACK WasapiGaplessProc(void *buffer, DWORD length, void *user) {
 	DWORD result;
-	if (channelPrimary != 0 && BASS_ChannelIsActive(channelPrimary)) {
-		result = BASS_ChannelGetData(channelPrimary, buffer, length);
+	if (channelMaster != 0 && BASS_ChannelIsActive(channelMaster)) {
+		result = BASS_ChannelGetData(channelMaster, buffer, length);
+		if (result == -1) {
+			result = 0;
+		}
 	}
-	else if (channelSecondary != 0 && BASS_ChannelIsActive(channelSecondary)) {
-		result = BASS_ChannelGetData(channelSecondary, buffer, length);
-		channelPrimary = channelSecondary;
-		channelSecondary = 0;
-	}
-	else {
+	else
+	{
 		result = 0;
 	}
 	return result;

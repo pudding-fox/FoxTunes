@@ -43,19 +43,28 @@ namespace FoxTunes
             }
         }
 
-        protected override void OnStartedStream()
+        protected override void StartStream(BassMasterChannelConfig config)
         {
-            this.Setup();
-            if (this.Config.DsdDirect && this.Config.DsdRate > 0)
+            base.StartStream(config);
+            try
             {
-                this.SetupDsd();
+                this.Setup();
+                if (this.Config.DsdDirect && this.Config.DsdRate > 0)
+                {
+                    this.SetupDsd();
+                }
+                else
+                {
+                    this.SetupPcm();
+                }
+                Logger.Write(this, LogLevel.Debug, "Enabled WASAPI on master stream: {0}", this.ChannelHandle);
             }
-            else
+            catch (Exception e)
             {
-                this.SetupPcm();
+                this.OnError(e);
+                this.IsStarted = false;
+                throw;
             }
-            Logger.Write(this, LogLevel.Debug, "Enabled WASAPI on master stream: {0}", this.ChannelHandle);
-            base.OnStartedStream();
         }
 
         protected virtual void Setup()
@@ -73,14 +82,26 @@ namespace FoxTunes
 
         }
 
-        protected override void OnFreeingStream()
+        protected override void StopStream()
         {
-            if (BassWasapi.IsStarted)
+            try
             {
-                BassUtils.OK(BassWasapi.Stop());
+                if (BassWasapi.IsStarted)
+                {
+                    BassUtils.OK(BassWasapi.Stop());
+                }
+                BassUtils.OK(BassWasapi.Free());
+                Logger.Write(this, LogLevel.Debug, "Disabled WASAPI on master stream: {0}", this.ChannelHandle);
             }
-            BassUtils.OK(BassWasapi.Free());
-            base.OnFreeingStream();
+            catch (Exception e)
+            {
+                this.OnError(e);
+                throw;
+            }
+            finally
+            {
+                base.StopStream();
+            }
         }
 
         public override void SetPrimaryChannel(int channelHandle)
