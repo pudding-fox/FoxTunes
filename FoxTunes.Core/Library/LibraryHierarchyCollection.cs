@@ -21,7 +21,7 @@ namespace FoxTunes
 
         public bool IsSuspended { get; private set; }
 
-        public Action Update(LibraryHierarchy[] libraryHierarchies)
+        public Action Reset(LibraryHierarchy[] libraryHierarchies)
         {
             lock (this.SyncRoot)
             {

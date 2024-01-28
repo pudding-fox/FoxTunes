@@ -21,7 +21,7 @@ namespace FoxTunes
 
         public bool IsSuspended { get; private set; }
 
-        public Action Update(PlaylistItem[] playlistItems)
+        public Action Reset(PlaylistItem[] playlistItems)
         {
             lock (this.SyncRoot)
             {
