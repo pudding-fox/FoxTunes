@@ -22,9 +22,9 @@ namespace FoxTunes
 
         public const string BASE_URL = "https://api.discogs.com";
 
-        public const string KEY = "XdvMyQSHURdKVmPQJrXv";
+        public const string KEY = "YhdvfZJhjzLfupJlzesm";
 
-        public const string SECRET = "VphFeVoRgCzPewlHHWstAheIKSBduLBR";
+        public const string SECRET = "IwUSieObFFyLInDlctXYmmVNIumjnhiv";
 
         public const int MAX_REQUESTS = 2;
 
