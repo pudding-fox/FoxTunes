@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace FoxTunes
 {
@@ -38,6 +41,14 @@ namespace FoxTunes
         public string Description { get; private set; }
 
         public string Path { get; private set; }
+
+        public bool IsVisible
+        {
+            get
+            {
+                return !this.IsHidden;
+            }
+        }
 
         private bool _IsHidden { get; set; }
 
@@ -232,6 +243,34 @@ namespace FoxTunes
             }
             this.Dependencies.Add(dependency);
             return this;
+        }
+
+        public void ConnectDependencies(IConfiguration configuration)
+        {
+            if (this.Dependencies == null)
+            {
+                return;
+            }
+            var dependencies = this.Dependencies.ToDictionary(
+                dependency => dependency,
+                dependency => configuration.GetElement(dependency.SectionId, dependency.ElementId)
+            );
+            var handler = new EventHandler((sender, e) =>
+            {
+                if (dependencies.All(pair => pair.Key.Validate(pair.Value)))
+                {
+                    this.Show();
+                }
+                else
+                {
+                    this.Hide();
+                }
+            });
+            foreach (var pair in dependencies)
+            {
+                pair.Key.AddHandler(pair.Value, handler);
+            }
+            handler(this, EventArgs.Empty);
         }
 
         public abstract void Reset();

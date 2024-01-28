@@ -95,7 +95,7 @@ namespace FoxTunes
         {
             get
             {
-                if (!this.Rms.Value)
+                if (this.ColorPalette.IsVisible)
                 {
                     foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette))
                     {

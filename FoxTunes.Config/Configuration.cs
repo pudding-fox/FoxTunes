@@ -264,37 +264,9 @@ namespace FoxTunes
             {
                 foreach (var element in section.Elements)
                 {
-                    if (element.Dependencies == null)
-                    {
-                        continue;
-                    }
-                    this.ConnectDependencies(element);
+                    element.ConnectDependencies(this);
                 }
             }
-        }
-
-        protected virtual void ConnectDependencies(ConfigurationElement element)
-        {
-            var dependencies = element.Dependencies.ToDictionary(
-                dependency => dependency,
-                dependency => this.GetElement(dependency.SectionId, dependency.ElementId)
-            );
-            var handler = new EventHandler((sender, e) =>
-            {
-                if (dependencies.All(pair => pair.Key.Validate(pair.Value)))
-                {
-                    element.Show();
-                }
-                else
-                {
-                    element.Hide();
-                }
-            });
-            foreach (var pair in dependencies)
-            {
-                pair.Key.AddHandler(pair.Value, handler);
-            }
-            handler(typeof(Configuration), EventArgs.Empty);
         }
 
         protected virtual IEnumerable<ConfigurationElement> GetModifiedElements()
