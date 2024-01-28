@@ -64,7 +64,14 @@ namespace FoxTunes
                 {
                     if (Math.Abs(from.Right - to.Left) <= proximity)
                     {
-                        from.X += -(from.Right - to.Left);
+                        if (resize)
+                        {
+                            from.Width += -(from.Right - to.Left);
+                        }
+                        else
+                        {
+                            from.X += -(from.Right - to.Left);
+                        }
                         result |= SnapDirection.Left;
                         Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap left.");
                     }
@@ -80,6 +87,10 @@ namespace FoxTunes
                     }
                     if (Math.Abs(from.Left - to.Right) <= proximity)
                     {
+                        if (resize)
+                        {
+                            from.Width += from.Left - to.Right;
+                        }
                         from.X += -(from.Left - to.Right);
                         result |= SnapDirection.Right;
                         Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap right.");
@@ -131,7 +142,14 @@ namespace FoxTunes
                 {
                     if (Math.Abs(from.Bottom - to.Top) <= proximity)
                     {
-                        from.Y += -(from.Bottom - to.Top);
+                        if (resize)
+                        {
+                            from.Height += -(from.Bottom - to.Top);
+                        }
+                        else
+                        {
+                            from.Y += -(from.Bottom - to.Top);
+                        }
                         result |= SnapDirection.Top;
                         Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap top.");
                     }
@@ -147,6 +165,10 @@ namespace FoxTunes
                     }
                     if (Math.Abs(from.Top - to.Bottom) <= proximity)
                     {
+                        if (resize)
+                        {
+                            from.Height += from.Top - to.Bottom;
+                        }
                         from.Y += -(from.Top - to.Bottom);
                         result |= SnapDirection.Bottom;
                         Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap bottom.");

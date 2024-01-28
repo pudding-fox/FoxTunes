@@ -43,7 +43,8 @@ namespace FoxTunes
             }
             set
             {
-                SetWindowPos(this.Handle, IntPtr.Zero, value.X, value.Y, value.Width, value.Height, SWP_SHOWWINDOW);
+                var flags = SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER;
+                SetWindowPos(this.Handle, IntPtr.Zero, value.X, value.Y, value.Width, value.Height, flags);
             }
         }
 
@@ -158,6 +159,10 @@ namespace FoxTunes
         [DllImport("user32.dll")]
         public static extern IntPtr WindowFromPoint(POINT lpPoint);
 
-        const uint SWP_SHOWWINDOW = 0x0040;
+        const uint SWP_NOZORDER = 0x0004;
+
+        const uint SWP_NOACTIVATE = 0x0010;
+
+        const uint SWP_NOOWNERZORDER = 0x0200;
     }
 }
