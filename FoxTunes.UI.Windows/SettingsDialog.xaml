@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:v4="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:System="clr-namespace:System;assembly=mscorlib" 
@@ -21,95 +20,104 @@
                 <ComponentModel:SortDescription PropertyName="Name"/>
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
+        <CollectionViewSource x:Key="Elements" Source="{Binding SelectedValue.Elements, ElementName=Sections}" IsLiveSortingRequested="True">
+            <CollectionViewSource.LiveGroupingProperties>
+                <System:String>Name</System:String>
+            </CollectionViewSource.LiveGroupingProperties>
+            <CollectionViewSource.SortDescriptions>
+                <ComponentModel:SortDescription PropertyName="Name"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <ScrollViewer Grid.Row="0" >
-            <ItemsControl Grid.IsSharedSizeScope="True" ItemsSource="{Binding Mode=OneWay, Source={StaticResource Sections}}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <GroupBox Header="{Binding Name}" Padding="0,7,0,0">
-                            <ItemsControl ItemsSource="{Binding Elements}">
-                                <ItemsControl.ItemContainerStyle>
-                                    <Style TargetType="{x:Type ContentPresenter}">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsHidden}" Value="True">
-                                                <Setter Property="Visibility" Value="Collapsed"></Setter>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ItemsControl.ItemContainerStyle>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Margin="0,0,0,5">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
-                                                <ColumnDefinition></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <Label Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
-                                            <ContentControl Grid.Column="1" Content="{Binding}">
-                                                <ContentControl.Resources>
-                                                    <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
-                                                        <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding SelectedOption}" DisplayMemberPath="Name"></ComboBox>
-                                                    </DataTemplate>
-                                                    <DataTemplate DataType="{x:Type Core:BooleanConfigurationElement}">
-                                                        <CheckBox VerticalAlignment="Center" IsChecked="{Binding Value}"></CheckBox>
-                                                    </DataTemplate>
-                                                    <DataTemplate DataType="{x:Type Core:TextConfigurationElement}">
-                                                        <TextBox>
-                                                            <TextBox.Resources>
-                                                                <ViewModel:Wrapper x:Key="Proxy" Value="{Binding}"></ViewModel:Wrapper>
-                                                            </TextBox.Resources>
-                                                            <TextBox.Text>
-                                                                <Binding Path="Value" UpdateSourceTrigger="LostFocus">
-                                                                    <Binding.ValidationRules>
-                                                                        <ViewModel:ValidationRule>
-                                                                            <ViewModel:ValidationRule.ConfigurationElement>
-                                                                                <ViewModel:Wrapper Value="{Binding Value, Source={StaticResource Proxy}}"></ViewModel:Wrapper>
-                                                                            </ViewModel:ValidationRule.ConfigurationElement>
-                                                                        </ViewModel:ValidationRule>
-                                                                    </Binding.ValidationRules>
-                                                                </Binding>
-                                                            </TextBox.Text>
-                                                            <TextBox.Style>
-                                                                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
-                                                                    <!-- System -->
-                                                                    <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
-                                                                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                                                                    <Setter Property="AllowDrop" Value="true" />
-                                                                    <Setter Property="Template" Value="{DynamicResource TextBoxTemplate}" />
-                                                                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                                                                    <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}"/>
-                                                                    <Setter Property="BorderBrush" Value="{DynamicResource SolidBorderBrush}"/>
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Flags, Converter={StaticResource HasFlagConverter}, ConverterParameter={x:Static Core:ConfigurationElementFlags.MultiLine}}" Value="True">
-                                                                            <Setter Property="AcceptsReturn" Value="True"></Setter>
-                                                                            <Setter Property="AcceptsTab" Value="True"></Setter>
-                                                                            <Setter Property="SpellCheck.IsEnabled" Value="False"></Setter>
-                                                                            <Setter Property="MinLines" Value="10"></Setter>
-                                                                            <Setter Property="MaxLines" Value="10"></Setter>
-                                                                            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"></Setter>
-                                                                            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"></Setter>
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </TextBox.Style>
-                                                        </TextBox>
-                                                    </DataTemplate>
-                                                </ContentControl.Resources>
-                                            </ContentControl>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </GroupBox>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+        <GroupBox Grid.Row="0" Header="Components" Padding="0,7,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <ListBox x:Name="Sections" ItemsSource="{Binding Mode=OneWay, Source={StaticResource Sections}}" DisplayMemberPath="Name"></ListBox>
+                <ScrollViewer Grid.Column="1" Grid.IsSharedSizeScope="True" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Mode=OneWay, Source={StaticResource Elements}}">
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="{x:Type ContentPresenter}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsHidden}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
+                                    <ContentControl Grid.Column="1" Content="{Binding}">
+                                        <ContentControl.Resources>
+                                            <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
+                                                <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding SelectedOption}" DisplayMemberPath="Name"></ComboBox>
+                                            </DataTemplate>
+                                            <DataTemplate DataType="{x:Type Core:BooleanConfigurationElement}">
+                                                <CheckBox VerticalAlignment="Center" IsChecked="{Binding Value}"></CheckBox>
+                                            </DataTemplate>
+                                            <DataTemplate DataType="{x:Type Core:TextConfigurationElement}">
+                                                <TextBox>
+                                                    <TextBox.Resources>
+                                                        <ViewModel:Wrapper x:Key="Proxy" Value="{Binding}"></ViewModel:Wrapper>
+                                                    </TextBox.Resources>
+                                                    <TextBox.Text>
+                                                        <Binding Path="Value" UpdateSourceTrigger="LostFocus">
+                                                            <Binding.ValidationRules>
+                                                                <ViewModel:ValidationRule>
+                                                                    <ViewModel:ValidationRule.ConfigurationElement>
+                                                                        <ViewModel:Wrapper Value="{Binding Value, Source={StaticResource Proxy}}"></ViewModel:Wrapper>
+                                                                    </ViewModel:ValidationRule.ConfigurationElement>
+                                                                </ViewModel:ValidationRule>
+                                                            </Binding.ValidationRules>
+                                                        </Binding>
+                                                    </TextBox.Text>
+                                                    <TextBox.Style>
+                                                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                            <!-- System -->
+                                                            <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
+                                                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                                            <Setter Property="AllowDrop" Value="true" />
+                                                            <Setter Property="Template" Value="{DynamicResource TextBoxTemplate}" />
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                                                            <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}"/>
+                                                            <Setter Property="BorderBrush" Value="{DynamicResource SolidBorderBrush}"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Flags, Converter={StaticResource HasFlagConverter}, ConverterParameter={x:Static Core:ConfigurationElementFlags.MultiLine}}" Value="True">
+                                                                    <Setter Property="AcceptsReturn" Value="True"></Setter>
+                                                                    <Setter Property="AcceptsTab" Value="True"></Setter>
+                                                                    <Setter Property="SpellCheck.IsEnabled" Value="False"></Setter>
+                                                                    <Setter Property="MinLines" Value="10"></Setter>
+                                                                    <Setter Property="MaxLines" Value="10"></Setter>
+                                                                    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"></Setter>
+                                                                    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"></Setter>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBox.Style>
+                                                </TextBox>
+                                            </DataTemplate>
+                                        </ContentControl.Resources>
+                                    </ContentControl>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </GroupBox>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
