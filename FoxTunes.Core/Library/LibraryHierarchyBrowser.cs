@@ -155,50 +155,41 @@ namespace FoxTunes
 
         public LibraryHierarchyNode[] GetNodes(LibraryHierarchy libraryHierarchy)
         {
-            var key = new LibraryHierarchyCacheKey(libraryHierarchy, null, this.Filter);
-            return this.LibraryHierarchyCache.GetNodes(key, () => this.GetNodesCore(libraryHierarchy));
+            return this.GetNodes(libraryHierarchy, this.Filter);
         }
 
-        private IEnumerable<LibraryHierarchyNode> GetNodesCore(LibraryHierarchy libraryHierarchy)
+        public LibraryHierarchyNode[] GetNodes(LibraryHierarchy libraryHierarchy, string filter)
         {
-            return this.GetNodes(libraryHierarchy.Id);
+            var key = new LibraryHierarchyCacheKey(libraryHierarchy, null, filter);
+            return this.LibraryHierarchyCache.GetNodes(key, () => this.GetNodesCore(libraryHierarchy, filter));
         }
 
         public LibraryHierarchyNode[] GetNodes(LibraryHierarchyNode libraryHierarchyNode)
         {
-            var key = new LibraryHierarchyCacheKey(null, libraryHierarchyNode, this.Filter);
-            return this.LibraryHierarchyCache.GetNodes(key, () => this.GetNodesCore(libraryHierarchyNode));
+            return this.GetNodes(libraryHierarchyNode, this.Filter);
         }
 
-        private IEnumerable<LibraryHierarchyNode> GetNodesCore(LibraryHierarchyNode libraryHierarchyNode)
+        public LibraryHierarchyNode[] GetNodes(LibraryHierarchyNode libraryHierarchyNode, string filter)
         {
-            foreach (var child in this.GetNodes(libraryHierarchyNode.LibraryHierarchyId, libraryHierarchyNode.Id))
-            {
-                child.Parent = libraryHierarchyNode;
-                yield return child;
-            }
+            var key = new LibraryHierarchyCacheKey(null, libraryHierarchyNode, filter);
+            return this.LibraryHierarchyCache.GetNodes(key, () => this.GetNodesCore(libraryHierarchyNode, filter));
         }
 
-        protected virtual IEnumerable<LibraryHierarchyNode> GetNodes(int libraryHierarchyId, int? libraryHierarchyItemId = null)
+        protected virtual IEnumerable<LibraryHierarchyNode> GetNodesCore(LibraryHierarchy libraryHierarchy, string filter)
         {
-            if (!libraryHierarchyItemId.HasValue)
-            {
-                //We're loading the root items so signal loading.
-                this.State |= LibraryHierarchyBrowserState.Loading;
-            }
+            this.State |= LibraryHierarchyBrowserState.Loading;
             try
             {
                 using (var database = this.DatabaseFactory.Create())
                 {
                     using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                     {
-                        var nodes = database.ExecuteEnumerator<LibraryHierarchyNode>(database.Queries.GetLibraryHierarchyNodes(this.Filter), (parameters, phase) =>
+                        var nodes = database.ExecuteEnumerator<LibraryHierarchyNode>(database.Queries.GetLibraryHierarchyNodes(filter), (parameters, phase) =>
                         {
                             switch (phase)
                             {
                                 case DatabaseParameterPhase.Fetch:
-                                    parameters["libraryHierarchyId"] = libraryHierarchyId;
-                                    parameters["libraryHierarchyItemId"] = libraryHierarchyItemId;
+                                    parameters["libraryHierarchyId"] = libraryHierarchy.Id;
                                     break;
                             }
                         }, transaction);
@@ -213,6 +204,32 @@ namespace FoxTunes
             finally
             {
                 this.State &= ~LibraryHierarchyBrowserState.Loading;
+            }
+        }
+
+        protected virtual IEnumerable<LibraryHierarchyNode> GetNodesCore(LibraryHierarchyNode libraryHierarchyNode, string filter)
+        {
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    var nodes = database.ExecuteEnumerator<LibraryHierarchyNode>(database.Queries.GetLibraryHierarchyNodes(filter), (parameters, phase) =>
+                    {
+                        switch (phase)
+                        {
+                            case DatabaseParameterPhase.Fetch:
+                                parameters["libraryHierarchyId"] = libraryHierarchyNode.LibraryHierarchyId;
+                                parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
+                                break;
+                        }
+                    }, transaction);
+                    foreach (var node in nodes)
+                    {
+                        node.Parent = libraryHierarchyNode;
+                        node.InitializeComponent(this.Core);
+                        yield return node;
+                    }
+                }
             }
         }
 

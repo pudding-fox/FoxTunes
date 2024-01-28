@@ -74,7 +74,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var libraryHierarchyNodes = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy);
+            var libraryHierarchyNodes = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy, playlist.Filter);
             using (var task = new AddLibraryHierarchyNodesToPlaylistTask(playlist, 0, libraryHierarchyNodes, playlist.Filter, true, false))
             {
                 task.InitializeComponent(this.Core);
