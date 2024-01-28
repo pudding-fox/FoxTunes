@@ -16,6 +16,14 @@ namespace FoxTunes
 
         public const int MAX_INTERVAL = 300;
 
+        public const string OPACITY = "AABBBC99-41C7-4563-BB7E-12EDAC59E57F";
+
+        public const int DEFAULT_OPACITY = 100;
+
+        public const int MIN_OPACITY = 1;
+
+        public const int MAX_OPACITY = 100;
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.StaticImageConfiguration_Section)
@@ -23,7 +31,10 @@ namespace FoxTunes
                     .WithFlags(ConfigurationElementFlags.MultiLine))
                 .WithElement(new IntegerConfigurationElement(INTERVAL, Strings.StaticImageConfiguration_Interval)
                     .WithValue(DEFAULT_INTERVAL)
-                    .WithValidationRule(new IntegerValidationRule(MIN_INTERVAL, MAX_INTERVAL, 10)));
+                    .WithValidationRule(new IntegerValidationRule(MIN_INTERVAL, MAX_INTERVAL, 10)))
+            .WithElement(new IntegerConfigurationElement(OPACITY, Strings.StaticImageConfiguration_Opacity)
+                    .WithValue(DEFAULT_OPACITY)
+                    .WithValidationRule(new IntegerValidationRule(MIN_OPACITY, MAX_OPACITY)));
         }
     }
 }

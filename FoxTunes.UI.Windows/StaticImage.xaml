@@ -9,7 +9,7 @@
              MinWidth="100"
              MinHeight="100">
     <Grid>
-        <Windows:AsyncImage x:Name="Image" Source="{Binding Source, IsAsync=True, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:StaticImage}}}"></Windows:AsyncImage>
+        <Windows:AsyncImage Source="{Binding Source, IsAsync=True, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:StaticImage}}}"></Windows:AsyncImage>
         <Rectangle Fill="Transparent"></Rectangle>
     </Grid>
 </Windows:ConfigurableUIComponentBase>

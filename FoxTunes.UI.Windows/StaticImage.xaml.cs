@@ -125,6 +125,14 @@ namespace FoxTunes
                     this.Timer.Interval = TimeSpan.FromSeconds(value);
                     this.Timer.Start();
                 });
+                this.Configuration.GetElement<IntegerConfigurationElement>(
+                    StaticImageConfiguration.SECTION,
+                    StaticImageConfiguration.OPACITY
+                ).ConnectValue(value =>
+                {
+                    var opacity = (float)value / 100;
+                    this.Opacity = opacity;
+                });
             }
             base.OnConfigurationChanged();
         }

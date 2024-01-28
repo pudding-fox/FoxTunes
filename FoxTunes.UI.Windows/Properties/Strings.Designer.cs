@@ -1303,6 +1303,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Opacity.
+        /// </summary>
+        internal static string StaticImageConfiguration_Opacity {
+            get {
+                return ResourceManager.GetString("StaticImageConfiguration.Opacity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Path.
         /// </summary>
         internal static string StaticImageConfiguration_Path {

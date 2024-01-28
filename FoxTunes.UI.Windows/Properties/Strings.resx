@@ -531,6 +531,9 @@
   <data name="StaticImageConfiguration.Interval" xml:space="preserve">
     <value>Interval (seconds)</value>
   </data>
+  <data name="StaticImageConfiguration.Opacity" xml:space="preserve">
+    <value>Opacity</value>
+  </data>
   <data name="StaticImageConfiguration.Path" xml:space="preserve">
     <value>Path</value>
   </data>
