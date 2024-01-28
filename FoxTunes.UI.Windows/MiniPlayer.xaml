@@ -12,22 +12,20 @@
     </UserControl.Resources>
     <Grid>
         <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding Enabled.Value, Source={StaticResource ViewModel}}">
-            <Rectangle Stroke="{DynamicResource TextBrush}" StrokeThickness="2">
-                <Rectangle.Style>
-                    <Style TargetType="{x:Type Rectangle}">
+            <TextBlock Margin="2.5,0,0,0" FontFamily="Marlett" Foreground="{DynamicResource TextBrush}">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Enabled.Value, Source={StaticResource ViewModel}}" Value="True">
-                                <Setter Property="Width" Value="17.5"></Setter>
-                                <Setter Property="Height" Value="17.5"></Setter>
+                                <Setter Property="Text" Value="&#x31;"></Setter>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Enabled.Value, Source={StaticResource ViewModel}}" Value="False">
-                                <Setter Property="Width" Value="7.5"></Setter>
-                                <Setter Property="Height" Value="7.5"></Setter>
+                                <Setter Property="Text" Value="&#x32;"></Setter>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </Rectangle.Style>
-            </Rectangle>
+                </TextBlock.Style>
+            </TextBlock>
         </ToggleButton>
     </Grid>
 </UserControl>
