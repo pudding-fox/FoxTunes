@@ -295,6 +295,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wrap.
+        /// </summary>
+        internal static string UIComponentContainer_Wrap {
+            get {
+                return ResourceManager.GetString("UIComponentContainer.Wrap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Parent: {0}.
         /// </summary>
         internal static string UIComponentDesignerOverlay_Path_Parent {

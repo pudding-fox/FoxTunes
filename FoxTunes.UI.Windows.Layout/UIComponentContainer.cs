@@ -1,5 +1,4 @@
-﻿using FoxDb;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,7 +15,9 @@ namespace FoxTunes
 {
     public class UIComponentContainer : DockPanel, IInvocableComponent, IUIComponent, IValueConverter, IConfigurationProvider
     {
-        public const string REPLACE = "XXXX";
+        public const string REPLACE = "WWWW";
+
+        public const string WRAP = "XXXX";
 
         public const string CLEAR = "YYYY";
 
@@ -58,7 +59,14 @@ namespace FoxTunes
             {
                 if (!newComponent.Children.Any())
                 {
-                    newComponent.Children.AddRange(oldComponent.Children);
+                    if (newComponent.Children.Contains(oldComponent))
+                    {
+                        //Component was re-hosted (wrapped).
+                    }
+                    else
+                    {
+                        newComponent.Children.AddRange(oldComponent.Children);
+                    }
                 }
                 if (!newComponent.MetaData.Any())
                 {
@@ -282,6 +290,7 @@ namespace FoxTunes
                             continue;
                         }
                         yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, REPLACE, alternative.Name, path: Strings.UIComponentContainer_Replace, attributes: attributes);
+                        yield return new InvocationComponent(InvocationComponent.CATEGORY_GLOBAL, WRAP, alternative.Name, path: Strings.UIComponentContainer_Wrap, attributes: attributes);
                         attributes = InvocationComponent.ATTRIBUTE_NONE;
                     }
                 }
@@ -295,6 +304,8 @@ namespace FoxTunes
             {
                 case REPLACE:
                     return this.Replace(component.Name);
+                case WRAP:
+                    return this.Wrap(component.Name);
                 case CLEAR:
                     return this.Clear();
 
@@ -320,6 +331,23 @@ namespace FoxTunes
                     return;
                 }
                 this.Configuration = new UIComponentConfiguration(component);
+            });
+        }
+
+        public Task Wrap(string name)
+        {
+            return Windows.Invoke(() =>
+            {
+                if (this.Configuration == null || this.Configuration.Component == null)
+                {
+                    return;
+                }
+                var component = LayoutManager.Instance.GetComponent(name, this.Configuration.Component.Role);
+                if (component == null)
+                {
+                    return;
+                }
+                this.Configuration = new UIComponentConfiguration(component, this.Configuration);
             });
         }
 
