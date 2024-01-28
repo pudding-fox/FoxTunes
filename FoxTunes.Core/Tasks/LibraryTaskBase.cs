@@ -39,6 +39,7 @@ namespace FoxTunes
 
         protected virtual async Task AddPaths(IEnumerable<string> paths, bool buildHierarchies)
         {
+            var complete = true;
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
              {
                  await this.AddLibraryItems(paths, cancellationToken);
@@ -50,6 +51,13 @@ namespace FoxTunes
              }))
             {
                 await task.Run();
+            }
+            if (this.IsCancellationRequested)
+            {
+                //Reset cancellation as the next phases should finish quickly.
+                //Cancelling again will still work.
+                this.IsCancellationRequested = false;
+                complete = false;
             }
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_LOW, async cancellationToken =>
             {
@@ -63,16 +71,12 @@ namespace FoxTunes
             {
                 await task.Run();
             }
-            var complete = default(bool);
             if (this.IsCancellationRequested)
             {
                 //Reset cancellation as the next phases should finish quickly.
                 //Cancelling again will still work.
                 this.IsCancellationRequested = false;
-            }
-            else
-            {
-                complete = true;
+                complete = false;
             }
             await this.UpdateVariousArtists();
             if (buildHierarchies)

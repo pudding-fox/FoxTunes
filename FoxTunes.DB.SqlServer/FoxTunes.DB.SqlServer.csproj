@@ -8,36 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\FoxDb.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\FoxDb.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.SqlServer" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\FoxDb.SqlServer.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.SqlServer.2012" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\FoxDb.SqlServer.2012.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net461'">
-      <HintPath>..\lib\FoxDb.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net461'">
-      <HintPath>..\lib\FoxDb.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.SqlServer" Condition="'$(TargetFramework)' == 'net461'">
-      <HintPath>..\lib\FoxDb.SqlServer.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.SqlServer.2012" Condition="'$(TargetFramework)' == 'net461'">
-      <HintPath>..\lib\FoxDb.SqlServer.2012.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="System.Configuration" />
   </ItemGroup>
   
@@ -106,6 +76,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FoxDb.SqlServer" Version="0.2.0"></PackageReference>
+    <PackageReference Include="FoxDb.SqlServer.2012" Version="0.2.0"></PackageReference>
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>
 

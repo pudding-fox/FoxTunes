@@ -12,24 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\FoxDb.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net40'">
-      <HintPath>..\lib\net40\FoxDb.Linq.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net461'">
-      <HintPath>..\lib\FoxDb.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net461'">
-      <HintPath>..\lib\FoxDb.Linq.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System.Xaml" />
@@ -40,10 +22,6 @@
     <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" />
     <Compile Update="**\*.xaml.cs" SubType="Code" DependentUpon="%(Filename)" />
     <UpToDateCheckInput Include="**\*.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="MetaDataEditor.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -71,9 +49,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="MetaDataEditor.xaml.cs">
-      <DependentUpon>MetaDataEditor.xaml</DependentUpon>
-    </Compile>
+    <None Update="MetaDataEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
   </ItemGroup>
 
   <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
