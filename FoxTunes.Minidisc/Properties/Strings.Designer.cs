@@ -421,6 +421,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Checking files....
+        /// </summary>
+        internal static string ValidateInputFormatsTask_Name {
+            get {
+                return ResourceManager.GetString("ValidateInputFormatsTask.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Writing disc.
         /// </summary>
         internal static string WriteMinidiscTask_Name {

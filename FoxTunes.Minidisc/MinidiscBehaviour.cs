@@ -291,11 +291,21 @@ namespace FoxTunes
             for (var a = 0; a < disc.Tracks.Count; a++)
             {
                 track = disc.Tracks[a];
+                //Match track name (ignore some characters) and equal (ish) duration.
                 if (MinidiscTrackFactory.StringComparer.Instance.Equals(track.Name, minidiscTrack.TrackName) && Convert.ToInt32(track.Time.TotalSeconds) == Convert.ToInt32(minidiscTrack.TrackTime.TotalSeconds))
                 {
                     Logger.Write(this, LogLevel.Debug, "Found existing track \"{0}\" at position {1}.", minidiscTrack.TrackName, minidiscTrack.TrackNumber);
                     return true;
                 }
+                //TODO: I was using this to update missing titles, match track on a missing title and equal (ish) duration.
+                //TODO: Probably isn't any use to anyone else and there's a risk of false positives.
+#if DEBUG
+                else if (string.IsNullOrEmpty(track.Name) && Convert.ToInt32(track.Time.TotalSeconds) == Convert.ToInt32(minidiscTrack.TrackTime.TotalSeconds))
+                {
+                    Logger.Write(this, LogLevel.Debug, "Found existing track \"{0}\" at position {1}.", minidiscTrack.TrackName, minidiscTrack.TrackNumber);
+                    return true;
+                }
+#endif
             }
             track = default(ITrack);
             return false;
@@ -319,7 +329,11 @@ namespace FoxTunes
 
         protected virtual void UpdateTrack(IDisc updatedDisc, MinidiscTrackFactory.MinidiscTrack minidiscTrack, ITrack track, Compression compression)
         {
-            Logger.Write(this, LogLevel.Debug, "Updating tracks is not yet implemented: {0}", minidiscTrack.FileName);
+            if (!MinidiscTrackFactory.StringComparer.Instance.Equals(minidiscTrack.TrackName, track.Name))
+            {
+                Logger.Write(this, LogLevel.Debug, "Updating track \"{0}\": Name: {1} => {2}", track.Location, track.Name, minidiscTrack.TrackName);
+                track.Name = minidiscTrack.TrackName;
+            }
         }
 
         protected virtual async Task<OpenMinidiscTask> OpenDisc()

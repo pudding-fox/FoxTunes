@@ -16,11 +16,15 @@ namespace FoxTunes
 
         public static readonly string TempPath = Path.Combine(Path.GetTempPath(), Publication.Product, typeof(MinidiscBehaviour).Name);
 
+        public ICore Core { get; private set; }
+
         public IEncoder Encoder { get; private set; }
 
         public IReportEmitter ReportEmitter { get; private set; }
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
+
+        public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -30,9 +34,11 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.Encoder = ComponentRegistry.Instance.GetComponent<IEncoder>();
             this.ReportEmitter = core.Components.ReportEmitter;
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
+            this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.Configuration = core.Components.Configuration;
             this.DiscTitleScript = this.Configuration.GetElement<TextConfigurationElement>(
                 MinidiscBehaviourConfiguration.SECTION,
@@ -63,37 +69,26 @@ namespace FoxTunes
             }
         }
 
-        protected virtual Task<IDictionary<IFileData, string>> GetWaveFiles(IFileData[] fileDatas)
+        protected virtual async Task<IDictionary<IFileData, string>> GetWaveFiles(IFileData[] fileDatas)
         {
             Logger.Write(this, LogLevel.Debug, "Preparing WAVE files..");
-            var fileNames = new Dictionary<IFileData, string>();
-            foreach (var fileData in fileDatas)
+            var fileNames = default(IDictionary<IFileData, string>);
+            using (var task = new ValidateInputFormatsTask(fileDatas))
             {
-                try
-                {
-                    var length = default(TimeSpan);
-                    FormatValidator.Default.Validate(fileData.FileName, out length);
-                    fileNames[fileData] = fileData.FileName;
-                    Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is supported.", fileData.FileName);
-                }
-                catch
-                {
-                    Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is not supported, it requires conversion.", fileData.FileName);
-                }
+                task.InitializeComponent(this.Core);
+                await this.BackgroundTaskEmitter.Send(task).ConfigureAwait(false);
+                await task.Run().ConfigureAwait(false);
+                fileNames = task.FileNames;
             }
             fileDatas = fileDatas.Except(fileNames.Keys).ToArray();
             if (!fileDatas.Any())
             {
-#if NET40
-                return TaskEx.FromResult<IDictionary<IFileData, string>>(fileNames);
-#else
-                return Task.FromResult<IDictionary<IFileData, string>>(fileNames);
-#endif
+                return fileNames;
             }
-            return this.GetWaveFiles(fileDatas, fileNames);
+            return await this.GetWaveFiles(fileDatas, fileNames).ConfigureAwait(false);
         }
 
-        protected virtual async Task<IDictionary<IFileData, string>> GetWaveFiles(IFileData[] fileDatas, Dictionary<IFileData, string> fileNames)
+        protected virtual async Task<IDictionary<IFileData, string>> GetWaveFiles(IFileData[] fileDatas, IDictionary<IFileData, string> fileNames)
         {
             Logger.Write(this, LogLevel.Debug, "Encoding {0} items: WAVE 16 bit, 44.1kHz.", fileDatas.Length);
             var encoderItems = await this.Encoder.Encode(
@@ -198,6 +193,61 @@ namespace FoxTunes
             catch (Exception e)
             {
                 Logger.Write(typeof(MinidiscBehaviour), LogLevel.Warn, "Failed to cleanup temp files: {0}", e.Message);
+            }
+        }
+
+        public class ValidateInputFormatsTask : BackgroundTask
+        {
+            public const string ID = "54AD7F0C-C653-4523-B85A-B1185D17ECD1";
+
+            public ValidateInputFormatsTask(IEnumerable<IFileData> fileDatas) : base(ID)
+            {
+                this.FileDatas = fileDatas;
+                this.FileNames = new Dictionary<IFileData, string>();
+            }
+
+            public override bool Visible
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
+            public IEnumerable<IFileData> FileDatas { get; private set; }
+
+            public IDictionary<IFileData, string> FileNames { get; private set; }
+
+            protected override Task OnStarted()
+            {
+                this.Name = Strings.ValidateInputFormatsTask_Name;
+                this.Count = this.FileDatas.Count();
+                return base.OnStarted();
+            }
+
+            protected override Task OnRun()
+            {
+                foreach (var fileData in this.FileDatas)
+                {
+                    this.Description = Path.GetFileName(fileData.FileName);
+                    try
+                    {
+                        var length = default(TimeSpan);
+                        FormatValidator.Default.Validate(fileData.FileName, out length);
+                        this.FileNames[fileData] = fileData.FileName;
+                        Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is supported.", fileData.FileName);
+                    }
+                    catch
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is not supported, it requires conversion.", fileData.FileName);
+                    }
+                    this.Position++;
+                }
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
             }
         }
 
