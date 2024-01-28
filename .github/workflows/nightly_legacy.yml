@@ -31,13 +31,13 @@ jobs:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
     - name: Restore NuGet Packages (build)
-      run: dotnet restore FoxTunes.sln
+      run: dotnet restore FoxTunes.Legacy.sln
 
     - name: Restore NuGet Packages (solution)
-      run: nuget restore FoxTunes.sln
+      run: nuget restore FoxTunes.Legacy.sln
 
     - name: Build
-      run: msbuild FoxTunes.sln /p:Configuration=Debug /p:TargetFrameworks=net40
+      run: msbuild FoxTunes.Legacy.sln /p:Configuration=Debug /p:TargetFrameworks=net40
 
     - name: Package
       run: |
