@@ -24,13 +24,14 @@ namespace FoxTunes
             yield return new ConfigurationSection(SECTION, "CD")
                 .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled").WithValue(false))
                 .WithElement(new SelectionConfigurationElement(DRIVE_ELEMENT, "Drive")
-                    .WithOptions(GetDrives()))
+                    .WithOptions(GetDrives())
+                    .DependsOn(SECTION, ENABLED_ELEMENT))
                 .WithElement(new BooleanConfigurationElement(LOOKUP_ELEMENT, "Lookup Tags")
-                    .WithValue(true))
+                    .WithValue(true)
+                    .DependsOn(SECTION, ENABLED_ELEMENT))
                 .WithElement(new TextConfigurationElement(LOOKUP_HOST_ELEMENT, "Host")
-                    .WithValue(BassCd.CDDBServer));
-            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLED_ELEMENT).ConnectValue(value => UpdateConfiguration());
-            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, LOOKUP_ELEMENT).ConnectValue(value => UpdateConfiguration());
+                    .WithValue(BassCd.CDDBServer)
+                    .DependsOn(SECTION, ENABLED_ELEMENT).DependsOn(SECTION, LOOKUP_ELEMENT));
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetDrives()
@@ -56,37 +57,6 @@ namespace FoxTunes
                 }
             }
             return CD_NO_DRIVE;
-        }
-
-        private static void UpdateConfiguration()
-        {
-            var enabled = StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(
-                SECTION,
-                ENABLED_ELEMENT
-            ).Value;
-            var cdda = StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(
-                SECTION,
-                LOOKUP_ELEMENT
-            ).Value;
-            if (enabled)
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, DRIVE_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, LOOKUP_ELEMENT).Show();
-                if (cdda)
-                {
-                    StandardComponents.Instance.Configuration.GetElement(SECTION, LOOKUP_HOST_ELEMENT).Show();
-                }
-                else
-                {
-                    StandardComponents.Instance.Configuration.GetElement(SECTION, LOOKUP_HOST_ELEMENT).Hide();
-                }
-            }
-            else
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, DRIVE_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, LOOKUP_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, LOOKUP_HOST_ELEMENT).Hide();
-            }
         }
     }
 }

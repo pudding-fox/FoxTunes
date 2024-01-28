@@ -22,13 +22,12 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(BassOutputConfiguration.SECTION, "Output")
                 .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled", path: "Resampler").WithValue(false))
-                .WithElement(new SelectionConfigurationElement(QUALITY_ELEMENT, "Quality", path: "Resampler").WithOptions(GetQualityOptions()))
-                .WithElement(new SelectionConfigurationElement(PHASE_ELEMENT, "Phase", path: "Resampler").WithOptions(GetPhaseOptions()))
-                .WithElement(new BooleanConfigurationElement(STEEP_FILTER_ELEMENT, "Steep Filter", path: "Resampler").WithValue(false))
-                .WithElement(new BooleanConfigurationElement(ALLOW_ALIASING_ELEMENT, "Allow Aliasing", path: "Resampler").WithValue(false))
-                .WithElement(new IntegerConfigurationElement(BUFFER_LENGTH_ELEMENT, "Buffer Length", path: "Resampler").WithValue(3).WithValidationRule(new IntegerValidationRule(3, 10))
+                .WithElement(new SelectionConfigurationElement(QUALITY_ELEMENT, "Quality", path: "Resampler").WithOptions(GetQualityOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
+                .WithElement(new SelectionConfigurationElement(PHASE_ELEMENT, "Phase", path: "Resampler").WithOptions(GetPhaseOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
+                .WithElement(new BooleanConfigurationElement(STEEP_FILTER_ELEMENT, "Steep Filter", path: "Resampler").WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
+                .WithElement(new BooleanConfigurationElement(ALLOW_ALIASING_ELEMENT, "Allow Aliasing", path: "Resampler").WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
+                .WithElement(new IntegerConfigurationElement(BUFFER_LENGTH_ELEMENT, "Buffer Length", path: "Resampler").WithValue(3).WithValidationRule(new IntegerValidationRule(3, 10)).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT)
             );
-            StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(BassOutputConfiguration.SECTION, ENABLED_ELEMENT).ConnectValue(value => UpdateConfiguration(value));
         }
 
         public static SoxChannelQuality GetQuality(SelectionConfigurationOption option)
@@ -89,26 +88,6 @@ namespace FoxTunes
                     option.Default();
                 }
                 yield return option;
-            }
-        }
-
-        private static void UpdateConfiguration(bool enabled)
-        {
-            if (enabled)
-            {
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, QUALITY_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, PHASE_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, STEEP_FILTER_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, ALLOW_ALIASING_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, BUFFER_LENGTH_ELEMENT).Show();
-            }
-            else
-            {
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, QUALITY_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, PHASE_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, STEEP_FILTER_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, ALLOW_ALIASING_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(BassOutputConfiguration.SECTION, BUFFER_LENGTH_ELEMENT).Hide();
             }
         }
     }

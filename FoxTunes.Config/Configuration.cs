@@ -138,6 +138,47 @@ namespace FoxTunes
             }
         }
 
+        public void ConnectDependencies()
+        {
+            foreach (var section in this.Sections)
+            {
+                foreach (var element in section.Elements)
+                {
+                    if (element.Dependencies == null)
+                    {
+                        continue;
+                    }
+                    foreach (var pair in element.Dependencies)
+                    {
+                        this.ConnectDependencies(element, pair.Key, pair.Value);
+                    }
+                }
+            }
+        }
+
+        protected virtual void ConnectDependencies(ConfigurationElement element, string sectionId, IEnumerable<string> elementIds)
+        {
+            var dependencies = elementIds.Select(
+                elementId => this.GetElement<BooleanConfigurationElement>(sectionId, elementId)
+            ).ToArray();
+            var handler = new EventHandler((sender, e) =>
+            {
+                if (dependencies.All(dependency => dependency != null && dependency.Value))
+                {
+                    element.Show();
+                }
+                else
+                {
+                    element.Hide();
+                }
+            });
+            foreach (var dependency in dependencies)
+            {
+                dependency.ValueChanged += handler;
+            }
+            handler(typeof(Configuration), EventArgs.Empty);
+        }
+
         public ConfigurationSection GetSection(string sectionId)
         {
             return this.Sections.FirstOrDefault(section => string.Equals(section.Id, sectionId, StringComparison.OrdinalIgnoreCase));

@@ -101,7 +101,7 @@ namespace FoxTunes
 
         public void ForEach(Action<IBaseComponent> action)
         {
-            foreach (var component in this.Components.ToArray())
+            foreach (var component in this.Components)
             {
                 action(component);
             }
@@ -109,7 +109,7 @@ namespace FoxTunes
 
         public void ForEach<T>(Action<T> action)
         {
-            foreach (var component in this.GetComponents<T>().ToArray())
+            foreach (var component in this.GetComponents<T>())
             {
                 action(component);
             }

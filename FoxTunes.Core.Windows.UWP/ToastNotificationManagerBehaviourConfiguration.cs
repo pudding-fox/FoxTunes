@@ -55,24 +55,9 @@ namespace FoxTunes
                 var releaseType = StandardComponents.Instance.Configuration.ReleaseType;
                 yield return new ConfigurationSection(SECTION, "Windows 10")
                     .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Notifications").WithValue(releaseType == ReleaseType.Default))
-                    .WithElement(new BooleanConfigurationElement(POPUP_ELEMENT, "Popup").WithValue(false))
-                    .WithElement(new BooleanConfigurationElement(LARGE_ARTWORK_ELEMENT, "Large Artwork").WithValue(false)
+                    .WithElement(new BooleanConfigurationElement(POPUP_ELEMENT, "Popup").WithValue(false).DependsOn(SECTION, ENABLED_ELEMENT))
+                    .WithElement(new BooleanConfigurationElement(LARGE_ARTWORK_ELEMENT, "Large Artwork").WithValue(false).DependsOn(SECTION, ENABLED_ELEMENT)
                 );
-                StandardComponents.Instance.Configuration.GetElement<BooleanConfigurationElement>(SECTION, ENABLED_ELEMENT).ConnectValue(value => UpdateConfiguration(value));
-            }
-        }
-
-        private static void UpdateConfiguration(bool enabled)
-        {
-            if (enabled)
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, POPUP_ELEMENT).Show();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, LARGE_ARTWORK_ELEMENT).Show();
-            }
-            else
-            {
-                StandardComponents.Instance.Configuration.GetElement(SECTION, POPUP_ELEMENT).Hide();
-                StandardComponents.Instance.Configuration.GetElement(SECTION, LARGE_ARTWORK_ELEMENT).Hide();
             }
         }
     }
