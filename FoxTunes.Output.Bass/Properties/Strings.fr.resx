@@ -117,6 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="BassOutput.Component" xml:space="preserve">
+    <value>Composant</value>
+  </data>
+  <data name="BassOutput.Input" xml:space="preserve">
+    <value>Entrée</value>
+  </data>
+  <data name="BassOutput.Latency" xml:space="preserve">
+    <value>Latence</value>
+  </data>
+  <data name="BassOutput.Output" xml:space="preserve">
+    <value>Sortie</value>
+  </data>
   <data name="BassOutputConfiguration.BufferLength" xml:space="preserve">
     <value>Longueur du tampon</value>
   </data>
@@ -132,11 +144,11 @@
   <data name="BassOutputConfiguration.Input" xml:space="preserve">
     <value>Entrée</value>
   </data>
+  <data name="BassOutputConfiguration.MixerBufferLength" xml:space="preserve">
+    <value>Longueur du tampon du mélangeur</value>
+  </data>
   <data name="BassOutputConfiguration.Output" xml:space="preserve">
     <value>Sortie</value>
-  </data>
-  <data name="BassOutputConfiguration.Ram" xml:space="preserve">
-    <value>Jouer à partir de la mémoire</value>
   </data>
   <data name="BassOutputConfiguration.Rate" xml:space="preserve">
     <value>Fréquence</value>

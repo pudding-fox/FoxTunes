@@ -144,11 +144,17 @@
   <data name="InputManagerConfiguration.Stop" xml:space="preserve">
     <value>Arrêter</value>
   </data>
+  <data name="LibraryHierarchyPopulator.Plugin" xml:space="preserve">
+    <value>Plugin</value>
+  </data>
   <data name="MetaDataBehaviourConfiguration.BackCover" xml:space="preserve">
     <value>Couverture de derrière</value>
   </data>
   <data name="MetaDataBehaviourConfiguration.DetectCompilations" xml:space="preserve">
     <value>Détecter les compilations</value>
+  </data>
+  <data name="MetaDataBehaviourConfiguration.Documents" xml:space="preserve">
+    <value>Documents</value>
   </data>
   <data name="MetaDataBehaviourConfiguration.EmbeddedImages" xml:space="preserve">
     <value>Images intégrées</value>
@@ -225,6 +231,15 @@
   <data name="PlaybackBehaviourConfiguration.Section" xml:space="preserve">
     <value>Playback</value>
   </data>
+  <data name="PlaylistActionsBehaviour.Crop" xml:space="preserve">
+    <value>Recadrer</value>
+  </data>
+  <data name="PlaylistActionsBehaviour.Locate" xml:space="preserve">
+    <value>Localiser</value>
+  </data>
+  <data name="PlaylistActionsBehaviour.Remove" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
   <data name="PlaylistBehaviourConfiguration.Order" xml:space="preserve">
     <value>Ordre</value>
   </data>
@@ -248,6 +263,24 @@
   </data>
   <data name="PlaylistBehaviourConfiguration.Section" xml:space="preserve">
     <value>Liste de lecture</value>
+  </data>
+  <data name="PlaylistManager.Clear" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="PlaylistManager.Reset" xml:space="preserve">
+    <value>Réinitialiser</value>
+  </data>
+  <data name="PlaylistQueue.Add" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="PlaylistQueue.AddNext" xml:space="preserve">
+    <value>Ajouter (Suivant)</value>
+  </data>
+  <data name="PlaylistQueue.Path" xml:space="preserve">
+    <value>File d'attente</value>
+  </data>
+  <data name="PlaylistQueue.Reset" xml:space="preserve">
+    <value>Réinitialiser</value>
   </data>
   <data name="SearchBehaviourConfiguration.Commit" xml:space="preserve">
     <value>Comportement</value>

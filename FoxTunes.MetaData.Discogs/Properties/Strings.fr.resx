@@ -117,4 +117,88 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Discogs.CompilationArtist" xml:space="preserve">
+    <value>Divers</value>
+  </data>
+  <data name="DiscogsBehaviour.FetchArtwork" xml:space="preserve">
+    <value>Récupérer l'illustration</value>
+  </data>
+  <data name="DiscogsBehaviour.FetchTags" xml:space="preserve">
+    <value>Récupérer les tags</value>
+  </data>
+  <data name="DiscogsBehaviourConfiguration.AutoLookup" xml:space="preserve">
+    <value>Recherche automatique</value>
+  </data>
+  <data name="DiscogsBehaviourConfiguration.BaseUrl" xml:space="preserve">
+    <value>URL de base</value>
+  </data>
+  <data name="DiscogsBehaviourConfiguration.ConsumerKey" xml:space="preserve">
+    <value>Consumer Key</value>
+  </data>
+  <data name="DiscogsBehaviourConfiguration.ConsumerSecret" xml:space="preserve">
+    <value>Consumer Secret</value>
+  </data>
+  <data name="DiscogsBehaviourConfiguration.Enabled" xml:space="preserve">
+    <value>Activé</value>
+  </data>
+  <data name="DiscogsBehaviourConfiguration.MaxRequests" xml:space="preserve">
+    <value>Requêtes par seconde</value>
+  </data>
+  <data name="DiscogsBehaviourConfiguration.MinConfidence" xml:space="preserve">
+    <value>Confiance minimale</value>
+  </data>
+  <data name="DiscogsBehaviourConfiguration.Section" xml:space="preserve">
+    <value>Discogs</value>
+  </data>
+  <data name="DiscogsBehaviourConfiguration.WriteTags" xml:space="preserve">
+    <value>Écrire les tags</value>
+  </data>
+  <data name="DiscogsFetchArtworkTask.NotFound" xml:space="preserve">
+    <value>Aucune illustration trouvée.</value>
+  </data>
+  <data name="DiscogsLookupTask.InsufficiantData" xml:space="preserve">
+    <value>Les données de l'artiste et de l'album sont requises.</value>
+  </data>
+  <data name="DiscogsLookupTask.NotFound" xml:space="preserve">
+    <value>Aucune version trouvée.</value>
+  </data>
+  <data name="General.Advanced" xml:space="preserve">
+    <value>Avancé</value>
+  </data>
+  <data name="LookupArtworkTask.Name" xml:space="preserve">
+    <value>Récupération de l'illustration...</value>
+  </data>
+  <data name="LookupTagsTask.Name" xml:space="preserve">
+    <value>Récupération des tags...</value>
+  </data>
+  <data name="ReleaseLookupReport.Album" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="ReleaseLookupReport.Artist" xml:space="preserve">
+    <value>Artiste</value>
+  </data>
+  <data name="ReleaseLookupReport.Release" xml:space="preserve">
+    <value>Release</value>
+  </data>
+  <data name="ReleaseLookupReport.Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ReleaseLookupReport.Title" xml:space="preserve">
+    <value>Release Lookup</value>
+  </data>
+  <data name="ReleaseSelectionReport.Confirm" xml:space="preserve">
+    <value>Confirmer</value>
+  </data>
+  <data name="ReleaseSelectionReport.ReleaseId" xml:space="preserve">
+    <value>Id</value>
+  </data>
+  <data name="ReleaseSelectionReport.ReleaseTitle" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="ReleaseSelectionReport.ReleaseUrl" xml:space="preserve">
+    <value>Url</value>
+  </data>
+  <data name="ReleaseSelectionReport.Title" xml:space="preserve">
+    <value>Release Selection: {0} - {1} ({2} tracks)</value>
+  </data>
 </root>

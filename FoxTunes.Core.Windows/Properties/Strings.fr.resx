@@ -135,4 +135,25 @@
   <data name="ExecutionStateBehaviourConfiguration.SleepSystem" xml:space="preserve">
     <value>Empêcher la mise en veille du système</value>
   </data>
+  <data name="TaskbarButtonsBehaviour.Next" xml:space="preserve">
+    <value>Suivant</value>
+  </data>
+  <data name="TaskbarButtonsBehaviour.PlayPause" xml:space="preserve">
+    <value>Lire ou mettre en pause</value>
+  </data>
+  <data name="TaskbarButtonsBehaviour.Previous" xml:space="preserve">
+    <value>Précédent</value>
+  </data>
+  <data name="TaskbarButtonsBehaviourConfiguration.Enabled" xml:space="preserve">
+    <value>Boutons dans la barre des tâches</value>
+  </data>
+  <data name="TaskbarProgressBehaviourConfiguration.Enabled" xml:space="preserve">
+    <value>Progression dans la barre des tâches</value>
+  </data>
+  <data name="TaskbarThumbnailBehaviourConfiguration.Enabled" xml:space="preserve">
+    <value>Vignette dans la barre des tâches</value>
+  </data>
+  <data name="WindowsConfiguration.Section" xml:space="preserve">
+    <value>Windows 7</value>
+  </data>
 </root>

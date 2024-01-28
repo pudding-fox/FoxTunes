@@ -141,4 +141,7 @@
   <data name="LyricsBehaviourConfiguration.Section" xml:space="preserve">
     <value>Paroles de chanson</value>
   </data>
+  <data name="LyricsBehaviourConfiguration.WriteTags" xml:space="preserve">
+    <value>Écrire les tags</value>
+  </data>
 </root>

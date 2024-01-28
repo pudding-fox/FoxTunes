@@ -117,14 +117,80 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="LayoutDesignerBehaviour.Design" xml:space="preserve">
+    <value>Modifier la mise en page</value>
+  </data>
+  <data name="ToolWindowBehaviour.Manage" xml:space="preserve">
+    <value>Gérer</value>
+  </data>
+  <data name="ToolWindowBehaviour.New" xml:space="preserve">
+    <value>Nouveau</value>
+  </data>
   <data name="ToolWindowBehaviour.NewWindow" xml:space="preserve">
     <value>Nouvelle fenêtre</value>
+  </data>
+  <data name="ToolWindowBehaviour.Path" xml:space="preserve">
+    <value>Dialogues</value>
+  </data>
+  <data name="UIComponentContainer.Clear" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="UIComponentContainer.Exit" xml:space="preserve">
+    <value>Fait</value>
+  </data>
+  <data name="UIComponentDockContainer.Collapse" xml:space="preserve">
+    <value>Pliable</value>
+  </data>
+  <data name="UIComponentDockContainer.DockBottom" xml:space="preserve">
+    <value>Ancrer en bas</value>
+  </data>
+  <data name="UIComponentDockContainer.DockLeft" xml:space="preserve">
+    <value>Ancrer à gauche</value>
+  </data>
+  <data name="UIComponentDockContainer.DockRight" xml:space="preserve">
+    <value>Ancrer à droite</value>
+  </data>
+  <data name="UIComponentDockContainer.DockTop" xml:space="preserve">
+    <value>Ancrer en haut</value>
   </data>
   <data name="UIComponentDockContainer.Name" xml:space="preserve">
     <value>Dock</value>
   </data>
+  <data name="UIComponentGridContainer.Add" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="UIComponentGridContainer.AlignLeft" xml:space="preserve">
+    <value>Aligner à gauche</value>
+  </data>
+  <data name="UIComponentGridContainer.AlignRight" xml:space="preserve">
+    <value>Aligner à droite</value>
+  </data>
+  <data name="UIComponentGridContainer.AlignStretch" xml:space="preserve">
+    <value>Aligner au centre</value>
+  </data>
+  <data name="UIComponentGridContainer.MoveLeft" xml:space="preserve">
+    <value>Déplacer à gauche</value>
+  </data>
+  <data name="UIComponentGridContainer.MoveRight" xml:space="preserve">
+    <value>Déplacer à droite</value>
+  </data>
   <data name="UIComponentGridContainer.Name" xml:space="preserve">
     <value>Grille horizontale</value>
+  </data>
+  <data name="UIComponentGridContainer.Remove" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="UIComponentHorizontalSplitContainer.CollapseBottom" xml:space="preserve">
+    <value>Réduire le bas</value>
+  </data>
+  <data name="UIComponentHorizontalSplitContainer.CollapseTop" xml:space="preserve">
+    <value>Réduire le haut</value>
+  </data>
+  <data name="UIComponentHorizontalSplitContainer.FreezeBottom" xml:space="preserve">
+    <value>Geler le fond</value>
+  </data>
+  <data name="UIComponentHorizontalSplitContainer.FreezeTop" xml:space="preserve">
+    <value>Geler le dessus</value>
   </data>
   <data name="UIComponentHorizontalSplitContainer.Name" xml:space="preserve">
     <value>Fractionnement horizontal</value>
@@ -152,6 +218,18 @@
   </data>
   <data name="UIComponentStackContainer.Name" xml:space="preserve">
     <value>Stack Grid</value>
+  </data>
+  <data name="UIComponentVerticalSplitContainer.CollapseLeft" xml:space="preserve">
+    <value>Réduire à gauche</value>
+  </data>
+  <data name="UIComponentVerticalSplitContainer.CollapseRight" xml:space="preserve">
+    <value>Réduire à droite</value>
+  </data>
+  <data name="UIComponentVerticalSplitContainer.FreezeLeft" xml:space="preserve">
+    <value>Figer à gauche</value>
+  </data>
+  <data name="UIComponentVerticalSplitContainer.FreezeRight" xml:space="preserve">
+    <value>Figer à droite</value>
   </data>
   <data name="UIComponentVerticalSplitContainer.Name" xml:space="preserve">
     <value>Fractionnement vertical</value>

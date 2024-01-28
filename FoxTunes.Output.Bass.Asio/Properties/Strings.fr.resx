@@ -120,4 +120,7 @@
   <data name="ASIO" xml:space="preserve">
     <value>ASIO</value>
   </data>
+  <data name="BassAsioStreamOutput.VolumeUnsupported" xml:space="preserve">
+    <value>Le volume ne peut pas être modifié, l'appareil ne le supporte pas.</value>
+  </data>
 </root>

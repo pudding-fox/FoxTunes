@@ -156,6 +156,12 @@
   <data name="General.Settings" xml:space="preserve">
     <value>Paramètres</value>
   </data>
+  <data name="ImageBehaviour.Path" xml:space="preserve">
+    <value>Bibliothèque</value>
+  </data>
+  <data name="ImageBehaviour.Refresh" xml:space="preserve">
+    <value>Actualiser les images</value>
+  </data>
   <data name="Info.Name" xml:space="preserve">
     <value>Lecture en cours</value>
   </data>
@@ -180,14 +186,14 @@
   <data name="KeyBindingsBehaviourConfiguration.Stop" xml:space="preserve">
     <value>Arrêter</value>
   </data>
-  <data name="KeyBindingsBehaviourConfiguration.ToggleMiniPlayer" xml:space="preserve">
-    <value>Mini lecteur</value>
-  </data>
   <data name="LibraryActionsBehaviour.AppendPlaylist" xml:space="preserve">
     <value>Ajouter à la liste de lecture</value>
   </data>
   <data name="LibraryActionsBehaviour.Library" xml:space="preserve">
     <value>Bibliothèque</value>
+  </data>
+  <data name="LibraryActionsBehaviour.Rebuild" xml:space="preserve">
+    <value>Reconstruire la vue</value>
   </data>
   <data name="LibraryActionsBehaviour.ReplacePlaylist" xml:space="preserve">
     <value>Remplacer la liste de lecture</value>
@@ -204,8 +210,32 @@
   <data name="LibraryBase.Loading" xml:space="preserve">
     <value>Chargement...</value>
   </data>
+  <data name="LibraryBase.UnvirtualizedTooLarge" xml:space="preserve">
+    <value>La vue de la bibliothèque contient {0} éléments qui dépassent les {1} éléments autorisés sans virtualisation. Veuillez activer le paramètre "Virtualisation des listes".</value>
+  </data>
   <data name="LibraryBase.Updating" xml:space="preserve">
     <value>Mise à jour...</value>
+  </data>
+  <data name="LibraryRootsDialog.Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="LibraryRootsDialog.Delete" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="LibraryRootsDialog.GroupHeader" xml:space="preserve">
+    <value>Dossiers de la bibliothèque</value>
+  </data>
+  <data name="LibraryRootsDialog.New" xml:space="preserve">
+    <value>Nouveau</value>
+  </data>
+  <data name="LibraryRootsDialog.Path" xml:space="preserve">
+    <value>Chemin</value>
+  </data>
+  <data name="LibraryRootsDialog.Save" xml:space="preserve">
+    <value>Sauvegarder</value>
+  </data>
+  <data name="LibraryRootsSettings.Browse" xml:space="preserve">
+    <value>Ajouter un dossier à la bibliothèque.</value>
   </data>
   <data name="LibrarySearch.Name" xml:space="preserve">
     <value>Recherche</value>
@@ -213,8 +243,101 @@
   <data name="LibrarySelector.Name" xml:space="preserve">
     <value>Sélecteur</value>
   </data>
+  <data name="LibrarySettingsDialog.Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="LibrarySettingsDialog.Clear" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="LibrarySettingsDialog.Clone" xml:space="preserve">
+    <value>Cloner</value>
+  </data>
+  <data name="LibrarySettingsDialog.Delete" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="LibrarySettingsDialog.Enabled" xml:space="preserve">
+    <value>Activé</value>
+  </data>
+  <data name="LibrarySettingsDialog.GroupHeader" xml:space="preserve">
+    <value>Vues</value>
+  </data>
+  <data name="LibrarySettingsDialog.Levels" xml:space="preserve">
+    <value>Niveaux</value>
+  </data>
+  <data name="LibrarySettingsDialog.Name" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="LibrarySettingsDialog.New" xml:space="preserve">
+    <value>Nouveau</value>
+  </data>
+  <data name="LibrarySettingsDialog.Rescan" xml:space="preserve">
+    <value>Rescan</value>
+  </data>
+  <data name="LibrarySettingsDialog.Reset" xml:space="preserve">
+    <value>Réinitialiser</value>
+  </data>
+  <data name="LibrarySettingsDialog.Save" xml:space="preserve">
+    <value>Sauvegarder</value>
+  </data>
+  <data name="LibrarySettingsDialog.Script" xml:space="preserve">
+    <value>Script</value>
+  </data>
+  <data name="LibrarySettingsDialog.Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
   <data name="LibraryTree.Name" xml:space="preserve">
-    <value>Arbre</value>
+    <value>Arborescence de la bibliothèque</value>
+  </data>
+  <data name="MetaDataItemType.CustomTag" xml:space="preserve">
+    <value>Tag (Custom)</value>
+  </data>
+  <data name="MetaDataItemType.Document" xml:space="preserve">
+    <value>Document</value>
+  </data>
+  <data name="MetaDataItemType.Image" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="MetaDataItemType.Property" xml:space="preserve">
+    <value>Propriété</value>
+  </data>
+  <data name="MetaDataItemType.Statistic" xml:space="preserve">
+    <value>Statistique</value>
+  </data>
+  <data name="MetaDataItemType.Tag" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="MetaDataName.IsCompilation" xml:space="preserve">
+    <value>Compilation</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Delete" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Enabled" xml:space="preserve">
+    <value>Activé</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.GroupHeader" xml:space="preserve">
+    <value>Meta Data</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Name" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.New" xml:space="preserve">
+    <value>Nouveau</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Reset" xml:space="preserve">
+    <value>Réinitialiser</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Save" xml:space="preserve">
+    <value>Sauvegarder</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Script" xml:space="preserve">
+    <value>Script</value>
+  </data>
+  <data name="MetaDataProvidersSettingsDialog.Type" xml:space="preserve">
+    <value>Type</value>
   </data>
   <data name="MinimalLayoutProvider.Description" xml:space="preserve">
     <value />
@@ -223,37 +346,85 @@
     <value>Minimal</value>
   </data>
   <data name="MiniPlayer.Name" xml:space="preserve">
-    <value>Mini lecteur</value>
+    <value>Lanceur du mini-lecteur</value>
   </data>
   <data name="MiniPlaylist.Name" xml:space="preserve">
-    <value>Liste de lecture simple</value>
+    <value>Simple Playlist</value>
   </data>
   <data name="Playback.Name" xml:space="preserve">
     <value>Commandes de lecture</value>
   </data>
+  <data name="PlaybackDetails.NoOutput" xml:space="preserve">
+    <value>Output Inactive</value>
+  </data>
   <data name="PlaylistBase.Empty" xml:space="preserve">
-    <value>Ajouter des fichiers à la liste de lecture en les déposant ici</value>
+    <value>Ajoutez à la liste de lecture en déposant des fichiers ici.</value>
   </data>
   <data name="PlaylistBase.Loading" xml:space="preserve">
     <value>Chargement...</value>
   </data>
+  <data name="PlaylistBase.UnvirtualizedTooLarge" xml:space="preserve">
+    <value>La liste de lecture contient {0} éléments qui dépassent les {1} éléments autorisés sans virtualisation. Veuillez activer le paramètre "Virtualisation des listes".</value>
+  </data>
   <data name="PlaylistBase.Updating" xml:space="preserve">
     <value>Mise à jour...</value>
   </data>
+  <data name="PlaylistConfigDialog.Count" xml:space="preserve">
+    <value>Pistes</value>
+  </data>
+  <data name="PlaylistConfigDialog.Expression" xml:space="preserve">
+    <value>Expression</value>
+  </data>
+  <data name="PlaylistConfigDialog.MinAge" xml:space="preserve">
+    <value>Min Age (Jours)</value>
+  </data>
+  <data name="PlaylistConfigDialog.MinRating" xml:space="preserve">
+    <value>Min Rating</value>
+  </data>
   <data name="PlaylistGroupingBehaviourConfiguration.Enabled" xml:space="preserve">
-    <value>Regroupement</value>
+    <value>Grouping</value>
   </data>
   <data name="PlaylistGroupingBehaviourConfiguration.Script" xml:space="preserve">
-    <value>Script de regroupement</value>
+    <value>Grouping Script</value>
+  </data>
+  <data name="PlaylistManager.Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="PlaylistManager.Save" xml:space="preserve">
+    <value>Sauvegarder</value>
   </data>
   <data name="Playlists.Name" xml:space="preserve">
     <value>Onglets de la liste de lecture</value>
   </data>
+  <data name="PlaylistsActionsBehaviour.Add" xml:space="preserve">
+    <value>Ajouter une liste de lecture</value>
+  </data>
+  <data name="PlaylistsActionsBehaviour.Create" xml:space="preserve">
+    <value>Créer une liste de lecture</value>
+  </data>
+  <data name="PlaylistsActionsBehaviour.Manage" xml:space="preserve">
+    <value>Playlist Manager</value>
+  </data>
+  <data name="PlaylistsActionsBehaviour.Remove" xml:space="preserve">
+    <value>Supprimer la liste de lecture</value>
+  </data>
   <data name="PlaylistSortingBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Tri</value>
   </data>
+  <data name="Plugins.NoDescription" xml:space="preserve">
+    <value>Le plugin n'a pas de description.</value>
+  </data>
+  <data name="Plugins.RestartWarning" xml:space="preserve">
+    <value>La sélection du plugin a été mise à jour, redémarrez l'application pour l'appliquer. En cas de problème, supprimez le fichier de configuration : {0}.</value>
+  </data>
+  <data name="PluginsDialog.Header" xml:space="preserve">
+    <value>Plugins</value>
+  </data>
+  <data name="PluginsDialog.NotAvailable" xml:space="preserve">
+    <value>Cette fonctionnalité est conçue pour le package portable.</value>
+  </data>
   <data name="ProfilesBehaviour.Delete" xml:space="preserve">
-    <value>Supprimer</value>
+    <value>Effacer</value>
   </data>
   <data name="ProfilesBehaviour.New" xml:space="preserve">
     <value>Nouveau</value>
@@ -262,31 +433,34 @@
     <value>Nom du profil</value>
   </data>
   <data name="ProfilesBehaviour.Path" xml:space="preserve">
-    <value>Profils</value>
+    <value>Profiles</value>
   </data>
   <data name="ProfilesBehaviourConfiguration.Enabled" xml:space="preserve">
     <value>Activé</value>
   </data>
   <data name="ProfilesBehaviourConfiguration.Section" xml:space="preserve">
-    <value>Profils</value>
+    <value>Profiles</value>
+  </data>
+  <data name="Report.Close" xml:space="preserve">
+    <value>Fermer</value>
   </data>
   <data name="Settings.Name" xml:space="preserve">
-    <value>Configuration des paramètres</value>
+    <value>Paramètres du lanceur</value>
   </data>
   <data name="SettingsDialog.EmptyPage" xml:space="preserve">
-    <value>Veuillez sélectionner une sous rubrique</value>
+    <value>Merci de sélectionner une sous-page.</value>
   </data>
   <data name="SettingsDialog.GroupHeader" xml:space="preserve">
     <value>Composants</value>
   </data>
   <data name="SettingsDialog.ResetAll" xml:space="preserve">
-    <value>Effacer tout</value>
+    <value>Réinitialiser tout</value>
   </data>
   <data name="SettingsDialog.ResetPage" xml:space="preserve">
-    <value>Réinitialiser</value>
+    <value>Réinitialiser la page</value>
   </data>
   <data name="SettingsDialog.Save" xml:space="preserve">
-    <value>Valider</value>
+    <value>Sauvegarder</value>
   </data>
   <data name="SettingsWindow.Title" xml:space="preserve">
     <value>Paramètres</value>
@@ -295,10 +469,10 @@
     <value>Shuffle</value>
   </data>
   <data name="StreamPosition.Name" xml:space="preserve">
-    <value>Seekbar</value>
+    <value>Barre de recherche</value>
   </data>
   <data name="Tempo.Name" xml:space="preserve">
-    <value>Tempo</value>
+    <value>Tempo Launcher</value>
   </data>
   <data name="TempoDialog.Name" xml:space="preserve">
     <value>Tempo</value>
@@ -322,7 +496,7 @@
     <value>Autre</value>
   </data>
   <data name="UIComponentRole.Playback" xml:space="preserve">
-    <value>Lecture</value>
+    <value>Relecture</value>
   </data>
   <data name="UIComponentRole.Playlist" xml:space="preserve">
     <value>Liste de lecture</value>
@@ -334,13 +508,13 @@
     <value>Visualisation</value>
   </data>
   <data name="Visualization.Unavailable" xml:space="preserve">
-    <value>Visualisation non disponible.</value>
+    <value>Visualisation indisponible.</value>
   </data>
   <data name="Visualization.UnavailableDetail" xml:space="preserve">
     <value>Le mélangeur est requis pour le rendu, vérifiez vos paramètres de sortie.</value>
   </data>
   <data name="VisualizationBehaviourConfiguration.FFTSize" xml:space="preserve">
-    <value>Taille FFT</value>
+    <value>FFT Size</value>
   </data>
   <data name="VisualizationBehaviourConfiguration.Interval" xml:space="preserve">
     <value>Intervalle de mise à jour</value>
@@ -358,7 +532,7 @@
     <value>Visualisations</value>
   </data>
   <data name="VisualizationBehaviourConfiguration.Smooth" xml:space="preserve">
-    <value>Lissage</value>
+    <value>Lisse</value>
   </data>
   <data name="VisualizationBehaviourConfiguration.SmoothFactor" xml:space="preserve">
     <value>Facteur de lissage</value>
@@ -379,10 +553,10 @@
     <value>Disposition</value>
   </data>
   <data name="WindowsUserInterfaceConfiguration.MarqueeInterval" xml:space="preserve">
-    <value>Intervalle de défilement</value>
+    <value>Marquee Interval</value>
   </data>
   <data name="WindowsUserInterfaceConfiguration.MarqueeStep" xml:space="preserve">
-    <value>Vitesse du défilement</value>
+    <value>Marquee Step</value>
   </data>
   <data name="WindowsUserInterfaceConfiguration.Scaling" xml:space="preserve">
     <value>Facteur d'échelle</value>
@@ -391,6 +565,9 @@
     <value>Apparence</value>
   </data>
   <data name="WindowsUserInterfaceConfiguration.Theme" xml:space="preserve">
-    <value>Thème</value>
+    <value>Theme</value>
+  </data>
+  <data name="WindowsUserInterfaceConfiguration.VirtualLists" xml:space="preserve">
+    <value>Virtualisation des listes</value>
   </data>
 </root>
