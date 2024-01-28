@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -11,6 +12,8 @@ namespace FoxTunes
         public const int MAX_SELECTED_ITEMS = 750;
 
         private static readonly ConditionalWeakTable<ListView, SelectedItemsBehaviour> SelectedItemsBehaviours = new ConditionalWeakTable<ListView, SelectedItemsBehaviour>();
+
+        public static bool IsSuspended { get; private set; }
 
         public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.RegisterAttached(
             "SelectedItems",
@@ -31,6 +34,10 @@ namespace FoxTunes
 
         private static void OnSelectedItemsPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
+            if (IsSuspended)
+            {
+                return;
+            }
             var listView = sender as ListView;
             if (listView == null)
             {
@@ -41,22 +48,30 @@ namespace FoxTunes
             {
                 SelectedItemsBehaviours.Add(listView, new SelectedItemsBehaviour(listView));
             }
-            //We only need this if we need two way binding (it's sketchy and causes weird recursive 
-            //calls to this handler anyway so let's just not).
-            //var items = (e.NewValue as IList);
-            //if (items == null)
-            //{
-            //    return;
-            //}
-            //if (Enumerable.SequenceEqual(listView.SelectedItems.Cast<object>(), items.Cast<object>()))
-            //{
-            //    return;
-            //}
-            //listView.SelectedItems.Clear();
-            //foreach (var item in items)
-            //{
-            //    listView.SelectedItems.Add(item);
-            //}
+            IsSuspended = true;
+            try
+            {
+                //We only need this if we need two way binding (it's sketchy and causes weird recursive 
+                //calls to this handler anyway so let's just not).
+                var items = (e.NewValue as IList);
+                if (items == null)
+                {
+                    return;
+                }
+                if (Enumerable.SequenceEqual(listView.SelectedItems.Cast<object>(), items.Cast<object>()))
+                {
+                    return;
+                }
+                listView.SelectedItems.Clear();
+                foreach (var item in items)
+                {
+                    listView.SelectedItems.Add(item);
+                }
+            }
+            finally
+            {
+                IsSuspended = false;
+            }
         }
 
         private class SelectedItemsBehaviour : UIBehaviour

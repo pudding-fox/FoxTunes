@@ -16,6 +16,8 @@ namespace FoxTunes.Interfaces
 
         PlaylistItem[] GetItems(Playlist playlist);
 
+        PlaylistItem[] GetItems(Playlist playlist, string filter);
+
         PlaylistItem GetItemById(Playlist playlist, int id);
 
         PlaylistItem GetItemBySequence(Playlist playlist, int sequence);

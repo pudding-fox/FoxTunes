@@ -681,6 +681,36 @@ namespace FoxTunes
 
         public event EventHandler SelectedItemsChanged;
 
+        private string _Filter { get; set; }
+
+        public string Filter
+        {
+            get
+            {
+                return this._Filter;
+            }
+            set
+            {
+                if (string.Equals(this._Filter, value, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+                this._Filter = value;
+                this.OnFilterChanged();
+            }
+        }
+
+        protected virtual void OnFilterChanged()
+        {
+            if (this.FilterChanged != null)
+            {
+                this.FilterChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Filter");
+        }
+
+        public event EventHandler FilterChanged;
+
         public IEnumerable<string> InvocationCategories
         {
             get

@@ -36,6 +36,7 @@
                   Windows:ListViewExtensions.DragSource="True"
                   Windows:ListViewExtensions.DragSourceInitialized="DragSourceInitialized"
                   Windows:ListViewExtensions.AutoSizeColumns="True"
+                  Windows:ListViewExtensions.EnsureSelectedItemVisible="True"
                   GridViewColumnHeader.Click="OnHeaderClick"
                   SelectionChanged="OnSelectionChanged">
             <ListView.Resources>

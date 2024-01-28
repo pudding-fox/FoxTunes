@@ -126,6 +126,16 @@ namespace FoxTunes
             return this.PlaylistCache.GetItems(playlist, () => this.GetItemsCore(playlist));
         }
 
+        public PlaylistItem[] GetItems(Playlist playlist, string filter)
+        {
+            var playlistItems = this.GetItems(playlist);
+            return playlistItems.Where(
+                playlistItem => playlistItem.MetaDatas.Any(
+                    metaDataItem => !string.IsNullOrEmpty(metaDataItem.Value) && metaDataItem.Value.Contains(filter, true)
+                )
+            ).ToArray();
+        }
+
         private IEnumerable<PlaylistItem> GetItemsCore(Playlist playlist)
         {
             this.State |= PlaylistBrowserState.Loading;

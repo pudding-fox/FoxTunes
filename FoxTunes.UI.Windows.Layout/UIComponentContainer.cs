@@ -367,7 +367,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                var component = LayoutManager.Instance.GetComponent(name, this.Configuration.Component.Role);
+                var component = LayoutManager.Instance.GetComponent(name, UIComponentRole.Container);
                 if (component == null)
                 {
                     return;

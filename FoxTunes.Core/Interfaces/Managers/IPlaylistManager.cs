@@ -70,6 +70,10 @@ namespace FoxTunes.Interfaces
         PlaylistItem[] SelectedItems { get; set; }
 
         event EventHandler SelectedItemsChanged;
+
+        string Filter { get; set; }
+
+        event EventHandler FilterChanged;
     }
 
     public enum PlaylistQueueFlags : byte
