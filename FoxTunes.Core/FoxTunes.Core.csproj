@@ -167,6 +167,7 @@
     <Compile Include="Tasks\BuildLibraryHierarchiesTask.cs" />
     <Compile Include="Tasks\ClearPlaylistTask.cs" />
     <Compile Include="Tasks\LibraryTaskBase.cs" />
+    <Compile Include="Tasks\UnloadOutputStreamTask.cs" />
     <Compile Include="Utilities\EnumerableDataReader.cs" />
     <Compile Include="Utilities\LibraryHierarchyPopulator.cs" />
     <Compile Include="Utilities\MetaDataPopulator.cs" />
@@ -188,7 +189,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>PivotViewBuilder.tt</DependentUpon>
     </Compile>
-    <Compile Include="Tasks\UnloadOutputStreamTask.cs" />
     <Compile Include="Utilities\PlaylistItemScriptRunner.cs" />
     <Compile Include="Utilities\Templates\PivotViewBuilder_Logic.cs" />
     <Compile Include="Utilities\Templates\PlaylistSequenceBuilder.cs">

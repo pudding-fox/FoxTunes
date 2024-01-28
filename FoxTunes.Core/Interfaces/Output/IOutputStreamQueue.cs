@@ -2,7 +2,7 @@
 
 namespace FoxTunes.Interfaces
 {
-    public interface IOutputStreamQueue : IStandardComponent
+    public interface IOutputStreamQueue : IStandardComponent, IDisposable
     {
         bool IsQueued(PlaylistItem playlistItem);
 

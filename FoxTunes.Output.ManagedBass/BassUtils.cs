@@ -11,7 +11,6 @@ namespace FoxTunes
             "mp1", "mp2", "mp3", "ogg", "wav", "aif"
         };
 
-
         public static IEnumerable<string> GetInputFormats()
         {
             foreach (var format in BUILT_IN_FORMATS)

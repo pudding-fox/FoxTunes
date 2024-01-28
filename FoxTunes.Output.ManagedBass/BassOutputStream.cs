@@ -63,6 +63,10 @@ namespace FoxTunes
         {
             get
             {
+                if (!this.Output.IsStarted)
+                {
+                    return false;
+                }
                 return this.Output.MasterChannel.IsPlaying;
             }
         }
@@ -71,6 +75,10 @@ namespace FoxTunes
         {
             get
             {
+                if (!this.Output.IsStarted)
+                {
+                    return false;
+                }
                 return this.Output.MasterChannel.IsPaused;
             }
         }
@@ -79,6 +87,10 @@ namespace FoxTunes
         {
             get
             {
+                if (!this.Output.IsStarted)
+                {
+                    return true;
+                }
                 return this.Output.MasterChannel.IsStopped;
             }
         }
@@ -121,7 +133,10 @@ namespace FoxTunes
         public override void Play()
         {
             this.Output.MasterChannel.SetPrimaryChannel(this.ChannelHandle);
-            this.Output.MasterChannel.Play();
+            if (!this.Output.MasterChannel.IsPlaying)
+            {
+                this.Output.MasterChannel.Play();
+            }
             this.EmitState();
             this.OnPlayed(true);
         }

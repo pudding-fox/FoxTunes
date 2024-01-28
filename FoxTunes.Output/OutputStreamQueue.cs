@@ -16,6 +16,12 @@ namespace FoxTunes
 
         private ConcurrentDictionary<PlaylistItem, OutputStreamQueueValue> Queue { get; set; }
 
+        public override void InitializeComponent(ICore core)
+        {
+            core.Components.Output.Error += (sender, e) => this.Clear(); //When the output encounters an error we write off all cached streams.
+            base.InitializeComponent(core);
+        }
+
         public bool IsQueued(PlaylistItem playlistItem)
         {
             return this.Queue.ContainsKey(playlistItem);
@@ -91,6 +97,44 @@ namespace FoxTunes
         }
 
         public event OutputStreamQueueEventHandler Dequeued;
+
+        public void Clear()
+        {
+            foreach (var key in this.Queue.Keys)
+            {
+                this.Queue[key].OutputStream.Dispose();
+            }
+            this.Queue.Clear();
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            this.Clear();
+        }
+
+        ~OutputStreamQueue()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            this.Dispose(true);
+        }
 
         private class OutputStreamQueueValue
         {

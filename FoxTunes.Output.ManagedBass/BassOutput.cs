@@ -14,12 +14,56 @@ namespace FoxTunes
 
         public BassMasterChannel MasterChannel { get; private set; }
 
+        public bool IsStarted { get; private set; }
+
+        public void Start(ICore core)
+        {
+            Logger.Write(this, LogLevel.Debug, "Starting BASS.");
+            try
+            {
+                BassUtils.OK(Bass.Init());
+                BassPluginLoader.Instance.Load();
+                this.MasterChannel = new BassMasterChannel(this);
+                this.MasterChannel.InitializeComponent(core);
+                this.MasterChannel.Error += this.MasterChannel_Error;
+                this.IsStarted = true;
+                Logger.Write(this, LogLevel.Debug, "Started BASS.");
+            }
+            catch (Exception e)
+            {
+                this.OnError(e);
+            }
+        }
+
+        public void Shutdown()
+        {
+            Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
+            try
+            {
+                this.MasterChannel.Dispose();
+                this.MasterChannel = null;
+                BassUtils.OK(Bass.Free());
+                BassUtils.OK(Bass.PluginFree(0));
+                Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
+            }
+            catch (Exception e)
+            {
+                this.OnError(e);
+            }
+            finally
+            {
+                this.IsStarted = false;
+            }
+        }
+
+        protected virtual void MasterChannel_Error(object sender, ComponentOutputErrorEventArgs e)
+        {
+            this.Shutdown();
+            this.OnError(e.Exception);
+        }
+
         public override void InitializeComponent(ICore core)
         {
-            BassUtils.OK(Bass.Init());
-            BassPluginLoader.Instance.Load();
-            this.MasterChannel = new BassMasterChannel();
-            this.MasterChannel.InitializeComponent(core);
             this.Core = core;
             base.InitializeComponent(core);
         }
@@ -39,7 +83,13 @@ namespace FoxTunes
 
         public override Task<IOutputStream> Load(PlaylistItem playlistItem)
         {
+            if (!this.IsStarted)
+            {
+                this.Start(this.Core);
+            }
+            Logger.Write(this, LogLevel.Debug, "Creating stream from file {0}", playlistItem.FileName);
             var channelHandle = Bass.CreateStream(playlistItem.FileName, 0, 0, BassFlags.Decode);
+            Logger.Write(this, LogLevel.Debug, "Created stream from file {0}: {1}", playlistItem.FileName, channelHandle);
             var outputStream = new BassOutputStream(this, playlistItem, channelHandle);
             outputStream.InitializeComponent(this.Core);
             return Task.FromResult<IOutputStream>(outputStream);
@@ -48,7 +98,8 @@ namespace FoxTunes
         public override Task Preempt(IOutputStream stream)
         {
             var outputStream = stream as BassOutputStream;
-            this.MasterChannel.SetStandbyChannelHandle(outputStream.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Pre-empting playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+            this.MasterChannel.SetSecondaryChannelHandle(outputStream.ChannelHandle);
             return Task.CompletedTask;
         }
 
@@ -82,8 +133,10 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            BassUtils.OK(Bass.Free());
-            BassUtils.OK(Bass.PluginFree(0));
+            if (this.IsStarted)
+            {
+                this.Shutdown();
+            }
         }
 
         ~BassOutput()
