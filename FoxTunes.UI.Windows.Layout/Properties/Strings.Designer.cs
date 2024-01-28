@@ -61,11 +61,38 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Edit Layout.
+        ///   Looks up a localized string similar to Edit.
         /// </summary>
         internal static string LayoutDesignerBehaviour_Design {
             get {
                 return ResourceManager.GetString("LayoutDesignerBehaviour.Design", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load Preset.
+        /// </summary>
+        internal static string LayoutDesignerBehaviour_Load {
+            get {
+                return ResourceManager.GetString("LayoutDesignerBehaviour.Load", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The current layout has been modified, overwrite it?.
+        /// </summary>
+        internal static string LayoutDesignerBehaviour_Overwrite {
+            get {
+                return ResourceManager.GetString("LayoutDesignerBehaviour.Overwrite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layout.
+        /// </summary>
+        internal static string LayoutDesignerBehaviour_Path {
+            get {
+                return ResourceManager.GetString("LayoutDesignerBehaviour.Path", resourceCulture);
             }
         }
         
