@@ -11,13 +11,11 @@ namespace FoxTunes
             this.PlaylistItem.Include("MetaDatas");
             this.PlaylistItem.Include("Properties");
             this.PlaylistItem.Include("Images");
-            this.PlaylistItem.Include("Images.MetaDatas");
             this.PlaylistColumn = this.DatabaseContext.GetQuery<PlaylistColumn>();
             this.LibraryItem = this.DatabaseContext.GetQuery<LibraryItem>();
             this.LibraryItem.Include("MetaDatas");
             this.LibraryItem.Include("Properties");
             this.LibraryItem.Include("Images");
-            this.LibraryItem.Include("Images.MetaDatas");
             this.LibraryItem.Include("Statistics");
             this.LibraryHierarchy = this.DatabaseContext.GetQuery<LibraryHierarchy>();
             this.LibraryHierarchy.Include("Levels");

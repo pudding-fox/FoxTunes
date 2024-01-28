@@ -16,6 +16,14 @@ namespace FoxTunes
         {
         }
 
+        public override bool Visible
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
         public IScriptingContext ScriptingContext { get; private set; }
