@@ -14,7 +14,7 @@
     </UserControl.Resources>
     <Grid>
         <ToggleButton Width="30" Height="30" FontSize="20" IsChecked="{Binding Enabled.Value, Source={StaticResource ViewModel}}">
-            <ContentControl Width="24" Height="24">
+            <ContentControl Width="20" Height="20">
                 <ContentControl.Style>
                     <Style TargetType="{x:Type ContentControl}">
                         <Style.Triggers>

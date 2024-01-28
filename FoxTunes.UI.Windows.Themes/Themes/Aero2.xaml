@@ -17,16 +17,6 @@
 
     <PopupAnimation x:Key="{x:Static SystemParameters.MenuPopupAnimationKey}">None</PopupAnimation>
 
-    <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
-        <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
-        <Setter Property="VerticalContentAlignment" Value="Top"></Setter>
-    </Style>
-
-    <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-        <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
-        <Setter Property="VerticalContentAlignment" Value="Top"></Setter>
-    </Style>
-
     <Style TargetType="{x:Type ListViewItem}">
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
         <Style.Triggers>

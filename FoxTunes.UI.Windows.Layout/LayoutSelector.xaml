@@ -21,7 +21,7 @@
         </Grid.RowDefinitions>
         <ComboBox Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Presets, Mode=OneWay, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedPreset, Source={StaticResource ViewModel}}" MinWidth="200" DisplayMemberPath="Name"></ComboBox>
         <Button Grid.Row="0" Grid.Column="1" Width="30" Height="30" Margin="2,0,0,0" Command="{Binding AddPresetCommand, Mode=OneWay, Source={StaticResource ViewModel}}">
-            <Viewbox Width="24" Height="24">
+            <Viewbox Width="20" Height="20">
                 <Canvas Width="1024" Height="1024">
                     <Path Fill="{DynamicResource TextBrush}">
                         <Path.Data>
@@ -32,7 +32,7 @@
             </Viewbox>
         </Button>
         <ToggleButton Grid.Row="0" Grid.Column="2" Width="30" Height="30" Margin="2,0,0,0" IsChecked="{Binding IsEditing, Source={StaticResource ViewModel}}">
-            <Viewbox Width="24" Height="24">
+            <Viewbox Width="20" Height="20">
                 <Canvas Width="1000" Height="1000">
                     <Path Fill="{DynamicResource TextBrush}">
                         <Path.Data>
