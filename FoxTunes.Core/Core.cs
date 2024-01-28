@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 
 namespace FoxTunes
 {
@@ -60,6 +61,37 @@ namespace FoxTunes
         protected virtual void InitializeComponents()
         {
             ComponentRegistry.Instance.ForEach(component => component.InitializeComponent(this));
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            ComponentRegistry.Instance.ForEach(component =>
+            {
+                if (!(component is IDisposable))
+                {
+                    return;
+                }
+                (component as IDisposable).Dispose();
+            });
+            ComponentRegistry.Instance.Clear();
         }
     }
 }

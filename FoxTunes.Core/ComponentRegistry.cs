@@ -10,7 +10,7 @@ namespace FoxTunes
     {
         private ComponentRegistry()
         {
-            this.Components = new ConcurrentBag<IBaseComponent>();
+            this.Clear();
         }
 
         private ConcurrentBag<IBaseComponent> Components { get; set; }
@@ -50,6 +50,19 @@ namespace FoxTunes
             {
                 action(component);
             }
+        }
+
+        public void ForEach<T>(Action<T> action) where T : IBaseComponent
+        {
+            foreach (var component in this.Components.OfType<T>())
+            {
+                action(component);
+            }
+        }
+
+        public void Clear()
+        {
+            this.Components = new ConcurrentBag<IBaseComponent>();
         }
 
         public static readonly IComponentRegistry Instance = new ComponentRegistry();
