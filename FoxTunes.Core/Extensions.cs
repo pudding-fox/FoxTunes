@@ -336,5 +336,15 @@ namespace FoxTunes
             }
             return value;
         }
+
+        public static IEnumerable<T> OrderBy<T>(this IEnumerable<T> sequence)
+        {
+            return sequence.OrderBy(element => element);
+        }
+
+        public static IEnumerable<T> OrderBy<T>(this IEnumerable<T> sequence, IComparer<T> comparer)
+        {
+            return sequence.OrderBy(element => element, comparer);
+        }
     }
 }
