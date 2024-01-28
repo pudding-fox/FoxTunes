@@ -297,6 +297,9 @@
   <data name="UIComponentLayoutProviderPresets.Main.4" xml:space="preserve">
     <value>Default (With Visualizations + Properties)</value>
   </data>
+  <data name="UIComponentLayoutProviderPresets.Main.5" xml:space="preserve">
+    <value>Development</value>
+  </data>
   <data name="UIComponentLayoutProviderPresets.Simple.1" xml:space="preserve">
     <value>Simple</value>
   </data>
