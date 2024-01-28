@@ -32,13 +32,19 @@ namespace FoxTunes
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseDown(e);
-            ((UIElement)e.OriginalSource).CaptureMouse();
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                ((UIElement)e.OriginalSource).CaptureMouse();
+            }
         }
 
         protected override void OnPreviewMouseUp(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseUp(e);
-            ((UIElement)e.OriginalSource).ReleaseMouseCapture();
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                ((UIElement)e.OriginalSource).ReleaseMouseCapture();
+            }
         }
     }
 }

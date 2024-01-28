@@ -8,7 +8,8 @@
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
+             d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}"
+             MinWidth="80">
     <UserControl.Resources>
         <ViewModel:StreamPosition x:Key="ViewModel" Core="{Binding}"></ViewModel:StreamPosition>
     </UserControl.Resources>
