@@ -180,4 +180,19 @@
   <data name="WaveFormStreamPositionConfiguration.Smoothing.Medium" xml:space="preserve">
     <value>Medium</value>
   </data>
+  <data name="BandedWaveFormStreamPositionConfiguration.Smoothing" xml:space="preserve">
+    <value>Smoothing</value>
+  </data>
+  <data name="BandedWaveFormStreamPositionConfiguration.Smoothing.High" xml:space="preserve">
+    <value>High</value>
+  </data>
+  <data name="BandedWaveFormStreamPositionConfiguration.Smoothing.Low" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="BandedWaveFormStreamPositionConfiguration.Smoothing.Medium" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="BandedWaveFormStreamPositionConfiguration.Smoothing.Off" xml:space="preserve">
+    <value>Off</value>
+  </data>
 </root>

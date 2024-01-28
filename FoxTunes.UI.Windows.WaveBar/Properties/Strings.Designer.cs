@@ -97,6 +97,51 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Smoothing.
+        /// </summary>
+        internal static string BandedWaveFormStreamPositionConfiguration_Smoothing {
+            get {
+                return ResourceManager.GetString("BandedWaveFormStreamPositionConfiguration.Smoothing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to High.
+        /// </summary>
+        internal static string BandedWaveFormStreamPositionConfiguration_Smoothing_High {
+            get {
+                return ResourceManager.GetString("BandedWaveFormStreamPositionConfiguration.Smoothing.High", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Low.
+        /// </summary>
+        internal static string BandedWaveFormStreamPositionConfiguration_Smoothing_Low {
+            get {
+                return ResourceManager.GetString("BandedWaveFormStreamPositionConfiguration.Smoothing.Low", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Medium.
+        /// </summary>
+        internal static string BandedWaveFormStreamPositionConfiguration_Smoothing_Medium {
+            get {
+                return ResourceManager.GetString("BandedWaveFormStreamPositionConfiguration.Smoothing.Medium", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Off.
+        /// </summary>
+        internal static string BandedWaveFormStreamPositionConfiguration_Smoothing_Off {
+            get {
+                return ResourceManager.GetString("BandedWaveFormStreamPositionConfiguration.Smoothing.Off", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Advanced.
         /// </summary>
         internal static string General_Advanced {
