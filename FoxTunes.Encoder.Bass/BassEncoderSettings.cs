@@ -8,8 +8,6 @@ namespace FoxTunes
 {
     public abstract class BassEncoderSettings : BaseComponent, IBassEncoderSettings
     {
-        public static readonly object SyncRoot = new object();
-
         public const int DEPTH_AUTO = 0;
 
         public const int DEPTH_16 = 16;
@@ -40,29 +38,28 @@ namespace FoxTunes
 
         private string _BrowseFolder { get; set; }
 
-        public string GetBrowseFolder(string fileName)
+        public bool GetBrowseFolder(string fileName, out string directoryName)
         {
-            lock (SyncRoot)
+            if (string.IsNullOrEmpty(this._BrowseFolder))
             {
-                if (string.IsNullOrEmpty(this._BrowseFolder))
+                var options = new BrowseOptions(
+                    "Save As",
+                    Path.GetDirectoryName(fileName),
+                    Enumerable.Empty<BrowseFilter>(),
+                    BrowseFlags.Folder
+                );
+                var result = this.FileSystemBrowser.Browse(options);
+                if (!result.Success)
                 {
-                    var options = new BrowseOptions(
-                        "Save As",
-                        Path.GetDirectoryName(fileName),
-                        Enumerable.Empty<BrowseFilter>(),
-                        BrowseFlags.Folder
-                    );
-                    var result = this.FileSystemBrowser.Browse(options);
-                    if (!result.Success)
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Save As folder browse dialog was cancelled.");
-                        throw new OperationCanceledException();
-                    }
-                    this._BrowseFolder = result.Paths.FirstOrDefault();
-                    Logger.Write(this, LogLevel.Debug, "Browse folder: {0}", this._BrowseFolder);
+                    Logger.Write(this, LogLevel.Debug, "Save As folder browse dialog was cancelled.");
+                    directoryName = null;
+                    return false;
                 }
+                this._BrowseFolder = result.Paths.FirstOrDefault();
+                Logger.Write(this, LogLevel.Debug, "Browse folder: {0}", this._BrowseFolder);
             }
-            return this._BrowseFolder;
+            directoryName = this._BrowseFolder;
+            return true;
         }
 
         public string SpecificFolder { get; private set; }
@@ -89,28 +86,33 @@ namespace FoxTunes
 
         public abstract string GetArguments(EncoderItem encoderItem, IBassStream stream);
 
-        public virtual string GetOutput(string fileName)
+        public virtual bool TryGetOutput(string inputFileName, out string outputFileName)
         {
-            var directory = default(string);
-            var name = Path.GetFileNameWithoutExtension(fileName);
+            var name = Path.GetFileNameWithoutExtension(inputFileName);
+            var directoryName = default(string);
             switch (this.Destination)
             {
                 default:
                 case BassEncoderOutputDestination.Browse:
-                    directory = this.GetBrowseFolder(fileName);
+                    if (!this.GetBrowseFolder(inputFileName, out directoryName))
+                    {
+                        outputFileName = default(string);
+                        return false;
+                    }
                     break;
                 case BassEncoderOutputDestination.Source:
-                    directory = Path.GetDirectoryName(fileName);
+                    directoryName = Path.GetDirectoryName(inputFileName);
                     break;
                 case BassEncoderOutputDestination.Specific:
-                    directory = this.SpecificFolder;
+                    directoryName = this.SpecificFolder;
                     break;
             }
-            if (!this.CanWrite(directory))
+            if (!this.CanWrite(directoryName))
             {
-                throw new InvalidOperationException(string.Format("Cannot output to path \"{0}\" please check encoder settings.", directory));
+                throw new InvalidOperationException(string.Format("Cannot output to path \"{0}\" please check encoder settings.", directoryName));
             }
-            return Path.Combine(directory, string.Format("{0}.{1}", name, this.Extension));
+            outputFileName = Path.Combine(directoryName, string.Format("{0}.{1}", name, this.Extension));
+            return true;
         }
 
         protected virtual bool CanWrite(string directoryName)
