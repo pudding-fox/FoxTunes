@@ -61,65 +61,57 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler FramesChanged;
 
-        private int _TileSize { get; set; }
+        private int _GridTileSize { get; set; }
 
-        public int TileSize
+        public int GridTileSize
         {
             get
             {
-                return this._TileSize;
+                return this._GridTileSize;
             }
             set
             {
-                this._TileSize = value;
-                this.OnTileSizeChanged();
+                this._GridTileSize = value;
+                this.OnGridTileSizeChanged();
             }
         }
 
-        protected virtual void OnTileSizeChanged()
+        protected virtual void OnGridTileSizeChanged()
         {
-            if (this.IsInitialized)
+            if (this.GridTileSizeChanged != null)
             {
-                this.Debouncer.Exec(this.Reload);
+                this.GridTileSizeChanged(this, EventArgs.Empty);
             }
-            if (this.TileSizeChanged != null)
-            {
-                this.TileSizeChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("TileSize");
+            this.OnPropertyChanged("GridTileSize");
         }
 
-        public event EventHandler TileSizeChanged;
+        public event EventHandler GridTileSizeChanged;
 
-        private LibraryBrowserViewMode _ViewMode { get; set; }
+        private int _ListTileSize { get; set; }
 
-        public LibraryBrowserViewMode ViewMode
+        public int ListTileSize
         {
             get
             {
-                return this._ViewMode;
+                return this._ListTileSize;
             }
             set
             {
-                this._ViewMode = value;
-                this.OnViewModeChanged();
+                this._ListTileSize = value;
+                this.OnListTileSizeChanged();
             }
         }
 
-        protected virtual void OnViewModeChanged()
+        protected virtual void OnListTileSizeChanged()
         {
-            if (this.IsInitialized)
+            if (this.ListTileSizeChanged != null)
             {
-                this.Debouncer.Exec(this.Reload);
+                this.ListTileSizeChanged(this, EventArgs.Empty);
             }
-            if (this.ViewModeChanged != null)
-            {
-                this.ViewModeChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("ViewMode");
+            this.OnPropertyChanged("ListTileSize");
         }
 
-        public event EventHandler ViewModeChanged;
+        public event EventHandler ListTileSizeChanged;
 
         private LibraryBrowserImageMode _ImageMode { get; set; }
 
@@ -156,12 +148,12 @@ namespace FoxTunes.ViewModel
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<IntegerConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
-                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_SIZE
-            ).ConnectValue(value => this.TileSize = value);
-            this.Configuration.GetElement<SelectionConfigurationElement>(
+                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_GRID_TILE_SIZE
+            ).ConnectValue(value => this.GridTileSize = value);
+            this.Configuration.GetElement<IntegerConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
-                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_VIEW
-            ).ConnectValue(option => this.ViewMode = LibraryBrowserBehaviourConfiguration.GetLibraryView(option));
+                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_LIST_TILE_SIZE
+            ).ConnectValue(value => this.ListTileSize = value);
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_IMAGE

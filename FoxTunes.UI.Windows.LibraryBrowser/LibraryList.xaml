@@ -10,12 +10,12 @@
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
              xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-             x:Class="FoxTunes.LibraryBrowser"
+             x:Class="FoxTunes.LibraryList"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" AllowDrop="True">
     <UserControl.Resources>
         <LocalViewModel:LibraryBrowser x:Key="ViewModel"></LocalViewModel:LibraryBrowser>
-        <LocalViewModel:LibraryBrowserImageConverter x:Key="LibraryBrowserImageConverter" Width="{Binding GridTileSize, Source={StaticResource ViewModel}}" Height="{Binding GridTileSize, Source={StaticResource ViewModel}}"></LocalViewModel:LibraryBrowserImageConverter>
+        <LocalViewModel:LibraryBrowserImageConverter x:Key="LibraryBrowserImageConverter" Width="{Binding ListTileSize, Source={StaticResource ViewModel}}" Height="{Binding ListTileSize, Source={StaticResource ViewModel}}"></LocalViewModel:LibraryBrowserImageConverter>
         <ViewModel:LibraryHierarchyNodeConverter x:Key="LibraryHierarchyNodeConverter"></ViewModel:LibraryHierarchyNodeConverter>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <System:Boolean x:Key="True">True</System:Boolean>
@@ -69,18 +69,13 @@
                         <ListBox.ContextMenu>
                             <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_LIBRARY}}"></Windows:Menu>
                         </ListBox.ContextMenu>
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <LocalWindows:VirtualizingWrapPanel IsItemsHost="True"></LocalWindows:VirtualizingWrapPanel>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
                         <ListBox.ItemTemplateSelector>
                             <LocalWindows:LibraryBrowserTemplateSelector>
                                 <LocalWindows:LibraryBrowserTemplateSelector.UpTemplate>
                                     <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
-                                        <StackPanel Width="{Binding GridTileSize, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,3,0,0">
-                                            <Border Width="{Binding GridTileSize, Source={StaticResource ViewModel}}" Height="{Binding GridTileSize, Source={StaticResource ViewModel}}" BorderBrush="{DynamicResource TextBrush}" BorderThickness="1" Opacity=".50">
-                                                <Viewbox Stretch="Uniform">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Width="{Binding ListTileSize, Source={StaticResource ViewModel}}" Height="{Binding ListTileSize, Source={StaticResource ViewModel}}" BorderBrush="{DynamicResource TextBrush}" BorderThickness="1" Opacity=".50" Margin="0,0,4,0">
+                                                <Viewbox  Stretch="Uniform">
                                                     <Canvas Width="48" Height="48">
                                                         <Path>
                                                             <Path.Data>
@@ -95,15 +90,15 @@
                                                     </Canvas>
                                                 </Viewbox>
                                             </Border>
-                                            <TextBlock HorizontalAlignment="Center" Text="Back" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                                            <TextBlock VerticalAlignment="Center" Text="Back" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
                                         </StackPanel>
                                     </DataTemplate>
                                 </LocalWindows:LibraryBrowserTemplateSelector.UpTemplate>
                                 <LocalWindows:LibraryBrowserTemplateSelector.DefaultTemplate>
                                     <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
-                                        <StackPanel Width="{Binding GridTileSize, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,3,0,0">
-                                            <Windows:AsyncImage DataContext="{Binding Converter={StaticResource LibraryBrowserImageConverter}, Mode=OneWay}" Width="{Binding GridTileSize, Source={StaticResource ViewModel}}" Height="{Binding GridTileSize, Source={StaticResource ViewModel}}" Source="{Binding Value, FallbackValue={StaticResource Transparent}}" Margin="0,0,5,0"></Windows:AsyncImage>
-                                            <TextBlock HorizontalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Windows:AsyncImage DataContext="{Binding Converter={StaticResource LibraryBrowserImageConverter}, Mode=OneWay}" Width="{Binding ListTileSize, Source={StaticResource ViewModel}}" Height="{Binding ListTileSize, Source={StaticResource ViewModel}}" Source="{Binding Value, FallbackValue={StaticResource Transparent}}" Margin="0,0,4,0"></Windows:AsyncImage>
+                                            <TextBlock VerticalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
                                         </StackPanel>
                                     </DataTemplate>
                                 </LocalWindows:LibraryBrowserTemplateSelector.DefaultTemplate>

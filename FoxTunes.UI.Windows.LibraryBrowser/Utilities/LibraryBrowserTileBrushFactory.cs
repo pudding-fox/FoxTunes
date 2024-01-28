@@ -29,8 +29,6 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
-        public IntegerConfigurationElement TileSize { get; private set; }
-
         public SelectionConfigurationElement ImageMode { get; private set; }
 
         public TaskFactory Factory { get; private set; }
@@ -47,10 +45,6 @@ namespace FoxTunes
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration = core.Components.Configuration;
-            this.TileSize = this.Configuration.GetElement<IntegerConfigurationElement>(
-                WindowsUserInterfaceConfiguration.SECTION,
-                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_SIZE
-            );
             this.ImageMode = this.Configuration.GetElement<SelectionConfigurationElement>(
                 WindowsUserInterfaceConfiguration.SECTION,
                 LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_IMAGE
@@ -100,12 +94,10 @@ namespace FoxTunes
             }
         }
 
-        public Wrapper<ImageBrush> Create(LibraryHierarchyNode libraryHierarchyNode)
+        public Wrapper<ImageBrush> Create(LibraryHierarchyNode libraryHierarchyNode, int width, int height)
         {
-            var width = this.TileSize.Value;
-            var height = this.TileSize.Value;
-            var mode = LibraryBrowserBehaviourConfiguration.GetLibraryImage(this.ImageMode.Value);
             this.PixelSizeConverter.Convert(ref width, ref height);
+            var mode = LibraryBrowserBehaviourConfiguration.GetLibraryImage(this.ImageMode.Value);
             var placeholder = this.PlaceholderBrushFactory.Create(width, height);
             if (libraryHierarchyNode == null)
             {

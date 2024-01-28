@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Strings {
@@ -61,7 +61,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Library Browser.
+        ///   Looks up a localized string similar to Library Browser (Grid).
         /// </summary>
         internal static string LibraryBrowser_Name {
             get {
@@ -79,6 +79,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compound.
+        /// </summary>
+        internal static string LibraryBrowserBehaviourConfiguration_Image_Compound {
+            get {
+                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Image.Compound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to First.
+        /// </summary>
+        internal static string LibraryBrowserBehaviourConfiguration_Image_First {
+            get {
+                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Image.First", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Library Browser.
         /// </summary>
         internal static string LibraryBrowserBehaviourConfiguration_Path {
@@ -88,38 +106,29 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tile Size.
+        ///   Looks up a localized string similar to Tile Size (Grid).
         /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_Size {
+        internal static string LibraryBrowserBehaviourConfiguration_Size_Grid {
             get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Size", resourceCulture);
+                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Size.Grid", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to View Type.
+        ///   Looks up a localized string similar to Tile Size (List).
         /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_View {
+        internal static string LibraryBrowserBehaviourConfiguration_Size_List {
             get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.View", resourceCulture);
+                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.Size.List", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Grid.
+        ///   Looks up a localized string similar to Library Browser (List).
         /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_View_Grid {
+        internal static string LibraryList_Name {
             get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.View.Grid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to List.
-        /// </summary>
-        internal static string LibraryBrowserBehaviourConfiguration_View_List {
-            get {
-                return ResourceManager.GetString("LibraryBrowserBehaviourConfiguration.View.List", resourceCulture);
+                return ResourceManager.GetString("LibraryList.Name", resourceCulture);
             }
         }
     }
