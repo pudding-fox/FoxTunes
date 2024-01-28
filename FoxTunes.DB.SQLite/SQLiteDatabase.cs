@@ -31,7 +31,9 @@ namespace FoxTunes
 
         protected override IDatabaseQueries CreateQueries()
         {
-            return new SQLiteDatabaseQueries(this);
+            var queries = new SQLiteDatabaseQueries(this);
+            queries.InitializeComponent(this.Core);
+            return queries;
         }
 
         private static IProvider GetProvider()

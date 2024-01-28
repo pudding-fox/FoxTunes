@@ -23,6 +23,14 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Templates\GetLibraryHierarchyNodes.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <CustomToolNamespace>FoxTunes.Templates</CustomToolNamespace>
+      <LastGenOutput>GetLibraryHierarchyNodes.cs</LastGenOutput>
+    </None>
     <Compile Update="Templates\GetLibraryHierarchyNodes.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -36,13 +44,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Templates\GetLibraryHierarchyNodes.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>GetLibraryHierarchyNodes.cs</LastGenOutput>
-    </None>
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using FoxTunes.Templates;
 using System.Data;
 
 namespace FoxTunes
@@ -14,6 +15,13 @@ namespace FoxTunes
 
         public IDatabase Database { get; private set; }
 
+        public IFilterParser FilterParser { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.FilterParser = core.Components.FilterParser;
+            base.InitializeComponent(core);
+        }
 
         public IDatabaseQuery AddLibraryHierarchyNode
         {
@@ -106,16 +114,20 @@ namespace FoxTunes
 
         public abstract IDatabaseQuery GetLibraryHierarchyMetaData { get; }
 
-        public IDatabaseQuery GetLibraryHierarchyNodes
+        public IDatabaseQuery GetLibraryHierarchyNodes(string filter)
         {
-            get
+            var result = default(IFilterParserResult);
+            if (!string.IsNullOrEmpty(filter) && !this.FilterParser.TryParse(filter, out result))
             {
-                return this.Database.QueryFactory.Create(
-                    Resources.GetLibraryHierarchyNodes,
-                    new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
-                );
+                //TODO: Warn, failed to parse filter.
+                result = null;
             }
+            var getLibraryHierarchyNodes = new GetLibraryHierarchyNodes(this.Database, result);
+            return this.Database.QueryFactory.Create(
+                getLibraryHierarchyNodes.TransformText(),
+                new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                new DatabaseQueryParameter("libraryHierarchyItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+            );
         }
 
         public IDatabaseQuery GetLibraryItems

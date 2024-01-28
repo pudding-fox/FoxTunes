@@ -126,7 +126,7 @@ namespace FoxTunes
             {
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    var nodes = database.ExecuteEnumerator<LibraryHierarchyNode>(database.Queries.GetLibraryHierarchyNodes, (parameters, phase) =>
+                    var nodes = database.ExecuteEnumerator<LibraryHierarchyNode>(database.Queries.GetLibraryHierarchyNodes(this.Filter), (parameters, phase) =>
                     {
                         switch (phase)
                         {
