@@ -15,7 +15,7 @@
     </Windows:WindowBase.Resources>
     <TabControl>
         <TabItem Header="General">
-            <Windows:SettingsDialog></Windows:SettingsDialog>
+            <Windows:ComponentSettingsDialog></Windows:ComponentSettingsDialog>
         </TabItem>
         <TabItem Header="Library">
             <Windows:LibrarySettingsDialog></Windows:LibrarySettingsDialog>

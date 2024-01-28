@@ -25,6 +25,8 @@ namespace FoxTunes
 
         public abstract void OpenInShell(string fileName);
 
+        public abstract Task ShowSettings(string title, IEnumerable<string> sections);
+
         public abstract void Restart();
 
         protected virtual void OnWindowCreated(IUserInterfaceWindow window)

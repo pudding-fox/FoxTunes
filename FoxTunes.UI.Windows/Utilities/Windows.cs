@@ -583,6 +583,23 @@ namespace FoxTunes
             return result;
         }
 
+        public static async Task<bool> ShowDialog<T>(ICore core, string title, T content)
+        {
+            var result = default(bool);
+            await Invoke(() =>
+            {
+                var window = new DialogWindow<T>(content)
+                {
+                    Owner = ActiveWindow,
+                    DataContext = core,
+                    Topmost = true,
+                    Title = title
+                };
+                result = window.ShowDialog().GetValueOrDefault();
+            }).ConfigureAwait(false);
+            return result;
+        }
+
         private class DialogWindow<T> : WindowBase
         {
             private DialogWindow()

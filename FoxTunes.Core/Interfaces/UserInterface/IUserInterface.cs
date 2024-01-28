@@ -24,6 +24,8 @@ namespace FoxTunes.Interfaces
 
         void OpenInShell(string fileName);
 
+        Task ShowSettings(string title, IEnumerable<string> sections);
+
         void Restart();
 
         event UserInterfaceWindowEventHandler WindowCreated;
