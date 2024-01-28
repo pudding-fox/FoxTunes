@@ -8,6 +8,15 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class LibraryBrowserBehaviour : StandardBehaviour, IConfigurableComponent
     {
+        const int TIMEOUT = 1000;
+
+        public LibraryBrowserBehaviour()
+        {
+            this.Debouncer = new Debouncer(TIMEOUT);
+        }
+
+        public Debouncer Debouncer { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -34,7 +43,7 @@ namespace FoxTunes
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
         {
-            this.Dispatch(this.RefreshImages);
+            this.Debouncer.Exec(() => this.Dispatch(this.RefreshImages));
         }
 
         private Task RefreshImages()
