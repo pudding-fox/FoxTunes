@@ -7,13 +7,17 @@
         xmlns:Windows="clr-namespace:FoxTunes" 
         xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
         xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:Shell="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         x:Class="FoxTunes.MainWindow"
         mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
-        Title="Fox Tunes" Icon="pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico">
+        Title="Fox Tunes" Icon="pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico" WindowStyle="None" AllowsTransparency="True" Background="Transparent">
+    <Shell:WindowChrome.WindowChrome>
+        <Shell:WindowChrome CaptionHeight="0" ResizeBorderThickness="5"></Shell:WindowChrome>
+    </Shell:WindowChrome.WindowChrome>
     <Window.Resources>
         <ViewModel:Main x:Key="ViewModel" Core="{Binding}"></ViewModel:Main>
     </Window.Resources>
-    <Grid Background="{DynamicResource NormalBrush}">
+    <Grid>
         <Grid.LayoutTransform>
             <ScaleTransform ScaleX="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" ScaleY="{Binding ScalingFactor.Value, Source={StaticResource ViewModel}}" />
         </Grid.LayoutTransform>
