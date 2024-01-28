@@ -14,7 +14,7 @@ namespace FoxTunes
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.MODE_ELEMENT
-            ).ConnectValue<string>(value => this.Enabled = string.Equals(value, BassDirectSoundStreamOutputConfiguration.MODE_DS_OPTION, StringComparison.OrdinalIgnoreCase));
+            ).ConnectValue(value => this.Enabled = string.Equals(value.Id, BassDirectSoundStreamOutputConfiguration.MODE_DS_OPTION, StringComparison.OrdinalIgnoreCase));
             base.InitializeComponent(core);
         }
 

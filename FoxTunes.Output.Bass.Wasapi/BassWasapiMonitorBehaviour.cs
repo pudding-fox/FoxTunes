@@ -14,7 +14,7 @@ namespace FoxTunes
             this.Configuration.GetElement<SelectionConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.MODE_ELEMENT
-            ).ConnectValue<string>(value => this.Enabled = string.Equals(value, BassWasapiStreamOutputConfiguration.MODE_WASAPI_OPTION, StringComparison.OrdinalIgnoreCase));
+            ).ConnectValue(value => this.Enabled = string.Equals(value.Id, BassWasapiStreamOutputConfiguration.MODE_WASAPI_OPTION, StringComparison.OrdinalIgnoreCase));
             base.InitializeComponent(core);
         }
 
