@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:Windows="clr-namespace:FoxTunes"
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" Loaded="OnLoaded" Unloaded="OnUnloaded">
     <Grid>
@@ -13,7 +14,7 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <TextBox x:Name="TextBox" Text="{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:SearchBox}}, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" KeyUp="OnKeyUp"></TextBox>
-        <TextBlock Text="{x:Static Windows:Strings.General_Search}" Opacity="0.5" FontStyle="Italic" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}">
+        <TextBlock Text="{x:Static ViewModel:StringResources.General_Search}" Opacity="0.5" FontStyle="Italic" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}">
             <TextBlock.Style>
                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                     <Setter Property="Visibility" Value="Collapsed"></Setter>

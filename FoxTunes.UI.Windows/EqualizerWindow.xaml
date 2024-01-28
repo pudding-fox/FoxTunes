@@ -5,9 +5,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
         xmlns:Windows="clr-namespace:FoxTunes" 
+        xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
         x:Class="FoxTunes.EqualizerWindow"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
-        Title="{x:Static Windows:Strings.EqualizerWindow_Title}" 
+        Title="{x:Static ViewModel:StringResources.EqualizerWindow_Title}" 
         Topmost="True"
         ResizeMode="NoResize" 
         SizeToContent="WidthAndHeight">

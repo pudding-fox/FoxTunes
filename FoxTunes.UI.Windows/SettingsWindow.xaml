@@ -5,9 +5,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
         xmlns:Windows="clr-namespace:FoxTunes" 
+        xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
         x:Class="FoxTunes.SettingsWindow"
         mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
-        Title="{x:Static Windows:Strings.SettingsWindow_Title}" 
+        Title="{x:Static ViewModel:StringResources.SettingsWindow_Title}" 
         Topmost="True">
     <TabControl>
         <TabItem Header="General">
