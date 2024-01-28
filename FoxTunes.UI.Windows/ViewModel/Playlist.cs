@@ -2,8 +2,10 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -227,6 +229,88 @@ namespace FoxTunes.ViewModel
             {
                 return new Command(() => this.SettingsVisible = true);
             }
+        }
+
+        public ICommand DragEnterCommand
+        {
+            get
+            {
+                return new Command<DragEventArgs>(this.OnDragEnter);
+            }
+        }
+
+        protected virtual void OnDragEnter(DragEventArgs e)
+        {
+            var effects = DragDropEffects.None;
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                effects = DragDropEffects.Copy;
+            }
+            if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
+            {
+                effects = DragDropEffects.Copy;
+            }
+            e.Effects = effects;
+        }
+
+        public ICommand DropCommand
+        {
+            get
+            {
+                return new AsyncCommand<DragEventArgs>(this.OnDrop);
+            }
+        }
+
+        protected virtual Task OnDrop(DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
+                return this.AddToPlaylist(paths);
+            }
+            if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
+            {
+                var libraryHierarchyNode = e.Data.GetData(typeof(LibraryHierarchyNode)) as LibraryHierarchyNode;
+                return this.AddToPlaylist(libraryHierarchyNode);
+            }
+            return Task.CompletedTask;
+        }
+
+        private Task AddToPlaylist(IEnumerable<string> paths)
+        {
+            var sequence = default(int);
+            if (this.TryGetInsertSequence(out sequence))
+            {
+                return this.Core.Managers.Playlist.Insert(sequence, paths);
+            }
+            else
+            {
+                return this.Core.Managers.Playlist.Add(paths);
+            }
+        }
+
+        private Task AddToPlaylist(LibraryHierarchyNode libraryHierarchyNode)
+        {
+            var sequence = default(int);
+            if (this.TryGetInsertSequence(out sequence))
+            {
+                return this.Core.Managers.Playlist.Insert(sequence, libraryHierarchyNode);
+            }
+            else
+            {
+                return this.Core.Managers.Playlist.Add(libraryHierarchyNode);
+            }
+        }
+
+        protected virtual bool TryGetInsertSequence(out int sequence)
+        {
+            if (!this.InsertActive)
+            {
+                sequence = 0;
+                return false;
+            }
+            sequence = this.InsertIndex + this.InsertOffset;
+            return true;
         }
 
         #region IValueConverter
