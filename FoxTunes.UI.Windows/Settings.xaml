@@ -6,7 +6,6 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
@@ -39,18 +38,27 @@
                Placement="Center" 
                AllowsTransparency="True" 
                IsOpen="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}" 
-               StaysOpen="False">
-            <Interactivity:Interaction.Triggers>
-                <Interactivity:EventTrigger EventName="Closed">
-                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=SaveCommand}" CommandParameter="{Binding Components.Configuration}"></Interactivity:InvokeCommandAction>
-                </Interactivity:EventTrigger>
-            </Interactivity:Interaction.Triggers>
+               StaysOpen="True"
+               Width="600" Height="400">
             <Border Background="{DynamicResource NormalBrush}" 
                     BorderBrush="{DynamicResource NormalBorderBrush}" 
                     BorderThickness="1" 
                     CornerRadius="8,8,3,3" 
                     Padding="10">
-                <Windows:SettingsDialog></Windows:SettingsDialog>
+                <TabControl>
+                    <Windows:CommandExtensions.Decorator>
+                        <Windows:CommandDecorator Command="{Binding HideCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Phase="{x:Static ViewModel:CommandPhase.After}" Tag="{x:Static ViewModel:CommandHints.DISMISS}"></Windows:CommandDecorator>
+                    </Windows:CommandExtensions.Decorator>
+                    <TabItem Header="General">
+                        <Windows:SettingsDialog></Windows:SettingsDialog>
+                    </TabItem>
+                    <TabItem Header="Library">
+                        <Windows:LibrarySettingsDialog></Windows:LibrarySettingsDialog>
+                    </TabItem>
+                    <TabItem Header="Playlist">
+                        <Windows:PlaylistSettingsDialog></Windows:PlaylistSettingsDialog>
+                    </TabItem>
+                </TabControl>
             </Border>
         </Popup>
     </Grid>

@@ -12,62 +12,63 @@
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock>Settings</TextBlock>
-        <ItemsControl Grid.Row="1" Grid.IsSharedSizeScope="True" ItemsSource="{Binding Components.Configuration.Sections}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <GroupBox Header="{Binding Name}" Padding="0,7,0,0">
-                        <ItemsControl ItemsSource="{Binding Elements}">
-                            <ItemsControl.ItemContainerStyle>
-                                <Style TargetType="{x:Type ContentPresenter}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsHidden}" Value="True">
-                                            <Setter Property="Visibility" Value="Collapsed"></Setter>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ItemsControl.ItemContainerStyle>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Margin="0,0,0,5">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition SharedSizeGroup="Value" Width="300"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Label VerticalAlignment="Center" Padding="0,0,7,0" Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
-                                        <ContentControl Grid.Column="1" Content="{Binding}">
-                                            <ContentControl.Resources>
-                                                <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
-                                                    <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding SelectedOption}" DisplayMemberPath="Name">
-                                                        <!--<ComboBox.ItemContainerStyle>
-                                                            <Style TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding IsHidden}" Value="True">
-                                                                        <Setter Property="Visibility" Value="Collapsed"></Setter>
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </ComboBox.ItemContainerStyle>-->
-                                                    </ComboBox>
-                                                </DataTemplate>
-                                                <DataTemplate DataType="{x:Type Core:BooleanConfigurationElement}">
-                                                    <CheckBox IsChecked="{Binding Value}"></CheckBox>
-                                                </DataTemplate>
-                                                <DataTemplate DataType="{x:Type Core:TextConfigurationElement}">
-                                                    <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus}"></TextBox>
-                                                </DataTemplate>
-                                            </ContentControl.Resources>
-                                        </ContentControl>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </GroupBox>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <ScrollViewer Grid.Row="0" >
+            <ItemsControl Grid.IsSharedSizeScope="True" ItemsSource="{Binding Components.Configuration.Sections}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <GroupBox Header="{Binding Name}" Padding="0,7,0,0">
+                            <ItemsControl ItemsSource="{Binding Elements}">
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ContentPresenter}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsHidden}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,0,0,5">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="Name" Width="Auto"></ColumnDefinition>
+                                                <ColumnDefinition></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <Label VerticalAlignment="Center" Padding="0,0,7,0" Content="{Binding Name}" ContentStringFormat="{}{0}:"></Label>
+                                            <ContentControl Grid.Column="1" Content="{Binding}">
+                                                <ContentControl.Resources>
+                                                    <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
+                                                        <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding SelectedOption}" DisplayMemberPath="Name"></ComboBox>
+                                                    </DataTemplate>
+                                                    <DataTemplate DataType="{x:Type Core:BooleanConfigurationElement}">
+                                                        <CheckBox IsChecked="{Binding Value}"></CheckBox>
+                                                    </DataTemplate>
+                                                    <DataTemplate DataType="{x:Type Core:TextConfigurationElement}">
+                                                        <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus}"></TextBox>
+                                                    </DataTemplate>
+                                                </ContentControl.Resources>
+                                            </ContentControl>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </GroupBox>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                    <Setter Property="Width" Value="60"></Setter>
+                    <Setter Property="Height" Value="30"></Setter>
+                    <Setter Property="Margin" Value="7,7,0,0"></Setter>
+                </Style>
+            </StackPanel.Resources>
+            <Button Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
+        </StackPanel>
     </Grid>
 </UserControl>

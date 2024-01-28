@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using FoxTunes.Interfaces;
 using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
@@ -33,14 +32,30 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler SettingsVisibleChanged = delegate { };
 
+        public ICommand ShowCommand
+        {
+            get
+            {
+                return new Command(() => this.SettingsVisible = true);
+            }
+        }
+
+        public ICommand HideCommand
+        {
+            get
+            {
+                return new Command(() => this.SettingsVisible = false);
+            }
+        }
+
         public ICommand SaveCommand
         {
             get
             {
-                return new Command<IConfiguration>(
-                    configuration => configuration.Save(),
-                    configuration => configuration != null
-                );
+                return new Command(() => this.Core.Components.Configuration.Save())
+                {
+                    Tag = CommandHints.DISMISS
+                };
             }
         }
 

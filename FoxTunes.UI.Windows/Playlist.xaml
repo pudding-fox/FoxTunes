@@ -50,19 +50,7 @@
                 <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYLIST}}"></Windows:Menu>
             </ListView.ContextMenu>
             <ListView.View>
-                <GridView Windows:GridViewExtensions.ColumnsSource="{Binding GridColumns, Source={StaticResource ViewModel}}">
-                    <GridView.ColumnHeaderContainerStyle>
-                        <Style TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
-                            <Setter Property="ContextMenu">
-                                <Setter.Value>
-                                    <ContextMenu>
-                                        <MenuItem Header="Settings" Command="{Binding SettingsCommand, Mode=OneWay, Source={StaticResource ViewModel}}"></MenuItem>
-                                    </ContextMenu>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </GridView.ColumnHeaderContainerStyle>
-                </GridView>
+                <GridView Windows:GridViewExtensions.ColumnsSource="{Binding GridColumns, Source={StaticResource ViewModel}}"></GridView>
             </ListView.View>
         </ListView>
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Add to playlist by dropping files here." IsHitTestVisible="False">
@@ -77,18 +65,5 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <Popup PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}" 
-              Placement="Center" 
-              AllowsTransparency="True" 
-              IsOpen="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}" 
-              StaysOpen="False">
-            <Border Background="{DynamicResource NormalBrush}" 
-                    BorderBrush="{DynamicResource NormalBorderBrush}" 
-                    BorderThickness="1" 
-                    CornerRadius="8,8,3,3" 
-                    Padding="10">
-                <Windows:PlaylistSettingsDialog></Windows:PlaylistSettingsDialog>
-            </Border>
-        </Popup>
     </Grid>
 </UserControl>

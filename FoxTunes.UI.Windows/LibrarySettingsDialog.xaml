@@ -6,26 +6,27 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance Core:Core}">
+             d:DesignHeight="500" d:DesignWidth="700" d:DataContext="{d:DesignInstance Core:Core}">
     <UserControl.Resources>
         <ViewModel:LibrarySettings x:Key="ViewModel" Core="{Binding}"/>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0">Library Settings</TextBlock>
-        <GroupBox Grid.Row="1" Header="Hierarchies" Padding="0,7,0,0">
+        <GroupBox Grid.Row="0" Header="Hierarchies" Padding="0,7,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition Width="200"></ColumnDefinition>
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <StackPanel>
-                    <ListBox Grid.Column="0" Grid.Row="0" Height="100" ItemsSource="{Binding LibraryHierarchies, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedLibraryHierarchy, Source={StaticResource ViewModel}}" DisplayMemberPath="Name"></ListBox>
-                    <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Row="0">
+                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
                                 <Setter Property="Width" Value="60"></Setter>
@@ -36,8 +37,10 @@
                         <Button Command="{Binding NewHierarchyCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
                         <Button Command="{Binding DeleteHierarchyCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
                     </StackPanel>
-                    <ListBox Grid.Column="0" Grid.Row="2" Height="100" Margin="0,7,0,0" ItemsSource="{Binding SelectedLibraryHierarchy.Levels, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedHierarchyLevel, Source={StaticResource ViewModel}}" DisplayMemberPath="Name"></ListBox>
-                    <StackPanel Grid.Column="0" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <ListBox ItemsSource="{Binding LibraryHierarchies, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedLibraryHierarchy, Source={StaticResource ViewModel}}" DisplayMemberPath="Name"></ListBox>
+                </DockPanel>
+                <DockPanel Grid.Row="1">
+                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
                                 <Setter Property="Width" Value="60"></Setter>
@@ -48,8 +51,9 @@
                         <Button Command="{Binding NewHierarchyLevelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
                         <Button Command="{Binding DeleteHierarchyLevelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
                     </StackPanel>
-                </StackPanel>
-                <DockPanel Grid.Column="1" Grid.IsSharedSizeScope="True">
+                    <ListBox Margin="0,7,0,0" ItemsSource="{Binding SelectedLibraryHierarchy.Levels, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedHierarchyLevel, Source={StaticResource ViewModel}}" DisplayMemberPath="Name"></ListBox>
+                </DockPanel>
+                <DockPanel Grid.Column="1" Grid.RowSpan="2" Grid.IsSharedSizeScope="True">
                     <Grid DockPanel.Dock="Top" DataContext="{Binding SelectedLibraryHierarchy, Source={StaticResource ViewModel}}">
                         <Grid.Style>
                             <Style TargetType="{x:Type Grid}">
@@ -63,7 +67,7 @@
                         </Grid.Style>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Label"></ColumnDefinition>
-                            <ColumnDefinition Width="300"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>
@@ -84,8 +88,7 @@
                         </Grid.Style>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Label"></ColumnDefinition>
-                            <ColumnDefinition Width="54.163"></ColumnDefinition>
-                            <ColumnDefinition Width="245.837"/>
+                            <ColumnDefinition></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>
@@ -99,7 +102,7 @@
                 </DockPanel>
             </Grid>
         </GroupBox>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
                     <Setter Property="Width" Value="60"></Setter>
@@ -108,6 +111,7 @@
                 </Style>
             </StackPanel.Resources>
             <Button Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
+            <Button Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Cancel</Button>
         </StackPanel>
     </Grid>
 </UserControl>

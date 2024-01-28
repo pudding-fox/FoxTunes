@@ -6,25 +6,23 @@
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
+             d:DesignHeight="500" d:DesignWidth="700" d:DataContext="{d:DesignInstance {x:Type Core:Core}, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:PlaylistSettings x:Key="ViewModel" Core="{Binding}"/>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0">Playlist Settings</TextBlock>
-        <GroupBox Grid.Row="1" Header="Columns" Padding="0,7,0,0">
+        <GroupBox Grid.Row="0" Header="Columns" Padding="0,7,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition Width="200"></ColumnDefinition>
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="175"></RowDefinition>
+                    <RowDefinition></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <ListBox Grid.Column="0" Grid.Row="0" ItemsSource="{Binding PlaylistColumns, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedPlaylistColumn, Source={StaticResource ViewModel}}" DisplayMemberPath="Name"></ListBox>
@@ -52,14 +50,14 @@
                     </Grid.Style>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="300"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Label Grid.Column="0" Grid.Row="0">Name</Label>
+                    <Label Grid.Column="0" Grid.Row="0">Column Name</Label>
                     <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Name}"></TextBox>
                     <Label Grid.Column="0" Grid.Row="1">Dynamic</Label>
                     <CheckBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" IsChecked="{Binding IsDynamic}"></CheckBox>
@@ -68,7 +66,7 @@
                 </Grid>
             </Grid>
         </GroupBox>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
                     <Setter Property="Width" Value="60"></Setter>
@@ -77,6 +75,7 @@
                 </Style>
             </StackPanel.Resources>
             <Button Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
+            <Button Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Cancel</Button>
         </StackPanel>
     </Grid>
 </UserControl>
