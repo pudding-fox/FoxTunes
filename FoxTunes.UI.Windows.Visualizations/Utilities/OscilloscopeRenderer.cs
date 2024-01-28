@@ -183,7 +183,7 @@ namespace FoxTunes
             }
             catch (Exception exception)
             {
-                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data, disabling: {0}", exception.Message);
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update oscilloscope data, disabling: {0}", exception.Message);
             }
         }
 

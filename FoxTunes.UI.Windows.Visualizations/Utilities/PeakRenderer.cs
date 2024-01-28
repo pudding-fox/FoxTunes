@@ -259,7 +259,7 @@ namespace FoxTunes
             }
             catch (Exception exception)
             {
-                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update Visualization data, disabling: {0}", exception.Message);
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update peak data, disabling: {0}", exception.Message);
             }
         }
 
