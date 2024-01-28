@@ -199,7 +199,7 @@ namespace FoxTunes.ViewModel
             this.Items.Clear();
             foreach (var item in this.GetItems().OrderBy(item => item.Invocation.Category).ThenBy(item => item.Invocation.Id))
             {
-                if (item.Separator)
+                if (item.Separator && this.Items.Count > 0)
                 {
                     this.Items.Add(null);
                 }
