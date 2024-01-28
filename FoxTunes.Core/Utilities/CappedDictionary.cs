@@ -72,9 +72,13 @@ namespace FoxTunes
             {
                 lock (this.SyncRoot)
                 {
-                    var value = this.Values[0];
-                    this.Values.RemoveAt(0);
-                    return value;
+                    if (this.Values.Count > 0)
+                    {
+                        var value = this.Values[0];
+                        this.Values.RemoveAt(0);
+                        return value;
+                    }
+                    return default(TKey);
                 }
             }
 

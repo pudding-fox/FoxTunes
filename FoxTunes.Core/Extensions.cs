@@ -251,6 +251,10 @@ namespace FoxTunes
 
         public static bool TryRemove<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dictionary, TKey key)
         {
+            if (EqualityComparer<TKey>.Default.Equals(key, default(TKey)))
+            {
+                return false;
+            }
             var value = default(TValue);
             return dictionary.TryRemove(key, out value);
         }

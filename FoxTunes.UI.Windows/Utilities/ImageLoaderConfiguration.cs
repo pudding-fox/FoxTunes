@@ -14,7 +14,7 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION, "Images")
                 .WithElement(new BooleanConfigurationElement(HIGH_QUALITY_RESIZER, "High Quality Resizer").WithValue(true))
-                .WithElement(new IntegerConfigurationElement(CACHE_SIZE, "Cache Size").WithValue(128).WithValidationRule(new IntegerValidationRule(0, 1280))
+                .WithElement(new IntegerConfigurationElement(CACHE_SIZE, "Cache Size").WithValue(128).WithValidationRule(new IntegerValidationRule(64, 1280))
             );
         }
     }
