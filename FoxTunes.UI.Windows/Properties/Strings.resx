@@ -363,6 +363,9 @@
   <data name="MiniPlaylist.Name" xml:space="preserve">
     <value>Simple Playlist</value>
   </data>
+  <data name="OutputSelector.Name" xml:space="preserve">
+    <value>Output Selector</value>
+  </data>
   <data name="Playback.Name" xml:space="preserve">
     <value>Playback Controls</value>
   </data>

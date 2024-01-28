@@ -799,6 +799,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Output Selector.
+        /// </summary>
+        internal static string OutputSelector_Name {
+            get {
+                return ResourceManager.GetString("OutputSelector.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Playback Controls.
         /// </summary>
         internal static string Playback_Name {

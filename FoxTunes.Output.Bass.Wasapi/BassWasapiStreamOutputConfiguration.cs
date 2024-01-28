@@ -71,15 +71,8 @@ namespace FoxTunes
                 .WithElement(new CommandConfigurationElement(ELEMENT_REFRESH, Strings.BassWasapiStreamOutputConfiguration_RefreshDevices, path: Strings.WASAPI)
                     .WithHandler(() =>
                     {
-                        var element = StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(
-                            BassOutputConfiguration.SECTION,
-                            ELEMENT_WASAPI_DEVICE
-                        );
-                        if (element == null)
-                        {
-                            return;
-                        }
-                        element.WithOptions(GetWASAPIDevices(), true);
+                        var selector = ComponentRegistry.Instance.GetComponent<BassWasapiOutputDeviceSelector>();
+                        selector.Refresh();
                     })
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_WASAPI_OPTION)
             );
@@ -102,7 +95,7 @@ namespace FoxTunes
             return BassWasapi.DefaultDevice;
         }
 
-        private static IEnumerable<SelectionConfigurationOption> GetWASAPIDevices()
+        public static IEnumerable<SelectionConfigurationOption> GetWASAPIDevices()
         {
             yield return new SelectionConfigurationOption(BassWasapi.DefaultDevice.ToString(), "Default Device");
             for (int a = 0, b = BassWasapi.DeviceCount; a < b; a++)

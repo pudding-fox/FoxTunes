@@ -7,6 +7,8 @@ namespace FoxTunes
 {
     public static class BassDirectSoundStreamOutputConfiguration
     {
+        const string NO_SOUND = "No sound";
+
         public const string SECTION = BassOutputConfiguration.SECTION;
 
         public const string OUTPUT_ELEMENT = BassOutputConfiguration.OUTPUT_ELEMENT;
@@ -28,15 +30,8 @@ namespace FoxTunes
                 .WithElement(new CommandConfigurationElement(ELEMENT_REFRESH, "Refresh Devices", path: Strings.DirectSound)
                     .WithHandler(() =>
                     {
-                        var element = StandardComponents.Instance.Configuration.GetElement<SelectionConfigurationElement>(
-                            BassOutputConfiguration.SECTION,
-                            ELEMENT_DS_DEVICE
-                        );
-                        if (element == null)
-                        {
-                            return;
-                        }
-                        element.WithOptions(GetDSDevices(), true);
+                        var selector = ComponentRegistry.Instance.GetComponent<BassDirectSoundOutputDeviceSelector>();
+                        selector.Refresh();
                     })
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_DS_OPTION)
             );
@@ -62,7 +57,7 @@ namespace FoxTunes
             return Bass.DefaultDevice;
         }
 
-        private static IEnumerable<SelectionConfigurationOption> GetDSDevices()
+        public static IEnumerable<SelectionConfigurationOption> GetDSDevices()
         {
             yield return new SelectionConfigurationOption(Bass.DefaultDevice.ToString(), "Default Device");
             for (int a = 0, b = Bass.DeviceCount; a < b; a++)
@@ -71,6 +66,10 @@ namespace FoxTunes
                 BassUtils.OK(Bass.GetDeviceInfo(a, out deviceInfo));
                 LogManager.Logger.Write(typeof(BassDirectSoundStreamOutputConfiguration), LogLevel.Debug, "DS Device: {0} => {1} => {2}", a, deviceInfo.Name, deviceInfo.Driver);
                 if (!deviceInfo.IsEnabled)
+                {
+                    continue;
+                }
+                if (string.Equals(deviceInfo.Name, NO_SOUND, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
