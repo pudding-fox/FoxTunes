@@ -12,7 +12,7 @@ namespace FoxTunes
     [UIComponentDependency(MetaDataBehaviourConfiguration.SECTION, MetaDataBehaviourConfiguration.ENABLE_ELEMENT)]
     public partial class LibraryBrowser : UIComponentBase
     {
-        public static readonly ArtworkGridLoader ArtworkGridLoader = ComponentRegistry.Instance.GetComponent<ArtworkGridLoader>();
+        public static readonly LibraryBrowserTileLoader LibraryBrowserTileLoader = ComponentRegistry.Instance.GetComponent<LibraryBrowserTileLoader>();
 
         public LibraryBrowser()
         {
@@ -142,68 +142,53 @@ namespace FoxTunes
             {
                 return;
             }
-            var artworkGrid = element.GetVisualChild<ArtworkGrid>();
-            if (artworkGrid == null)
+            var libraryBrowserTile = element.GetVisualChild<LibraryBrowserTile>();
+            if (libraryBrowserTile == null)
             {
                 return;
             }
-            if (e.IsItemVisible && artworkGrid.Background == null)
+            if (e.IsItemVisible && libraryBrowserTile.Background == null)
             {
-                ArtworkGridLoader.Load(artworkGrid, ArtworkGridLoaderPriority.High);
+                LibraryBrowserTileLoader.Load(libraryBrowserTile, LibraryBrowserTileLoaderPriority.High);
             }
             else
             {
-                ArtworkGridLoader.Cancel(artworkGrid, ArtworkGridLoaderPriority.High);
+                LibraryBrowserTileLoader.Cancel(libraryBrowserTile, LibraryBrowserTileLoaderPriority.High);
             }
         }
 
         protected virtual void OnItemLoaded_Low(object sender, RoutedEventArgs e)
         {
-            var artworkGrid = e.OriginalSource as ArtworkGrid;
-            if (artworkGrid == null)
+            var libraryBrowserTile = e.OriginalSource as LibraryBrowserTile;
+            if (libraryBrowserTile == null)
             {
                 return;
             }
-            if (artworkGrid.Background == null)
+            if (libraryBrowserTile.Background == null)
             {
-                ArtworkGridLoader.Load(artworkGrid, ArtworkGridLoaderPriority.Low);
+                LibraryBrowserTileLoader.Load(libraryBrowserTile, LibraryBrowserTileLoaderPriority.Low);
             }
             else
             {
-                ArtworkGridLoader.Cancel(artworkGrid, ArtworkGridLoaderPriority.Low);
+                LibraryBrowserTileLoader.Cancel(libraryBrowserTile, LibraryBrowserTileLoaderPriority.Low);
             }
         }
 
         protected virtual void OnItemLoaded_High(object sender, RoutedEventArgs e)
         {
-            var artworkGrid = e.OriginalSource as ArtworkGrid;
-            if (artworkGrid == null)
+            var libraryBrowserTile = e.OriginalSource as LibraryBrowserTile;
+            if (libraryBrowserTile == null)
             {
                 return;
             }
-            if (artworkGrid.Background == null)
+            if (libraryBrowserTile.Background == null)
             {
-                ArtworkGridLoader.Load(artworkGrid, ArtworkGridLoaderPriority.High);
+                LibraryBrowserTileLoader.Load(libraryBrowserTile, LibraryBrowserTileLoaderPriority.High);
             }
             else
             {
-                ArtworkGridLoader.Cancel(artworkGrid, ArtworkGridLoaderPriority.High);
+                LibraryBrowserTileLoader.Cancel(libraryBrowserTile, LibraryBrowserTileLoaderPriority.High);
             }
-        }
-
-        protected virtual void OnCleanUpVirtualizedItem(object sender, CleanUpVirtualizedItemEventArgs e)
-        {
-            var element = e.UIElement as FrameworkElement;
-            if (element == null)
-            {
-                return;
-            }
-            var artworkGrid = element.GetVisualChild<ArtworkGrid>();
-            if (artworkGrid == null)
-            {
-                return;
-            }
-            artworkGrid.Background = null;
         }
     }
 }

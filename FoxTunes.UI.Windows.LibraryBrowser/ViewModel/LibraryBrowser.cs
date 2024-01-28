@@ -11,7 +11,7 @@ namespace FoxTunes.ViewModel
 {
     public class LibraryBrowser : LibraryBase
     {
-        public ArtworkGridProvider ArtworkGridProvider { get; private set; }
+        public LibraryBrowserTileProvider LibraryBrowserTileProvider { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
@@ -137,6 +137,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ViewModeChanged;
 
+        private LibraryBrowserImageMode _ImageMode { get; set; }
+
+        public LibraryBrowserImageMode ImageMode
+        {
+            get
+            {
+                return this._ImageMode;
+            }
+            set
+            {
+                this._ImageMode = value;
+                this.OnImageModeChanged();
+            }
+        }
+
+        protected virtual void OnImageModeChanged()
+        {
+            if (this.ImageModeChanged != null)
+            {
+                this.ImageModeChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ImageMode");
+        }
+
+        public event EventHandler ImageModeChanged;
+
         public bool IsSlave
         {
             get
@@ -158,10 +184,10 @@ namespace FoxTunes.ViewModel
 
         public override void InitializeComponent(ICore core)
         {
-            this.ArtworkGridProvider = ComponentRegistry.Instance.GetComponent<ArtworkGridProvider>();
-            if (this.ArtworkGridProvider != null)
+            this.LibraryBrowserTileProvider = ComponentRegistry.Instance.GetComponent<LibraryBrowserTileProvider>();
+            if (this.LibraryBrowserTileProvider != null)
             {
-                this.ArtworkGridProvider.Cleared += this.OnCleared;
+                this.LibraryBrowserTileProvider.Cleared += this.OnCleared;
             }
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<DoubleConfigurationElement>(
@@ -176,6 +202,10 @@ namespace FoxTunes.ViewModel
                 WindowsUserInterfaceConfiguration.SECTION,
                 LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_VIEW
             ).ConnectValue(option => this.ViewMode = LibraryBrowserBehaviourConfiguration.GetLibraryView(option));
+            this.Configuration.GetElement<SelectionConfigurationElement>(
+                WindowsUserInterfaceConfiguration.SECTION,
+                LibraryBrowserBehaviourConfiguration.LIBRARY_BROWSER_TILE_IMAGE
+            ).ConnectValue(option => this.ImageMode = LibraryBrowserBehaviourConfiguration.GetLibraryImage(option));
             LayoutManager.Instance.ActiveComponentsChanged += this.OnActiveComponentsChanged;
             this.OnIsSlaveChanged();
             base.InitializeComponent(core);
@@ -387,9 +417,9 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (this.ArtworkGridProvider != null)
+            if (this.LibraryBrowserTileProvider != null)
             {
-                this.ArtworkGridProvider.Cleared -= this.OnCleared;
+                this.LibraryBrowserTileProvider.Cleared -= this.OnCleared;
             }
             LayoutManager.Instance.ActiveComponentsChanged -= this.OnActiveComponentsChanged;
             base.OnDisposing();

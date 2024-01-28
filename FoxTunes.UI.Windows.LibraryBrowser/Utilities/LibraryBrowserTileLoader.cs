@@ -5,21 +5,21 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class ArtworkGridLoader : StandardComponent
+    public class LibraryBrowserTileLoader : StandardComponent
     {
         public static readonly object SyncRoot = new object();
 
-        public ArtworkGridLoader()
+        public LibraryBrowserTileLoader()
         {
-            this.ForegroundQueue = new List<ArtworkGrid>();
-            this.BackgroundQueue = new List<ArtworkGrid>();
+            this.ForegroundQueue = new List<LibraryBrowserTile>();
+            this.BackgroundQueue = new List<LibraryBrowserTile>();
         }
 
-        public IList<ArtworkGrid> ForegroundQueue { get; private set; }
+        public IList<LibraryBrowserTile> ForegroundQueue { get; private set; }
 
         public TaskFactory ForegroundFactory { get; private set; }
 
-        public IList<ArtworkGrid> BackgroundQueue { get; private set; }
+        public IList<LibraryBrowserTile> BackgroundQueue { get; private set; }
 
         public TaskFactory BackgroundFactory { get; private set; }
 
@@ -54,19 +54,19 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        public Task Load(ArtworkGrid artworkGrid, ArtworkGridLoaderPriority priority)
+        public Task Load(LibraryBrowserTile libraryBrowserTile, LibraryBrowserTileLoaderPriority priority)
         {
             var queue = this.GetQueue(priority);
             var factory = this.GetFactory(priority);
             lock (SyncRoot)
             {
-                queue.Add(artworkGrid);
+                queue.Add(libraryBrowserTile);
             }
             return factory.StartNew(async () =>
             {
                 lock (SyncRoot)
                 {
-                    if (!queue.Contains(artworkGrid))
+                    if (!queue.Contains(libraryBrowserTile))
                     {
 #if NET40
                         return TaskEx.FromResult(false);
@@ -74,10 +74,10 @@ namespace FoxTunes
                         return Task.CompletedTask;
 #endif
                     }
-                    queue.Remove(artworkGrid);
+                    queue.Remove(libraryBrowserTile);
                 }
                 //If we're in the low priority queue then sleep a little so other (more important) threads can work.
-                if (priority == ArtworkGridLoaderPriority.Low && this.Interval.Value > 0)
+                if (priority == LibraryBrowserTileLoaderPriority.Low && this.Interval.Value > 0)
                 {
 #if NET40
                     await TaskEx.Delay(this.Interval.Value).ConfigureAwait(false);
@@ -85,54 +85,54 @@ namespace FoxTunes
                     await Task.Delay(this.Interval.Value).ConfigureAwait(false);
 #endif
                 }
-                return artworkGrid.Refresh();
+                return libraryBrowserTile.Refresh();
             });
         }
 
-        public void Cancel(ArtworkGrid artworkGrid)
+        public void Cancel(LibraryBrowserTile libraryBrowserTile)
         {
             lock (SyncRoot)
             {
-                this.BackgroundQueue.Remove(artworkGrid);
-                this.ForegroundQueue.Remove(artworkGrid);
+                this.BackgroundQueue.Remove(libraryBrowserTile);
+                this.ForegroundQueue.Remove(libraryBrowserTile);
             }
         }
 
-        public void Cancel(ArtworkGrid artworkGrid, ArtworkGridLoaderPriority priority)
+        public void Cancel(LibraryBrowserTile libraryBrowserTile, LibraryBrowserTileLoaderPriority priority)
         {
             var queue = this.GetQueue(priority);
             lock (SyncRoot)
             {
-                queue.Remove(artworkGrid);
+                queue.Remove(libraryBrowserTile);
             }
         }
 
-        protected virtual IList<ArtworkGrid> GetQueue(ArtworkGridLoaderPriority priority)
+        protected virtual IList<LibraryBrowserTile> GetQueue(LibraryBrowserTileLoaderPriority priority)
         {
             switch (priority)
             {
-                case ArtworkGridLoaderPriority.Low:
+                case LibraryBrowserTileLoaderPriority.Low:
                     return this.BackgroundQueue;
                 default:
-                case ArtworkGridLoaderPriority.High:
+                case LibraryBrowserTileLoaderPriority.High:
                     return this.ForegroundQueue;
             }
         }
 
-        protected virtual TaskFactory GetFactory(ArtworkGridLoaderPriority priority)
+        protected virtual TaskFactory GetFactory(LibraryBrowserTileLoaderPriority priority)
         {
             switch (priority)
             {
-                case ArtworkGridLoaderPriority.Low:
+                case LibraryBrowserTileLoaderPriority.Low:
                     return this.BackgroundFactory;
                 default:
-                case ArtworkGridLoaderPriority.High:
+                case LibraryBrowserTileLoaderPriority.High:
                     return this.ForegroundFactory;
             }
         }
     }
 
-    public enum ArtworkGridLoaderPriority : byte
+    public enum LibraryBrowserTileLoaderPriority : byte
     {
         None,
         Low,
