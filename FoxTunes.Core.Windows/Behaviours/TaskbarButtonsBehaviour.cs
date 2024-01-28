@@ -9,7 +9,6 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Interop;
-using System.Windows.Threading;
 
 namespace FoxTunes
 {
@@ -121,11 +120,13 @@ namespace FoxTunes
                 //Only create taskbar buttons for main windows.
                 return;
             }
+            Logger.Write(this, LogLevel.Debug, "Window created: {0}", e.Window.Handle);
             this.Windows.TryAdd(e.Window.Handle, TaskbarButtonsWindowFlags.None);
         }
 
         protected virtual void OnWindowDestroyed(object sender, UserInterfaceWindowEventArgs e)
         {
+            Logger.Write(this, LogLevel.Debug, "Window destroyed: {0}", e.Window.Handle);
             this.AddFlag(e.Window.Handle, TaskbarButtonsWindowFlags.Destroyed);
         }
 
@@ -158,6 +159,8 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Debug, "Updater disabled.");
                 }
             }
+            //Perform any cleanup.
+            var task = this.Update();
         }
 
         protected virtual async void OnElapsed(object sender, ElapsedEventArgs e)
@@ -272,7 +275,7 @@ namespace FoxTunes
                 //Handing an event for an unknown window?
                 return;
             }
-            //TODO: Should we be destroying the image list?
+            Logger.Write(this, LogLevel.Debug, "Taskbar was created: {0}", handle);
             this.Windows[handle] = TaskbarButtonsWindowFlags.Registered;
         }
 
@@ -350,8 +353,7 @@ namespace FoxTunes
                 }
             }
             var result = default(WindowsTaskbarList.HResult);
-            await this.Invoke(
-                source.Dispatcher,
+            await source.Invoke(
                 () => result = WindowsTaskbarList.Instance.ThumbBarSetImageList(handle, imageList)
             ).ConfigureAwait(false);
             if (result != WindowsTaskbarList.HResult.Ok)
@@ -370,13 +372,7 @@ namespace FoxTunes
 
         protected virtual bool AddImage(IntPtr handle, IntPtr imageList, Bitmap bitmap, int width, int height)
         {
-            var bitmapSection = default(IntPtr);
-            if (!WindowsImaging.CreateDIBSection(bitmap, width, height, out bitmapSection))
-            {
-                Logger.Write(this, LogLevel.Warn, "Failed to create native bitmap.");
-                this.AddFlag(handle, TaskbarButtonsWindowFlags.Error);
-                return false;
-            }
+            var bitmapSection = bitmap.GetHbitmap();
             var result = WindowsImageList.ImageList_Add(
                 imageList,
                 bitmapSection,
@@ -469,8 +465,7 @@ namespace FoxTunes
             }
             var buttons = this.Buttons.ToArray();
             var result = default(WindowsTaskbarList.HResult);
-            await this.Invoke(
-                source.Dispatcher,
+            await source.Invoke(
                 () => result = WindowsTaskbarList.Instance.ThumbBarAddButtons(
                     handle,
                     Convert.ToUInt32(buttons.Length),
@@ -509,8 +504,7 @@ namespace FoxTunes
             }
             var buttons = this.Buttons.ToArray();
             var result = default(WindowsTaskbarList.HResult);
-            await this.Invoke(
-                source.Dispatcher,
+            await source.Invoke(
                 () => result = WindowsTaskbarList.Instance.ThumbBarUpdateButtons(
                     handle,
                     Convert.ToUInt32(buttons.Length),
@@ -621,27 +615,6 @@ namespace FoxTunes
                     task = this.Next();
                     break;
             }
-        }
-
-        protected virtual Task Invoke(Dispatcher dispatcher, Action action)
-        {
-#if NET40
-            var source = new TaskCompletionSource<bool>();
-            dispatcher.BeginInvoke(new Action(() =>
-            {
-                try
-                {
-                    action();
-                }
-                finally
-                {
-                    source.SetResult(false);
-                }
-            }));
-            return source.Task;
-#else
-            return dispatcher.BeginInvoke(action).Task;
-#endif
         }
 
         protected virtual async Task Previous()

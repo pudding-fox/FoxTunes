@@ -106,11 +106,13 @@ namespace FoxTunes
                 //Only create taskbar progress for main windows.
                 return;
             }
+            Logger.Write(this, LogLevel.Debug, "Window created: {0}", e.Window.Handle);
             this.Windows.TryAdd(e.Window.Handle, TaskbarProgressWindowFlags.None);
         }
 
         protected virtual void OnWindowDestroyed(object sender, UserInterfaceWindowEventArgs e)
         {
+            Logger.Write(this, LogLevel.Debug, "Window destroyed: {0}", e.Window.Handle);
             this.AddFlag(e.Window.Handle, TaskbarProgressWindowFlags.Destroyed);
         }
 
@@ -142,7 +144,9 @@ namespace FoxTunes
                     this.Timer = null;
                     Logger.Write(this, LogLevel.Debug, "Updater disabled.");
                 }
-            }
+            }           
+            //Perform any cleanup.
+            var task = this.Update();
         }
 
         protected virtual async void OnElapsed(object sender, ElapsedEventArgs e)
@@ -207,10 +211,9 @@ namespace FoxTunes
             }
             else
             {
-                //Although we're no longer enabled, these features can't be disabled so we must keep them updated.
                 if (flags.HasFlag(TaskbarProgressWindowFlags.ProgressCreated))
                 {
-                    if (!await this.UpdateProgress(handle).ConfigureAwait(false))
+                    if (!await this.ClearProgress(handle).ConfigureAwait(false))
                     {
                         return;
                     }
@@ -234,7 +237,7 @@ namespace FoxTunes
                 //Handing an event for an unknown window?
                 return;
             }
-            //TODO: Should we be destroying the image list?
+            Logger.Write(this, LogLevel.Debug, "Taskbar was created: {0}", handle);
             this.Windows[handle] = TaskbarProgressWindowFlags.Registered;
         }
 
@@ -297,8 +300,7 @@ namespace FoxTunes
                 return false;
             }
             var result = default(WindowsTaskbarList.HResult);
-            await this.Invoke(
-                source.Dispatcher,
+            await source.Invoke(
                 () =>
                 {
                     if (backgroundTask.Count != 0)
@@ -345,8 +347,7 @@ namespace FoxTunes
                 return false;
             }
             var result = default(WindowsTaskbarList.HResult);
-            await this.Invoke(
-                source.Dispatcher,
+            await source.Invoke(
                 () =>
                 {
                     result = WindowsTaskbarList.Instance.SetProgressValue(
@@ -392,8 +393,7 @@ namespace FoxTunes
                 return false;
             }
             var result = default(WindowsTaskbarList.HResult);
-            await this.Invoke(
-                source.Dispatcher,
+            await source.Invoke(
                 () => result = WindowsTaskbarList.Instance.SetProgressState(
                     handle,
                     WindowsTaskbarList.TaskbarProgressBarStatus.NoProgress
@@ -407,27 +407,6 @@ namespace FoxTunes
             }
             this.RemoveFlag(handle, TaskbarProgressWindowFlags.ProgressCreated);
             return true;
-        }
-
-        protected virtual Task Invoke(Dispatcher dispatcher, Action action)
-        {
-#if NET40
-            var source = new TaskCompletionSource<bool>();
-            dispatcher.BeginInvoke(new Action(() =>
-            {
-                try
-                {
-                    action();
-                }
-                finally
-                {
-                    source.SetResult(false);
-                }
-            }));
-            return source.Task;
-#else
-            return dispatcher.BeginInvoke(action).Task;
-#endif
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

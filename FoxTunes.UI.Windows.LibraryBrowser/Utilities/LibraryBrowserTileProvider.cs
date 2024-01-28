@@ -291,7 +291,6 @@ namespace FoxTunes
                     encoder.Save(stream);
                     stream.Seek(0, SeekOrigin.Begin);
                     FileMetaDataStore.Write(PREFIX, this.GetImageId(libraryHierarchyNode, width, height), stream);
-                    stream.Seek(0, SeekOrigin.Begin);
                 }
             }
             target.Freeze();
