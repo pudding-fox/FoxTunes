@@ -5,6 +5,7 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace FoxTunes
 {
@@ -139,7 +140,7 @@ namespace FoxTunes
                     return;
                 }
                 info = BitmapHelper.CreateRenderInfo(bitmap, this.Color);
-            }).ConfigureAwait(false);
+            }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
             if (!success)
             {
@@ -159,7 +160,7 @@ namespace FoxTunes
 
                 bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
-            }).ConfigureAwait(false);
+            }, DISPATCHER_PRIORITY).ConfigureAwait(false);
 
             this.Start();
         }
