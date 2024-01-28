@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using FoxTunes.Interfaces;
+using System.ComponentModel;
 
 namespace FoxTunes
 {
@@ -27,6 +28,14 @@ namespace FoxTunes
             get
             {
                 return "5B14F9E7-8759-45BA-834B-4F70E05CE22C";
+            }
+        }
+
+        public override UserInterfaceWindowRole Role
+        {
+            get
+            {
+                return UserInterfaceWindowRole.Main;
             }
         }
 

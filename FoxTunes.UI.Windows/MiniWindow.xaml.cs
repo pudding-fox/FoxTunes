@@ -70,6 +70,14 @@ namespace FoxTunes
             }
         }
 
+        public override UserInterfaceWindowRole Role
+        {
+            get
+            {
+                return UserInterfaceWindowRole.Main;
+            }
+        }
+
         protected override bool ApplyTemplate
         {
             get
