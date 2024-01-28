@@ -169,7 +169,7 @@ namespace FoxTunes
                     return;
                 }
                 UpdateValues(data);
-                if (this.Smooth.Value)
+                if (this.Smooth.Value && !data.LastUpdated.Equals(default(DateTime)))
                 {
                     UpdateElementsSmooth(data.Values, data.Elements, data.Width, data.Height, this.SmoothingFactor.Value, Orientation.Vertical);
                 }
@@ -340,7 +340,7 @@ namespace FoxTunes
             };
             if (showPeaks)
             {
-                data.Peaks = new Int32Rect[count];
+                data.Peaks = CreatePeaks(count);
                 data.Holds = new int[count];
             }
             if (highCut)
@@ -352,6 +352,16 @@ namespace FoxTunes
                 data.FFTRange = data.Samples.Length;
             }
             return data;
+        }
+
+        private static Int32Rect[] CreatePeaks(int count)
+        {
+            var peaks = new Int32Rect[count];
+            for (var a = 0; a < count; a++)
+            {
+                peaks[a].Y = int.MaxValue;
+            }
+            return peaks;
         }
 
         public class SpectrumRendererData

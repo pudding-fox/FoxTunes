@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
@@ -197,7 +198,7 @@ namespace FoxTunes
                 else
                 {
                     UpdateValues(data);
-                    if (this.Smooth.Value)
+                    if (this.Smooth.Value && !data.LastUpdated.Equals(default(DateTime)))
                     {
                         UpdateElementsSmooth(data);
                     }
@@ -567,10 +568,20 @@ namespace FoxTunes
             }
             if (showPeaks)
             {
-                data.PeakElements = new Int32Rect[bands.Length];
+                data.PeakElements = CreatePeaks(bands.Length);
                 data.Holds = new int[bands.Length];
             }
             return data;
+        }
+
+        private static Int32Rect[] CreatePeaks(int count)
+        {
+            var peaks = new Int32Rect[count];
+            for (var a = 0; a < count; a++)
+            {
+                peaks[a].Y = int.MaxValue;
+            }
+            return peaks;
         }
 
         public class SpectrumRendererData

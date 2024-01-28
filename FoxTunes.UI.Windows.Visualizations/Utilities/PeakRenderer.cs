@@ -213,7 +213,7 @@ namespace FoxTunes
                     return;
                 }
                 UpdateValues(data);
-                if (this.Smooth.Value)
+                if (this.Smooth.Value && !data.LastUpdated.Equals(default(DateTime)))
                 {
                     UpdateElementsSmooth(data);
                 }
@@ -540,9 +540,19 @@ namespace FoxTunes
                 }
                 if (this.Renderer.ShowPeaks.Value)
                 {
-                    this.PeakElements = new Int32Rect[channels];
+                    this.PeakElements = CreatePeaks(channels);
                     this.Holds = new int[channels];
                 }
+            }
+
+            private static Int32Rect[] CreatePeaks(int count)
+            {
+                var peaks = new Int32Rect[count];
+                for (var a = 0; a < count; a++)
+                {
+                    peaks[a].Y = int.MaxValue;
+                }
+                return peaks;
             }
         }
     }
