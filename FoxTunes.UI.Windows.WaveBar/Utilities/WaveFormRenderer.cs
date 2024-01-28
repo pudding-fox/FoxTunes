@@ -2,7 +2,6 @@
 using System;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -100,11 +99,7 @@ namespace FoxTunes
             this.GeneratorData = this.Generator.Generate(stream);
             this.GeneratorData.Updated += this.OnUpdated;
 
-            await Windows.Invoke(() =>
-            {
-                this.RendererData = Create(this.GeneratorData, this.Bitmap.PixelWidth, this.Bitmap.PixelHeight);
-                this.Viewbox = new Rect(0, 0, this.GetPixelWidth(), this.Bitmap.PixelHeight);
-            }).ConfigureAwait(false);
+            await Windows.Invoke(this.CreateViewBox).ConfigureAwait(false);
 
             this.Update();
         }

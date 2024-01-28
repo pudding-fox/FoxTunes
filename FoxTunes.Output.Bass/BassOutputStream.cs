@@ -280,6 +280,26 @@ namespace FoxTunes
             }
         }
 
+        public override T[] GetBuffer<T>(TimeSpan duration)
+        {
+            var length = Convert.ToInt32(
+                Bass.ChannelSeconds2Bytes(this.ChannelHandle, duration.TotalSeconds)
+            );
+            if (typeof(T) == typeof(short))
+            {
+                length /= sizeof(short);
+            }
+            else if (typeof(T) == typeof(float))
+            {
+                length /= sizeof(float);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+            return new T[length];
+        }
+
         public override int GetData(short[] buffer)
         {
             return Bass.ChannelGetData(this.ChannelHandle, buffer, buffer.Length * sizeof(short));
@@ -288,6 +308,11 @@ namespace FoxTunes
         public override int GetData(float[] buffer)
         {
             return Bass.ChannelGetData(this.ChannelHandle, buffer, buffer.Length * sizeof(float));
+        }
+
+        public override float[] GetBuffer(int fftSize)
+        {
+            return this.Output.GetBuffer(fftSize);
         }
 
         public override int GetData(float[] buffer, int fftSize)
