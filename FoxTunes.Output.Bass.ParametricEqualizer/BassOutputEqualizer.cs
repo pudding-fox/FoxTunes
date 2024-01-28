@@ -16,6 +16,10 @@ namespace FoxTunes
             set
             {
                 this.EnabledElement.Value = value;
+                if (this.IsInitialized)
+                {
+                    this.Configuration.Save();
+                }
             }
         }
 

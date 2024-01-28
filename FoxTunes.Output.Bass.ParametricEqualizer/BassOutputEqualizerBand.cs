@@ -3,17 +3,20 @@ using System;
 
 namespace FoxTunes
 {
-    public class BassOutputEqualizerBand : OutputEqualizerBand, IDisposable
+    public class BassOutputEqualizerBand : BaseComponent, IOutputEqualizerBand, IDisposable
     {
-        public BassOutputEqualizerBand(string id, int position, float center) : base(position)
+        public BassOutputEqualizerBand(string id, int position, float center)
         {
             this.Id = id;
-            this._Center = center;
+            this.Position = position;
+            this.Center = center;
         }
 
         public string Id { get; private set; }
 
-        public override float MinCenter
+        public int Position { get; private set; }
+
+        public float MinCenter
         {
             get
             {
@@ -21,7 +24,7 @@ namespace FoxTunes
             }
         }
 
-        public override float MaxCenter
+        public float MaxCenter
         {
             get
             {
@@ -31,7 +34,7 @@ namespace FoxTunes
 
         private float _Center { get; set; }
 
-        public override float Center
+        public float Center
         {
             get
             {
@@ -39,11 +42,23 @@ namespace FoxTunes
             }
             set
             {
-                throw new NotImplementedException();
+                this._Center = value;
+                this.OnCenterChanged();
             }
         }
 
-        public override float MinWidth
+        protected virtual void OnCenterChanged()
+        {
+            if (this.CenterChanged != null)
+            {
+                this.CenterChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Center");
+        }
+
+        public event EventHandler CenterChanged;
+
+        public float MinWidth
         {
             get
             {
@@ -51,7 +66,7 @@ namespace FoxTunes
             }
         }
 
-        public override float MaxWidth
+        public float MaxWidth
         {
             get
             {
@@ -59,7 +74,7 @@ namespace FoxTunes
             }
         }
 
-        public override float Width
+        public float Width
         {
             get
             {
@@ -68,11 +83,25 @@ namespace FoxTunes
             set
             {
                 this.WidthElement.Value = value;
-                this.OnWidthChanged();
+                if (this.IsInitialized)
+                {
+                    this.Configuration.Save();
+                }
             }
         }
 
-        public override float MinValue
+        protected virtual void OnWidthChanged()
+        {
+            if (this.WidthChanged != null)
+            {
+                this.WidthChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Width");
+        }
+
+        public event EventHandler WidthChanged;
+
+        public float MinValue
         {
             get
             {
@@ -80,7 +109,7 @@ namespace FoxTunes
             }
         }
 
-        public override float MaxValue
+        public float MaxValue
         {
             get
             {
@@ -88,7 +117,7 @@ namespace FoxTunes
             }
         }
 
-        public override float Value
+        public float Value
         {
             get
             {
@@ -97,9 +126,23 @@ namespace FoxTunes
             set
             {
                 this.ValueElement.Value = value;
-                this.OnValueChanged();
+                if (this.IsInitialized)
+                {
+                    this.Configuration.Save();
+                }
             }
         }
+
+        protected virtual void OnValueChanged()
+        {
+            if (this.ValueChanged != null)
+            {
+                this.ValueChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Value");
+        }
+
+        public event EventHandler ValueChanged;
 
         public IConfiguration Configuration { get; private set; }
 

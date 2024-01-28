@@ -37,11 +37,8 @@ namespace FoxTunes
             {
                 case SHUFFLE:
                     this.Shuffle.Toggle();
-#if NET40
-                    return TaskEx.Run(() => this.Configuration.Save());
-#else
-                    return Task.Run(() => this.Configuration.Save());
-#endif
+                    this.Configuration.Save();
+                    break;
             }
 #if NET40
             return TaskEx.FromResult(false);

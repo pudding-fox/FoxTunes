@@ -5,7 +5,7 @@ using System.Timers;
 
 namespace FoxTunes
 {
-    public class PendingQueue<T> : IDisposable
+    public class Debouncer : IDisposable
     {
         protected static ILogger Logger
         {
@@ -17,34 +17,28 @@ namespace FoxTunes
 
         public static readonly object SyncRoot = new object();
 
-        private PendingQueue()
+        private Debouncer()
         {
-            this.Queue = new Queue<T>();
+            this.Actions = new HashSet<Action>();
         }
 
-        public PendingQueue(int timeout)
-            : this()
+        public Debouncer(int timeout) : this()
         {
-            this.Timer = new Timer(timeout);
+            this.Timer = new global::System.Timers.Timer(timeout);
             this.Timer.AutoReset = false;
             this.Timer.Elapsed += this.OnElapsed;
         }
 
-
-        public PendingQueue(TimeSpan timeout)
-            : this(Convert.ToInt32(timeout.TotalMilliseconds))
+        public Debouncer(TimeSpan timeout) : this(Convert.ToInt32(timeout.TotalMilliseconds))
         {
 
         }
-        public Timer Timer { get; private set; }
 
-        public Queue<T> Queue { get; private set; }
-
-        public void Enqueue(T value)
+        public void Exec(Action action)
         {
             lock (SyncRoot)
             {
-                this.Queue.Enqueue(value);
+                this.Actions.Add(action);
                 this.Timer.Stop();
                 this.Timer.Start();
             }
@@ -54,21 +48,17 @@ namespace FoxTunes
         {
             lock (SyncRoot)
             {
-                this.OnComplete();
+                foreach (var action in this.Actions)
+                {
+                    action();
+                }
+                this.Actions.Clear();
             }
         }
 
-        protected virtual void OnComplete()
-        {
-            if (this.Complete != null)
-            {
-                var e = new PendingQueueEventArgs<T>(this.Queue.ToArray());
-                this.Complete(this, e);
-            }
-            this.Queue.Clear();
-        }
+        public HashSet<Action> Actions { get; private set; }
 
-        public event PendingQueueEventHandler<T> Complete;
+        public global::System.Timers.Timer Timer { get; private set; }
 
         public bool IsDisposed { get; private set; }
 
@@ -100,7 +90,7 @@ namespace FoxTunes
             }
         }
 
-        ~PendingQueue()
+        ~Debouncer()
         {
             Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
@@ -112,17 +102,5 @@ namespace FoxTunes
                 //Nothing can be done, never throw on GC thread.
             }
         }
-    }
-
-    public delegate void PendingQueueEventHandler<T>(object sender, PendingQueueEventArgs<T> e);
-
-    public class PendingQueueEventArgs<T> : EventArgs
-    {
-        public PendingQueueEventArgs(IEnumerable<T> sequence)
-        {
-            this.Sequence = sequence;
-        }
-
-        public IEnumerable<T> Sequence { get; private set; }
     }
 }

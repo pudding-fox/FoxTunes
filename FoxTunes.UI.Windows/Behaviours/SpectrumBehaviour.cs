@@ -48,10 +48,11 @@ namespace FoxTunes
         public Task InvokeAsync(IInvocationComponent component)
         {
             this.Bars.Value = this.Bars.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id));
+            this.Configuration.Save();
 #if NET40
-            return TaskEx.Run(() => this.Configuration.Save());
+            return TaskEx.FromResult(false);
 #else
-            return Task.Run(() => this.Configuration.Save());
+            return Task.CompletedTask;
 #endif
         }
 

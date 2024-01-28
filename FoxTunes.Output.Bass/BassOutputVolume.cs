@@ -27,6 +27,10 @@ namespace FoxTunes
             set
             {
                 this.EnabledElement.Value = value;
+                if (this.IsInitialized)
+                {
+                    this.Configuration.Save();
+                }
             }
         }
 
@@ -39,6 +43,10 @@ namespace FoxTunes
             set
             {
                 this.ValueElement.Value = value;
+                if (this.IsInitialized)
+                {
+                    this.Configuration.Save();
+                }
             }
         }
 

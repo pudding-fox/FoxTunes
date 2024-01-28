@@ -17,10 +17,15 @@ namespace FoxTunes
             "Settings.dat"
         );
 
+        const int TIMEOUT = 1000;
+
         public Configuration()
         {
+            this.Debouncer = new Debouncer(TIMEOUT);
             this.Load();
         }
+
+        public Debouncer Debouncer { get; private set; }
 
         private static readonly Lazy<ReleaseType> _ReleaseType = new Lazy<ReleaseType>(() =>
         {
@@ -108,11 +113,21 @@ namespace FoxTunes
 
         public void Save()
         {
-            using (var stream = File.OpenWrite(ConfigurationFileName))
+            this.Debouncer.Exec(() =>
             {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(stream, this.Sections.ToArray());
-            }
+                try
+                {
+                    using (var stream = File.OpenWrite(ConfigurationFileName))
+                    {
+                        var formatter = new BinaryFormatter();
+                        formatter.Serialize(stream, this.Sections.ToArray());
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
+                }
+            });
         }
 
         public void Reset()
