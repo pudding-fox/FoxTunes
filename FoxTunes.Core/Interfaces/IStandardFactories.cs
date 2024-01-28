@@ -7,5 +7,9 @@
         IMetaDataSourceFactory MetaDataSource { get; }
 
         IMetaDataDecoratorFactory MetaDataDecorator { get; }
+
+        IOutputStreamDataSourceFactory OutputStreamDataSource { get; }
+
+        IFFTDataTransformerFactory FFTDataTransformer { get; }
     }
 }
