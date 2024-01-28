@@ -58,6 +58,19 @@ namespace FoxTunes
 
         public abstract int GetData(float[] buffer);
 
+        public abstract bool CanControlVolume { get; protected set; }
+
+        protected virtual void OnCanControlVolumeChanged()
+        {
+            if (this.CanControlVolumeChanged != null)
+            {
+                this.CanControlVolumeChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("CanControlVolume");
+        }
+
+        public event EventHandler CanControlVolumeChanged;
+
         public abstract float Volume { get; set; }
 
         protected virtual void OnVolumeChanged()

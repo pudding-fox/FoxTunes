@@ -32,6 +32,10 @@ namespace FoxTunes.Interfaces
 
         int GetData(float[] buffer);
 
+        bool CanControlVolume { get; }
+
+        event EventHandler CanControlVolumeChanged;
+
         float Volume { get; set; }
 
         event EventHandler VolumeChanged;

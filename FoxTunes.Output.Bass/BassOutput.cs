@@ -313,6 +313,10 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.BUFFER_LENGTH_ELEMENT
             ).ConnectValue(value => this.BufferLength = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassOutputConfiguration.VOLUME_ENABLED_ELEMENT
+            ).ConnectValue(value => this.CanControlVolume = value);
             this.Configuration.GetElement<DoubleConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassOutputConfiguration.VOLUME_ELEMENT
@@ -444,6 +448,29 @@ namespace FoxTunes
             return result;
         }
 
+        private bool _CanControlVolume { get; set; }
+
+        public override bool CanControlVolume
+        {
+            get
+            {
+                return this._CanControlVolume;
+            }
+            protected set
+            {
+                this._CanControlVolume = value;
+                this.OnCanControlVolumeChanged();
+            }
+        }
+
+        protected override void OnCanControlVolumeChanged()
+        {
+            Logger.Write(this, LogLevel.Debug, "CanControlVolume = {0}", this.CanControlVolume);
+            //TODO: Bad .Wait().
+            this.Shutdown().Wait();
+            base.OnCanControlVolumeChanged();
+        }
+
         private float _Volume { get; set; }
 
         public override float Volume
@@ -461,7 +488,7 @@ namespace FoxTunes
 
         protected override void OnVolumeChanged()
         {
-            if (this.PipelineManager != null)
+            if (this.PipelineManager != null && this.CanControlVolume)
             {
                 this.PipelineManager.WithPipeline(pipeline =>
                 {

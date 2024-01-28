@@ -9,7 +9,11 @@
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <ViewModel:Volume x:Key="ViewModel" Core="{Binding}"></ViewModel:Volume>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
+    <UserControl.Visibility>
+        <Binding Converter="{StaticResource BooleanToVisibilityConverter}" Mode="OneWay" Path="Enabled" Source="{StaticResource ViewModel}"/>
+    </UserControl.Visibility>
     <Grid>
         <Windows:DraggableSlider x:Name="Slider" VerticalAlignment="Center" Value="{Binding Value, Source={StaticResource ViewModel}}" Minimum="0" Maximum="1" SmallChange="0.01" LargeChange="0.1">
             <Slider.Style>

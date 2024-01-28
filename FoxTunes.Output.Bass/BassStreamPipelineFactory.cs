@@ -63,8 +63,9 @@ namespace FoxTunes
                         );
                     }
                 }
-                if (pipeline.Output.CanControlVolume)
+                if (stream.Output.CanControlVolume && pipeline.Output.CanControlVolume)
                 {
+                    Logger.Write(this, LogLevel.Debug, "Enabling software volume control.");
                     pipeline.Output.Volume = stream.Output.Volume;
                 }
             }
