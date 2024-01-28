@@ -39,7 +39,14 @@ namespace FoxTunes
                 {
                     return string.Format("{0} (none)", this.Name);
                 }
-                return string.Empty;
+                var rate = GetTempoFrequency(this.Rate, this.OutputEffects.Tempo.Rate);
+                return string.Format(
+                    "{0}%, Pitch {1} semitones, Rate {2}{3}",
+                    this.OutputEffects.Tempo.Tempo,
+                    this.OutputEffects.Tempo.Pitch,
+                    MetaDataInfo.SampleRateDescription(rate),
+                    this.OutputEffects.Tempo.AAFilter ? string.Format(", aa filter {0} taps", this.OutputEffects.Tempo.AAFilterLength) : string.Empty
+                );
             }
         }
 
@@ -61,7 +68,7 @@ namespace FoxTunes
                 {
                     return false;
                 }
-                if (!this.OutputEffects.Tempo.Available || !this.OutputEffects.Tempo.Enabled)
+                if (!this.OutputEffects.Tempo.Available || !this.OutputEffects.Tempo.Enabled || (this.OutputEffects.Tempo.Tempo == 0 && this.OutputEffects.Tempo.Pitch == 0 && this.OutputEffects.Tempo.Rate == 0))
                 {
                     return false;
                 }
@@ -104,6 +111,10 @@ namespace FoxTunes
             {
                 this.Update();
             }
+            else
+            {
+                this.Stop();
+            }
         }
 
         protected virtual void OnPitchChanged(object sender, EventArgs e)
@@ -112,6 +123,10 @@ namespace FoxTunes
             {
                 this.Update();
             }
+            else
+            {
+                this.Stop();
+            }
         }
 
         protected virtual void OnRateChanged(object sender, EventArgs e)
@@ -119,6 +134,10 @@ namespace FoxTunes
             if (this.IsActive)
             {
                 this.Update();
+            }
+            else
+            {
+                this.Stop();
             }
         }
 
@@ -140,15 +159,26 @@ namespace FoxTunes
 
         protected virtual void Update()
         {
+            var rate = GetTempoFrequency(this.Rate, this.OutputEffects.Tempo.Rate);
+            Logger.Write(
+                this,
+                LogLevel.Debug,
+                "Tempo effect enabled: Tempo {0}%, Pitch {1} semitones, Rate {2}{3}",
+                this.OutputEffects.Tempo.Tempo,
+                this.OutputEffects.Tempo.Pitch,
+                MetaDataInfo.SampleRateDescription(rate),
+                this.OutputEffects.Tempo.AAFilter ? string.Format(", aa filter {0} taps", this.OutputEffects.Tempo.AAFilterLength) : string.Empty
+            );
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Tempo, this.OutputEffects.Tempo.Tempo));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Pitch, this.OutputEffects.Tempo.Pitch));
-            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, 1.0 + ((double)this.OutputEffects.Tempo.Rate / Tempo.MAX_RATE)));
+            BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, rate));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoUseAAFilter, this.OutputEffects.Tempo.AAFilter ? 1 : 0));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoAAFilterLength, this.OutputEffects.Tempo.AAFilterLength));
         }
 
         protected virtual void Stop()
         {
+            Logger.Write(this, LogLevel.Debug, "Tempo effect disabled.");
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Tempo, 0));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Pitch, 0));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, 0));
@@ -165,7 +195,7 @@ namespace FoxTunes
             {
                 BassUtils.Throw();
             }
-            if (this.OutputEffects.Tempo.Enabled)
+            if (this.IsActive)
             {
                 this.Update();
             }
@@ -183,6 +213,15 @@ namespace FoxTunes
                 this.OutputEffects.Tempo.AAFilterLengthChanged -= this.OnAAFilterLengthChanged;
             }
             this.Stop();
+        }
+
+        public static int GetTempoFrequency(int rate, int multipler)
+        {
+            if (multipler == 0)
+            {
+                return rate;
+            }
+            return Convert.ToInt32(rate * (1.0f + ((float)multipler / 100)));
         }
     }
 }
