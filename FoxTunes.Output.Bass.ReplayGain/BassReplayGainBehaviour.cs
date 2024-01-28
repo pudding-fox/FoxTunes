@@ -1,5 +1,4 @@
 ﻿using FoxTunes.Interfaces;
-using ManagedBass.Fx;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -10,9 +9,6 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class BassReplayGainBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
-        //Make sure bass_fx.dll is loaded.
-        private static readonly Version Version = BassFx.Version;
-
         public BassReplayGainBehaviour()
         {
             this.Effects = new ConditionalWeakTable<BassOutputStream, VolumeEffect>();
