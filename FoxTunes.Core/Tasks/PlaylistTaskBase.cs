@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using FoxTunes.Tasks;
+using System.Data;
 
 namespace FoxTunes
 {
@@ -21,11 +22,12 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual void ShiftItems(IDatabaseContext context, int sequence, int offset)
+        protected virtual void ShiftItems(IDatabaseContext context, IDbTransaction transaction, int sequence, int offset)
         {
             var parameters = default(IDbParameterCollection);
             using (var command = context.Connection.CreateCommand(Resources.ShiftPlaylistItems, new[] { "status", "sequence", "offset" }, out parameters))
             {
+                command.Transaction = transaction;
                 parameters["status"] = PlaylistItemStatus.None;
                 parameters["sequence"] = sequence;
                 parameters["offset"] = offset;
@@ -33,11 +35,12 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void SetPlaylistItemsStatus(IDatabaseContext databaseContext)
+        protected virtual void SetPlaylistItemsStatus(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
             var parameters = default(IDbParameterCollection);
             using (var command = databaseContext.Connection.CreateCommand(Resources.SetPlaylistItemStatus, new[] { "status" }, out parameters))
             {
+                command.Transaction = transaction;
                 parameters["status"] = LibraryItemStatus.None;
                 command.ExecuteNonQuery();
             }

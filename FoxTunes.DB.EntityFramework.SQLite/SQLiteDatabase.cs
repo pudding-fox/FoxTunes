@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Data;
 using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
@@ -9,6 +10,16 @@ namespace FoxTunes
     [Component("F9F07827-E4F6-49FE-A26D-E415E0211E56", ComponentSlots.Database, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class SQLiteDatabase : EntityFrameworkDatabase
     {
+        const SynchronizationModes SYNC_MODE = SynchronizationModes.Normal;
+
+        const SQLiteJournalModeEnum JOURNAL_MODE = SQLiteJournalModeEnum.Default;
+
+        const int BUSY_TIMEOUT = 60;
+
+        const int DEFAULT_TIMEOUT = 60;
+
+        const IsolationLevel DEFAULT_ISOLATION_LEVEL = IsolationLevel.ReadCommitted;
+
         private static readonly Type[] References = new[]
         {
             typeof(global::System.Data.SQLite.EF6.SQLiteProviderFactory),
@@ -66,21 +77,30 @@ namespace FoxTunes
             {
                 var builder = new SQLiteConnectionStringBuilder();
                 builder.DataSource = DatabaseFileName;
-                builder.SyncMode = SynchronizationModes.Off;
-                builder.JournalMode = SQLiteJournalModeEnum.Memory;
+                builder.SyncMode = SYNC_MODE;
+                builder.JournalMode = JOURNAL_MODE;
+                builder.BusyTimeout = BUSY_TIMEOUT;
+                builder.DefaultTimeout = DEFAULT_TIMEOUT;
+                builder.DefaultIsolationLevel = DEFAULT_ISOLATION_LEVEL;
                 return builder.ToString();
             }
         }
 
+        private static DbConnection Connection { get; set; }
+
         public override DbConnection CreateConnection()
         {
-            if (!File.Exists(DatabaseFileName))
+            if (Connection == null)
             {
-                Logger.Write(this, LogLevel.Fatal, "Failed to locate the database: {0}", DatabaseFileName);
-                throw new FileNotFoundException("Failed to locate the database.", DatabaseFileName);
+                if (!File.Exists(DatabaseFileName))
+                {
+                    Logger.Write(this, LogLevel.Fatal, "Failed to locate the database: {0}", DatabaseFileName);
+                    throw new FileNotFoundException("Failed to locate the database.", DatabaseFileName);
+                }
+                Logger.Write(this, LogLevel.Debug, "Connecting to database: {0}", this.ConnectionString);
+                Connection = new SQLiteConnection(this.ConnectionString);
             }
-            Logger.Write(this, LogLevel.Debug, "Connecting to database: {0}", this.ConnectionString);
-            return new SQLiteConnection(this.ConnectionString);
+            return Connection;
         }
     }
 }

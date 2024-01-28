@@ -25,7 +25,14 @@ namespace FoxTunes
             var fileName = GetFileName(id);
             LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Trace, "Writing data: {0} => {1}", id, fileName);
             Directory.CreateDirectory(Path.GetDirectoryName(fileName));
-            File.WriteAllBytes(fileName, data);
+            try
+            {
+                File.WriteAllBytes(fileName, data);
+            }
+            catch (Exception e)
+            {
+                LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Error, "Failed to write data: {0} => {1} => {2}", id, fileName, e.Message);
+            }
             return Task.FromResult(fileName);
         }
 
@@ -35,7 +42,14 @@ namespace FoxTunes
             LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Trace, "Writing data: {0} => {1}", id, fileName);
             using (var file = File.OpenWrite(fileName))
             {
-                await stream.CopyToAsync(file);
+                try
+                {
+                    await stream.CopyToAsync(file);
+                }
+                catch (Exception e)
+                {
+                    LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Error, "Failed to write data: {0} => {1} => {2}", id, fileName, e.Message);
+                }
             }
             return fileName;
         }

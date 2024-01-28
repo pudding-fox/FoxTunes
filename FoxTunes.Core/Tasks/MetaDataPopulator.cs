@@ -17,13 +17,16 @@ namespace FoxTunes.Tasks
             this.Commands = new ThreadLocal<MetaDataPopulatorCommands>(true);
         }
 
-        public MetaDataPopulator(IDatabaseContext databaseContext, string prefix) : this()
+        public MetaDataPopulator(IDatabaseContext databaseContext, IDbTransaction transaction, string prefix) : this()
         {
             this.DatabaseContext = databaseContext;
+            this.Transaction = transaction;
             this.Prefix = prefix;
         }
 
         public IDatabaseContext DatabaseContext { get; private set; }
+
+        public IDbTransaction Transaction { get; private set; }
 
         public string Prefix { get; private set; }
 
@@ -212,7 +215,7 @@ namespace FoxTunes.Tasks
             {
                 return this.Commands.Value;
             }
-            return this.Commands.Value = new MetaDataPopulatorCommands(this.DatabaseContext, this.Prefix);
+            return this.Commands.Value = new MetaDataPopulatorCommands(this.DatabaseContext, this.Transaction, this.Prefix);
         }
 
         public bool IsDisposed { get; private set; }
@@ -244,11 +247,12 @@ namespace FoxTunes.Tasks
 
         private class MetaDataPopulatorCommands : BaseComponent
         {
-            public MetaDataPopulatorCommands(IDatabaseContext databaseContext, string prefix)
+            public MetaDataPopulatorCommands(IDatabaseContext databaseContext, IDbTransaction transaction, string prefix)
             {
                 var metaDataParameters = default(IDbParameterCollection);
                 var propertyParameters = default(IDbParameterCollection);
                 var imageParameters = default(IDbParameterCollection);
+
                 this.MetaDataCommand = databaseContext.Connection.CreateCommand(
                     string.Format(Resources.AddMetaDataItems, prefix),
                     new[] { "itemId", "name", "numericValue", "textValue", "fileValue" },
@@ -264,6 +268,11 @@ namespace FoxTunes.Tasks
                     new[] { "itemId", "fileName", "imageType" },
                     out imageParameters
                 );
+
+                this.MetaDataCommand.Transaction = transaction;
+                this.PropertyCommand.Transaction = transaction;
+                this.ImageCommand.Transaction = transaction;
+
                 this.MetaDataParameters = metaDataParameters;
                 this.PropertyParameters = propertyParameters;
                 this.ImageParameters = imageParameters;

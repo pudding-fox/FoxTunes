@@ -11,12 +11,10 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            using (var connection = this.CreateConnection())
-            {
-                var model = this.CreateDbModel(connection);
-                Logger.Write(this, LogLevel.Debug, "Compiling database model.");
-                this.DbCompiledModel = model.Compile();
-            }
+            var connection = this.CreateConnection();
+            var model = this.CreateDbModel(connection);
+            Logger.Write(this, LogLevel.Debug, "Compiling database model.");
+            this.DbCompiledModel = model.Compile();
             base.InitializeComponent(core);
         }
 

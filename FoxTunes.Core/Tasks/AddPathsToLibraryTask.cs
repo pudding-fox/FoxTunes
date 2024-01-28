@@ -2,6 +2,7 @@
 using FoxTunes.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,9 +53,9 @@ namespace FoxTunes
             {
                 using (var transaction = databaseContext.Connection.BeginTransaction())
                 {
-                    this.AddLibraryItems(databaseContext);
-                    this.AddOrUpdateMetaData(databaseContext);
-                    this.SetLibraryItemsStatus(databaseContext);
+                    this.AddLibraryItems(databaseContext, transaction);
+                    this.AddOrUpdateMetaData(databaseContext, transaction);
+                    this.SetLibraryItemsStatus(databaseContext, transaction);
                     transaction.Commit();
                 }
             }
@@ -62,13 +63,14 @@ namespace FoxTunes
             return Task.CompletedTask;
         }
 
-        private void AddLibraryItems(IDatabaseContext databaseContext)
+        private void AddLibraryItems(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
             this.Name = "Getting file list";
             this.IsIndeterminate = true;
             var parameters = default(IDbParameterCollection);
             using (var command = databaseContext.Connection.CreateCommand(Resources.AddLibraryItem, new[] { "directoryName", "fileName", "status" }, out parameters))
             {
+                command.Transaction = transaction;
                 var addLibraryItem = new Action<string>(fileName =>
                 {
                     if (!this.PlaybackManager.IsSupported(fileName))
@@ -97,9 +99,9 @@ namespace FoxTunes
             }
         }
 
-        private void AddOrUpdateMetaData(IDatabaseContext databaseContext)
+        private void AddOrUpdateMetaData(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
-            using (var metaDataPopulator = new MetaDataPopulator(databaseContext, "Library"))
+            using (var metaDataPopulator = new MetaDataPopulator(databaseContext, transaction, "Library"))
             {
                 var query = databaseContext.GetQuery<LibraryItem>().Detach().Where(libraryItem => libraryItem.Status == LibraryItemStatus.Import);
                 metaDataPopulator.InitializeComponent(this.Core);
@@ -111,11 +113,12 @@ namespace FoxTunes
             }
         }
 
-        private void SetLibraryItemsStatus(IDatabaseContext databaseContext)
+        private void SetLibraryItemsStatus(IDatabaseContext databaseContext, IDbTransaction transaction)
         {
             var parameters = default(IDbParameterCollection);
             using (var command = databaseContext.Connection.CreateCommand(Resources.SetLibraryItemStatus, new[] { "status" }, out parameters))
             {
+                command.Transaction = transaction;
                 parameters["status"] = LibraryItemStatus.None;
                 command.ExecuteNonQuery();
             }
