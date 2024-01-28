@@ -92,12 +92,13 @@ namespace FoxTunes
 
         protected virtual async Task Render()
         {
+            var bitmap = default(WriteableBitmap);
             var success = default(bool);
             var info = default(BitmapHelper.RenderInfo);
 
             await Windows.Invoke(() =>
             {
-                var bitmap = this.Bitmap;
+                bitmap = this.Bitmap;
                 if (bitmap == null)
                 {
                     return;
@@ -122,8 +123,7 @@ namespace FoxTunes
 
             await Windows.Invoke(() =>
             {
-                var bitmap = this.Bitmap;
-                if (bitmap == null)
+                if (!object.ReferenceEquals(this.Bitmap, bitmap))
                 {
                     return;
                 }

@@ -160,6 +160,11 @@ namespace FoxTunes
             await Windows.Invoke(() =>
             {
                 bitmap = this.Bitmap;
+                if (bitmap == null)
+                {
+                    return;
+                }
+
                 success = bitmap.TryLock(LockTimeout);
                 if (!success)
                 {
@@ -193,6 +198,11 @@ namespace FoxTunes
 
             await Windows.Invoke(() =>
             {
+                if (!object.ReferenceEquals(this.Bitmap, bitmap))
+                {
+                    return;
+                }
+
                 bitmap.AddDirtyRect(new global::System.Windows.Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
             }).ConfigureAwait(false);

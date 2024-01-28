@@ -138,6 +138,7 @@ namespace FoxTunes
         {
             const byte SHADE = 30;
 
+            var bitmap = default(WriteableBitmap);
             var success = default(bool);
             var valueRenderInfo = default(BitmapHelper.RenderInfo);
             var rmsRenderInfo = default(BitmapHelper.RenderInfo);
@@ -145,7 +146,7 @@ namespace FoxTunes
 
             await Windows.Invoke(() =>
             {
-                var bitmap = this.Bitmap;
+                bitmap = this.Bitmap;
                 if (bitmap == null)
                 {
                     return;
@@ -183,8 +184,7 @@ namespace FoxTunes
 
             await Windows.Invoke(() =>
             {
-                var bitmap = this.Bitmap;
-                if (bitmap == null)
+                if (!object.ReferenceEquals(this.Bitmap, bitmap))
                 {
                     return;
                 }
