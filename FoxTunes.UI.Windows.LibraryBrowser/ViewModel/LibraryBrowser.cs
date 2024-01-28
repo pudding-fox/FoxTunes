@@ -23,9 +23,19 @@ namespace FoxTunes.ViewModel
             }
             set
             {
+                this.OnFramesChanging();
                 this._Frames = value;
                 this.OnFramesChanged();
             }
+        }
+
+        protected virtual void OnFramesChanging()
+        {
+            if (this._Frames == null)
+            {
+                return;
+            }
+            this._Frames.ForEach(frame => frame.Dispose());
         }
 
         protected virtual void OnFramesChanged()

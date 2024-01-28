@@ -263,6 +263,12 @@ namespace FoxTunes.ViewModel
             return this.Component.InvokeAsync(this.Invocation);
         }
 
+        protected override void OnDisposing()
+        {
+            this.Children.ForEach(child => child.Dispose());
+            base.OnDisposing();
+        }
+
         protected override Freezable CreateInstanceCore()
         {
             return new MenuItem();
