@@ -93,7 +93,14 @@ namespace FoxTunes.ViewModel
             this.OnPhase(CommandPhase.Before, this.Tag, parameter);
             try
             {
-                this.Action((T)parameter);
+                if (parameter is T)
+                {
+                    this.Action((T)parameter);
+                }
+                else
+                {
+                    this.Action(default(T));
+                }
                 this.OnPhase(CommandPhase.After, this.Tag, parameter);
             }
             catch

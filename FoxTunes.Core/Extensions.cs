@@ -1,31 +1,15 @@
 ﻿using FoxDb;
-using FoxTunes.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public static partial class Extensions
     {
-        public static T Value<T>(this IEnumerable<INamedValue> items, string name)
-        {
-            var item = items.FirstOrDefault(
-                _item => string.Equals(_item.Name, name, StringComparison.InvariantCultureIgnoreCase)
-            );
-            if (item == null)
-            {
-                return default(T);
-            }
-            return (T)Convert.ChangeType(item.Value, typeof(T));
-        }
-
         public static bool HasCustomAttribute<T>(this Type type, bool inherit = false) where T : Attribute
         {
             var attribute = default(T);
@@ -243,6 +227,16 @@ namespace FoxTunes
             }
 
             return result;
+        }
+
+        public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> sequence, TKey key)
+        {
+            var value = default(TValue);
+            if (!sequence.TryGetValue(key, out value))
+            {
+                return default(TValue);
+            }
+            return value;
         }
     }
 }

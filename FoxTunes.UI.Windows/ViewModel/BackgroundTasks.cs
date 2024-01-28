@@ -1,6 +1,6 @@
-﻿using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -10,81 +10,52 @@ namespace FoxTunes.ViewModel
     {
         public BackgroundTasks()
         {
-            this.RunningTasks = new ObservableCollection<BackgroundTask>();
+            this.Items = new ObservableCollection<BackgroundTask>();
+            global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
         }
 
-        public ObservableCollection<BackgroundTask> RunningTasks { get; set; }
+        private ObservableCollection<BackgroundTask> _Items { get; set; }
 
-        public override void InitializeComponent(ICore core)
+        public ObservableCollection<BackgroundTask> Items
         {
-            ComponentRegistry.Instance.ForEach<IBackgroundTaskSource>(component => component.BackgroundTask += this.OnBackgroundTask);
-            base.InitializeComponent(core);
-        }
-
-        protected virtual void OnBackgroundTask(object sender, BackgroundTaskEventArgs e)
-        {
-            e.BackgroundTask.Started += this.OnBackgroundTaskStarted;
-            e.BackgroundTask.Completed += this.OnBackgroundTaskCompleted;
-            e.BackgroundTask.Faulted += this.OnBackgroundTaskFaulted;
-        }
-
-        protected virtual void OnBackgroundTaskStarted(object sender, EventArgs e)
-        {
-            var backgroundTask = sender as IBackgroundTask;
-            if (backgroundTask == null || !backgroundTask.Visible || backgroundTask.IsCompleted ||  backgroundTask.IsFaulted)
+            get
             {
-                return;
+                return this._Items;
             }
-            this.Add(backgroundTask);
-        }
-
-        protected virtual void OnBackgroundTaskCompleted(object sender, EventArgs e)
-        {
-            var backgroundTask = sender as IBackgroundTask;
-            if (backgroundTask == null)
+            set
             {
-                return;
+                this._Items = value;
+                this.OnItemsChanged();
             }
-            this.Remove(backgroundTask);
         }
 
-        protected virtual void OnBackgroundTaskFaulted(object sender, EventArgs e)
+        protected virtual void OnItemsChanged()
         {
-            var backgroundTask = sender as IBackgroundTask;
-            if (backgroundTask == null)
+            if (this.ItemsChanged != null)
             {
-                return;
+                this.ItemsChanged(this, EventArgs.Empty);
             }
-            this.Remove(backgroundTask);
+            this.OnPropertyChanged("Items");
         }
 
-        public Task Add(IBackgroundTask backgroundTask)
+        public event EventHandler ItemsChanged;
+
+        protected virtual void OnActiveChanged(object sender, EventArgs e)
         {
-            return Windows.Invoke(() => this.RunningTasks.Add(new BackgroundTask(backgroundTask)));
+            var task = this.Refresh();
         }
 
-        public Task Remove(IBackgroundTask backgroundTask)
+        public Task Refresh()
         {
-            backgroundTask.Started -= this.OnBackgroundTaskStarted;
-            backgroundTask.Completed -= this.OnBackgroundTaskCompleted;
-            backgroundTask.Faulted -= this.OnBackgroundTaskFaulted;
-            foreach (var element in this.RunningTasks)
-            {
-                if (object.ReferenceEquals(element.InnerBackgroundTask, backgroundTask))
-                {
-                    return Windows.Invoke(() => this.RunningTasks.Remove(element));
-                }
-            }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
+            var items = global::FoxTunes.BackgroundTask.Active
+                .Select(backgroundTask => new BackgroundTask(backgroundTask))
+                .ToArray();
+            return Windows.Invoke(() => this.Items = new ObservableCollection<BackgroundTask>(items));
         }
 
         protected override void OnDisposing()
         {
-            ComponentRegistry.Instance.ForEach<IBackgroundTaskSource>(component => component.BackgroundTask -= this.OnBackgroundTask);
+            global::FoxTunes.BackgroundTask.ActiveChanged -= this.OnActiveChanged;
             base.OnDisposing();
         }
 

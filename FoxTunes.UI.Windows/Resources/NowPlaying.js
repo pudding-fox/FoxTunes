@@ -9,8 +9,7 @@
     if (tag.track) {
         parts.push(zeropad(tag.track, 2));
     }
-    var artist = tag.albumartist || tag.artist;
-    if (artist) {
+    if (tag.artist) {
         parts.push(artist);
     }
     if (tag.album) {
@@ -22,7 +21,7 @@
     else {
         parts.push(filename(item.FileName));
     }
-    if (tag.performer && tag.performer != (tag.albumartist || tag.artist)) {
+    if (tag.performer && tag.performer != tag.artist) {
         parts.push(tag.performer);
     }
     return parts.join(" - ");

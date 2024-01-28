@@ -11,16 +11,18 @@ namespace FoxTunes
         public MiniPlaylist()
         {
             this.InitializeComponent();
+            this.IsVisibleChanged += this.OnIsVisibleChanged;
         }
 
-        protected virtual void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        protected virtual async void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var listBox = sender as ListBox;
-            if (listBox == null || listBox.SelectedItem == null)
+            await Windows.Invoke(() =>
             {
-                return;
-            }
-            listBox.ScrollIntoView(listBox.SelectedItem);
+                if (this.ListBox.SelectedItem != null)
+                {
+                    this.ListBox.ScrollIntoView(this.ListBox.SelectedItem);
+                }
+            });
         }
 
         protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -32,17 +32,7 @@ namespace FoxTunes.Templates
 WITH ""VerticalMetaData""
 AS
 (
-	SELECT ""PlaylistItems"".""Id"", ""PlaylistItems"".""FileName"", ""MetaDataItems"".""Name"", 
-		CASE 
-			WHEN ""MetaDataItems"".""NumericValue"" IS NOT NULL THEN 'Numeric' 
-			WHEN ""MetaDataItems"".""TextValue"" IS NOT NULL THEN 'Text' 
-			WHEN ""MetaDataItems"".""FileValue"" IS NOT NULL THEN 'File' 
-		END AS ""ValueType"",
-			CASE 
-			WHEN ""MetaDataItems"".""NumericValue"" IS NOT NULL THEN ""MetaDataItems"".""NumericValue""
-			WHEN ""MetaDataItems"".""TextValue"" IS NOT NULL THEN ""MetaDataItems"".""TextValue"" 
-			WHEN ""MetaDataItems"".""FileValue"" IS NOT NULL THEN ""MetaDataItems"".""FileValue""
-		END AS ""Value""
+	SELECT ""PlaylistItems"".""Id"", ""PlaylistItems"".""FileName"", ""MetaDataItems"".""Name"", ""MetaDataItems"".""Value""
 	FROM ""PlaylistItems""
 		LEFT OUTER JOIN ""PlaylistItem_MetaDataItem"" 
 			ON ""PlaylistItems"".""Id"" = ""PlaylistItem_MetaDataItem"".""PlaylistItem_Id""
@@ -66,7 +56,7 @@ AS
 		"VerticalMetaData", 
 		new[] { "Id", "FileName" }, 
 		new[] { "Name" }, 
-		new[] { "ValueType", "Value" }, 
+		new[] { "Value" }, 
 		this.MetaDataNames
 	).TransformText()));
             

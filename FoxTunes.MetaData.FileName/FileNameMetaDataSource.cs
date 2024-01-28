@@ -7,15 +7,6 @@ namespace FoxTunes
 {
     public class FileNameMetaDataSource : BaseComponent, IMetaDataSource
     {
-        public static IDictionary<string, string> Lookup = GetLookup();
-
-        private static IDictionary<string, string> GetLookup()
-        {
-            var lookup = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            lookup.Add("artist", CommonMetaData.AlbumArtist);
-            return lookup;
-        }
-
         public FileNameMetaDataSource(IEnumerable<IFileNameMetaDataExtractor> extractors)
         {
             this.Extractors = extractors;
@@ -36,7 +27,7 @@ namespace FoxTunes
                 foreach (var key in metaData.Keys)
                 {
                     var name = default(string);
-                    if (!CommonMetaData.Lookup.TryGetValue(key, out name) && !Lookup.TryGetValue(key, out name))
+                    if (!CommonMetaData.Lookup.TryGetValue(key, out name))
                     {
                         name = key;
                     }
@@ -53,17 +44,15 @@ namespace FoxTunes
 
         protected virtual MetaDataItem GetMetaData(string name, string value)
         {
-            var numeric = default(int);
-            var result = new MetaDataItem(name, MetaDataItemType.Tag);
-            if (int.TryParse(value, out numeric))
+            return new MetaDataItem(name, MetaDataItemType.Tag)
             {
-                result.NumericValue = numeric;
-            }
-            else
-            {
-                result.TextValue = value;
-            }
-            return result;
+                Value = value
+            };
+        }
+
+        public Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems)
+        {
+            throw new NotImplementedException();
         }
     }
 }

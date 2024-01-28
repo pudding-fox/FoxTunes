@@ -140,7 +140,10 @@ namespace FoxTunes
                     }
                     var set = this.Database.Set<PlaylistItem>(transaction);
                     await set.AddOrUpdateAsync(playlistItems);
-                    transaction.Commit();
+                    if (transaction.HasTransaction)
+                    {
+                        transaction.Commit();
+                    }
                 }
             }))
             {
@@ -293,7 +296,7 @@ namespace FoxTunes
                          case DatabaseParameterPhase.Fetch:
                              parameters["name"] = CustomMetaData.VariousArtists;
                              parameters["type"] = MetaDataItemType.Tag;
-                             parameters["numericValue"] = 1;
+                             parameters["value"] = bool.TrueString;
                              parameters["status"] = PlaylistItemStatus.Import;
                              break;
                      }

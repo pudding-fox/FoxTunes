@@ -3,8 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
              xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
+             xmlns:LocalWindows="clr-namespace:FoxTunes"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel;assembly=FoxTunes.UI.Windows"
              xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
@@ -14,6 +16,8 @@
     <UserControl.Resources>
         <LocalViewModel:LibraryBrowser x:Key="ViewModel" Core="{Binding}"></LocalViewModel:LibraryBrowser>
         <ViewModel:NegavingBooleanToVisibilityConverter x:Key="NegavingBooleanToVisibilityConverter"></ViewModel:NegavingBooleanToVisibilityConverter>
+        <System:Boolean x:Key="True">True</System:Boolean>
+        <System:Boolean x:Key="False">False</System:Boolean>
     </UserControl.Resources>
     <Interactivity:Interaction.Triggers>
         <Interactivity:EventTrigger EventName="DragEnter">
@@ -35,7 +39,6 @@
             DisplayMemberPath="Name"
             Visibility="{Binding IsSlave, Converter={StaticResource NegavingBooleanToVisibilityConverter}, Source={StaticResource ViewModel}}"/>
         <ListBox 
-                x:Name="TreeView" 
                 Grid.Row="1" 
                 Margin="0,2,0,2" 
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
@@ -44,12 +47,17 @@
                 IsVisibleChanged="OnIsVisibleChanged"
                 SelectionChanged="OnSelectionChanged"
                 Windows:ListBoxExtensions.DragSource="True"
-                Windows:ListBoxExtensions.DragSourceInitialized="DragSourceInitialized">
+                Windows:ListBoxExtensions.DragSourceInitialized="DragSourceInitialized"
+                TextSearch.TextPath="Value">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="MouseDoubleClick">
                     <Interactivity:InvokeCommandAction Command="{Binding BrowseCommand, Source={StaticResource ViewModel}}"/>
                 </Interactivity:EventTrigger>
             </Interactivity:Interaction.Triggers>
+            <ListBox.InputBindings>
+                <KeyBinding Key="Return" Command="{Binding BrowseCommand, Source={StaticResource ViewModel}}"></KeyBinding>
+                <KeyBinding Key="Backspace" Command="{Binding BrowseCommand, Source={StaticResource ViewModel}}" CommandParameter="{StaticResource True}"></KeyBinding>
+            </ListBox.InputBindings>
             <ListBox.ContextMenu>
                 <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_LIBRARY}}"></Windows:Menu>
             </ListBox.ContextMenu>
@@ -86,7 +94,7 @@
                     <Windows:LibraryBrowserTemplateSelector.DefaultTemplate>
                         <DataTemplate DataType="{x:Type Core:LibraryHierarchyNode}">
                             <StackPanel Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Orientation="Vertical" Margin="0,0,5,0">
-                                <Windows:ArtworkGrid Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Height="{Binding TileSize.Value, Source={StaticResource ViewModel}}"></Windows:ArtworkGrid>
+                                <LocalWindows:ArtworkGrid Width="{Binding TileSize.Value, Source={StaticResource ViewModel}}" Height="{Binding TileSize.Value, Source={StaticResource ViewModel}}"></LocalWindows:ArtworkGrid>
                                 <TextBlock HorizontalAlignment="Center" Text="{Binding Value}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextBrush}"></TextBlock>
                             </StackPanel>
                         </DataTemplate>

@@ -18,9 +18,9 @@
         </Grid.RowDefinitions>
         <Border>
             <ListBox 
+                Name="ListBox"
                 ItemsSource="{Binding Items, Source={StaticResource ViewModel}}" 
                 SelectedValue="{Binding SelectedItem, Source={StaticResource ViewModel}}" 
-                IsVisibleChanged="OnIsVisibleChanged"
                 SelectionChanged="OnSelectionChanged" 
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                 Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}}"

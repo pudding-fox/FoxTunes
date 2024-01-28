@@ -32,17 +32,7 @@ namespace FoxTunes.Templates
 WITH ""VerticalMetaData""
 AS
 (
-	SELECT ""LibraryItems"".""Id"", ""LibraryItems"".""FileName"", ""MetaDataItems"".""Name"", 
-		CASE 
-			WHEN ""MetaDataItems"".""NumericValue"" IS NOT NULL THEN 'Numeric' 
-			WHEN ""MetaDataItems"".""TextValue"" IS NOT NULL THEN 'Text' 
-			WHEN ""MetaDataItems"".""FileValue"" IS NOT NULL THEN 'File' 
-		END AS ""ValueType"",
-			CASE 
-			WHEN ""MetaDataItems"".""NumericValue"" IS NOT NULL THEN ""MetaDataItems"".""NumericValue""
-			WHEN ""MetaDataItems"".""TextValue"" IS NOT NULL THEN ""MetaDataItems"".""TextValue"" 
-			WHEN ""MetaDataItems"".""FileValue"" IS NOT NULL THEN ""MetaDataItems"".""FileValue""
-		END AS ""Value""
+	SELECT ""LibraryItems"".""Id"", ""LibraryItems"".""FileName"", ""MetaDataItems"".""Name"", ""MetaDataItems"".""Value""
 	FROM ""LibraryItems""
 		JOIN ""LibraryItem_MetaDataItem"" ON ""LibraryItems"".""Id"" = ""LibraryItem_MetaDataItem"".""LibraryItem_Id""
 		JOIN ""MetaDataItems"" ON ""MetaDataItems"".""Id"" = ""LibraryItem_MetaDataItem"".""MetaDataItem_Id""
@@ -61,7 +51,7 @@ AS
 		"VerticalMetaData", 
 		new[] { "Id", "FileName" }, 
 		new[] { "Name" }, 
-		new[] { "ValueType", "Value" }, 
+		new[] { "Value" }, 
 		this.MetaDataNames
 	).TransformText()));
             

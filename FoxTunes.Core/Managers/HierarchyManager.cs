@@ -3,21 +3,45 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace FoxTunes
 {
     public class HierarchyManager : StandardManager, IHierarchyManager
     {
+        public HierarchyManagerState State
+        {
+            get
+            {
+                if (global::FoxTunes.BackgroundTask.Active.Any(backgroundTask =>
+                {
+                    var type = backgroundTask.GetType();
+                    return type == typeof(BuildLibraryHierarchiesTask) || type == typeof(ClearLibraryHierarchiesTask);
+                }))
+                {
+                    return HierarchyManagerState.Updating;
+                }
+                return HierarchyManagerState.None;
+            }
+        }
+
         public ICore Core { get; private set; }
+
+        public ILibraryManager LibraryManager { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.LibraryManager = core.Managers.Library;
             base.InitializeComponent(core);
         }
 
         public async Task Build(bool reset)
         {
+            if (this.LibraryManager.State.HasFlag(LibraryManagerState.Updating))
+            {
+                return;
+            }
             using (var task = new BuildLibraryHierarchiesTask(reset))
             {
                 task.InitializeComponent(this.Core);
@@ -28,6 +52,10 @@ namespace FoxTunes
 
         public async Task Clear()
         {
+            if (this.LibraryManager.State.HasFlag(LibraryManagerState.Updating))
+            {
+                return;
+            }
             using (var task = new ClearLibraryHierarchiesTask())
             {
                 task.InitializeComponent(this.Core);

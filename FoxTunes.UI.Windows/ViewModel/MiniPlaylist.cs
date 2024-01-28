@@ -78,7 +78,6 @@ namespace FoxTunes.ViewModel
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.PLAYLIST_SCRIPT_ELEMENT
             ).ConnectValue(async value => await this.SetScript(value));
-            var task = this.Refresh();
         }
 
         protected virtual async void OnCurrentItemChanged(object sender, AsyncEventArgs e)
@@ -89,8 +88,22 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual Task Refresh()
+        public virtual async Task Refresh()
         {
+            await this.RefreshItems();
+            await this.RefreshSelectedItem();
+        }
+
+        public virtual Task RefreshSelectedItem()
+        {
+            if (this.PlaylistManager == null)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
             return Windows.Invoke(() => this.SelectedItem = this.PlaylistManager.CurrentItem);
         }
 

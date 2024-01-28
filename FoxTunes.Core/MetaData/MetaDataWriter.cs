@@ -1,5 +1,6 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -13,14 +14,20 @@ namespace FoxTunes
 
         public IDatabaseCommand Command { get; private set; }
 
+        public async Task Write(int itemId, IEnumerable<MetaDataItem> metaDataItems)
+        {
+            foreach (var metaDataItem in metaDataItems)
+            {
+                await this.Write(itemId, metaDataItem);
+            }
+        }
+
         public Task Write(int itemId, MetaDataItem metaDataItem)
         {
             this.Command.Parameters["itemId"] = itemId;
             this.Command.Parameters["name"] = metaDataItem.Name;
             this.Command.Parameters["type"] = metaDataItem.Type;
-            this.Command.Parameters["numericValue"] = metaDataItem.NumericValue;
-            this.Command.Parameters["textValue"] = metaDataItem.TextValue;
-            this.Command.Parameters["fileValue"] = metaDataItem.FileValue;
+            this.Command.Parameters["value"] = metaDataItem.Value;
             return this.Command.ExecuteNonQueryAsync();
         }
 

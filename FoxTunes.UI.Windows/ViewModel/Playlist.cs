@@ -15,14 +15,39 @@ namespace FoxTunes.ViewModel
 {
     public class Playlist : PlaylistBase
     {
-        public Playlist()
-        {
-            this.SelectedItems = new ObservableCollection<PlaylistItem>();
-        }
-
         public PlaylistGridViewColumnFactory GridViewColumnFactory { get; private set; }
 
-        public IList SelectedItems { get; set; }
+        public IList SelectedItems
+        {
+            get
+            {
+                if (this.PlaylistManager == null)
+                {
+                    return null;
+                }
+                return this.PlaylistManager.SelectedItems;
+            }
+            set
+            {
+                if (this.PlaylistManager == null)
+                {
+                    return;
+                }
+                this.PlaylistManager.SelectedItems = new ObservableCollection<PlaylistItem>(value.OfType<PlaylistItem>());
+                this.OnSelectedItemsChanged();
+            }
+        }
+
+        protected virtual void OnSelectedItemsChanged()
+        {
+            if (this.SelectedItemsChanged != null)
+            {
+                this.SelectedItemsChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SelectedItems");
+        }
+
+        public event EventHandler SelectedItemsChanged;
 
         private bool _InsertActive { get; set; }
 
@@ -136,7 +161,7 @@ namespace FoxTunes.ViewModel
             this.GridViewColumnFactory = new PlaylistGridViewColumnFactory(this.PlaybackManager, this.ScriptingRuntime);
             this.GridViewColumnFactory.PositionChanged += this.OnColumnChanged;
             this.GridViewColumnFactory.WidthChanged += this.OnColumnChanged;
-            var task = this.RefreshColumns();
+            var task = this.Refresh();
         }
 
         protected virtual async void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
@@ -169,26 +194,6 @@ namespace FoxTunes.ViewModel
             {
                 case CommonSignals.PlaylistColumnsUpdated:
                     return this.ReloadColumns();
-                case CommonSignals.PluginInvocation:
-                    var invocation = signal.State as IInvocationComponent;
-                    if (invocation != null)
-                    {
-                        switch (invocation.Category)
-                        {
-                            case InvocationComponent.CATEGORY_PLAYLIST:
-                                switch (invocation.Id)
-                                {
-                                    case PlaylistActionsBehaviour.REMOVE_PLAYLIST_ITEMS:
-                                        return this.RemovePlaylistItems();
-                                    case PlaylistActionsBehaviour.CROP_PLAYLIST_ITEMS:
-                                        return this.CropPlaylistItems();
-                                    case PlaylistActionsBehaviour.LOCATE_PLAYLIST_ITEMS:
-                                        return this.LocatePlaylistItems();
-                                }
-                                break;
-                        }
-                    }
-                    break;
             }
             return base.OnSignal(sender, signal);
         }
@@ -392,6 +397,18 @@ namespace FoxTunes.ViewModel
             }
         }
 
+        public virtual async Task Refresh()
+        {
+            await this.RefreshItems();
+            await this.RefreshSelectedItems();
+            await this.RefreshColumns();
+        }
+
+        public virtual Task RefreshSelectedItems()
+        {
+            return Windows.Invoke(() => this.OnSelectedItemsChanged());
+        }
+
         public virtual async Task RefreshColumns()
         {
             if (this.GridColumns == null || this.GridColumns.Count == 0)
@@ -416,12 +433,6 @@ namespace FoxTunes.ViewModel
         {
             var columns = this.GetGridColumns();
             return Windows.Invoke(() => this.GridColumns = new ObservableCollection<GridViewColumn>(columns));
-        }
-
-        protected override async Task ReloadItems()
-        {
-            await base.ReloadItems();
-            await this.RefreshColumns();
         }
 
         protected override void OnDisposing()

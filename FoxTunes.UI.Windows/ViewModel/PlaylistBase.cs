@@ -67,7 +67,6 @@ namespace FoxTunes.ViewModel
             this.ScriptingRuntime = this.Core.Components.ScriptingRuntime;
             this.PlaylistManager = this.Core.Managers.Playlist;
             this.PlaybackManager = this.Core.Managers.Playback;
-            this.ReloadItems();
             base.InitializeComponent(core);
         }
 
@@ -76,7 +75,7 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    return this.ReloadItems();
+                    return this.RefreshItems();
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -85,7 +84,7 @@ namespace FoxTunes.ViewModel
 #endif
         }
 
-        protected virtual Task ReloadItems()
+        protected virtual Task RefreshItems()
         {
             return Windows.Invoke(new Action(this.OnItemsChanged));
         }

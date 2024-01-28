@@ -3,7 +3,7 @@
     if (tag.title) {
         parts.push(tag.title);
     }
-    if (tag.performer && tag.performer != (tag.albumartist || tag.artist)) {
+    if (tag.performer && tag.performer != tag.artist) {
         parts.push(tag.performer);
     }
     if (parts.length) {

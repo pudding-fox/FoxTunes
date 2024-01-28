@@ -71,7 +71,7 @@
                 Margin="4,0,0,0"
                 ControlType1="{Binding TopRight.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={x:Static Windows:LayoutManager.Instance}}" 
                 ControlType2="{Binding BottomRight.Value, Converter={StaticResource SelectionConfigurationOptionConverter}, Source={x:Static Windows:LayoutManager.Instance}}"/>
-            <Windows:BackgroundTasks Grid.ColumnSpan="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="200"></Windows:BackgroundTasks>
+            <Windows:BackgroundTasks Grid.ColumnSpan="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="250"></Windows:BackgroundTasks>
             <Windows:Components></Windows:Components>
         </Grid>
     </DockPanel>

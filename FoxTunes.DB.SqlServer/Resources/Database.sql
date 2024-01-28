@@ -2,9 +2,7 @@ CREATE TABLE [MetaDataItems](
     [Id] INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
     [Name] nvarchar(250) NOT NULL, 
 	[Type] INTEGER NOT NULL,
-    [NumericValue] INTEGER, 
-    [TextValue] nvarchar(250), 
-    [FileValue] nvarchar(250));
+    [Value] nvarchar(250));
 
 CREATE TABLE LibraryItems (
 	Id INTEGER IDENTITY(1,1) PRIMARY KEY NOT NULL, 
@@ -138,26 +136,10 @@ ON [PlaylistItem_MetaDataItem](
     [PlaylistItem_Id], 
     [MetaDataItem_Id]);
 
-CREATE UNIQUE INDEX [IDX_MetaDataItems_TextValue]
+CREATE UNIQUE INDEX [IDX_MetaDataItems_Value]
 ON [MetaDataItems](
     [Name], 
-    [TextValue])
-WHERE
-    [TextValue] IS NOT NULL;
-
-CREATE UNIQUE INDEX [IDX_MetaDataItems_NumericValue]
-ON [MetaDataItems](
-    [Name], 
-    [NumericValue])
-WHERE
-    [NumericValue] IS NOT NULL;
-
-CREATE UNIQUE INDEX [IDX_MetaDataItems_FileValue]
-ON [MetaDataItems](
-    [Name], 
-    [FileValue])
-WHERE
-    [FileValue] IS NOT NULL;
+    [Value]);
 
 CREATE UNIQUE INDEX IDX_LibraryItems_Location 
 ON LibraryItems (

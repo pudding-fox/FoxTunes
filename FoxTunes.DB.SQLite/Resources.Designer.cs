@@ -61,8 +61,8 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT OR IGNORE INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;NumericValue&quot;, &quot;TextValue&quot;, &quot;FileValue&quot;) 
-        ///SELECT @name, @type, @numericValue, @textValue, @fileValue;
+        ///   Looks up a localized string similar to INSERT OR IGNORE INTO &quot;MetaDataItems&quot; (&quot;Name&quot;, &quot;Type&quot;, &quot;Value&quot;) 
+        ///SELECT @name, @type, @value;
         ///
         ///INSERT OR IGNORE INTO &quot;LibraryItem_MetaDataItem&quot; (&quot;LibraryItem_Id&quot;, &quot;MetaDataItem_Id&quot;)
         ///SELECT @itemId, last_insert_rowid();.
@@ -112,9 +112,7 @@ namespace FoxTunes {
         ///	[Id] INTEGER PRIMARY KEY NOT NULL, 
         ///	[Name] text NOT NULL, 
         ///	[Type] bigint NOT NULL,
-        ///	[NumericValue] INTEGER, 
-        ///	[TextValue] text, 
-        ///	[FileValue] text);
+        ///	[Value] text);
         ///
         ///CREATE TABLE LibraryItems (
         ///	Id INTEGER PRIMARY KEY NOT NULL, 
@@ -126,7 +124,8 @@ namespace FoxTunes {
         ///    [Id] INTEGER PRIMARY KEY NOT NULL, 
         ///	[LibraryItem_Id] INTEGER NULL REFERENCES LibraryItems([Id]),
         ///    [Sequence] bigint NOT NULL, 
-        ///    [DirectoryNa [rest of string was truncated]&quot;;.
+        ///    [DirectoryName] text NOT NULL, 
+        ///    [FileName] text NOT NULL,  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Database {
             get {
@@ -156,12 +155,13 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT &quot;MetaDataItems&quot;.&quot;NumericValue&quot;,  &quot;MetaDataItems&quot;.&quot;TextValue&quot;, &quot;MetaDataItems&quot;.&quot;FileValue&quot;
+        ///   Looks up a localized string similar to SELECT &quot;MetaDataItems&quot;.&quot;Value&quot;
         ///FROM &quot;LibraryHierarchyItems&quot;
         ///	JOIN &quot;LibraryHierarchyItem_LibraryItem&quot; ON &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryHierarchyItem_Id&quot;
         ///	JOIN &quot;LibraryItem_MetaDataItem&quot; ON &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryItem_Id&quot; = &quot;LibraryItem_MetaDataItem&quot;.&quot;LibraryItem_Id&quot;
         ///	JOIN &quot;MetaDataItems&quot; ON &quot;MetaDataItems&quot;.&quot;Id&quot; = &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot;
-        ///WHERE &quot;LibraryHier [rest of string was truncated]&quot;;.
+        ///WHERE &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = @libraryHierarchyItemId 
+        ///	AND (@type &amp; &quot;MetaDa [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetLibraryHierarchyMetaData {
             get {

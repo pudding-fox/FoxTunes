@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System.Text.RegularExpressions;
 
 namespace FoxTunes
 {
@@ -19,29 +20,46 @@ namespace FoxTunes
 
         public MetaDataItemType Type { get; set; }
 
-        public int? NumericValue { get; set; }
+        public string Value { get; set; }
 
-        public string TextValue { get; set; }
-
-        public string FileValue { get; set; }
-
-        public object Value
+        public bool IsNumeric
         {
             get
             {
-                if (this.NumericValue.HasValue)
+                if (string.IsNullOrEmpty(this.Value))
                 {
-                    return this.NumericValue.Value;
+                    return false;
                 }
-                if (this.TextValue != null)
+                foreach (char c in this.Value)
                 {
-                    return this.TextValue;
+                    if (c < '0' || c > '9')
+                    {
+                        return false;
+                    }
                 }
-                if (this.FileValue != null)
+                return true;
+            }
+        }
+
+        public bool IsFile
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this.Value))
                 {
-                    return this.FileValue;
+                    return false;
                 }
-                return null;
+                var regex = new Regex(@"((?:[a-zA-Z]\:(\\|\/)|file\:\/\/|\\\\|\.(\/|\\))([^\\\/\:\*\?\<\>\""\|]+(\\|\/){0,1})+)");
+                var matches = regex.Matches(this.Value);
+                for (var a = 0; a < matches.Count; a++)
+                {
+                    var match = matches[a];
+                    if (match.Success)
+                    {
+                        return true;
+                    }
+                }
+                return false;
             }
         }
 

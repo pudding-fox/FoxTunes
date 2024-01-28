@@ -7,6 +7,8 @@ namespace FoxTunes.Interfaces
     public interface IMetaDataSource : IBaseComponent
     {
         Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName);
+
+        Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems);
     }
 
     [Flags]

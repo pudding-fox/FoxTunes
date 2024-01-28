@@ -100,12 +100,17 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return new Command(this.Browse);
+                return new Command<bool>(this.Browse);
             }
         }
 
-        public void Browse()
+        public void Browse(bool up)
         {
+            if (up)
+            {
+                this.Up();
+                return;
+            }
             if (this.AddToPlaylistCommand.CanExecute(null))
             {
                 this.AddToPlaylistCommand.Execute(null);

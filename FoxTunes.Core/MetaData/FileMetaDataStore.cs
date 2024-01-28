@@ -29,7 +29,7 @@ namespace FoxTunes
             Directory.CreateDirectory(Path.GetDirectoryName(fileName));
             try
             {
-                using (var stream = File.OpenWrite(fileName))
+                using (var stream = File.Open(fileName, FileMode.Create))
                 {
                     await stream.WriteAsync(data, 0, data.Length);
                 }
@@ -62,7 +62,14 @@ namespace FoxTunes
 
         public static void Clear(string prefix)
         {
-            //TODO: Implement me. Tricky due to file locking.
+            try
+            {
+                Directory.Delete(Path.Combine(DataStoreDirectoryName, prefix), true);
+            }
+            catch (Exception e)
+            {
+                LogManager.Logger.Write(typeof(FileMetaDataStore), LogLevel.Error, "Failed to clear data: {0} => {1}", prefix, e.Message);
+            }
         }
 
         private static IEnumerable<string> GetSegments(string id)

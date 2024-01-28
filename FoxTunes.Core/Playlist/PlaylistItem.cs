@@ -14,6 +14,8 @@ namespace FoxTunes
 
         }
 
+        public int? LibraryItem_Id { get; set; }
+
         public int Sequence { get; set; }
 
         public string DirectoryName { get; set; }
@@ -42,6 +44,16 @@ namespace FoxTunes
             return TaskEx.FromResult<IEnumerable<MetaDataItem>>(this.MetaDatas);
 #else
             return Task.FromResult<IEnumerable<MetaDataItem>>(this.MetaDatas);
+#endif
+        }
+
+        public Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaDataItems)
+        {
+            this.MetaDatas = new ObservableCollection<MetaDataItem>(metaDataItems);
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;  
 #endif
         }
 

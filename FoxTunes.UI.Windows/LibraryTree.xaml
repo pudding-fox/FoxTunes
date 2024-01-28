@@ -36,7 +36,9 @@
                   Windows:TreeViewExtensions.SelectedItem="{Binding SelectedItem, Source={StaticResource ViewModel}}"
                   Windows:TreeViewExtensions.RightButtonSelect="True"
                   Windows:TreeViewExtensions.DragSource="True"
-                  Windows:TreeViewExtensions.DragSourceInitialized="DragSourceInitialized">
+                  Windows:TreeViewExtensions.DragSourceInitialized="DragSourceInitialized"
+                  IsTextSearchEnabled="True"
+                  TextSearch.TextPath="Value">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="MouseDoubleClick">
                     <Interactivity:InvokeCommandAction Command="{Binding AddToPlaylistCommand, Source={StaticResource ViewModel}}"/>

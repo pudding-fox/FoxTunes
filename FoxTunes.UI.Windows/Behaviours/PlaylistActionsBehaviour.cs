@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxTunes.Integration;
+using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,11 +13,11 @@ namespace FoxTunes
 
         public const string LOCATE_PLAYLIST_ITEMS = "AAAC";
 
-        public ISignalEmitter SignalEmitter { get; private set; }
+        public IPlaylistManager PlaylistManager { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.SignalEmitter = core.Components.SignalEmitter;
+            this.PlaylistManager = core.Managers.Playlist;
             base.InitializeComponent(core);
         }
 
@@ -35,9 +36,34 @@ namespace FoxTunes
             switch (component.Id)
             {
                 case REMOVE_PLAYLIST_ITEMS:
+                    return this.RemovePlaylistItems();
                 case CROP_PLAYLIST_ITEMS:
+                    return this.CropPlaylistItems();
                 case LOCATE_PLAYLIST_ITEMS:
-                    return this.SignalEmitter.Send(new Signal(this, CommonSignals.PluginInvocation, component));
+                    return this.LocatePlaylistItems();
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
+        protected virtual Task RemovePlaylistItems()
+        {
+            return this.PlaylistManager.Remove(this.PlaylistManager.SelectedItems);
+        }
+
+        protected virtual Task CropPlaylistItems()
+        {
+            return this.PlaylistManager.Crop(this.PlaylistManager.SelectedItems);
+        }
+
+        protected virtual Task LocatePlaylistItems()
+        {
+            foreach (var item in this.PlaylistManager.SelectedItems)
+            {
+                Explorer.Select(item.FileName);
             }
 #if NET40
             return TaskEx.FromResult(false);

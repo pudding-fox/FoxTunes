@@ -22,11 +22,11 @@ namespace FoxTunes
         {
             yield return new MetaDataItem(CommonMetaData.Track, MetaDataItemType.Tag)
             {
-                NumericValue = track + 1
+                Value = (track + 1).ToString()
             };
             yield return new MetaDataItem(CommonMetaData.Title, MetaDataItemType.Tag)
             {
-                TextValue = string.Format("CD Track {0:00}", track + 1)
+                Value = string.Format("CD Track {0:00}", track + 1)
             };
         }
 
@@ -35,7 +35,7 @@ namespace FoxTunes
             yield return new MetaDataItem(CommonProperties.Duration, MetaDataItemType.Property)
             {
                 //What the fuck is this? Something to do with 44.1kHz/16bit?
-                NumericValue = (BassCd.GetTrackLength(this.Drive, track) / 176400) * 1000
+                Value = ((BassCd.GetTrackLength(this.Drive, track) / 176400) * 1000).ToString()
             };
         }
     }

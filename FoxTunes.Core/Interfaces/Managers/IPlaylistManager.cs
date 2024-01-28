@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
@@ -46,5 +48,9 @@ namespace FoxTunes.Interfaces
         PlaylistItem CurrentItem { get; }
 
         event AsyncEventHandler CurrentItemChanged;
+
+        ObservableCollection<PlaylistItem> SelectedItems { get; set; }
+
+        event EventHandler SelectedItemsChanged;
     }
 }

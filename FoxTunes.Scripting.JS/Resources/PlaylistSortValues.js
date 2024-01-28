@@ -5,8 +5,8 @@
     parts.push("Various Artists");
   }
   else {
-    if (tag.firstalbumartist || tag.firstartist) {
-      parts.push(tag.firstalbumartist || tag.firstartist);
+    if (tag.artist) {
+        parts.push(tag.artist);
     }
   }
 

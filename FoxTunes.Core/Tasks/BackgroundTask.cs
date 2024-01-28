@@ -1,6 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,14 +12,42 @@ namespace FoxTunes
     {
         static BackgroundTask()
         {
+            Instances = new List<WeakReference>();
             Semaphores = new ConcurrentDictionary<string, SemaphoreSlim>();
         }
 
+        private static List<WeakReference> Instances { get; set; }
+
         private static ConcurrentDictionary<string, SemaphoreSlim> Semaphores { get; set; }
+
+        public static IEnumerable<IBackgroundTask> Active
+        {
+            get
+            {
+                return Instances
+                    .Where(instance => instance.IsAlive)
+                    .Select(instance => (IBackgroundTask)instance.Target)
+                    .Where(backgroundTask => !(backgroundTask.IsCompleted || backgroundTask.IsFaulted))
+                    .ToArray();
+            }
+        }
+
+        protected static void OnActiveChanged()
+        {
+            if (ActiveChanged == null)
+            {
+                return;
+            }
+            ActiveChanged(null, EventArgs.Empty);
+        }
+
+        public static event EventHandler ActiveChanged;
 
         protected BackgroundTask(string id)
         {
             this.Id = id;
+            Instances.Add(new WeakReference(this));
+            OnActiveChanged();
         }
 
         public string Id { get; private set; }
@@ -391,7 +421,19 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            //Nothing to do.
+            var instances = Instances.ToArray();
+            foreach (var instance in instances)
+            {
+                if (!instance.IsAlive)
+                {
+                    Instances.Remove(instance);
+                }
+                else if (object.ReferenceEquals(this, instance.Target))
+                {
+                    Instances.Remove(instance);
+                }
+            }
+            OnActiveChanged();
         }
 
         ~BackgroundTask()

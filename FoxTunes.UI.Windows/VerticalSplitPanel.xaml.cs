@@ -1,6 +1,8 @@
-﻿using System;
+﻿using FoxDb;
+using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace FoxTunes
 {
@@ -9,25 +11,6 @@ namespace FoxTunes
     /// </summary>
     public partial class VerticalSplitPanel : UserControl
     {
-        public static readonly DependencyPropertyKey ControlTypePropertyKey = DependencyProperty.RegisterReadOnly(
-            "ControlType",
-            typeof(Type),
-            typeof(VerticalSplitPanel),
-            new FrameworkPropertyMetadata(LayoutManager.PLACEHOLDER, FrameworkPropertyMetadataOptions.None)
-        );
-
-        public static readonly DependencyProperty ControlTypeProperty = ControlTypePropertyKey.DependencyProperty;
-
-        public static Type GetControlType(VerticalSplitPanel source)
-        {
-            return (Type)source.GetValue(ControlTypeProperty);
-        }
-
-        protected static void SetControlType(VerticalSplitPanel source, Type value)
-        {
-            source.SetValue(ControlTypePropertyKey, value);
-        }
-
         public static readonly DependencyProperty ControlType1Property = DependencyProperty.Register(
             "ControlType1",
             typeof(Type),
@@ -112,24 +95,8 @@ namespace FoxTunes
         public VerticalSplitPanel()
         {
             this.InitializeComponent();
+            this.DataContextChanged += this.OnDataContextChanged;
             this.RefreshLayout();
-        }
-
-        public Type ControlType
-        {
-            get
-            {
-                return GetControlType(this);
-            }
-            protected set
-            {
-                SetControlType(this, value);
-            }
-        }
-
-        protected virtual void OnControlTypeChanged()
-        {
-
         }
 
         public Type ControlType1
@@ -146,6 +113,17 @@ namespace FoxTunes
 
         protected virtual void OnControlType1Changed()
         {
+            if (this.Component1 != null)
+            {
+                this.Component1.IsComponentEnabledChanged -= this.OnIsComponentEnabledChanged;
+                this.Component1 = null;
+            }
+            if (this.HasControlType1)
+            {
+                this.Component1 = ComponentActivator.Instance.Activate<UIComponentBase>(this.ControlType1);
+                this.Component1.DataContext = this.DataContext;
+                this.Component1.IsComponentEnabledChanged += this.OnIsComponentEnabledChanged;
+            }
             this.RefreshLayout();
         }
 
@@ -154,6 +132,16 @@ namespace FoxTunes
             get
             {
                 return this.ControlType1 != null && this.ControlType1 != LayoutManager.PLACEHOLDER;
+            }
+        }
+
+        public UIComponentBase Component1 { get; private set; }
+
+        public bool HasComponent1
+        {
+            get
+            {
+                return this.Component1 != null && this.Component1.IsComponentEnabled;
             }
         }
 
@@ -171,6 +159,17 @@ namespace FoxTunes
 
         protected virtual void OnControlType2Changed()
         {
+            if (this.Component2 != null)
+            {
+                this.Component2.IsComponentEnabledChanged -= this.OnIsComponentEnabledChanged;
+                this.Component2 = null;
+            }
+            if (this.HasControlType2)
+            {
+                this.Component2 = ComponentActivator.Instance.Activate<UIComponentBase>(this.ControlType2);
+                this.Component2.DataContext = this.DataContext;
+                this.Component2.IsComponentEnabledChanged += this.OnIsComponentEnabledChanged;
+            }
             this.RefreshLayout();
         }
 
@@ -179,6 +178,16 @@ namespace FoxTunes
             get
             {
                 return this.ControlType2 != null && this.ControlType2 != LayoutManager.PLACEHOLDER;
+            }
+        }
+
+        public UIComponentBase Component2 { get; private set; }
+
+        public bool HasComponent2
+        {
+            get
+            {
+                return this.Component2 != null && this.Component2.IsComponentEnabled;
             }
         }
 
@@ -199,37 +208,98 @@ namespace FoxTunes
 
         }
 
+        public bool HasSplitPanel
+        {
+            get
+            {
+                return this.Content is Grid;
+            }
+        }
+
+        public bool IsRefreshingLayout { get; private set; }
+
         protected virtual void RefreshLayout()
         {
-            if (this.HasControlType1 && this.HasControlType2)
+            if (this.IsRefreshingLayout)
             {
-                this.Style = this.FindResource<Style>("SplitStyle");
-                this.ControlType = LayoutManager.PLACEHOLDER;
-                this.Visibility = Visibility.Visible;
+                return;
             }
-            else if (this.HasControlType1)
+            this.IsRefreshingLayout = true;
+            try
             {
-                this.Style = this.FindResource<Style>("FillStyle");
-                this.ControlType = this.ControlType1;
-                this.Visibility = Visibility.Visible;
-                //TODO: For some stupid fucking reason the binding does not work sometimes.
-                //TODO: I have no idea why but spent hours trying to fix it.
-                ((ControlSlot)this.Content).ControlType = this.ControlType1;
+                if (this.HasComponent1 && this.HasComponent2)
+                {
+                    if (!this.HasSplitPanel)
+                    {
+                        this.Component1.Disconnect();
+                        this.Component2.Disconnect();
+                        this.Component1.SetValue(Grid.RowProperty, 0);
+                        this.Component1.SetValue(FrameworkElement.MarginProperty, new Thickness(0, 0, 0, 4));
+                        this.Component2.SetValue(Grid.RowProperty, 1);
+                        this.Content = this.CreateSplitPanel();
+                    }
+                    this.Visibility = Visibility.Visible;
+                }
+                else if (this.HasComponent1 || this.HasComponent2)
+                {
+                    var component = this.Component1 ?? this.Component2;
+                    component.SetValue(FrameworkElement.MarginProperty, new Thickness());
+                    component.Disconnect();
+                    this.Content = component;
+                    this.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    this.Visibility = Visibility.Collapsed;
+                }
             }
-            else if (this.HasControlType2)
+            finally
             {
-                this.Style = this.FindResource<Style>("FillStyle");
-                this.ControlType = this.ControlType2;
-                this.Visibility = Visibility.Visible;
-                //TODO: For some stupid fucking reason the binding does not work sometimes.
-                //TODO: I have no idea why but spent hours trying to fix it.
-                ((ControlSlot)this.Content).ControlType = this.ControlType2;
+                this.IsRefreshingLayout = false;
             }
-            else
+        }
+
+        protected virtual object CreateSplitPanel()
+        {
+            return new Grid().With(grid =>
             {
-                this.Style = null;
-                this.ControlType = LayoutManager.PLACEHOLDER;
-                this.Visibility = Visibility.Collapsed;
+                grid.RowDefinitions.Add(new RowDefinition());
+                grid.RowDefinitions.Add(new RowDefinition().With(rowDefinition =>
+                {
+                    rowDefinition.SetBinding(
+                        RowDefinition.HeightProperty,
+                        new Binding("SplitterHeight")
+                        {
+                            Source = this,
+                            Mode = BindingMode.TwoWay
+                        }
+                    );
+                }));
+                grid.Children.Add(this.Component1);
+                grid.Children.Add(new GridSplitter()
+                {
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    Height = 4
+                });
+                grid.Children.Add(this.Component2);
+            });
+        }
+
+        protected virtual void OnIsComponentEnabledChanged(object sender, EventArgs e)
+        {
+            this.RefreshLayout();
+        }
+
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (this.Component1 != null)
+            {
+                this.Component1.DataContext = this.DataContext;
+            }
+            if (this.Component2 != null)
+            {
+                this.Component2.DataContext = this.DataContext;
             }
         }
     }
