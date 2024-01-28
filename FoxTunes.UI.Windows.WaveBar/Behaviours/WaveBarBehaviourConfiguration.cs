@@ -10,6 +10,7 @@ namespace FoxTunes
 
         public const string MODE_MONO_OPTION = "AAAA21C9-A9FF-4CFD-8EFB-96EE79455050";
 
+        //TODO: This was never implemented.
         public const string MODE_STEREO_OPTION = "BBBB6F8B-5FCD-4EEC-997E-D3DF8B63BD36";
 
         public const string MODE_SEPERATE_OPTION = "CCCC3286-5097-4977-A4CC-5CEDA5E2E099";
@@ -22,18 +23,18 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION, "Wave Form")
-                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, "Mode").WithOptions(GetModeOptions()))
-                .WithElement(new IntegerConfigurationElement(RESOLUTION_ELEMENT, "Resolution", path: "Advanced").WithValue(10).WithValidationRule(new IntegerValidationRule(1, 100)))
-                .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, "RMS", path: "Advanced").WithValue(false))
-                .WithElement(new BooleanConfigurationElement(CACHE_ELEMENT, "Cache", path: "Advanced").WithValue(false)
+            yield return new ConfigurationSection(SECTION, Strings.WaveBarBehaviourConfiguration_Section)
+                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.WaveBarBehaviourConfiguration_Mode).WithOptions(GetModeOptions()))
+                .WithElement(new IntegerConfigurationElement(RESOLUTION_ELEMENT, Strings.WaveBarBehaviourConfiguration_Resolution, path: Strings.General_Advanced).WithValue(10).WithValidationRule(new IntegerValidationRule(1, 100)))
+                .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.WaveBarBehaviourConfiguration_RMS, path: Strings.General_Advanced).WithValue(true))
+                .WithElement(new BooleanConfigurationElement(CACHE_ELEMENT, Strings.WaveBarBehaviourConfiguration_Cache, path: Strings.General_Advanced).WithValue(true)
             );
         }
 
         private static IEnumerable<SelectionConfigurationOption> GetModeOptions()
         {
-            yield return new SelectionConfigurationOption(MODE_MONO_OPTION, "Mono").Default();
-            yield return new SelectionConfigurationOption(MODE_SEPERATE_OPTION, "Seperate");
+            yield return new SelectionConfigurationOption(MODE_MONO_OPTION, Strings.WaveBarBehaviourConfiguration_Mode_Mono).Default();
+            yield return new SelectionConfigurationOption(MODE_SEPERATE_OPTION, Strings.WaveBarBehaviourConfiguration_Mode_Seperate);
         }
 
         public static WaveFormRendererMode GetMode(SelectionConfigurationOption option)
