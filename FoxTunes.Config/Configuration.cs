@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace FoxTunes
 {
@@ -206,9 +207,15 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Saving configuration to file \"{0}\".", fileName);
                 try
                 {
-                    using (var stream = File.Create(fileName))
+                    //Use a temp file so the settings aren't lost if something goes wrong.
+                    var temp = Path.GetTempFileName();
+                    using (var stream = File.Create(temp))
                     {
                         Serializer.Save(stream, this.Sections);
+                    }
+                    if (!MoveFileEx(temp, fileName, MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+                    {
+                        throw new Exception("MoveFileEx: Failed.");
                     }
                     Profiles.Profile = profile;
                 }
@@ -382,5 +389,15 @@ namespace FoxTunes
                 //Nothing can be done, never throw on GC thread.
             }
         }
+
+        const int MOVEFILE_REPLACE_EXISTING = 0x1;
+
+        const int MOVEFILE_COPY_ALLOWED = 0x2;
+
+        const int MOVEFILE_WRITE_THROUGH = 0x8;
+
+        [return: MarshalAs(UnmanagedType.Bool)]
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        static extern bool MoveFileEx(string lpExistingFileName, string lpNewFileName, int dwFlags);
     }
 }
