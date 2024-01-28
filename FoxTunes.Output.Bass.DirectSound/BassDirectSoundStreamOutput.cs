@@ -16,7 +16,7 @@ namespace FoxTunes
         public BassDirectSoundStreamOutput(BassDirectSoundStreamOutputBehaviour behaviour, BassOutputStream stream) : this()
         {
             this.Behaviour = behaviour;
-            this.Rate = behaviour.Output.Rate;
+            this.Rate = BassDirectSoundDevice.Info.Rate;
             this.Channels = BassDirectSoundDevice.Info.Outputs;
             this.Flags = BassFlags.Default;
             if (this.Behaviour.Output.Float)
