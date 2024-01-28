@@ -34,8 +34,8 @@ AS
 (
 	SELECT ""LibraryItems"".""Id"", ""LibraryItems"".""FileName"", ""MetaDataItems"".""Name"", ""MetaDataItems"".""Value"" 
 	FROM ""LibraryItems""
-		JOIN ""LibraryItem_MetaDataItem"" ON ""LibraryItems"".""Id"" = ""LibraryItem_MetaDataItem"".""LibraryItem_Id""
-		JOIN ""MetaDataItems"" ON ""MetaDataItems"".""Id"" = ""LibraryItem_MetaDataItem"".""MetaDataItem_Id""
+		LEFT JOIN ""LibraryItem_MetaDataItem"" ON ""LibraryItems"".""Id"" = ""LibraryItem_MetaDataItem"".""LibraryItem_Id""
+		LEFT JOIN ""MetaDataItems"" ON ""MetaDataItems"".""Id"" = ""LibraryItem_MetaDataItem"".""MetaDataItem_Id""
 	WHERE @status IS NULL OR ""LibraryItems"".""Status"" = @status
 )
 ,
