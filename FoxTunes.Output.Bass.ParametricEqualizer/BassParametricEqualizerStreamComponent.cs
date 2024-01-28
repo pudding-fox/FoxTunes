@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
-using ManagedBass.DirectX8;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +8,9 @@ namespace FoxTunes
 {
     public class BassParametricEqualizerStreamComponent : BassStreamComponent
     {
-        public const int MIN_BANDWIDTH = 1;
+        public const float MIN_BANDWIDTH = 0.5f;
 
-        public const int MAX_BANDWIDTH = 36;
+        public const float MAX_BANDWIDTH = 5.0f;
 
         public const int MIN_GAIN = -15;
 
@@ -46,13 +45,13 @@ namespace FoxTunes
         {
             get
             {
-                var bands = string.Join(",", this.Bands.Where(band => band.Gain != 0).Select(band => band.Description));
-                if (string.IsNullOrEmpty(bands))
+                if (this.PeakEQ == null || !this.PeakEQ.Effects.Any())
                 {
-                    bands = "None";
+                    return string.Format("{0} (none)", this.Name);
                 }
+                var bands = string.Join(",", this.PeakEQ.Effects.Values.Select(effect => effect.Description));
                 return string.Format(
-                    "{0} ({1}@{2}semitones)",
+                    "{0} ({1}@{2}octaves)",
                     this.Name,
                     bands,
                     this.Bandwidth
@@ -62,11 +61,11 @@ namespace FoxTunes
 
         public BassParametricEqualizerStreamComponentBehaviour Behaviour { get; private set; }
 
-        public int Bandwidth
+        public float Bandwidth
         {
             get
             {
-                var bandwidth = this.Behaviour.Configuration.GetElement<IntegerConfigurationElement>(
+                var bandwidth = this.Behaviour.Configuration.GetElement<DoubleConfigurationElement>(
                     BassOutputConfiguration.SECTION,
                     BassParametricEqualizerStreamComponentConfiguration.BANDWIDTH
                 ).Value;
@@ -78,13 +77,11 @@ namespace FoxTunes
                 {
                     bandwidth = MAX_BANDWIDTH;
                 }
-                return bandwidth;
+                return Convert.ToSingle(bandwidth);
             }
         }
 
-        public List<Band> Bands { get; private set; }
-
-        public DXParamEQ Eq { get; private set; }
+        public PeakEQ PeakEQ { get; private set; }
 
         public override int Rate { get; protected set; }
 
@@ -96,7 +93,7 @@ namespace FoxTunes
 
         protected virtual void Attach()
         {
-            this.Behaviour.Configuration.GetElement<IntegerConfigurationElement>(
+            this.Behaviour.Configuration.GetElement<DoubleConfigurationElement>(
                 BassOutputConfiguration.SECTION,
                 BassParametricEqualizerStreamComponentConfiguration.BANDWIDTH
             ).ValueChanged += this.OnBandwidthChanged;
@@ -140,7 +137,8 @@ namespace FoxTunes
 
         public override void Connect(IBassStreamComponent previous)
         {
-            Logger.Write(this, LogLevel.Debug, "Creating BASS PARAMETRIC EQUALIZER stream with rate {0} => {1} and {2} channels.", previous.Rate, this.Rate, this.Channels);
+            this.Rate = previous.Rate;
+            this.Channels = previous.Channels;
             this.ChannelHandle = previous.ChannelHandle;
             this.Start();
             this.Configure();
@@ -148,115 +146,70 @@ namespace FoxTunes
 
         protected virtual void Start()
         {
-            Logger.Write(this, LogLevel.Debug, "Creating DX8 ParamEQ Effect: Bandwidth = {0}", this.Bandwidth);
-            this.Eq = new DXParamEQ(this.ChannelHandle, this.Bandwidth);
-            Logger.Write(this, LogLevel.Debug, "Creating DX8 ParamEQ Bands.");
-            this.Bands = BassParametricEqualizerStreamComponentConfiguration.Bands.Select(
-                band => new Band(this.Behaviour, band.Key, this.Eq.AddBand(band.Value), band.Value)
-            ).ToList();
+            this.PeakEQ = new PeakEQ(this.ChannelHandle);
         }
 
         protected virtual void Stop()
         {
-            if (this.Eq != null)
-            {
-                this.Eq.Dispose();
-                this.Eq = null;
-            }
-            if (this.Bands != null)
-            {
-                this.Bands = null;
-            }
+            this.PeakEQ.Dispose();
+            this.PeakEQ = null;
         }
 
         protected virtual void Configure()
         {
-            foreach (var band in this.Bands)
+            foreach (var band in BassParametricEqualizerStreamComponentConfiguration.Bands)
             {
-                Logger.Write(this, LogLevel.Debug, "Updating DX8 ParamEQ Band: {0} => {1} => {2}", band.Id, band.Center, band.Gain);
-                this.Eq.UpdateBand(band.Index, band.Gain);
+                var element = this.Behaviour.Configuration.GetElement<IntegerConfigurationElement>(
+                    BassOutputConfiguration.SECTION,
+                    band.Key
+                );
+                if (element == null)
+                {
+                    continue;
+                }
+                this.Configure(band.Value, element.Value);
+            }
+        }
+
+        protected virtual void Configure(int band, int gain)
+        {
+            if (gain != 0)
+            {
+                this.PeakEQ.AddOrUpdateBand(this.Bandwidth, band, gain);
+            }
+            else
+            {
+                this.PeakEQ.RemoveBand(band);
             }
         }
 
         protected virtual void OnBandwidthChanged(object sender, EventArgs e)
         {
-            this.Stop();
-            this.Start();
             this.Configure();
         }
 
         protected virtual void OnBandChanged(object sender, EventArgs e)
         {
-            this.Configure();
+            var element = sender as IntegerConfigurationElement;
+            if (element == null)
+            {
+                return;
+            }
+            foreach (var band in BassParametricEqualizerStreamComponentConfiguration.Bands)
+            {
+                if (!string.Equals(band.Key, element.Id))
+                {
+                    continue;
+                }
+                this.Configure(band.Value, element.Value);
+                return;
+            }
         }
 
         protected override void OnDisposing()
         {
             this.Detach();
             this.Stop();
-        }
-
-        public class Band
-        {
-            public Band(BassParametricEqualizerStreamComponentBehaviour behaviour, string id, int index, int center)
-            {
-                this.Behaviour = behaviour;
-                this.Id = id;
-                this.Index = index;
-                this.Center = center;
-            }
-
-            public BassParametricEqualizerStreamComponentBehaviour Behaviour { get; private set; }
-
-            public string Id { get; private set; }
-
-            public int Index { get; private set; }
-
-            public int Center { get; private set; }
-
-            public int Gain
-            {
-                get
-                {
-                    var gain = this.Behaviour.Configuration.GetElement<IntegerConfigurationElement>(
-                        BassOutputConfiguration.SECTION,
-                        this.Id
-                    ).Value;
-                    if (gain < MIN_GAIN)
-                    {
-                        gain = MIN_GAIN;
-                    }
-                    else if (gain > MAX_GAIN)
-                    {
-                        gain = MAX_GAIN;
-                    }
-                    return gain;
-                }
-            }
-
-            public string Description
-            {
-                get
-                {
-                    return string.Format(
-                        "{0}/{1}dB",
-                        GetBandName(this.Center),
-                        this.Gain > 0 ? "+" + this.Gain.ToString() : this.Gain.ToString()
-                    );
-                }
-            }
-
-            public static string GetBandName(int value)
-            {
-                if (value < 1000)
-                {
-                    return string.Format("{0}Hz", value);
-                }
-                else
-                {
-                    return string.Format("{0}kHz", value / 1000);
-                }
-            }
         }
     }
 }

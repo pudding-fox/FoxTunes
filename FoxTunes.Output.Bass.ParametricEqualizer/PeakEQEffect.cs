@@ -4,14 +4,14 @@ using System;
 
 namespace FoxTunes
 {
-    public class VolumeEffect : BaseComponent, IDisposable
+    public class PeakEQEffect : BaseComponent, IDisposable
     {
-        private VolumeEffect()
+        private PeakEQEffect()
         {
-            this.Parameters = new VolumeParameters();
+            this.Parameters = new PeakEQParameters();
         }
 
-        public VolumeEffect(int channelHandle) : this()
+        public PeakEQEffect(int channelHandle) : this()
         {
             this.ChannelHandle = channelHandle;
         }
@@ -20,9 +20,74 @@ namespace FoxTunes
 
         public bool IsActive { get; private set; }
 
-        public VolumeParameters Parameters { get; private set; }
+        public PeakEQParameters Parameters { get; private set; }
 
         public int ChannelHandle { get; private set; }
+
+        public int Band
+        {
+            get
+            {
+                return this.Parameters.lBand;
+            }
+            set
+            {
+                this.Parameters.lBand = value;
+                this.OnPropertyChanged("Band");
+            }
+        }
+
+        public float Bandwidth
+        {
+            get
+            {
+                return this.Parameters.fBandwidth;
+            }
+            set
+            {
+                this.Parameters.fBandwidth = value;
+                this.OnPropertyChanged("Bandwidth");
+            }
+        }
+
+        public float Q
+        {
+            get
+            {
+                return this.Parameters.fQ;
+            }
+            set
+            {
+                this.Parameters.fQ = value;
+                this.OnPropertyChanged("Q");
+            }
+        }
+
+        public float Center
+        {
+            get
+            {
+                return this.Parameters.fCenter;
+            }
+            set
+            {
+                this.Parameters.fCenter = value;
+                this.OnPropertyChanged("Center");
+            }
+        }
+
+        public float Gain
+        {
+            get
+            {
+                return this.Parameters.fGain;
+            }
+            set
+            {
+                this.Parameters.fGain = value;
+                this.OnPropertyChanged("Gain");
+            }
+        }
 
         public int Channel
         {
@@ -37,16 +102,15 @@ namespace FoxTunes
             }
         }
 
-        public float Volume
+        public string Description
         {
             get
             {
-                return this.Parameters.fVolume;
-            }
-            set
-            {
-                this.Parameters.fVolume = value;
-                this.OnPropertyChanged("Volume");
+                return string.Format(
+                    "{0}/{1}dB",
+                    GetBandName(Convert.ToInt32(this.Center)),
+                    this.Gain > 0 ? "+" + this.Gain.ToString() : this.Gain.ToString()
+                );
             }
         }
 
@@ -61,7 +125,6 @@ namespace FoxTunes
                 }
                 this.IsActive = true;
             }
-
             if (!Bass.FXSetParameters(this.EffectHandle, this.Parameters))
             {
                 BassUtils.Throw();
@@ -103,7 +166,7 @@ namespace FoxTunes
             this.Deactivate();
         }
 
-        ~VolumeEffect()
+        ~PeakEQEffect()
         {
             Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
@@ -113,6 +176,18 @@ namespace FoxTunes
             catch
             {
                 //Nothing can be done, never throw on GC thread.
+            }
+        }
+
+        public static string GetBandName(int value)
+        {
+            if (value < 1000)
+            {
+                return string.Format("{0}Hz", value);
+            }
+            else
+            {
+                return string.Format("{0}kHz", value / 1000);
             }
         }
     }
