@@ -141,6 +141,10 @@ namespace FoxTunes
 
         public static string GetName(this string fileName)
         {
+            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                return fileName;
+            }
             var name = Path.GetFileName(fileName);
             return name;
         }

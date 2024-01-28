@@ -65,13 +65,7 @@ namespace FoxTunes
                 }
                 return;
             }
-            if (!File.Exists(this.PlaylistItem.FileName))
-            {
-                if (!NetworkDrive.IsRemotePath(this.PlaylistItem.FileName) || !await NetworkDrive.ConnectRemotePath(this.PlaylistItem.FileName))
-                {
-                    throw new FileNotFoundException(string.Format("File not found: {0}", this.PlaylistItem.FileName), this.PlaylistItem.FileName);
-                }
-            }
+            await this.CheckPath();
             var outputStream = await this.Output.Load(this.PlaylistItem, this.Immediate);
             if (outputStream == null)
             {
@@ -87,6 +81,17 @@ namespace FoxTunes
             else
             {
                 Logger.Write(this, LogLevel.Debug, "Output stream added to the queue: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+            }
+        }
+
+        protected virtual async Task CheckPath()
+        {
+            if (!string.IsNullOrEmpty(Path.GetPathRoot(this.PlaylistItem.FileName)) && !File.Exists(this.PlaylistItem.FileName))
+            {
+                if (!NetworkDrive.IsRemotePath(this.PlaylistItem.FileName) || !await NetworkDrive.ConnectRemotePath(this.PlaylistItem.FileName))
+                {
+                    throw new FileNotFoundException(string.Format("File not found: {0}", this.PlaylistItem.FileName), this.PlaylistItem.FileName);
+                }
             }
         }
 
