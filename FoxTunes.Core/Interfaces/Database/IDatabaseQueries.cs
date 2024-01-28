@@ -20,7 +20,7 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery GetLibraryMetaData { get; }
 
-        IDatabaseQuery GetLibraryHierarchyMetaData(string filter);
+        IDatabaseQuery GetLibraryHierarchyMetaData(string filter, int limit);
 
         IDatabaseQuery GetLibraryHierarchyNodes(string filter);
 
@@ -28,7 +28,7 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery GetOrAddMetaDataItem { get; }
 
-        IDatabaseQuery GetPlaylistMetaData(int count);
+        IDatabaseQuery GetPlaylistMetaData(int count, int limit);
 
         IDatabaseQuery RemoveCancelledLibraryItems { get; }
 

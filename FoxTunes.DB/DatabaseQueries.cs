@@ -108,7 +108,7 @@ namespace FoxTunes
             }
         }
 
-        public abstract IDatabaseQuery GetLibraryHierarchyMetaData(string filter);
+        public abstract IDatabaseQuery GetLibraryHierarchyMetaData(string filter, int limit);
 
         public IDatabaseQuery GetLibraryHierarchyNodes(string filter)
         {
@@ -157,7 +157,7 @@ namespace FoxTunes
             }
         }
 
-        public abstract IDatabaseQuery GetPlaylistMetaData(int count);
+        public abstract IDatabaseQuery GetPlaylistMetaData(int count, int limit);
 
         public IDatabaseQuery RemoveCancelledLibraryItems
         {

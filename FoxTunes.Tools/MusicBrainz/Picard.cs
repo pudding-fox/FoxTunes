@@ -18,6 +18,8 @@ namespace FoxTunes
 
         public IMetaDataManager MetaDataManager { get; private set; }
 
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
         public IPlaylistCache PlaylistCache { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -31,6 +33,7 @@ namespace FoxTunes
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
             this.MetaDataManager = core.Managers.MetaData;
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.PlaylistCache = core.Components.PlaylistCache;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -89,7 +92,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var libraryItems = this.LibraryManager.SelectedItem.Items;
+            var libraryItems = this.LibraryHierarchyBrowser.GetItems(this.LibraryManager.SelectedItem);
             if (!libraryItems.Any())
             {
                 return;

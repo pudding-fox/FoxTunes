@@ -16,4 +16,4 @@ WHERE "LibraryHierarchyItems"."Id" = @libraryHierarchyItemId
 	AND (@name IS NULL OR "MetaDataItems"."Name" = @name)
 <#= new LibraryHierarchyFilterBuilder(this.Database, this.Filter, LibraryHierarchyFilterSource.LibraryItem).TransformText() #>
 GROUP BY "MetaDataItems"."Value"
-LIMIT 5
+LIMIT <#= this.Limit #>

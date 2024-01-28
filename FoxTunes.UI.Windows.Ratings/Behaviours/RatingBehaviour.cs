@@ -122,6 +122,8 @@ namespace FoxTunes
 
         public RatingManager RatingManager { get; private set; }
 
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
         public IMetaDataBrowser MetaDataBrowser { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -133,6 +135,7 @@ namespace FoxTunes
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
             this.RatingManager = ComponentRegistry.Instance.GetComponent<RatingManager>();
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.MetaDataBrowser = core.Components.MetaDataBrowser;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -220,7 +223,12 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Determining rating for library hierarchy node: {0}", libraryHierarchyNode.Id);
             var rating = default(byte);
-            var ratings = await this.MetaDataBrowser.GetMetaDatasAsync(libraryHierarchyNode, MetaDataItemType.Tag, CommonStatistics.Rating).ConfigureAwait(false);
+            var ratings = await this.MetaDataBrowser.GetMetaDatas(
+                libraryHierarchyNode,
+                CommonStatistics.Rating,
+                MetaDataItemType.Tag,
+                2
+            ).ConfigureAwait(false);
             switch (ratings.Length)
             {
                 case 0:
@@ -259,7 +267,12 @@ namespace FoxTunes
             }
             Logger.Write(this, LogLevel.Debug, "Determining rating for {0} playlist items.", playlistItems.Length);
             var rating = default(byte);
-            var ratings = await this.MetaDataBrowser.GetMetaDatasAsync(playlistItems, MetaDataItemType.Tag, CommonStatistics.Rating).ConfigureAwait(false);
+            var ratings = await this.MetaDataBrowser.GetMetaDatas(
+                playlistItems,
+                CommonStatistics.Rating,
+                MetaDataItemType.Tag,
+                2
+            ).ConfigureAwait(false);
             switch (ratings.Length)
             {
                 case 0:
@@ -303,7 +316,7 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            var libraryItems = this.LibraryManager.SelectedItem.Items;
+            var libraryItems = this.LibraryHierarchyBrowser.GetItems(this.LibraryManager.SelectedItem);
             if (!libraryItems.Any())
             {
 #if NET40

@@ -69,7 +69,7 @@ namespace FoxTunes
                 var keys = this.Keys;
                 if (state.Names != null && state.Names.Any())
                 {
-                    keys = keys.Where(key => state.Names.Contains(key.MetaDataItemName, StringComparer.OrdinalIgnoreCase));
+                    keys = keys.Where(key => state.Names.Contains(key.Name, StringComparer.OrdinalIgnoreCase));
                 }
                 if (state.FileDatas != null && state.FileDatas.Any())
                 {
@@ -100,7 +100,7 @@ namespace FoxTunes
         {
             return this.Values.GetOrAdd(
                 key,
-                _key => new Lazy<MetaDataItem[]>(() => factory().ToArray())
+                () => new Lazy<MetaDataItem[]>(() => factory().ToArray())
             ).Value;
         }
 
@@ -118,7 +118,7 @@ namespace FoxTunes
                     return value.Value;
                 }
                 var metaDataItems = await factory().ConfigureAwait(false);
-                return this.Values.GetOrAdd(key, _key => new Lazy<MetaDataItem[]>(() => metaDataItems.ToArray())).Value;
+                return this.Values.GetOrAdd(key, () => new Lazy<MetaDataItem[]>(() => metaDataItems.ToArray())).Value;
             }
         }
 

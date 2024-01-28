@@ -6,7 +6,7 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 
-SELECT TOP 5 "MetaDataItems"."Value"
+SELECT TOP <#= this.Limit #> "MetaDataItems"."Value"
 FROM "PlaylistItems"
 	LEFT JOIN "PlaylistItem_MetaDataItem" 
 		ON "PlaylistItems"."Id" = "PlaylistItem_MetaDataItem"."PlaylistItem_Id"

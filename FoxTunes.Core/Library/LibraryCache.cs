@@ -56,7 +56,7 @@ namespace FoxTunes
 
         public LibraryItem Get(int id, Func<LibraryItem> factory)
         {
-            return this.Items.GetOrAdd(id, _id => new Lazy<LibraryItem>(factory)).Value;
+            return this.Items.GetOrAdd(id, () => new Lazy<LibraryItem>(factory)).Value;
         }
 
         public LibraryItem AddOrUpdate(LibraryItem libraryItem)

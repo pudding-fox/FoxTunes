@@ -14,8 +14,6 @@ namespace FoxTunes
 
         }
 
-        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
-
         [Column(Name = "LibraryHierarchy_Id")]
         public int LibraryHierarchyId { get; set; }
 
@@ -63,34 +61,6 @@ namespace FoxTunes
         }
 
         public event EventHandler ChildrenChanged;
-
-        private ResettableLazy<LibraryItem[]> _Items { get; set; }
-
-        public LibraryItem[] Items
-        {
-            get
-            {
-                if (this._Items != null)
-                {
-                    return this._Items.Value;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-        protected virtual void OnItemsChanged()
-        {
-            if (this.ItemsChanged != null)
-            {
-                this.ItemsChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Items");
-        }
-
-        public event EventHandler ItemsChanged;
 
         private bool _IsExpanded { get; set; }
 
@@ -165,16 +135,11 @@ namespace FoxTunes
 
         #endregion
 
-        public override void InitializeComponent(ICore core)
+        public virtual void InitializeComponent(ILibraryHierarchyBrowser libraryHierarchyBrowser)
         {
-            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this._Children = new ResettableLazy<LibraryHierarchyNode[]>(
-                () => this.LibraryHierarchyBrowser.GetNodes(this)
+                () => libraryHierarchyBrowser.GetNodes(this)
             );
-            this._Items = new ResettableLazy<LibraryItem[]>(
-                () => this.LibraryHierarchyBrowser.GetItems(this)
-            );
-            base.InitializeComponent(core);
         }
 
         public void Refresh(IEnumerable<string> names)

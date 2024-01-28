@@ -17,6 +17,8 @@ namespace FoxTunes
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
         public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
 
         public IReportEmitter ReportEmitter { get; private set; }
@@ -34,6 +36,7 @@ namespace FoxTunes
             this.Core = core;
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ReportEmitter = core.Components.ReportEmitter;
             this.Profiles = ComponentRegistry.Instance.GetComponents<IBassEncoderSettings>()
@@ -112,7 +115,7 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            var libraryItems = this.LibraryManager.SelectedItem.Items;
+            var libraryItems = this.LibraryHierarchyBrowser.GetItems(this.LibraryManager.SelectedItem);
             if (!libraryItems.Any())
             {
 #if NET40

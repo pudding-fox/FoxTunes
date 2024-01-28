@@ -1,4 +1,7 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
+using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -54,13 +57,26 @@ namespace FoxTunes
 
         private class IsVirtualizingBehaviour : UIBehaviour
         {
+            //VirtualizationMode.Recycling causes issues, types in this list are OK.
+            public static readonly Type[] RECYCLING_TYPES = new[]
+            {
+                typeof(TreeView)
+            };
+
             public IsVirtualizingBehaviour(FrameworkElement frameworkElement)
             {
                 this.FrameworkElement = frameworkElement;
                 if (GetIsVirtualizing(this.FrameworkElement).GetValueOrDefault())
                 {
                     VirtualizingStackPanel.SetIsVirtualizing(this.FrameworkElement, true);
-                    VirtualizingStackPanel.SetVirtualizationMode(this.FrameworkElement, VirtualizationMode.Standard);
+                    if (RECYCLING_TYPES.Any(type => type.IsAssignableFrom(this.FrameworkElement.GetType())))
+                    {
+                        VirtualizingStackPanel.SetVirtualizationMode(this.FrameworkElement, VirtualizationMode.Recycling);
+                    }
+                    else
+                    {
+                        VirtualizingStackPanel.SetVirtualizationMode(this.FrameworkElement, VirtualizationMode.Standard);
+                    }
                 }
                 else
                 {
