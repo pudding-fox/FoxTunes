@@ -207,19 +207,19 @@ namespace FoxTunes.ViewModel
 
         protected virtual Task OnMetaDataUpdated(MetaDataUpdatedSignalState state)
         {
-            if (state != null && state.Names != null)
+            if (state != null)
             {
-                return this.Refresh(state.Names);
+                return this.Refresh(state.FileDatas, state.Names);
             }
             else
             {
-                return this.Refresh(Enumerable.Empty<string>());
+                return this.Refresh(Enumerable.Empty<IFileData>(), Enumerable.Empty<string>());
             }
         }
 
         public bool IsRefreshing { get; private set; }
 
-        protected virtual Task Refresh(IEnumerable<string> names)
+        protected virtual Task Refresh(IEnumerable<IFileData> fileDatas, IEnumerable<string> names)
         {
             if (names != null && names.Any())
             {
@@ -231,6 +231,10 @@ namespace FoxTunes.ViewModel
                     return Task.CompletedTask;
 #endif
                 }
+            }
+            if (fileDatas != null && fileDatas.Any())
+            {
+
             }
             return this.Refresh();
         }

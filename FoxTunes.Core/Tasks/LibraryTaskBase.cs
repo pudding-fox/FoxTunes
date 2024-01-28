@@ -299,23 +299,6 @@ namespace FoxTunes
             return result;
         }
 
-        public static void UpdateLibraryHierarchyNodes(IEnumerable<LibraryItem> libraryItems, IEnumerable<string> names)
-        {
-            var libraryHierarchyNodes = new HashSet<LibraryHierarchyNode>();
-            foreach (var libraryItem in libraryItems)
-            {
-                if (libraryItem.Parents == null)
-                {
-                    continue;
-                }
-                libraryHierarchyNodes.AddRange(libraryItem.Parents);
-            }
-            foreach (var libraryHierarchyNode in libraryHierarchyNodes)
-            {
-                libraryHierarchyNode.RefreshMetaData(HierarchyDirection.Both);
-            }
-        }
-
         public static async Task RemoveCancelledLibraryItems(IDatabaseComponent database)
         {
             using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))

@@ -2,23 +2,18 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace FoxTunes
 {
     [Table(Name = "LibraryHierarchyItems")]
-    public class LibraryHierarchyNode : PersistableComponent, IFileData, ISelectable, IExpandable, IHierarchical
+    public class LibraryHierarchyNode : PersistableComponent, ISelectable, IExpandable, IHierarchical
     {
         public LibraryHierarchyNode()
         {
 
         }
 
-        public IDatabaseFactory DatabaseFactory { get; private set; }
-
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
-
-        public IMetaDataBrowser MetaDataBrowser { get; private set; }
 
         [Column(Name = "LibraryHierarchy_Id")]
         public int LibraryHierarchyId { get; set; }
@@ -96,34 +91,6 @@ namespace FoxTunes
 
         public event EventHandler ItemsChanged;
 
-        private ResettableLazy<MetaDataItem[]> _MetaDatas { get; set; }
-
-        public MetaDataItem[] MetaDatas
-        {
-            get
-            {
-                if (this._MetaDatas != null)
-                {
-                    return this._MetaDatas.Value;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-        protected virtual void OnMetaDatasChanged()
-        {
-            if (this.MetaDatasChanged != null)
-            {
-                this.MetaDatasChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("MetaDatas");
-        }
-
-        public event EventHandler MetaDatasChanged;
-
         private bool _IsExpanded { get; set; }
 
         public bool IsExpanded
@@ -177,46 +144,6 @@ namespace FoxTunes
 
         public event EventHandler IsSelectedChanged;
 
-        #region IFileData
-
-        string IFileData.DirectoryName
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        string IFileData.FileName
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        IList<MetaDataItem> IFileData.MetaDatas
-        {
-            get
-            {
-                return this.MetaDatas;
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        #endregion
-
         #region IHierarchical
 
         IHierarchical IHierarchical.Parent
@@ -239,17 +166,12 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            this.DatabaseFactory = core.Factories.Database;
             this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
-            this.MetaDataBrowser = core.Components.MetaDataBrowser;
             this._Children = new ResettableLazy<LibraryHierarchyNode[]>(
                 () => this.LibraryHierarchyBrowser.GetNodes(this)
             );
             this._Items = new ResettableLazy<LibraryItem[]>(
                 () => this.LibraryHierarchyBrowser.GetItems(this)
-            );
-            this._MetaDatas = new ResettableLazy<MetaDataItem[]>(
-                () => this.MetaDataBrowser.GetMetaDatas(this, MetaDataItemType.Image, CommonImageTypes.FrontCover)
             );
             base.InitializeComponent(core);
         }
@@ -260,7 +182,7 @@ namespace FoxTunes
             {
                 this.Parent.RefreshChildren(HierarchyDirection.Up);
             }
-            if (this._MetaDatas.IsValueCreated)
+            if (this._Children.IsValueCreated)
             {
                 this._Children.Reset();
                 this.OnChildrenChanged();
@@ -290,26 +212,6 @@ namespace FoxTunes
                 foreach (var libraryHierarchyNode in this._Children.Value)
                 {
                     libraryHierarchyNode.RefreshItems(HierarchyDirection.Down);
-                }
-            }
-        }
-
-        public void RefreshMetaData(HierarchyDirection direction)
-        {
-            if (direction.HasFlag(HierarchyDirection.Up) && this.Parent != null)
-            {
-                this.Parent.RefreshMetaData(HierarchyDirection.Up);
-            }
-            if (this._MetaDatas.IsValueCreated)
-            {
-                this._MetaDatas.Reset();
-                this.OnMetaDatasChanged();
-            }
-            if (direction.HasFlag(HierarchyDirection.Down) && this._Children.IsValueCreated)
-            {
-                foreach (var libraryHierarchyNode in this._Children.Value)
-                {
-                    libraryHierarchyNode.RefreshMetaData(HierarchyDirection.Down);
                 }
             }
         }

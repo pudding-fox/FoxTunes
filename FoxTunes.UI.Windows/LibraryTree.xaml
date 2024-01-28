@@ -14,6 +14,7 @@
              d:DesignHeight="300" d:DesignWidth="300" AllowDrop="True">
     <UserControl.Resources>
         <ViewModel:LibraryTree x:Key="ViewModel"></ViewModel:LibraryTree>
+        <ViewModel:LibraryHierarchyNodeConverter x:Key="LibraryHierarchyNodeConverter"></ViewModel:LibraryHierarchyNodeConverter>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <System:Boolean x:Key="True">True</System:Boolean>
         <System:Boolean x:Key="False">False</System:Boolean>
@@ -79,7 +80,7 @@
         <Windows:MouseCursorAdorner x:Name="MouseCursorAdorner" Visibility="{Binding ShowCursorAdorners, Converter={StaticResource BooleanToVisibilityConverter}, Source={StaticResource ViewModel}}">
             <Windows:MouseCursorAdorner.Template>
                 <DataTemplate>
-                    <Windows:ArtworkStack FileData="{Binding SelectedItem, Source={StaticResource ViewModel}}"></Windows:ArtworkStack>
+                    <Windows:ArtworkStack DataContext="{Binding SelectedItem, Converter={StaticResource LibraryHierarchyNodeConverter}, Source={StaticResource ViewModel}}" FileData="{Binding Value}"></Windows:ArtworkStack>
                 </DataTemplate>
             </Windows:MouseCursorAdorner.Template>
         </Windows:MouseCursorAdorner>
