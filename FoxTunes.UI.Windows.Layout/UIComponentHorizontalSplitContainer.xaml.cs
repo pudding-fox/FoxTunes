@@ -637,25 +637,25 @@ namespace FoxTunes
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     FREEZE_TOP,
-                    "Freeze Top",
+                    Strings.UIComponentHorizontalSplitContainer_FreezeTop,
                     attributes: string.Equals(this.SplitterDirection, Enum.GetName(typeof(Dock), Dock.Top), StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     FREEZE_BOTTOM,
-                    "Freeze Bottom",
+                    Strings.UIComponentHorizontalSplitContainer_FreezeBottom,
                     attributes: string.Equals(this.SplitterDirection, Enum.GetName(typeof(Dock), Dock.Bottom), StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     COLLAPSE_TOP,
-                    "Collapsable Top",
+                    Strings.UIComponentHorizontalSplitContainer_CollapseTop,
                     attributes: (byte)((this.CollapseTop ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     COLLAPSE_BOTTOM,
-                    "Collapsable Bottom",
+                    Strings.UIComponentHorizontalSplitContainer_CollapseBottom,
                     attributes: this.CollapseBottom ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
             }

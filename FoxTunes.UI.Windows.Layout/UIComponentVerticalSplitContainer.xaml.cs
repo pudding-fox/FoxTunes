@@ -638,25 +638,25 @@ namespace FoxTunes
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     FREEZE_LEFT,
-                    "Freeze Left",
+                    Strings.UIComponentVerticalSplitContainer_FreezeLeft,
                     attributes: string.Equals(this.SplitterDirection, Enum.GetName(typeof(Dock), Dock.Left), StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     FREEZE_RIGHT,
-                    "Freeze Right",
+                    Strings.UIComponentVerticalSplitContainer_FreezeRight,
                     attributes: string.Equals(this.SplitterDirection, Enum.GetName(typeof(Dock), Dock.Right), StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     COLLAPSE_LEFT,
-                    "Collapsable Left",
+                    Strings.UIComponentVerticalSplitContainer_CollapseLeft,
                     attributes: (byte)((this.CollapseLeft ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
                 );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     COLLAPSE_RIGHT,
-                    "Collapsable Right",
+                    Strings.UIComponentVerticalSplitContainer_CollapseRight,
                     attributes: this.CollapseRight ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
             }

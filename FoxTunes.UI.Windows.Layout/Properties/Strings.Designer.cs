@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Strings {
@@ -61,11 +61,110 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit Layout.
+        /// </summary>
+        internal static string LayoutDesignerBehaviour_Design {
+            get {
+                return ResourceManager.GetString("LayoutDesignerBehaviour.Design", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage.
+        /// </summary>
+        internal static string ToolWindowBehaviour_Manage {
+            get {
+                return ResourceManager.GetString("ToolWindowBehaviour.Manage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New.
+        /// </summary>
+        internal static string ToolWindowBehaviour_New {
+            get {
+                return ResourceManager.GetString("ToolWindowBehaviour.New", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New Window.
         /// </summary>
         internal static string ToolWindowBehaviour_NewWindow {
             get {
                 return ResourceManager.GetString("ToolWindowBehaviour.NewWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dialogs.
+        /// </summary>
+        internal static string ToolWindowBehaviour_Path {
+            get {
+                return ResourceManager.GetString("ToolWindowBehaviour.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear.
+        /// </summary>
+        internal static string UIComponentContainer_Clear {
+            get {
+                return ResourceManager.GetString("UIComponentContainer.Clear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Done.
+        /// </summary>
+        internal static string UIComponentContainer_Exit {
+            get {
+                return ResourceManager.GetString("UIComponentContainer.Exit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collapsable.
+        /// </summary>
+        internal static string UIComponentDockContainer_Collapse {
+            get {
+                return ResourceManager.GetString("UIComponentDockContainer.Collapse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dock Bottom.
+        /// </summary>
+        internal static string UIComponentDockContainer_DockBottom {
+            get {
+                return ResourceManager.GetString("UIComponentDockContainer.DockBottom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dock Left.
+        /// </summary>
+        internal static string UIComponentDockContainer_DockLeft {
+            get {
+                return ResourceManager.GetString("UIComponentDockContainer.DockLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dock Right.
+        /// </summary>
+        internal static string UIComponentDockContainer_DockRight {
+            get {
+                return ResourceManager.GetString("UIComponentDockContainer.DockRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dock Top.
+        /// </summary>
+        internal static string UIComponentDockContainer_DockTop {
+            get {
+                return ResourceManager.GetString("UIComponentDockContainer.DockTop", resourceCulture);
             }
         }
         
@@ -79,11 +178,110 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        internal static string UIComponentGridContainer_Add {
+            get {
+                return ResourceManager.GetString("UIComponentGridContainer.Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Align Left.
+        /// </summary>
+        internal static string UIComponentGridContainer_AlignLeft {
+            get {
+                return ResourceManager.GetString("UIComponentGridContainer.AlignLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Align Right.
+        /// </summary>
+        internal static string UIComponentGridContainer_AlignRight {
+            get {
+                return ResourceManager.GetString("UIComponentGridContainer.AlignRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Align Center.
+        /// </summary>
+        internal static string UIComponentGridContainer_AlignStretch {
+            get {
+                return ResourceManager.GetString("UIComponentGridContainer.AlignStretch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Left.
+        /// </summary>
+        internal static string UIComponentGridContainer_MoveLeft {
+            get {
+                return ResourceManager.GetString("UIComponentGridContainer.MoveLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move Right.
+        /// </summary>
+        internal static string UIComponentGridContainer_MoveRight {
+            get {
+                return ResourceManager.GetString("UIComponentGridContainer.MoveRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Horizontal Grid.
         /// </summary>
         internal static string UIComponentGridContainer_Name {
             get {
                 return ResourceManager.GetString("UIComponentGridContainer.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        internal static string UIComponentGridContainer_Remove {
+            get {
+                return ResourceManager.GetString("UIComponentGridContainer.Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collapse Bottom.
+        /// </summary>
+        internal static string UIComponentHorizontalSplitContainer_CollapseBottom {
+            get {
+                return ResourceManager.GetString("UIComponentHorizontalSplitContainer.CollapseBottom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collapse Top.
+        /// </summary>
+        internal static string UIComponentHorizontalSplitContainer_CollapseTop {
+            get {
+                return ResourceManager.GetString("UIComponentHorizontalSplitContainer.CollapseTop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Freeze Bottom.
+        /// </summary>
+        internal static string UIComponentHorizontalSplitContainer_FreezeBottom {
+            get {
+                return ResourceManager.GetString("UIComponentHorizontalSplitContainer.FreezeBottom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Freeze Top.
+        /// </summary>
+        internal static string UIComponentHorizontalSplitContainer_FreezeTop {
+            get {
+                return ResourceManager.GetString("UIComponentHorizontalSplitContainer.FreezeTop", resourceCulture);
             }
         }
         
@@ -165,6 +363,42 @@ namespace FoxTunes {
         internal static string UIComponentStackContainer_Name {
             get {
                 return ResourceManager.GetString("UIComponentStackContainer.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collapse Left.
+        /// </summary>
+        internal static string UIComponentVerticalSplitContainer_CollapseLeft {
+            get {
+                return ResourceManager.GetString("UIComponentVerticalSplitContainer.CollapseLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collapse Right.
+        /// </summary>
+        internal static string UIComponentVerticalSplitContainer_CollapseRight {
+            get {
+                return ResourceManager.GetString("UIComponentVerticalSplitContainer.CollapseRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Freeze Left.
+        /// </summary>
+        internal static string UIComponentVerticalSplitContainer_FreezeLeft {
+            get {
+                return ResourceManager.GetString("UIComponentVerticalSplitContainer.FreezeLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Freeze Right.
+        /// </summary>
+        internal static string UIComponentVerticalSplitContainer_FreezeRight {
+            get {
+                return ResourceManager.GetString("UIComponentVerticalSplitContainer.FreezeRight", resourceCulture);
             }
         }
         
