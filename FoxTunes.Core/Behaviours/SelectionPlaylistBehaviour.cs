@@ -32,7 +32,7 @@ namespace FoxTunes
             this.Dispatch(this.Refresh);
         }
 
-        protected override async Task Refresh(Playlist playlist)
+        public override async Task Refresh(Playlist playlist)
         {
             var libraryHierarchyNode = this.LibraryManager.SelectedItem;
             if (libraryHierarchyNode != null && !LibraryHierarchyNode.Empty.Equals(libraryHierarchyNode))

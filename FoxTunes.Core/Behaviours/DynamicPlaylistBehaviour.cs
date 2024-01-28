@@ -68,7 +68,7 @@ namespace FoxTunes
             }
         }
 
-        protected override async Task Refresh(Playlist playlist)
+        public override async Task Refresh(Playlist playlist)
         {
             var libraryHierarchy = this.LibraryManager.SelectedHierarchy;
             if (libraryHierarchy == null || LibraryHierarchy.Empty.Equals(libraryHierarchy))

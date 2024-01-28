@@ -65,7 +65,7 @@ namespace FoxTunes
             }
         }
 
-        protected abstract Task Refresh(Playlist playlist);
+        public abstract Task Refresh(Playlist playlist);
 
         protected virtual async Task Update(Playlist playlist)
         {
