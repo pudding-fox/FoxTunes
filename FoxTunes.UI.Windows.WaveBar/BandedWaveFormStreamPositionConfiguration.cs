@@ -20,8 +20,6 @@ namespace FoxTunes
 
         public const string COLOR_PALETTE_HIGH = "HIGH";
 
-        public const string COLOR_PALETTE_VALUE = "VALUE";
-
         public const string COLOR_PALETTE_BACKGROUND = "BACKGROUND";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -44,7 +42,7 @@ namespace FoxTunes
                 try
                 {
                     var palettes = value.ToNamedColorStops().ToDictionary(
-                        pair => string.IsNullOrEmpty(pair.Key) ? COLOR_PALETTE_VALUE : pair.Key,
+                        pair => pair.Key,
                         pair => pair.Value.ToGradient(),
                         StringComparer.OrdinalIgnoreCase
                     );
