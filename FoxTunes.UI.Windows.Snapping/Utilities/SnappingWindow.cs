@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -79,6 +80,8 @@ namespace FoxTunes
 
         public SnappingAdapter Adapter { get; private set; }
 
+        private bool IsSticky;
+
         private bool IsMoving;
 
         private bool IsResizing;
@@ -89,11 +92,18 @@ namespace FoxTunes
 
         private Rectangle PreviousBounds;
 
+        private Dictionary<SnappingWindow, SnapDirection> StickyWindows;
+
         public override void InitializeComponent(ICore core)
         {
             this.Adapter = new SnappingAdapter(this.Handle);
             this.Adapter.InitializeComponent(core);
             this.SetHook(this.DefaultHook);
+
+            core.Components.Configuration.GetElement<TextConfigurationElement>(
+                WindowSnappingBehaviourConfiguration.SECTION,
+                WindowSnappingBehaviourConfiguration.STICKY
+            ).ConnectValue(value => this.IsSticky = WindowSnappingBehaviourConfiguration.GetIsSticky(value, this.Adapter.Id));
 
             lock (Instances)
             {
@@ -237,46 +247,104 @@ namespace FoxTunes
             this.MouseOrigin = GetMousePosition();
             this.PreviousBounds = this.Adapter.Bounds;
             this.ResizeDirection = ResizeDirection.None;
+            this.StickyWindows = new Dictionary<SnappingWindow, SnapDirection>();
             this.SetHook(this.MoveHook);
         }
 
         private void Move()
         {
-            var point = GetMousePosition();
+            var mousePosition = GetMousePosition();
+            var mouseOffset = new Point(
+                mousePosition.X - this.MouseOrigin.X,
+                mousePosition.Y - this.MouseOrigin.Y
+            );
+            var location = new Point(
+                this.PreviousBounds.X + mouseOffset.X,
+                this.PreviousBounds.Y + mouseOffset.Y
+            );
             var bounds = this.Adapter.Bounds;
             var offset = Point.Empty;
 
-            point.Offset(-this.MouseOrigin.X, -this.MouseOrigin.Y);
-            point.Offset(this.PreviousBounds.X, this.PreviousBounds.Y);
+            bounds.Location = location;
 
-            bounds.Location = point;
+            var direction = this.SnapToScreen(mousePosition, ref bounds, false) | this.SnapToWindows(mousePosition, ref bounds, false);
 
+            if (this.Adapter.Bounds != bounds)
+            {
+                this.Adapter.Bounds = bounds;
+            }
+
+            if (this.IsSticky)
+            {
+                foreach (var pair in this.StickyWindows)
+                {
+                    this.Move(mousePosition, pair.Key);
+                }
+            }
+        }
+
+        protected virtual void Move(Point mousePosition, SnappingWindow snappingWindow)
+        {
+            var mouseOffset = new Point(
+                mousePosition.X - snappingWindow.MouseOrigin.X,
+                mousePosition.Y - snappingWindow.MouseOrigin.Y
+            );
+            var location = new Point(
+                snappingWindow.PreviousBounds.X + mouseOffset.X,
+                snappingWindow.PreviousBounds.Y + mouseOffset.Y
+            );
+            var bounds = snappingWindow.PreviousBounds;
+
+            bounds.Location = location;
+
+            if (snappingWindow.Adapter.Bounds != bounds)
+            {
+                snappingWindow.Adapter.Bounds = bounds;
+            }
+        }
+
+        protected virtual SnapDirection SnapToScreen(Point mousePosition, ref Rectangle bounds, bool resize)
+        {
             //TODO: Use only WPF frameworks.
             var screen = global::System.Windows.Forms.Screen.FromHandle(this.Handle);
-            var direction = SnappingHelper.Snap(bounds, screen.WorkingArea, ref offset, true);
+            var result = SnappingHelper.Snap(ref bounds, screen.WorkingArea, true, resize);
+            return result;
+        }
 
+        protected virtual SnapDirection SnapToWindows(Point mousePosition, ref Rectangle bounds, bool resize)
+        {
+            var result = SnapDirection.None;
             foreach (var snappingWindow in Active)
             {
                 if (object.ReferenceEquals(snappingWindow, this))
                 {
                     continue;
                 }
-                direction |= SnappingHelper.Snap(bounds, snappingWindow.Adapter.Bounds, ref offset, false);
+                if (!snappingWindow.Adapter.IsVisible)
+                {
+                    continue;
+                }
+                if (this.StickyWindows.ContainsKey(snappingWindow))
+                {
+                    continue;
+                }
+                var direction = SnappingHelper.Snap(ref bounds, snappingWindow.Adapter.Bounds, false, resize);
+                if (direction == SnapDirection.None)
+                {
+                    continue;
+                }
+                if (this.IsSticky)
+                {
+                    if (!this.StickyWindows.ContainsKey(snappingWindow))
+                    {
+                        snappingWindow.MouseOrigin = mousePosition;
+                        snappingWindow.PreviousBounds = snappingWindow.Adapter.Bounds;
+                    }
+                    this.StickyWindows[snappingWindow] = direction;
+                }
+                result |= direction;
             }
-
-            if (direction.HasFlag(SnapDirection.Left) || direction.HasFlag(SnapDirection.Right))
-            {
-                bounds.X += offset.X;
-            }
-            if (direction.HasFlag(SnapDirection.Top) || direction.HasFlag(SnapDirection.Bottom))
-            {
-                bounds.Y += offset.Y;
-            }
-
-            if (this.Adapter.Bounds != bounds)
-            {
-                this.Adapter.Bounds = bounds;
-            }
+            return result;
         }
 
         protected virtual void EndMove()
@@ -294,72 +362,84 @@ namespace FoxTunes
             this.MouseOrigin = GetMousePosition();
             this.PreviousBounds = this.Adapter.Bounds;
             this.ResizeDirection = direction;
+            this.StickyWindows = new Dictionary<SnappingWindow, SnapDirection>();
             this.SetHook(this.ResizeHook);
         }
 
         protected virtual void Resize()
         {
-            var point = GetMousePosition();
+            var mousePosition = GetMousePosition();
+            var mouseOffset = new Point(
+                mousePosition.X - this.MouseOrigin.X,
+                mousePosition.Y - this.MouseOrigin.Y
+            );
             var bounds = this.Adapter.Bounds;
-            var offset = Point.Empty;
 
-            point.Offset(-this.MouseOrigin.X, -this.MouseOrigin.Y);
-
-            if ((ResizeDirection & ResizeDirection.Left) == ResizeDirection.Left)
+            if (this.ResizeDirection.HasFlag(ResizeDirection.Left))
             {
-                bounds.X = this.PreviousBounds.X + point.X;
-                bounds.Width = this.PreviousBounds.Width - point.X;
+                bounds.X = this.PreviousBounds.X + mouseOffset.X;
+                bounds.Width = this.PreviousBounds.Width - mouseOffset.X;
             }
-            if ((ResizeDirection & ResizeDirection.Right) == ResizeDirection.Right)
+            if (this.ResizeDirection.HasFlag(ResizeDirection.Right))
             {
-                bounds.Width = this.PreviousBounds.Width + point.X;
+                bounds.Width = this.PreviousBounds.Width + mouseOffset.X;
             }
-            if ((ResizeDirection & ResizeDirection.Top) == ResizeDirection.Top)
+            if (this.ResizeDirection.HasFlag(ResizeDirection.Top))
             {
-                bounds.Y = this.PreviousBounds.Y + point.Y;
-                bounds.Height = this.PreviousBounds.Height - point.Y;
+                bounds.Y = this.PreviousBounds.Y + mouseOffset.Y;
+                bounds.Height = this.PreviousBounds.Height - mouseOffset.Y;
             }
-            if ((ResizeDirection & ResizeDirection.Bottom) == ResizeDirection.Bottom)
+            if (this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
             {
-                bounds.Height = this.PreviousBounds.Height + point.Y;
+                bounds.Height = this.PreviousBounds.Height + mouseOffset.Y;
             }
 
+            var direction = this.SnapToScreen(mousePosition, ref bounds, true) | this.SnapToWindows(mousePosition, ref bounds, true);
+
+            if (this.Adapter.Bounds != bounds)
+            {
+                this.Adapter.Bounds = bounds;
+            }
+        }
+
+        protected virtual SnapDirection ResizeToScreen(Point mousePosition, ref Rectangle bounds)
+        {
             //TODO: Use only WPF frameworks.
             var screen = global::System.Windows.Forms.Screen.FromHandle(this.Handle);
-            var direction = SnappingHelper.Snap(bounds, screen.WorkingArea, ref offset, true);
+            var result = SnappingHelper.Snap(ref bounds, screen.WorkingArea, true, false);
+            return result;
+        }
 
+        protected virtual SnapDirection ResizeToWindows(Point mousePosition, ref Rectangle bounds)
+        {
+            var result = SnapDirection.None;
             foreach (var snappingWindow in Active)
             {
                 if (object.ReferenceEquals(snappingWindow, this))
                 {
                     continue;
                 }
-                direction |= SnappingHelper.Snap(bounds, snappingWindow.Adapter.Bounds, ref offset, false);
+                if (!snappingWindow.Adapter.IsVisible)
+                {
+                    continue;
+                }
+                var direction = SnappingHelper.Snap(ref bounds, snappingWindow.Adapter.Bounds, false, true);
+                if (direction == SnapDirection.None)
+                {
+                    continue;
+                }
+                if (this.IsSticky)
+                {
+                    if (!this.StickyWindows.ContainsKey(snappingWindow))
+                    {
+                        snappingWindow.MouseOrigin = mousePosition;
+                        snappingWindow.PreviousBounds = snappingWindow.Adapter.Bounds;
+                    }
+                    this.StickyWindows[snappingWindow] = direction;
+                }
+                result |= direction;
             }
-
-            if (direction.HasFlag(SnapDirection.Left))
-            {
-                bounds.X += offset.X;
-                bounds.Width += -offset.X;
-            }
-            if (direction.HasFlag(SnapDirection.Right))
-            {
-                bounds.Width += offset.X;
-            }
-            if (direction.HasFlag(SnapDirection.Top))
-            {
-                bounds.Y += offset.Y;
-                bounds.Height += -offset.Y;
-            }
-            if (direction.HasFlag(SnapDirection.Bottom))
-            {
-                bounds.Height += offset.Y;
-            }
-
-            if (this.Adapter.Bounds != bounds)
-            {
-                this.Adapter.Bounds = bounds;
-            }
+            return result;
         }
 
         protected virtual void EndResize()
