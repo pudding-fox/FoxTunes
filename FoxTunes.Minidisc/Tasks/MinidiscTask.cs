@@ -16,6 +16,8 @@ namespace FoxTunes
 
         public IDeviceManager DeviceManager { get; private set; }
 
+        public IFormatValidator FormatValidator { get; private set; }
+
         public IDiscManager DiscManager { get; private set; }
 
         public IFormatManager FormatManager { get; private set; }
@@ -34,7 +36,8 @@ namespace FoxTunes
         {
             this.ToolManager = new ToolManager();
             this.DeviceManager = new DeviceManager(this.ToolManager);
-            this.DiscManager = new DiscManager(this.ToolManager);
+            this.FormatValidator = new FormatValidator();
+            this.DiscManager = new DiscManager(this.ToolManager, this.FormatValidator);
             this.FormatManager = new FormatManager(this.ToolManager);
             this.ActionBuilder = new ActionBuilder(this.FormatManager);
             base.InitializeComponent(core);

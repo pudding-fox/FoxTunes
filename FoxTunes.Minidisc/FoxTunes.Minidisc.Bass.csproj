@@ -1,26 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net40;net462</TargetFrameworks>
-    <AssemblyName>FoxTunes.Minidisc.Bass</AssemblyName>
-    <OutputPath>..\distribution\$(Platform)\</OutputPath>
-	<Platforms>x86;x64</Platforms>
-    <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
-    <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
-    <AssemblyVersion>2.3.1.0</AssemblyVersion>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net40;net462</TargetFrameworks>
+		<AssemblyName>FoxTunes.Minidisc.Bass</AssemblyName>
+		<OutputPath>..\distribution\$(Platform)\</OutputPath>
+		<Platforms>x86;x64</Platforms>
+		<SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
+		<SkipValidatePackageReferences>true</SkipValidatePackageReferences>
+		<AssemblyVersion>2.3.1.0</AssemblyVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
-	<!-- We need the encoder to create wav files. -->
-	<ProjectReference Include="..\FoxTunes.Encoder.Bass\FoxTunes.Encoder.Bass.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
+		<!-- We need the encoder to create wav files. -->
+		<ProjectReference Include="..\FoxTunes.Encoder.Bass\FoxTunes.Encoder.Bass.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MD.Net" Version="0.0.1" />
-    <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
-    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.14" Condition="'$(TargetFramework)' == 'net40'" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="MD.Net" Version="0.0.1" />
+		<PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
+		<PackageReference Include="Microsoft.Bcl.Build" Version="1.0.14" Condition="'$(TargetFramework)' == 'net40'" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+			<CustomToolNamespace>FoxTunes</CustomToolNamespace>
+		</EmbeddedResource>
+	</ItemGroup>
 
 	<ItemGroup>
 		<Compile Update="Properties\Strings.Designer.cs">
@@ -35,6 +48,6 @@
 		</EmbeddedResource>
 	</ItemGroup>
 
-  <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
+	<Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
 
 </Project>

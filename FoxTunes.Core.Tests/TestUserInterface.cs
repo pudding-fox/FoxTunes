@@ -43,6 +43,11 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
+        public string Prompt(string message, string value, UserInterfacePromptFlags flags = UserInterfacePromptFlags.None)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Restart()
         {
             throw new NotImplementedException();

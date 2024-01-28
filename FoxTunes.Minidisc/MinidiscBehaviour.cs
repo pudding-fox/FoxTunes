@@ -13,13 +13,17 @@ namespace FoxTunes
     {
         public const string VIEW_DISC = "AAAA";
 
-        public const string ERASE_DISC = "BBBB";
+        public const string SET_DISC_TITLE = "BBBB";
 
-        public const string SEND_TO_DISC_SP = "CCCC";
+        public const string ERASE_DISC = "CCCC";
 
-        public const string SEND_TO_DISC_LP2 = "DDDD";
+        public const string SEND_TO_DISC_SP = "DDDD";
 
-        public const string SEND_TO_DISC_LP4 = "EEEE";
+        public const string SEND_TO_DISC_LP2 = "EEEE";
+
+        public const string SEND_TO_DISC_LP4 = "FFFF";
+
+        public static readonly string TempPath = Path.Combine(Path.GetTempPath(), Publication.Product, typeof(MinidiscBehaviour).Name);
 
         public ICore Core { get; private set; }
 
@@ -29,9 +33,15 @@ namespace FoxTunes
 
         public IUserInterface UserInterface { get; private set; }
 
+        public IScriptingRuntime ScriptingRuntime { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public BooleanConfigurationElement Enabled { get; private set; }
+
+        public TextConfigurationElement DiscTitleScript { get; private set; }
+
+        public TextConfigurationElement TrackNameScript { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
@@ -39,10 +49,19 @@ namespace FoxTunes
             this.PlaylistManager = core.Managers.Playlist;
             this.ReportEmitter = core.Components.ReportEmitter;
             this.UserInterface = core.Components.UserInterface;
+            this.ScriptingRuntime = core.Components.ScriptingRuntime;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MinidiscBehaviourConfiguration.SECTION,
                 MinidiscBehaviourConfiguration.ENABLED
+            );
+            this.DiscTitleScript = this.Configuration.GetElement<TextConfigurationElement>(
+                MinidiscBehaviourConfiguration.SECTION,
+                MinidiscBehaviourConfiguration.DISC_TITLE_SCRIPT
+            );
+            this.TrackNameScript = this.Configuration.GetElement<TextConfigurationElement>(
+                MinidiscBehaviourConfiguration.SECTION,
+                MinidiscBehaviourConfiguration.TRACK_NAME_SCRIPT
             );
             base.InitializeComponent(core);
         }
@@ -54,7 +73,8 @@ namespace FoxTunes
                 if (this.Enabled.Value)
                 {
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, VIEW_DISC, Strings.MinidiscBehaviour_ViewDisc, path: Strings.MinidiscBehaviour_Path);
-                    yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, ERASE_DISC, Strings.MinidiscBehaviour_EraseDisc, path: Strings.MinidiscBehaviour_Path);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, SET_DISC_TITLE, Strings.MinidiscBehaviour_SetDiscTitle, path: Strings.MinidiscBehaviour_Path);
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_SETTINGS, ERASE_DISC, Strings.MinidiscBehaviour_EraseDisc, path: Strings.MinidiscBehaviour_Path, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
                     if (this.PlaylistManager.SelectedItems != null && this.PlaylistManager.SelectedItems.Any())
                     {
                         yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, SEND_TO_DISC_SP, string.Format(Strings.MinidiscBehaviour_SendToDisc, "SP"), path: Strings.MinidiscBehaviour_Path);
@@ -71,6 +91,8 @@ namespace FoxTunes
             {
                 case VIEW_DISC:
                     return this.ViewDisc();
+                case SET_DISC_TITLE:
+                    return this.SetDiscTitle();
                 case ERASE_DISC:
                     return this.EraseDisc();
                 case SEND_TO_DISC_SP:
@@ -96,6 +118,32 @@ namespace FoxTunes
             }
             var actions = new Actions(task.Device, task.Disc, task.Disc, Actions.None);
             this.ConfirmActions(task.Device, actions);
+        }
+
+        public async Task<bool> SetDiscTitle()
+        {
+            var task = await this.OpenDisc().ConfigureAwait(false);
+            if (task.Disc == null)
+            {
+                return false;
+            }
+            var title = this.UserInterface.Prompt(Strings.MinidiscBehaviour_SetDiscTitle, task.Disc.Title);
+            if (string.IsNullOrEmpty(title))
+            {
+                return false;
+            }
+            return await this.SetDiscTitle(title).ConfigureAwait(false);
+        }
+
+        public async Task<bool> SetDiscTitle(string title)
+        {
+            using (var task = new SetDiscTitleTask(title))
+            {
+                task.InitializeComponent(this.Core);
+                this.OnBackgroundTask(task);
+                await task.Run().ConfigureAwait(false);
+                return task.Result != null && task.Result.Status == ResultStatus.Success;
+            }
         }
 
         public async Task<bool> EraseDisc()
@@ -152,14 +200,17 @@ namespace FoxTunes
             var device = task.Device;
             var currentDisc = task.Disc;
             var updatedDisc = currentDisc.Clone();
-            if (this.IsUntitled(updatedDisc))
+            using (var scriptingContext = this.ScriptingRuntime.CreateContext())
             {
-                updatedDisc.Title = this.GetTitle(playlistItems);
-            }
-            foreach (var pair in fileNames)
-            {
-                var track = updatedDisc.Tracks.Add(pair.Value, compression);
-                track.Name = this.GetName(pair.Key);
+                if (this.IsUntitled(updatedDisc))
+                {
+                    updatedDisc.Title = this.GetTitle(scriptingContext, playlistItems);
+                }
+                foreach (var pair in fileNames)
+                {
+                    var track = updatedDisc.Tracks.Add(pair.Value, compression);
+                    track.Name = this.GetName(scriptingContext, pair.Key);
+                }
             }
             var toolManager = new ToolManager();
             var formatManager = new FormatManager(toolManager);
@@ -192,13 +243,13 @@ namespace FoxTunes
             var behaviour = ComponentRegistry.Instance.GetComponent<BassEncoderBehaviour>();
             var encoderItems = await behaviour.Encode(
                 fileDatas,
-                new BassEncoderOutputPath.Fixed(Path.Combine(Path.GetTempPath(), string.Format("MD-{0}", DateTime.UtcNow.ToFileTimeUtc()))),
+                new BassEncoderOutputPath.Fixed(TempPath),
                 Wav_16_44100_Settings.NAME,
                 false
             ).ConfigureAwait(false);
             foreach (var encoderItem in encoderItems)
             {
-                if (encoderItem.Status != EncoderItemStatus.Complete)
+                if (encoderItem.Status != EncoderItemStatus.Complete && !EncoderItem.WasSkipped(encoderItem))
                 {
                     //If something went wrong then present the conversion log.
                     var report = new BassEncoderReport(encoderItems);
@@ -209,7 +260,7 @@ namespace FoxTunes
                 var fileData = fileDatas.FirstOrDefault(_fileData => string.Equals(_fileData.FileName, encoderItem.InputFileName, StringComparison.OrdinalIgnoreCase));
                 if (fileData == null)
                 {
-                    //TODO: Warn.
+                    Logger.Write(this, LogLevel.Warn, "Failed to determine input file for encoder item: {0}", encoderItem.InputFileName);
                     continue;
                 }
                 fileNames.Add(fileData, encoderItem.OutputFileName);
@@ -220,17 +271,40 @@ namespace FoxTunes
         public bool IsUntitled(IDisc disc)
         {
             const string UNTITLED = "<Untitled>";
-            return string.IsNullOrEmpty(disc.Title) || string.Equals(disc.Title, UNTITLED, StringComparison.OrdinalIgnoreCase)
+            return string.IsNullOrEmpty(disc.Title) || string.Equals(disc.Title, UNTITLED, StringComparison.OrdinalIgnoreCase);
         }
 
-        public string GetTitle(IEnumerable<IFileData> fileDatas)
+        public string GetTitle(IScriptingContext scriptingContext, IEnumerable<IFileData> fileDatas)
         {
-
+            var title = default(string);
+            foreach (var playlistItem in fileDatas.OfType<PlaylistItem>())
+            {
+                var runner = new PlaylistItemScriptRunner(scriptingContext, playlistItem, this.DiscTitleScript.Value);
+                runner.Prepare();
+                var temp = Convert.ToString(runner.Run());
+                if (string.IsNullOrEmpty(title) || string.Equals(temp, title, StringComparison.OrdinalIgnoreCase))
+                {
+                    title = temp;
+                }
+                else
+                {
+                    const string UNTITLED = "<Untitled>";
+                    Logger.Write(this, LogLevel.Warn, "Disc title is ambiguous, falling back to : {0}", UNTITLED);
+                    return UNTITLED;
+                }
+            }
+            return title;
         }
 
-        public string GetName(IFileData fileData)
+        public string GetName(IScriptingContext scriptingContext, IFileData fileData)
         {
-
+            if (fileData is PlaylistItem playlistItem)
+            {
+                var runner = new PlaylistItemScriptRunner(scriptingContext, playlistItem, this.TrackNameScript.Value);
+                runner.Prepare();
+                return Convert.ToString(runner.Run());
+            }
+            throw new NotImplementedException();
         }
 
         protected virtual void OnBackgroundTask(IBackgroundTask backgroundTask)
@@ -247,6 +321,18 @@ namespace FoxTunes
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return MinidiscBehaviourConfiguration.GetConfigurationSections();
+        }
+
+        public static void Cleanup()
+        {
+            try
+            {
+                Directory.Delete(TempPath, true);
+            }
+            catch (Exception e)
+            {
+                Logger.Write(typeof(MinidiscBehaviour), LogLevel.Warn, "Failed to cleanup temp files: {0}", e.Message);
+            }
         }
     }
 }

@@ -87,9 +87,16 @@ namespace FoxTunes
                     }
                     if (!this.CheckOutput(encoderItem.OutputFileName))
                     {
-                        Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\" due to output file \"{1}\" already exists or cannot be written.", encoderItem.InputFileName, encoderItem.OutputFileName);
+                        Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\": Output file \"{1}\" cannot be written.", encoderItem.InputFileName, encoderItem.OutputFileName);
                         encoderItem.Status = EncoderItemStatus.Failed;
-                        encoderItem.AddError(string.Format("Output file \"{0}\" already exists or cannot be written.", encoderItem.OutputFileName));
+                        encoderItem.AddError(string.Format("Output file \"{0}\" cannot be written.", encoderItem.OutputFileName));
+                        return;
+                    }
+                    if (File.Exists(encoderItem.OutputFileName))
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Skipping file \"{0}\": Output file \"{1}\" already exists.", encoderItem.InputFileName, encoderItem.OutputFileName);
+                        encoderItem.Status = EncoderItemStatus.Failed;
+                        encoderItem.AddError(string.Format("Output file \"{0}\" already exists.", encoderItem.OutputFileName));
                         return;
                     }
                     Logger.Write(this, LogLevel.Debug, "Beginning encoding file \"{0}\" to output file \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
@@ -396,10 +403,6 @@ namespace FoxTunes
                         throw new DirectoryNotFoundException(string.Format("Directory not found: {0}", directoryName));
                     }
                 }
-            }
-            if (File.Exists(fileName))
-            {
-                return false;
             }
             return true;
         }

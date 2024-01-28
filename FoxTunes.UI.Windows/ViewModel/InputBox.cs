@@ -101,6 +101,8 @@ namespace FoxTunes.ViewModel
     public abstract class InputBoxPrompt : ViewModelBase
     {
         public abstract string GetResult();
+
+        public abstract void SetResult(string result);
     }
 
     public class InputBoxTextPrompt : InputBoxPrompt
@@ -134,6 +136,11 @@ namespace FoxTunes.ViewModel
         public override string GetResult()
         {
             return this.Value;
+        }
+
+        public override void SetResult(string result)
+        {
+            this.Value = result;
         }
 
         protected override Freezable CreateInstanceCore()
@@ -173,6 +180,11 @@ namespace FoxTunes.ViewModel
         public override string GetResult()
         {
             return this.Value;
+        }
+
+        public override void SetResult(string result)
+        {
+            this.Value = result;
         }
 
         protected override Freezable CreateInstanceCore()
