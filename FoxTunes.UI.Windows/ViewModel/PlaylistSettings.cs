@@ -106,7 +106,8 @@ namespace FoxTunes.ViewModel
                     CommonFormats.Float,
                     CommonFormats.Integer,
                     CommonFormats.TimeSpan,
-                    CommonFormats.TimeStamp
+                    CommonFormats.TimeStamp,
+                    CommonFormats.Size
                 };
             }
         }

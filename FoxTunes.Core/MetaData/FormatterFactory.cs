@@ -26,6 +26,10 @@ namespace FoxTunes
             {
                 return new IntegerFormatter(format);
             }
+            if (SizeFormatter.CanFormat(format))
+            {
+                return new SizeFormatter(format);
+            }
             return new StringFormatter(format);
         }
 
@@ -193,6 +197,38 @@ namespace FoxTunes
             public static bool CanFormat(string format)
             {
                 return string.Equals(format, CommonFormats.Integer, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        public class SizeFormatter : FormatterBase
+        {
+            private static readonly string[] SUFFIX = { "B", "KB", "MB", "GB", "TB" };
+
+            public SizeFormatter(string format) : base(format)
+            {
+
+            }
+
+            public override object GetValue(object value)
+            {
+                var total = default(int);
+                if (!int.TryParse(Convert.ToString(value), out total))
+                {
+                    return value;
+                }
+                var length = total;
+                var order = 0;
+                while (length >= 1024 && order < SUFFIX.Length - 1)
+                {
+                    order++;
+                    length = length / 1024;
+                }
+                return string.Format("{0:0.##} {1} ({2} bytes)", length, SUFFIX[order], total);
+            }
+
+            public static bool CanFormat(string format)
+            {
+                return string.Equals(format, CommonFormats.Size, StringComparison.OrdinalIgnoreCase);
             }
         }
     }

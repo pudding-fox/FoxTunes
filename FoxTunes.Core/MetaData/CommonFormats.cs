@@ -11,5 +11,7 @@
         public const string Float = "Float";
 
         public const string Integer = "Integer";
+
+        public const string Size = "Size";
     }
 }
