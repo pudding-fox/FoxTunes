@@ -99,6 +99,14 @@ namespace FoxTunes
             }
         }
 
+        public override long ActualPosition
+        {
+            get
+            {
+                return Math.Max(this.Stream.Position, 0);
+            }
+        }
+
         public override long Length
         {
             get

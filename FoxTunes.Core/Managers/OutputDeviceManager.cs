@@ -163,7 +163,7 @@ namespace FoxTunes
             var outputStream = this.PlaybackManager.CurrentStream;
             if (outputStream != null)
             {
-                position = outputStream.Position;
+                position = outputStream.ActualPosition;
                 paused = outputStream.IsPaused;
                 playlistItem = outputStream.PlaylistItem;
             }

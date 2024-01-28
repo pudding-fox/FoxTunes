@@ -16,6 +16,8 @@ namespace FoxTunes.Interfaces
 
         long Position { get; set; }
 
+        bool IsInteractive { get; }
+
         bool IsEmpty { get; }
 
         bool IsPending { get; }

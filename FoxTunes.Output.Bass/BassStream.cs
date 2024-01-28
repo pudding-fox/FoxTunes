@@ -70,6 +70,14 @@ namespace FoxTunes
 
         public Errors Errors { get; private set; }
 
+        public bool IsInteractive
+        {
+            get
+            {
+                return this.Syncs != null && this.Syncs.Any();
+            }
+        }
+
         public bool IsEmpty
         {
             get
