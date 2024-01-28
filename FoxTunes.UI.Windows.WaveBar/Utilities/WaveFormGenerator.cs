@@ -1,8 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Windows.Markup;
 
 namespace FoxTunes
 {
@@ -128,7 +126,7 @@ namespace FoxTunes
         {
             var duration = TimeSpan.FromMilliseconds(data.Resolution);
             var buffer = dataSource.GetBuffer<short>(duration);
-            var interval = data.Capacity / 10;
+            var interval = data.Capacity / 100;
 
             do
             {
@@ -192,7 +190,7 @@ namespace FoxTunes
         {
             var duration = TimeSpan.FromMilliseconds(data.Resolution);
             var buffer = dataSource.GetBuffer<float>(duration);
-            var interval = data.Capacity / 10;
+            var interval = data.Capacity / 100;
 
             do
             {

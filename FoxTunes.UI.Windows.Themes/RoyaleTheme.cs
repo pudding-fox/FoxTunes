@@ -39,7 +39,7 @@ namespace FoxTunes
 
         public override Stream GetArtworkPlaceholder()
         {
-            return typeof(RoyaleTheme).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Themes.Images.System_Artwork.png");
+            return typeof(RoyaleTheme).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Themes.Images.Artwork.png");
         }
     }
 }

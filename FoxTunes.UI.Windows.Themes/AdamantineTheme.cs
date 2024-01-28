@@ -35,7 +35,7 @@ namespace FoxTunes
 
         public override Stream GetArtworkPlaceholder()
         {
-            return typeof(AdamantineTheme).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Themes.Images.Adamantine_Artwork.png");
+            return typeof(AdamantineTheme).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Themes.Images.Artwork.png");
         }
     }
 }
