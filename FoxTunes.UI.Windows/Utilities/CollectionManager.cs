@@ -110,7 +110,7 @@ namespace FoxTunes
             }
             if (this.SelectedValue == default(T))
             {
-                this.SelectedValue = (this.OrderedItemsSource ?? this.ItemsSource).FirstOrDefault();
+                this.SelectedValue = (this.OrderedItemsSource ?? this.ItemsSource ?? Enumerable.Empty<T>()).FirstOrDefault();
             }
             if (this.ItemsSourceChanged != null)
             {
