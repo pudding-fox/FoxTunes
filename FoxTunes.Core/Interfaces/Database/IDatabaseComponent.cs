@@ -6,6 +6,8 @@ namespace FoxTunes.Interfaces
     {
         IDatabaseSets Sets { get; }
 
+        IDatabaseTables Tables { get; }
+
         IDatabaseQueries Queries { get; }
     }
 }

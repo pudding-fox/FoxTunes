@@ -50,6 +50,7 @@
     <Compile Include="Interfaces\Database\IDatabaseComponent.cs" />
     <Compile Include="Interfaces\Database\IDatabaseQueries.cs" />
     <Compile Include="Interfaces\Database\IDatabaseSets.cs" />
+    <Compile Include="Interfaces\Database\IDatabaseTables.cs" />
     <Compile Include="Interfaces\ICountable.cs" />
     <Compile Include="Interfaces\IFileData.cs" />
     <Compile Include="Interfaces\IReportsProgress.cs" />

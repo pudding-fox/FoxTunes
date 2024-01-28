@@ -50,7 +50,7 @@ namespace FoxTunes.Managers
                 query1.Output.AddFunction(QueryFunction.Exists, query1.Output.CreateSubQuery(this.Database.QueryFactory.Build().With(query2 =>
                 {
                     query2.Output.AddOperator(QueryOperator.Star);
-                    query2.Source.AddTable(this.Database.Config.Table<PlaylistItem>());
+                    query2.Source.AddTable(this.Database.Tables.PlaylistItem);
                 })));
             }));
             if (this.CanNavigate)

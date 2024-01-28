@@ -35,12 +35,15 @@ namespace FoxTunes
 
         public IDatabaseSets Sets { get; private set; }
 
+        public IDatabaseTables Tables { get; private set; }
+
         public IDatabaseQueries Queries { get; private set; }
 
         public virtual void InitializeComponent(ICore core)
         {
             this.Sets = new DatabaseSets();
             this.Sets.InitializeComponent(core);
+            this.Tables = new SQLiteDatabaseTables(this);
             this.Queries = new SQLiteDatabaseQueries(this);
         }
 

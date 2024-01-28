@@ -4,8 +4,8 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -59,7 +59,17 @@ namespace FoxTunes
             this.Name = "Getting file list";
             this.IsIndeterminate = true;
             var parameters = default(IDatabaseParameters);
-            using (var command = this.Database.CreateCommand(this.Database.Queries.AddPlaylistItem, out parameters))
+            var query = this.Database.QueryFactory.Build();
+            query.Add.SetTable(this.Database.Tables.PlaylistItem);
+            query.Add.AddColumns(this.Database.Tables.PlaylistItem.Columns.Except(this.Database.Tables.PlaylistItem.PrimaryKeys));
+            query.Output.AddSubQuery(this.Database.QueryFactory.Build().With(subQuery =>
+            {
+                subQuery.Output.AddColumn(this.Database.Tables.LibraryItem.Column("Id"));
+                subQuery.Source.AddTable(this.Database.Tables.LibraryItem);
+                subQuery.Filter.AddColumn(this.Database.Tables.LibraryItem.Column("FileName"));
+            }));
+            query.Output.AddParameters(this.Database.Tables.PlaylistItem.Columns.Except(this.Database.Tables.PlaylistItem.PrimaryKeys.Concat(this.Database.Tables.PlaylistItem.Column("LibraryItem_Id"))));
+            using (var command = this.Database.CreateCommand(query.Build(), out parameters))
             {
                 transaction.Bind(command);
                 var count = 0;
