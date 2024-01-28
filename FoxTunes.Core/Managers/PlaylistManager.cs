@@ -31,32 +31,6 @@ namespace FoxTunes
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
-        private bool _CanNavigate { get; set; }
-
-        public bool CanNavigate
-        {
-            get
-            {
-                return this._CanNavigate;
-            }
-            set
-            {
-                this._CanNavigate = value;
-                this.OnCanNavigateChanged();
-            }
-        }
-
-        protected virtual void OnCanNavigateChanged()
-        {
-            if (this.CanNavigateChanged != null)
-            {
-                this.CanNavigateChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("CanNavigate");
-        }
-
-        public event EventHandler CanNavigateChanged;
-
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
@@ -118,36 +92,27 @@ namespace FoxTunes
 
         public async Task Refresh()
         {
-            Logger.Write(this, LogLevel.Debug, "Refresh was requested, determining whether navigation is possible.");
-            this.CanNavigate = this.DatabaseFactory != null && await this.HasItems().ConfigureAwait(false);
-            if (this.CanNavigate)
+            if (this.CurrentItem == null)
             {
-                Logger.Write(this, LogLevel.Debug, "Navigation is possible.");
-                if (this.CurrentItem != null)
+                return;
+            }
+            Logger.Write(this, LogLevel.Debug, "Refreshing current item.");
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    Logger.Write(this, LogLevel.Debug, "Refreshing current item.");
-                    using (var database = this.DatabaseFactory.Create())
+                    var set = database.Set<PlaylistItem>(transaction);
+                    var playlistItem = await set.FindAsync(this.CurrentItem.Id).ConfigureAwait(false);
+                    if (playlistItem != null && string.Equals(this.CurrentItem.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase))
                     {
-                        using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                        {
-                            var set = database.Set<PlaylistItem>(transaction);
-                            var playlistItem = await set.FindAsync(this.CurrentItem.Id).ConfigureAwait(false);
-                            if (playlistItem != null && string.Equals(this.CurrentItem.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase))
-                            {
-                                this.CurrentItem = playlistItem;
-                            }
-                            else
-                            {
-                                this.CurrentItem = null;
-                                Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
-                            }
-                        }
+                        this.CurrentItem = playlistItem;
+                    }
+                    else
+                    {
+                        this.CurrentItem = null;
+                        Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
                     }
                 }
-            }
-            else
-            {
-                Logger.Write(this, LogLevel.Debug, "Navigation is not possible, playlist is empty.");
             }
         }
 
@@ -269,10 +234,6 @@ namespace FoxTunes
 
         public async Task Next()
         {
-            if (!this.CanNavigate)
-            {
-                return;
-            }
             Logger.Write(this, LogLevel.Debug, "Navigating to next playlist item.");
             if (this.IsNavigating)
             {
@@ -298,10 +259,6 @@ namespace FoxTunes
 
         public async Task Previous()
         {
-            if (!this.CanNavigate)
-            {
-                return;
-            }
             Logger.Write(this, LogLevel.Debug, "Navigating to previous playlist item.");
             if (this.IsNavigating)
             {
