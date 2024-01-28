@@ -9,11 +9,11 @@ namespace FoxTunes
 
         public const string INTERVAL_ELEMENT = "FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438";
 
-        public const int MIN_INTERVAL = 5; //200 fps
+        public const int MIN_INTERVAL = 5;
 
-        public const int MAX_INTERVAL = 40; //25 fps
+        public const int MAX_INTERVAL = 40;
 
-        public const int DEFAULT_INTERVAL = 16; //60 fps
+        public const int DEFAULT_INTERVAL = 16;
 
         public const string FFT_SIZE_ELEMENT = "GGGGAE69-551B-4E86-BE04-7EB00AD30099";
 

@@ -138,15 +138,18 @@ namespace FoxTunes
             var success = await base.CreateBitmap().ConfigureAwait(false);
             if (success)
             {
-                var visualization = this.FindAncestor<Visualization>();
-                if (visualization != null)
+                await Windows.Invoke(() =>
                 {
-                    var grid = visualization.FindChild<Grid>();
-                    if (grid != null)
+                    var visualization = this.FindAncestor<Visualization>();
+                    if (visualization != null)
                     {
-                        grid.TryFindResource("ViewModel", out this.ViewModel);
+                        var grid = visualization.FindChild<Grid>();
+                        if (grid != null)
+                        {
+                            grid.TryFindResource("ViewModel", out this.ViewModel);
+                        }
                     }
-                }
+                }).ConfigureAwait(false);
             }
             return success;
         }

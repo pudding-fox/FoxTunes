@@ -288,4 +288,13 @@
   <data name="SpectrumConfiguration.PreAmp" xml:space="preserve">
     <value>Pre Amp (dB)</value>
   </data>
+  <data name="Visualization.Speed.Default" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Visualization.Speed.Fast" xml:space="preserve">
+    <value>Fast</value>
+  </data>
+  <data name="Visualization.Speed.Slow" xml:space="preserve">
+    <value>Slow</value>
+  </data>
 </root>
