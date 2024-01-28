@@ -280,32 +280,41 @@ namespace FoxTunes.ViewModel
 
         public async Task Save()
         {
+            var names = new HashSet<string>();
             var sources = new HashSet<IFileData>();
             if (this.Tags != null)
             {
                 foreach (var tag in this.Tags)
                 {
-                    tag.Save();
-                    sources.AddRange(tag.GetSources());
+                    if (tag.HasChanges)
+                    {
+                        tag.Save();
+                        sources.AddRange(tag.GetSources());
+                        names.Add(tag.Name);
+                    }
                 }
             }
             if (this.Images != null)
             {
                 foreach (var image in this.Images)
                 {
-                    image.Save();
-                    sources.AddRange(image.GetSources());
+                    if (image.HasChanges)
+                    {
+                        image.Save();
+                        sources.AddRange(image.GetSources());
+                        names.Add(image.Name);
+                    }
                 }
             }
             var libraryItems = sources.OfType<LibraryItem>().ToArray();
             var playlistItems = sources.OfType<PlaylistItem>().ToArray();
             if (libraryItems.Any())
             {
-                await this.MetaDataManager.Save(libraryItems, true, true).ConfigureAwait(false);
+                await this.MetaDataManager.Save(libraryItems, true, true, names.ToArray()).ConfigureAwait(false);
             }
             if (playlistItems.Any())
             {
-                await this.MetaDataManager.Save(playlistItems, true, true).ConfigureAwait(false);
+                await this.MetaDataManager.Save(playlistItems, true, true, names.ToArray()).ConfigureAwait(false);
             }
             if (libraryItems.Any() || playlistItems.Any(playlistItem => playlistItem.LibraryItem_Id.HasValue))
             {
