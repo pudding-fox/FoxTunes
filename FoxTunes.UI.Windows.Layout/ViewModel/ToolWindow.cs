@@ -14,6 +14,10 @@ namespace FoxTunes.ViewModel
                 {
                     return null;
                 }
+                if (string.IsNullOrEmpty(this.Configuration.Title))
+                {
+                    return GetTitle(this);
+                }
                 return this.Configuration.Title;
             }
             set
@@ -183,6 +187,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual void OnComponentChanged(object sender, EventArgs e)
         {
+            this.OnTitleChanged(this, EventArgs.Empty);
             if (this.ComponentChanged != null)
             {
                 this.ComponentChanged(this, EventArgs.Empty);
@@ -191,6 +196,68 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler ComponentChanged;
+
+        public bool ShowWithMainWindow
+        {
+            get
+            {
+                if (this.Configuration == null)
+                {
+                    return false;
+                }
+                return this.Configuration.ShowWithMainWindow;
+            }
+            set
+            {
+                if (this.Configuration == null || this.Configuration.ShowWithMainWindow == value)
+                {
+                    return;
+                }
+                this.Configuration.ShowWithMainWindow = value;
+            }
+        }
+
+        protected virtual void OnShowWithMainWindowChanged(object sender, EventArgs e)
+        {
+            if (this.ShowWithMainWindowChanged != null)
+            {
+                this.ShowWithMainWindowChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowWithMainWindow");
+        }
+
+        public event EventHandler ShowWithMainWindowChanged;
+
+        public bool ShowWithMiniWindow
+        {
+            get
+            {
+                if (this.Configuration == null)
+                {
+                    return false;
+                }
+                return this.Configuration.ShowWithMiniWindow;
+            }
+            set
+            {
+                if (this.Configuration == null || this.Configuration.ShowWithMiniWindow == value)
+                {
+                    return;
+                }
+                this.Configuration.ShowWithMiniWindow = value;
+            }
+        }
+
+        protected virtual void OnShowWithMiniWindowChanged(object sender, EventArgs e)
+        {
+            if (this.ShowWithMiniWindowChanged != null)
+            {
+                this.ShowWithMiniWindowChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ShowWithMiniWindow");
+        }
+
+        public event EventHandler ShowWithMiniWindowChanged;
 
         public bool AlwaysOnTop
         {
@@ -252,6 +319,8 @@ namespace FoxTunes.ViewModel
                 this.Configuration.WidthChanged += this.OnWidthChanged;
                 this.Configuration.HeightChanged += this.OnHeightChanged;
                 this.Configuration.ComponentChanged += this.OnComponentChanged;
+                this.Configuration.ShowWithMainWindowChanged += this.OnShowWithMainWindowChanged;
+                this.Configuration.ShowWithMiniWindowChanged += this.OnShowWithMiniWindowChanged;
                 this.Configuration.AlwaysOnTopChanged += this.OnAlwaysOnTopChanged;
 
                 this.OnTitleChanged(this, EventArgs.Empty);
@@ -260,6 +329,8 @@ namespace FoxTunes.ViewModel
                 this.OnWidthChanged(this, EventArgs.Empty);
                 this.OnHeightChanged(this, EventArgs.Empty);
                 this.OnComponentChanged(this, EventArgs.Empty);
+                this.OnShowWithMainWindowChanged(this, EventArgs.Empty);
+                this.OnShowWithMiniWindowChanged(this, EventArgs.Empty);
                 this.OnAlwaysOnTopChanged(this, EventArgs.Empty);
             }
             if (this.ConfigurationChanged != null)
@@ -291,9 +362,26 @@ namespace FoxTunes.ViewModel
                 this.Configuration.WidthChanged -= this.OnWidthChanged;
                 this.Configuration.HeightChanged -= this.OnHeightChanged;
                 this.Configuration.ComponentChanged -= this.OnComponentChanged;
+                this.Configuration.ShowWithMainWindowChanged -= this.OnShowWithMainWindowChanged;
+                this.Configuration.ShowWithMiniWindowChanged -= this.OnShowWithMiniWindowChanged;
                 this.Configuration.AlwaysOnTopChanged -= this.OnAlwaysOnTopChanged;
             }
             base.OnDisposing();
+        }
+
+        public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
+
+        public string GetTitle(ToolWindow instance)
+        {
+            if (instance.Component != null)
+            {
+                var component = Factory.CreateComponent(instance.Component);
+                if (component != null)
+                {
+                    return component.Name;
+                }
+            }
+            return Strings.ToolWindowBehaviour_NewWindow;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -10,17 +10,25 @@ namespace FoxTunes.ViewModel
 {
     public class ToolWindowManager : ViewModelBase
     {
+        public ToolWindowManager()
+        {
+            this.Windows = new ObservableCollection<ToolWindow>();
+        }
+
         public ToolWindowBehaviour Behaviour { get; private set; }
 
-        public IEnumerable<ToolWindowConfiguration> Windows
+        private ObservableCollection<ToolWindow> _Windows { get; set; }
+
+        public ObservableCollection<ToolWindow> Windows
         {
             get
             {
-                if (this.Behaviour == null)
-                {
-                    return Enumerable.Empty<ToolWindowConfiguration>();
-                }
-                return this.Behaviour.Windows.Keys.ToArray();
+                return this._Windows;
+            }
+            set
+            {
+                this._Windows = value;
+                this.OnWindowsChanged();
             }
         }
 
@@ -35,9 +43,9 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler WindowsChanged;
 
-        private ToolWindowConfiguration _SelectedWindow { get; set; }
+        private ToolWindow _SelectedWindow { get; set; }
 
-        public ToolWindowConfiguration SelectedWindow
+        public ToolWindow SelectedWindow
         {
             get
             {
@@ -84,11 +92,33 @@ namespace FoxTunes.ViewModel
         {
             return global::FoxTunes.Windows.Invoke(() =>
             {
-                if (this.SelectedWindow == null)
+                var selectedWindow = this.SelectedWindow;
+                foreach (var window in this.Windows)
+                {
+                    window.Dispose();
+                }
+                this.Windows.Clear();
+                this.Windows.AddRange(this.Behaviour.Windows.Keys.Select(configuration =>
+                {
+                    var window = new ToolWindow();
+                    window.Core = this.Core;
+                    window.Configuration = configuration;
+                    return window;
+                }));
+                if (selectedWindow != null)
+                {
+                    selectedWindow = this.Windows.FirstOrDefault(
+                        window => object.ReferenceEquals(window.Configuration, selectedWindow.Configuration)
+                    );
+                }
+                if (selectedWindow != null)
+                {
+                    this.SelectedWindow = selectedWindow;
+                }
+                else
                 {
                     this.SelectedWindow = this.Windows.FirstOrDefault();
                 }
-                this.OnWindowsChanged();
             });
         }
 
