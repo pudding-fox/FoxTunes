@@ -56,6 +56,11 @@ namespace FoxTunes
             }
         }
 
+        public bool CanGetValue(IFileData fileData)
+        {
+            return true;
+        }
+
         public async Task<OnDemandMetaDataValues> GetValues(IEnumerable<IFileData> fileDatas, object state)
         {
             var provider = state as LyricsProvider ?? this.GetAutoLookupProvider();

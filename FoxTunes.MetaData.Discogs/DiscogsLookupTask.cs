@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,12 +31,15 @@ namespace FoxTunes
 
         public Discogs.ReleaseLookup[] LookupItems { get; private set; }
 
+        public IMetaDataManager MetaDataManager { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         public DoubleConfigurationElement MinConfidence { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
+            this.MetaDataManager = core.Managers.MetaData;
             this.Configuration = core.Components.Configuration;
             this.MinConfidence = this.Configuration.GetElement<DoubleConfigurationElement>(
                 DiscogsBehaviourConfiguration.SECTION,
@@ -91,6 +95,11 @@ namespace FoxTunes
                     releaseLookup.AddError(e.Message);
                     releaseLookup.Status = Discogs.ReleaseLookupStatus.Failed;
                 }
+                finally
+                {
+                    //Save the DiscogsRelease tag (either the actual release id or none).
+                    await this.SaveMetaData(releaseLookup).ConfigureAwait(false);
+                }
                 position++;
             }
         }
@@ -144,5 +153,51 @@ namespace FoxTunes
         }
 
         protected abstract Task<bool> OnLookupSuccess(Discogs.ReleaseLookup releaseLookup);
+
+        protected virtual async Task SaveMetaData(Discogs.ReleaseLookup releaseLookup)
+        {
+            foreach (var fileData in releaseLookup.FileDatas)
+            {
+                lock (fileData.MetaDatas)
+                {
+                    var metaDataItem = fileData.MetaDatas.FirstOrDefault(
+                        element => string.Equals(element.Name, CustomMetaData.DiscogsRelease, StringComparison.OrdinalIgnoreCase) && element.Type == MetaDataItemType.Tag
+                    );
+                    if (metaDataItem == null)
+                    {
+                        metaDataItem = new MetaDataItem(CustomMetaData.DiscogsRelease, MetaDataItemType.Tag);
+                        fileData.MetaDatas.Add(metaDataItem);
+                    }
+                    if (releaseLookup.Release != null)
+                    {
+                        metaDataItem.Value = releaseLookup.Release.Id;
+                    }
+                    else
+                    {
+                        metaDataItem.Value = Discogs.Release.None;
+                    }
+                }
+            }
+            var libraryItems = releaseLookup.FileDatas.OfType<LibraryItem>().ToArray();
+            var playlistItems = releaseLookup.FileDatas.OfType<PlaylistItem>().ToArray();
+            if (libraryItems.Any())
+            {
+                await this.MetaDataManager.Save(
+                    libraryItems,
+                    false, //These tags cannot be "written".
+                    false,
+                    new[] { CustomMetaData.DiscogsRelease }
+                ).ConfigureAwait(false);
+            }
+            if (playlistItems.Any())
+            {
+                await this.MetaDataManager.Save(
+                    playlistItems,
+                    false, //These tags cannot be "written".
+                    false,
+                    new[] { CustomMetaData.DiscogsRelease }
+                ).ConfigureAwait(false);
+            }
+        }
     }
 }
