@@ -49,6 +49,8 @@ namespace FoxTunes
 
         public IBassStreamPipelineQueryResult Query { get; private set; }
 
+        public int InputChannelHandle { get; protected set; }
+
         public int InputRate { get; protected set; }
 
         public override int ChannelHandle { get; protected set; }
@@ -60,9 +62,9 @@ namespace FoxTunes
                 var length = default(int);
                 if (!BassSox.StreamBufferLength(this.ChannelHandle, out length))
                 {
-                    length = 0;
+                    return 0;
                 }
-                return length;
+                return Convert.ToInt32(Bass.ChannelBytes2Seconds(this.InputChannelHandle, length) / 1000);
             }
         }
 
@@ -80,6 +82,7 @@ namespace FoxTunes
             var channels = default(int);
             var flags = default(BassFlags);
             previous.GetFormat(out rate, out channels, out flags);
+            this.InputChannelHandle = previous.ChannelHandle;
             this.InputRate = rate;
             if (this.Behaviour.Output.EnforceRate)
             {
