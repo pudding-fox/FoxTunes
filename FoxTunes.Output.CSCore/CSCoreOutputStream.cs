@@ -1,6 +1,7 @@
 ﻿using CSCore;
 using CSCore.SoundOut;
 using CSCore.Streams;
+using FoxTunes.Interfaces;
 
 namespace FoxTunes
 {
@@ -13,7 +14,11 @@ namespace FoxTunes
         {
             this.WaveSource = waveSource;
             this.SoundOut = soundOut;
-            this.InitializeComponent();
+            this.SampleSource = this.WaveSource.ToSampleSource();
+            this.NotificationSource = new NotificationSource(this.SampleSource);
+            this.NotificationSource.Interval = UPDATE_INTERVAL;
+            this.NotificationSource.BlockRead += this.NotificationSource_BlockRead;
+            this.SoundOut.Stopped += this.SoundOut_Stopped;
         }
 
         public IWaveSource WaveSource { get; private set; }
@@ -23,6 +28,8 @@ namespace FoxTunes
         public NotificationSource NotificationSource { get; private set; }
 
         public ISoundOut SoundOut { get; private set; }
+
+        public IForegroundTaskRunner ForegroundTaskRunner { get; private set; }
 
         public WaveFormat WaveFormat
         {
@@ -86,18 +93,15 @@ namespace FoxTunes
 
         public bool StopRequested { get; private set; }
 
-        private void InitializeComponent()
+        public override void InitializeComponent(ICore core)
         {
-            this.SampleSource = this.WaveSource.ToSampleSource();
-            this.NotificationSource = new NotificationSource(this.SampleSource);
-            this.NotificationSource.Interval = UPDATE_INTERVAL;
-            this.NotificationSource.BlockRead += this.NotificationSource_BlockRead;
-            this.SoundOut.Stopped += this.SoundOut_Stopped;
+            this.ForegroundTaskRunner = core.Components.ForegroundTaskRunner;
+            base.InitializeComponent(core);
         }
 
         protected virtual void NotificationSource_BlockRead(object sender, BlockReadEventArgs<float> e)
         {
-            this.OnPositionChanged();
+            this.ForegroundTaskRunner.Run(() => this.OnPositionChanged());
         }
 
         protected virtual void SoundOut_Stopped(object sender, PlaybackStoppedEventArgs e)
