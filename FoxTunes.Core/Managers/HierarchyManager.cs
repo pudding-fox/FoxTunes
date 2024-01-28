@@ -2,6 +2,7 @@
 using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -32,11 +33,14 @@ namespace FoxTunes
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
             this.LibraryManager = core.Managers.Library;
             this.DatabaseFactory = core.Factories.Database;
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             base.InitializeComponent(core);
         }
 
@@ -68,34 +72,77 @@ namespace FoxTunes
             }
         }
 
-        public Task Refresh(IEnumerable<IFileData> fileDatas)
+        public Task Refresh(IEnumerable<IFileData> fileDatas, params string[] names)
+        {
+            if (!this.RefreshRequired(fileDatas))
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            return this.Refresh(names);
+        }
+
+        protected virtual bool RefreshRequired(IEnumerable<IFileData> fileDatas)
         {
             foreach (var fileData in fileDatas)
             {
                 if (fileData is LibraryItem)
                 {
-                    return this.Refresh();
+                    return true;
                 }
                 if (fileData is PlaylistItem playlistItem)
                 {
                     if (playlistItem.LibraryItem_Id.HasValue)
                     {
-                        return this.Refresh();
+                        return true;
                     }
                 }
             }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
+            return false;
         }
 
-        public async Task Refresh()
+        public async Task Refresh(params string[] names)
         {
+            if (!this.RefreshRequired(names))
+            {
+                return;
+            }
             await this.Clear(LibraryItemStatus.Import, false).ConfigureAwait(false);
             await this.Build(LibraryItemStatus.Import).ConfigureAwait(false);
             await this.LibraryManager.SetStatus(LibraryItemStatus.None).ConfigureAwait(false);
+        }
+
+        protected virtual bool RefreshRequired(IEnumerable<string> names)
+        {
+            if (names == null || !names.Any())
+            {
+                //We don't know what has changed so assume the worst.
+                return true;
+            }
+            foreach (var libraryHierarchy in this.LibraryHierarchyBrowser.GetHierarchies())
+            {
+                if (!libraryHierarchy.Enabled || libraryHierarchy.Type != LibraryHierarchyType.Script)
+                {
+                    //No need to refresh disabled hierarchies, not sure about non script types though. We should ask their plugin.
+                    continue;
+                }
+                foreach (var libraryHierarchyLevel in libraryHierarchy.Levels)
+                {
+                    if (string.IsNullOrEmpty(libraryHierarchyLevel.Script))
+                    {
+                        continue;
+                    }
+                    //Very naive check whether the script references the meta data that has changed.
+                    if (names.Any(name => libraryHierarchyLevel.Script.Contains(name, true)))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         protected virtual Task OnBackgroundTask(IBackgroundTask backgroundTask)

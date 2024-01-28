@@ -12,7 +12,9 @@ namespace FoxTunes.Interfaces
 
         Task Clear(LibraryItemStatus? status, bool signal);
 
-        Task Refresh(IEnumerable<IFileData> fileDatas);
+        Task Refresh(params string[] names);
+
+        Task Refresh(IEnumerable<IFileData> fileDatas, params string[] names);
     }
 
     [Flags]
