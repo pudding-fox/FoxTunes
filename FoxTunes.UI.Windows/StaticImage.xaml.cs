@@ -29,7 +29,14 @@ namespace FoxTunes
 
         protected virtual void OnTick(object sender, EventArgs e)
         {
-            this.Refresh();
+            try
+            {
+                this.Refresh();
+            }
+            catch
+            {
+                //Never throw on Dispatcher thread.
+            }
         }
 
         public override IEnumerable<string> InvocationCategories
@@ -73,36 +80,60 @@ namespace FoxTunes
 
         public void Refresh()
         {
-            if (!Directory.Exists(this.Path))
-            {
-                return;
-            }
             var fileName = default(string);
-            var fileNames = FileSystemHelper.EnumerateFiles(
-                this.Path,
-                "*.*",
-                FileSystemHelper.SearchOption.Recursive | FileSystemHelper.SearchOption.Sort
-            ).ToArray();
-            if (!string.IsNullOrEmpty(this.FileName))
+            var fileNames = this.GetFileNames().ToArray();
+            var index = fileNames.IndexOf(this.FileName);
+            if (index < 0 || index >= fileNames.Length - 1)
             {
                 fileName = fileNames.FirstOrDefault();
             }
             else
             {
-                var index = fileNames.IndexOf(this.FileName);
-                if (index < 0 || index > fileNames.Length - 1)
-                {
-                    fileName = fileNames.FirstOrDefault();
-                }
-                else
-                {
-                    fileName = fileNames[index + 1];
-                }
+                fileName = fileNames[index + 1];
+            }
+            if (string.Equals(this.FileName, fileName, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
             }
             this.FileName = fileName;
             if (!string.IsNullOrEmpty(this.FileName))
             {
                 this.LoadImage();
+            }
+        }
+
+        protected IEnumerable<string> GetFileNames()
+        {
+            if (string.IsNullOrEmpty(this.Path))
+            {
+                yield break;
+            }
+            var paths = this.Path.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).Select(
+                element => element.Trim()
+            ).ToArray();
+            foreach (var path in paths)
+            {
+                if (Directory.Exists(path))
+                {
+                    var fileNames = FileSystemHelper.EnumerateFiles(
+                        this.Path,
+                        "*.*",
+                        FileSystemHelper.SearchOption.Recursive | FileSystemHelper.SearchOption.Sort
+                    );
+                    foreach (var fileName in fileNames)
+                    {
+                        yield return fileName;
+                    }
+                }
+                else if (File.Exists(path))
+                {
+                    yield return path;
+                }
+                else
+                {
+                    //Who knows, might work.
+                    yield return path;
+                }
             }
         }
 

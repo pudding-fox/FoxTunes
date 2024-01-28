@@ -23,9 +23,13 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION, Strings.MiniPlayerBehaviourConfiguration_Section)
                 .WithElement(
-                    new TextConfigurationElement(NOW_PLAYING_SCRIPT_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_NowPlayingScript, path: Strings.MiniPlayerBehaviourConfiguration_Advanced).WithValue(Resources.NowPlaying).WithFlags(ConfigurationElementFlags.Script))
+                    new TextConfigurationElement(NOW_PLAYING_SCRIPT_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_NowPlayingScript, path: Strings.MiniPlayerBehaviourConfiguration_Advanced)
+                    .WithValue(Resources.NowPlaying)
+                    .WithFlags(ConfigurationElementFlags.MultiLine | ConfigurationElementFlags.Script))
                 .WithElement(
-                    new TextConfigurationElement(PLAYLIST_SCRIPT_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_PlaylistScript, path: Strings.MiniPlayerBehaviourConfiguration_Advanced).WithValue(Resources.Playlist).WithFlags(ConfigurationElementFlags.Script))
+                    new TextConfigurationElement(PLAYLIST_SCRIPT_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_PlaylistScript, path: Strings.MiniPlayerBehaviourConfiguration_Advanced)
+                    .WithValue(Resources.Playlist)
+                    .WithFlags(ConfigurationElementFlags.MultiLine | ConfigurationElementFlags.Script))
                 .WithElement(
                     new BooleanConfigurationElement(TOPMOST_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_Topmost).WithValue(false))
                 .WithElement(

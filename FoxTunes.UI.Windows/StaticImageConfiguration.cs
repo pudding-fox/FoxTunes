@@ -19,8 +19,11 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.StaticImageConfiguration_Section)
-                .WithElement(new TextConfigurationElement(PATH, Strings.StaticImageConfiguration_Path).WithFlags(ConfigurationElementFlags.FolderName))
-                .WithElement(new IntegerConfigurationElement(INTERVAL, Strings.StaticImageConfiguration_Interval).WithValue(DEFAULT_INTERVAL).WithValidationRule(new IntegerValidationRule(MIN_INTERVAL, MAX_INTERVAL, 10)));
+                .WithElement(new TextConfigurationElement(PATH, Strings.StaticImageConfiguration_Path)
+                    .WithFlags(ConfigurationElementFlags.MultiLine))
+                .WithElement(new IntegerConfigurationElement(INTERVAL, Strings.StaticImageConfiguration_Interval)
+                    .WithValue(DEFAULT_INTERVAL)
+                    .WithValidationRule(new IntegerValidationRule(MIN_INTERVAL, MAX_INTERVAL, 10)));
         }
     }
 }

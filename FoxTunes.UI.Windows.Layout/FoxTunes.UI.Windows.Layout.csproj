@@ -68,6 +68,20 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\001.jpg" />
+	  <None Remove="Resources\002.jpg" />
+	  <None Remove="Resources\003.jpg" />
+	  <None Remove="Resources\004.jpg" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\001.jpg" />
+	  <Resource Include="Resources\002.jpg" />
+	  <Resource Include="Resources\003.jpg" />
+	  <Resource Include="Resources\004.jpg" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
 	</ItemGroup>
 

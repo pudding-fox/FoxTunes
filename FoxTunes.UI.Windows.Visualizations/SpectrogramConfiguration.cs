@@ -51,7 +51,7 @@ namespace FoxTunes
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.SpectrogramConfiguration_Mode, path: Strings.SpectrogramConfiguration_Path).WithOptions(GetModeOptions()))
                 .WithElement(new SelectionConfigurationElement(SCALE_ELEMENT, Strings.SpectrogramConfiguration_Scale, path: Strings.SpectrogramConfiguration_Path).WithOptions(GetScaleOptions()))
                 .WithElement(new IntegerConfigurationElement(SMOOTHING_ELEMENT, Strings.SpectrogramConfiguration_Smoothing, path: Strings.SpectrogramConfiguration_Path).WithValue(SMOOTHING_DEFAULT).WithValidationRule(new IntegerValidationRule(SMOOTHING_MIN, SMOOTHING_MAX)))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrogramConfiguration_ColorPalette, path: Strings.SpectrogramConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrogramConfiguration_ColorPalette, path: Strings.SpectrogramConfiguration_Path).WithFlags(ConfigurationElementFlags.MultiLine))
                 .WithElement(new IntegerConfigurationElement(HISTORY_ELEMENT, Strings.SpectrogramConfiguration_History, path: Strings.SpectrogramConfiguration_Path).WithValue(Publication.ReleaseType == ReleaseType.Default ? HISTORY_DEFAULT : HISTORY_MIN).WithValidationRule(new IntegerValidationRule(HISTORY_MIN, HISTORY_MAX))
             );
         }

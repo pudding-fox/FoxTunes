@@ -1,56 +1,89 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <FoxTunes>
 	<UIComponentConfiguration Component="3451DAA4-C643-4CB2-8105-B441F0277559">
-		<UIComponentConfiguration Component="A6820FDA-E415-40C6-AEFB-A73B6FBE4C93">
-			<UIComponentConfiguration Component="18E98420-F039-4504-A116-3D0F26BEAAD5">
-				<UIComponentConfiguration Component="A6820FDA-E415-40C6-AEFB-A73B6FBE4C93">
-					<UIComponentConfiguration Component="3E899F79-380C-4EF7-8570-4B4E3B3467CB">
-						<UIComponentConfiguration Component="86276AD4-3962-4659-A00F-95065CD92117" />
-						<UIComponentConfiguration Component="F5B28CA5-163F-491B-83B6-9D08DAB11B3F" />
-						<MetaDataEntry Name="DockLocation" Value="Top" />
-					</UIComponentConfiguration>
+		<UIComponentConfiguration Component="8A4E9DDB-2390-455D-9BA9-57C9A441CD75">
+			<MetaDataEntry Name="Configuration_BBBBA520-343A-40E9-AB94-82ED4970418B" Value="60" />
+			<MetaDataEntry Name="Configuration_AAAA1509-4808-419D-93BB-B8D914C60646" Value="pack://application:,,,/FoxTunes.UI.Windows.Layout;component/Resources/001.jpg &#xD;&#xA;pack://application:,,,/FoxTunes.UI.Windows.Layout;component/Resources/002.jpg &#xD;&#xA;pack://application:,,,/FoxTunes.UI.Windows.Layout;component/Resources/003.jpg &#xD;&#xA;pack://application:,,,/FoxTunes.UI.Windows.Layout;component/Resources/004.jpg " />
+		</UIComponentConfiguration>
+		<UIComponentConfiguration Component="3E899F79-380C-4EF7-8570-4B4E3B3467CB">
+			<UIComponentConfiguration Component="A6820FDA-E415-40C6-AEFB-A73B6FBE4C93">
+				<UIComponentConfiguration Component="18E98420-F039-4504-A116-3D0F26BEAAD5">
 					<UIComponentConfiguration Component="A6820FDA-E415-40C6-AEFB-A73B6FBE4C93">
-						<UIComponentConfiguration Component="1155473E-FA29-4D31-8A28-4E4F5582261A">
-							<MetaDataEntry Name="Configuration_BBCC9137-2B5C-4D2E-9976-A268C1AEB146" Value="True" />
+						<UIComponentConfiguration Component="3E899F79-380C-4EF7-8570-4B4E3B3467CB">
+							<UIComponentConfiguration Component="86276AD4-3962-4659-A00F-95065CD92117" />
+							<UIComponentConfiguration Component="F5B28CA5-163F-491B-83B6-9D08DAB11B3F" />
+							<MetaDataEntry Name="DockLocation" Value="Top" />
 						</UIComponentConfiguration>
-						<UIComponentConfiguration Component="F7774E81-26FC-4F0C-8E0A-67214D155547" />
-						<MetaDataEntry Name="SplitterDistance" Value="260" />
-						<MetaDataEntry Name="CollapseBottom" Value="True" />
-						<MetaDataEntry Name="SplitterDirection" Value="Top" />
-					</UIComponentConfiguration>
-					<MetaDataEntry Name="SplitterDistance" Value="360" />
-					<MetaDataEntry Name="SplitterDirection" Value="Top" />
-				</UIComponentConfiguration>
-				<UIComponentConfiguration Component="A6820FDA-E415-40C6-AEFB-A73B6FBE4C93">
-					<UIComponentConfiguration Component="18E98420-F039-4504-A116-3D0F26BEAAD5">
-						<UIComponentConfiguration Component="66C8A9E7-0891-48DD-8086-E40F72D4D030" />
-						<UIComponentConfiguration Component="18E98420-F039-4504-A116-3D0F26BEAAD5">
-							<UIComponentConfiguration Component="F8231616-9D5E-45C8-BD72-506FC5FC9C95">
-								<MetaDataEntry Name="Configuration_BBBBFFA3-8F13-4838-9429-69C5E208963D" Value="False" />
+						<UIComponentConfiguration Component="A6820FDA-E415-40C6-AEFB-A73B6FBE4C93">
+							<UIComponentConfiguration Component="1155473E-FA29-4D31-8A28-4E4F5582261A">
+								<MetaDataEntry Name="Configuration_BBCC9137-2B5C-4D2E-9976-A268C1AEB146" Value="True" />
 							</UIComponentConfiguration>
-							<UIComponentConfiguration Component="381328C3-C2CE-4FDA-AC92-71A15C3FC387">
-								<MetaDataEntry Name="Configuration_AABBF573-83D3-498E-BEF8-F1DB5A329B9D" Value="GGGG5E28-CC67-43F2-8778-61570785C766" />
-								<MetaDataEntry Name="Configuration_BBBBDCF0-8B24-4321-B7BE-74DADE59D4FA" Value="False" />
-								<MetaDataEntry Name="Configuration_DDDEE2B6A-188E-4FF4-A277-37D140D49C45" Value="False" />
-								<MetaDataEntry Name="Configuration_AAAA0663-7CBF-4EE4-99C8-A0A096D4E876" Value="DDDD058E-7B9C-4101-992A-709B87756991" />
-							</UIComponentConfiguration>
-							<MetaDataEntry Name="SplitterDistance" Value="110" />
-							<MetaDataEntry Name="SplitterDirection" Value="Left" />
+							<UIComponentConfiguration Component="F7774E81-26FC-4F0C-8E0A-67214D155547" />
+							<MetaDataEntry Name="SplitterDistance" Value="260" />
+							<MetaDataEntry Name="CollapseBottom" Value="True" />
+							<MetaDataEntry Name="SplitterDirection" Value="Top" />
 						</UIComponentConfiguration>
 						<MetaDataEntry Name="SplitterDistance" Value="360" />
-						<MetaDataEntry Name="SplitterDirection" Value="Left" />
+						<MetaDataEntry Name="SplitterDirection" Value="Top" />
 					</UIComponentConfiguration>
-					<UIComponentConfiguration Component="12023E31-CB53-4F9C-8A5B-A0593706F37E" />
-					<MetaDataEntry Name="SplitterDistance" Value="360" />
-					<MetaDataEntry Name="SplitterDirection" Value="Top" />
+					<UIComponentConfiguration Component="A6820FDA-E415-40C6-AEFB-A73B6FBE4C93">
+						<UIComponentConfiguration Component="18E98420-F039-4504-A116-3D0F26BEAAD5">
+							<UIComponentConfiguration Component="66C8A9E7-0891-48DD-8086-E40F72D4D030" />
+							<UIComponentConfiguration Component="18E98420-F039-4504-A116-3D0F26BEAAD5">
+								<UIComponentConfiguration Component="F8231616-9D5E-45C8-BD72-506FC5FC9C95">
+									<MetaDataEntry Name="Configuration_BBBBFFA3-8F13-4838-9429-69C5E208963D" Value="False" />
+								</UIComponentConfiguration>
+								<UIComponentConfiguration Component="381328C3-C2CE-4FDA-AC92-71A15C3FC387">
+									<MetaDataEntry Name="Configuration_AABBF573-83D3-498E-BEF8-F1DB5A329B9D" Value="GGGG5E28-CC67-43F2-8778-61570785C766" />
+									<MetaDataEntry Name="Configuration_BBBBDCF0-8B24-4321-B7BE-74DADE59D4FA" Value="False" />
+									<MetaDataEntry Name="Configuration_DDDEE2B6A-188E-4FF4-A277-37D140D49C45" Value="False" />
+									<MetaDataEntry Name="Configuration_AAAA0663-7CBF-4EE4-99C8-A0A096D4E876" Value="DDDD058E-7B9C-4101-992A-709B87756991" />
+								</UIComponentConfiguration>
+								<MetaDataEntry Name="SplitterDistance" Value="110" />
+								<MetaDataEntry Name="SplitterDirection" Value="Left" />
+							</UIComponentConfiguration>
+							<MetaDataEntry Name="SplitterDistance" Value="360" />
+							<MetaDataEntry Name="SplitterDirection" Value="Left" />
+						</UIComponentConfiguration>
+						<UIComponentConfiguration Component="3E899F79-380C-4EF7-8570-4B4E3B3467CB">
+							<UIComponentConfiguration Component="12023E31-CB53-4F9C-8A5B-A0593706F37E" />
+							<UIComponentConfiguration Component="868C483E-C23A-4960-A60F-B3AD9A4460C2" />
+							<MetaDataEntry Name="DockLocation" Value="Bottom" />
+						</UIComponentConfiguration>
+						<MetaDataEntry Name="SplitterDistance" Value="360" />
+						<MetaDataEntry Name="SplitterDirection" Value="Top" />
+					</UIComponentConfiguration>
+					<MetaDataEntry Name="SplitterDistance" Value="400" />
+					<MetaDataEntry Name="SplitterDirection" Value="Left" />
 				</UIComponentConfiguration>
-				<MetaDataEntry Name="SplitterDistance" Value="400" />
-				<MetaDataEntry Name="SplitterDirection" Value="Left" />
+				<UIComponentConfiguration Component="1CABFBE6-C5BD-4818-A092-2D79509D3A52">
+					<MetaDataEntry Name="Configuration_402DE29B-50AB-4345-89FB-174D87824F98" Value="CCCC3286-5097-4977-A4CC-5CEDA5E2E099" />
+				</UIComponentConfiguration>
+				<MetaDataEntry Name="SplitterDistance" Value="220" />
+				<MetaDataEntry Name="DockLocation" Value="Top" />
+				<MetaDataEntry Name="SplitterDirection" Value="Bottom" />
 			</UIComponentConfiguration>
-			<UIComponentConfiguration Component="1CABFBE6-C5BD-4818-A092-2D79509D3A52">
-				<MetaDataEntry Name="Configuration_402DE29B-50AB-4345-89FB-174D87824F98" Value="CCCC3286-5097-4977-A4CC-5CEDA5E2E099" />
+			<UIComponentConfiguration Component="C1BD2AF7-ACF8-4710-99A3-AB5F34C46A90">
+				<UIComponentConfiguration Component="26A6EFC8-E2A5-4157-AAF7-6E7A52516FCA" />
+				<UIComponentConfiguration Component="DA832CBE-3C11-4F1F-80D4-B72A801DD972" />
+				<UIComponentConfiguration Component="9C2BD136-A337-448C-906B-7317C43990B6">
+					<MetaDataEntry Name="Alignment" Value="Stretch" />
+				</UIComponentConfiguration>
+				<UIComponentConfiguration Component="F0398311-BF56-4307-B6A8-E30F283F7C89">
+					<MetaDataEntry Name="Alignment" Value="Right" />
+				</UIComponentConfiguration>
+				<UIComponentConfiguration Component="3EAA32EE-9CB2-491B-928E-EA1E9E547E30">
+					<MetaDataEntry Name="Alignment" Value="Right" />
+				</UIComponentConfiguration>
+				<UIComponentConfiguration Component="7709A1DD-5334-4164-ACBD-56E52491BF69">
+					<MetaDataEntry Name="Alignment" Value="Right" />
+				</UIComponentConfiguration>
+				<UIComponentConfiguration Component="82279C77-7959-4FCA-A699-270612C20F62">
+					<MetaDataEntry Name="Alignment" Value="Right" />
+				</UIComponentConfiguration>
 			</UIComponentConfiguration>
 			<MetaDataEntry Name="SplitterDistance" Value="220" />
+			<MetaDataEntry Name="DockLocation" Value="Top" />
 			<MetaDataEntry Name="SplitterDirection" Value="Bottom" />
 		</UIComponentConfiguration>
 		<UIComponentConfiguration Component="EDC787A6-7B1E-4161-B2E1-843C58806D81">

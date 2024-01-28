@@ -409,6 +409,6 @@ namespace FoxTunes
         FileName = 2,
         FolderName = 4,
         Secret = 8,
-        Script = MultiLine | 16
+        Script = 16
     }
 }
