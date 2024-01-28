@@ -66,9 +66,21 @@ namespace FoxTunes
             }
         }
 
+        public static int GetChannelCount(int channelHandle)
+        {
+            var channelInfo = default(ChannelInfo);
+            OK(Bass.ChannelGetInfo(channelHandle, out channelInfo));
+            return channelInfo.Channels;
+        }
+
         public static int GetChannelRate(int channelHandle)
         {
             return (int)Convert.ChangeType(Bass.ChannelGetAttribute(channelHandle, ChannelAttribute.Frequency), typeof(int));
+        }
+
+        public static int GetChannelDsdRate(int channelHandle)
+        {
+            return (int)Convert.ChangeType(Bass.ChannelGetAttribute(channelHandle, ChannelAttribute.DSDRate), typeof(int));
         }
     }
 }

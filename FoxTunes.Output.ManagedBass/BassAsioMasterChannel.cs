@@ -23,17 +23,52 @@ namespace FoxTunes
             }
         }
 
-        protected override void OnStartedStream(int rate)
+        public AsioSampleFormat SampleFormat
         {
+            get
+            {
+                if (this.Output.Float)
+                {
+                    return AsioSampleFormat.Float;
+                }
+                return AsioSampleFormat.Bit16;
+            }
+        }
+
+        public AsioSampleFormat DSDSampleFormat
+        {
+            get
+            {
+                return AsioSampleFormat.DSD_MSB;
+            }
+        }
+
+        protected override void OnStartedStream()
+        {
+            BassUtils.OK(BassAsio.Init(this.Output.AsioDevice, AsioInitFlags.Thread));
             BassUtils.OK(BASS_ASIO_ChannelEnableGaplessMaster(false, PRIMARY_CHANNEL, new IntPtr(this.ChannelHandle)));
-            for (var a = 1; a < CHANNELS; a++)
+            if (this.Config.Channels > BassAsio.Info.Outputs)
+            {
+                Logger.Write(this, LogLevel.Warn, "Stream has {0} channels which is greater than {1} channels supported by the output.", this.Config.Channels, BassAsio.Info.Outputs);
+            }
+            for (var a = 1; a < Math.Min(BassAsio.Info.Outputs, this.Config.Channels); a++)
             {
                 BassUtils.OK(BassAsio.ChannelJoin(false, a, PRIMARY_CHANNEL));
             }
-            BassUtils.OK(BassAsio.ChannelSetFormat(false, PRIMARY_CHANNEL, AsioSampleFormat.Bit16));
-            BassUtils.OK(BassAsio.ChannelSetRate(false, PRIMARY_CHANNEL, rate));
+            if (this.Config.DsdDirect && this.Config.DsdRate > 0)
+            {
+                BassUtils.OK(BassAsio.SetDSD(true));
+                BassUtils.OK(BassAsio.ChannelSetFormat(false, PRIMARY_CHANNEL, this.DSDSampleFormat));
+            }
+            else
+            {
+                BassUtils.OK(BassAsio.SetDSD(false));
+                BassUtils.OK(BassAsio.ChannelSetFormat(false, PRIMARY_CHANNEL, this.SampleFormat));
+                BassUtils.OK(BassAsio.ChannelSetRate(false, PRIMARY_CHANNEL, this.Config.GetActualRate()));
+            }
+            BassAsio.Rate = this.Config.GetActualRate();
             Logger.Write(this, LogLevel.Debug, "Enabled ASIO on master stream: {0}", this.ChannelHandle);
-            base.OnStartedStream(rate);
+            base.OnStartedStream();
         }
 
         protected override void OnFreeingStream()
@@ -43,10 +78,13 @@ namespace FoxTunes
                 BassUtils.OK(BassAsio.Stop());
             }
             BassUtils.OK(BassAsio.ChannelReset(false, PRIMARY_CHANNEL, AsioChannelResetFlags.Enable));
-            for (var a = 1; a < CHANNELS; a++)
+            BassUtils.OK(BassAsio.ChannelReset(false, PRIMARY_CHANNEL, AsioChannelResetFlags.Format));
+            BassUtils.OK(BassAsio.ChannelReset(false, PRIMARY_CHANNEL, AsioChannelResetFlags.Rate));
+            for (var a = 1; a < Math.Min(BassAsio.Info.Outputs, this.Config.Channels); a++)
             {
                 BassUtils.OK(BassAsio.ChannelReset(false, a, AsioChannelResetFlags.Join));
             }
+            BassUtils.OK(BassAsio.Free());
             Logger.Write(this, LogLevel.Debug, "Disabled ASIO on master stream: {0}", this.ChannelHandle);
             base.OnFreeingStream();
         }

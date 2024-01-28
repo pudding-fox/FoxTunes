@@ -191,16 +191,19 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            if (this.Output.MasterChannel.GetPrimaryChannel() == this.ChannelHandle)
+            if (this.Output.IsStarted)
             {
-                Logger.Write(this, LogLevel.Debug, "Disposing primary channel, stopping master: {0}", this.ChannelHandle);
-                this.Stop();
-                this.Output.MasterChannel.SetPrimaryChannel(0);
-            }
-            if (this.Output.MasterChannel.GetSecondaryChannel() == this.ChannelHandle)
-            {
-                Logger.Write(this, LogLevel.Debug, "Disposing secondary channel: {0}", this.ChannelHandle);
-                this.Output.MasterChannel.SetSecondaryChannel(0);
+                if (this.Output.MasterChannel.GetPrimaryChannel() == this.ChannelHandle)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Disposing primary channel, stopping master: {0}", this.ChannelHandle);
+                    this.Stop();
+                    this.Output.MasterChannel.SetPrimaryChannel(0);
+                }
+                if (this.Output.MasterChannel.GetSecondaryChannel() == this.ChannelHandle)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Disposing secondary channel: {0}", this.ChannelHandle);
+                    this.Output.MasterChannel.SetSecondaryChannel(0);
+                }
             }
             Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
             this.ChannelHandle = 0;
