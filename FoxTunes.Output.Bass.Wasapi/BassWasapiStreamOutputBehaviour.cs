@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using ManagedBass;
+using ManagedBass.Wasapi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,6 +104,23 @@ namespace FoxTunes
             }
         }
 
+        private bool _Mixer { get; set; }
+
+        public bool Mixer
+        {
+            get
+            {
+                return this._Mixer;
+            }
+            private set
+            {
+                this._Mixer = value;
+                Logger.Write(this, LogLevel.Debug, "Mixer = {0}", this.Mixer);
+                //TODO: Bad .Wait().
+                this.Output.Shutdown().Wait();
+            }
+        }
+
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output as IBassOutput;
@@ -129,6 +147,10 @@ namespace FoxTunes
                 BassOutputConfiguration.SECTION,
                 BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_DITHER
             ).ConnectValue(value => this.Dither = value);
+            this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassOutputConfiguration.SECTION,
+                BassWasapiStreamOutputConfiguration.MIXER_ELEMENT
+            ).ConnectValue(value => this.Mixer = value);
             this.BassStreamPipelineFactory = ComponentRegistry.Instance.GetComponent<IBassStreamPipelineFactory>();
             if (this.BassStreamPipelineFactory != null)
             {
@@ -158,11 +180,21 @@ namespace FoxTunes
                 return;
             }
             BassWasapiDevice.Init(this.WasapiDevice, this.Exclusive, this.EventDriven, this.Dither);
-            if (!BassWasapiDevice.Info.SupportedRates.Contains(this.Output.Rate))
+            if (this.Output.EnforceRate && !BassWasapiDevice.Info.SupportedRates.Contains(this.Output.Rate))
             {
-                Logger.Write(this, LogLevel.Error, "The output rate {0} is not supported by the device.", this.Output.Rate);
+                var supportedRates = string.Join(
+                    ", ",
+                    BassWasapiDevice.Info.SupportedRates.Select(
+                        supportedRate => string.Format(
+                            "{0}@{1}",
+                            Enum.GetName(typeof(WasapiFormat), BassWasapiDevice.Info.SupportedFormats[supportedRate]),
+                            supportedRate
+                        )
+                    )
+                );
+                Logger.Write(this, LogLevel.Error, "The output rate {0} is not supported by the device, supported rates are: {1}", this.Output.Rate, supportedRates);
                 BassWasapiDevice.Free();
-                throw new NotImplementedException(string.Format("The output rate {0} is not supported by the device.", this.Output.Rate));
+                throw new NotImplementedException(string.Format("The output rate {0} is not supported by the device, supported rates are: {1}", this.Output.Rate, supportedRates));
             }
         }
 

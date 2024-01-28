@@ -82,15 +82,17 @@ namespace FoxTunes
                 LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detecting WASAPI device, attempt: {0}", a);
                 try
                 {
+                    var deviceInfo = default(WasapiDeviceInfo);
+                    BassUtils.OK(BassWasapi.GetDeviceInfo(device, out deviceInfo));
                     Devices[device] = new BassWasapiDeviceInfo(
-                        BassWasapi.Info.Frequency,
+                        deviceInfo.MixFrequency,
                         0,
-                        BassWasapi.Info.Channels,
+                        deviceInfo.MixChannels,
                         GetSupportedFormats(device, flags),
-                        BassWasapi.Info.Format
+                        BassWasapi.CheckFormat(device, deviceInfo.MixFrequency, deviceInfo.MixChannels, flags)
                     );
-                    LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detected WASAPI device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}, Format = {4}", Device, Info.Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(WasapiFormat), Info.Format));
-                    LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detected WASAPI device: {0} => Rates => {1}", Device, string.Join(", ", Info.SupportedRates));
+                    LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detected WASAPI device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}, Format = {4}", Device, Devices[device].Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(WasapiFormat), Info.Format));
+                    LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detected WASAPI device: {0} => Rates => {1}", Device, string.Join(", ", Devices[device].SupportedRates));
                     return;
                 }
                 catch (Exception e)
@@ -183,6 +185,18 @@ namespace FoxTunes
 #endif
 
             public WasapiFormat Format { get; private set; }
+
+            public int GetNearestRate(int rate)
+            {
+                foreach (var supportedRate in this.SupportedRates)
+                {
+                    if (supportedRate >= rate)
+                    {
+                        return supportedRate;
+                    }
+                }
+                return rate;
+            }
         }
     }
 }
