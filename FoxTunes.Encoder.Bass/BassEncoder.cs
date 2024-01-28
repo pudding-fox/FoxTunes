@@ -177,15 +177,9 @@ namespace FoxTunes
                 this.Encode(encoderItem, stream, encoderProcess);
                 if (this.WaitForExit(encoderProcess))
                 {
-                    var errors = encoderProcess.StandardError.ReadToEnd();
-                    if (!string.IsNullOrEmpty(errors))
-                    {
-                        Logger.Write(this.GetType(), LogLevel.Trace, "Encoder process output: {0}", errors);
-                        encoderItem.AddError(string.Format("Encoder: {0}", errors));
-                    }
                     if (encoderProcess.ExitCode != 0)
                     {
-                        throw new InvalidOperationException(string.Format("Encoder process \"{0}\" failed.", encoderProcess.Id));
+                        throw new InvalidOperationException("Process does not indicate success.");
                     }
                 }
             }
@@ -205,50 +199,25 @@ namespace FoxTunes
             {
                 using (var encoderProcess = this.CreateEncoderProcess(encoderItem, stream, settings))
                 {
+                    var success = true;
                     this.EncodeWithResampler(encoderItem, stream, resamplerProcess, encoderProcess);
-                    try
+                    if (this.WaitForExit(resamplerProcess))
                     {
-                        if (this.WaitForExit(resamplerProcess))
+                        if (resamplerProcess.ExitCode != 0)
                         {
-                            var errors = resamplerProcess.StandardError.ReadToEnd();
-                            if (!string.IsNullOrEmpty(errors))
-                            {
-                                Logger.Write(this.GetType(), LogLevel.Trace, "Resampler process output: {0}", errors);
-                                encoderItem.AddError(string.Format("Resampler: {0}", errors));
-                            }
+                            success = false;
                         }
                     }
-                    catch (Exception e)
+                    if (this.WaitForExit(encoderProcess))
                     {
-                        Logger.Write(this.GetType(), LogLevel.Trace, "Resampler process error: {0}", e.Message);
-                        encoderItem.Status = EncoderItemStatus.Failed;
-                        encoderItem.AddError(e.Message);
-                    }
-                    try
-                    {
-                        if (this.WaitForExit(encoderProcess))
+                        if (encoderProcess.ExitCode != 0)
                         {
-                            var errors = encoderProcess.StandardError.ReadToEnd();
-                            if (!string.IsNullOrEmpty(errors))
-                            {
-                                Logger.Write(this.GetType(), LogLevel.Trace, "Encoder process output: {0}", errors);
-                                encoderItem.AddError(string.Format("Encoder: {0}", errors));
-                            }
+                            success = false;
                         }
                     }
-                    catch (Exception e)
+                    if (!success)
                     {
-                        Logger.Write(this.GetType(), LogLevel.Trace, "Encoder process error: {0}", e.Message);
-                        encoderItem.Status = EncoderItemStatus.Failed;
-                        encoderItem.AddError(e.Message);
-                    }
-                    if (resamplerProcess.ExitCode != 0)
-                    {
-                        throw new InvalidOperationException(string.Format("Resampler process \"{0}\" failed.", resamplerProcess.Id));
-                    }
-                    if (encoderProcess.ExitCode != 0)
-                    {
-                        throw new InvalidOperationException(string.Format("Encoder process \"{0}\" failed.", encoderProcess.Id));
+                        throw new InvalidOperationException("Process does not indicate success.");
                     }
                 }
             }
@@ -364,6 +333,8 @@ namespace FoxTunes
                 CreateNoWindow = true
             };
             var process = Process.Start(processStartInfo);
+            process.ErrorDataReceived += (sender, e) => encoderItem.AddError(e.Data);
+            process.BeginErrorReadLine();
             Logger.Write(this.GetType(), LogLevel.Debug, "Created resampler process for file \"{0}\": \"{1}\" {2}", encoderItem.InputFileName, processStartInfo.FileName, processStartInfo.Arguments);
             return process;
         }
@@ -383,6 +354,8 @@ namespace FoxTunes
                 CreateNoWindow = true
             };
             var process = Process.Start(processStartInfo);
+            process.ErrorDataReceived += (sender, e) => encoderItem.AddError(e.Data);
+            process.BeginErrorReadLine();
             Logger.Write(this.GetType(), LogLevel.Debug, "Created encoder process for file \"{0}\": \"{1}\" {2}", encoderItem.InputFileName, processStartInfo.FileName, processStartInfo.Arguments);
             return process;
         }
@@ -449,7 +422,7 @@ namespace FoxTunes
                     {
                         break;
                     }
-                    process.Close();
+                    process.Kill();
                     return false;
                 }
             }
