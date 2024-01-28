@@ -46,6 +46,7 @@ namespace FoxTunes
                 Windows.MiniWindow.Topmost = this.Topmost.Value;
                 Windows.MiniWindow.Show();
                 Windows.MiniWindow.BringToFront();
+                Windows.MiniWindow.Focus();
                 Windows.ActiveWindow = Windows.MiniWindow;
             });
         }
@@ -64,6 +65,7 @@ namespace FoxTunes
                 }
                 Windows.MainWindow.Show();
                 Windows.MainWindow.BringToFront();
+                Windows.MainWindow.Focus();
                 Windows.ActiveWindow = Windows.MainWindow;
             });
         }
