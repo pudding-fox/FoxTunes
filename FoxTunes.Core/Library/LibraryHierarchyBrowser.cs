@@ -128,7 +128,7 @@ namespace FoxTunes
 #endif
         }
 
-        public IEnumerable<LibraryHierarchy> GetHierarchies()
+        public LibraryHierarchy[] GetHierarchies()
         {
             return this.LibraryHierarchyCache.GetHierarchies(this.GetHierarchiesCore);
         }
@@ -153,7 +153,7 @@ namespace FoxTunes
             }
         }
 
-        public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchy libraryHierarchy)
+        public LibraryHierarchyNode[] GetNodes(LibraryHierarchy libraryHierarchy)
         {
             var key = new LibraryHierarchyCacheKey(libraryHierarchy, null, this.Filter);
             var nodes = this.LibraryHierarchyCache.GetNodes(key, () => this.GetNodesCore(libraryHierarchy));
@@ -169,7 +169,7 @@ namespace FoxTunes
             return this.GetNodes(libraryHierarchy.Id);
         }
 
-        public IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyNode libraryHierarchyNode)
+        public LibraryHierarchyNode[] GetNodes(LibraryHierarchyNode libraryHierarchyNode)
         {
             var key = new LibraryHierarchyCacheKey(null, libraryHierarchyNode, this.Filter);
             return this.LibraryHierarchyCache.GetNodes(key, () => this.GetNodesCore(libraryHierarchyNode));

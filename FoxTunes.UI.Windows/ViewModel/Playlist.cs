@@ -504,16 +504,6 @@ namespace FoxTunes.ViewModel
             await this.ResizeColumns().ConfigureAwait(false);
         }
 
-        protected override Task RefreshItems()
-        {
-            return Windows.Invoke(() =>
-            {
-                var selectedItems = this.SelectedItems;
-                this.OnItemsChanged();
-                this.SelectedItems = selectedItems;
-            });
-        }
-
         public virtual Task RefreshSelectedItems()
         {
             return Windows.Invoke(new Action(this.OnSelectedItemsChanged));

@@ -20,15 +20,18 @@ namespace FoxTunes.ViewModel
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
-        public IEnumerable<PlaylistItem> Items
+        private PlaylistItemCollection _Items { get; set; }
+
+        public PlaylistItemCollection Items
         {
             get
             {
-                if (this.PlaylistBrowser == null)
-                {
-                    return Enumerable.Empty<PlaylistItem>();
-                }
-                return this.PlaylistBrowser.GetItems();
+                return this._Items;
+            }
+            set
+            {
+                this._Items = value;
+                this.OnItemsChanged();
             }
         }
 
@@ -81,6 +84,10 @@ namespace FoxTunes.ViewModel
         {
             get
             {
+                if (this.Items != null && this.Items.Count > 0)
+                {
+                    return false;
+                }
                 if (this.PlaylistBrowser != null)
                 {
                     switch (this.PlaylistBrowser.State)
@@ -162,7 +169,15 @@ namespace FoxTunes.ViewModel
 
         protected virtual Task RefreshItems()
         {
-            return Windows.Invoke(new Action(this.OnItemsChanged));
+            var items = this.PlaylistBrowser.GetItems();
+            if (this.Items == null)
+            {
+                return Windows.Invoke(() => this.Items = new PlaylistItemCollection(items));
+            }
+            else
+            {
+                return Windows.Invoke(this.Items.Update(items));
+            }
         }
 
         protected override void OnDisposing()

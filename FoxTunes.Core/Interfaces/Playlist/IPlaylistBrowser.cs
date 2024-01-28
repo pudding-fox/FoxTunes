@@ -10,7 +10,7 @@ namespace FoxTunes.Interfaces
 
         event EventHandler StateChanged;
 
-        IEnumerable<PlaylistItem> GetItems();
+        PlaylistItem[] GetItems();
 
         Task<PlaylistItem> Get(int sequence);
 

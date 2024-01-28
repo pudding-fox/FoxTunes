@@ -9,6 +9,6 @@ namespace FoxTunes.Interfaces
 
         bool TryGetItemsByLibraryId(int id, out IEnumerable<PlaylistItem> playlistItems);
 
-        IEnumerable<PlaylistItem> GetItems(Func<IEnumerable<PlaylistItem>> factory);
+        PlaylistItem[] GetItems(Func<IEnumerable<PlaylistItem>> factory);
     }
 }

@@ -7,9 +7,9 @@ namespace FoxTunes.Interfaces
     {
         IEnumerable<LibraryHierarchyCacheKey> Keys { get; }
 
-        IEnumerable<LibraryHierarchy> GetHierarchies(Func<IEnumerable<LibraryHierarchy>> factory);
+        LibraryHierarchy[] GetHierarchies(Func<IEnumerable<LibraryHierarchy>> factory);
 
-        IEnumerable<LibraryHierarchyNode> GetNodes(LibraryHierarchyCacheKey key, Func<IEnumerable<LibraryHierarchyNode>> factory);
+        LibraryHierarchyNode[] GetNodes(LibraryHierarchyCacheKey key, Func<IEnumerable<LibraryHierarchyNode>> factory);
 
         void Evict(LibraryHierarchyCacheKey key);
 

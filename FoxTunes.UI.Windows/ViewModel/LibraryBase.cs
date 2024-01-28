@@ -26,15 +26,18 @@ namespace FoxTunes.ViewModel
 
         private IConfiguration Configuration { get; set; }
 
-        public IEnumerable<LibraryHierarchy> Hierarchies
+        private LibraryHierarchyCollection _Hierarchies { get; set; }
+
+        public LibraryHierarchyCollection Hierarchies
         {
             get
             {
-                if (this.LibraryHierarchyBrowser == null)
-                {
-                    return Enumerable.Empty<LibraryHierarchy>();
-                }
-                return this.LibraryHierarchyBrowser.GetHierarchies();
+                return this._Hierarchies;
+            }
+            set
+            {
+                this._Hierarchies = value;
+                this.OnHierarchiesChanged();
             }
         }
 
@@ -86,15 +89,18 @@ namespace FoxTunes.ViewModel
             this.OnPropertyChanged("SelectedHierarchy");
         }
 
-        public virtual IEnumerable<LibraryHierarchyNode> Items
+        private LibraryHierarchyNodeCollection _Items { get; set; }
+
+        public virtual LibraryHierarchyNodeCollection Items
         {
             get
             {
-                if (this.LibraryHierarchyBrowser == null || this.SelectedHierarchy == null)
-                {
-                    return Enumerable.Empty<LibraryHierarchyNode>();
-                }
-                return this.LibraryHierarchyBrowser.GetNodes(this.SelectedHierarchy);
+                return this._Items;
+            }
+            set
+            {
+                this._Items = value;
+                this.OnItemsChanged();
             }
         }
 
@@ -271,6 +277,10 @@ namespace FoxTunes.ViewModel
         {
             get
             {
+                if (this.Items != null && this.Items.Count > 0)
+                {
+                    return false;
+                }
                 if (this.HierarchyManager != null)
                 {
                     if (!this.HierarchyManager.CanNavigate)
@@ -302,32 +312,49 @@ namespace FoxTunes.ViewModel
             });
         }
 
-        public virtual Task Refresh()
+        public virtual async Task Refresh()
         {
-            return Windows.Invoke(() =>
+            await this.RefreshItems().ConfigureAwait(false);
+            await Windows.Invoke(() =>
             {
-                this.OnItemsChanged();
                 this.OnSelectedItemChanged();
-            });
+            }).ConfigureAwait(false);
         }
 
-        public virtual Task Reload()
+        protected virtual Task RefreshItems()
         {
-            if (this.DatabaseFactory == null)
+            var items = this.LibraryHierarchyBrowser.GetNodes(this.SelectedHierarchy);
+            if (this.Items == null)
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                return Windows.Invoke(() => this.Items = new LibraryHierarchyNodeCollection(items));
             }
-            return Windows.Invoke(() =>
+            else
             {
-                this.OnHierarchiesChanged();
+                return Windows.Invoke(this.Items.Update(items));
+            }
+        }
+
+        protected virtual Task RefreshHierarchies()
+        {
+            var hierarchies = this.LibraryHierarchyBrowser.GetHierarchies();
+            if (this.Hierarchies == null)
+            {
+                return Windows.Invoke(() => this.Hierarchies = new LibraryHierarchyCollection(hierarchies));
+            }
+            else
+            {
+                return Windows.Invoke(this.Hierarchies.Update(hierarchies));
+            }
+        }
+
+        public virtual async Task Reload()
+        {
+            await this.RefreshHierarchies().ConfigureAwait(false);
+            await Windows.Invoke(() =>
+            {
                 this.OnSelectedHierarchyChanged();
-                this.OnItemsChanged();
-                this.OnSelectedItemChanged();
-            });
+            }).ConfigureAwait(false);
+            await this.Refresh().ConfigureAwait(false);
         }
 
         public override void InitializeComponent(ICore core)
