@@ -2,14 +2,14 @@
 {
     public interface IReportSource : IBaseComponent
     {
-        event ReportSourceEventHandler Report;
+        event ReportEventHandler Report;
     }
 
-    public delegate void ReportSourceEventHandler(object sender, ReportSourceEventArgs e);
+    public delegate void ReportEventHandler(object sender, ReportEventArgs e);
 
-    public class ReportSourceEventArgs : AsyncEventArgs
+    public class ReportEventArgs : AsyncEventArgs
     {
-        public ReportSourceEventArgs(IReport report)
+        public ReportEventArgs(IReport report)
         {
             this.Report = report;
         }

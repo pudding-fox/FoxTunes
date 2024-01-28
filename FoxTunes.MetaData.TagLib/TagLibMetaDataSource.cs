@@ -119,46 +119,35 @@ namespace FoxTunes
 
         public async Task SetMetaData(string fileName, IEnumerable<MetaDataItem> metaData)
         {
-            try
+            var collect = default(bool);
+            using (var file = this.Create(fileName))
             {
-                var collect = default(bool);
-                using (var file = this.Create(fileName))
+                foreach (var metaDataItem in metaData)
                 {
-                    foreach (var metaDataItem in metaData)
+                    switch (metaDataItem.Type)
                     {
-                        switch (metaDataItem.Type)
-                        {
-                            case MetaDataItemType.Tag:
-                                this.SetTag(metaDataItem, file.Tag);
-                                break;
-                            case MetaDataItemType.Image:
-                                if (file.InvariantStartPosition > MAX_TAG_SIZE)
-                                {
-                                    Logger.Write(this, LogLevel.Warn, "Not exporting images to file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, MAX_TAG_SIZE);
-                                    collect = true;
-                                }
-                                else
-                                {
-                                    await this.SetImage(metaDataItem, file.Tag).ConfigureAwait(false);
-                                }
-                                break;
-                        }
+                        case MetaDataItemType.Tag:
+                            this.SetTag(metaDataItem, file.Tag);
+                            break;
+                        case MetaDataItemType.Image:
+                            if (file.InvariantStartPosition > MAX_TAG_SIZE)
+                            {
+                                Logger.Write(this, LogLevel.Warn, "Not exporting images to file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, MAX_TAG_SIZE);
+                                collect = true;
+                            }
+                            else
+                            {
+                                await this.SetImage(metaDataItem, file.Tag).ConfigureAwait(false);
+                            }
+                            break;
                     }
-                    file.Save();
                 }
-                if (collect)
-                {
-                    //If we encountered a large meta data section (>10MB) then we need to try to reclaim the memory.
-                    GC.Collect();
-                }
+                file.Save();
             }
-            catch (UnsupportedFormatException)
+            if (collect)
             {
-                Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
-            }
-            catch (Exception e)
-            {
-                Logger.Write(this, LogLevel.Warn, "Failed to write meta data: {0} => {1}", fileName, e.Message);
+                //If we encountered a large meta data section (>10MB) then we need to try to reclaim the memory.
+                GC.Collect();
             }
         }
 
