@@ -67,7 +67,6 @@ namespace FoxTunes
                 return this.Database.QueryFactory.Create(
                     Resources.AddLibraryHierarchyNode,
                     new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
-                    new DatabaseQueryParameter("libraryHierarchyLevelId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
                     new DatabaseQueryParameter("libraryItemId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
                     new DatabaseQueryParameter("parentId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
                     new DatabaseQueryParameter("value", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
@@ -132,6 +131,17 @@ namespace FoxTunes
                     new DatabaseQueryParameter("name", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
                     new DatabaseQueryParameter("type", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
                     new DatabaseQueryParameter("value", DbType.String, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+                );
+            }
+        }
+
+        public IDatabaseQuery CleanupLibraryHierarchyNodes
+        {
+            get
+            {
+                return this.Database.QueryFactory.Create(
+                    Resources.CleanupLibraryHierarchyNodes,
+                    new DatabaseQueryParameter("libraryHierarchyId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
                 );
             }
         }

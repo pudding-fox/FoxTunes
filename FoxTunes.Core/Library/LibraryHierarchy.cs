@@ -58,8 +58,41 @@ namespace FoxTunes
 
         public event EventHandler NameChanged;
 
+        private LibraryHierarchyType _Type { get; set; }
+
+        public LibraryHierarchyType Type
+        {
+            get
+            {
+                return this._Type;
+            }
+            set
+            {
+                this._Type = value;
+                this.OnTypeChanged();
+            }
+        }
+
+        protected virtual void OnTypeChanged()
+        {
+            if (this.TypeChanged != null)
+            {
+                this.TypeChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Type");
+        }
+
+        public event EventHandler TypeChanged;
+
         public ObservableCollection<LibraryHierarchyLevel> Levels { get; set; }
 
         public static readonly LibraryHierarchy Empty = new LibraryHierarchy();
+    }
+
+    public enum LibraryHierarchyType : byte
+    {
+        None = 0,
+        Script = 1,
+        FileSystem = 2
     }
 }

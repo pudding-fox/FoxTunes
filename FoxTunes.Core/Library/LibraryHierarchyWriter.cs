@@ -27,10 +27,10 @@ namespace FoxTunes
 
         public IDatabaseCommand UpdateCommand { get; private set; }
 
-        public async Task<int> Write(LibraryHierarchy libraryHierarchy, LibraryHierarchyLevel libraryHierarchyLevel, int libraryItemId, int? parentId, string value, bool isLeaf)
+        public async Task<int> Write(LibraryHierarchy libraryHierarchy, int libraryItemId, int? parentId, string value, bool isLeaf)
         {
             var libraryHierarchyItemId = default(int);
-            if (this.Store.TryGetValue(libraryHierarchy.Id, libraryHierarchyLevel.Id, parentId, value, out libraryHierarchyItemId))
+            if (this.Store.TryGetValue(libraryHierarchy.Id, parentId, value, out libraryHierarchyItemId))
             {
                 this.UpdateCommand.Parameters["libraryHierarchyItemId"] = libraryHierarchyItemId;
                 this.UpdateCommand.Parameters["libraryItemId"] = libraryItemId;
@@ -39,7 +39,6 @@ namespace FoxTunes
             else
             {
                 this.AddCommand.Parameters["libraryHierarchyId"] = libraryHierarchy.Id;
-                this.AddCommand.Parameters["libraryHierarchyLevelId"] = libraryHierarchyLevel.Id;
                 this.AddCommand.Parameters["libraryItemId"] = libraryItemId;
                 this.AddCommand.Parameters["parentId"] = parentId;
                 this.AddCommand.Parameters["value"] = value;
@@ -52,7 +51,6 @@ namespace FoxTunes
                 {
                     this.Store.Add(
                         libraryHierarchy.Id,
-                        libraryHierarchyLevel.Id,
                         parentId,
                         value,
                         libraryHierarchyItemId = Converter.ChangeType<int>(await this.AddCommand.ExecuteScalarAsync())
@@ -96,31 +94,28 @@ namespace FoxTunes
 
             public IDictionary<Key, int> Store { get; private set; }
 
-            public void Add(int libraryHierarchyId, int libraryHierarchyLevelId, int? parentId, string value, int libraryHierarchyItemId)
+            public void Add(int libraryHierarchyId, int? parentId, string value, int libraryHierarchyItemId)
             {
-                var key = new Key(libraryHierarchyId, libraryHierarchyLevelId, parentId, value);
+                var key = new Key(libraryHierarchyId, parentId, value);
                 this.Store[key] = libraryHierarchyItemId;
             }
 
-            public bool TryGetValue(int libraryHierarchyId, int libraryHierarchyLevelId, int? parentId, string value, out int libraryHierarchyItemId)
+            public bool TryGetValue(int libraryHierarchyId, int? parentId, string value, out int libraryHierarchyItemId)
             {
-                var key = new Key(libraryHierarchyId, libraryHierarchyLevelId, parentId, value);
+                var key = new Key(libraryHierarchyId, parentId, value);
                 return this.Store.TryGetValue(key, out libraryHierarchyItemId);
             }
 
             public class Key : IEquatable<Key>
             {
-                public Key(int libraryHierarchyId, int libraryHierarchyLevelId, int? parentId, string value)
+                public Key(int libraryHierarchyId, int? parentId, string value)
                 {
                     this.LibraryHierarchyId = libraryHierarchyId;
-                    this.LibraryHierarchyLevelId = libraryHierarchyLevelId;
                     this.ParentId = parentId;
                     this.Value = value;
                 }
 
                 public int LibraryHierarchyId { get; private set; }
-
-                public int LibraryHierarchyLevelId { get; private set; }
 
                 public int? ParentId { get; private set; }
 
@@ -137,10 +132,6 @@ namespace FoxTunes
                         return true;
                     }
                     if (this.LibraryHierarchyId != other.LibraryHierarchyId)
-                    {
-                        return false;
-                    }
-                    if (this.LibraryHierarchyLevelId != other.LibraryHierarchyLevelId)
                     {
                         return false;
                     }
@@ -166,8 +157,11 @@ namespace FoxTunes
                     unchecked
                     {
                         hashCode += this.LibraryHierarchyId.GetHashCode();
-                        hashCode += this.LibraryHierarchyLevelId.GetHashCode();
                         hashCode += this.ParentId.GetHashCode();
+                        if (!string.IsNullOrEmpty(this.Value))
+                        {
+                            hashCode += this.Value.ToLower().GetHashCode();
+                        }
                     }
                     return hashCode;
                 }

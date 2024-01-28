@@ -90,6 +90,7 @@ namespace FoxTunes
                 set.Add(new LibraryHierarchy()
                 {
                     Name = "Artist/Album/Title",
+                    Type = LibraryHierarchyType.Script,
                     Sequence = 0,
                     Levels = new ObservableCollection<LibraryHierarchyLevel>()
                     {
@@ -101,6 +102,7 @@ namespace FoxTunes
                 set.Add(new LibraryHierarchy()
                 {
                     Name = "Genre/Album/Title",
+                    Type = LibraryHierarchyType.Script,
                     Sequence = 1,
                     Levels = new ObservableCollection<LibraryHierarchyLevel>()
                     {
@@ -108,6 +110,12 @@ namespace FoxTunes
                         new LibraryHierarchyLevel() { Name = "Year - Album", Sequence = 1, Script = scripts.Year_Album },
                         new LibraryHierarchyLevel() { Name = "Disk - Track - Title", Sequence = 2, Script = scripts.Disk_Track_Title }
                     }
+                });
+                set.Add(new LibraryHierarchy()
+                {
+                    Name = "Folder Structure",
+                    Type = LibraryHierarchyType.FileSystem,
+                    Sequence = 2
                 });
                 transaction.Commit();
             }
