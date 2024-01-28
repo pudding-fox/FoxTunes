@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -109,9 +110,14 @@ namespace FoxTunes
 
         public IEnumerable<IInvocationComponent> SelectColorPalette(string category, TextConfigurationElement element, ColorPaletteRole role)
         {
+            return this.SelectColorPalette(category, element, colorPalette => colorPalette.Role.HasFlag(role));
+        }
+
+        public IEnumerable<IInvocationComponent> SelectColorPalette(string category, TextConfigurationElement element, Func<IColorPalette, bool> predicate)
+        {
             foreach (var colorPalette in this.Theme.ColorPalettes)
             {
-                if (!colorPalette.Role.HasFlag(role))
+                if (predicate != null && !predicate(colorPalette))
                 {
                     continue;
                 }
