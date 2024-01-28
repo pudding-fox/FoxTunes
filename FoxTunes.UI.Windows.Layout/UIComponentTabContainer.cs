@@ -274,8 +274,6 @@ namespace FoxTunes
             });
         }
 
-        public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
-
         public string GetHeader(UIComponentContainer container)
         {
             if (container.Configuration != null)

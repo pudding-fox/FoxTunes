@@ -749,8 +749,6 @@ namespace FoxTunes
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
-
         public static string GetTitle(ToolWindowConfiguration instance)
         {
             if (!string.IsNullOrEmpty(instance.Title))

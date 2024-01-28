@@ -79,18 +79,6 @@ namespace FoxTunes
             typeof(UIComponentContainer)
         );
 
-        public event RoutedPropertyChangedEventHandler<UIComponentConfiguration> ConfigurationChanged
-        {
-            add
-            {
-                AddHandler(ConfigurationChangedEvent, value);
-            }
-            remove
-            {
-                RemoveHandler(ConfigurationChangedEvent, value);
-            }
-        }
-
         public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(
             "Content",
             typeof(UIComponentBase),
@@ -142,6 +130,18 @@ namespace FoxTunes
         protected virtual void OnConfigurationChanged()
         {
             //Nothing to do.
+        }
+
+        public event RoutedPropertyChangedEventHandler<UIComponentConfiguration> ConfigurationChanged
+        {
+            add
+            {
+                AddHandler(ConfigurationChangedEvent, value);
+            }
+            remove
+            {
+                RemoveHandler(ConfigurationChangedEvent, value);
+            }
         }
 
         public UIComponentBase Content
@@ -318,7 +318,10 @@ namespace FoxTunes
                 {
                     return;
                 }
-                this.Configuration = Factory.CreateConfiguration(component);
+                this.Configuration = new UIComponentConfiguration()
+                {
+                    Component = component
+                };
             });
         }
 

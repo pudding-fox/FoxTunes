@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Net;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -10,50 +11,6 @@ namespace FoxTunes
     /// </summary>
     public partial class ComponentSettingsDialog : UserControl
     {
-        public static readonly DependencyProperty ConfigurationProperty = DependencyProperty.Register(
-           "Configuration",
-           typeof(IConfiguration),
-           typeof(ComponentSettingsDialog),
-           new PropertyMetadata(null, new PropertyChangedCallback(OnConfigurationChanged))
-       );
-
-        public static IConfiguration GetConfiguration(ComponentSettingsDialog source)
-        {
-            return (IConfiguration)source.GetValue(ConfigurationProperty);
-        }
-
-        public static void SetConfiguration(ComponentSettingsDialog source, IConfiguration value)
-        {
-            source.SetValue(ConfigurationProperty, value);
-        }
-
-        private static void OnConfigurationChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var componentSettingsDialog = sender as ComponentSettingsDialog;
-            if (componentSettingsDialog == null)
-            {
-                return;
-            }
-            componentSettingsDialog.OnConfigurationChanged();
-        }
-
-        public static readonly DependencyProperty SectionsProperty = DependencyProperty.Register(
-            "Sections",
-            typeof(StringCollection),
-            typeof(ComponentSettingsDialog),
-            new PropertyMetadata(default(StringCollection))
-        );
-
-        public static StringCollection GetSections(ComponentSettingsDialog source)
-        {
-            return (StringCollection)source.GetValue(SectionsProperty);
-        }
-
-        public static void SetSections(ComponentSettingsDialog source, StringCollection value)
-        {
-            source.SetValue(SectionsProperty, value);
-        }
-
         public ComponentSettingsDialog()
         {
             this.InitializeComponent();
@@ -63,45 +20,45 @@ namespace FoxTunes
         {
             get
             {
-                return GetConfiguration(this);
+                var viewModel = this.FindResource<global::FoxTunes.ViewModel.ComponentSettings>("ViewModel");
+                if (viewModel == null)
+                {
+                    return null;
+                }
+                return viewModel.Configuration;
             }
             set
             {
-                SetConfiguration(this, value);
+                var viewModel = this.FindResource<global::FoxTunes.ViewModel.ComponentSettings>("ViewModel");
+                if (viewModel == null)
+                {
+                    return;
+                }
+                viewModel.Configuration = value;
             }
         }
-
-        protected virtual void OnConfigurationChanged()
-        {
-            if (this.ConfigurationChanged != null)
-            {
-                this.ConfigurationChanged(this, EventArgs.Empty);
-            }
-        }
-
-        public event EventHandler ConfigurationChanged;
 
         public StringCollection Sections
         {
             get
             {
-                return this.GetValue(SectionsProperty) as StringCollection;
+                var viewModel = this.FindResource<global::FoxTunes.ViewModel.ComponentSettings>("ViewModel");
+                if (viewModel == null)
+                {
+                    return null;
+                }
+                return viewModel.Sections;
             }
             set
             {
-                this.SetValue(SectionsProperty, value);
+                var viewModel = this.FindResource<global::FoxTunes.ViewModel.ComponentSettings>("ViewModel");
+                if (viewModel == null)
+                {
+                    return;
+                }
+                viewModel.Sections = value;
             }
         }
-
-        protected virtual void OnSectionsChanged()
-        {
-            if (this.SectionsChanged != null)
-            {
-                this.SectionsChanged(this, EventArgs.Empty);
-            }
-        }
-
-        public event EventHandler SectionsChanged;
 
         protected override void OnVisualParentChanged(DependencyObject oldParent)
         {

@@ -8,8 +8,6 @@ namespace FoxTunes.ViewModel
 {
     public class UIComponentSelector : ViewModelBase, IValueConverter
     {
-        public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
-
         public IEnumerable<UIComponent> Components
         {
             get
@@ -22,7 +20,10 @@ namespace FoxTunes.ViewModel
         {
             if (value is UIComponent component)
             {
-                return Factory.CreateConfiguration(component);
+                return new UIComponentConfiguration()
+                {
+                    Component = component
+                };
             }
             if (value is UIComponentConfiguration configuration)
             {
@@ -35,7 +36,10 @@ namespace FoxTunes.ViewModel
         {
             if (value is UIComponent component)
             {
-                return Factory.CreateConfiguration(component);
+                return new UIComponentConfiguration()
+                {
+                    Component = component
+                };
             }
             if (value is UIComponentConfiguration configuration)
             {
