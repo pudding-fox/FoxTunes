@@ -23,7 +23,11 @@ namespace FoxTunes
 
         public const string PEAKS_ELEMENT = "DDDD7FCF-8A71-4367-8F48-4F8D8C89739C";
 
-        public const string HIGH_CUT = "DDEE2ADA-C904-4AA5-82F0-F53412EF24BD";
+        public const string HIGH_CUT_ELEMENT = "DDEE2ADA-C904-4AA5-82F0-F53412EF24BD";
+
+        public const string SMOOTH_ELEMENT = "DEEEFBF0-AA25-456E-B759-AF94F6E9C371";
+
+        public const string HOLD_ELEMENT = "EEEE64D9-FF15-49FB-BDF4-706958576FFC";
 
         public const string INTERVAL_ELEMENT = "FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438";
 
@@ -33,9 +37,11 @@ namespace FoxTunes
             yield return new ConfigurationSection(SECTION, "Spectrum")
                 .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Show In Toolbar").WithValue(releaseType == ReleaseType.Default))
                 .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, "Bars").WithOptions(GetBarsOptions()))
-                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, "Peaks").WithValue(true))
-                .WithElement(new BooleanConfigurationElement(HIGH_CUT, "High Cut").WithValue(true))
-                .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, "Interval").WithValue(100).WithValidationRule(new IntegerValidationRule(1, 1000))
+                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, "Peaks").WithValue(releaseType == ReleaseType.Default))
+                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, "Peak Hold").WithValue(500).WithValidationRule(new IntegerValidationRule(0, 1000)).DependsOn(SECTION, PEAKS_ELEMENT))
+                .WithElement(new BooleanConfigurationElement(HIGH_CUT_ELEMENT, "High Cut").WithValue(true))
+                .WithElement(new BooleanConfigurationElement(SMOOTH_ELEMENT, "Smooth").WithValue(releaseType == ReleaseType.Default))
+                .WithElement(new IntegerConfigurationElement(INTERVAL_ELEMENT, "Interval").WithValue(releaseType == ReleaseType.Default ? 1 : 100).WithValidationRule(new IntegerValidationRule(1, 100))
             );
         }
 

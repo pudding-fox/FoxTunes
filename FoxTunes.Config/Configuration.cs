@@ -9,7 +9,7 @@ using System.Linq;
 namespace FoxTunes
 {
     [Component("BA77B392-1900-4931-B720-16206B23DDA1", ComponentSlots.Configuration, priority: ComponentAttribute.PRIORITY_HIGH)]
-    public class Configuration : StandardComponent, IConfiguration
+    public class Configuration : StandardComponent, IConfiguration, IDisposable
     {
         private static readonly string ConfigurationFileName = Path.Combine(
             Publication.StoragePath,
@@ -238,6 +238,45 @@ namespace FoxTunes
                 return default(ConfigurationElement);
             }
             return section.GetElement(elementId);
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            if (this.Debouncer != null)
+            {
+                this.Debouncer.Dispose();
+            }
+        }
+
+        ~Configuration()
+        {
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }

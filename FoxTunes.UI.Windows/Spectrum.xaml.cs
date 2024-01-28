@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Configuration;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,6 +22,10 @@ namespace FoxTunes
         public static readonly BooleanConfigurationElement ShowPeaks;
 
         public static readonly BooleanConfigurationElement HighCut;
+
+        public static readonly BooleanConfigurationElement Smooth;
+
+        public static readonly IntegerConfigurationElement HoldInterval;
 
         public static readonly IntegerConfigurationElement UpdateInterval;
 
@@ -47,7 +50,15 @@ namespace FoxTunes
             );
             HighCut = configuration.GetElement<BooleanConfigurationElement>(
                 SpectrumBehaviourConfiguration.SECTION,
-                SpectrumBehaviourConfiguration.HIGH_CUT
+                SpectrumBehaviourConfiguration.HIGH_CUT_ELEMENT
+            );
+            Smooth = configuration.GetElement<BooleanConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.SMOOTH_ELEMENT
+            );
+            HoldInterval = configuration.GetElement<IntegerConfigurationElement>(
+                SpectrumBehaviourConfiguration.SECTION,
+                SpectrumBehaviourConfiguration.HOLD_ELEMENT
             );
             UpdateInterval = configuration.GetElement<IntegerConfigurationElement>(
                 SpectrumBehaviourConfiguration.SECTION,
@@ -107,15 +118,13 @@ namespace FoxTunes
 
             const int FACTOR = 4;
 
-            const int UPDATE_INTERVAL = 100;
-
-            const int HOLD_INTERVAL = 10;
+            const int ROLLOFF_INTERVAL = 500;
 
             public static readonly int SampleCount = 512;
 
             public static readonly int HighCutOff = 128;
 
-            public static readonly float[] Buffer = new float[SampleCount];
+            public float[] Buffer = new float[SampleCount];
 
             public int[] Dimentions = new int[2];
 
@@ -133,39 +142,31 @@ namespace FoxTunes
 
             public float Weight;
 
-            public int Iteration;
+            public DateTime LastUpdated;
 
             public bool HasData = false;
 
             public Renderer()
             {
                 this.SnapsToDevicePixels = true;
-                if (BarCount != null)
+                this.LastUpdated = DateTime.UtcNow;
+                BarCount.ConnectValue(value =>
                 {
-                    BarCount.ConnectValue(value =>
+                    this.ElementCount = SpectrumBehaviourConfiguration.GetBars(value);
+                    var task = Windows.Invoke(() => this.MinWidth = SpectrumBehaviourConfiguration.GetWidth(value));
+                    Configure();
+                });
+                HighCut.ConnectValue(value => Configure());
+                UpdateInterval.ConnectValue(value =>
+                {
+                    lock (SyncRoot)
                     {
-                        this.ElementCount = SpectrumBehaviourConfiguration.GetBars(value);
-                        var task = Windows.Invoke(() => this.MinWidth = SpectrumBehaviourConfiguration.GetWidth(value));
-                        Configure();
-                    });
-                }
-                if (HighCut != null)
-                {
-                    HighCut.ConnectValue(value => Configure());
-                }
-                if (UpdateInterval != null)
-                {
-                    UpdateInterval.ConnectValue(value =>
-                    {
-                        lock (SyncRoot)
+                        if (this.Timer != null)
                         {
-                            if (this.Timer != null)
-                            {
-                                this.Timer.Interval = value;
-                            }
+                            this.Timer.Interval = value;
                         }
-                    });
-                }
+                    }
+                });
             }
 
             public Timer Timer { get; private set; }
@@ -177,14 +178,7 @@ namespace FoxTunes
                     if (this.Timer == null)
                     {
                         this.Timer = new Timer();
-                        if (UpdateInterval != null)
-                        {
-                            this.Timer.Interval = UpdateInterval.Value;
-                        }
-                        else
-                        {
-                            this.Timer.Interval = UPDATE_INTERVAL;
-                        }
+                        this.Timer.Interval = UpdateInterval.Value;
                         this.Timer.AutoReset = false;
                         this.Timer.Elapsed += this.OnElapsed;
                         this.Timer.Start();
@@ -266,14 +260,33 @@ namespace FoxTunes
                     }
                     else
                     {
-                        this.Iteration++;
-                        var iterations = 10 / this.Timer.Interval;
-                        Update(this.ElementCount, this.SamplesPerElement, this.Weight, this.Step, this.Dimentions[1], this.Elements, this.Peaks, this.Holds);
-                        if (this.Iteration >= iterations)
+                        var now = DateTime.UtcNow;
+                        var duration = now - this.LastUpdated;
+                        var data = new SpectrumData()
                         {
-                            Update(this.ElementCount, this.Dimentions[1], this.Elements, this.Peaks, this.Holds);
-                            this.Iteration = 0;
+                            Samples = Buffer,
+                            ElementCount = this.ElementCount,
+                            SamplesPerElement = this.SamplesPerElement,
+                            Weight = this.Weight,
+                            Step = this.Step,
+                            Height = this.Dimentions[1],
+                            Elements = this.Elements,
+                            Peaks = this.Peaks,
+                            Holds = this.Holds,
+                            Duration = Convert.ToInt32(duration.TotalMilliseconds),
+                            HoldInterval = HoldInterval.Value,
+                            UpdateInterval = UpdateInterval.Value
+                        };
+                        if (Smooth == null || !Smooth.Value)
+                        {
+                            UpdateFast(data);
                         }
+                        else
+                        {
+                            UpdateSmooth(data);
+                        }
+                        UpdatePeaks(data);
+                        this.LastUpdated = DateTime.UtcNow;
                         this.HasData = true;
                     }
                     Windows.Invoke(() => this.InvalidateVisual());
@@ -301,17 +314,17 @@ namespace FoxTunes
                 this.Step = this.Dimentions[0] / ElementCount;
             }
 
-            private static void Update(int count, int samples, float weight, int step, int height, int[,] elements, int[,] peaks, int[] holds)
+            private static void UpdateFast(SpectrumData data)
             {
-                for (int a = 0, b = 0; a < count; a++)
+                for (int a = 0, b = 0; a < data.ElementCount; a++)
                 {
                     var sample = 0f;
-                    for (var c = 0; c < samples; b++, c++)
+                    for (var c = 0; c < data.SamplesPerElement; b++, c++)
                     {
-                        sample += Buffer[b];
+                        sample += data.Samples[b];
                     }
-                    sample /= samples;
-                    var factor = FACTOR + (a * weight);
+                    sample /= data.ElementCount;
+                    var factor = FACTOR + (a * data.Weight);
                     var value = Math.Sqrt(sample) * factor;
                     if (value > 1)
                     {
@@ -321,46 +334,105 @@ namespace FoxTunes
                     {
                         value = 0;
                     }
-                    elements[a, 0] = a * step;
-                    elements[a, 2] = step;
-                    elements[a, 3] = Convert.ToInt32(value * height);
-                    elements[a, 1] = height - elements[a, 3];
-                    if (elements[a, 1] < peaks[a, 1])
+                    var barHeight = Convert.ToInt32(value * data.Height);
+                    data.Elements[a, 0] = a * data.Step;
+                    data.Elements[a, 2] = data.Step;
+                    if (barHeight > 0)
                     {
-                        peaks[a, 0] = a * step;
-                        peaks[a, 2] = step;
-                        peaks[a, 3] = 1;
-                        peaks[a, 1] = elements[a, 1];
-                        holds[a] = HOLD_INTERVAL;
+                        data.Elements[a, 3] = Convert.ToInt32(value * data.Height);
+                    }
+                    else
+                    {
+                        data.Elements[a, 3] = 0;
+                    }
+                    data.Elements[a, 1] = data.Height - data.Elements[a, 3];
+                    if (data.Elements[a, 1] < data.Peaks[a, 1])
+                    {
+                        data.Peaks[a, 0] = a * data.Step;
+                        data.Peaks[a, 2] = data.Step;
+                        data.Peaks[a, 3] = 1;
+                        data.Peaks[a, 1] = data.Elements[a, 1];
+                        data.Holds[a] = data.HoldInterval;
                     }
                 }
             }
 
-            private static void Update(int count, int height, int[,] elements, int[,] peaks, int[] holds)
+            private static void UpdateSmooth(SpectrumData data)
             {
-                const int HOLD = 3;
-                var fast = height / 6;
-                for (int a = 0; a < count; a++)
+                var fast = data.Height / 8;
+                for (int a = 0, b = 0; a < data.ElementCount; a++)
                 {
-                    if (elements[a, 1] > peaks[a, 1] && peaks[a, 1] < height - 1)
+                    var sample = 0f;
+                    for (var c = 0; c < data.SamplesPerElement; b++, c++)
                     {
-                        if (holds[a] > 0)
+                        sample += data.Samples[b];
+                    }
+                    sample /= data.SamplesPerElement;
+                    var factor = FACTOR + (a * data.Weight);
+                    var value = Math.Sqrt(sample) * factor;
+                    if (value > 1)
+                    {
+                        value = 1;
+                    }
+                    else if (value < 0)
+                    {
+                        value = 0;
+                    }
+                    var barHeight = Convert.ToInt32(value * data.Height);
+                    data.Elements[a, 0] = a * data.Step;
+                    data.Elements[a, 2] = data.Step;
+                    if (barHeight > 0)
+                    {
+                        var barDifference = Convert.ToInt32((Math.Abs((float)data.Elements[a, 3] - barHeight) / barHeight) * fast);
+                        if (barHeight > data.Elements[a, 3])
                         {
-                            if (holds[a] < HOLD_INTERVAL - HOLD)
+                            data.Elements[a, 3] = Math.Min(data.Elements[a, 3] + barDifference, data.Height);
+                        }
+                        else if (barHeight < data.Elements[a, 3])
+                        {
+                            data.Elements[a, 3] = Math.Max(data.Elements[a, 3] - barDifference, 0);
+                        }
+                    }
+                    else
+                    {
+                        data.Elements[a, 3] = 0;
+                    }
+                    data.Elements[a, 1] = data.Height - data.Elements[a, 3];
+                    if (data.Elements[a, 1] < data.Peaks[a, 1])
+                    {
+                        data.Peaks[a, 0] = a * data.Step;
+                        data.Peaks[a, 2] = data.Step;
+                        data.Peaks[a, 3] = 1;
+                        data.Peaks[a, 1] = data.Elements[a, 1];
+                        data.Holds[a] = data.HoldInterval + ROLLOFF_INTERVAL;
+                    }
+                }
+            }
+
+            private static void UpdatePeaks(SpectrumData data)
+            {
+                var fast = data.Height / 4;
+                for (int a = 0; a < data.ElementCount; a++)
+                {
+                    if (data.Elements[a, 1] > data.Peaks[a, 1] && data.Peaks[a, 1] < data.Height - 1)
+                    {
+                        if (data.Holds[a] > 0)
+                        {
+                            if (data.Holds[a] < data.HoldInterval)
                             {
-                                var distance = 1 - (float)holds[a] / (HOLD_INTERVAL - HOLD);
+                                var distance = 1 - (float)data.Holds[a] / data.HoldInterval;
                                 var increment = distance * distance * distance;
-                                peaks[a, 1] += (int)Math.Round(fast * increment);
+                                data.Peaks[a, 1] += (int)Math.Round(fast * increment);
                             }
-                            holds[a]--;
+                            data.Holds[a] -= data.Duration;
                         }
-                        else if (peaks[a, 1] < height - fast)
+                        else if (data.Peaks[a, 1] < data.Height - fast)
                         {
-                            peaks[a, 1] += fast;
+                            data.Peaks[a, 1] += fast;
                         }
-                        else if (peaks[a, 1] < height - 1)
+                        else if (data.Peaks[a, 1] < data.Height - 1)
                         {
-                            peaks[a, 1]++;
+                            data.Peaks[a, 1] = data.Height - 1;
                         }
                     }
                 }
@@ -375,6 +447,33 @@ namespace FoxTunes
                     this.Timer.Dispose();
                     this.Timer = null;
                 }
+            }
+
+            private struct SpectrumData
+            {
+                public float[] Samples;
+
+                public int ElementCount;
+
+                public int SamplesPerElement;
+
+                public float Weight;
+
+                public int Step;
+
+                public int Height;
+
+                public int[,] Elements;
+
+                public int[,] Peaks;
+
+                public int[] Holds;
+
+                public int UpdateInterval;
+
+                public int HoldInterval;
+
+                public int Duration;
             }
         }
     }

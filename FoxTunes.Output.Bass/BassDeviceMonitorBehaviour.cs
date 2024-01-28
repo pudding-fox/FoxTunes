@@ -207,6 +207,10 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            if (this.Debouncer != null)
+            {
+                this.Debouncer.Dispose();
+            }
             if (this.Output != null)
             {
                 this.Output.Init -= this.OnInit;

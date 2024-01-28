@@ -102,6 +102,10 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
+            if (this.Debouncer != null)
+            {
+                this.Debouncer.Dispose();
+            }
             if (this.PlaybackManager != null)
             {
                 this.PlaybackManager.CurrentStreamChanged -= this.OnCurrentStreamChanged;

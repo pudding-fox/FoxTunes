@@ -110,6 +110,10 @@ namespace FoxTunes
 
             protected override void OnDisposing()
             {
+                if (this.Debouncer != null)
+                {
+                    this.Debouncer.Dispose();
+                }
                 if (this.TabControl != null)
                 {
                     this.TabControl.DragOver -= this.OnDragOver;
