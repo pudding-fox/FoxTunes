@@ -20,10 +20,21 @@ namespace FoxTunes
         {
             try
             {
-                using (var stream = File.OpenRead(fileName))
+                var source = new BitmapImage();
+                source.BeginInit();
+                source.CacheOption = BitmapCacheOption.OnLoad;
+                source.UriSource = new Uri(fileName);
+                if (decodePixelWidth != 0)
                 {
-                    return Load(stream, decodePixelWidth, decodePixelHeight);
+                    source.DecodePixelWidth = decodePixelWidth;
                 }
+                else if (decodePixelHeight != 0)
+                {
+                    source.DecodePixelHeight = decodePixelHeight;
+                }
+                source.EndInit();
+                source.Freeze();
+                return source;
             }
             catch (Exception e)
             {
