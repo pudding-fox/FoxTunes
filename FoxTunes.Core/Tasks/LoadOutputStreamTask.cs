@@ -1,4 +1,5 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -70,7 +71,7 @@ namespace FoxTunes
             if (outputStream == null)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to load play list item into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
-                return;
+                throw new InvalidOperationException(string.Format("Failed to load stream: {0}", this.PlaylistItem.FileName));
             }
             Logger.Write(this, LogLevel.Debug, "Play list item loaded into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
             await this.OutputStreamQueue.Enqueue(outputStream, this.Immediate);

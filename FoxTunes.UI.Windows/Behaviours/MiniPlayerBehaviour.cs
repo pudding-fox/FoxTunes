@@ -15,8 +15,6 @@ namespace FoxTunes
 
         public ICore Core { get; private set; }
 
-        public IUserInterface UserInterface { get; private set; }
-
         public IConfiguration Configuration { get; private set; }
 
         public BooleanConfigurationElement Enabled { get; private set; }
@@ -69,7 +67,6 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.UserInterface = core.Components.UserInterface;
             this.Configuration = core.Components.Configuration;
             this.Topmost = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
@@ -82,6 +79,7 @@ namespace FoxTunes
                     Windows.MiniWindow.Topmost = value;
                 }
             });
+           
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT

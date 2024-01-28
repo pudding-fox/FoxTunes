@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -42,6 +43,7 @@ namespace FoxTunes
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public static Window MainWindow
         {
             get
@@ -67,7 +69,7 @@ namespace FoxTunes
             {
                 return;
             }
-            MainWindowCreated(null, EventArgs.Empty);
+            MainWindowCreated(MainWindow, EventArgs.Empty);
         }
 
         public static event EventHandler MainWindowCreated = delegate { };
@@ -82,6 +84,7 @@ namespace FoxTunes
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public static Window MiniWindow
         {
             get
@@ -107,7 +110,7 @@ namespace FoxTunes
             {
                 return;
             }
-            MiniWindowCreated(null, EventArgs.Empty);
+            MiniWindowCreated(MiniWindow, EventArgs.Empty);
         }
 
         public static event EventHandler MiniWindowCreated = delegate { };

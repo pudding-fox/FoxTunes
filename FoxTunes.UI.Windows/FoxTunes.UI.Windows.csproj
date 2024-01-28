@@ -56,6 +56,7 @@
     <Compile Include="BackgroundTasks.xaml.cs">
       <DependentUpon>BackgroundTasks.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Behaviours\AeroGlassBehaviour.cs" />
     <Compile Include="Behaviours\LibraryActionsBehaviour.cs" />
     <Compile Include="Behaviours\MiniPlayerBehaviour.cs" />
     <Compile Include="Behaviours\MiniPlayerBehaviourConfiguration.cs" />
@@ -76,6 +77,9 @@
     <Compile Include="Extensions\TreeView_DragSource.cs" />
     <Compile Include="Extensions\TreeView_RightButtonSelect.cs" />
     <Compile Include="Extensions\TreeView_SelectedItem.cs" />
+    <Compile Include="GlassLabel.xaml.cs">
+      <DependentUpon>GlassLabel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Integration\Explorer.cs" />
     <Compile Include="LibraryTree.xaml.cs">
       <DependentUpon>LibraryTree.xaml</DependentUpon>
@@ -178,6 +182,7 @@
     <Compile Include="ViewModel\Converters\MultiConverter.cs" />
     <Compile Include="ViewModel\Converters\NegatingConverter.cs" />
     <Compile Include="ViewModel\Extensions.cs" />
+    <Compile Include="ViewModel\GlassLabel.cs" />
     <Compile Include="ViewModel\InvokeParameterizedCommandAction.cs" />
     <Compile Include="ViewModel\Library.cs" />
     <Compile Include="ViewModel\LibraryTree.cs" />
@@ -238,6 +243,10 @@
       <SubType>Designer</SubType>
     </None>
     <Page Include="Components.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GlassLabel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

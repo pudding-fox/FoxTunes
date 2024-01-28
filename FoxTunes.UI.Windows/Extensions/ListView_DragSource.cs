@@ -42,7 +42,6 @@ namespace FoxTunes
             else
             {
                 DragSourceBehaviours.TryRemove(listView);
-
             }
         }
 

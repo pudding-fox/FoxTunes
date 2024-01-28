@@ -27,16 +27,17 @@ namespace FoxTunes.ViewModel
                     {
                         if (this.PlaybackManager.CurrentStream == null)
                         {
-                            this.PlaylistManager.Next();
+                            return this.PlaylistManager.Next();
                         }
                         else if (this.PlaybackManager.CurrentStream.IsPaused)
                         {
-                            this.PlaybackManager.CurrentStream.Resume();
+                            return this.PlaybackManager.CurrentStream.Resume();
                         }
                         else if (this.PlaybackManager.CurrentStream.IsStopped)
                         {
-                            this.PlaybackManager.CurrentStream.Play();
+                            return this.PlaybackManager.CurrentStream.Play();
                         }
+                        return Task.CompletedTask;
                     },
                     () =>
                     {
@@ -67,12 +68,13 @@ namespace FoxTunes.ViewModel
                     {
                         if (this.PlaybackManager.CurrentStream.IsPaused)
                         {
-                            this.PlaybackManager.CurrentStream.Resume();
+                            return this.PlaybackManager.CurrentStream.Resume();
                         }
                         else if (this.PlaybackManager.CurrentStream.IsPlaying)
                         {
-                            this.PlaybackManager.CurrentStream.Pause();
+                            return this.PlaybackManager.CurrentStream.Pause();
                         }
+                        return Task.CompletedTask;
                     },
                     () =>
                     {

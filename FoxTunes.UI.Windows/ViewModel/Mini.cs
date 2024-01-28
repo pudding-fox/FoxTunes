@@ -169,6 +169,32 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ScalingFactorChanged = delegate { };
 
+        private BooleanConfigurationElement _ExtendGlass { get; set; }
+
+        public BooleanConfigurationElement ExtendGlass
+        {
+            get
+            {
+                return this._ExtendGlass;
+            }
+            set
+            {
+                this._ExtendGlass = value;
+                this.OnExtendGlassChanged();
+            }
+        }
+
+        protected virtual void OnExtendGlassChanged()
+        {
+            if (this.ExtendGlassChanged != null)
+            {
+                this.ExtendGlassChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("ExtendGlass");
+        }
+
+        public event EventHandler ExtendGlassChanged = delegate { };
+
         public ICommand DragEnterCommand
         {
             get
@@ -258,6 +284,10 @@ namespace FoxTunes.ViewModel
             this.ScalingFactor = this.Configuration.GetElement<TextConfigurationElement>(
               WindowsUserInterfaceConfiguration.SECTION,
               WindowsUserInterfaceConfiguration.UI_SCALING_ELEMENT
+            );
+            this.ExtendGlass = this.Configuration.GetElement<BooleanConfigurationElement>(
+              MiniPlayerBehaviourConfiguration.SECTION,
+              MiniPlayerBehaviourConfiguration.EXTEND_GLASS_ELEMENT
             );
             base.InitializeComponent(core);
         }

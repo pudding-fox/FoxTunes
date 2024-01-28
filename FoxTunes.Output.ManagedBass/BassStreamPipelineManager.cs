@@ -28,6 +28,10 @@ namespace FoxTunes
 
         public async Task WithPipelineExclusive(Action<IBassStreamPipeline> action)
         {
+            if (this.Semaphore == null)
+            {
+                return;
+            }
             if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
@@ -49,6 +53,10 @@ namespace FoxTunes
 
         public async Task<T> WithPipelineExclusive<T>(Func<IBassStreamPipeline, T> func)
         {
+            if (this.Semaphore == null)
+            {
+                return default(T);
+            }
             if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
@@ -70,6 +78,10 @@ namespace FoxTunes
 
         public async Task WithPipelineExclusive(BassOutputStream stream, Action<IBassStreamPipeline> action)
         {
+            if (this.Semaphore == null)
+            {
+                return;
+            }
             if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
@@ -102,6 +114,10 @@ namespace FoxTunes
 
         protected virtual async Task CreatePipeline(BassOutputStream stream)
         {
+            if (this.Semaphore == null)
+            {
+                return;
+            }
             if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
@@ -125,6 +141,10 @@ namespace FoxTunes
 
         public async Task FreePipeline()
         {
+            if (this.Semaphore == null)
+            {
+                return;
+            }
             if (!await this.Semaphore.WaitAsync(SYNCHRONIZE_PIPELINE_TIMEOUT))
             {
                 throw new InvalidOperationException(string.Format("{0} is already locked.", this.GetType().Name));
@@ -174,6 +194,7 @@ namespace FoxTunes
             if (this.Semaphore != null)
             {
                 this.Semaphore.Dispose();
+                this.Semaphore = null;
             }
         }
 
