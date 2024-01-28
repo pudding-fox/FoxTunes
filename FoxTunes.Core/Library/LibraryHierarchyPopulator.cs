@@ -18,7 +18,11 @@ namespace FoxTunes
         {
             this.Database = database;
             this.Transaction = transaction;
+#if NET40
+            this.Contexts = new TrackingThreadLocal<IScriptingContext>();
+#else
             this.Contexts = new ThreadLocal<IScriptingContext>(true);
+#endif
             this.Writer = new LibraryHierarchyWriter(this.Database, this.Transaction);
         }
 
@@ -28,7 +32,11 @@ namespace FoxTunes
 
         public IScriptingRuntime ScriptingRuntime { get; private set; }
 
+#if NET40
+        private TrackingThreadLocal<IScriptingContext> Contexts { get; set; }
+#else
         private ThreadLocal<IScriptingContext> Contexts { get; set; }
+#endif
 
         private LibraryHierarchyWriter Writer { get; set; }
 

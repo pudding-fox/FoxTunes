@@ -10,7 +10,11 @@ namespace FoxTunes
         [Test]
         public void BackgroundTaskRespectsConcurrency()
         {
+#if NET40
+            var tasks = Enumerable.Range(0, 1024).Select(index => TaskEx.Run(async () =>
+#else
             var tasks = Enumerable.Range(0, 1024).Select(index => Task.Run(async () =>
+#endif
             {
                 using (var task = new Task001())
                 {
@@ -35,7 +39,11 @@ namespace FoxTunes
             protected override Task OnRun()
             {
                 Counter++;
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return Task.CompletedTask;
+#endif
             }
         }
     }

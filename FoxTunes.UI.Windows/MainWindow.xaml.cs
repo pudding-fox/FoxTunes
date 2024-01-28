@@ -1,6 +1,12 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 
+#if NET40
+using Microsoft.Windows.Shell;
+#else
+using System.Windows.Shell;
+#endif
+
 namespace FoxTunes
 {
     /// <summary>
@@ -10,6 +16,11 @@ namespace FoxTunes
     {
         public MainWindow()
         {
+            this.SetValue(WindowChrome.WindowChromeProperty, new WindowChrome()
+            {
+                CaptionHeight = 30,
+                ResizeBorderThickness = new Thickness(5)
+            });
             if (!global::FoxTunes.Properties.Settings.Default.MainWindowBounds.IsEmpty())
             {
                 this.Left = global::FoxTunes.Properties.Settings.Default.MainWindowBounds.Left;

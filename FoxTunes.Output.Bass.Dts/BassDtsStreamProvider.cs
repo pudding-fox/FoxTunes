@@ -40,7 +40,11 @@ namespace FoxTunes
             {
                 Logger.Write(this, LogLevel.Warn, "This provider cannot play from memory.");
             }
+#if NET40
+            return TaskEx.FromResult(BassDts.CreateStream(playlistItem.FileName, 0, 0, flags));
+#else
             return Task.FromResult(BassDts.CreateStream(playlistItem.FileName, 0, 0, flags));
+#endif
         }
     }
 }

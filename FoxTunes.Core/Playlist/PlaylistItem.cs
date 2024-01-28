@@ -38,7 +38,11 @@ namespace FoxTunes
 
         public Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName)
         {
+#if NET40
+            return TaskEx.FromResult<IEnumerable<MetaDataItem>>(this.MetaDatas);
+#else
             return Task.FromResult<IEnumerable<MetaDataItem>>(this.MetaDatas);
+#endif
         }
 
         public override bool Equals(IPersistableComponent other)

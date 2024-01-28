@@ -18,6 +18,19 @@ namespace FoxTunes
             var tasks = new List<Task>(options.MaxDegreeOfParallelism);
             foreach (var element in sequence)
             {
+#if NET40
+                tasks.Add(TaskEx.Run(async () =>
+                {
+                    try
+                    {
+                        await factory(element);
+                    }
+                    catch (Exception e)
+                    {
+                        exceptions.Add(e);
+                    }
+                }));
+#else
                 tasks.Add(Task.Run(async () =>
                 {
                     try
@@ -29,6 +42,7 @@ namespace FoxTunes
                         exceptions.Add(e);
                     }
                 }));
+#endif
                 if (exceptions.Count > 0)
                 {
                     break;
@@ -39,11 +53,19 @@ namespace FoxTunes
                 }
                 if (tasks.Count == tasks.Capacity)
                 {
+#if NET40
+                    await TaskEx.WhenAny(tasks);
+#else
                     await Task.WhenAny(tasks);
+#endif
                     tasks.RemoveAll(task => task.IsCompleted);
                 }
             }
+#if NET40
+            await TaskEx.WhenAll(tasks);
+#else
             await Task.WhenAll(tasks);
+#endif
             if (exceptions.Any())
             {
                 throw new AggregateException(exceptions);

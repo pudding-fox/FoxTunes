@@ -48,7 +48,11 @@ namespace FoxTunes
 
             protected override async Task OnRun()
             {
-                await Task.Delay(1000);
+#if NET40
+                await TaskEx.Delay(100);
+#else
+                await Task.Delay(100);
+#endif
                 this.CompletedA = true;
             }
         }

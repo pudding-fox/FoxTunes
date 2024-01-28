@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 
 namespace FoxTunes
@@ -16,11 +17,11 @@ namespace FoxTunes
 
         public ResourceDictionary ResourceDictionary { get; private set; }
 
-        public override string ArtworkPlaceholder
+        public override Stream ArtworkPlaceholder
         {
             get
             {
-                return string.Format("/{0};Component/Resources/ExpressionDark_Artwork.png", typeof(ExpressionDarkTheme).Assembly.GetName().Name);
+                return typeof(ExpressionDarkTheme).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Themes.Resources.ExpressionDark_Artwork.png");
             }
         }
 

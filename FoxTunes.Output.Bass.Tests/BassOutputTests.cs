@@ -85,7 +85,11 @@ namespace FoxTunes.Output.Bass.Tests
             await outputStream.Play();
             for (var a = 0; a <= 15; a++)
             {
+#if NET40
+                await TaskEx.Delay(1000);
+#else
                 await Task.Delay(1000);
+#endif
                 if (outputStream.Position == outputStream.Length)
                 {
                     break;
@@ -102,14 +106,26 @@ namespace FoxTunes.Output.Bass.Tests
         {
             var outputStream = await this.Core.Components.Output.Load(TestInfo.PlaylistItems[0], false);
             await outputStream.Play();
+#if NET40
+            await TaskEx.Delay(1000);
+#else
             await Task.Delay(1000);
+#endif
             Assert.IsTrue(outputStream.Position > 0);
             await outputStream.Pause();
             var position = outputStream.Position;
+#if NET40
+            await TaskEx.Delay(1000);
+#else
             await Task.Delay(1000);
+#endif
             Assert.AreEqual(position, outputStream.Position);
             await outputStream.Resume();
+#if NET40
+            await TaskEx.Delay(1000);
+#else
             await Task.Delay(1000);
+#endif
             Assert.IsTrue(outputStream.Position > position);
         }
 
@@ -121,10 +137,18 @@ namespace FoxTunes.Output.Bass.Tests
             var half = outputStream.Length / 2;
             outputStream.Position = quarter;
             await outputStream.Play();
+#if NET40
+            await TaskEx.Delay(1000);
+#else
             await Task.Delay(1000);
+#endif
             Assert.IsTrue(outputStream.Position > quarter);
             outputStream.Position = half;
+#if NET40
+            await TaskEx.Delay(1000);
+#else
             await Task.Delay(1000);
+#endif
             Assert.IsTrue(outputStream.Position > half);
         }
 
@@ -139,7 +163,11 @@ namespace FoxTunes.Output.Bass.Tests
             await outputStreams[0].Play();
             await this.Core.Components.Output.Preempt(outputStreams[1]);
             outputStreams[0].Position = outputStreams[0].Length - 1000;
+#if NET40
+            await TaskEx.Delay(1000);
+#else
             await Task.Delay(1000);
+#endif
             Assert.AreEqual(outputStreams[0].Length, outputStreams[0].Position);
             Assert.IsTrue(outputStreams[1].Position > 0);
         }

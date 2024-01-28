@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             xmlns:Shell="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              mc:Ignorable="d" d:DesignHeight="30" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" Focusable="False" MouseDown="OnMouseDown">
     <UserControl.Resources>
         <ViewModel:Titlebar x:Key="ViewModel"></ViewModel:Titlebar>
@@ -16,7 +15,6 @@
             <Setter Property="Margin" Value="0,0,0,5"></Setter>
             <Setter Property="FontFamily" Value="Marlett"></Setter>
             <Setter Property="FontSize" Value="12"></Setter>
-            <Setter Property="Shell:WindowChrome.IsHitTestVisibleInChrome" Value="True"></Setter>
             <!-- System -->
             <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
@@ -59,14 +57,10 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Rectangle Grid.Column="0" Margin="3,3,10,3" Width="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource Self}}">
-            <Rectangle.Fill>
-                <ImageBrush ImageSource="pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico"></ImageBrush>
-            </Rectangle.Fill>
-        </Rectangle>
-        <TextBlock Grid.Column="1" Text="{Binding Title, Source={StaticResource ViewModel}}" VerticalAlignment="Center"></TextBlock>
-        <Button Grid.Column="2" Command="{Binding MinimizeCommand, Mode=OneWay, Source={StaticResource ViewModel}}">&#x30;</Button>
-        <Button Grid.Column="3" Command="{Binding MaximizeRestoreCommand, Mode=OneWay, Source={StaticResource ViewModel}}">
+        <Rectangle Grid.Column="0" Margin="3,3,10,3" Width="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource Self}}" Fill="{Binding Icon, Mode=OneWay, Source={StaticResource ViewModel}}"></Rectangle>
+        <TextBlock Grid.Column="1" Text="{Binding Title, Source={StaticResource ViewModel}}" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"></TextBlock>
+        <Button Name="Minimize" Grid.Column="2" Command="{Binding MinimizeCommand, Mode=OneWay, Source={StaticResource ViewModel}}">&#x30;</Button>
+        <Button Name="MaximizeRestore" Grid.Column="3" Command="{Binding MaximizeRestoreCommand, Mode=OneWay, Source={StaticResource ViewModel}}">
             <Button.Style>
                 <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
                     <Setter Property="Content" Value="&#x31;"></Setter>
@@ -78,6 +72,6 @@
                 </Style>
             </Button.Style>
         </Button>
-        <Button Grid.Column="4" Command="{Binding CloseCommand, Mode=OneWay, Source={StaticResource ViewModel}}">&#x72;</Button>
+        <Button Name="Close" Grid.Column="4" Command="{Binding CloseCommand, Mode=OneWay, Source={StaticResource ViewModel}}">&#x72;</Button>
     </Grid>
 </UserControl>

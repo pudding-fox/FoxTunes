@@ -21,12 +21,20 @@ namespace FoxTunes
             if (!BassCdStreamProvider.ParseUrl(fileName, out drive, out track))
             {
                 //TODO: Warn.
+#if NET40
+                return TaskEx.FromResult(Enumerable.Empty<MetaDataItem>());
+#else
                 return Task.FromResult(Enumerable.Empty<MetaDataItem>());
+#endif
             }
             var metaData = new List<MetaDataItem>();
             metaData.AddRange(this.Strategy.GetMetaDatas(track));
             metaData.AddRange(this.Strategy.GetProperties(track));
+#if NET40
+            return TaskEx.FromResult<IEnumerable<MetaDataItem>>(metaData);
+#else
             return Task.FromResult<IEnumerable<MetaDataItem>>(metaData);
+#endif
         }
     }
 }

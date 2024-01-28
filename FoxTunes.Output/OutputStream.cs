@@ -94,7 +94,11 @@ namespace FoxTunes
         {
             if (this.Stopping == null)
             {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return Task.CompletedTask;
+#endif
             }
             var e = new AsyncEventArgs();
             this.Stopping(this, e);
@@ -107,7 +111,11 @@ namespace FoxTunes
         {
             if (this.Stopped == null)
             {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return Task.CompletedTask;
+#endif
             }
             var e = new StoppedEventArgs(manual);
             this.Stopped(this, e);
@@ -120,7 +128,11 @@ namespace FoxTunes
         {
             if (!this.IsPlaying)
             {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return Task.CompletedTask;
+#endif
             }
             return this.Stop();
         }
@@ -129,7 +141,11 @@ namespace FoxTunes
         {
             if (!this.IsStopped)
             {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return Task.CompletedTask;
+#endif
             }
             return this.Play();
         }
@@ -137,7 +153,11 @@ namespace FoxTunes
         protected virtual async Task EmitState()
         {
             //It takes a moment for the stream to start playing or whatever.
+#if NET40
+            await TaskEx.Delay(100);
+#else
             await Task.Delay(100);
+#endif
             await this.OnIsPlayingChanged();
             await this.OnIsPausedChanged();
             await this.OnIsStoppedChanged();

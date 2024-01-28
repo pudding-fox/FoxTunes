@@ -1,228 +1,42 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{62CD8F70-8415-4C15-B672-CB18475ABD7E}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FoxTunes</RootNamespace>
+    <TargetFrameworks>net40;net461</TargetFrameworks>
     <AssemblyName>FoxTunes.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <OutputPath>..\distribution\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\distribution\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <OutputPath>..\distribution\Release\</OutputPath>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="FoxDb.Core">
+    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\FoxDb.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\FoxDb.Linq.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net461'">
       <HintPath>..\lib\FoxDb.Core.dll</HintPath>
     </Reference>
-    <Reference Include="FoxDb.Linq, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net461'">
       <HintPath>..\lib\FoxDb.Linq.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="ArtworkProvider.cs" />
-    <Compile Include="AssemblyRegistry.cs" />
-    <Compile Include="AssemblyResolver.cs" />
-    <Compile Include="AsyncEventArgs.cs" />
-    <Compile Include="Behaviours\BuildHierarchiesBehaviour.cs" />
-    <Compile Include="Behaviours\EnqueueNextItemBehaviour.cs" />
-    <Compile Include="Behaviours\PreemptNextItemBehaviour.cs" />
-    <Compile Include="Configuration\BooleanConfigurationElement.cs" />
-    <Compile Include="Configuration\ComponentResolver.cs" />
-    <Compile Include="Configuration\TextConfigurationElement.cs" />
-    <Compile Include="Configuration\ValidationRule.cs" />
-    <Compile Include="CoreValidator.cs" />
-    <Compile Include="Deferral.cs" />
-    <Compile Include="Interfaces\Configuration\IComponentResolver.cs" />
-    <Compile Include="Interfaces\Configuration\IFileAssociation.cs" />
-    <Compile Include="Interfaces\Configuration\IFileAssociations.cs" />
-    <Compile Include="Interfaces\Database\IDatabaseFactory.cs" />
-    <Compile Include="Interfaces\Factories\IMessageSinkFactory.cs" />
-    <Compile Include="Interfaces\IArtworkProvider.cs" />
-    <Compile Include="Interfaces\ISelectable.cs" />
-    <Compile Include="Interfaces\IExpandable.cs" />
-    <Compile Include="Interfaces\IInvocableComponent.cs" />
-    <Compile Include="Interfaces\IInvocationComponent.cs" />
-    <Compile Include="Interfaces\Database\IDatabaseComponent.cs" />
-    <Compile Include="Interfaces\Database\IDatabaseQueries.cs" />
-    <Compile Include="Interfaces\Database\IDatabaseTables.cs" />
-    <Compile Include="Interfaces\ICoreValidator.cs" />
-    <Compile Include="Interfaces\IFileData.cs" />
-    <Compile Include="Interfaces\IMessageSink.cs" />
-    <Compile Include="Interfaces\INotifyIcon.cs" />
-    <Compile Include="Interfaces\IReportsProgress.cs" />
-    <Compile Include="Interfaces\ISequenceableComponent.cs" />
-    <Compile Include="Interfaces\Library\ILibraryHierarchyBrowser.cs" />
-    <Compile Include="Interfaces\Logging\ILogger.cs" />
-    <Compile Include="Interfaces\Managers\IHierarchyManager.cs" />
-    <Compile Include="Interfaces\Managers\IInputManager.cs" />
-    <Compile Include="Interfaces\Output\IOutputStreamQueue.cs" />
-    <Compile Include="Interfaces\Scripting\ICoreScripts.cs" />
-    <Compile Include="Interfaces\Signal\ISignal.cs" />
-    <Compile Include="InvocationComponent.cs" />
-    <Compile Include="Library\LibraryHierarchy.cs" />
-    <Compile Include="Library\LibraryHierarchyBrowser.cs" />
-    <Compile Include="Library\LibraryHierarchyLevel.cs" />
-    <Compile Include="Library\LibraryHierarchyNode.cs" />
-    <Compile Include="Library\LibraryHierarchyWriter.cs" />
-    <Compile Include="Library\LibraryPopulator.cs" />
-    <Compile Include="Library\LibraryWriter.cs" />
-    <Compile Include="LogManager.cs" />
-    <Compile Include="Managers\HierarchyManager.cs" />
-    <Compile Include="Managers\InputManager.cs" />
-    <Compile Include="Managers\InputManagerConfiguration.cs" />
-    <Compile Include="Managers\PlaylistManager.cs" />
-    <Compile Include="MessageSink.cs" />
-    <Compile Include="MessageSinkFactory.cs" />
-    <Compile Include="MetaData\CommonImageTypes.cs" />
-    <Compile Include="MetaData\CustomMetaData.cs" />
-    <Compile Include="MetaData\Extensions.cs" />
-    <Compile Include="MetaData\FileMetaDataStore.cs" />
-    <Compile Include="MetaData\MetaDataInfo.cs" />
-    <Compile Include="MetaData\MetaDataWriter.cs" />
-    <Compile Include="NotifyIcon.cs" />
-    <Compile Include="NotifyIconConfiguration.cs" />
-    <Compile Include="Tasks\ClearLibraryHierarchiesTask.cs" />
-    <Compile Include="Tasks\MovePlaylistItemsTask.cs" />
-    <Compile Include="Tasks\RescanLibraryTask.cs" />
-    <Compile Include="Utilities\AsyncParallel.cs" />
-    <Compile Include="Utilities\CancellationToken.cs" />
-    <Compile Include="Utilities\NetworkDrive.cs" />
-    <Compile Include="Utilities\PendingQueue.cs" />
-    <Compile Include="Playlist\PlaylistColumn.cs" />
-    <Compile Include="Interfaces\Signal\ISignalEmitter.cs" />
-    <Compile Include="Playlist\PlaylistSequenceWriter.cs" />
-    <Compile Include="Playlist\PlaylistWriter.cs" />
-    <Compile Include="Scripting\ScriptingException.cs" />
-    <Compile Include="Signal\CommonSignals.cs" />
-    <Compile Include="Signal\Signal.cs" />
-    <Compile Include="Signal\SignalEmitter.cs" />
-    <Compile Include="Tasks\AddPathsToLibraryTask.cs" />
-    <Compile Include="Tasks\BackgroundTask.cs" />
-    <Compile Include="BaseBehaviour.cs" />
-    <Compile Include="BaseComponent.cs" />
-    <Compile Include="BaseFactory.cs" />
-    <Compile Include="BaseLoader.cs" />
-    <Compile Include="BaseManager.cs" />
-    <Compile Include="Interfaces\IBackgroundTask.cs" />
-    <Compile Include="Interfaces\IBackgroundTaskSource.cs" />
-    <Compile Include="Interfaces\Managers\ILibraryManager.cs" />
-    <Compile Include="Library\LibraryItem.cs" />
-    <Compile Include="ComponentAttribute.cs" />
-    <Compile Include="ComponentSlots.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="FactoryLoader.cs" />
-    <Compile Include="Interfaces\Configuration\IConfigurableComponent.cs" />
-    <Compile Include="Configuration\ConfigurationElement.cs" />
-    <Compile Include="Configuration\ConfigurationSection.cs" />
-    <Compile Include="Configuration\SelectionConfigurationElement.cs" />
-    <Compile Include="Configuration\SelectionConfigurationOption.cs" />
-    <Compile Include="Interfaces\Factories\IMetaDataSourceFactory.cs" />
-    <Compile Include="Interfaces\IBaseFactory.cs" />
-    <Compile Include="Interfaces\IBaseLoader.cs" />
-    <Compile Include="Interfaces\INamedValue.cs" />
-    <Compile Include="Interfaces\IPersistableComponent.cs" />
-    <Compile Include="Interfaces\IStandardFactories.cs" />
-    <Compile Include="Interfaces\IStandardFactory.cs" />
-    <Compile Include="Interfaces\MetaData\IMetaDataSource.cs" />
-    <Compile Include="Interfaces\Scripting\IScriptingContext.cs" />
-    <Compile Include="Interfaces\Scripting\IScriptingRuntime.cs" />
-    <Compile Include="ManagerLoader.cs" />
-    <Compile Include="BehaviourLoader.cs" />
-    <Compile Include="Behaviours\PlayNextItemBehaviour.cs" />
-    <Compile Include="ComponentRegistry.cs" />
-    <Compile Include="ComponentScanner.cs" />
-    <Compile Include="Core.cs" />
-    <Compile Include="ComponentActivator.cs" />
-    <Compile Include="ComponentLoader.cs" />
-    <Compile Include="Managers\LibraryManager.cs" />
-    <Compile Include="Managers\PlaybackManager.cs" />
-    <Compile Include="MetaData\CommonMetaData.cs" />
-    <Compile Include="MetaData\CommonProperties.cs" />
-    <Compile Include="MetaData\MetaDataItem.cs" />
-    <Compile Include="PersistableComponent.cs" />
-    <Compile Include="Playlist\PlaylistItem.cs" />
-    <Compile Include="StandardBehaviour.cs" />
-    <Compile Include="StandardComponent.cs" />
-    <Compile Include="StandardComponents.cs" />
-    <Compile Include="Interfaces\IAssemblyRegistry.cs" />
-    <Compile Include="Interfaces\IAssemblyResolver.cs" />
-    <Compile Include="Interfaces\IBaseBehaviour.cs" />
-    <Compile Include="Interfaces\IBaseComponent.cs" />
-    <Compile Include="Interfaces\IBaseManager.cs" />
-    <Compile Include="Interfaces\IComponentRegistry.cs" />
-    <Compile Include="Interfaces\IComponentScanner.cs" />
-    <Compile Include="Interfaces\Configuration\IConfiguration.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Interfaces\ICore.cs" />
-    <Compile Include="Interfaces\IObservable.cs" />
-    <Compile Include="Interfaces\IStandardBehaviour.cs" />
-    <Compile Include="Interfaces\IStandardComponents.cs" />
-    <Compile Include="Interfaces\IStandardManager.cs" />
-    <Compile Include="Interfaces\IStandardManagers.cs" />
-    <Compile Include="Interfaces\Managers\IPlaybackManager.cs" />
-    <Compile Include="Interfaces\Managers\IPlaylistManager.cs" />
-    <Compile Include="Interfaces\Output\IOutput.cs" />
-    <Compile Include="Interfaces\IComponentActivator.cs" />
-    <Compile Include="Interfaces\Output\IOutputStream.cs" />
-    <Compile Include="Interfaces\IStandardComponent.cs" />
-    <Compile Include="Interfaces\UserInterface\IUserInterface.cs" />
-    <Compile Include="StandardFactories.cs" />
-    <Compile Include="StandardFactory.cs" />
-    <Compile Include="StandardManager.cs" />
-    <Compile Include="StandardManagers.cs" />
-    <Compile Include="Tasks\AddLibraryHierarchyNodeToPlaylistTask.cs" />
-    <Compile Include="Tasks\AddPathsToPlaylistTask.cs" />
-    <Compile Include="Tasks\BuildLibraryHierarchiesTask.cs" />
-    <Compile Include="Tasks\ClearLibraryTask.cs" />
-    <Compile Include="Tasks\ClearPlaylistTask.cs" />
-    <Compile Include="Tasks\LibraryTaskBase.cs" />
-    <Compile Include="Tasks\RemoveItemsFromPlaylistTask.cs" />
-    <Compile Include="Tasks\UnloadOutputStreamTask.cs" />
-    <Compile Include="Library\LibraryHierarchyPopulator.cs" />
-    <Compile Include="MetaData\MetaDataPopulator.cs" />
-    <Compile Include="Tasks\PlaylistTaskBase.cs" />
-    <Compile Include="Tasks\LoadOutputStreamTask.cs" />
-    <Compile Include="Playlist\PlaylistPopulator.cs" />
-    <Compile Include="Playlist\PlaylistSequencePopulator.cs" />
-    <Compile Include="Utilities\PopulatorBase.cs" />
-    <Compile Include="Utilities\Metric.cs" />
-    <Compile Include="Playlist\PlaylistItemScriptRunner.cs" />
-    <Compile Include="Utilities\Shell.cs" />
-    <Compile Include="Utilities\SingletonReentrantTask.cs" />
-    <Compile Include="Utilities\TwoWayConcurrentDictionary.cs" />
+    <Folder Include="Properties\" />
   </ItemGroup>
+
   <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+    <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\Tasks\" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
+  <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
+
 </Project>

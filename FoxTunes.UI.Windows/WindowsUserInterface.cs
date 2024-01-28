@@ -5,7 +5,14 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Markup;
 using System.Windows.Threading;
+
+#if NET40
+[assembly: XmlnsDefinition("NET40", "System")]
+#else
+[assembly: XmlnsDefinition("NET45", "System")]
+#endif
 
 namespace FoxTunes
 {
@@ -102,7 +109,7 @@ namespace FoxTunes
                 var path = match.Value;
                 if ((File.Exists(path) && this.Output.IsSupported(path)) || Directory.Exists(path))
                 {
-                    this.Queue.Enqueue(path);
+                    var task = this.Queue.Enqueue(path);
                 }
             }
         }

@@ -227,11 +227,19 @@ namespace FoxTunes
         protected virtual void Start()
         {
             this.Reset();
+#if NET40
+            this.Dispatcher.BeginInvoke(new Func<Task>(async () =>
+            {
+                await TaskEx.Delay(this.Pause);
+                this.Timer.Start();
+            }));
+#else
             this.Dispatcher.InvokeAsync(async () =>
             {
                 await Task.Delay(this.Pause);
                 this.Timer.Start();
             });
+#endif
         }
 
         protected virtual void Stop()
@@ -258,11 +266,19 @@ namespace FoxTunes
             if (this.Timer.IsEnabled)
             {
                 this.Timer.Stop();
+#if NET40
+                this.Dispatcher.BeginInvoke(new Func<Task>(async () =>
+                {
+                    await TaskEx.Delay(this.Pause);
+                    this.Timer.Start();
+                }));
+#else
                 this.Dispatcher.InvokeAsync(async () =>
                 {
                     await Task.Delay(this.Pause);
                     this.Timer.Start();
                 });
+#endif
             }
             switch (this.Direction)
             {

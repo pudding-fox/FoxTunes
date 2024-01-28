@@ -92,10 +92,10 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type Windows:Main}">
+    <!--<Style TargetType="{x:Type Windows:Main}">
         <Setter Property="Background" Value="{DynamicResource NormalBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-    </Style>
+    </Style>-->
 
     <Style TargetType="{x:Type Button}" BasedOn="{x:Null}">
         <Setter Property="FocusVisualStyle" Value="{DynamicResource NuclearButtonFocusVisual}" />
@@ -2038,7 +2038,7 @@
                             </Border.Background>
                         </Border>
                         <Grid>
-                            <ContentPresenter x:Name="ContentSite" RecognizesAccessKey="True" ContentSource="Header" d:LayoutOverrides="Width, Height" HorizontalAlignment="Center" Margin="6,1,6,1" VerticalAlignment="Center" />
+                            <ContentPresenter x:Name="ContentSite" RecognizesAccessKey="True" ContentSource="Header" HorizontalAlignment="Center" Margin="6,1,6,1" VerticalAlignment="Center" />
                         </Grid>
                     </Grid>
                     <ControlTemplate.Triggers>

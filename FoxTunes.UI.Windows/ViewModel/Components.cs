@@ -101,7 +101,11 @@ namespace FoxTunes.ViewModel
         {
             if (!this.Enabled)
             {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
                 return Task.CompletedTask;
+#endif
             }
             return Windows.Invoke(() =>
             {

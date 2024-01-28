@@ -32,7 +32,7 @@ namespace FoxTunes
 
         public static DependencyObject Get(DependencyObject source)
         {
-            return (DependencyObject)Property.GetValue(source);
+            return (DependencyObject)Property.GetValue(source, null);
         }
 
         public static void AddEventHandler(DependencyObject source, EventHandler handler)

@@ -46,7 +46,7 @@ namespace FoxTunes
             var sequence = type.GetCustomAttributesData();
             foreach (var element in sequence)
             {
-                if (!string.Equals(element.AttributeType.FullName, typeof(T).FullName, StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(element.Constructor.DeclaringType.FullName, typeof(T).FullName, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }

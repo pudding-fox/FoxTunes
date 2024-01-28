@@ -49,7 +49,11 @@ namespace FoxTunes
                 {
                     break;
                 }
+#if NET40
+                await TaskEx.Delay(TimeSpan.FromSeconds(1));
+#else
                 await Task.Delay(TimeSpan.FromSeconds(1));
+#endif
             }
 
             foreach (var process in Process.GetProcessesByName("explorer"))

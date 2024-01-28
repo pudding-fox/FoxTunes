@@ -79,7 +79,7 @@ namespace FoxTunes
                     Windows.MiniWindow.Topmost = value;
                 }
             });
-           
+
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
                 MiniPlayerBehaviourConfiguration.ENABLED_ELEMENT
@@ -96,7 +96,11 @@ namespace FoxTunes
                 }
                 if (this.IsInitialized)
                 {
+#if NET40
+                    await TaskEx.Run(() => this.Configuration.Save());
+#else
                     await Task.Run(() => this.Configuration.Save());
+#endif
                 }
             });
             this.ShowArtwork = this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -144,15 +148,27 @@ namespace FoxTunes
             {
                 case SHOW_ARTWORK:
                     this.ShowArtwork.Toggle();
+#if NET40
+                    return TaskEx.Run(() => this.Configuration.Save());
+#else
                     return Task.Run(() => this.Configuration.Save());
+#endif
                 case SHOW_PLAYLIST:
                     this.ShowPlaylist.Toggle();
+#if NET40
+                    return TaskEx.Run(() => this.Configuration.Save());
+#else
                     return Task.Run(() => this.Configuration.Save());
+#endif
                 case QUIT:
                     Windows.Shutdown();
                     break;
             }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
             return Task.CompletedTask;
+#endif
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

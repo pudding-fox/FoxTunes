@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -12,6 +13,21 @@ namespace FoxTunes.ViewModel
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
+
+        public Icon Icon
+        {
+            get
+            {
+                using (var stream = typeof(Mini).Assembly.GetManifestResourceStream("FoxTunes.UI.Windows.Images.Fox.ico"))
+                {
+                    if (stream == null)
+                    {
+                        return null;
+                    }
+                    return new Icon(stream);
+                }
+            }
+        }
 
         private BooleanConfigurationElement _ShowArtwork { get; set; }
 
@@ -244,7 +260,11 @@ namespace FoxTunes.ViewModel
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to process clipboard contents: {0}", exception.Message);
             }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
             return Task.CompletedTask;
+#endif
         }
 
         private async Task AddToPlaylist(IEnumerable<string> paths)

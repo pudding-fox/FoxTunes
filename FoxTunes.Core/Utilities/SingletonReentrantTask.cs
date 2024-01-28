@@ -95,7 +95,11 @@ namespace FoxTunes
                 else
                 {
                     Logger.Write(this, LogLevel.Trace, "Retrying in {0}ms", this.Timeout);
+#if NET40
+                    await TaskEx.Delay(this.Timeout);
+#else
                     await Task.Delay(this.Timeout);
+#endif
                 }
             } while (true);
             Logger.Write(this, LogLevel.Trace, "Task was executed successfully.");
@@ -138,7 +142,11 @@ namespace FoxTunes
         {
             private SingletonReentrantTaskContainer()
             {
+#if NET40
+                this.Semaphore = new AsyncSemaphore(1);
+#else
                 this.Semaphore = new SemaphoreSlim(1, 1);
+#endif
                 this.CancellationToken = new CancellationToken();
             }
 
@@ -148,7 +156,11 @@ namespace FoxTunes
                 this.Instances = new HashSet<SingletonReentrantTask>(new[] { instance });
             }
 
+#if NET40
+            public AsyncSemaphore Semaphore { get; private set; }
+#else
             public SemaphoreSlim Semaphore { get; private set; }
+#endif
 
             public CancellationToken CancellationToken { get; private set; }
 

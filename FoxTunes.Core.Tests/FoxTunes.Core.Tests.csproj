@@ -1,96 +1,45 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C5C3BD3A-E2B7-4258-B705-704C502AF38B}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FoxTunes</RootNamespace>
+    <TargetFrameworks>net40;net461</TargetFrameworks>
     <AssemblyName>FoxTunes.Core.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <OutputPath>..\distribution\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\distribution\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="FoxDb.Core">
+    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\FoxDb.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\FoxDb.Linq.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="FoxDb.Core" Condition="'$(TargetFramework)' == 'net461'">
       <HintPath>..\lib\FoxDb.Core.dll</HintPath>
     </Reference>
-    <Reference Include="FoxDb.Linq">
+    <Reference Include="FoxDb.Linq" Condition="'$(TargetFramework)' == 'net461'">
       <HintPath>..\lib\FoxDb.Linq.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=3.9.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.9.0\lib\net45\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhino.Mocks, Version=3.6.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="BackgroundTaskTests.cs" />
-    <Compile Include="DatabaseTests.cs" />
-    <Compile Include="FileAssociationTests.cs" />
-    <Compile Include="LibraryTests.cs" />
-    <Compile Include="MetaDataTests.cs" />
-    <Compile Include="PendingQueueTests.cs" />
-    <Compile Include="PlaylistTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReentrantTaskTests.cs" />
-    <Compile Include="Tasks.cs" />
-    <Compile Include="TestBase.cs" />
-    <Compile Include="TestCore.cs" />
-    <Compile Include="TestInfo.cs" />
+    <Folder Include="Properties\" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="Audio\B.ogg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
+  
   <ItemGroup>
-    <ProjectReference Include="..\FoxTunes.Config\FoxTunes.Config.csproj">
-      <Project>{9660a7c2-d1f7-4d17-8087-5b82afeaa6d7}</Project>
-      <Name>FoxTunes.Config</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj">
-      <Project>{62cd8f70-8415-4c15-b672-cb18475abd7e}</Project>
-      <Name>FoxTunes.Core</Name>
-    </ProjectReference>
+    <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
   </ItemGroup>
+
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+    <PackageReference Include="NUnit" Version="3.9.0" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Audio\A.mp3">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Audio\C.mp3">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Audio\D.mp3">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
+  <Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
+
 </Project>

@@ -79,7 +79,7 @@ namespace FoxTunes
             this.WidthChanged(this, column);
         }
 
-        public event EventHandler<PlaylistColumn> WidthChanged = delegate { };
+        public event PlaylistColumnEventHandler WidthChanged = delegate { };
 
         protected virtual void OnPositionChanged(PlaylistColumn column)
         {
@@ -90,7 +90,7 @@ namespace FoxTunes
             this.PositionChanged(this, column);
         }
 
-        public event EventHandler<PlaylistColumn> PositionChanged = delegate { };
+        public event PlaylistColumnEventHandler PositionChanged = delegate { };
 
         public void Refresh(GridViewColumn column)
         {
@@ -155,4 +155,6 @@ namespace FoxTunes
             this.Dispose(true);
         }
     }
+
+    public delegate void PlaylistColumnEventHandler(object sender, PlaylistColumn playlistColumn);
 }

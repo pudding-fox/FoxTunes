@@ -10,7 +10,6 @@
         x:Class="FoxTunes.MiniWindow"
         mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" 
         Title="Fox Tunes" 
-        Icon="pack://application:,,,/FoxTunes.UI.Windows;component/Images/Fox.ico" 
         WindowStyle="None" 
         SizeToContent="WidthAndHeight"
         AllowsTransparency="True" 
@@ -28,7 +27,7 @@
             </Border.Effect>
             <Windows:Mini MouseDown="OnMouseDown"></Windows:Mini>
         </Border>
-        <Windows:NotifyIconElement ImageSource="Images/Fox.ico" IsEnabled="{Binding ShowNotifyIcon.Value, Source={StaticResource ViewModel}}">
+        <Windows:NotifyIconElement Icon="{Binding Icon, Source={StaticResource ViewModel}}"  IsEnabled="{Binding ShowNotifyIcon.Value, Source={StaticResource ViewModel}}">
             <Interactivity:Interaction.Triggers>
                 <Interactivity:EventTrigger EventName="MouseLeftButtonUp">
                     <ViewModel:InvokeParameterizedCommandAction Command="{Binding RestoreCommand, Source={StaticResource ViewModel}}" />
