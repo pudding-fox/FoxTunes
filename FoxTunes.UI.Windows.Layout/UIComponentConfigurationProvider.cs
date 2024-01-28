@@ -3,7 +3,6 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
 
 namespace FoxTunes
 {
@@ -204,7 +203,7 @@ namespace FoxTunes
 
         public void Reset()
         {
-            foreach (var pair in this.Sections)
+            foreach (var pair in this.Elements)
             {
                 pair.Value.Reset();
             }

@@ -20,6 +20,8 @@ namespace FoxTunes
 
         public SelectionConfigurationElement Mode { get; private set; }
 
+        public IntegerConfigurationElement Window { get; private set; }
+
         public IntegerConfigurationElement Duration { get; private set; }
 
         protected override void OnConfigurationChanged()
@@ -29,6 +31,10 @@ namespace FoxTunes
                 this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
                     OscilloscopeConfiguration.SECTION,
                     OscilloscopeConfiguration.MODE_ELEMENT
+                );
+                this.Window = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    OscilloscopeConfiguration.SECTION,
+                    OscilloscopeConfiguration.WINDOW_ELEMENT
                 );
                 this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
                     OscilloscopeConfiguration.SECTION,
@@ -56,6 +62,7 @@ namespace FoxTunes
                 this.Output,
                 width,
                 height,
+                OscilloscopeConfiguration.GetWindow(this.Window.Value),
                 OscilloscopeConfiguration.GetDuration(this.Duration.Value),
                 OscilloscopeConfiguration.GetMode(this.Mode.Value)
             );
@@ -508,13 +515,14 @@ namespace FoxTunes
             }
         }
 
-        public static OscilloscopeRendererData Create(IOutput output, int width, int height, TimeSpan duration, OscilloscopeRendererMode mode)
+        public static OscilloscopeRendererData Create(IOutput output, int width, int height, TimeSpan window, TimeSpan duration, OscilloscopeRendererMode mode)
         {
             var data = new OscilloscopeRendererData()
             {
                 Output = output,
                 Width = width,
                 Height = height,
+                Window = window,
                 Duration = duration,
                 Mode = mode
             };
@@ -558,6 +566,8 @@ namespace FoxTunes
             public Int32Point[,] Elements;
 
             public DateTime LastUpdated;
+
+            public TimeSpan Window;
 
             public TimeSpan Duration;
 
@@ -616,22 +626,20 @@ namespace FoxTunes
                 this.Channels = channels;
                 this.Format = format;
 
-                var interval = TimeSpan.FromMilliseconds(100);
-
                 switch (format)
                 {
                     case OutputStreamFormat.Short:
-                        this.Samples16 = this.Output.GetBuffer<short>(interval);
+                        this.Samples16 = this.Output.GetBuffer<short>(this.Window);
                         this.Samples32 = new float[this.Samples16.Length];
                         break;
                     case OutputStreamFormat.Float:
-                        this.Samples32 = this.Output.GetBuffer<float>(interval);
+                        this.Samples32 = this.Output.GetBuffer<float>(this.Window);
                         break;
                     default:
                         throw new NotImplementedException();
                 }
 
-                this.HistoryCapacity = Convert.ToInt32(this.Duration.TotalMilliseconds / interval.TotalMilliseconds);
+                this.HistoryCapacity = Math.Max(Convert.ToInt32(this.Duration.TotalMilliseconds / this.Window.TotalMilliseconds), 1);
 
                 //TODO: Only realloc if required.
                 switch (this.Mode)

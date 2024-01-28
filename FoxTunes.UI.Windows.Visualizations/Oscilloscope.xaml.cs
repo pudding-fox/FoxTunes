@@ -21,6 +21,8 @@ namespace FoxTunes
 
         public SelectionConfigurationElement Mode { get; private set; }
 
+        public IntegerConfigurationElement Window { get; private set; }
+
         public IntegerConfigurationElement Duration { get; private set; }
 
         public BooleanConfigurationElement DropShadow { get; private set; }
@@ -32,6 +34,10 @@ namespace FoxTunes
                 this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
                     OscilloscopeConfiguration.SECTION,
                     OscilloscopeConfiguration.MODE_ELEMENT
+                );
+                this.Window = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    OscilloscopeConfiguration.SECTION,
+                    OscilloscopeConfiguration.WINDOW_ELEMENT
                 );
                 this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
                     OscilloscopeConfiguration.SECTION,
@@ -67,14 +73,26 @@ namespace FoxTunes
                         attributes: this.Mode.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
-                for (var value = OscilloscopeConfiguration.DURATION_MIN; value <= OscilloscopeConfiguration.DURATION_MAX; value += 100)
+                for (var value = OscilloscopeConfiguration.WINDOW_MIN; value <= OscilloscopeConfiguration.WINDOW_MAX; value += 100)
+                {
+                    yield return new InvocationComponent(
+                        CATEGORY,
+                        this.Window.Id,
+                        string.Format("{0}ms", value),
+                        path: this.Window.Name,
+                        attributes: this.Window.Value == value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    );
+                }
+                var min = this.Window.Value * 2;
+                var duration = Math.Max(this.Duration.Value.ToNearestMultiple(this.Window.Value), min);
+                for (var value = min; value <= OscilloscopeConfiguration.DURATION_MAX; value += this.Window.Value)
                 {
                     yield return new InvocationComponent(
                         CATEGORY,
                         this.Duration.Id,
                         string.Format("{0}ms", value),
                         path: this.Duration.Name,
-                        attributes: this.Duration.Value == value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                        attributes: duration == value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
                 yield return new InvocationComponent(
@@ -95,6 +113,18 @@ namespace FoxTunes
             if (string.Equals(this.Mode.Name, component.Path))
             {
                 this.Mode.Value = this.Mode.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id));
+            }
+            else if (string.Equals(this.Window.Name, component.Path))
+            {
+                var value = default(int);
+                if (!string.IsNullOrEmpty(component.Name) && component.Name.Length > 2 && int.TryParse(component.Name.Substring(0, component.Name.Length - 2), out value))
+                {
+                    this.Window.Value = value;
+                }
+                else
+                {
+                    this.Window.Value = OscilloscopeConfiguration.WINDOW_DEFAULT;
+                }
             }
             else if (string.Equals(this.Duration.Name, component.Path))
             {

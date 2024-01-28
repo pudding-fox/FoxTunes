@@ -16,11 +16,19 @@ namespace FoxTunes
 
         public const string MODE_SEPERATE_OPTION = "CCCCD496-E88A-4B42-8A89-75FFB9A1CD49";
 
+        public const string WINDOW_ELEMENT = "AABBF71F-72AD-46F6-964F-A4D30539C87E";
+
+        public const int WINDOW_MIN = 100;
+
+        public const int WINDOW_MAX = 500;
+
+        public const int WINDOW_DEFAULT = 100;
+
         public const string DURATION_ELEMENT = "BBBBE8CC-88E9-4B66-B2FB-3577CD32D8C7";
 
         public const int DURATION_MIN = 100;
 
-        public const int DURATION_MAX = 800;
+        public const int DURATION_MAX = 2000;
 
         public const int DURATION_DEFAULT = 400;
 
@@ -30,6 +38,7 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.OscilloscopeConfiguration_Mode, path: Strings.OscilloscopeConfiguration_Path).WithOptions(GetModeOptions()))
+                .WithElement(new IntegerConfigurationElement(WINDOW_ELEMENT, Strings.OscilloscopeConfiguration_Window, path: Strings.OscilloscopeConfiguration_Path).WithValue(WINDOW_DEFAULT).WithValidationRule(new IntegerValidationRule(WINDOW_MIN, WINDOW_MAX, 10)))
                 .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.OscilloscopeConfiguration_Duration, path: Strings.OscilloscopeConfiguration_Path).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10)))
                 .WithElement(new BooleanConfigurationElement(DROP_SHADOW_ELEMENT, Strings.OscilloscopeConfiguration_DropShadow, path: Strings.OscilloscopeConfiguration_Path).WithValue(false)
             );
@@ -51,6 +60,11 @@ namespace FoxTunes
                 case MODE_SEPERATE_OPTION:
                     return OscilloscopeRendererMode.Seperate;
             }
+        }
+
+        public static TimeSpan GetWindow(int value)
+        {
+            return TimeSpan.FromMilliseconds(value);
         }
 
         public static TimeSpan GetDuration(int value)

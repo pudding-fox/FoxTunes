@@ -322,6 +322,11 @@ namespace FoxTunes
             return result;
         }
 
+        public static int ToNearestMultiple(this int value, int multiple)
+        {
+            return Math.Max(multiple * (value / multiple), multiple);
+        }
+
         public static bool TryAdd<TKey, TValue>(this IDictionary<TKey, TValue> sequence, TKey key, TValue value)
         {
             if (sequence.ContainsKey(key))

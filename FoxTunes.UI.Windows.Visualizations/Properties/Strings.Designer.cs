@@ -160,7 +160,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Duration.
+        ///   Looks up a localized string similar to Duration (ms).
         /// </summary>
         internal static string OscilloscopeConfiguration_Duration {
             get {
@@ -201,6 +201,15 @@ namespace FoxTunes {
         internal static string OscilloscopeConfiguration_Path {
             get {
                 return ResourceManager.GetString("OscilloscopeConfiguration.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Window (ms).
+        /// </summary>
+        internal static string OscilloscopeConfiguration_Window {
+            get {
+                return ResourceManager.GetString("OscilloscopeConfiguration.Window", resourceCulture);
             }
         }
         
