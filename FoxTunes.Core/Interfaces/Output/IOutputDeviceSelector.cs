@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -20,6 +21,8 @@ namespace FoxTunes.Interfaces
         event EventHandler DeviceChanged;
 
         void Refresh();
+
+        Task ShowSettings();
     }
 
     public class OutputDevice : BaseComponent, IEquatable<OutputDevice>

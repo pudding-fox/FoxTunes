@@ -83,6 +83,23 @@ namespace FoxTunes.ViewModel
             this.OutputDeviceManager.Refresh();
         }
 
+        public ICommand SettingsCommand
+        {
+            get
+            {
+                return CommandFactory.Instance.CreateCommand(this.Settings);
+            }
+        }
+
+        public void Settings()
+        {
+            if (this.Device == null)
+            {
+                return;
+            }
+            var task = this.Device.Selector.ShowSettings();
+        }
+
         protected override Freezable CreateInstanceCore()
         {
             return new OutputSelector();
