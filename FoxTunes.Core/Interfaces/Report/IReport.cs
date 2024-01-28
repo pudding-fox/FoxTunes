@@ -1,29 +1,31 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IReportComponent : IBaseComponent
+    public interface IReportComponent : IInvocableComponent
     {
         string Title { get; }
 
+        event EventHandler TitleChanged;
+
         string Description { get; }
+
+        event EventHandler DescriptionChanged;
 
         string[] Headers { get; }
 
+        event EventHandler HeadersChanged;
+
         IEnumerable<IReportComponentRow> Rows { get; }
 
-        string ActionName { get; }
-
-        Task<bool> Action();
+        event EventHandler RowsChanged;
     }
 
-    public interface IReportComponentRow : IBaseComponent
+    public interface IReportComponentRow : IInvocableComponent
     {
         string[] Values { get; }
 
-        string ActionName { get; }
-
-        Task<bool> Action();
+        event EventHandler ValuesChanged;
     }
 }

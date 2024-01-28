@@ -117,11 +117,25 @@ namespace FoxTunes
                 }
             }
 
-            public override Task<bool> Action()
+
+            public override IEnumerable<IInvocationComponent> Invocations
             {
-                var url = new Uri(new Uri("https://www.discogs.com"), this.ReleaseLookup.Release.Url).ToString();
-                this.Report.UserInterface.OpenInShell(url);
-                return base.Action();
+                get
+                {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_REPORT, ACTIVATE, attributes: InvocationComponent.ATTRIBUTE_SYSTEM);
+                }
+            }
+
+            public override Task InvokeAsync(IInvocationComponent component)
+            {
+                switch (component.Id)
+                {
+                    case ACTIVATE:
+                        var url = new Uri(new Uri("https://www.discogs.com"), this.ReleaseLookup.Release.Url).ToString();
+                        this.Report.UserInterface.OpenInShell(url);
+                        break;
+                }
+                return base.InvokeAsync(component);
             }
         }
     }

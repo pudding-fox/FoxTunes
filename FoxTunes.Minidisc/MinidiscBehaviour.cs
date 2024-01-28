@@ -120,8 +120,7 @@ namespace FoxTunes
                 this.UserInterface.Warn(Strings.MinidiscBehaviour_NoDisc);
                 return;
             }
-            var actions = new Actions(task.Device, task.Disc, task.Disc, Actions.None);
-            this.ConfirmActions(task.Device, actions);
+            this.Confirm(task.Device, task.Disc, task.Disc);
         }
 
         public async Task<bool> SetDiscTitle()
@@ -178,9 +177,9 @@ namespace FoxTunes
             }
         }
 
-        public async Task<bool> WriteDisc(IDevice device, IActions actions)
+        public async Task<bool> WriteDisc(IDevice device, IDisc currentDisc, IDisc updatedDisc)
         {
-            var percentUsed = actions.UpdatedDisc.GetCapacity().PercentUsed;
+            var percentUsed = updatedDisc.GetCapacity().PercentUsed;
             if (percentUsed > 100)
             {
                 Logger.Write(this, LogLevel.Warn, "The disc capactiy will be exceeded: {0}", percentUsed);
@@ -193,6 +192,10 @@ namespace FoxTunes
             {
                 return false;
             }
+            var toolManager = new ToolManager();
+            var formatManager = new FormatManager(toolManager);
+            var actionBuilder = new ActionBuilder(formatManager);
+            var actions = actionBuilder.GetActions(device, currentDisc, updatedDisc);
             using (var task = new WriteMinidiscTask(device, actions))
             {
                 task.InitializeComponent(this.Core);
@@ -227,6 +230,7 @@ namespace FoxTunes
             var device = task.Device;
             var currentDisc = task.Disc;
             var updatedDisc = currentDisc.Clone();
+            var errors = new List<Exception>();
             using (var scriptingContext = this.ScriptingRuntime.CreateContext())
             {
                 if (this.IsUntitled(updatedDisc))
@@ -248,16 +252,26 @@ namespace FoxTunes
                 }
                 foreach (var pair in fileNames)
                 {
-                    var track = updatedDisc.Tracks.Add(pair.Value, compression);
+                    var track = default(ITrack);
+                    try
+                    {
+                        track = updatedDisc.Tracks.Add(pair.Value, compression);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Write(this, LogLevel.Error, "Error adding track \"{0}\" to disc: {1}", pair.Value, e.Message);
+                        errors.Add(e);
+                        continue;
+                    }
                     track.Name = this.GetName(scriptingContext, pair.Key);
                     Logger.Write(this, LogLevel.Debug, "Adding track \"{0}\": Name: {1}, Compression: {2}", pair.Value, track.Name, Enum.GetName(typeof(Compression), compression));
                 }
             }
-            var toolManager = new ToolManager();
-            var formatManager = new FormatManager(toolManager);
-            var actionBuilder = new ActionBuilder(formatManager);
-            var actions = actionBuilder.GetActions(device, currentDisc, updatedDisc);
-            this.ConfirmActions(task.Device, actions);
+            if (errors.Any())
+            {
+                throw new AggregateException(errors);
+            }
+            this.Confirm(task.Device, currentDisc, updatedDisc);
         }
 
         protected virtual async Task<OpenMinidiscTask> OpenDisc()
@@ -271,9 +285,9 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void ConfirmActions(IDevice device, IActions actions)
+        protected virtual void Confirm(IDevice device, IDisc currentDisc, IDisc updatedDisc)
         {
-            var report = new MinidiscReport(this, device, actions);
+            var report = new MinidiscReport(this, device, currentDisc, updatedDisc);
             report.InitializeComponent(this.Core);
             this.ReportEmitter.Send(report);
         }

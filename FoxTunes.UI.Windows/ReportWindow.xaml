@@ -17,7 +17,7 @@
     </Window.Title>
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Width="70" Height="30" Margin="0,7,0,0" Windows:ButtonExtensions.Command="{Binding ActionCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Windows:ButtonExtensions.CommandBehaviour="{x:Static Windows:ButtonExtensions.COMMAND_BEHAVIOUR_DISMISS}" Content="{Binding ActionName, Mode=OneWay, Source={StaticResource ViewModel}}"/>
+            <Button Width="70" Height="30" Margin="0,7,0,0" Windows:ButtonExtensions.Command="{Binding AcceptCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Windows:ButtonExtensions.CommandBehaviour="{x:Static Windows:ButtonExtensions.COMMAND_BEHAVIOUR_DISMISS}" Content="{Binding AcceptText, Mode=OneWay, Source={StaticResource ViewModel}}"/>
         </StackPanel>
         <Windows:Report x:Name="Report"></Windows:Report>
     </DockPanel>

@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -190,10 +189,23 @@ namespace FoxTunes
                 }
             }
 
-            public override Task<bool> Action()
+            public override IEnumerable<IInvocationComponent> Invocations
             {
-                this.Report.FileSystemBrowser.Select(this.ScannerItem.FileName);
-                return base.Action();
+                get
+                {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_REPORT, ACTIVATE, attributes: InvocationComponent.ATTRIBUTE_SYSTEM);
+                }
+            }
+
+            public override Task InvokeAsync(IInvocationComponent component)
+            {
+                switch (component.Id)
+                {
+                    case ACTIVATE:
+                        this.Report.FileSystemBrowser.Select(this.ScannerItem.FileName);
+                        break;
+                }
+                return base.InvokeAsync(component);
             }
         }
     }

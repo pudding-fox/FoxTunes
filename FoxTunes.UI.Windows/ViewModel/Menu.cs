@@ -232,9 +232,18 @@ namespace FoxTunes.ViewModel
             var items = new List<MenuItem>();
             foreach (var component in this.Components)
             {
+                if (component == null)
+                {
+                    continue;
+                }
                 foreach (var invocation in component.Invocations)
                 {
                     if (!string.IsNullOrEmpty(this.Category) && !string.Equals(this.Category, invocation.Category, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    if ((invocation.Attributes & InvocationComponent.ATTRIBUTE_SYSTEM) == InvocationComponent.ATTRIBUTE_SYSTEM)
                     {
                         continue;
                     }
