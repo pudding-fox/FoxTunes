@@ -35,9 +35,9 @@ AS
 			WHEN "MetaDataItems"."FileValue" IS NOT NULL THEN "MetaDataItems"."FileValue"
 		END AS "Value"
 	FROM "PlaylistItems"
-		JOIN "PlaylistItem_MetaDataItem" 
+		LEFT OUTER JOIN "PlaylistItem_MetaDataItem" 
 			ON "PlaylistItems"."Id" = "PlaylistItem_MetaDataItem"."PlaylistItem_Id"
-		JOIN "MetaDataItems" 
+		LEFT OUTER JOIN "MetaDataItems" 
 			ON "MetaDataItems"."Id" = "PlaylistItem_MetaDataItem"."MetaDataItem_Id"
 	WHERE "PlaylistItems"."Status" = @status
 	ORDER BY "PlaylistItems"."Id"

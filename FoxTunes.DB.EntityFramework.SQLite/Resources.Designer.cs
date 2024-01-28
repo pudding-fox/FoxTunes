@@ -94,13 +94,16 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WITH &quot;OrderedLibraryItems&quot;
-        ///AS
-        ///(
-        ///	SELECT  &quot;LibraryItems&quot;.&quot;Id&quot;, &quot;LibraryItems&quot;.&quot;DirectoryName&quot;, &quot;LibraryItems&quot;.&quot;FileName&quot;, &quot;LibraryHierarchyItems&quot;.&quot;LibraryHierarchy_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;SortValue&quot;, &quot;LibraryHierarchyItems&quot;.&quot;DisplayValue&quot;
-        ///	FROM  &quot;LibraryItems&quot;
-        ///		JOIN &quot;LibraryHierarchyItem_LibraryItem&quot; ON &quot;LibraryItems&quot;.&quot;Id&quot; = &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryItem_Id&quot;
-        ///		JOIN &quot;LibraryHierarchyItems&quot; ON &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryHierarchyItem_Id&quot; = &quot;LibraryHierarchyItems&quot;. [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistItems&quot; (&quot;Sequence&quot;, &quot;DirectoryName&quot;, &quot;FileName&quot;, &quot;Status&quot;) 
+        ///SELECT @sequence, &quot;LibraryItems&quot;.&quot;DirectoryName&quot;, &quot;LibraryItems&quot;.&quot;FileName&quot;, @status
+        ///FROM &quot;LibraryHierarchyItems&quot;
+        ///	JOIN &quot;LibraryHierarchyItem_LibraryItem&quot; 
+        ///		ON &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryHierarchyItem_Id&quot;
+        ///	JOIN &quot;LibraryItems&quot;
+        ///		ON &quot;LibraryItems&quot;.&quot;Id&quot; = &quot;LibraryHierarchyItem_LibraryItem&quot;.&quot;LibraryItem_Id&quot;
+        ///WHERE &quot;LibraryHierarchyItems&quot;.&quot;Id&quot; = @libraryHierarchyItemId;
+        ///
+        ///SELECT [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AddLibraryHierarchyNodeToPlaylist {
             get {
@@ -161,7 +164,8 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to INSERT INTO &quot;PlaylistSort&quot; (&quot;PlaylistItem_Id&quot;, &quot;Value1&quot;, &quot;Value2&quot;, &quot;Value3&quot;, &quot;Value4&quot;, &quot;Value5&quot;, &quot;Value6&quot;, &quot;Value7&quot;, &quot;Value8&quot;, &quot;Value9&quot;, &quot;Value10&quot;)
+        ///VALUES (@playlistItemId, @value1, @value2, @value3, @value4, @value5, @value6, @value7, @value8, @value9, @value10);.
         /// </summary>
         internal static string AddPlaylistSequenceRecord {
             get {
@@ -314,26 +318,6 @@ namespace FoxTunes {
         internal static string ShiftPlaylistItems {
             get {
                 return ResourceManager.GetString("ShiftPlaylistItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] SQLite_Interop_x64 {
-            get {
-                object obj = ResourceManager.GetObject("SQLite_Interop_x64", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] SQLite_Interop_x86 {
-            get {
-                object obj = ResourceManager.GetObject("SQLite_Interop_x86", resourceCulture);
-                return ((byte[])(obj));
             }
         }
         

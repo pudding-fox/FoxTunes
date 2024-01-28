@@ -8,6 +8,8 @@ namespace FoxTunes.Interfaces
 
         Task<IOutputStream> Load(PlaylistItem playlistItem);
 
+        Task Preempt(IOutputStream stream);
+
         Task Unload(IOutputStream stream);
     }
 }

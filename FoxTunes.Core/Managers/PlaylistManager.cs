@@ -96,6 +96,33 @@ namespace FoxTunes.Managers
             }
         }
 
+        public PlaylistItem GetNext()
+        {
+            var sequence = default(int);
+            if (this.CurrentItem == null)
+            {
+                Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming first item.");
+                sequence = 0;
+            }
+            else
+            {
+                sequence = this.CurrentItem.Sequence;
+                Logger.Write(this, LogLevel.Debug, "Current playlist item is sequence: {0}", sequence);
+            }
+            var playlistItem = this.GetNextPlaylistItem(sequence);
+            if (playlistItem == null)
+            {
+                playlistItem = this.GetFirstPlaylistItem();
+                if (playlistItem == null)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Playlist was empty.");
+                    return default(PlaylistItem);
+                }
+                Logger.Write(this, LogLevel.Debug, "Sequence was too large, wrapping around to first item.");
+            }
+            return playlistItem;
+        }
+
         public async Task Next()
         {
             Logger.Write(this, LogLevel.Debug, "Navigating to next playlist item.");
@@ -107,27 +134,10 @@ namespace FoxTunes.Managers
             try
             {
                 this.IsNavigating = true; ;
-                var sequence = default(int);
-                if (this.CurrentItem == null)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming first item.");
-                    sequence = 0;
-                }
-                else
-                {
-                    sequence = this.CurrentItem.Sequence;
-                    Logger.Write(this, LogLevel.Debug, "Current playlist item is sequence: {0}", sequence);
-                }
-                var playlistItem = this.GetNextPlaylistItem(sequence);
+                var playlistItem = this.GetNext();
                 if (playlistItem == null)
                 {
-                    playlistItem = this.GetFirstPlaylistItem();
-                    if (playlistItem == null)
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Playlist was empty.");
-                        return;
-                    }
-                    Logger.Write(this, LogLevel.Debug, "Sequence was too large, wrapping around to first item.");
+                    return;
                 }
                 Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                 await this.Play(playlistItem);
@@ -136,6 +146,33 @@ namespace FoxTunes.Managers
             {
                 this.IsNavigating = false;
             }
+        }
+
+        public PlaylistItem GetPrevious()
+        {
+            var sequence = default(int);
+            if (this.CurrentItem == null)
+            {
+                Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming first item.");
+                sequence = 0;
+            }
+            else
+            {
+                sequence = this.CurrentItem.Sequence;
+                Logger.Write(this, LogLevel.Debug, "Previous playlist item is sequence: {0}", sequence);
+            }
+            var playlistItem = this.GetPreviousPlaylistItem(sequence);
+            if (playlistItem == null)
+            {
+                playlistItem = this.GetLastPlaylistItem();
+                if (playlistItem == null)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Playlist was empty.");
+                    return default(PlaylistItem);
+                }
+                Logger.Write(this, LogLevel.Debug, "Sequence was too small, wrapping around to last item.");
+            }
+            return playlistItem;
         }
 
         public async Task Previous()
@@ -149,28 +186,7 @@ namespace FoxTunes.Managers
             try
             {
                 this.IsNavigating = true;
-                var sequence = default(int);
-                if (this.CurrentItem == null)
-                {
-                    Logger.Write(this, LogLevel.Debug, "Current playlist item is empty, assuming first item.");
-                    sequence = 0;
-                }
-                else
-                {
-                    sequence = this.CurrentItem.Sequence;
-                    Logger.Write(this, LogLevel.Debug, "Previous playlist item is sequence: {0}", sequence);
-                }
-                var playlistItem = this.GetPreviousPlaylistItem(sequence);
-                if (playlistItem == null)
-                {
-                    playlistItem = this.GetLastPlaylistItem();
-                    if (playlistItem == null)
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Playlist was empty.");
-                        return;
-                    }
-                    Logger.Write(this, LogLevel.Debug, "Sequence was too small, wrapping around to last item.");
-                }
+                var playlistItem = this.GetPrevious();
                 Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                 await this.Play(playlistItem);
             }
@@ -223,6 +239,11 @@ namespace FoxTunes.Managers
             await this.PlaybackManager.Load(playlistItem, true)
                 .ContinueWith(_ =>
                 {
+                    if (this.CurrentItem != playlistItem)
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it was {2} => {3}", playlistItem.Id, playlistItem.FileName, this.CurrentItem.Id, this.CurrentItem.FileName);
+                        return;
+                    }
                     if (this.PlaybackManager.CurrentStream.PlaylistItem != playlistItem)
                     {
                         Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it was {2} => {3}", playlistItem.Id, playlistItem.FileName, this.PlaybackManager.CurrentStream.PlaylistItem.Id, this.PlaybackManager.CurrentStream.PlaylistItem.FileName);

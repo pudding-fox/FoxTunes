@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
@@ -17,21 +16,7 @@ namespace FoxTunes.Interfaces
 
         long Length { get; }
 
-        int BytesPerSample { get; }
-
-        int ExtraSize { get; }
-
-        int BitsPerSample { get; }
-
-        int BlockAlign { get; }
-
-        int BytesPerSecond { get; }
-
         int SampleRate { get; }
-
-        string Format { get; }
-
-        int BytesPerBlock { get; }
 
         int Channels { get; }
 
@@ -59,7 +44,9 @@ namespace FoxTunes.Interfaces
 
         event EventHandler Resumed;
 
-        Task Stop();
+        void Stop();
+
+        event EventHandler Stopping;
 
         event StoppedEventHandler Stopped;
 

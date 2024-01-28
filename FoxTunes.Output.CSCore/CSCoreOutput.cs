@@ -25,16 +25,6 @@ namespace FoxTunes
 
         public IWaveSourceFactory WaveSourceFactory { get; private set; }
 
-        protected virtual IWaveSourceFactory GetWaveSourceFactory(string id)
-        {
-            switch (id)
-            {
-                case CSCoreOutputConfiguration.FFMPEG_OPTION:
-                    return new FfmpegWaveSourceFactory();
-            }
-            return new NativeWaveSourceFactory();
-        }
-
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
@@ -46,13 +36,7 @@ namespace FoxTunes
                 );
                 element.ConnectValue<string>(id => this.SoundOutFactory = this.GetSoundOutFactory(id));
             }
-            {
-                var element = this.Configuration.GetElement<SelectionConfigurationElement>(
-                   CSCoreOutputConfiguration.OUTPUT_SECTION,
-                   CSCoreOutputConfiguration.DECODER_ELEMENT
-                );
-                element.ConnectValue<string>(id => this.WaveSourceFactory = this.GetWaveSourceFactory(id));
-            }
+            this.WaveSourceFactory = new NativeWaveSourceFactory();
             base.InitializeComponent(core);
         }
 
@@ -74,16 +58,17 @@ namespace FoxTunes
             return Task.FromResult<IOutputStream>(outputStream);
         }
 
-        public override async Task Unload(IOutputStream stream)
+        public override Task Unload(IOutputStream stream)
         {
             Logger.Write(this, LogLevel.Debug, "Unloading output stream for playlist item: {0} => {1}", stream.Id, stream.FileName);
             if (!stream.IsStopped)
             {
                 Logger.Write(this, LogLevel.Debug, "Stopping output stream for playlist item: {0} => {1}", stream.Id, stream.FileName);
-                await stream.Stop();
+                stream.Stop();
             }
             Logger.Write(this, LogLevel.Debug, "Disposing output stream for playlist item: {0} => {1}", stream.Id, stream.FileName);
             stream.Dispose();
+            return Task.CompletedTask;
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()

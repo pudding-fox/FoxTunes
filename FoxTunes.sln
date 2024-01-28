@@ -37,6 +37,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.UI.Windows.Themes"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Logging", "FoxTunes.Logging\FoxTunes.Logging.csproj", "{AB1362C8-0754-496D-85E1-3C258FF250BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Output.Bass", "FoxTunes.Output.ManagedBass\FoxTunes.Output.Bass.csproj", "{676F7DD1-BF13-4317-819F-9B5D85DF18B5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FoxTunes.Output.Bass.Native", "FoxTunes.Output.Bass.Native\FoxTunes.Output.Bass.Native.vcxproj", "{1994D072-5098-4AD3-A84C-85AB8FBC9360}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,18 +95,16 @@ Global
 		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E364D8B1-CFC6-4551-91F9-D5B7127CBE60}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Debug|Any CPU.Build.0 = Debug|x86
+		{AFF37A81-F152-44E6-9686-95BF34C6487C}.Release|Any CPU.ActiveCfg = Release|x86
 		{50D995F1-CA54-42B6-BDA5-4047E720716D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{50D995F1-CA54-42B6-BDA5-4047E720716D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50D995F1-CA54-42B6-BDA5-4047E720716D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50D995F1-CA54-42B6-BDA5-4047E720716D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0F6183DB-5001-4D9A-BBD3-157356B62684}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{0F6183DB-5001-4D9A-BBD3-157356B62684}.Debug|Any CPU.Build.0 = Debug|x86
-		{0F6183DB-5001-4D9A-BBD3-157356B62684}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0F6183DB-5001-4D9A-BBD3-157356B62684}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F6183DB-5001-4D9A-BBD3-157356B62684}.Release|Any CPU.ActiveCfg = Release|x86
 		{80FABB9C-9FA7-4232-92EB-481BE8AB8BFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{80FABB9C-9FA7-4232-92EB-481BE8AB8BFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80FABB9C-9FA7-4232-92EB-481BE8AB8BFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -111,6 +113,11 @@ Global
 		{AB1362C8-0754-496D-85E1-3C258FF250BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB1362C8-0754-496D-85E1-3C258FF250BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB1362C8-0754-496D-85E1-3C258FF250BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{676F7DD1-BF13-4317-819F-9B5D85DF18B5}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{676F7DD1-BF13-4317-819F-9B5D85DF18B5}.Debug|Any CPU.Build.0 = Debug|x86
+		{676F7DD1-BF13-4317-819F-9B5D85DF18B5}.Release|Any CPU.ActiveCfg = Release|x86
+		{1994D072-5098-4AD3-A84C-85AB8FBC9360}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{1994D072-5098-4AD3-A84C-85AB8FBC9360}.Release|Any CPU.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,7 +15,6 @@ namespace FoxTunes
         {
             typeof(Configuration),
             typeof(SQLiteDatabase),
-            typeof(CSCoreOutput),
             typeof(TagLibMetaDataSource),
             typeof(WindowsUserInterface),
             typeof(JSScriptingRuntime)

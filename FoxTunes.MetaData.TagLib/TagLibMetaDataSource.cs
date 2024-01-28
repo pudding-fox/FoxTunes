@@ -1,6 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using TagLib;
@@ -12,6 +14,11 @@ namespace FoxTunes
         private static readonly TimeSpan FILE_STORE_LOCK_TIMEOUT = TimeSpan.FromSeconds(10);
 
         public static MetaDataCategory Categories = MetaDataCategory.Standard | MetaDataCategory.First;
+
+        static TagLibMetaDataSource()
+        {
+            FileTypes.Register(typeof(TagLib.Dsf.File));
+        }
 
         private TagLibMetaDataSource()
         {
@@ -30,26 +37,45 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            Logger.Write(this, LogLevel.Trace, "Reading meta data for file: {0}", this.FileName);
-            try
-            {
-                var file = File.Create(this.FileName);
-                if (file.PossiblyCorrupt)
-                {
-                    foreach (var reason in file.CorruptionReasons)
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Meta data corruption detected: {0} => {1}", this.FileName, reason);
-                    }
-                }
-                this.AddMetaDatas(file.Tag);
-                this.AddProperties(file.Properties);
-                this.AddImages(file.Tag);
-            }
-            catch (UnsupportedFormatException)
+            if (!this.IsSupported(this.FileName))
             {
                 Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", this.FileName);
             }
+            else
+            {
+                Logger.Write(this, LogLevel.Trace, "Reading meta data for file: {0}", this.FileName);
+                try
+                {
+                    var file = global::TagLib.File.Create(this.FileName);
+                    if (file.PossiblyCorrupt)
+                    {
+                        foreach (var reason in file.CorruptionReasons)
+                        {
+                            Logger.Write(this, LogLevel.Debug, "Meta data corruption detected: {0} => {1}", this.FileName, reason);
+                        }
+                    }
+                    this.AddMetaDatas(file.Tag);
+                    this.AddProperties(file.Properties);
+                    this.AddImages(file.Tag);
+                }
+                catch (UnsupportedFormatException)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", this.FileName);
+                }
+            }
             base.InitializeComponent(core);
+        }
+
+        protected virtual bool IsSupported(string fileName)
+        {
+            var extension = Path.GetExtension(fileName);
+            if (string.IsNullOrEmpty(extension))
+            {
+                return false;
+            }
+            extension = extension.Substring(1).ToLower(CultureInfo.InvariantCulture);
+            var mimeType = string.Format("taglib/{0}", extension);
+            return FileTypes.AvailableTypes.ContainsKey(mimeType);
         }
 
         private void AddMetaDatas(Tag tag)

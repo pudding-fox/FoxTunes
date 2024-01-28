@@ -25,7 +25,8 @@ namespace FoxTunes
         {
             var outputStream = this.PlaybackManager.CurrentStream;
             Logger.Write(this, LogLevel.Debug, "Stopping output stream: {0} => {1}", outputStream.Id, outputStream.FileName);
-            return outputStream.Stop();
+            outputStream.Stop();
+            return Task.CompletedTask;
         }
     }
 }

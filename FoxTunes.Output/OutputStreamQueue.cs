@@ -21,6 +21,16 @@ namespace FoxTunes
             return this.Queue.ContainsKey(playlistItem);
         }
 
+        public IOutputStream Peek(PlaylistItem playlistItem)
+        {
+            var value = default(OutputStreamQueueValue);
+            if (!this.Queue.TryGetValue(playlistItem, out value))
+            {
+                return default(IOutputStream);
+            }
+            return value.OutputStream;
+        }
+
         public void Enqueue(IOutputStream outputStream, bool dequeue)
         {
             if (!this.Queue.TryAdd(outputStream.PlaylistItem, new OutputStreamQueueValue(outputStream)))

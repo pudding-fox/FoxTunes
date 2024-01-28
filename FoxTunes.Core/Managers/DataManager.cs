@@ -10,11 +10,12 @@ namespace FoxTunes.Managers
         {
             return this.ForegroundTaskRunner.Run(() =>
             {
-                if (this.ReadContext != null)
-                {
-                    this.ReadContext.Dispose();
-                }
+                var databaseContext = this.ReadContext;
                 this.ReadContext = this.Database.CreateContext();
+                if (databaseContext != null)
+                {
+                    databaseContext.Dispose();
+                }
             });
         }
 
