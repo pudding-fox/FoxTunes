@@ -55,7 +55,7 @@
                         </ItemsControl>
                     </ScrollViewer>
                 </Border>
-                <Button Grid.Row="2" Command="{Binding ClearErrorsCommand, Mode=OneWay, Source={StaticResource ViewModel}}" HorizontalAlignment="Right" Height="30" Width="60" Margin="0,7,0,0" Content="Dismiss"/>
+                <Button Grid.Row="2" Command="{Binding ClearErrorsCommand, Mode=OneWay, Source={StaticResource ViewModel}}" HorizontalAlignment="Right" Height="30" Width="70" Margin="0,7,0,0" Content="Dismiss"/>
             </Grid>
         </Border>
     </Popup>
