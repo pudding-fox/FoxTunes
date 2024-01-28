@@ -20,6 +20,8 @@ namespace FoxTunes
 
         public static readonly ThemeLoader ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
 
+        public static readonly ImageLoader ImageLoader = ComponentRegistry.Instance.GetComponent<ImageLoader>();
+
         public Artwork()
         {
             this.InitializeComponent();
@@ -57,7 +59,7 @@ namespace FoxTunes
                 var source = default(ImageSource);
                 using (var stream = ThemeLoader.Theme.ArtworkPlaceholder)
                 {
-                    source = ImageLoader.Load(stream, 0, 0);
+                    source = ImageLoader.Load(null, stream, 0, 0);
                 }
                 await Windows.Invoke(() =>
                 {
@@ -70,7 +72,7 @@ namespace FoxTunes
             }
             else
             {
-                var source = ImageLoader.Load(metaDataItem.Value, 0, 0);
+                var source = ImageLoader.Load(null, metaDataItem.Value, 0, 0);
                 await Windows.Invoke(() =>
                 {
                     this.Background = new ImageBrush(source)
