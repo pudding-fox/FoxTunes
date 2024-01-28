@@ -19,7 +19,8 @@
         <DockPanel DockPanel.Dock="Bottom" Margin="2">
             <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                 <Windows:Playback></Windows:Playback>
-                <Windows:Spectrum  Margin="2,0,2,0"></Windows:Spectrum>
+                <Windows:Shuffle Margin="2,0,0,0"></Windows:Shuffle>
+                <Windows:Spectrum Margin="2,0,2,0"></Windows:Spectrum>
             </StackPanel>
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                 <Windows:Volume Width="80" Margin="4,0,4,0"></Windows:Volume>
