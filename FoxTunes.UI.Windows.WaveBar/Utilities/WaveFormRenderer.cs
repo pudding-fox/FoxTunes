@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace FoxTunes
@@ -23,6 +24,8 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Rms { get; private set; }
 
+        public TextConfigurationElement ColorPalette { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Generator = ComponentRegistry.Instance.GetComponent<WaveFormGenerator>();
@@ -41,9 +44,14 @@ namespace FoxTunes
                 WaveBarBehaviourConfiguration.SECTION,
                 WaveBarBehaviourConfiguration.RMS_ELEMENT
             );
+            this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                WaveBarBehaviourConfiguration.SECTION,
+                WaveBarBehaviourConfiguration.COLOR_PALETTE_ELEMENT
+            );
             this.Mode.ValueChanged += this.OnValueChanged;
             this.Resolution.ValueChanged += this.OnValueChanged;
             this.Rms.ValueChanged += this.OnValueChanged;
+            this.ColorPalette.ValueChanged += this.OnValueChanged;
             base.InitializeComponent(core);
 #if NET40
             var task = TaskEx.Run(async () =>
@@ -113,10 +121,28 @@ namespace FoxTunes
             {
                 return false;
             }
+            var mode = WaveBarBehaviourConfiguration.GetMode(this.Mode.Value);
+            var colors = WaveBarBehaviourConfiguration.GetColorPalette(this.ColorPalette.Value, this.Color);
+            switch (mode)
+            {
+                default:
+                case WaveFormRendererMode.Mono:
+                    //Nothing to do.
+                    break;
+                case WaveFormRendererMode.Seperate:
+                    if (colors.Length > 1)
+                    {
+                        colors = colors.DuplicateGradient(generatorData.Channels);
+                    }
+                    break;
+            }
             this.RendererData = Create(
                 generatorData,
                 width,
-                height
+                height,
+                this.Rms.Value,
+                mode,
+                colors
             );
             this.Dispatch(this.Update);
             return true;
@@ -144,7 +170,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                if (this.Rms.Value)
+                if (data.PowerElements != null)
                 {
                     var colors = this.Color.ToPair(SHADE);
                     waveRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, colors[0]));
@@ -152,7 +178,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    waveRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(0, this.Color));
+                    waveRenderInfo = BitmapHelper.CreateRenderInfo(bitmap, BitmapHelper.GetOrCreatePalette(BitmapHelper.COLOR_FROM_Y, data.Colors));
                 }
             }).ConfigureAwait(false);
 
@@ -166,9 +192,7 @@ namespace FoxTunes
                 Render(
                     data,
                     waveRenderInfo,
-                    powerRenderInfo,
-                    this.Rms.Value,
-                    WaveBarBehaviourConfiguration.GetMode(this.Mode.Value)
+                    powerRenderInfo
                 );
             }
             catch (Exception e)
@@ -193,9 +217,7 @@ namespace FoxTunes
                 {
                     Update(
                         generatorData,
-                        rendererData,
-                        this.Rms.Value,
-                        WaveBarBehaviourConfiguration.GetMode(this.Mode.Value)
+                        rendererData
                     );
                 }
                 catch (Exception e)
@@ -241,38 +263,48 @@ namespace FoxTunes
             }
             if (this.Resolution != null)
             {
-                this.Resolution.ValueChanged += this.OnValueChanged;
+                this.Resolution.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.ColorPalette != null)
+            {
+                this.ColorPalette.ValueChanged -= this.OnValueChanged;
             }
             base.OnDisposing();
         }
 
-        private static void Update(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData, bool rms, WaveFormRendererMode mode)
+        private static void Update(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
         {
             if (generatorData.Peak == 0)
             {
                 return;
             }
-            else if (generatorData.Peak != rendererData.Peak)
+            else
             {
-                rendererData.Position = 0;
-                rendererData.Peak = generatorData.Peak;
-                rendererData.NormalizedPeak = GetPeak(generatorData, rendererData);
+                UpdatePeak(generatorData, rendererData);
             }
 
-            switch (mode)
+            if (rendererData.Channels == 1)
             {
-                case WaveFormRendererMode.Mono:
-                    UpdateMono(generatorData, rendererData, rms);
-                    break;
-                case WaveFormRendererMode.Seperate:
-                    UpdateSeperate(generatorData, rendererData, rms);
-                    break;
-                default:
-                    throw new NotImplementedException();
+                UpdateMono(generatorData, rendererData);
+            }
+            else
+            {
+                UpdateSeperate(generatorData, rendererData);
             }
         }
 
-        private static void UpdateMono(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData, bool rms)
+        private static void UpdatePeak(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
+        {
+            var peak = GetPeak(generatorData, rendererData);
+            if (generatorData.Peak > rendererData.Peak || peak > rendererData.NormalizedPeak)
+            {
+                rendererData.Position = 0;
+                rendererData.Peak = generatorData.Peak;
+                rendererData.NormalizedPeak = peak;
+            }
+        }
+
+        private static void UpdateMono(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
         {
             var center = rendererData.Height / 2.0f;
             var factor = rendererData.NormalizedPeak;
@@ -338,7 +370,7 @@ namespace FoxTunes
 
                 }
 
-                if (rms)
+                if (powerElements != null)
                 {
 
                     var y = default(int);
@@ -372,7 +404,7 @@ namespace FoxTunes
             }
         }
 
-        private static void UpdateSeperate(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData, bool rms)
+        private static void UpdateSeperate(WaveFormGenerator.WaveFormGeneratorData generatorData, WaveFormRendererData rendererData)
         {
             var factor = rendererData.NormalizedPeak / generatorData.Channels;
 
@@ -388,6 +420,8 @@ namespace FoxTunes
             var powerElements = rendererData.PowerElements;
             var valuesPerElement = rendererData.ValuesPerElement;
 
+            var waveHeight = rendererData.Height / generatorData.Channels;
+
             while (rendererData.Position < rendererData.Capacity)
             {
                 var valuePosition = rendererData.Position * rendererData.ValuesPerElement;
@@ -402,8 +436,6 @@ namespace FoxTunes
                         valuesPerElement = generatorData.Capacity - valuePosition;
                     }
                 }
-
-                var waveHeight = rendererData.Height / generatorData.Channels;
 
                 for (var channel = 0; channel < generatorData.Channels; channel++)
                 {
@@ -440,7 +472,7 @@ namespace FoxTunes
 
                     }
 
-                    if (rms)
+                    if (powerElements != null)
                     {
 
                         var y = default(int);
@@ -520,8 +552,9 @@ namespace FoxTunes
             return peak;
         }
 
-        public static void Render(WaveFormRendererData rendererData, BitmapHelper.RenderInfo waveRenderInfo, BitmapHelper.RenderInfo powerRenderInfo, bool rms, WaveFormRendererMode mode)
+        public static void Render(WaveFormRendererData rendererData, BitmapHelper.RenderInfo waveRenderInfo, BitmapHelper.RenderInfo powerRenderInfo)
         {
+            //TODO: We should only clear and re-render when the peak changes.
             BitmapHelper.Clear(ref waveRenderInfo);
 
             if (rendererData.Capacity == 0)
@@ -536,52 +569,47 @@ namespace FoxTunes
                 return;
             }
 
-            switch (mode)
+            BitmapHelper.DrawRectangles(ref waveRenderInfo, rendererData.WaveElements, rendererData.Channels, rendererData.Capacity);
+            if (rendererData.PowerElements != null)
             {
-                case WaveFormRendererMode.Mono:
-                    RenderMono(rendererData, waveRenderInfo, powerRenderInfo, rms);
-                    break;
-                case WaveFormRendererMode.Seperate:
-                    RenderSeperate(rendererData, waveRenderInfo, powerRenderInfo, rms);
-                    break;
-                default:
-                    throw new NotImplementedException();
+                BitmapHelper.DrawRectangles(ref powerRenderInfo, rendererData.PowerElements, rendererData.Channels, rendererData.Capacity);
             }
         }
 
-        public static void RenderMono(WaveFormRendererData rendererData, BitmapHelper.RenderInfo waveRenderInfo, BitmapHelper.RenderInfo powerRenderInfo, bool rms)
-        {
-            BitmapHelper.DrawRectangles(ref waveRenderInfo, rendererData.WaveElements, 1, rendererData.Position);
-            if (rms)
-            {
-                BitmapHelper.DrawRectangles(ref powerRenderInfo, rendererData.PowerElements, 1, rendererData.Position);
-            }
-        }
-
-        public static void RenderSeperate(WaveFormRendererData rendererData, BitmapHelper.RenderInfo waveRenderInfo, BitmapHelper.RenderInfo powerRenderInfo, bool rms)
-        {
-            BitmapHelper.DrawRectangles(ref waveRenderInfo, rendererData.WaveElements, rendererData.Channels, rendererData.Position);
-            if (rms)
-            {
-                BitmapHelper.DrawRectangles(ref powerRenderInfo, rendererData.PowerElements, rendererData.Channels, rendererData.Position);
-            }
-        }
-
-        public static WaveFormRendererData Create(WaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height)
+        public static WaveFormRendererData Create(WaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height, bool rms, WaveFormRendererMode mode, Color[] colors)
         {
             var valuesPerElement = generatorData.Capacity / width;
-            return new WaveFormRendererData()
+            var data = new WaveFormRendererData()
             {
                 Width = width,
                 Height = height,
                 ValuesPerElement = valuesPerElement,
-                WaveElements = new Int32Rect[generatorData.Channels, width],
-                PowerElements = new Int32Rect[generatorData.Channels, width],
-                Channels = generatorData.Channels,
+                Colors = colors,
                 Position = 0,
                 Capacity = width,
                 Peak = 0
             };
+            switch (mode)
+            {
+                default:
+                case WaveFormRendererMode.Mono:
+                    data.WaveElements = new Int32Rect[1, width];
+                    if (rms)
+                    {
+                        data.PowerElements = new Int32Rect[1, width];
+                    }
+                    data.Channels = 1;
+                    break;
+                case WaveFormRendererMode.Seperate:
+                    data.WaveElements = new Int32Rect[generatorData.Channels, width];
+                    if (rms)
+                    {
+                        data.PowerElements = new Int32Rect[generatorData.Channels, width];
+                    }
+                    data.Channels = generatorData.Channels;
+                    break;
+            }
+            return data;
         }
 
         public class WaveFormRendererData
@@ -591,6 +619,8 @@ namespace FoxTunes
             public int Height;
 
             public int ValuesPerElement;
+
+            public Color[] Colors;
 
             public Int32Rect[,] WaveElements;
 

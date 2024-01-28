@@ -126,6 +126,9 @@
   <data name="WaveBarBehaviourConfiguration.Cleanup" xml:space="preserve">
     <value>Cleanup Temp Files</value>
   </data>
+  <data name="WaveBarBehaviourConfiguration.ColorPalette" xml:space="preserve">
+    <value>Color Palette</value>
+  </data>
   <data name="WaveBarBehaviourConfiguration.Mode" xml:space="preserve">
     <value>Mode</value>
   </data>
