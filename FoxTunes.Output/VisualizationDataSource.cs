@@ -53,6 +53,7 @@ namespace FoxTunes
                     var avg = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Average);
                     var peak = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Peak);
                     var rms = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Rms);
+                    var crest = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Crest);
                     if (data.Flags.HasFlag(VisualizationDataFlags.Individual))
                     {
                         data.History.Values = new float[data.Channels, data.Samples32.Length, data.History.Capacity];
@@ -67,6 +68,10 @@ namespace FoxTunes
                         if (rms)
                         {
                             data.History.Rms = new float[data.Channels, data.Samples32.Length];
+                        }
+                        if (crest)
+                        {
+                            data.History.Crest = new float[data.Channels, data.Samples32.Length];
                         }
                     }
                     else
@@ -83,6 +88,10 @@ namespace FoxTunes
                         if (rms)
                         {
                             data.History.Rms = new float[1, data.Samples32.Length];
+                        }
+                        if (crest)
+                        {
+                            data.History.Crest = new float[1, data.Samples32.Length];
                         }
                     }
                     data.History.Position = 0;
@@ -169,6 +178,7 @@ namespace FoxTunes
                     var avg = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Average);
                     var peak = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Peak);
                     var rms = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Rms);
+                    var crest = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Crest);
                     if (data.Flags.HasFlag(VisualizationDataFlags.Individual))
                     {
                         data.History.Values = new float[data.Channels, data.Samples.Length, data.History.Capacity];
@@ -183,6 +193,10 @@ namespace FoxTunes
                         if (rms)
                         {
                             data.History.Rms = new float[data.Channels, data.Samples.Length];
+                        }
+                        if (crest)
+                        {
+                            data.History.Crest = new float[data.Channels, data.Samples.Length];
                         }
                     }
                     else
@@ -199,6 +213,10 @@ namespace FoxTunes
                         if (rms)
                         {
                             data.History.Rms = new float[1, data.Samples.Length];
+                        }
+                        if (crest)
+                        {
+                            data.History.Crest = new float[1, data.Samples.Length];
                         }
                     }
                     data.History.Position = 0;
@@ -271,6 +289,7 @@ namespace FoxTunes
             var avg = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Average);
             var peak = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Peak);
             var rms = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Rms);
+            var crest = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Crest);
             for (var a = 0; a < count; a++)
             {
                 data.History.Values[0, a, data.History.Position] = data.Data[0, a];
@@ -290,6 +309,10 @@ namespace FoxTunes
             if (rms)
             {
                 Array.Clear(data.History.Rms, 0, data.History.Rms.Length);
+            }
+            if (crest)
+            {
+                Array.Clear(data.History.Crest, 0, data.History.Crest.Length);
             }
             for (var a = 0; a < count; a++)
             {
@@ -341,6 +364,10 @@ namespace FoxTunes
                 {
                     data.History.Rms[0, a] = Convert.ToSingle(Math.Sqrt(data.History.Rms[0, a] / data.History.Count));
                 }
+                if (crest)
+                {
+                    data.History.Crest[0, a] = data.History.Peak[0, a] - data.History.Rms[0, a];
+                }
             }
             if (data.History.Position < data.History.Capacity - 1)
             {
@@ -357,6 +384,7 @@ namespace FoxTunes
             var avg = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Average);
             var peak = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Peak);
             var rms = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Rms);
+            var crest = data.History.Flags.HasFlag(VisualizationDataHistoryFlags.Crest);
             for (var channel = 0; channel < data.Channels; channel++)
             {
                 for (var a = 0; a < count; a++)
@@ -379,6 +407,10 @@ namespace FoxTunes
             if (rms)
             {
                 Array.Clear(data.History.Rms, 0, data.History.Rms.Length);
+            }
+            if (crest)
+            {
+                Array.Clear(data.History.Crest, 0, data.History.Crest.Length);
             }
             for (var channel = 0; channel < data.Channels; channel++)
             {
@@ -431,6 +463,10 @@ namespace FoxTunes
                     if (rms)
                     {
                         data.History.Rms[channel, a] = Convert.ToSingle(Math.Sqrt(data.History.Rms[channel, a] / data.History.Count));
+                    }
+                    if (crest)
+                    {
+                        data.History.Crest[channel, a] = data.History.Peak[channel, a] - data.History.Rms[channel, a];
                     }
                 }
             }
