@@ -71,8 +71,7 @@ namespace FoxTunes
             }
             if (state != null && state.FileDatas != null && state.FileDatas.Any())
             {
-                var libraryItems = state.FileDatas.OfType<LibraryItem>();
-                var libraryHierarchyNodes = libraryItems.SelectMany(libraryItem => libraryItem.Parents).Distinct();
+                var libraryHierarchyNodes = state.FileDatas.GetParents();
                 foreach (var libraryHierarchyNode in libraryHierarchyNodes)
                 {
                     Logger.Write(this, LogLevel.Debug, "Meta data was updated for item {0}, resetting cache.", libraryHierarchyNode.Id);

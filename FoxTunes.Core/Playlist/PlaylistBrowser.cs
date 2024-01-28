@@ -35,6 +35,9 @@ namespace FoxTunes
 
         public event EventHandler StateChanged;
 
+
+        public ICore Core { get; private set; }
+
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IPlaylistCache PlaylistCache { get; private set; }
@@ -49,6 +52,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
+            this.Core = core;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaylistCache = core.Components.PlaylistCache;
             this.DatabaseFactory = core.Factories.Database;
@@ -136,7 +140,7 @@ namespace FoxTunes
                             .OrderBy(playlistItem => playlistItem.Sequence);
                         foreach (var element in sequence)
                         {
-                            yield return element;
+                            yield return this.CreateItem(playlist, element);
                         }
                     }
                 }
@@ -145,6 +149,12 @@ namespace FoxTunes
             {
                 this.State &= ~PlaylistBrowserState.Loading;
             }
+        }
+
+        protected virtual PlaylistItem CreateItem(Playlist playlist, PlaylistItem item)
+        {
+            item.InitializeComponent(this.Core);
+            return item;
         }
 
         public PlaylistItem GetItemById(Playlist playlist, int id)

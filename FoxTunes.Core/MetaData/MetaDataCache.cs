@@ -73,8 +73,7 @@ namespace FoxTunes
                 }
                 if (state.FileDatas != null && state.FileDatas.Any())
                 {
-                    var libraryItems = state.FileDatas.OfType<LibraryItem>();
-                    var libraryHierarchyNodes = libraryItems.SelectMany(libraryItem => libraryItem.Parents).Distinct();
+                    var libraryHierarchyNodes = state.FileDatas.GetParents();
                     var playlistItems = state.FileDatas.OfType<PlaylistItem>();
                     keys = keys.Where(key =>
                     {

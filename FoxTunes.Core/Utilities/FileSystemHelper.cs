@@ -126,6 +126,10 @@ namespace FoxTunes
         {
             try
             {
+                if (Publication.IsPortable)
+                {
+                    fileName = Path.GetFullPath(fileName);
+                }
                 var uri = default(Uri);
                 if (!Uri.TryCreate(fileName, UriKind.Absolute, out uri))
                 {

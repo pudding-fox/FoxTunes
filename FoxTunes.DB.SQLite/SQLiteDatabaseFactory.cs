@@ -8,7 +8,6 @@ using System.IO;
 
 namespace FoxTunes
 {
-    [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     [ComponentPreference(ComponentPreferenceAttribute.DEFAULT)]
     [Component(ID, ComponentSlots.Database)]
     public class SQLiteDatabaseFactory : DatabaseFactory

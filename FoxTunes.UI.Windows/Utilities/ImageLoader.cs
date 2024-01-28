@@ -74,7 +74,7 @@ namespace FoxTunes
                 var decode = false;
                 if (width != 0 && height != 0 && this.HighQualityResizer)
                 {
-                    fileName = ImageResizer.Resize(fileName, width, height);
+                    fileName = this.ImageResizer.Resize(fileName, width, height);
                 }
                 else
                 {

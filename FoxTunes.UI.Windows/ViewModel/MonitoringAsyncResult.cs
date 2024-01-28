@@ -21,16 +21,13 @@ namespace FoxTunes.ViewModel
             this.Dispatch(this.Run);
         }
 
-        public MonitoringAsyncResult(IObservable source, T value, Func<Task<T>> factory, bool refresh) : this()
+        public MonitoringAsyncResult(IObservable source, T value, Func<Task<T>> factory) : this()
         {
             this.Source = source;
             PropertyChangedEventManager.AddListener(source, this, string.Empty);
             this.Value = value;
             this.Factory = factory;
-            if (refresh)
-            {
-                this.Dispatch(this.Run);
-            }
+            this.Dispatch(this.Run);
         }
 
         public IObservable Source { get; private set; }
