@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
+    //Setting PRIORITY_HIGH so the the cache is cleared before being re-queried.
     [Component("AF71D00F-5D47-4740-BC14-1B3E4513A1A3", ComponentSlots.None, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class PlaylistCache : StandardComponent, IPlaylistCache, IDisposable
     {

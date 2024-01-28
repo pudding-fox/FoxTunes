@@ -23,6 +23,8 @@ namespace FoxTunes
 
         public ICore Core { get; private set; }
 
+        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
+
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
@@ -34,6 +36,7 @@ namespace FoxTunes
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
+            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.DatabaseFactory = core.Factories.Database;
             this.PlaybackManager = core.Managers.Playback;
@@ -275,7 +278,7 @@ namespace FoxTunes
         public async Task Insert(Playlist playlist, int index, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
         {
             Logger.Write(this, LogLevel.Debug, "Inserting library nodes into playlist at index: {0}", index);
-            using (var task = new AddLibraryHierarchyNodesToPlaylistTask(playlist, index, libraryHierarchyNodes, clear))
+            using (var task = new AddLibraryHierarchyNodesToPlaylistTask(playlist, index, libraryHierarchyNodes, this.LibraryHierarchyBrowser.Filter, clear))
             {
                 task.InitializeComponent(this.Core);
                 await this.OnBackgroundTask(task).ConfigureAwait(false);
