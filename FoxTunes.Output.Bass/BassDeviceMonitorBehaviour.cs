@@ -137,14 +137,12 @@ namespace FoxTunes
             var position = default(long);
             var paused = default(bool);
             var playlistItem = default(PlaylistItem);
-            if (this.PlaybackManager.CurrentStream != null)
+            var outputStream = this.PlaybackManager.CurrentStream;
+            if (outputStream != null)
             {
-                position = this.PlaybackManager.CurrentStream.Position;
-                paused = this.PlaybackManager.CurrentStream.IsPaused;
-            }
-            if (this.PlaylistManager.CurrentItem != null)
-            {
-                playlistItem = this.PlaylistManager.CurrentItem;
+                position = outputStream.Position;
+                paused = outputStream.IsPaused;
+                playlistItem = outputStream.PlaylistItem;
             }
             try
             {
