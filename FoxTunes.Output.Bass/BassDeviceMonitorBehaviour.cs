@@ -1,11 +1,24 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     public abstract class BassDeviceMonitorBehaviour : StandardBehaviour, IDisposable
     {
+        public static readonly DataFlow[] HandledFlows = new[]
+        {
+            DataFlow.Render
+        };
+
+        public static readonly Role[] HandledRoles = new[]
+        {
+            Role.Console,
+            Role.Multimedia
+        };
+
         public static readonly TimeSpan TIMEOUT = TimeSpan.FromMilliseconds(100);
 
         private BassDeviceMonitorBehaviour()
@@ -122,7 +135,7 @@ namespace FoxTunes
         {
             this.Debouncer.Exec(() =>
             {
-                if (!this.RestartRequired(e.Flow, e.Role))
+                if (!this.RestartRequired(e.Flow, e.Role, e.Device))
                 {
                     return;
                 }
@@ -137,17 +150,17 @@ namespace FoxTunes
             //Nothing to do.
         }
 
-        protected virtual bool RestartRequired(DataFlow? flow, Role? role)
+        protected virtual bool RestartRequired(DataFlow? flow, Role? role, string device)
         {
             if (!this.Output.IsStarted)
             {
                 return false;
             }
-            if (flow == null || flow.Value != DataFlow.Render)
+            if (!flow.HasValue || !HandledFlows.Contains(flow.Value))
             {
                 return false;
             }
-            if (role == null || role.Value != Role.Multimedia)
+            if (!role.HasValue || !HandledRoles.Contains(role.Value))
             {
                 return false;
             }
