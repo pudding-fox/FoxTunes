@@ -349,13 +349,26 @@ namespace FoxTunes
                     continue;
                 }
                 var to = snappingWindow.Adapter.Bounds;
-                //if (this.StickyWindows.ContainsKey(snappingWindow))
-                //{
-                //    if (SnappingHelper.IsSnapped(bounds, to) == SnapDirection.None)
-                //    {
-                //        this.StickyWindows.Remove(snappingWindow);
-                //    }
-                //}
+                if (this.StickyWindows.ContainsKey(snappingWindow))
+                {
+                    if (resize)
+                    {
+                        if (this.IsStuck(snappingWindow, this.StickyWindows[snappingWindow]))
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if (!this.IsSticky && SnappingHelper.IsSnapped(bounds, to) == SnapDirection.None)
+                        {
+                            this.StickyWindows.Remove(snappingWindow);
+                            snappingWindow.StickyWindows.Remove(this);
+                            Logger.Write(this, LogLevel.Debug, "Unstick.");
+                        }
+                        continue;
+                    }
+                }
                 direction |= SnappingHelper.Snap(ref bounds, to, resize);
             }
             return direction;
@@ -563,19 +576,19 @@ namespace FoxTunes
         {
             if (this.ResizeDirection.HasFlag(ResizeDirection.Left))
             {
-                return direction.HasFlag(SnapDirection.OutsideRight);
+                return direction.HasFlag(SnapDirection.InsideLeft) || direction.HasFlag(SnapDirection.OutsideRight);
             }
             if (this.ResizeDirection.HasFlag(ResizeDirection.Right))
             {
-                return direction.HasFlag(SnapDirection.OutsideLeft);
+                return direction.HasFlag(SnapDirection.InsideRight) || direction.HasFlag(SnapDirection.OutsideLeft);
             }
             if (this.ResizeDirection.HasFlag(ResizeDirection.Top))
             {
-                return direction.HasFlag(SnapDirection.OutsideBottom);
+                return direction.HasFlag(SnapDirection.InsideTop) || direction.HasFlag(SnapDirection.OutsideBottom);
             }
             if (this.ResizeDirection.HasFlag(ResizeDirection.Bottom))
             {
-                return direction.HasFlag(SnapDirection.OutsideTop);
+                return direction.HasFlag(SnapDirection.InsideBottom) || direction.HasFlag(SnapDirection.OutsideTop);
             }
             return false;
         }
