@@ -135,27 +135,27 @@ namespace FoxTunes
         {
             var flags = default(int);
             var palettes = PeakMeterConfiguration.GetColorPalette(value, colors);
+            var background = palettes.GetOrAdd(
+                PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND,
+                () => DefaultColors.GetBackground()
+            );
             //Switch the default colors to the VALUE palette if one was provided.
             colors = palettes.GetOrAdd(
                 PeakMeterConfiguration.COLOR_PALETTE_VALUE,
-                () => GetDefaultColors(PeakMeterConfiguration.COLOR_PALETTE_VALUE, showRms, colors)
-            );
-            palettes.GetOrAdd(
-                PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND,
-                () => GetDefaultColors(PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND, showRms, colors)
+                () => DefaultColors.GetValue(colors)
             );
             if (showPeak)
             {
                 palettes.GetOrAdd(
                     PeakMeterConfiguration.COLOR_PALETTE_PEAK,
-                    () => GetDefaultColors(PeakMeterConfiguration.COLOR_PALETTE_PEAK, showRms, colors)
+                    () => DefaultColors.GetPeak(colors)
                 );
             }
             if (showRms)
             {
                 palettes.GetOrAdd(
                     PeakMeterConfiguration.COLOR_PALETTE_RMS,
-                    () => GetDefaultColors(PeakMeterConfiguration.COLOR_PALETTE_RMS, showRms, colors)
+                    () => DefaultColors.GetRms(background, colors)
                 );
             }
             return palettes.ToDictionary(
@@ -166,52 +166,20 @@ namespace FoxTunes
                     colors = pair.Value;
                     if (colors.Length > 1)
                     {
-                        if (string.Equals(pair.Key, PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND, StringComparison.OrdinalIgnoreCase))
+                        if (orientation == Orientation.Horizontal)
+                        {
+                            flags |= BitmapHelper.COLOR_FROM_X;
+                            colors = colors.Reverse().ToArray();
+                        }
+                        else if (orientation == Orientation.Vertical)
                         {
                             flags |= BitmapHelper.COLOR_FROM_Y;
-                        }
-                        else
-                        {
-                            if (orientation == Orientation.Horizontal)
-                            {
-                                flags |= BitmapHelper.COLOR_FROM_X;
-                                colors = colors.Reverse().ToArray();
-                            }
-                            else if (orientation == Orientation.Vertical)
-                            {
-                                flags |= BitmapHelper.COLOR_FROM_Y;
-                            }
                         }
                     }
                     return BitmapHelper.CreatePalette(flags, colors);
                 },
                 StringComparer.OrdinalIgnoreCase
             );
-        }
-
-        private static Color[] GetDefaultColors(string name, bool showRms, Color[] colors)
-        {
-            var color = colors.FirstOrDefault();
-            switch (name)
-            {
-                case PeakMeterConfiguration.COLOR_PALETTE_PEAK:
-                    return new[]
-                    {
-                        color
-                    };
-                case PeakMeterConfiguration.COLOR_PALETTE_RMS:
-                    const byte SHADE = 30;
-                    var contrast = Color.FromRgb(SHADE, SHADE, SHADE);
-                    return colors.Shade(contrast);
-                case PeakMeterConfiguration.COLOR_PALETTE_VALUE:
-                    return colors;
-                case PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND:
-                    return new[]
-                    {
-                        global::System.Windows.Media.Colors.Black
-                    };
-            }
-            throw new NotImplementedException();
         }
 
         protected override WriteableBitmap CreateBitmap(int width, int height)
@@ -625,6 +593,45 @@ namespace FoxTunes
             public BitmapHelper.RenderInfo Value;
 
             public BitmapHelper.RenderInfo Background;
+        }
+
+        public static class DefaultColors
+        {
+            public static Color[] GetBackground()
+            {
+                return new[]
+                {
+                    global::System.Windows.Media.Colors.Black
+                };
+            }
+
+            public static Color[] GetPeak(Color[] colors)
+            {
+                return new[]
+                {
+                    colors.FirstOrDefault()
+                };
+            }
+
+            public static Color[] GetRms(Color[] background, Color[] colors)
+            {
+                var transparency = background.Length > 1;
+                if (transparency)
+                {
+                    //TODO: This is wrong, we need to make the color darker not lighter.
+                    return colors.WithAlpha(-25);
+                }
+                else
+                {
+                    var color = background.FirstOrDefault();
+                    return colors.Interpolate(color, 0.1f);
+                }
+            }
+
+            public static Color[] GetValue(Color[] colors)
+            {
+                return colors;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,6 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
-using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -116,34 +116,34 @@ namespace FoxTunes
         protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showPeak, bool showRms, bool showCrest, Color[] colors)
         {
             var palettes = EnhancedSpectrumConfiguration.GetColorPalette(value, colors);
+            var background = palettes.GetOrAdd(
+                EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND,
+                () => DefaultColors.GetBackground()
+            );
             //Switch the default colors to the VALUE palette if one was provided.
             colors = palettes.GetOrAdd(
                 EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE,
-                () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE, showPeak, showRms, colors)
-            );
-            palettes.GetOrAdd(
-                EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND,
-                () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND, showPeak, showRms, colors)
+                () => DefaultColors.GetValue(showPeak, showRms, colors)
             );
             if (showPeak)
             {
                 palettes.GetOrAdd(
                     EnhancedSpectrumConfiguration.COLOR_PALETTE_PEAK,
-                    () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_PEAK, showPeak, showRms, colors)
+                    () => DefaultColors.GetPeak(background, showRms, colors)
                 );
             }
             if (showRms)
             {
                 palettes.GetOrAdd(
                     EnhancedSpectrumConfiguration.COLOR_PALETTE_RMS,
-                    () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_RMS, showPeak, showRms, colors)
+                    () => DefaultColors.GetRms(background, showPeak, colors)
                 );
             }
             if (showCrest)
             {
                 palettes.GetOrAdd(
                     EnhancedSpectrumConfiguration.COLOR_PALETTE_CREST,
-                    () => GetDefaultColors(EnhancedSpectrumConfiguration.COLOR_PALETTE_CREST, showPeak, showRms, colors)
+                    () => DefaultColors.GetCrest()
                 );
             }
             return palettes.ToDictionary(
@@ -159,51 +159,6 @@ namespace FoxTunes
                 },
                 StringComparer.OrdinalIgnoreCase
             );
-        }
-
-        private static Color[] GetDefaultColors(string name, bool showPeak, bool showRms, Color[] colors)
-        {
-            switch (name)
-            {
-                case EnhancedSpectrumConfiguration.COLOR_PALETTE_PEAK:
-                    if (showRms)
-                    {
-                        return colors.WithAlpha(-200);
-                    }
-                    else
-                    {
-                        return colors.WithAlpha(-100);
-                    }
-                case EnhancedSpectrumConfiguration.COLOR_PALETTE_RMS:
-                    if (showPeak)
-                    {
-                        return colors.WithAlpha(-100);
-                    }
-                    else
-                    {
-                        return colors.WithAlpha(-50);
-                    }
-                case EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE:
-                    if (showPeak || showRms)
-                    {
-                        return colors.WithAlpha(-25);
-                    }
-                    else
-                    {
-                        return colors;
-                    }
-                case EnhancedSpectrumConfiguration.COLOR_PALETTE_CREST:
-                    return new[]
-                    {
-                        global::System.Windows.Media.Colors.Red
-                    };
-                case EnhancedSpectrumConfiguration.COLOR_PALETTE_BACKGROUND:
-                    return new[]
-                    {
-                        global::System.Windows.Media.Colors.Black
-                    };
-            }
-            throw new NotImplementedException();
         }
 
         protected override WriteableBitmap CreateBitmap(int width, int height)
@@ -793,6 +748,93 @@ namespace FoxTunes
             public BitmapHelper.RenderInfo Crest;
 
             public BitmapHelper.RenderInfo Background;
+        }
+
+        public static class DefaultColors
+        {
+            public static Color[] GetBackground()
+            {
+                return new[]
+                {
+                    global::System.Windows.Media.Colors.Black
+                };
+            }
+
+            public static Color[] GetPeak(Color[] background, bool showRms, Color[] colors)
+            {
+                var transparency = background.Length > 1;
+                if (transparency)
+                {
+                    if (showRms)
+                    {
+                        return colors.WithAlpha(-200);
+                    }
+                    else
+                    {
+                        return colors.WithAlpha(-100);
+                    }
+                }
+                else
+                {
+                    var color = background.FirstOrDefault();
+                    if (showRms)
+                    {
+                        return colors.Interpolate(color, 0.8f);
+                    }
+                    else
+                    {
+                        return colors.Interpolate(color, 0.4f);
+                    }
+                }
+            }
+
+            public static Color[] GetRms(Color[] background, bool showPeak, Color[] colors)
+            {
+                var transparency = background.Length > 1;
+                if (transparency)
+                {
+                    if (showPeak)
+                    {
+                        return colors.WithAlpha(-100);
+                    }
+                    else
+                    {
+                        return colors.WithAlpha(-50);
+                    }
+                }
+                else
+                {
+                    var color = background.FirstOrDefault();
+                    if (showPeak)
+                    {
+                        return colors.Interpolate(color, 0.4f);
+                    }
+                    else
+                    {
+                        return colors.Interpolate(color, 0.2f);
+                    }
+                }
+            }
+
+            public static Color[] GetValue(bool showPeak, bool showRms, Color[] colors)
+            {
+                if (showPeak || showRms)
+                {
+                    return colors.WithAlpha(-25);
+                }
+                else
+                {
+                    return colors;
+                }
+            }
+
+            public static Color[] GetCrest()
+            {
+                return new[]
+                {
+                    global::System.Windows.Media.Colors.Red
+                };
+            }
         }
     }
 }

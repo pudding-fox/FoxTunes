@@ -745,6 +745,18 @@ namespace FoxTunes
             return color.R > byte.MaxValue / 2 && color.G > byte.MaxValue / 2 && color.B > byte.MaxValue / 2;
         }
 
+        public static Color[] Shade(this Color[] colors, byte contrast, bool transparency)
+        {
+            if (transparency)
+            {
+                return colors.WithAlpha(contrast * -1);
+            }
+            else
+            {
+                return colors.Shade(Color.FromRgb(contrast, contrast, contrast));
+            }
+        }
+
         public static Color[] Shade(this Color[] colors, Color color)
         {
             return colors.Select(_color => _color.Shade(color)).ToArray();
@@ -1020,7 +1032,12 @@ namespace FoxTunes
             return true;
         }
 
-        public static Color Interpolate(Color color1, Color color2, float ratio)
+        public static Color[] Interpolate(this Color[] colors, Color color, float ratio)
+        {
+            return colors.Select(_color => _color.Interpolate(color, ratio)).ToArray();
+        }
+
+        public static Color Interpolate(this Color color1, Color color2, float ratio)
         {
             var ratio1 = 1 - ratio;
             var ratio2 = ratio;
