@@ -1,9 +1,10 @@
 ﻿using FoxTunes.Interfaces;
+using ManagedBass;
 using ManagedBass.Wasapi;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -17,51 +18,118 @@ namespace FoxTunes
             }
         }
 
-        const int INIT_ATTEMPTS = 5;
-
-        const int INIT_ATTEMPT_INTERVAL = 400;
-
-        public const int PRIMARY_CHANNEL = 0;
-
-        public const int SECONDARY_CHANNEL = 1;
-
         static BassWasapiDevice()
         {
-            Devices = new Dictionary<int, BassWasapiDeviceInfo>();
+            //Perhaps we shouldn't Reset each time the output is started.
+            //But what if the system config changes and the current device id isn't what we think it is?
+            //var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
+            //configuration.GetElement<SelectionConfigurationElement>(
+            //    BassOutputConfiguration.SECTION,
+            //    BassWasapiStreamOutputConfiguration.ELEMENT_WASAPI_DEVICE
+            //).ConnectValue(value => Reset());
+            //configuration.GetElement<CommandConfigurationElement>(
+            //    BassOutputConfiguration.SECTION,
+            //    BassWasapiStreamOutputConfiguration.ELEMENT_REFRESH
+            //).Invoked += (sender, e) => Reset();
         }
 
-        private static IDictionary<int, BassWasapiDeviceInfo> Devices { get; set; }
-
-        public static int Device { get; private set; }
+        public static bool IsInitialized { get; private set; }
 
         public static bool IsDefaultDevice
         {
             get
             {
-                return Device == BassWasapi.DefaultDevice;
+                return Info != null && Info.Device == BassWasapi.DefaultDevice;
             }
         }
 
-        public static bool Exclusive { get; private set; }
-
-        public static bool EventDriven { get; private set; }
-
-        public static bool Dither { get; private set; }
-
-        public static bool IsInitialized { get; private set; }
-
-        public static void Init(int frequency = 0, int channels = 0)
+        public static void Init(int device, bool exclusive, bool autoFormat, bool buffer, bool eventDriven, bool dither, int frequency, int channels, BassFlags flags)
         {
-            Init(Device, Exclusive, EventDriven, Dither, frequency, channels);
+            if (IsInitialized)
+            {
+                throw new InvalidOperationException("Device is already initialized.");
+            }
+
+            IsInitialized = true;
+
+            LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Initializing BASS WASAPI.");
+
+            try
+            {
+                BassUtils.OK(
+                    BassWasapiHandler.Init(
+                        device,
+                        0,
+                        0,
+                        GetFlags(exclusive, autoFormat, buffer, eventDriven, dither),
+                        0,
+                        0
+                    )
+                );
+
+                LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Initialized BASS WASAPI.");
+            }
+            catch
+            {
+                Free();
+                throw;
+            }
         }
 
-        public static void Init(int device, bool exclusive, bool eventDriven, bool dither, int frequency = 0, int channels = 0)
+        public static void Detect(int device, bool exclusive, bool autoFormat, bool buffer, bool eventDriven, bool dither)
         {
-            LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Initializing BASS WASAPI.");
+            if (IsInitialized)
+            {
+                throw new InvalidOperationException("Device is already initialized.");
+            }
+
+            IsInitialized = true;
+
+            LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detecting WASAPI device.");
+
+            try
+            {
+                var flags = GetFlags(exclusive, autoFormat, buffer, eventDriven, dither);
+                BassUtils.OK(BassWasapiHandler.Init(device, 0, 0, flags, 0, 0));
+                var deviceInfo = default(WasapiDeviceInfo);
+                BassUtils.OK(BassWasapi.GetDeviceInfo(device, out deviceInfo));
+                Info = new BassWasapiDeviceInfo(
+                    device,
+                    deviceInfo.MixFrequency,
+                    0,
+                    deviceInfo.MixChannels,
+                    GetSupportedFormats(device, flags),
+                    BassWasapi.CheckFormat(device, deviceInfo.MixFrequency, deviceInfo.MixChannels, flags)
+                );
+
+                LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detected WASAPI device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}, Format = {4}", device, Info.Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(WasapiFormat), Info.Format));
+                LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detected WASAPI device: {0} => Rates => {1}", device, string.Join(", ", Info.SupportedRates));
+            }
+            finally
+            {
+                Free();
+            }
+        }
+
+        public static void Reset()
+        {
+            Info = null;
+        }
+
+        private static WasapiInitFlags GetFlags(bool exclusive, bool autoFormat, bool buffer, bool eventDriven, bool dither)
+        {
             var flags = WasapiInitFlags.Shared;
             if (exclusive)
             {
                 flags |= WasapiInitFlags.Exclusive;
+            }
+            if (autoFormat)
+            {
+                flags |= WasapiInitFlags.AutoFormat;
+            }
+            if (buffer)
+            {
+                flags |= WasapiInitFlags.Buffer;
             }
             if (eventDriven)
             {
@@ -71,43 +139,7 @@ namespace FoxTunes
             {
                 flags |= WasapiInitFlags.Dither;
             }
-            BassUtils.OK(BassWasapiHandler.Init(device, frequency, channels, flags, 0, 0));
-            IsInitialized = true;
-            Device = device;
-            Exclusive = exclusive;
-            EventDriven = eventDriven;
-            var exception = default(Exception);
-            for (var a = 1; a <= INIT_ATTEMPTS; a++)
-            {
-                LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detecting WASAPI device, attempt: {0}", a);
-                try
-                {
-                    var deviceInfo = default(WasapiDeviceInfo);
-                    BassUtils.OK(BassWasapi.GetDeviceInfo(device, out deviceInfo));
-                    Devices[device] = new BassWasapiDeviceInfo(
-                        deviceInfo.MixFrequency,
-                        0,
-                        deviceInfo.MixChannels,
-                        GetSupportedFormats(device, flags),
-                        BassWasapi.CheckFormat(device, deviceInfo.MixFrequency, deviceInfo.MixChannels, flags)
-                    );
-                    LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detected WASAPI device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}, Format = {4}", Device, Devices[device].Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(WasapiFormat), Info.Format));
-                    LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Debug, "Detected WASAPI device: {0} => Rates => {1}", Device, string.Join(", ", Devices[device].SupportedRates));
-                    return;
-                }
-                catch (Exception e)
-                {
-                    exception = e;
-                    LogManager.Logger.Write(typeof(BassWasapiDevice), LogLevel.Warn, "Failed to detect WASAPI device: {0}", e.Message);
-                }
-                Thread.Sleep(INIT_ATTEMPT_INTERVAL);
-            }
-            if (exception != null)
-            {
-                Free();
-                throw exception;
-            }
-            throw new NotImplementedException();
+            return flags;
         }
 
         private static IDictionary<int, WasapiFormat> GetSupportedFormats(int device, WasapiInitFlags flags)
@@ -137,22 +169,13 @@ namespace FoxTunes
             IsInitialized = false;
         }
 
-        public static BassWasapiDeviceInfo Info
-        {
-            get
-            {
-                if (!Devices.ContainsKey(Device))
-                {
-                    return null;
-                }
-                return Devices[Device];
-            }
-        }
+        public static BassWasapiDeviceInfo Info { get; private set; }
 
         public class BassWasapiDeviceInfo
         {
-            public BassWasapiDeviceInfo(int rate, int inputs, int outputs, IDictionary<int, WasapiFormat> supportedFormats, WasapiFormat format)
+            public BassWasapiDeviceInfo(int device, int rate, int inputs, int outputs, IDictionary<int, WasapiFormat> supportedFormats, WasapiFormat format)
             {
+                this.Device = device;
                 this.Rate = rate;
                 this.Inputs = inputs;
                 this.Outputs = outputs;
@@ -163,6 +186,8 @@ namespace FoxTunes
 #endif
                 this.Format = format;
             }
+
+            public int Device { get; private set; }
 
             public int Rate { get; private set; }
 
@@ -188,6 +213,7 @@ namespace FoxTunes
 
             public int GetNearestRate(int rate)
             {
+                //Find the closest supported rate.
                 foreach (var supportedRate in this.SupportedRates)
                 {
                     if (supportedRate >= rate)
@@ -195,7 +221,8 @@ namespace FoxTunes
                         return supportedRate;
                     }
                 }
-                return rate;
+                //Ah. The minimum supported rate is not enough.
+                return this.SupportedRates.LastOrDefault();
             }
         }
     }

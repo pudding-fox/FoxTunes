@@ -42,9 +42,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\lib\bassmix.dll" Link="bassmix.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="..\lib\basswasapi.dll" Link="basswasapi.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

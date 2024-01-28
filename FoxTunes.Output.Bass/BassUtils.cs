@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text;
+using System.Linq;
 
 namespace FoxTunes
 {
@@ -144,7 +146,7 @@ namespace FoxTunes
     public class BassException : Exception
     {
         public BassException(Errors error)
-            : this(Enum.GetName(typeof(Errors), error), error)
+            : this(GetMessage(error), error)
         {
 
         }
@@ -156,5 +158,34 @@ namespace FoxTunes
         }
 
         public Errors Error { get; private set; }
+
+        private static string GetMessage(Errors errors)
+        {
+            var builder = new StringBuilder();
+            foreach (var error in Enum.GetValues(typeof(Errors)).Cast<Errors>())
+            {
+                if (!errors.HasFlag(error))
+                {
+                    continue;
+                }
+                switch (error)
+                {
+                    case Errors.OK:
+                    case Errors.Init:
+                    case Errors.Start:
+                        continue;
+                }
+                if (builder.Length > 0)
+                {
+                    builder.Append(", ");
+                }
+                builder.Append(Enum.GetName(typeof(Errors), error));
+            }
+            if (builder.Length == 0)
+            {
+                return Enum.GetName(typeof(Errors), Errors.Unknown);
+            }
+            return builder.ToString();
+        }
     }
 }
