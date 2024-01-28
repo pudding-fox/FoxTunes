@@ -30,6 +30,8 @@ namespace FoxTunes
 
         public IConfiguration Configuration { get; private set; }
 
+        public BooleanConfigurationElement MetaData { get; private set; }
+
         public BooleanConfigurationElement Popularimeter { get; private set; }
 
 #if NET40
@@ -43,6 +45,10 @@ namespace FoxTunes
             this.PlaylistManager = core.Managers.Playlist;
             this.MetaDataBrowser = core.Components.MetaDataBrowser;
             this.Configuration = core.Components.Configuration;
+            this.MetaData = this.Configuration.GetElement<BooleanConfigurationElement>(
+                MetaDataBehaviourConfiguration.SECTION,
+                MetaDataBehaviourConfiguration.ENABLE_ELEMENT
+            );
             this.Popularimeter = this.Configuration.GetElement<BooleanConfigurationElement>(
                 MetaDataBehaviourConfiguration.SECTION,
                 MetaDataBehaviourConfiguration.READ_POPULARIMETER_TAGS
@@ -66,7 +72,7 @@ namespace FoxTunes
                 {
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, REMOVE_PLAYLIST_ITEMS, "Remove");
                     yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, CROP_PLAYLIST_ITEMS, "Crop");
-                    if (this.Popularimeter.Value)
+                    if (this.MetaData.Value && this.Popularimeter.Value)
                     {
                         var invocationComponents = new Dictionary<byte, InvocationComponent>();
                         for (var a = 0; a <= 5; a++)
@@ -90,9 +96,9 @@ namespace FoxTunes
                 //ListView grouping is too slow under net40 due to lack of virtualization.
 #else
                 yield return new InvocationComponent(
-                    InvocationComponent.CATEGORY_PLAYLIST, 
-                    TOGGLE_GROUPING, 
-                    "Grouping", 
+                    InvocationComponent.CATEGORY_PLAYLIST,
+                    TOGGLE_GROUPING,
+                    "Grouping",
                     path: "Playlist",
                     attributes: this.Grouping.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
