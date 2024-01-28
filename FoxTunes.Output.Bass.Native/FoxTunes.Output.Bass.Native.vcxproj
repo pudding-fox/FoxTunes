@@ -72,6 +72,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="bass\bass.h" />
+    <ClInclude Include="bass\bassasio.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\bass.lib" />
+    <Library Include="lib\bassasio.lib" />
     <Library Include="lib\msvcrt.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

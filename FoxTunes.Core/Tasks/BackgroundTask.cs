@@ -227,7 +227,7 @@ namespace FoxTunes
                         {
                             case TaskStatus.Faulted:
                                 Logger.Write(this, LogLevel.Error, "Background task failed: {0}", task.Exception.Message);
-                                this.Exception = task.Exception;
+                                this.Exception = task.Exception.InnerException;
                                 this.OnFaulted();
                                 break;
                             default:

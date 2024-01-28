@@ -1,4 +1,5 @@
 ﻿using ManagedBass;
+using ManagedBass.Asio;
 using System;
 using System.Collections.Generic;
 
@@ -33,7 +34,7 @@ namespace FoxTunes
         {
             if (!result)
             {
-                if (Bass.LastError != Errors.OK)
+                if (Bass.LastError != Errors.OK || BassAsio.LastError != Errors.OK)
                 {
                     Throw();
                 }
@@ -45,7 +46,7 @@ namespace FoxTunes
         {
             if (result == 0)
             {
-                if (Bass.LastError != Errors.OK)
+                if (Bass.LastError != Errors.OK || BassAsio.LastError != Errors.OK)
                 {
                     Throw();
                 }
@@ -55,7 +56,14 @@ namespace FoxTunes
 
         public static void Throw()
         {
-            throw new ApplicationException(Enum.GetName(typeof(Errors), Bass.LastError));
+            if (Bass.LastError != Errors.OK)
+            {
+                throw new ApplicationException(Enum.GetName(typeof(Errors), Bass.LastError));
+            }
+            if (BassAsio.LastError != Errors.OK)
+            {
+                throw new ApplicationException(Enum.GetName(typeof(Errors), BassAsio.LastError));
+            }
         }
 
         public static int GetChannelRate(int channelHandle)

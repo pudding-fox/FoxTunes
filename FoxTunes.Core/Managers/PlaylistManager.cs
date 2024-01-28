@@ -266,6 +266,11 @@ namespace FoxTunes.Managers
             await this.PlaybackManager.Load(playlistItem, true)
                 .ContinueWith(_ =>
                 {
+                    if (this.CurrentItem == null)
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it empty.", playlistItem.Id, playlistItem.FileName);
+                        return;
+                    }
                     if (this.CurrentItem != playlistItem)
                     {
                         Logger.Write(this, LogLevel.Warn, "Expected current output stream to be {0} => {1} but it was {2} => {3}", playlistItem.Id, playlistItem.FileName, this.CurrentItem.Id, this.CurrentItem.FileName);

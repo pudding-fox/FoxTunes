@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     public class BassMasterChannel : BaseComponent, IDisposable
     {
-        const int CHANNELS = 2;
+        public const int CHANNELS = 2;
 
         public BassMasterChannel(BassOutput output)
         {
@@ -20,7 +20,7 @@ namespace FoxTunes
 
         public bool IsStarted { get; private set; }
 
-        public BassFlags Flags
+        public virtual BassFlags Flags
         {
             get
             {
@@ -40,64 +40,89 @@ namespace FoxTunes
                 this.FreeStream();
             }
             this.ChannelHandle = BASS_StreamCreateGaplessMaster(rate, CHANNELS, this.Flags, IntPtr.Zero);
-            if (this.ChannelHandle != 0)
-            {
-                Logger.Write(this, LogLevel.Debug, "Created master stream {0}/{1}: {2}.", this.Output.Rate, this.Output.Float ? "32F" : "16", this.ChannelHandle);
-                this.IsStarted = true;
-            }
-            else
+            if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();
             }
+            Logger.Write(this, LogLevel.Debug, "Created master stream {0}/{1}: {2}.", rate, this.Output.Float ? "32F" : "16", this.ChannelHandle);
+            this.OnStartedStream(rate);
+            this.IsStarted = true;
+        }
+
+        protected virtual void OnStartedStream(int rate)
+        {
+            //Nothing to do;
         }
 
         public void FreeStream()
         {
+            this.OnFreeingStream();
             Logger.Write(this, LogLevel.Debug, "Stopping master stream: {0}", this.ChannelHandle);
             Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
             this.ChannelHandle = 0;
             this.IsStarted = false;
         }
 
-        public void SetPrimaryChannel(int channelHandle)
+        protected virtual void OnFreeingStream()
         {
-            var channelRate = BassUtils.GetChannelRate(channelHandle);
-            if (!this.IsStarted)
+            //Nothing to do.
+        }
+
+        public virtual int GetPrimaryChannel()
+        {
+            return BASS_ChannelGetGaplessPrimary();
+        }
+
+        public virtual void SetPrimaryChannel(int channelHandle)
+        {
+            if (channelHandle != 0)
             {
-                this.StartStream(channelRate);
-            }
-            else
-            {
-                var currentRate = BassUtils.GetChannelRate(this.ChannelHandle);
-                if (currentRate != channelRate)
+                var channelRate = BassUtils.GetChannelRate(channelHandle);
+                if (!this.IsStarted)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Channel rate {0} differs from current rate {1}, restarting.", channelRate, currentRate);
                     this.StartStream(channelRate);
+                }
+                else
+                {
+                    var currentRate = BassUtils.GetChannelRate(this.ChannelHandle);
+                    if (currentRate != channelRate)
+                    {
+                        Logger.Write(this, LogLevel.Warn, "Channel rate {0} differs from current rate {1}, restarting.", channelRate, currentRate);
+                        this.StartStream(channelRate);
+                    }
                 }
             }
             Logger.Write(this, LogLevel.Debug, "Setting primary playback channel: {0}", channelHandle);
             BassUtils.OK(BASS_ChannelSetGaplessPrimary(channelHandle));
         }
 
-        public void SetSecondaryChannelHandle(int channelHandle)
+        public int GetSecondaryChannel()
         {
-            if (!this.IsStarted)
+            return BASS_ChannelGetGaplessSecondary();
+        }
+
+        public void SetSecondaryChannel(int channelHandle)
+        {
+            if (channelHandle != 0)
             {
-                Logger.Write(this, LogLevel.Warn, "Not yet started, cannot set secondary playback channel: {0}", channelHandle);
-                return;
-            }
-            var channelRate = BassUtils.GetChannelRate(channelHandle);
-            var currentRate = BassUtils.GetChannelRate(this.ChannelHandle);
-            if (currentRate != channelRate)
-            {
-                Logger.Write(this, LogLevel.Warn, "Channel rate {0} differs from current rate {1}, cannot set secondary playback channel: {2}", channelRate, currentRate, channelHandle);
-                return;
+                if (!this.IsStarted)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Not yet started, cannot set secondary playback channel: {0}", channelHandle);
+                    return;
+                }
+                var channelRate = BassUtils.GetChannelRate(channelHandle);
+                var currentRate = BassUtils.GetChannelRate(this.ChannelHandle);
+                if (currentRate != channelRate)
+                {
+                    Logger.Write(this, LogLevel.Warn, "Channel rate {0} differs from current rate {1}, cannot set secondary playback channel: {2}", channelRate, currentRate, channelHandle);
+                    return;
+                }
             }
             Logger.Write(this, LogLevel.Debug, "Setting secondary playback channel: {0}", channelHandle);
             BassUtils.OK(BASS_ChannelSetGaplessSecondary(channelHandle));
         }
 
-        public bool IsPlaying
+        public virtual bool IsPlaying
         {
             get
             {
@@ -105,7 +130,7 @@ namespace FoxTunes
             }
         }
 
-        public bool IsPaused
+        public virtual bool IsPaused
         {
             get
             {
@@ -113,7 +138,7 @@ namespace FoxTunes
             }
         }
 
-        public bool IsStopped
+        public virtual bool IsStopped
         {
             get
             {
@@ -121,7 +146,7 @@ namespace FoxTunes
             }
         }
 
-        public void Play()
+        public virtual void Play()
         {
             Logger.Write(this, LogLevel.Debug, "Starting master stream: {0}", this.ChannelHandle);
             try
@@ -134,7 +159,7 @@ namespace FoxTunes
             }
         }
 
-        public void Pause()
+        public virtual void Pause()
         {
             Logger.Write(this, LogLevel.Debug, "Pausing master stream: {0}", this.ChannelHandle);
             try
@@ -147,7 +172,7 @@ namespace FoxTunes
             }
         }
 
-        public void Resume()
+        public virtual void Resume()
         {
             Logger.Write(this, LogLevel.Debug, "Resuming master stream: {0}", this.ChannelHandle);
             try
@@ -160,7 +185,7 @@ namespace FoxTunes
             }
         }
 
-        public void Stop()
+        public virtual void Stop()
         {
             Logger.Write(this, LogLevel.Debug, "Stopping master stream: {0}", this.ChannelHandle);
             try
