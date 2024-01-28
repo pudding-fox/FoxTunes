@@ -68,12 +68,13 @@
                     <RowDefinition></RowDefinition>
                 </Grid.RowDefinitions>
                 <Windows:MiniPlaylist x:Name="MiniPlaylist" Style="{StaticResource PlaylistStyle}"></Windows:MiniPlaylist>
-                <Windows:Artwork x:Name="Artwork" Grid.Row="2" Style="{StaticResource ArtworkStyle}" ShowPlaceholder="True" Margin="0,0,0,2"></Windows:Artwork>
-                <Windows:StreamPosition x:Name="StreamPosition" Grid.Row="3" Margin="0,0,0,2"></Windows:StreamPosition>
-                <StackPanel x:Name="StackPanel" Grid.Row="4" Orientation="Horizontal">
+                <Windows:Artwork x:Name="Artwork" Grid.Row="1" Style="{StaticResource ArtworkStyle}" ShowPlaceholder="True" Margin="0,0,0,2"></Windows:Artwork>
+                <Windows:StreamPosition x:Name="StreamPosition" Grid.Row="2" Margin="0,0,0,2"></Windows:StreamPosition>
+                <StackPanel x:Name="StackPanel" Grid.Row="3" Orientation="Horizontal">
                     <Windows:Playback Grid.Row="2" Margin="0,0,2,0"></Windows:Playback>
                     <Windows:MiniPlayer Grid.Column="1" Grid.Row="2"></Windows:MiniPlayer>
                 </StackPanel>
+                <Windows:Components></Windows:Components>
             </Grid>
         </StackPanel>
     </Border>

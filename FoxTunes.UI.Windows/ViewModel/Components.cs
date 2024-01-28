@@ -17,6 +17,32 @@ namespace FoxTunes.ViewModel
 
         public ObservableCollection<ComponentError> Errors { get; set; }
 
+        public bool _Enabled { get; private set; }
+
+        public bool Enabled
+        {
+            get
+            {
+                return this._Enabled;
+            }
+            set
+            {
+                this._Enabled = value;
+                this.OnEnabledChanged();
+            }
+        }
+
+        protected virtual void OnEnabledChanged()
+        {
+            if (this.EnabledChanged != null)
+            {
+                this.EnabledChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Enabled");
+        }
+
+        public event EventHandler EnabledChanged = delegate { };
+
         public override void InitializeComponent(ICore core)
         {
             ComponentRegistry.Instance.ForEach(component =>
@@ -73,6 +99,10 @@ namespace FoxTunes.ViewModel
 
         public Task Add(ComponentError error)
         {
+            if (!this.Enabled)
+            {
+                return Task.CompletedTask;
+            }
             return Windows.Invoke(() =>
             {
                 if (this.Errors.Contains(error))
