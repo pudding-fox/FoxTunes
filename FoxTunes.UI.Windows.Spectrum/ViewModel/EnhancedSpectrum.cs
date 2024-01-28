@@ -55,7 +55,7 @@ namespace FoxTunes.ViewModel
             ).ConnectValue(value =>
             {
                 var bands = SpectrumBehaviourConfiguration.GetBands(value).Select(
-                    band => band < 1000 ? Convert.ToString(band) : string.Format("{0}K", band / 1000)
+                    band => band < 1000 ? Convert.ToString(band) : string.Format("{0:0.##}K", (float)band / 1000)
                 );
                 this.Bands = new StringCollection(bands);
             });

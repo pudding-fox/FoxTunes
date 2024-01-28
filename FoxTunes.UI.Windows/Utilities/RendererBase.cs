@@ -525,6 +525,11 @@ namespace FoxTunes
             return 1.0f - Math.Abs(dB) / Math.Abs(DB_MIN);
         }
 
+        protected static float ToCrestFactor(float value, float rms, float offset)
+        {
+            return Math.Min(Math.Max((value - rms) + offset, 0), 1);
+        }
+
         protected static void UpdateElementsFast(float[] values, Int32Rect[] elements, int width, int height, Orientation orientation)
         {
             if (values.Length == 0)

@@ -8,14 +8,12 @@ namespace FoxTunes
     {
         public readonly object SyncRoot = new object();
 
-        public bool IsStarted;
-
         public global::System.Timers.Timer Timer;
 
         public VisualizationBase()
         {
             this.Timer = new global::System.Timers.Timer();
-            this.Timer.AutoReset = false;
+            this.Timer.AutoReset = true;
             this.Timer.Elapsed += this.OnElapsed;
         }
 
@@ -39,12 +37,12 @@ namespace FoxTunes
 
         protected virtual void OnNotify(object sender, EventArgs e)
         {
-            if (PlaybackStateNotifier.IsPlaying && !this.IsStarted)
+            if (PlaybackStateNotifier.IsPlaying && !this.Timer.Enabled)
             {
                 Logger.Write(this, LogLevel.Debug, "Playback was started, starting renderer.");
                 this.Start();
             }
-            else if (!PlaybackStateNotifier.IsPlaying && this.IsStarted)
+            else if (!PlaybackStateNotifier.IsPlaying && this.Timer.Enabled)
             {
                 Logger.Write(this, LogLevel.Debug, "Playback was stopped, stopping renderer.");
                 this.Stop();
@@ -57,7 +55,6 @@ namespace FoxTunes
             {
                 if (this.Timer != null)
                 {
-                    this.IsStarted = true;
                     this.Timer.Start();
                 }
             }
@@ -70,7 +67,6 @@ namespace FoxTunes
                 if (this.Timer != null)
                 {
                     this.Timer.Stop();
-                    this.IsStarted = false;
                 }
             }
             if (PlaybackStateNotifier.IsPlaying)

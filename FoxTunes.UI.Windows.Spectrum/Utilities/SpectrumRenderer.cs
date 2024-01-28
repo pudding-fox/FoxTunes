@@ -69,18 +69,7 @@ namespace FoxTunes
             this.SmoothingFactor.ValueChanged += this.OnValueChanged;
             this.HoldInterval.ValueChanged += this.OnValueChanged;
             this.FFTSize.ValueChanged += this.OnValueChanged;
-#if NET40
-            var task = TaskEx.Run(async () =>
-#else
-            var task = Task.Run(async () =>
-#endif
-            {
-                await this.CreateBitmap().ConfigureAwait(false);
-                if (PlaybackStateNotifier.IsPlaying)
-                {
-                    this.Start();
-                }
-            });
+            var task = this.CreateBitmap();
         }
 
         protected virtual void OnValueChanged(object sender, EventArgs e)
@@ -146,7 +135,6 @@ namespace FoxTunes
             if (!success)
             {
                 //Failed to establish lock.
-                this.Start();
                 return;
             }
 
@@ -156,7 +144,6 @@ namespace FoxTunes
             {
                 bitmap.AddDirtyRect(new Int32Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
                 bitmap.Unlock();
-                this.Start();
             }).ConfigureAwait(false);
         }
 
