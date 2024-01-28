@@ -2,7 +2,6 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace FoxTunes
 {
@@ -41,6 +40,8 @@ namespace FoxTunes
         {
             this.ImportDate = DateTimeHelper.ToString(value);
         }
+
+        public HashSet<LibraryHierarchyNode> Parents { get; set; }
 
         public override bool Equals(IPersistableComponent other)
         {

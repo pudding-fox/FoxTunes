@@ -8,8 +8,6 @@ namespace FoxTunes
     {
         private static readonly string PREFIX = typeof(DiscogsBehaviour).Name;
 
-        public static readonly string FRONT_COVER = Enum.GetName(typeof(ArtworkType), ArtworkType.FrontCover);
-
         public DiscogsFetchArtworkTask(Discogs.ReleaseLookup[] releaseLookups) : base(releaseLookups)
         {
             this.Name = Strings.LookupArtworkTask_Name;
@@ -20,7 +18,7 @@ namespace FoxTunes
             var value = await this.ImportImage(releaseLookup).ConfigureAwait(false);
             if (!string.IsNullOrEmpty(value))
             {
-                releaseLookup.MetaData[FRONT_COVER] = value;
+                releaseLookup.MetaData[CommonImageTypes.FrontCover] = value;
                 return true;
             }
             else

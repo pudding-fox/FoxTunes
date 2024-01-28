@@ -17,8 +17,6 @@ namespace FoxTunes
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
-        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
-
         public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
 
         public IReportEmitter ReportEmitter { get; private set; }
@@ -36,7 +34,6 @@ namespace FoxTunes
             this.Core = core;
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
-            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ReportEmitter = core.Components.ReportEmitter;
             this.Profiles = ComponentRegistry.Instance.GetComponents<IBassEncoderSettings>()
@@ -115,11 +112,7 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
-            var libraryItems = this.LibraryHierarchyBrowser.GetItems(
-                this.LibraryManager.SelectedItem,
-                true
-            ).ToArray();
+            var libraryItems = this.LibraryManager.SelectedItem.Items;
             if (!libraryItems.Any())
             {
 #if NET40

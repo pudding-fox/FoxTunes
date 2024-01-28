@@ -303,7 +303,16 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            return this.RatingManager.SetRating(this.LibraryManager.SelectedItem, rating);
+            var libraryItems = this.LibraryManager.SelectedItem.Items;
+            if (!libraryItems.Any())
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            return this.RatingManager.SetRating(libraryItems, rating);
         }
 
         protected virtual Task SetPlaylistRating(string name)

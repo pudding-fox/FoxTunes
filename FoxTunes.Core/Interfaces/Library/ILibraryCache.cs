@@ -4,8 +4,10 @@ namespace FoxTunes.Interfaces
 {
     public interface ILibraryCache : IStandardComponent
     {
-        bool TryGetItem(int id, out LibraryItem playlistItem);
+        bool TryGet(int id, out LibraryItem libraryItem);
 
-        LibraryItem GetItem(int id, Func<LibraryItem> factory);
+        LibraryItem Get(int id, Func<LibraryItem> factory);
+
+        LibraryItem AddOrUpdate(LibraryItem libraryItem);
     }
 }

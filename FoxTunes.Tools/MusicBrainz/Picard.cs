@@ -20,8 +20,6 @@ namespace FoxTunes
 
         public IHierarchyManager HierarchyManager { get; private set; }
 
-        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
-
         public IPlaylistCache PlaylistCache { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -36,7 +34,6 @@ namespace FoxTunes
             this.PlaylistManager = core.Managers.Playlist;
             this.MetaDataManager = core.Managers.MetaData;
             this.HierarchyManager = core.Managers.Hierarchy;
-            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.PlaylistCache = core.Components.PlaylistCache;
             this.Configuration = core.Components.Configuration;
             this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
@@ -95,10 +92,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
-            var libraryItems = this.LibraryHierarchyBrowser
-                .GetItems(this.LibraryManager.SelectedItem, false)
-                .ToArray();
+            var libraryItems = this.LibraryManager.SelectedItem.Items;
             if (!libraryItems.Any())
             {
                 return;

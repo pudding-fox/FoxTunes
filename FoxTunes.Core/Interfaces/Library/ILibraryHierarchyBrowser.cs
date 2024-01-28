@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
@@ -25,7 +24,9 @@ namespace FoxTunes.Interfaces
 
         LibraryHierarchyNode[] GetNodes(LibraryHierarchyNode libraryHierarchyNode, string filter);
 
-        IEnumerable<LibraryItem> GetItems(LibraryHierarchyNode libraryHierarchyNode, bool loadMetaData);
+        LibraryItem[] GetItems(LibraryHierarchyNode libraryHierarchyNode);
+
+        LibraryItem[] GetItems(LibraryHierarchyNode libraryHierarchyNode, string filter);
     }
 
     public enum LibraryHierarchyBrowserState : byte

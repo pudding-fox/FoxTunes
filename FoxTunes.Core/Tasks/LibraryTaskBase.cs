@@ -5,7 +5,9 @@ using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using static FoxTunes.LibraryHierarchyNode;
 
 namespace FoxTunes
 {
@@ -272,7 +274,7 @@ namespace FoxTunes
             foreach (var libraryItem in libraryItems)
             {
                 var cachedLibraryItem = default(LibraryItem);
-                if (libraryCache.TryGetItem(libraryItem.Id, out cachedLibraryItem))
+                if (libraryCache.TryGet(libraryItem.Id, out cachedLibraryItem))
                 {
                     if (!object.ReferenceEquals(libraryItem, cachedLibraryItem))
                     {
@@ -295,6 +297,23 @@ namespace FoxTunes
                 }
             }
             return result;
+        }
+
+        public static void UpdateLibraryHierarchyNodes(IEnumerable<LibraryItem> libraryItems, IEnumerable<string> names)
+        {
+            var libraryHierarchyNodes = new HashSet<LibraryHierarchyNode>();
+            foreach (var libraryItem in libraryItems)
+            {
+                if (libraryItem.Parents == null)
+                {
+                    continue;
+                }
+                libraryHierarchyNodes.AddRange(libraryItem.Parents);
+            }
+            foreach (var libraryHierarchyNode in libraryHierarchyNodes)
+            {
+                libraryHierarchyNode.RefreshMetaData(HierarchyDirection.Both);
+            }
         }
 
         public static async Task RemoveCancelledLibraryItems(IDatabaseComponent database)

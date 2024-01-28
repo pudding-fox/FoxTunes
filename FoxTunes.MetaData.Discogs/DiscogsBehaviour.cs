@@ -18,8 +18,6 @@ namespace FoxTunes
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
-        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
-
         public IOnDemandMetaDataProvider OnDemandMetaDataProvider { get; private set; }
 
         public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
@@ -39,7 +37,6 @@ namespace FoxTunes
             this.Core = core;
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
-            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             this.OnDemandMetaDataProvider = core.Components.OnDemandMetaDataProvider;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
             this.ReportEmitter = core.Components.ReportEmitter;
@@ -115,11 +112,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
-            var libraryItems = this.LibraryHierarchyBrowser.GetItems(
-                this.LibraryManager.SelectedItem,
-                true
-            ).ToArray();
+            var libraryItems = this.LibraryManager.SelectedItem.Items;
             if (!libraryItems.Any())
             {
                 return;
@@ -161,11 +154,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
-            var libraryItems = this.LibraryHierarchyBrowser.GetItems(
-                this.LibraryManager.SelectedItem,
-                true
-            ).ToArray();
+            var libraryItems = this.LibraryManager.SelectedItem.Items;
             if (!libraryItems.Any())
             {
                 return;
@@ -174,7 +163,7 @@ namespace FoxTunes
             this.OnReport(releaseLookups);
             await this.OnDemandMetaDataProvider.SetMetaData(
                 new OnDemandMetaDataRequest(
-                    DiscogsFetchArtworkTask.FRONT_COVER,
+                    CommonImageTypes.FrontCover,
                     MetaDataItemType.Image,
                     true
                 ),
@@ -197,7 +186,7 @@ namespace FoxTunes
             this.OnReport(releaseLookups);
             await this.OnDemandMetaDataProvider.SetMetaData(
                 new OnDemandMetaDataRequest(
-                    DiscogsFetchArtworkTask.FRONT_COVER,
+                    CommonImageTypes.FrontCover,
                     MetaDataItemType.Image,
                     true
                 ),
@@ -227,7 +216,7 @@ namespace FoxTunes
                     continue;
                 }
                 var value = default(string);
-                if (!releaseLookup.MetaData.TryGetValue(DiscogsFetchArtworkTask.FRONT_COVER, out value))
+                if (!releaseLookup.MetaData.TryGetValue(CommonImageTypes.FrontCover, out value))
                 {
                     continue;
                 }

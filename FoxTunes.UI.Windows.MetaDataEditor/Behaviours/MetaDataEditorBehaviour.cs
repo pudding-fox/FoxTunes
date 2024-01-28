@@ -14,13 +14,10 @@ namespace FoxTunes
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
-        public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.LibraryManager = core.Managers.Library;
             this.PlaylistManager = core.Managers.Playlist;
-            this.LibraryHierarchyBrowser = core.Components.LibraryHierarchyBrowser;
             base.InitializeComponent(core);
         }
 
@@ -70,11 +67,7 @@ namespace FoxTunes
                 return Task.CompletedTask;
 #endif
             }
-            //TODO: Warning: Buffering a potentially large sequence. It might be better to run the query multiple times.
-            var libraryItems = this.LibraryHierarchyBrowser.GetItems(
-                this.LibraryManager.SelectedItem,
-                true
-            ).ToArray();
+            var libraryItems = this.LibraryManager.SelectedItem.Items;
             if (!libraryItems.Any())
             {
 #if NET40

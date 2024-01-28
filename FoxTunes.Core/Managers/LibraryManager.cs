@@ -120,6 +120,7 @@ namespace FoxTunes
         {
             this.Core = core;
             this.HierarchyBrowser = core.Components.LibraryHierarchyBrowser;
+            this.HierarchyBrowser.FilterChanged += this.OnFilterChanged;
             this.PlaybackManager = core.Managers.Playback;
             this.DatabaseFactory = core.Factories.Database;
             this.SignalEmitter = core.Components.SignalEmitter;
@@ -128,6 +129,11 @@ namespace FoxTunes
             this.ReportEmitter = core.Components.ReportEmitter;
             this.Refresh();
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnFilterChanged(object sender, EventArgs e)
+        {
+            this.Refresh();
         }
 
         protected virtual Task OnSignal(object sender, ISignal signal)
@@ -334,6 +340,19 @@ namespace FoxTunes
         public Task Handle(IEnumerable<string> paths, int index, FileActionType type)
         {
             throw new NotImplementedException();
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.HierarchyBrowser != null)
+            {
+                this.HierarchyBrowser.FilterChanged -= this.OnFilterChanged;
+            }
+            if (this.SignalEmitter != null)
+            {
+                this.SignalEmitter.Signal -= this.OnSignal;
+            }
+            base.OnDisposing();
         }
 
         public class LibraryManagerReport : ReportComponent

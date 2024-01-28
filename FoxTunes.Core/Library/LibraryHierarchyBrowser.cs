@@ -23,6 +23,8 @@ namespace FoxTunes
 
         public ILibraryManager LibraryManager { get; private set; }
 
+        public ILibraryBrowser LibraryBrowser { get; private set; }
+
         public ILibraryHierarchyCache LibraryHierarchyCache { get; private set; }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
@@ -93,6 +95,7 @@ namespace FoxTunes
         {
             this.Core = core;
             this.LibraryManager = core.Managers.Library;
+            this.LibraryBrowser = core.Components.LibraryBrowser;
             this.LibraryHierarchyCache = core.Components.LibraryHierarchyCache;
             this.DatabaseFactory = core.Factories.Database;
             this.FilterParser = core.Components.FilterParser;
@@ -256,44 +259,72 @@ namespace FoxTunes
                     }, transaction);
                     foreach (var node in nodes)
                     {
-                        node.Parent = libraryHierarchyNode;
-                        node.InitializeComponent(this.Core);
-                        yield return node;
+                        yield return this.CreateNode(libraryHierarchyNode, node);
                     }
                 }
             }
         }
 
-        public IEnumerable<LibraryItem> GetItems(LibraryHierarchyNode libraryHierarchyNode, bool loadMetaData)
+        protected virtual LibraryHierarchyNode CreateNode(LibraryHierarchyNode parent, LibraryHierarchyNode node)
+        {
+            node.Parent = parent;
+            node.InitializeComponent(this.Core);
+            return node;
+        }
+
+        public LibraryItem[] GetItems(LibraryHierarchyNode libraryHierarchyNode)
+        {
+            return this.GetItems(libraryHierarchyNode, this.Filter);
+        }
+
+        public LibraryItem[] GetItems(LibraryHierarchyNode libraryHierarchyNode, string filter)
+        {
+            var key = new LibraryHierarchyCacheKey(null, libraryHierarchyNode, filter);
+            return this.LibraryHierarchyCache.GetItems(key, () => this.GetItemsCore(libraryHierarchyNode, filter));
+        }
+
+        protected virtual IEnumerable<LibraryItem> GetItemsCore(LibraryHierarchyNode libraryHierarchyNode, string filter)
         {
             using (var database = this.DatabaseFactory.Create())
             {
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    var items = database.ExecuteEnumerator<LibraryItem>(database.Queries.GetLibraryItems(this.Filter), (parameters, phase) =>
+                    var items = database.ExecuteEnumerator<LibraryItem>(database.Queries.GetLibraryItems(filter), (parameters, phase) =>
                     {
                         switch (phase)
                         {
                             case DatabaseParameterPhase.Fetch:
                                 parameters["libraryHierarchyId"] = libraryHierarchyNode.LibraryHierarchyId;
                                 parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
-                                parameters["loadMetaData"] = loadMetaData;
+                                parameters["loadMetaData"] = true;
                                 parameters["metaDataType"] = META_DATA_TYPE;
                                 break;
                         }
                     }, transaction);
                     foreach (var item in items)
                     {
-                        item.InitializeComponent(this.Core);
-                        yield return item;
+                        yield return this.CreateItem(libraryHierarchyNode, item);
                     }
                 }
             }
         }
 
-        private LibraryHierarchyNode FindNode(IEnumerable<LibraryHierarchyNode> nodes, string value)
+        protected virtual LibraryItem CreateItem(LibraryHierarchyNode parent, LibraryItem item)
         {
-            return nodes.FirstOrDefault(node => string.Equals(node.Value, value, StringComparison.OrdinalIgnoreCase));
+            item = this.LibraryBrowser.AddOrUpdate(item);
+            if (item.Parents == null)
+            {
+                item.Parents = new HashSet<LibraryHierarchyNode>(new[] { parent });
+            }
+            else
+            {
+                item.Parents.Add(parent);
+            }
+            if (!item.IsInitialized)
+            {
+                item.InitializeComponent(this.Core);
+            }
+            return item;
         }
 
         public bool IsDisposed { get; private set; }
