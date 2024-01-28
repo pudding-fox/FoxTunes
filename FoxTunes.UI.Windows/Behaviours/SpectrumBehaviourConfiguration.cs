@@ -20,8 +20,6 @@ namespace FoxTunes
 
         public const string BARS_256_OPTION = "EEEEFFC1-592E-4EC6-9CCD-5182935AD12E";
 
-        public const string BARS_512_OPTION = "FFFF97F3-1C4A-4660-ABC8-8E686F921FBF";
-
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, "Spectrum")
@@ -37,7 +35,6 @@ namespace FoxTunes
             yield return new SelectionConfigurationOption(BARS_64_OPTION, "64");
             yield return new SelectionConfigurationOption(BARS_128_OPTION, "128");
             yield return new SelectionConfigurationOption(BARS_256_OPTION, "256");
-            yield return new SelectionConfigurationOption(BARS_512_OPTION, "512");
         }
 
         public static int GetBars(SelectionConfigurationOption option)
@@ -55,8 +52,24 @@ namespace FoxTunes
                     return 128;
                 case BARS_256_OPTION:
                     return 256;
-                case BARS_512_OPTION:
-                    return 512;
+            }
+        }
+
+        public static int GetWidth(SelectionConfigurationOption option)
+        {
+            switch (option.Id)
+            {
+                default:
+                case BARS_16_OPTION:
+                    return 160;
+                case BARS_32_OPTION:
+                    return 160;
+                case BARS_64_OPTION:
+                    return 192;
+                case BARS_128_OPTION:
+                    return 256;
+                case BARS_256_OPTION:
+                    return 256;
             }
         }
     }
