@@ -93,7 +93,15 @@ namespace FoxTunes
             if (stream != null)
             {
                 Logger.Write(this, LogLevel.Debug, "Playing stream: {0} => {1}", stream.Id, stream.FileName);
-                await stream.Play();
+                try
+                {
+                    await stream.Play();
+                }
+                catch
+                {
+                    await this.Unload(stream);
+                    throw;
+                }
             }
             await this.OnCurrentStreamChanged();
         }
