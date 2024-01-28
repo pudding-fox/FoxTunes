@@ -515,7 +515,7 @@ namespace FoxTunes
             Logger.Write(this, LogLevel.Debug, "Unloaded stream for file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
         }
 
-        public override bool GetFormat(out int rate, out int channels, out OutputStreamFormat format)
+        public override bool GetOutputFormat(out int rate, out int channels, out OutputStreamFormat format)
         {
             var _rate = default(int);
             var _channels = default(int);
@@ -552,12 +552,12 @@ namespace FoxTunes
             return true;
         }
 
-        public override bool GetChannelMap(out IDictionary<int, OutputChannel> channels)
+        public override bool GetOutputChannelMap(out IDictionary<int, OutputChannel> channels)
         {
             var _rate = default(int);
             var _channels = default(int);
             var _format = default(OutputStreamFormat);
-            if (!this.GetFormat(out _rate, out _channels, out _format))
+            if (!this.GetOutputFormat(out _rate, out _channels, out _format))
             {
                 channels = default(IDictionary<int, OutputChannel>);
                 return false;
@@ -581,6 +581,58 @@ namespace FoxTunes
                 return result;
             }
         }
+
+        public override bool GetDataFormat(out int rate, out int channels, out OutputStreamFormat format)
+        {
+            var _rate = default(int);
+            var _channels = default(int);
+            var _flags = default(BassFlags);
+            var _result = default(bool);
+            this.PipelineManager.WithPipeline(pipeline =>
+            {
+                if (pipeline != null)
+                {
+                    _result = pipeline.Output.GetDataFormat(out _rate, out _channels, out _flags);
+                }
+            });
+            if (!_result)
+            {
+                rate = 0;
+                channels = 0;
+                format = OutputStreamFormat.None;
+                return false;
+            }
+            rate = _rate;
+            channels = _channels;
+            if (_flags.HasFlag(BassFlags.DSDRaw))
+            {
+                format = OutputStreamFormat.DSDRaw;
+            }
+            else if (_flags.HasFlag(BassFlags.Float))
+            {
+                format = OutputStreamFormat.Float;
+            }
+            else
+            {
+                format = OutputStreamFormat.Short;
+            }
+            return true;
+        }
+
+        public override bool GetDataChannelMap(out IDictionary<int, OutputChannel> channels)
+        {
+            var _rate = default(int);
+            var _channels = default(int);
+            var _format = default(OutputStreamFormat);
+            if (!this.GetDataFormat(out _rate, out _channels, out _format))
+            {
+                channels = default(IDictionary<int, OutputChannel>);
+                return false;
+            }
+            channels = BassChannelMap.GetChannelMap(_channels);
+            return true;
+        }
+
 
         public override T[] GetBuffer<T>(TimeSpan duration)
         {
@@ -638,53 +690,49 @@ namespace FoxTunes
 
         public override float[] GetBuffer(int fftSize, bool individual = false)
         {
-            var result = default(float[]);
+            var length = default(int);
+            switch (fftSize)
+            {
+                case BassFFT.FFT256:
+                    length = BassFFT.FFT256_SIZE;
+                    break;
+                case BassFFT.FFT512:
+                    length = BassFFT.FFT512_SIZE;
+                    break;
+                case BassFFT.FFT1024:
+                    length = BassFFT.FFT1024_SIZE;
+                    break;
+                case BassFFT.FFT2048:
+                    length = BassFFT.FFT2048_SIZE;
+                    break;
+                case BassFFT.FFT4096:
+                    length = BassFFT.FFT4096_SIZE;
+                    break;
+                case BassFFT.FFT8192:
+                    length = BassFFT.FFT8192_SIZE;
+                    break;
+                case BassFFT.FFT16384:
+                    length = BassFFT.FFT16384_SIZE;
+                    break;
+                case BassFFT.FFT32768:
+                    length = BassFFT.FFT32768_SIZE;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
             if (individual)
             {
-                this.PipelineManager.WithPipeline(pipeline =>
+                var rate = default(int);
+                var channels = default(int);
+                var format = default(OutputStreamFormat);
+                if (!this.GetDataFormat(out rate, out channels, out format))
                 {
-                    if (pipeline != null)
-                    {
-                        result = pipeline.Output.GetBuffer(fftSize, individual);
-                    }
-                });
-            }
-            else
-            {
-                //TODO: This code is duplicated by BassStreamOutput.GetBuffer.
-                var length = default(int);
-                switch (fftSize)
-                {
-                    case BassFFT.FFT256:
-                        length = BassFFT.FFT256_SIZE;
-                        break;
-                    case BassFFT.FFT512:
-                        length = BassFFT.FFT512_SIZE;
-                        break;
-                    case BassFFT.FFT1024:
-                        length = BassFFT.FFT1024_SIZE;
-                        break;
-                    case BassFFT.FFT2048:
-                        length = BassFFT.FFT2048_SIZE;
-                        break;
-                    case BassFFT.FFT4096:
-                        length = BassFFT.FFT4096_SIZE;
-                        break;
-                    case BassFFT.FFT8192:
-                        length = BassFFT.FFT8192_SIZE;
-                        break;
-                    case BassFFT.FFT16384:
-                        length = BassFFT.FFT16384_SIZE;
-                        break;
-                    case BassFFT.FFT32768:
-                        length = BassFFT.FFT32768_SIZE;
-                        break;
-                    default:
-                        throw new NotImplementedException();
+                    Logger.Write(this, LogLevel.Error, "Failed to determine channel count while creating interleaved FFT buffer.");
+                    return null;
                 }
-                result = new float[length];
+                length *= channels;
             }
-            return result;
+            return new float[length];
         }
 
         public override int GetData(float[] buffer, int fftSize, bool individual = false)

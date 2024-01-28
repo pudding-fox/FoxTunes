@@ -99,7 +99,7 @@ namespace FoxTunes.ViewModel
             return Windows.Invoke(() =>
             {
                 var channels = default(IDictionary<int, OutputChannel>);
-                if (this.Output.CanGetData && this.Output.GetChannelMap(out channels))
+                if (this.Output.CanGetData && this.Output.GetDataChannelMap(out channels))
                 {
                     this.Channels = new StringCollection(
                         channels.Values.Select(ChannelMap.GetChannelName)

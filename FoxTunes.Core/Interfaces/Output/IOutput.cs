@@ -38,13 +38,17 @@ namespace FoxTunes.Interfaces
 
         Task Shutdown();
 
-        bool GetFormat(out int rate, out int channels, out OutputStreamFormat format);
+        bool GetOutputFormat(out int rate, out int channels, out OutputStreamFormat format);
 
-        bool GetChannelMap(out IDictionary<int, OutputChannel> channels);
+        bool GetOutputChannelMap(out IDictionary<int, OutputChannel> channels);
 
         bool CanGetData { get; }
 
         event EventHandler CanGetDataChanged;
+
+        bool GetDataFormat(out int rate, out int channels, out OutputStreamFormat format);
+
+        bool GetDataChannelMap(out IDictionary<int, OutputChannel> channels);
 
         T[] GetBuffer<T>(TimeSpan duration) where T : struct;
 
