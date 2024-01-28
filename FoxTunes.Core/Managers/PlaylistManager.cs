@@ -3,7 +3,6 @@ using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -134,11 +133,11 @@ namespace FoxTunes
                             var playlistItem = await set.FindAsync(this.CurrentItem.Id).ConfigureAwait(false);
                             if (playlistItem != null && string.Equals(this.CurrentItem.FileName, playlistItem.FileName, StringComparison.OrdinalIgnoreCase))
                             {
-                                await this.SetCurrentItem(playlistItem).ConfigureAwait(false);
+                                this.CurrentItem = playlistItem;
                             }
                             else
                             {
-                                await this.SetCurrentItem(null).ConfigureAwait(false);
+                                this.CurrentItem = null;
                                 Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
                             }
                         }
@@ -151,23 +150,17 @@ namespace FoxTunes
             }
         }
 
-        protected virtual async void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
+        protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
         {
             Logger.Write(this, LogLevel.Debug, "Playback manager output stream changed, updating current playlist item.");
             if (this.PlaybackManager.CurrentStream == null)
             {
-                using (e.Defer())
-                {
-                    await this.SetCurrentItem(null).ConfigureAwait(false);
-                }
+                this.CurrentItem = null;
                 Logger.Write(this, LogLevel.Debug, "Playback manager output stream is empty. Cleared current playlist item.");
             }
             else if (this.PlaybackManager.CurrentStream.PlaylistItem != this.CurrentItem)
             {
-                using (e.Defer())
-                {
-                    await this.SetCurrentItem(this.PlaybackManager.CurrentStream.PlaylistItem).ConfigureAwait(false);
-                }
+                this.CurrentItem = this.PlaybackManager.CurrentStream.PlaylistItem;
                 Logger.Write(this, LogLevel.Debug, "Updated current playlist item: {0} => {1}", this.CurrentItem.Id, this.CurrentItem.FileName);
             }
         }
@@ -386,26 +379,23 @@ namespace FoxTunes
             {
                 return this._CurrentItem;
             }
+            protected set
+            {
+                this._CurrentItem = value;
+                this.OnCurrentItemChanged();
+            }
         }
 
-        private Task SetCurrentItem(PlaylistItem value)
-        {
-            this._CurrentItem = value;
-            return this.OnCurrentItemChanged();
-        }
-
-        protected virtual async Task OnCurrentItemChanged()
+        protected virtual void OnCurrentItemChanged()
         {
             if (this.CurrentItemChanged != null)
             {
-                var e = new AsyncEventArgs();
-                this.CurrentItemChanged(this, e);
-                await e.Complete().ConfigureAwait(false);
+                this.CurrentItemChanged(this, EventArgs.Empty);
             }
             this.OnPropertyChanged("CurrentItem");
         }
 
-        public event AsyncEventHandler CurrentItemChanged;
+        public event EventHandler CurrentItemChanged;
 
         private PlaylistItem[] _SelectedItems { get; set; }
 

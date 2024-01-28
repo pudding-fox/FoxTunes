@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
@@ -45,7 +44,7 @@ namespace FoxTunes.Interfaces
 
         PlaylistItem CurrentItem { get; }
 
-        event AsyncEventHandler CurrentItemChanged;
+        event EventHandler CurrentItemChanged;
 
         PlaylistItem[] SelectedItems { get; set; }
 

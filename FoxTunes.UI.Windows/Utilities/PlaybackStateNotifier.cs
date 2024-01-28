@@ -26,7 +26,7 @@ namespace FoxTunes
             Timer.Tick += OnTick;
         }
 
-        private static void OnCurrentStreamChanged(object sender, AsyncEventArgs e)
+        private static void OnCurrentStreamChanged(object sender, EventArgs e)
         {
             //Critical: Don't block in this event handler, it causes a deadlock.
 #if NET40

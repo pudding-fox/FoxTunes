@@ -24,6 +24,7 @@ namespace FoxTunes
             set
             {
                 BassUtils.OK(Bass.ChannelSetPosition(this.InnerChannelHandle, value + this.Offset, PositionFlags.Bytes));
+                this.OnPositionChanged();
             }
         }
 

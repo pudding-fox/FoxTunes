@@ -1,4 +1,5 @@
 ﻿using ManagedBass;
+using System;
 
 namespace FoxTunes.Interfaces
 {
@@ -16,8 +17,8 @@ namespace FoxTunes.Interfaces
 
         Errors Errors { get; }
 
-        event AsyncEventHandler Ending;
+        event EventHandler Ending;
 
-        event AsyncEventHandler Ended;
+        event EventHandler Ended;
     }
 }

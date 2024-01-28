@@ -25,12 +25,9 @@ namespace FoxTunes
             base.InitializeComponent(core);
         }
 
-        protected virtual async void OnEnding(object sender, AsyncEventArgs e)
+        protected virtual void OnEnding(object sender, EventArgs e)
         {
-            using (e.Defer())
-            {
-                await this.PreemptItems().ConfigureAwait(false);
-            }
+            this.Dispatch(this.PreemptItems);
         }
 
         private async Task PreemptItems()

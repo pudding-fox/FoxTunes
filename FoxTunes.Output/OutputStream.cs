@@ -51,9 +51,9 @@ namespace FoxTunes
 
         public abstract Task Stop();
 
-        public abstract event AsyncEventHandler Ending;
+        public abstract event EventHandler Ending;
 
-        public abstract event AsyncEventHandler Ended;
+        public abstract event EventHandler Ended;
 
         public virtual Task BeginSeek()
         {
