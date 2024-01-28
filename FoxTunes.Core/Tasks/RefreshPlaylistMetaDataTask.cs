@@ -15,10 +15,11 @@ namespace FoxTunes
 
         public const string ID = "8DB1257E-5854-4F8F-BAE3-D59A45DEE998";
 
-        public RefreshPlaylistMetaDataTask(IEnumerable<PlaylistItem> playlistItems)
+        public RefreshPlaylistMetaDataTask(IEnumerable<PlaylistItem> playlistItems, MetaDataUpdateType updateType)
             : base(ID)
         {
             this.PlaylistItems = playlistItems;
+            this.UpdateType = updateType;
         }
 
         public override bool Visible
@@ -38,6 +39,8 @@ namespace FoxTunes
         }
 
         public IEnumerable<PlaylistItem> PlaylistItems { get; private set; }
+
+        public MetaDataUpdateType UpdateType { get; private set; }
 
         public IDatabaseComponent Database { get; private set; }
 
@@ -116,7 +119,7 @@ namespace FoxTunes
             var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             names.AddRange(PlaylistTaskBase.UpdateLibraryCache(this.LibraryCache, this.PlaylistItems, null));
             names.AddRange(PlaylistTaskBase.UpdatePlaylistCache(this.PlaylistCache, this.PlaylistItems, null));
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, names)).ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, new MetaDataUpdatedSignalState(this.PlaylistItems, names, this.UpdateType))).ConfigureAwait(false);
         }
 
         private async Task WritePlaylistMetaData(PlaylistItem playlistItem)

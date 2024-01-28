@@ -72,27 +72,7 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.MetaDataUpdated:
-                    var names = signal.State as IEnumerable<string>;
-                    var appliesTo = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    foreach (var key in this.Keys)
-                    {
-                        if (string.IsNullOrEmpty(key.Filter))
-                        {
-                            //No filter.
-                            continue;
-                        }
-                        if (names != null && names.Any())
-                        {
-                            //If we know what meta data was updated then check if the filter applies to it.
-                            if (!appliesTo.GetOrAdd(key.Filter, filter => this.FilterParser.AppliesTo(filter, names)))
-                            {
-                                //It's unrelated.
-                                continue;
-                            }
-                        }
-                        //The cache entry is affected by the meta data update, invalidate it.
-                        this.Evict(key);
-                    }
+                    this.OnMetaDataUpdated(signal.State as MetaDataUpdatedSignalState);
                     break;
                 case CommonSignals.HierarchiesUpdated:
                     Logger.Write(this, LogLevel.Debug, "Hierarchies were updated, resetting cache.");
@@ -104,6 +84,30 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        protected virtual void OnMetaDataUpdated(MetaDataUpdatedSignalState state)
+        {
+            var appliesTo = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            foreach (var key in this.Keys)
+            {
+                if (string.IsNullOrEmpty(key.Filter))
+                {
+                    //No filter.
+                    continue;
+                }
+                if (state != null && state.Names != null && state.Names.Any())
+                {
+                    //If we know what meta data was updated then check if the filter applies to it.
+                    if (!appliesTo.GetOrAdd(key.Filter, filter => this.FilterParser.AppliesTo(filter, state.Names)))
+                    {
+                        //It's unrelated.
+                        continue;
+                    }
+                }
+                //The cache entry is affected by the meta data update, invalidate it.
+                this.Evict(key);
+            }
         }
 
         public LibraryHierarchy[] GetHierarchies(Func<IEnumerable<LibraryHierarchy>> factory)

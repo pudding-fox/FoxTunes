@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -28,14 +29,7 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.MetaDataUpdated:
-                    var names = signal.State as IEnumerable<string>;
-                    if (names == null || names.Contains(CommonStatistics.Rating, StringComparer.OrdinalIgnoreCase))
-                    {
-                        foreach (var rating in Active)
-                        {
-                            rating.Refresh();
-                        }
-                    }
+                    OnMetaDataUpdated(signal.State as MetaDataUpdatedSignalState);
                     break;
             }
 #if NET40
@@ -43,6 +37,17 @@ namespace FoxTunes.ViewModel
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        private static void OnMetaDataUpdated(MetaDataUpdatedSignalState state)
+        {
+            if (state == null || state.Names == null || state.Names.Contains(CommonStatistics.Rating, StringComparer.OrdinalIgnoreCase))
+            {
+                foreach (var rating in Active)
+                {
+                    rating.Refresh();
+                }
+            }
         }
 
         public static IEnumerable<Rating> Active

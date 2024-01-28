@@ -199,4 +199,21 @@ namespace FoxTunes
         CustomTag = 32,
         All = Tag | Property | Image | Statistic | Document | CustomTag
     }
+
+    public enum MetaDataUpdateType : byte
+    {
+        None,
+        System,
+        User
+    }
+
+    [Flags]
+    public enum MetaDataUpdateFlags : byte
+    {
+        None,
+        WriteToFiles,
+        ShowReport,
+        RefreshHierarchies,
+        All = WriteToFiles | ShowReport | RefreshHierarchies
+    }
 }

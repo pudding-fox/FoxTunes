@@ -101,9 +101,9 @@ namespace FoxTunes
             }
             return this.MetaDataManager.Save(
                 new[] { playlistItem },
-                false, //These tags cannot be "written".
-                false,
-                new[] { CustomMetaData.LeadIn, CustomMetaData.LeadOut }
+                new[] { CustomMetaData.LeadIn, CustomMetaData.LeadOut },
+                MetaDataUpdateType.System,
+                MetaDataUpdateFlags.None
             );
         }
 

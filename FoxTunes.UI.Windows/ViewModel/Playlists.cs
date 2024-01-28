@@ -181,21 +181,25 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    var playlists = signal.State as IEnumerable<Playlist>;
-                    if (playlists != null && playlists.Any())
-                    {
-                        return this.Refresh(playlists);
-                    }
-                    else
-                    {
-                        return this.Refresh();
-                    }
+                    return this.OnPlaylistUpdated(signal.State as PlaylistUpdatedSignalState);
             }
 #if NET40
             return TaskEx.FromResult(false);
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        protected virtual Task OnPlaylistUpdated(PlaylistUpdatedSignalState state)
+        {
+            if (state != null && state.Playlists != null && state.Playlists.Any())
+            {
+                return this.Refresh(state.Playlists);
+            }
+            else
+            {
+                return this.Refresh();
+            }
         }
 
         protected virtual void OnSelectedPlaylistChanged(object sender, EventArgs e)

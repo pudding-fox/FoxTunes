@@ -2,6 +2,7 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Design;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -44,15 +45,7 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    var playlists = signal.State as IEnumerable<Playlist>;
-                    if (playlists != null && playlists.Any())
-                    {
-
-                    }
-                    else
-                    {
-                        this.Dispatch(() => this.Refresh(true));
-                    }
+                    this.OnPlaylistUpdated(signal.State as PlaylistUpdatedSignalState);
                     break;
             }
 #if NET40
@@ -60,6 +53,18 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        protected virtual void OnPlaylistUpdated(PlaylistUpdatedSignalState state)
+        {
+            if (state != null && state.Playlists != null && state.Playlists.Any())
+            {
+                //Nothing to do.
+            }
+            else
+            {
+                this.Dispatch(() => this.Refresh(true));
+            }
         }
 
         protected virtual async Task Refresh(bool force)

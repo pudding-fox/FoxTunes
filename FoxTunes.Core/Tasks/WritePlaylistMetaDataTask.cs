@@ -15,12 +15,13 @@ namespace FoxTunes
 
         public const string ID = "8DB1257E-5854-4F8F-BAE3-D59A45DEE998";
 
-        public WritePlaylistMetaDataTask(IEnumerable<PlaylistItem> playlistItems, IEnumerable<string> names, bool writeToFiles)
+        public WritePlaylistMetaDataTask(IEnumerable<PlaylistItem> playlistItems, IEnumerable<string> names, MetaDataUpdateType updateType, MetaDataUpdateFlags flags)
             : base(ID)
         {
             this.PlaylistItems = playlistItems;
             this.Names = names;
-            this.WriteToFiles = writeToFiles;
+            this.UpdateType = updateType;
+            this.Flags = flags;
             this.Errors = new Dictionary<PlaylistItem, IList<string>>();
         }
 
@@ -44,7 +45,9 @@ namespace FoxTunes
 
         public IEnumerable<string> Names { get; private set; }
 
-        public bool WriteToFiles { get; private set; }
+        public MetaDataUpdateType UpdateType { get; private set; }
+
+        public MetaDataUpdateFlags Flags { get; private set; }
 
         public IDictionary<PlaylistItem, IList<string>> Errors { get; private set; }
 
@@ -115,7 +118,7 @@ namespace FoxTunes
                         await this.WritePlaylistMetaData(playlistItem).ConfigureAwait(false);
                     }
 
-                    if (this.WriteToFiles)
+                    if (this.Flags.HasFlag(MetaDataUpdateFlags.WriteToFiles))
                     {
                         if (!await this.MetaDataManager.Synchronize(new[] { playlistItem }, this.Names.ToArray()).ConfigureAwait(false))
                         {
@@ -134,7 +137,7 @@ namespace FoxTunes
         protected override async Task OnCompleted()
         {
             await base.OnCompleted().ConfigureAwait(false);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, this.Names)).ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, new MetaDataUpdatedSignalState(this.PlaylistItems, this.Names, this.UpdateType))).ConfigureAwait(false);
         }
 
         private async Task WritePlaylistMetaData(PlaylistItem playlistItem)

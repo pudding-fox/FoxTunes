@@ -210,8 +210,7 @@ namespace FoxTunes.ViewModel
             await Windows.Invoke(() => this.IsSaving = true).ConfigureAwait(false);
             try
             {
-                await this.MetaDataManager.Save(fileDatas, true, true, names.ToArray()).ConfigureAwait(false);
-                await this.HierarchyManager.Refresh(fileDatas, names.ToArray()).ConfigureAwait(false);
+                await this.MetaDataManager.Save(fileDatas, names, MetaDataUpdateType.User, MetaDataUpdateFlags.All).ConfigureAwait(false);
             }
             finally
             {

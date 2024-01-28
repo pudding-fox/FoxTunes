@@ -63,7 +63,7 @@ namespace FoxTunes
             {
                 return false;
             }
-            if (request.User)
+            if (request.UpdateType.HasFlag(MetaDataUpdateType.User))
             {
                 //User requests are always processed.
                 return true;
@@ -102,7 +102,12 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Debug, "Looking up lyrics for file \"{0}\": OK.", fileData.FileName);
                 values.Add(new OnDemandMetaDataValue(fileData, result.Lyrics));
             }
-            return new OnDemandMetaDataValues(values, this.Behaviour.WriteTags.Value);
+            var flags = MetaDataUpdateFlags.None;
+            if (this.Behaviour.WriteTags.Value)
+            {
+                flags |= MetaDataUpdateFlags.WriteToFiles;
+            }
+            return new OnDemandMetaDataValues(values, flags);
         }
 
         protected virtual LyricsProvider GetAutoLookupProvider()

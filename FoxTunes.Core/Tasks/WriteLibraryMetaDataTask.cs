@@ -15,11 +15,12 @@ namespace FoxTunes
 
         public const string ID = "3EDED881-5AFD-46B2-AD53-78290E535F2E";
 
-        public WriteLibraryMetaDataTask(IEnumerable<LibraryItem> libraryItems, bool writeToFiles, IEnumerable<string> names) : base(ID)
+        public WriteLibraryMetaDataTask(IEnumerable<LibraryItem> libraryItems, IEnumerable<string> names, MetaDataUpdateType updateType, MetaDataUpdateFlags flags) : base(ID)
         {
             this.LibraryItems = libraryItems;
             this.Names = names;
-            this.WriteToFiles = writeToFiles;
+            this.UpdateType = updateType;
+            this.Flags = flags;
             this.Errors = new Dictionary<LibraryItem, IList<string>>();
         }
 
@@ -43,7 +44,9 @@ namespace FoxTunes
 
         public IEnumerable<string> Names { get; private set; }
 
-        public bool WriteToFiles { get; private set; }
+        public MetaDataUpdateType UpdateType { get; private set; }
+
+        public MetaDataUpdateFlags Flags { get; private set; }
 
         public IDictionary<LibraryItem, IList<string>> Errors { get; private set; }
 
@@ -105,7 +108,7 @@ namespace FoxTunes
                     libraryItem.Status = LibraryItemStatus.Import;
                     await LibraryTaskBase.UpdateLibraryItem(this.Database, libraryItem).ConfigureAwait(false);
 
-                    if (this.WriteToFiles)
+                    if (this.Flags.HasFlag(MetaDataUpdateFlags.WriteToFiles))
                     {
                         if (!await this.MetaDataManager.Synchronize(new[] { libraryItem }, this.Names.ToArray()).ConfigureAwait(false))
                         {
@@ -125,7 +128,7 @@ namespace FoxTunes
         {
             await base.OnCompleted().ConfigureAwait(false);
             LibraryTaskBase.UpdateLibraryHierarchyNodes(this.LibraryItems, this.Names);
-            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, this.Names)).ConfigureAwait(false);
+            await this.SignalEmitter.Send(new Signal(this, CommonSignals.MetaDataUpdated, new MetaDataUpdatedSignalState(this.LibraryItems, this.Names, this.UpdateType))).ConfigureAwait(false);
         }
 
         private async Task WriteLibraryMetaData(LibraryItem libraryItem)

@@ -213,20 +213,35 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistColumnsUpdated:
-                    var columns = signal.State as IEnumerable<PlaylistColumn>;
-                    if (columns != null && columns.Any())
-                    {
-                        await this.RefreshColumns().ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        await this.ReloadColumns().ConfigureAwait(false);
-                    }
+                    await this.OnPlaylistColumnsUpdated(signal.State as PlaylistColumnsUpdatedSignalState).ConfigureAwait(false);
                     break;
                 case CommonSignals.MetaDataUpdated:
-                    var names = signal.State as IEnumerable<string>;
-                    await this.RefreshColumns(names).ConfigureAwait(false);
+                    await this.OnMetaDataUpdated(signal.State as MetaDataUpdatedSignalState).ConfigureAwait(false);
                     break;
+            }
+        }
+
+        protected virtual async Task OnPlaylistColumnsUpdated(PlaylistColumnsUpdatedSignalState state)
+        {
+            if (state != null && state.Columns != null && state.Columns.Any())
+            {
+                await this.RefreshColumns().ConfigureAwait(false);
+            }
+            else
+            {
+                await this.ReloadColumns().ConfigureAwait(false);
+            }
+        }
+
+        protected virtual async Task OnMetaDataUpdated(MetaDataUpdatedSignalState state)
+        {
+            if (state != null && state.Names != null && state.Names.Any())
+            {
+                await this.RefreshColumns(state.Names).ConfigureAwait(false);
+            }
+            else
+            {
+                await this.RefreshColumns(Enumerable.Empty<string>()).ConfigureAwait(false);
             }
         }
 

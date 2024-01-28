@@ -8,9 +8,17 @@ namespace FoxTunes
 {
     public class DiscogsFetchTagsTask : DiscogsLookupTask
     {
-        public DiscogsFetchTagsTask(Discogs.ReleaseLookup[] releaseLookups) : base(releaseLookups)
+        public DiscogsFetchTagsTask(Discogs.ReleaseLookup[] releaseLookups, MetaDataUpdateType updateType) : base(releaseLookups)
+        {
+            this.UpdateType = updateType;
+        }
+
+        public MetaDataUpdateType UpdateType { get; private set; }
+
+        protected override Task OnStarted()
         {
             this.Name = Strings.LookupTagsTask_Name;
+            return base.OnStarted();
         }
 
         protected override Task<bool> OnLookupSuccess(Discogs.ReleaseLookup releaseLookup)
@@ -50,8 +58,12 @@ namespace FoxTunes
             }
             if (names.Any())
             {
-                await this.MetaDataManager.Save(releaseLookup.FileDatas, this.WriteTags.Value, false, names.ToArray()).ConfigureAwait(false);
-                await this.HierarchyManager.Refresh(releaseLookup.FileDatas, names.ToArray()).ConfigureAwait(false);
+                var flags = MetaDataUpdateFlags.None;
+                if (this.WriteTags.Value)
+                {
+                    flags |= MetaDataUpdateFlags.WriteToFiles;
+                }
+                await this.MetaDataManager.Save(releaseLookup.FileDatas, names, this.UpdateType, flags).ConfigureAwait(false);
             }
             return true;
         }

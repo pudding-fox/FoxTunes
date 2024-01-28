@@ -43,32 +43,10 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    var playlists = signal.State as IEnumerable<Playlist>;
-                    if (playlists != null && playlists.Any())
-                    {
-                        foreach (var playlist in playlists)
-                        {
-                            Logger.Write(this, LogLevel.Debug, "Playlist \"{0}\" was updated, resetting cache.", playlist.Name);
-                            this.Reset(playlist);
-                        }
-                    }
-                    else
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Playlists were updated, resetting cache.");
-                        this.Reset();
-                    }
+                    this.OnPlaylistUpdated(signal.State as PlaylistUpdatedSignalState);
                     break;
                 case CommonSignals.PlaylistColumnsUpdated:
-                    var columns = signal.State as IEnumerable<PlaylistColumn>;
-                    if (columns != null && columns.Any())
-                    {
-                        //Nothing to do for indivudual column change.
-                    }
-                    else
-                    {
-                        Logger.Write(this, LogLevel.Debug, "Columns were updated, resetting cache.");
-                        this.Columns = null;
-                    }
+                    this.OnPlaylistColumnsUpdated(signal.State as PlaylistColumnsUpdatedSignalState);
                     break;
             }
 #if NET40
@@ -76,6 +54,36 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        protected virtual void OnPlaylistUpdated(PlaylistUpdatedSignalState state)
+        {
+            if (state != null && state.Playlists != null && state.Playlists.Any())
+            {
+                foreach (var playlist in state.Playlists)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Playlist \"{0}\" was updated, resetting cache.", playlist.Name);
+                    this.Reset(playlist);
+                }
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "Playlists were updated, resetting cache.");
+                this.Reset();
+            }
+        }
+
+        protected virtual void OnPlaylistColumnsUpdated(PlaylistColumnsUpdatedSignalState state)
+        {
+            if (state != null && state.Columns != null && state.Columns.Any())
+            {
+                //Nothing to do for indivudual column change.
+            }
+            else
+            {
+                Logger.Write(this, LogLevel.Debug, "Columns were updated, resetting cache.");
+                this.Columns = null;
+            }
         }
 
         public PlaylistColumn[] GetColumns(Func<IEnumerable<PlaylistColumn>> factory)

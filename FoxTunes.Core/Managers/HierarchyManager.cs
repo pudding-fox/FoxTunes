@@ -75,7 +75,7 @@ namespace FoxTunes
             }
         }
 
-        public Task<bool> Refresh(IEnumerable<IFileData> fileDatas, params string[] names)
+        public Task<bool> Refresh(IEnumerable<IFileData> fileDatas, IEnumerable<string> names)
         {
             if (!this.RefreshRequired(fileDatas))
             {
@@ -107,7 +107,7 @@ namespace FoxTunes
             return false;
         }
 
-        public async Task<bool> Refresh(params string[] names)
+        public async Task<bool> Refresh(IEnumerable<string> names)
         {
             if (!this.RefreshRequired(names))
             {

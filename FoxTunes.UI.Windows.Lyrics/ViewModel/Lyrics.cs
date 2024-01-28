@@ -209,14 +209,25 @@ namespace FoxTunes.ViewModel
             switch (signal.Name)
             {
                 case CommonSignals.MetaDataUpdated:
-                    var names = signal.State as IEnumerable<string>;
-                    return this.Refresh(names);
+                    return this.OnMetaDataUpdated(signal.State as MetaDataUpdatedSignalState);
             }
 #if NET40
             return TaskEx.FromResult(false);
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        protected virtual Task OnMetaDataUpdated(MetaDataUpdatedSignalState state)
+        {
+            if (state != null && state.Names != null)
+            {
+                return this.Refresh(state.Names);
+            }
+            else
+            {
+                return this.Refresh(Enumerable.Empty<string>());
+            }
         }
 
         protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
@@ -261,7 +272,7 @@ namespace FoxTunes.ViewModel
                     new OnDemandMetaDataRequest(
                         CommonMetaData.Lyrics,
                         MetaDataItemType.Tag,
-                        false
+                        MetaDataUpdateType.System
                     )
                 ).ConfigureAwait(false);
             }

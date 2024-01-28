@@ -147,7 +147,7 @@ namespace FoxTunes
             }
             if (columns.Any())
             {
-                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated, columns.ToArray())).ConfigureAwait(false);
+                await this.SignalEmitter.Send(new Signal(this, CommonSignals.PlaylistColumnsUpdated, new PlaylistColumnsUpdatedSignalState(columns))).ConfigureAwait(false);
             }
         }
 

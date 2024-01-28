@@ -20,13 +20,10 @@ namespace FoxTunes
 
         public IMetaDataManager MetaDataManager { get; private set; }
 
-        public IHierarchyManager HierarchyManager { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.Sources.AddRange(ComponentRegistry.Instance.GetComponents<IOnDemandMetaDataSource>());
             this.MetaDataManager = core.Managers.MetaData;
-            this.HierarchyManager = core.Managers.Hierarchy;
             base.InitializeComponent(core);
         }
 
@@ -49,7 +46,7 @@ namespace FoxTunes
                 var queue = new HashSet<IFileData>(fileDatas.Except(values.Keys));
                 if (queue.Any())
                 {
-                    var sources = this.GetSources(request.Name, request.Type);
+                    var sources = this.GetSources(request.Name, request.ItemType);
                     foreach (var source in sources)
                     {
                         var result = await source.GetValues(
@@ -86,7 +83,7 @@ namespace FoxTunes
                 lock (fileData.MetaDatas)
                 {
                     var metaDataItem = fileData.MetaDatas.FirstOrDefault(
-                         element => string.Equals(element.Name, request.Name, StringComparison.OrdinalIgnoreCase) && element.Type == request.Type
+                         element => string.Equals(element.Name, request.Name, StringComparison.OrdinalIgnoreCase) && element.Type == request.ItemType
                     );
                     if (metaDataItem != null)
                     {
@@ -122,25 +119,21 @@ namespace FoxTunes
             lock (value.FileData.MetaDatas)
             {
                 var metaDataItem = value.FileData.MetaDatas.FirstOrDefault(
-                    element => string.Equals(element.Name, request.Name, StringComparison.OrdinalIgnoreCase) && element.Type == request.Type
+                    element => string.Equals(element.Name, request.Name, StringComparison.OrdinalIgnoreCase) && element.Type == request.ItemType
                 );
                 if (metaDataItem == null)
                 {
-                    metaDataItem = new MetaDataItem(request.Name, request.Type);
+                    metaDataItem = new MetaDataItem(request.Name, request.ItemType);
                     value.FileData.MetaDatas.Add(metaDataItem);
                 }
                 metaDataItem.Value = value.Value;
             }
         }
 
-        protected virtual async Task SaveMetaData(OnDemandMetaDataRequest request, OnDemandMetaDataValues result)
+        protected virtual Task SaveMetaData(OnDemandMetaDataRequest request, OnDemandMetaDataValues result)
         {
             var fileDatas = result.Values.Select(value => value.FileData).ToArray();
-            await this.MetaDataManager.Save(fileDatas, result.Write, result.Write, request.Name).ConfigureAwait(false);
-            if (request.User)
-            {
-                await this.HierarchyManager.Refresh(fileDatas, request.Name);
-            }
+            return this.MetaDataManager.Save(fileDatas, new[] { request.Name }, request.UpdateType, result.Flags);
         }
     }
 }

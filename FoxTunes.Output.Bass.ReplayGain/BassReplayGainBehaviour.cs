@@ -328,11 +328,16 @@ namespace FoxTunes
                     names.Add(name);
                 }
             }
+            var flags = MetaDataUpdateFlags.None;
+            if (this.WriteTags)
+            {
+                flags |= MetaDataUpdateFlags.WriteToFiles;
+            }
             await this.MetaDataManager.Save(
                 new[] { stream.PlaylistItem },
-                this.WriteTags,
-                false,
-                names.ToArray()
+                names,
+                MetaDataUpdateType.System,
+                flags
             ).ConfigureAwait(false);
         }
 

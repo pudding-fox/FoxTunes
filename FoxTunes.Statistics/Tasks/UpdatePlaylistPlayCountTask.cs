@@ -46,15 +46,16 @@ namespace FoxTunes
                 this.UpdatePlayCount(metaDatas);
                 this.UpdateLastPlayed(metaDatas);
             }
-            var write = MetaDataBehaviourConfiguration.GetWriteBehaviour(
-                this.Write.Value
-            ).HasFlag(WriteBehaviour.Statistics);
+            var flags = MetaDataUpdateFlags.None;
+            if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value).HasFlag(WriteBehaviour.Statistics))
+            {
+                flags |= MetaDataUpdateFlags.WriteToFiles;
+            }
             await this.MetaDataManager.Save(
                 new[] { this.PlaylistItem },
-                write,
-                false,
-                CommonStatistics.PlayCount,
-                CommonStatistics.LastPlayed
+                new[] { CommonStatistics.PlayCount, CommonStatistics.LastPlayed },
+                MetaDataUpdateType.System,
+                flags
             ).ConfigureAwait(false);
         }
 

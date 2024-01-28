@@ -245,25 +245,33 @@ namespace FoxTunes.ViewModel
             this.Debouncer.Exec(this.RefreshStatus);
         }
 
-        protected virtual async Task OnSignal(object sender, ISignal signal)
+        protected virtual Task OnSignal(object sender, ISignal signal)
         {
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    var playlists = signal.State as IEnumerable<Playlist>;
-                    if (playlists != null && playlists.Any())
-                    {
-                        var playlist = await this.GetPlaylist().ConfigureAwait(false);
-                        if (playlist == null || playlists.Contains(playlist))
-                        {
-                            await this.Refresh().ConfigureAwait(false);
-                        }
-                    }
-                    else
-                    {
-                        await this.Refresh().ConfigureAwait(false);
-                    }
-                    break;
+                    return this.OnPlaylistUpdated(signal.State as PlaylistUpdatedSignalState);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
+        protected virtual async Task OnPlaylistUpdated(PlaylistUpdatedSignalState state)
+        {
+            if (state != null && state.Playlists != null && state.Playlists.Any())
+            {
+                var playlist = await this.GetPlaylist().ConfigureAwait(false);
+                if (playlist == null || state.Playlists.Contains(playlist))
+                {
+                    await this.Refresh().ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                await this.Refresh().ConfigureAwait(false);
             }
         }
 

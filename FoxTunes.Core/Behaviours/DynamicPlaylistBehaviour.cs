@@ -49,14 +49,25 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.MetaDataUpdated:
-                    var names = signal.State as IEnumerable<string>;
-                    await this.Refresh(names).ConfigureAwait(false);
+                    await this.OnMetaDataUpdated(signal.State as MetaDataUpdatedSignalState).ConfigureAwait(false);
                     break;
                 case CommonSignals.HierarchiesUpdated:
                     await this.Refresh(false).ConfigureAwait(false);
                     break;
             }
             await base.OnSignal(sender, signal).ConfigureAwait(false);
+        }
+
+        protected Task OnMetaDataUpdated(MetaDataUpdatedSignalState state)
+        {
+            if (state != null && state.Names != null)
+            {
+                return this.Refresh(state.Names);
+            }
+            else
+            {
+                return this.Refresh(Enumerable.Empty<string>());
+            }
         }
 
         protected virtual async Task Refresh(IEnumerable<string> names)

@@ -108,11 +108,11 @@ namespace FoxTunes
                     {
                         //TODO: Bad .Result
                         fileNames = this.OnDemandMetaDataProvider.GetMetaData(
-                            libraryItems, 
+                            libraryItems,
                             new OnDemandMetaDataRequest(
-                                CommonImageTypes.FrontCover, 
-                                MetaDataItemType.Image, 
-                                false
+                                CommonImageTypes.FrontCover,
+                                MetaDataItemType.Image,
+                                MetaDataUpdateType.System
                             )
                         ).Result.ToArray();
                     }

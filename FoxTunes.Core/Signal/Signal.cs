@@ -4,7 +4,7 @@ namespace FoxTunes
 {
     public class Signal : ISignal
     {
-        public Signal(object source, string name, object state = null)
+        public Signal(object source, string name, SignalState state = null)
         {
             this.Source = source;
             this.Name = name;
@@ -15,6 +15,6 @@ namespace FoxTunes
 
         public string Name { get; private set; }
 
-        public object State { get; private set; }
+        public SignalState State { get; private set; }
     }
 }

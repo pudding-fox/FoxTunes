@@ -58,27 +58,7 @@ namespace FoxTunes
             switch (signal.Name)
             {
                 case CommonSignals.PlaylistUpdated:
-                    var playlists = signal.State as IEnumerable<Playlist>;
-                    if (playlists != null && playlists.Any())
-                    {
-                        this.RefreshSelectedItems(playlists);
-                        if (this.SelectedPlaylist == null || playlists.Contains(this.SelectedPlaylist))
-                        {
-                            this.RefreshSelectedPlaylist();
-                        }
-                        if (this.CurrentPlaylist != null && playlists.Contains(this.CurrentPlaylist))
-                        {
-                            this.RefreshCurrentPlaylist();
-                        }
-                        if (this.CurrentItem != null && playlists.Any(playlist => playlist.Id == this.CurrentItem.Playlist_Id))
-                        {
-                            this.RefreshCurrentItem();
-                        }
-                    }
-                    else
-                    {
-                        this.Refresh();
-                    }
+                    this.OnPlaylistUpdated(signal.State as PlaylistUpdatedSignalState);
                     break;
             }
 #if NET40
@@ -86,6 +66,30 @@ namespace FoxTunes
 #else
             return Task.CompletedTask;
 #endif
+        }
+
+        protected virtual void OnPlaylistUpdated(PlaylistUpdatedSignalState state)
+        {
+            if (state != null && state.Playlists != null && state.Playlists.Any())
+            {
+                this.RefreshSelectedItems(state.Playlists);
+                if (this.SelectedPlaylist == null || state.Playlists.Contains(this.SelectedPlaylist))
+                {
+                    this.RefreshSelectedPlaylist();
+                }
+                if (this.CurrentPlaylist != null && state.Playlists.Contains(this.CurrentPlaylist))
+                {
+                    this.RefreshCurrentPlaylist();
+                }
+                if (this.CurrentItem != null && state.Playlists.Any(playlist => playlist.Id == this.CurrentItem.Playlist_Id))
+                {
+                    this.RefreshCurrentItem();
+                }
+            }
+            else
+            {
+                this.Refresh();
+            }
         }
 
         public void Refresh()
