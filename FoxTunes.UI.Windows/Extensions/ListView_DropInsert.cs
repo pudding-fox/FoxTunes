@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -135,12 +134,7 @@ namespace FoxTunes
 
         private class DropInsertBehaviour : UIBehaviour
         {
-            private DropInsertBehaviour()
-            {
-                this.Callback = new DelayedCallback(this.RemoveCore, TimeSpan.FromMilliseconds(500));
-            }
-
-            public DropInsertBehaviour(ListView listView) : this()
+            public DropInsertBehaviour(ListView listView)
             {
                 this.ListView = listView;
                 this.ListView.DragEnter += this.OnDragEnter;
@@ -150,8 +144,6 @@ namespace FoxTunes
                 this.ListView.QueryContinueDrag += this.OnQueryContinueDrag;
                 this.Adorner = new DropInsertAdorner(listView);
             }
-
-            public DelayedCallback Callback { get; private set; }
 
             public ListView ListView { get; private set; }
 
@@ -190,7 +182,6 @@ namespace FoxTunes
 
             protected virtual void Add()
             {
-                this.Callback.Disable();
                 if (this.Adorner.Parent == null)
                 {
                     var layer = AdornerLayer.GetAdornerLayer(this.ListView);
@@ -204,22 +195,14 @@ namespace FoxTunes
 
             protected virtual void Remove()
             {
-                this.Callback.Enable();
-            }
-
-            protected virtual void RemoveCore()
-            {
-                var task = Windows.Invoke(() =>
+                if (this.Adorner.Parent != null)
                 {
-                    if (this.Adorner.Parent != null)
-                    {
-                        var layer = AdornerLayer.GetAdornerLayer(this.ListView);
-                        layer.Remove(this.Adorner);
-                    }
-                    SetDropInsertActive(this.ListView, false);
-                    SetDropInsertItem(this.ListView, null);
-                    SetDropInsertOffset(this.ListView, 0);
-                });
+                    var layer = AdornerLayer.GetAdornerLayer(this.ListView);
+                    layer.Remove(this.Adorner);
+                }
+                SetDropInsertActive(this.ListView, false);
+                SetDropInsertItem(this.ListView, null);
+                SetDropInsertOffset(this.ListView, 0);
             }
 
             protected virtual void UpdateDropInsertIndex(Point point)
@@ -252,6 +235,7 @@ namespace FoxTunes
             public DropInsertAdorner(ListView listView) : base(listView)
             {
                 this.ListView = listView;
+                this.IsHitTestVisible = false;
             }
 
             public ListView ListView { get; private set; }
