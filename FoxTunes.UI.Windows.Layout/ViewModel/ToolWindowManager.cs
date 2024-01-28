@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -37,48 +38,84 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ScalingFactorChanged;
 
-        private CollectionManager<ToolWindowConfiguration> _Windows { get; set; }
-
-        public CollectionManager<ToolWindowConfiguration> Windows
+        public IEnumerable<ToolWindowConfiguration> Windows
         {
             get
             {
-                return this._Windows;
-            }
-            set
-            {
-                this._Windows = value;
-                this.OnWindowsChanged();
+                if (this.Behaviour == null)
+                {
+                    return Enumerable.Empty<ToolWindowConfiguration>();
+                }
+                return this.Behaviour.Windows.Keys.ToArray();
             }
         }
 
         protected virtual void OnWindowsChanged()
         {
+            if (this.WindowsChanged != null)
+            {
+                this.WindowsChanged(this, EventArgs.Empty);
+            }
             this.OnPropertyChanged("Windows");
         }
+
+        public event EventHandler WindowsChanged;
+
+        private ToolWindowConfiguration _SelectedWindow { get; set; }
+
+        public ToolWindowConfiguration SelectedWindow
+        {
+            get
+            {
+                return this._SelectedWindow;
+            }
+            set
+            {
+                this._SelectedWindow = value;
+                this.OnSelectedWindowChanged();
+            }
+        }
+
+        protected virtual void OnSelectedWindowChanged()
+        {
+            if (this.SelectedWindowChanged != null)
+            {
+                this.SelectedWindowChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("SelectedWindow");
+        }
+
+        public event EventHandler SelectedWindowChanged;
 
         public override void InitializeComponent(ICore core)
         {
             this.Behaviour = ComponentRegistry.Instance.GetComponent<ToolWindowBehaviour>();
-            this.Windows = new CollectionManager<ToolWindowConfiguration>(CollectionManagerFlags.AllowEmptyCollection)
-            {
-                ItemFactory = () => new ToolWindowConfiguration()
-                {
-                    Title = "New Window",
-                    Width = 400,
-                    Height = 250,
-                    ShowWithMainWindow = true,
-                    ShowWithMiniWindow = false
-                }
-            };
-            this.Dispatch(this.Refresh);
+            this.Behaviour.Loaded += this.OnLoaded;
+            this.Behaviour.Unloaded += this.OnUnloaded;
+            var task = this.Refresh();
             base.InitializeComponent(core);
+        }
+
+        protected virtual void OnLoaded(object sender, ToolWindowConfigurationEventArgs e)
+        {
+            var task = this.Refresh();
+        }
+
+        protected virtual void OnUnloaded(object sender, ToolWindowConfigurationEventArgs e)
+        {
+            var task = this.Refresh();
         }
 
         protected virtual Task Refresh()
         {
-            var windows = this.Behaviour.Windows.Keys;
-            return global::FoxTunes.Windows.Invoke(() => this.Windows.ItemsSource = new ObservableCollection<ToolWindowConfiguration>(windows));
+            return global::FoxTunes.Windows.Invoke(() =>
+            {
+                if (this.SelectedWindow == null)
+                {
+                    this.SelectedWindow = this.Windows.FirstOrDefault();
+                }
+                this.OnWindowsChanged();
+            });
         }
 
         public bool ToolWindowManagerVisible
@@ -112,25 +149,42 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ToolWindowManagerVisibleChanged;
 
-        public ICommand SaveCommand
+        public ICommand AddCommand
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand(this.Save);
+                return CommandFactory.Instance.CreateCommand(this.Add);
             }
         }
 
-        public Task Save()
+        public async Task Add()
         {
-            return this.Behaviour.Update(this.Windows.ItemsSource);
+            await this.Behaviour.New().ConfigureAwait(false);
+            await this.Refresh().ConfigureAwait(false);
         }
 
-        public ICommand CancelCommand
+        public ICommand CloseCommand
         {
             get
             {
-                return new Command(() => this.ToolWindowManagerVisible = false);
+                return CommandFactory.Instance.CreateCommand(this.Close);
             }
+        }
+
+        public async Task Close()
+        {
+            await global::FoxTunes.Windows.Invoke(() => this.ToolWindowManagerVisible = false).ConfigureAwait(false);
+            await this.Behaviour.Refresh().ConfigureAwait(false);
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.Behaviour != null)
+            {
+                this.Behaviour.Loaded -= this.OnLoaded;
+                this.Behaviour.Unloaded -= this.OnUnloaded;
+            }
+            base.OnDisposing();
         }
 
         protected override Freezable CreateInstanceCore()

@@ -33,7 +33,7 @@
         <Binding Path="Left" Source="{StaticResource ViewModel}" Mode="TwoWay"/>
     </Window.Left>
     <Window.Title>
-        <Binding Mode="OneWay" Path="Title" Source="{StaticResource ViewModel}"/>
+        <Binding Mode="OneWay" Path="Title" Source="{StaticResource ViewModel}" FallbackValue="Tool Window"/>
     </Window.Title>
     <Grid Background="{DynamicResource NormalBrush}">
         <Grid.LayoutTransform>

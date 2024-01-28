@@ -29,15 +29,14 @@
             <ListBox 
                     Grid.Column="0" 
                     Grid.Row="0" 
-                    ItemsSource="{Binding Windows.OrderedItemsSource, Source={StaticResource ViewModel}}" 
-                    SelectedValue="{Binding Windows.SelectedValue, Source={StaticResource ViewModel}}" 
+                    ItemsSource="{Binding Windows, Source={StaticResource ViewModel}}" 
+                    SelectedValue="{Binding SelectedWindow, Source={StaticResource ViewModel}}"
                     DisplayMemberPath="Title">
             </ListBox>
             <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding Windows.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
-                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding Windows.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
+                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding AddCommand, Source={StaticResource ViewModel}}">New</Button>
             </StackPanel>
-            <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding Windows.SelectedValue, Source={StaticResource ViewModel}}" Grid.IsSharedSizeScope="True">
+            <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding SelectedWindow, Source={StaticResource ViewModel}}" Grid.IsSharedSizeScope="True">
                 <Grid.Style>
                     <Style TargetType="{x:Type Grid}">
                         <Setter Property="IsEnabled" Value="True"></Setter>
@@ -79,8 +78,7 @@
         </Grid>
         <Grid Grid.Row="1" >
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding SaveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Save</Button>
-                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding CancelCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Cancel</Button>
+                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding CloseCommand, Source={StaticResource ViewModel}}">Close</Button>
             </StackPanel>
         </Grid>
     </Grid>
