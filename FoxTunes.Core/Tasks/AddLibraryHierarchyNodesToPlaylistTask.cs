@@ -76,15 +76,6 @@ namespace FoxTunes
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
                 {
-                    var query = default(IDatabaseQuery);
-                    if (string.IsNullOrEmpty(this.LibraryHierarchyBrowser.Filter))
-                    {
-                        query = this.Database.Queries.AddLibraryHierarchyNodeToPlaylist;
-                    }
-                    else
-                    {
-                        query = this.Database.Queries.AddLibraryHierarchyNodeToPlaylistWithFilter;
-                    }
                     var position = 0;
                     foreach (var libraryHierarchyNode in this.LibraryHierarchyNodes)
                     {
@@ -93,7 +84,7 @@ namespace FoxTunes
                             break;
                         }
                         await this.SetDescription(libraryHierarchyNode.Value).ConfigureAwait(false);
-                        await this.AddPlaylistItems(query, libraryHierarchyNode, transaction).ConfigureAwait(false);
+                        await this.AddPlaylistItems(this.Database.Queries.AddLibraryHierarchyNodeToPlaylist, libraryHierarchyNode, transaction).ConfigureAwait(false);
                         await this.SetPosition(++position).ConfigureAwait(false);
                     }
                     transaction.Commit();
@@ -115,26 +106,9 @@ namespace FoxTunes
                         parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
                         parameters["sequence"] = this.Sequence;
                         parameters["status"] = PlaylistItemStatus.Import;
-                        if (parameters.Contains("filter"))
-                        {
-                            parameters["filter"] = this.GetFilter();
-                        }
                         break;
                 }
             }, transaction).ConfigureAwait(false);
-        }
-
-        private string GetFilter()
-        {
-            if (string.IsNullOrEmpty(this.LibraryHierarchyBrowser.Filter))
-            {
-                return null;
-            }
-            var builder = new StringBuilder();
-            builder.Append('%');
-            builder.Append(this.LibraryHierarchyBrowser.Filter.Replace(' ', '%'));
-            builder.Append('%');
-            return builder.ToString();
         }
     }
 }

@@ -124,28 +124,15 @@ namespace FoxTunes
         {
             using (var database = this.DatabaseFactory.Create())
             {
-                var query = default(IDatabaseQuery);
-                if (string.IsNullOrEmpty(this.Filter))
-                {
-                    query = database.Queries.GetLibraryHierarchyNodes;
-                }
-                else
-                {
-                    query = database.Queries.GetLibraryHierarchyNodesWithFilter;
-                }
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    var nodes = database.ExecuteEnumerator<LibraryHierarchyNode>(query, (parameters, phase) =>
+                    var nodes = database.ExecuteEnumerator<LibraryHierarchyNode>(database.Queries.GetLibraryHierarchyNodes, (parameters, phase) =>
                     {
                         switch (phase)
                         {
                             case DatabaseParameterPhase.Fetch:
                                 parameters["libraryHierarchyId"] = libraryHierarchyId;
                                 parameters["libraryHierarchyItemId"] = libraryHierarchyItemId;
-                                if (parameters.Contains("filter"))
-                                {
-                                    parameters["filter"] = this.GetFilter();
-                                }
                                 break;
                         }
                     }, transaction);
@@ -163,27 +150,15 @@ namespace FoxTunes
             using (var database = this.DatabaseFactory.Create())
             {
                 var query = default(IDatabaseQuery);
-                if (string.IsNullOrEmpty(this.Filter))
-                {
-                    query = database.Queries.GetLibraryItems;
-                }
-                else
-                {
-                    query = database.Queries.GetLibraryItemsWithFilter;
-                }
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    var items = database.ExecuteEnumerator<LibraryItem>(query, (parameters, phase) =>
+                    var items = database.ExecuteEnumerator<LibraryItem>(database.Queries.GetLibraryItems, (parameters, phase) =>
                     {
                         switch (phase)
                         {
                             case DatabaseParameterPhase.Fetch:
                                 parameters["libraryHierarchyId"] = libraryHierarchyNode.LibraryHierarchyId;
                                 parameters["libraryHierarchyItemId"] = libraryHierarchyNode.Id;
-                                if (parameters.Contains("filter"))
-                                {
-                                    parameters["filter"] = this.GetFilter();
-                                }
                                 parameters["loadMetaData"] = loadMetaData;
                                 parameters["metaDataType"] = META_DATA_TYPE;
                                 break;
@@ -196,19 +171,6 @@ namespace FoxTunes
                     }
                 }
             }
-        }
-
-        private string GetFilter()
-        {
-            if (string.IsNullOrEmpty(this.Filter))
-            {
-                return null;
-            }
-            var builder = new StringBuilder();
-            builder.Append('%');
-            builder.Append(this.Filter.Replace(' ', '%'));
-            builder.Append('%');
-            return builder.ToString();
         }
 
         private void ApplySelection(IEnumerable<LibraryHierarchyNode> nodes)

@@ -9,8 +9,6 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery AddLibraryHierarchyNodeToPlaylist { get; }
 
-        IDatabaseQuery AddLibraryHierarchyNodeToPlaylistWithFilter { get; }
-
         IDatabaseQuery AddLibraryMetaDataItem { get; }
 
         IDatabaseQuery AddPlaylistMetaDataItem { get; }
@@ -25,11 +23,7 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery GetLibraryHierarchyNodes { get; }
 
-        IDatabaseQuery GetLibraryHierarchyNodesWithFilter { get; }
-
         IDatabaseQuery GetLibraryItems { get; }
-
-        IDatabaseQuery GetLibraryItemsWithFilter { get; }
 
         IDatabaseQuery GetOrAddMetaDataItem { get; }
 

@@ -102,26 +102,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WITH
-        ///
-        ///LibraryHierarchyParents(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;)
-        ///AS
-        ///(
-        ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;
-        ///	FROM &quot;LibraryHierarchyItems&quot;
-        ///	WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
-        ///	UNION ALL 
-        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;
-        ///	FROM &quot;LibraryHierarchyItems&quot; 
-        ///		JOIN LibraryHierarchyParents ON &quot;LibraryHierarchyIte [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string AddLibraryHierarchyNodeToPlaylistWithFilter {
-            get {
-                return ResourceManager.GetString("AddLibraryHierarchyNodeToPlaylistWithFilter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to INSERT INTO &quot;LibraryItem_MetaDataItem&quot; (&quot;LibraryItem_Id&quot;, &quot;MetaDataItem_Id&quot;)
         ///SELECT @itemId, @metaDataItemId
         ///WHERE NOT EXISTS(
@@ -202,25 +182,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to WITH
-        ///
-        ///LibraryHierarchyParents(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;)
-        ///AS
-        ///(
-        ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;
-        ///	FROM &quot;LibraryHierarchyItems&quot;
-        ///	WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
-        ///		AND ((@libraryHierarchyItemId IS NULL AND &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; IS NULL) OR &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot; = @libraryHierarchyItemId)
-        ///	UNION ALL 
-        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;,  [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string GetLibraryHierarchyNodesWithFilter {
-            get {
-                return ResourceManager.GetString("GetLibraryHierarchyNodesWithFilter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to SELECT 
         ///	&quot;LibraryItems&quot;.&quot;Id&quot; AS &quot;LibraryItems_Id&quot;,
         ///	&quot;LibraryItems&quot;.&quot;DirectoryName&quot; AS &quot;LibraryItems_DirectoryName&quot;,
@@ -236,26 +197,6 @@ namespace FoxTunes {
         internal static string GetLibraryItems {
             get {
                 return ResourceManager.GetString("GetLibraryItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to WITH
-        ///
-        ///LibraryHierarchyParents(&quot;Root&quot;, &quot;Id&quot;, &quot;Parent_Id&quot;, &quot;Value&quot;)
-        ///AS
-        ///(
-        ///	SELECT &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;
-        ///	FROM &quot;LibraryHierarchyItems&quot;
-        ///	WHERE &quot;LibraryHierarchy_Id&quot; = @libraryHierarchyId
-        ///	UNION ALL 
-        ///	SELECT &quot;Root&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Parent_Id&quot;, &quot;LibraryHierarchyItems&quot;.&quot;Value&quot;
-        ///	FROM &quot;LibraryHierarchyItems&quot; 
-        ///		JOIN LibraryHierarchyParents ON &quot;LibraryHierarchyIte [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string GetLibraryItemsWithFilter {
-            get {
-                return ResourceManager.GetString("GetLibraryItemsWithFilter", resourceCulture);
             }
         }
         
