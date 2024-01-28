@@ -24,8 +24,21 @@ namespace FoxTunes.ViewModel
             }
             set
             {
+                this.OnItemsChanging();
                 this._Items = value;
                 this.OnItemsChanged();
+            }
+        }
+
+        protected virtual void OnItemsChanging()
+        {
+            if (this.Items == null)
+            {
+                return;
+            }
+            foreach (var item in this.Items)
+            {
+                item.Dispose();
             }
         }
 

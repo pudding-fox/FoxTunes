@@ -45,7 +45,12 @@ namespace FoxTunes
             }
             else
             {
-                DragSourceBehaviours.Remove(listBox);
+                var behaviour = default(DragSourceBehaviour);
+                if (DragSourceBehaviours.TryGetValue(listBox, out behaviour))
+                {
+                    DragSourceBehaviours.Remove(listBox);
+                    behaviour.Dispose();
+                }
             }
         }
 
