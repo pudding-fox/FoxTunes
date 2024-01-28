@@ -7,6 +7,7 @@
              xmlns:Windows="clr-namespace:FoxTunes" 
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Extensions="clr-namespace:FoxTunes.Extensions"
+             xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
@@ -20,6 +21,11 @@
     <Grid>
         <ToggleButton IsChecked="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}">&#x2699;</ToggleButton>
         <Popup PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Placement="Center" AllowsTransparency="True" IsOpen="{Binding Source={StaticResource ViewModel}, Path=SettingsVisible}">
+            <Interactivity:Interaction.Triggers>
+                <Interactivity:EventTrigger EventName="Closed">
+                    <Interactivity:InvokeCommandAction Command="{Binding Source={StaticResource ViewModel}, Path=SaveCommand}" CommandParameter="{Binding Components.Configuration}"></Interactivity:InvokeCommandAction>
+                </Interactivity:EventTrigger>
+            </Interactivity:Interaction.Triggers>
             <Windows:SettingsDialog></Windows:SettingsDialog>
         </Popup>
     </Grid>

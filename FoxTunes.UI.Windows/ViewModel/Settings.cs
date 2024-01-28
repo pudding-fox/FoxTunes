@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Windows;
 using FoxTunes.Interfaces;
+using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
     public class Settings : ViewModelBase
     {
-        private string _SettingsVisible { get; set; }
+        private bool _SettingsVisible { get; set; }
 
-        public string SettingsVisible
+        public bool SettingsVisible
         {
             get
             {
@@ -31,6 +32,17 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler SettingsVisibleChanged = delegate { };
+
+        public ICommand SaveCommand
+        {
+            get
+            {
+                return new Command<IConfiguration>(
+                    configuration => configuration.Save(),
+                    configuration => configuration != null
+                );
+            }
+        }
 
         protected override Freezable CreateInstanceCore()
         {

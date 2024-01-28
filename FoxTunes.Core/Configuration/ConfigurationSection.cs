@@ -1,7 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 
 namespace FoxTunes
 {
+    [Serializable]
     public class ConfigurationSection : BaseComponent
     {
         public ConfigurationSection()
