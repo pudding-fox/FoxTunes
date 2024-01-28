@@ -29,10 +29,10 @@ namespace FoxTunes
 
         protected virtual void OnSelectedItemChanged(object sender, EventArgs e)
         {
-            this.Dispatch(this.Refresh);
+            this.Dispatch(() => this.Refresh(false));
         }
 
-        public override async Task Refresh(Playlist playlist)
+        public override async Task Refresh(Playlist playlist, bool force)
         {
             var libraryHierarchyNode = this.LibraryManager.SelectedItem;
             if (libraryHierarchyNode != null && !LibraryHierarchyNode.Empty.Equals(libraryHierarchyNode))

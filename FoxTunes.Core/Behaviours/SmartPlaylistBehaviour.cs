@@ -20,7 +20,7 @@ namespace FoxTunes
         {
             var minRating = 4;
             var maxLastPlayed = DateTimeHelper.ToString(DateTime.Now.AddDays(-30).Date);
-            return string.Format("rating>:{0} lastplayed<\"{1}\"", minRating, maxLastPlayed);
+            return string.Format("rating>:{0} lastplayed<{1}", minRating, maxLastPlayed);
         }
 
         protected override async Task Refresh(IEnumerable<string> names)
@@ -34,13 +34,27 @@ namespace FoxTunes
                         return;
                     }
                 }
-                await this.Refresh(playlist).ConfigureAwait(false);
+                await this.Refresh(playlist, false).ConfigureAwait(false);
             }
         }
 
-        public override Task Refresh(Playlist playlist)
+        public override Task Refresh(Playlist playlist, bool force)
         {
-            return this.Refresh(playlist, this.GetFilter(playlist));
+            return this.Refresh(playlist, this.GetFilter(playlist), force);
+        }
+
+        protected override async Task Refresh(Playlist playlist, string filter, bool force)
+        {
+            if (!force)
+            {
+                //Only refresh when user requests.
+                return;
+            }
+            using (var task = new CreateSmartPlaylistTask(playlist, filter, "random", 16))
+            {
+                task.InitializeComponent(this.Core);
+                await task.Run().ConfigureAwait(false);
+            }
         }
     }
 }

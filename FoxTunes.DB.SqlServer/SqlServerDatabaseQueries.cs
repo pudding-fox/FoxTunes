@@ -39,6 +39,11 @@ namespace FoxTunes
             );
         }
 
+        public override IDatabaseQuery AddSearchToPlaylist(string filter, string sort, int limit)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override IDatabaseQuery SequencePlaylistItems(string sort)
         {
             var sortResult = default(ISortParserResult);

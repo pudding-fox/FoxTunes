@@ -39,6 +39,29 @@ namespace FoxTunes
             );
         }
 
+        public override IDatabaseQuery AddSearchToPlaylist(string filter, string sort, int limit)
+        {
+            var filterResult = default(IFilterParserResult);
+            var sortResult = default(ISortParserResult);
+            if (!string.IsNullOrEmpty(filter) && !this.FilterParser.TryParse(filter, out filterResult))
+            {
+                //TODO: Warn, failed to parse filter.
+                filterResult = null;
+            }
+            if (!string.IsNullOrEmpty(sort) && !this.SortParser.TryParse(sort, out sortResult))
+            {
+                //TODO: Warn, failed to parse sort.
+                sortResult = null;
+            }
+            var template = new AddSearchToPlaylist(this.Database, filterResult, sortResult, limit);
+            return this.Database.QueryFactory.Create(
+                template.TransformText(),
+                new DatabaseQueryParameter("playlistId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                new DatabaseQueryParameter("sequence", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None),
+                new DatabaseQueryParameter("status", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+            );
+        }
+
         public override IDatabaseQuery SequencePlaylistItems(string sort)
         {
             var sortResult = default(ISortParserResult);

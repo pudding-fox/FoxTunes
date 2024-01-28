@@ -5,14 +5,14 @@ namespace FoxTunes.Interfaces
 {
     public interface ISortParser : IStandardComponent
     {
-        void Register(ISortParserProvider provider);
-
         bool TryParse(string sort, out ISortParserResult result);
     }
 
     public interface ISortParserResult : IEquatable<ISortParserResult>
     {
         IEnumerable<ISortParserResultExpression> Expressions { get; }
+
+        bool IsRandom { get; }
     }
 
     public interface ISortParserResultExpression : IEquatable<ISortParserResultExpression>
@@ -28,6 +28,7 @@ namespace FoxTunes.Interfaces
     {
         None,
         Numeric,
-        NullCoalesce
+        NullCoalesce,
+        Random
     }
 }
