@@ -25,7 +25,7 @@ namespace FoxTunes
         {
             get
             {
-                return "Resampler";
+                return Strings.BassResamplerStreamComponent_Name;
             }
         }
 

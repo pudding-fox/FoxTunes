@@ -23,12 +23,12 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION)
-                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, "Enabled", path: "Resampler").WithValue(false))
-                .WithElement(new SelectionConfigurationElement(QUALITY_ELEMENT, "Quality", path: "Resampler").WithOptions(GetQualityOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
-                .WithElement(new SelectionConfigurationElement(PHASE_ELEMENT, "Phase", path: "Resampler").WithOptions(GetPhaseOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
-                .WithElement(new BooleanConfigurationElement(STEEP_FILTER_ELEMENT, "Steep Filter", path: "Resampler").WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
-                .WithElement(new BooleanConfigurationElement(ALLOW_ALIASING_ELEMENT, "Allow Aliasing", path: "Resampler").WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
-                .WithElement(new IntegerConfigurationElement(BUFFER_LENGTH_ELEMENT, "Buffer Length", path: "Resampler").WithValue(3).WithValidationRule(new IntegerValidationRule(3, 10)).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT)
+                .WithElement(new BooleanConfigurationElement(ENABLED_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_Enabled, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithValue(false))
+                .WithElement(new SelectionConfigurationElement(QUALITY_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_Quality, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithOptions(GetQualityOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
+                .WithElement(new SelectionConfigurationElement(PHASE_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_Phase, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithOptions(GetPhaseOptions()).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
+                .WithElement(new BooleanConfigurationElement(STEEP_FILTER_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_SteepFilter, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
+                .WithElement(new BooleanConfigurationElement(ALLOW_ALIASING_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_AllowAliasing, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithValue(false).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT))
+                .WithElement(new IntegerConfigurationElement(BUFFER_LENGTH_ELEMENT, Strings.BassResamplerStreamComponentConfiguration_BufferLength, path: Strings.BassResamplerStreamComponentConfiguration_Path).WithValue(3).WithValidationRule(new IntegerValidationRule(3, 10)).DependsOn(BassOutputConfiguration.SECTION, ENABLED_ELEMENT)
             );
         }
 

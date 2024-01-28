@@ -39,7 +39,7 @@ namespace FoxTunes {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Output.Bass.ParametricEqualizer.Properties.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoxTunes.Output.Bass.Resampler.Properties.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,65 +61,74 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enabled.
+        ///   Looks up a localized string similar to Resampler.
         /// </summary>
-        internal static string BassOutputEqualizer_Enabled {
+        internal static string BassResamplerStreamComponent_Name {
             get {
-                return ResourceManager.GetString("BassOutputEqualizer.Enabled", resourceCulture);
+                return ResourceManager.GetString("BassResamplerStreamComponent.Name", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Save.
+        ///   Looks up a localized string similar to Allow Aliasing.
         /// </summary>
-        internal static string BassOutputEqualizer_Save {
+        internal static string BassResamplerStreamComponentConfiguration_AllowAliasing {
             get {
-                return ResourceManager.GetString("BassOutputEqualizer.Save", resourceCulture);
+                return ResourceManager.GetString("BassResamplerStreamComponentConfiguration.AllowAliasing", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Name:.
+        ///   Looks up a localized string similar to Buffer Length.
         /// </summary>
-        internal static string BassOutputEqualizer_SaveAs {
+        internal static string BassResamplerStreamComponentConfiguration_BufferLength {
             get {
-                return ResourceManager.GetString("BassOutputEqualizer.SaveAs", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to None.
-        /// </summary>
-        internal static string BassParametricEqualizerPreset_None {
-            get {
-                return ResourceManager.GetString("BassParametricEqualizerPreset.None", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Bandwidth.
-        /// </summary>
-        internal static string BassParametricEqualizerStreamComponentConfiguration_Bandwidth {
-            get {
-                return ResourceManager.GetString("BassParametricEqualizerStreamComponentConfiguration.Bandwidth", resourceCulture);
+                return ResourceManager.GetString("BassResamplerStreamComponentConfiguration.BufferLength", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
-        internal static string BassParametricEqualizerStreamComponentConfiguration_Enabled {
+        internal static string BassResamplerStreamComponentConfiguration_Enabled {
             get {
-                return ResourceManager.GetString("BassParametricEqualizerStreamComponentConfiguration.Enabled", resourceCulture);
+                return ResourceManager.GetString("BassResamplerStreamComponentConfiguration.Enabled", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parametric Equalizer.
+        ///   Looks up a localized string similar to Resampler.
         /// </summary>
-        internal static string BassParametricEqualizerStreamComponentConfiguration_Path {
+        internal static string BassResamplerStreamComponentConfiguration_Path {
             get {
-                return ResourceManager.GetString("BassParametricEqualizerStreamComponentConfiguration.Path", resourceCulture);
+                return ResourceManager.GetString("BassResamplerStreamComponentConfiguration.Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phase.
+        /// </summary>
+        internal static string BassResamplerStreamComponentConfiguration_Phase {
+            get {
+                return ResourceManager.GetString("BassResamplerStreamComponentConfiguration.Phase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quality.
+        /// </summary>
+        internal static string BassResamplerStreamComponentConfiguration_Quality {
+            get {
+                return ResourceManager.GetString("BassResamplerStreamComponentConfiguration.Quality", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Steep Filter.
+        /// </summary>
+        internal static string BassResamplerStreamComponentConfiguration_SteepFilter {
+            get {
+                return ResourceManager.GetString("BassResamplerStreamComponentConfiguration.SteepFilter", resourceCulture);
             }
         }
     }

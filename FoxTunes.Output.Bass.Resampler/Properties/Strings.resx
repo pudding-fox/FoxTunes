@@ -117,25 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BassOutputEqualizer.Enabled" xml:space="preserve">
+  <data name="BassResamplerStreamComponent.Name" xml:space="preserve">
+    <value>Resampler</value>
+  </data>
+  <data name="BassResamplerStreamComponentConfiguration.AllowAliasing" xml:space="preserve">
+    <value>Allow Aliasing</value>
+  </data>
+  <data name="BassResamplerStreamComponentConfiguration.BufferLength" xml:space="preserve">
+    <value>Buffer Length</value>
+  </data>
+  <data name="BassResamplerStreamComponentConfiguration.Enabled" xml:space="preserve">
     <value>Enabled</value>
   </data>
-  <data name="BassOutputEqualizer.Save" xml:space="preserve">
-    <value>Save</value>
+  <data name="BassResamplerStreamComponentConfiguration.Path" xml:space="preserve">
+    <value>Resampler</value>
   </data>
-  <data name="BassOutputEqualizer.SaveAs" xml:space="preserve">
-    <value>Name:</value>
+  <data name="BassResamplerStreamComponentConfiguration.Phase" xml:space="preserve">
+    <value>Phase</value>
   </data>
-  <data name="BassParametricEqualizerPreset.None" xml:space="preserve">
-    <value>None</value>
+  <data name="BassResamplerStreamComponentConfiguration.Quality" xml:space="preserve">
+    <value>Quality</value>
   </data>
-  <data name="BassParametricEqualizerStreamComponentConfiguration.Bandwidth" xml:space="preserve">
-    <value>Bandwidth</value>
-  </data>
-  <data name="BassParametricEqualizerStreamComponentConfiguration.Enabled" xml:space="preserve">
-    <value>Enabled</value>
-  </data>
-  <data name="BassParametricEqualizerStreamComponentConfiguration.Path" xml:space="preserve">
-    <value>Parametric Equalizer</value>
+  <data name="BassResamplerStreamComponentConfiguration.SteepFilter" xml:space="preserve">
+    <value>Steep Filter</value>
   </data>
 </root>

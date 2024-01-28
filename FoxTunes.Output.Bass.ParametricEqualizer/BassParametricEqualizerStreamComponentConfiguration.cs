@@ -34,10 +34,10 @@ namespace FoxTunes
         {
             var section = new ConfigurationSection(SECTION)
                 .WithElement(
-                    new BooleanConfigurationElement(ENABLED, "Enabled", path: "Parametric Equalizer")
+                    new BooleanConfigurationElement(ENABLED, Strings.BassParametricEqualizerStreamComponentConfiguration_Enabled, path: Strings.BassParametricEqualizerStreamComponentConfiguration_Path)
                         .WithValue(false))
                 .WithElement(
-                    new DoubleConfigurationElement(BANDWIDTH, "Bandwidth", path: "Parametric Equalizer")
+                    new DoubleConfigurationElement(BANDWIDTH, Strings.BassParametricEqualizerStreamComponentConfiguration_Bandwidth, path: Strings.BassParametricEqualizerStreamComponentConfiguration_Path)
                         .WithValue(2.5)
                         .DependsOn(BassOutputConfiguration.SECTION, ENABLED)
                         .WithValidationRule(
@@ -54,7 +54,7 @@ namespace FoxTunes
                     new DoubleConfigurationElement(
                             band.Key,
                             band.Value < 1000 ? band.Value.ToString() + "Hz" : band.Value.ToString() + "kHz",
-                            path: "Parametric Equalizer")
+                            path: Strings.BassParametricEqualizerStreamComponentConfiguration_Path)
                         .WithValue(0)
                         .DependsOn(BassOutputConfiguration.SECTION, ENABLED)
                         .WithValidationRule(
