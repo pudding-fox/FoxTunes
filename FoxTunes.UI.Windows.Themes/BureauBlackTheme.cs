@@ -4,10 +4,10 @@ using System.Windows;
 
 namespace FoxTunes
 {
-    public class ExpressionLightTheme : ThemeBase
+    public class BureauBlackTheme : ThemeBase
     {
-        public ExpressionLightTheme()
-            : base("BF3790D0-033B-4526-8D06-1B3F66637EAF", "ExpressionLight")
+        public BureauBlackTheme()
+            : base("AF4E116B-6319-400D-880E-B080EC3811A6", "BureauBlack")
         {
 
         }
@@ -18,7 +18,7 @@ namespace FoxTunes
             application.Resources.MergedDictionaries.Add(
                 new ResourceDictionary()
                 {
-                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/ExpressionLight.xaml", UriKind.Relative)
+                    Source = new Uri("/FoxTunes.UI.Windows.Themes;component/Themes/BureauBlack.xaml", UriKind.Relative)
                 }
             );
         }
