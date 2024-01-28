@@ -12,7 +12,7 @@ namespace FoxTunes
     [Component("BA77B392-1900-4931-B720-16206B23DDA1", ComponentSlots.Configuration, priority: ComponentAttribute.PRIORITY_HIGH)]
     public class Configuration : StandardComponent, IConfiguration, IDisposable
     {
-        const int TIMEOUT = 1000;
+        const int TIMEOUT = 60000;
 
         public Configuration()
         {
@@ -257,11 +257,6 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "Failed to delete configuration: {0}", e.Message);
             }
             this.OnSaved();
-        }
-
-        public void Wait()
-        {
-            this.Debouncer.Wait();
         }
 
         public void Reset()

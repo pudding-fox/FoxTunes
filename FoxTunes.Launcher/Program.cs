@@ -136,10 +136,6 @@ namespace FoxTunes.Launcher
                         {
                             //TODO: Warn.
                         }
-                        if (core.Components.Configuration != null)
-                        {
-                            core.Components.Configuration.Wait();
-                        }
                     }
                     catch (Exception e)
                     {

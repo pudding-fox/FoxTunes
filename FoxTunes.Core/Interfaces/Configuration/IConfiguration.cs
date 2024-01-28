@@ -32,8 +32,6 @@ namespace FoxTunes.Interfaces
 
         void Delete(string profile);
 
-        void Wait();
-
         void Reset();
 
         void ConnectDependencies();
