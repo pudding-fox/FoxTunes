@@ -13,6 +13,13 @@ namespace FoxTunes
 {
     public class Discogs : BaseComponent, IDisposable
     {
+        public static RateLimiter RateLimiter { get; private set; }
+
+        static Discogs()
+        {
+            RateLimiter = new RateLimiter(1000 / MAX_REQUESTS);
+        }
+
         public const string BASE_URL = "https://api.discogs.com";
 
         public const string KEY = "XdvMyQSHURdKVmPQJrXv";
@@ -28,11 +35,11 @@ namespace FoxTunes
             this.Secret = string.IsNullOrEmpty(secret) ? SECRET : secret;
             if (maxRequests < 0 || maxRequests > 10)
             {
-                this.RateLimiter = new RateLimiter(1000 / MAX_REQUESTS);
+                RateLimiter.Interval = 1000 / MAX_REQUESTS;
             }
             else
             {
-                this.RateLimiter = new RateLimiter(1000 / maxRequests);
+                RateLimiter.Interval = 1000 / maxRequests;
             }
         }
 
@@ -41,8 +48,6 @@ namespace FoxTunes
         public string Key { get; private set; }
 
         public string Secret { get; private set; }
-
-        public RateLimiter RateLimiter { get; private set; }
 
         public async Task<IEnumerable<Release>> GetReleases(ReleaseLookup releaseLookup, bool master)
         {
@@ -172,7 +177,7 @@ namespace FoxTunes
         protected virtual HttpWebRequest CreateRequest(string url)
         {
             var request = WebRequestFactory.Create(url);
-            this.RateLimiter.Exec(() =>
+            RateLimiter.Exec(() =>
             {
                 request.UserAgent = string.Format("{0}/{1} +{2}", Publication.Product, Publication.Version, Publication.HomePage);
                 if (this.Key != null && this.Secret != null)
@@ -203,10 +208,7 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            if (this.RateLimiter != null)
-            {
-                this.RateLimiter.Dispose();
-            }
+            //Nothing to do.
         }
 
         ~Discogs()
