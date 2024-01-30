@@ -143,6 +143,20 @@ namespace FoxTunes
                 new DatabaseQueryParameter("metaDataType", DbType.Byte, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
             );
         }
+        public IDatabaseQuery GetPlaylistItems(string filter)
+        {
+            var result = default(IFilterParserResult);
+            if (!string.IsNullOrEmpty(filter) && !this.FilterParser.TryParse(filter, out result))
+            {
+                //TODO: Warn, failed to parse filter.
+                result = null;
+            }
+            var template = new GetPlaylistItems(this.Database, result);
+            return this.Database.QueryFactory.Create(
+                template.TransformText(),
+                new DatabaseQueryParameter("playlistId", DbType.Int32, 0, 0, 0, ParameterDirection.Input, false, null, DatabaseQueryParameterFlags.None)
+            );
+        }
 
         public IDatabaseQuery GetOrAddMetaDataItem
         {

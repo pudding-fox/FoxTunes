@@ -1,4 +1,5 @@
 ﻿using FoxDb;
+using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -126,16 +127,6 @@ namespace FoxTunes
             return this.PlaylistCache.GetItems(playlist, () => this.GetItemsCore(playlist));
         }
 
-        public PlaylistItem[] GetItems(Playlist playlist, string filter)
-        {
-            var playlistItems = this.GetItems(playlist);
-            return playlistItems.Where(
-                playlistItem => playlistItem.MetaDatas.Any(
-                    metaDataItem => !string.IsNullOrEmpty(metaDataItem.Value) && metaDataItem.Value.Contains(filter, true)
-                )
-            ).ToArray();
-        }
-
         private IEnumerable<PlaylistItem> GetItemsCore(Playlist playlist)
         {
             this.State |= PlaylistBrowserState.Loading;
@@ -158,6 +149,36 @@ namespace FoxTunes
             finally
             {
                 this.State &= ~PlaylistBrowserState.Loading;
+            }
+        }
+
+        public PlaylistItem[] GetItems(Playlist playlist, string filter)
+        {
+            return this.GetItemsCore(playlist, filter).ToArray();
+        }
+
+        private IEnumerable<PlaylistItem> GetItemsCore(Playlist playlist, string filter)
+        {
+            using (var database = this.DatabaseFactory.Create())
+            {
+                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+                {
+                    using (var reader = database.ExecuteReader(database.Queries.GetPlaylistItems(filter), (parameters, phase) =>
+                    {
+                        switch (phase)
+                        {
+                            case DatabaseParameterPhase.Fetch:
+                                parameters["playlistId"] = playlist.Id;
+                                break;
+                        }
+                    }, transaction))
+                    {
+                        foreach (var record in reader)
+                        {
+                            yield return this.GetItemById(playlist, record.Get<int>("Id"));
+                        }
+                    }
+                }
             }
         }
 

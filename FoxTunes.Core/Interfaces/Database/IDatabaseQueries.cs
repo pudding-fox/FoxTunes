@@ -26,6 +26,8 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery GetLibraryItems(string filter);
 
+        IDatabaseQuery GetPlaylistItems(string filter);
+
         IDatabaseQuery GetOrAddMetaDataItem { get; }
 
         IDatabaseQuery GetPlaylistMetaData(int count, int limit);
