@@ -13,6 +13,8 @@ namespace FoxTunes
 
         public const string SHOW_PLAYLIST_ELEMENT = "GGGG60A9-B108-49DD-9D9D-EA608BBDB0E7";
 
+        public const string NOW_PLAYING_SCRIPT_ELEMENT = "BBBB78F3-B32F-4A8C-B566-9A8B39A896C7";
+
         public const string PLAYLIST_SCRIPT_ELEMENT = "HHHHD917-2172-421D-9E22-F549B17CE0C8";
 
         public const string DROP_COMMIT_ELEMENT = "IIIIF490-CE3D-481A-8924-B698BD443D88";
@@ -20,6 +22,10 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.MiniPlayerBehaviourConfiguration_Section)
+                .WithElement(
+                    new TextConfigurationElement(NOW_PLAYING_SCRIPT_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_NowPlayingScript, path: Strings.MiniPlayerBehaviourConfiguration_Advanced)
+                    .WithValue(Resources.NowPlaying)
+                    .WithFlags(ConfigurationElementFlags.MultiLine | ConfigurationElementFlags.Script))
                 .WithElement(
                     new TextConfigurationElement(PLAYLIST_SCRIPT_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_PlaylistScript, path: Strings.MiniPlayerBehaviourConfiguration_Advanced)
                     .WithValue(Resources.Playlist)

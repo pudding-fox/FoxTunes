@@ -34,8 +34,8 @@ namespace FoxTunes.ViewModel
             if (this.Configuration != null)
             {
                 this.Configuration.GetElement<TextConfigurationElement>(
-                    NowPlayingConfiguration.SECTION,
-                    NowPlayingConfiguration.NOW_PLAYING_SCRIPT_ELEMENT
+                    new[] { NowPlayingConfiguration.SECTION, MiniPlayerBehaviourConfiguration.SECTION },
+                    new[] { NowPlayingConfiguration.NOW_PLAYING_SCRIPT_ELEMENT, MiniPlayerBehaviourConfiguration.NOW_PLAYING_SCRIPT_ELEMENT }
                 ).ConnectValue(async value => await this.SetScript(value).ConfigureAwait(false));
                 this.MarqueeInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
                   WindowsUserInterfaceConfiguration.SECTION,

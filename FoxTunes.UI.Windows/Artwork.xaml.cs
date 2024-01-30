@@ -91,6 +91,10 @@ namespace FoxTunes
 
         protected virtual void OnMouseUp(object sender, MouseButtonEventArgs e)
         {
+            if (e.ChangedButton != MouseButton.Left)
+            {
+                return;
+            }
             var viewModel = this.FindResource<global::FoxTunes.ViewModel.Artwork>("ViewModel");
             if (viewModel != null)
             {
