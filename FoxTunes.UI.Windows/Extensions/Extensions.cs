@@ -331,7 +331,14 @@ namespace FoxTunes
                     return false;
                 }
             }
-            scrollViewer.ScrollToVerticalOffset(offset * item.ActualHeight);
+            if (scrollViewer.CanContentScroll)
+            {
+                scrollViewer.ScrollToVerticalOffset(offset);
+            }
+            else
+            {
+                scrollViewer.ScrollToVerticalOffset(offset * item.ActualHeight);
+            }
             return true;
         }
 
