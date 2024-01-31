@@ -1076,7 +1076,7 @@
 
     <Style TargetType="{x:Type TabControl}">
         <Setter Property="FocusVisualStyle" Value="{DynamicResource FocusVisualStyle}" />
-        <Setter Property="Background" Value="{DynamicResource ControlBrush}" />
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabControl}">
@@ -1600,7 +1600,6 @@
         <Setter Property="Background" Value="{DynamicResource ControlBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ControlBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Foreground" Value="#FF042271" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
