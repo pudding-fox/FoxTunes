@@ -89,25 +89,7 @@ namespace FoxTunes
             return false;
         }
 
-        public bool IsDisposed { get; private set; }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.IsDisposed || !disposing)
-            {
-                return;
-            }
-            this.OnDisposing();
-            this.IsDisposed = true;
-        }
-
-        protected virtual void OnDisposing()
+        protected override void OnDisposing()
         {
             lock (Instances)
             {
@@ -125,19 +107,7 @@ namespace FoxTunes
                 }
             }
             OnActiveChanged(this);
-        }
-
-        ~UIComponentRoot()
-        {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
-            try
-            {
-                this.Dispose(true);
-            }
-            catch
-            {
-                //Nothing can be done, never throw on GC thread.
-            }
+            base.OnDisposing();
         }
     }
 }

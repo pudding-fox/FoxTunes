@@ -187,11 +187,11 @@ namespace FoxTunes.ViewModel
 
         protected virtual void Refresh()
         {
-            if (PlaybackManager != null && this.PlaylistItem != null)
+            if (this.PlaybackManager != null && this.PlaylistItem != null)
             {
                 var isPlaying = default(bool);
                 var isPaused = default(bool);
-                var currentStream = PlaybackManager.CurrentStream;
+                var currentStream = this.PlaybackManager.CurrentStream;
                 if (currentStream != null)
                 {
                     isPlaying = this.PlaylistItem.Id == currentStream.Id && string.Equals(this.PlaylistItem.FileName, currentStream.FileName, StringComparison.OrdinalIgnoreCase);
@@ -209,9 +209,9 @@ namespace FoxTunes.ViewModel
                     this.IsPaused = isPaused;
                 }
             }
-            if (PlaylistQueue != null && this.PlaylistItem != null)
+            if (this.PlaylistQueue != null && this.PlaylistItem != null)
             {
-                var queuePosition = PlaylistQueue.GetPosition(this.PlaylistItem) + 1;
+                var queuePosition = this.PlaylistQueue.GetPosition(this.PlaylistItem) + 1;
                 var isQueued = queuePosition > 0;
                 if (this.IsQueued != isQueued)
                 {

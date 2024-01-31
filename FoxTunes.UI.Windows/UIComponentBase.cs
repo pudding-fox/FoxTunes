@@ -1,13 +1,14 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace FoxTunes
 {
-    public abstract class UIComponentBase : UserControl, IUIComponent, IObservable
+    public abstract class UIComponentBase : UserControl, IUIComponent, IObservable, IDisposable
     {
         protected static ILogger Logger
         {
@@ -117,5 +118,43 @@ namespace FoxTunes
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
+        {
+            foreach (var disposable in this.Resources.Values.OfType<IDisposable>())
+            {
+                disposable.Dispose();
+            }
+        }
+
+        ~UIComponentBase()
+        {
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
+        }
     }
 }

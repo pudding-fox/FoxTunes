@@ -1,9 +1,10 @@
-﻿<UserControl x:Class="FoxTunes.PlaybackState"
+﻿<Windows:UIComponentBase x:Class="FoxTunes.PlaybackState"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-            xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+             xmlns:Windows="clr-namespace:FoxTunes" 
+             xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ViewModel:PlaybackState x:Key="ViewModel" PlaylistItem="{Binding}"></ViewModel:PlaybackState>
@@ -29,4 +30,4 @@
             </Style>
         </TextBlock.Style>
     </TextBlock>
-</UserControl>
+</Windows:UIComponentBase>

@@ -5,7 +5,7 @@ namespace FoxTunes
     /// <summary>
     /// Interaction logic for PlaybackState.xaml
     /// </summary>
-    public partial class PlaybackState : UserControl
+    public partial class PlaybackState : UIComponentBase
     {
         public PlaybackState()
         {
