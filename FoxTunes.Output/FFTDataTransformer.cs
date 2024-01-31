@@ -39,6 +39,22 @@ namespace FoxTunes
                     }
                 }
             }
+
+            var doPeaks = peakValues != null;
+            var doRms = rmsValues != null;
+            while (position < this.Bands.Length)
+            {
+                values[position] = 0f;
+                if (doPeaks)
+                {
+                    peakValues[position] = 0f;
+                }
+                if (doRms)
+                {
+                    rmsValues[position] = 0f;
+                }
+                position++;
+            }
         }
 
         protected virtual void UpdateValue(FFTVisualizationData source, float[] values, float[] peakValues, float[] rmsValues, int band, int start, int end)

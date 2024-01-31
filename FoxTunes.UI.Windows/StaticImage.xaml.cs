@@ -172,27 +172,28 @@ namespace FoxTunes
             ).ToArray();
             foreach (var path in paths)
             {
-                if (Directory.Exists(path))
+                if (!string.IsNullOrEmpty(global::System.IO.Path.GetPathRoot(path)))
                 {
-                    var fileNames = FileSystemHelper.EnumerateFiles(
-                        this.Path,
-                        "*.*",
-                        FileSystemHelper.SearchOption.Recursive | FileSystemHelper.SearchOption.Sort
-                    );
-                    foreach (var fileName in fileNames)
+                    if (Directory.Exists(path))
                     {
-                        yield return fileName;
+                        var fileNames = FileSystemHelper.EnumerateFiles(
+                            this.Path,
+                            "*.*",
+                            FileSystemHelper.SearchOption.Recursive | FileSystemHelper.SearchOption.Sort
+                        );
+                        foreach (var fileName in fileNames)
+                        {
+                            yield return fileName;
+                        }
                     }
+                    else if (File.Exists(path))
+                    {
+                        yield return path;
+                    }
+                    continue;
                 }
-                else if (File.Exists(path))
-                {
-                    yield return path;
-                }
-                else
-                {
-                    //Who knows, might work.
-                    yield return path;
-                }
+                //Who knows, might work.
+                yield return path;
             }
         }
 
