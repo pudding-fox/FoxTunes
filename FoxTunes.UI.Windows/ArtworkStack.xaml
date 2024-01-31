@@ -9,7 +9,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
-        <ViewModel:ThemeInfo x:Key="ThemeInfo"></ViewModel:ThemeInfo>
         <ViewModel:ArtworkImageConverter x:Key="ArtworkImageConverter" Width="100" Height="100"></ViewModel:ArtworkImageConverter>
         <SolidColorBrush x:Key="Transparent" Color="Transparent"></SolidColorBrush>
     </UserControl.Resources>
@@ -21,7 +20,7 @@
         </ItemsControl.ItemsPanel>
         <ItemsControl.ItemTemplate>
             <DataTemplate DataType="{x:Type Core:MetaDataItem}">
-                <Border Background="{DynamicResource ControlBrush}" BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="1" CornerRadius="{Binding CornerRadius, Mode=OneWay, Source={StaticResource ThemeInfo}}" Padding="5">
+                <Border Background="{DynamicResource ControlBrush}" BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="1" Padding="5">
                     <Rectangle DataContext="{Binding Value, Converter={StaticResource ArtworkImageConverter}}" Width="100" Height="100" Fill="{Binding Value, FallbackValue={StaticResource Transparent}}"></Rectangle>
                 </Border>
             </DataTemplate>

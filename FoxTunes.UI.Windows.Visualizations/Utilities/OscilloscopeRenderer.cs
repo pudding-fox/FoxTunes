@@ -45,6 +45,7 @@ namespace FoxTunes
                 );
                 this.Mode.ValueChanged += this.OnValueChanged;
                 this.Window.ValueChanged += this.OnValueChanged;
+                this.ColorPalette.ValueChanged += this.OnValueChanged;
                 this.Duration.ValueChanged += this.OnValueChanged;
                 var task = this.CreateBitmap();
             }

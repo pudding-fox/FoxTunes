@@ -15,7 +15,6 @@
         ResizeMode="CanMinimize">
     <Window.Resources>
         <LocalViewModel:Mini x:Key="ViewModel"></LocalViewModel:Mini>
-        <ViewModel:ThemeInfo x:Key="ThemeInfo"></ViewModel:ThemeInfo>
     </Window.Resources>
     <Window.Topmost>
         <Binding Path="Topmost.Value" Source="{StaticResource ViewModel}"/>

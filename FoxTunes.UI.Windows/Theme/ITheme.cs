@@ -13,8 +13,6 @@ namespace FoxTunes
 
         string Description { get; }
 
-        int CornerRadius { get; }
-
         Stream GetArtworkPlaceholder();
 
         IEnumerable<IColorPalette> ColorPalettes { get; }

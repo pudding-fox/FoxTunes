@@ -5,13 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.IO.Packaging;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Effects;
 using System.Windows.Threading;
 
 namespace FoxTunes
@@ -34,8 +32,6 @@ namespace FoxTunes
 
         public SelectionConfigurationElement ImageMode { get; private set; }
 
-        public BooleanConfigurationElement Transparency { get; private set; }
-
         protected override void OnConfigurationChanged()
         {
             if (this.Configuration != null)
@@ -47,10 +43,6 @@ namespace FoxTunes
                 this.ImageMode = this.Configuration.GetElement<SelectionConfigurationElement>(
                     LibraryBrowserBaseConfiguration.SECTION,
                     LibraryBrowserBaseConfiguration.TILE_IMAGE
-                );
-                this.Transparency = this.Configuration.GetElement<BooleanConfigurationElement>(
-                    WindowsUserInterfaceConfiguration.SECTION,
-                    WindowsUserInterfaceConfiguration.TRANSPARENCY
                 );
                 this.TileSize.ValueChanged += this.OnValueChanged;
                 this.ImageMode.ValueChanged += this.OnValueChanged;
@@ -189,16 +181,13 @@ namespace FoxTunes
         {
             var activeListBox = this.GetActiveListBox();
             var inactiveListBox = this.GetInactiveListBox();
-            activeListBox.Effect = null;
-            if (this.Transparency.Value)
+            if (activeListBox != null)
             {
-                if (inactiveListBox != null)
-                {
-                    inactiveListBox.Effect = new BlurEffect()
-                    {
-                        Radius = 20
-                    };
-                }
+                UIElementExtensions.SetTransparentBlur(activeListBox, false);
+            }
+            if (inactiveListBox != null)
+            {
+                UIElementExtensions.SetTransparentBlur(inactiveListBox, true);
             }
         }
 

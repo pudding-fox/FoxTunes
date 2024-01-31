@@ -34,8 +34,6 @@ namespace FoxTunes
 
         public bool IsEnabled { get; private set; }
 
-        public abstract int CornerRadius { get; }
-
         public abstract ResourceDictionary GetResourceDictionary();
 
         public abstract Stream GetArtworkPlaceholder();
