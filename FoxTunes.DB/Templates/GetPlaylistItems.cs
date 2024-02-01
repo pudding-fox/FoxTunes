@@ -20,7 +20,7 @@ namespace FoxTunes.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\GetPlaylistItems.tt"
+    #line 1 "C:\Source\FoxTunes\FoxTunes.DB\Templates\GetPlaylistItems.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "17.0.0.0")]
     public partial class GetPlaylistItems : GetPlaylistItemsBase
     {
@@ -44,7 +44,7 @@ FROM
 	(
 	");
             
-            #line 20 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\GetPlaylistItems.tt"
+            #line 20 "C:\Source\FoxTunes\FoxTunes.DB\Templates\GetPlaylistItems.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(new PlaylistFilterBuilder(this.Database, this.Filter).TransformText()));
             
             #line default

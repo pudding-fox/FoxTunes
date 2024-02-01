@@ -20,7 +20,7 @@ namespace FoxTunes.Templates
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+    #line 1 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "17.0.0.0")]
     public partial class PlaylistFilterBuilder : PlaylistFilterBuilderBase
     {
@@ -32,7 +32,7 @@ namespace FoxTunes.Templates
         {
             this.Write("\r\n");
             
-            #line 9 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 9 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 
 if (this.Filter != null)
 {
@@ -51,7 +51,7 @@ if (this.Filter != null)
             #line hidden
             this.Write(" AND ");
             
-            #line 21 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 21 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 
 		}
 		var firstEntry = true;
@@ -69,7 +69,7 @@ if (this.Filter != null)
             #line hidden
             this.Write(" OR ");
             
-            #line 32 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 32 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 
 			}
 			var numeric = default(int);
@@ -80,14 +80,14 @@ if (this.Filter != null)
             #line hidden
             this.Write("(\"MetaDataItems\".\"Name\" = ");
             
-            #line 36 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 36 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String(entry.Name)));
             
             #line default
             #line hidden
             this.Write(" AND ");
             
-            #line 36 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 36 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 
 			if (isNumeric)
 			{
@@ -97,7 +97,7 @@ if (this.Filter != null)
             #line hidden
             this.Write("CAST(\"MetaDataItems\".\"Value\" AS int)");
             
-            #line 39 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 39 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 
 			}
 			else
@@ -108,7 +108,7 @@ if (this.Filter != null)
             #line hidden
             this.Write("\"MetaDataItems\".\"Value\"");
             
-            #line 43 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 43 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 
 			}
 			switch (entry.Operator)
@@ -121,7 +121,7 @@ if (this.Filter != null)
             #line hidden
             this.Write(" = ");
             
-            #line 49 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 49 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 
 					break;
 				case FilterParserEntryOperator.Greater:
@@ -131,7 +131,7 @@ if (this.Filter != null)
             #line hidden
             this.Write(" > ");
             
-            #line 52 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 52 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 					
 					break;
 				case FilterParserEntryOperator.GreaterEqual:
@@ -141,7 +141,7 @@ if (this.Filter != null)
             #line hidden
             this.Write(" >= ");
             
-            #line 55 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 55 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 					
 					break;
 				case FilterParserEntryOperator.Less:
@@ -151,7 +151,7 @@ if (this.Filter != null)
             #line hidden
             this.Write(" < ");
             
-            #line 58 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 58 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 					
 					break;
 				case FilterParserEntryOperator.LessEqual:
@@ -161,7 +161,7 @@ if (this.Filter != null)
             #line hidden
             this.Write(" <= ");
             
-            #line 61 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 61 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 					
 					break;
 				case FilterParserEntryOperator.Match:
@@ -171,7 +171,7 @@ if (this.Filter != null)
             #line hidden
             this.Write(" LIKE ");
             
-            #line 64 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 64 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 					
 					break;
 			}
@@ -180,7 +180,7 @@ if (this.Filter != null)
             #line default
             #line hidden
             
-            #line 68 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 68 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
  
 			if (isNumeric)
 			{
@@ -189,13 +189,13 @@ if (this.Filter != null)
             #line default
             #line hidden
             
-            #line 71 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 71 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(numeric));
             
             #line default
             #line hidden
             
-            #line 71 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 71 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 
 			}
 			else
@@ -205,13 +205,13 @@ if (this.Filter != null)
             #line default
             #line hidden
             
-            #line 75 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 75 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Database.QueryFactory.Dialect.String(entry.Value.Replace(FilterParserResultEntry.BOUNDED_WILDCARD, "_").Replace(FilterParserResultEntry.UNBOUNDED_WILDCARD, "%"))));
             
             #line default
             #line hidden
             
-            #line 75 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 75 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 
 			}
 
@@ -220,7 +220,7 @@ if (this.Filter != null)
             #line hidden
             this.Write(")");
             
-            #line 78 "C:\sourcecode\source\personal\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
+            #line 78 "C:\Source\FoxTunes\FoxTunes.DB\Templates\PlaylistFilterBuilder.tt"
 
 		}
 	}
