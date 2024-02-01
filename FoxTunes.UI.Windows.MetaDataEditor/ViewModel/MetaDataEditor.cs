@@ -30,7 +30,8 @@ namespace FoxTunes.ViewModel
 
         private static readonly string[] IMAGES = new[]
         {
-            CommonImageTypes.FrontCover
+            CommonImageTypes.FrontCover,
+            CommonImageTypes.BackCover
         };
 
         public MetaDataEditor()
