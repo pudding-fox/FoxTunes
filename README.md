@@ -6,7 +6,7 @@ For additional plugins, download [FoxTunes-3.1.1-Plugins-net462.zip](https://git
 
 There is also a [Microsoft Store](https://www.microsoft.com/store/productId/9MWPJTXWTXLG) package.
 
-Consult the [Wiki](https://github.com/aidan-g/FoxTunes/wiki) for more informations.
+![Development](Media/Screenshots/Development.png)
 
 ![Main](https://user-images.githubusercontent.com/13859177/216791551-186168bd-78fd-4a2d-96d1-195855a80330.png)
 
@@ -86,19 +86,19 @@ It needs at least;
 * **Archive** - Tracks can be played directly from some archive formats: 7z, iso, rar, tar and zip.
 * **ASIO** - Low latency exclusive output, supports DSD direct.
 * **CD** - Play audio CDs from a physical drive.
-* **CROSSFADE** - A fading input transport: https://github.com/aidan-g/BASS_CROSSFADE
-* **CUE** - Play cue sheets: https://github.com/aidan-g/BASS_SUBSTREAM
+* **CROSSFADE** - A fading input transport.
+* **CUE** - Play cue sheets.
   * Provides the "skip silence" feature which can trim silence from the start and end of media.
 * **Discogs** - Fetch meta data and images using the discogs API.
   * Automatically fetch missing artwork.
 * **DirectSound** - Use standard windows audio session for output.
 * **DSD** - Required for DSD direct.
-* **DTS** - Play .dts multi channel format: https://github.com/aidan-g/BASS_DTS
+* **DTS** - Play .dts multi channel format.
 * **Encoder** - A converter with various output formats. 
   * Can split cue sheets with the CUE plugin.
   * Can rip CDs with the CD plugin.
   * Can up/down sample rate/depth with the Resampler plugin.
-* **GAPLESS** - A "true" gapless input transport: https://github.com/aidan-g/BASS_GAPLESS
+* **GAPLESS** - A "true" gapless input transport.
 * **Noesis** - Use Noesis.Javascript for scriptable elements.
 * **ClearScript** - Use Microsoft.ClearScript for scriptable elements.  
 * **Layout** - A flexible layout system with various panel types. 
@@ -110,13 +110,12 @@ It needs at least;
 * **MetaDataEditor** - A simple batch mode tag editor. Can embed artwork.
 * **MetaDataViewer** - A simple meta data viewer.
 * **Minidisc** - Write physical minidiscs using a compatible netmd device.
-  * Uses the MD.Net library: https://github.com/aidan-g/MD.Net
 * **MOD** - Play various mod music formats.
 * **ParametricEqualizer** - A ten band parametric equalizer with EQ presets easily modifiable and addable (TEXT files).
 * **Ratings** - 1-5 based star rating system with several controls for viewing and editing.
-* **ReplayGain** - Calculate and utilize replay gain meta data for tracks and albums: https://github.com/aidan-g/BASS_REPLAY_GAIN
+* **ReplayGain** - Calculate and utilize replay gain meta data for tracks and albums.
   * Can calculate on demand (per track) if you don't mind waiting a moment for playback.
-* **Resampler** - SOXR based high quality configurable resampler. Can perform up/down sampling: https://github.com/aidan-g/BASS_SOX
+* **Resampler** - SOXR based high quality configurable resampler. Can perform up/down sampling.
 * **Snapping** - Enable winamp like window snapping.
 * **Visualizations** - Visualizations: Spectrum, Peak Meter, Oscilloscope and Spectrogram.
 * **SQLite** - Use SQLite for database functions.
