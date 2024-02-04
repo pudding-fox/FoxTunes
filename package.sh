@@ -48,26 +48,32 @@ cp "$RAIMUSOFT_CER" "./release/SigningCert.cer"
 for target in $TARGET
 do
 
-cd "./release/$target"
+	if [ ! -d "./release/$target" ]
+	then
+		echo "Source was not built: $target"
+		continue
+	fi
 
-echo "Creating manifest.."
-cp "../../FoxTunes.Manifest.xml" "./main/AppxManifest.xml"
+	cd "./release/$target"
 
-echo "Creating assets.."
-mkdir -p "./main/Assets"
-cp ../../Assets/* "main/Assets/"
+	echo "Creating manifest.."
+	cp "../../FoxTunes.Manifest.xml" "./main/AppxManifest.xml"
 
-echo "Creating msix package.."
-"$MAKEMSIX" pack -d "main" -p "FoxTunes-$version-$target.appx"
-cp "./FoxTunes-$version-$target.appx" "../FoxTunes-$version-$target.appx"
+	echo "Creating assets.."
+	mkdir -p "./main/Assets"
+	cp ../../Assets/* "main/Assets/"
 
-echo "Signing msix package.."
-cp "$RAIMUSOFT_PFX" "./SigningCert.pfx"
-"$SIGNTOOL" sign //fd SHA256 //a //f SigningCert.pfx "FoxTunes-$version-$target.appx"
-cp "./FoxTunes-$version-$target.appx" "../FoxTunes-$version-$target-Signed.appx"
+	echo "Creating msix package.."
+	"$MAKEMSIX" pack -d "main" -p "FoxTunes-$version-$target.appx"
+	cp "./FoxTunes-$version-$target.appx" "../FoxTunes-$version-$target.appx"
 
-cd ..
-cd ..
+	echo "Signing msix package.."
+	cp "$RAIMUSOFT_PFX" "./SigningCert.pfx"
+	"$SIGNTOOL" sign //fd SHA256 //a //f SigningCert.pfx "FoxTunes-$version-$target.appx"
+	cp "./FoxTunes-$version-$target.appx" "../FoxTunes-$version-$target-Signed.appx"
+
+	cd ..
+	cd ..
 
 done
 echo
