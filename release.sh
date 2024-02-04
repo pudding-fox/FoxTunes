@@ -1,8 +1,6 @@
 #!/bin/sh
 
 TARGET="
-net40
-net462
 net48
 "
 
