@@ -76,8 +76,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
-    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" Condition="'$(TargetFramework)' == 'net40'" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -90,6 +88,5 @@
 	  </None>
 	</ItemGroup>
 
-	<Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.21\build\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
 
 </Project>

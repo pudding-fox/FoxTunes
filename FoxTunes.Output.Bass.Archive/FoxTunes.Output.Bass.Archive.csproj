@@ -11,12 +11,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net40'">
-			<HintPath>..\lib\net40\ManagedBass.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-
-	<ItemGroup>
 		<Reference Include="ManagedBass" Condition="'$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'net48'">
 			<HintPath>..\lib\net462\ManagedBass.dll</HintPath>
 		</Reference>
@@ -36,8 +30,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="ManagedBass.ZipStream" Version="0.2.2" />
-		<PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" Condition="'$(TargetFramework)' == 'net40'" />
-		<PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" Condition="'$(TargetFramework)' == 'net40'" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -52,7 +44,5 @@
 			<DependentUpon>Strings.resx</DependentUpon>
 		</Compile>
 	</ItemGroup>
-
-	<Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.21\build\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />
 
 </Project>
