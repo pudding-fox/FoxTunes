@@ -1,11 +1,12 @@
 ﻿using FoxTunes.Interfaces;
+using System;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media.Effects;
 
 namespace FoxTunes
 {
-    public static class UIElementExtensions
+    public static partial class UIElementExtensions
     {
         private static readonly ConditionalWeakTable<UIElement, TransparentBlurBehaviour> TransparentBlurBehaviours = new ConditionalWeakTable<UIElement, TransparentBlurBehaviour>();
 

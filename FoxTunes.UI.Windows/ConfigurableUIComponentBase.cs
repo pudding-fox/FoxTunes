@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using static FoxTunes.UIElementExtensions;
 
 namespace FoxTunes
 {
@@ -33,11 +34,7 @@ namespace FoxTunes
         protected virtual void OnLoaded(object sender, RoutedEventArgs e)
         {
             this.CreateMenu();
-            if (this.Configuration != null)
-            {
-                this.ApplyConfiguration();
-            }
-            this.Loaded -= this.OnLoaded;
+            this.ApplyConfiguration();
         }
 
         protected virtual void ApplyConfiguration()
@@ -51,7 +48,10 @@ namespace FoxTunes
                     //Not sure if this is a bug or intended behaviour but FindChildren returns the parent (this).
                     continue;
                 }
-                child.Configuration = this.Configuration;
+                if (!object.ReferenceEquals(child.Configuration, this.Configuration))
+                {
+                    child.Configuration = this.Configuration;
+                }
                 if (child is FrameworkElement element)
                 {
                     this.ApplyConfiguration(element);
@@ -67,7 +67,10 @@ namespace FoxTunes
             }
             foreach (var configurationTarget in element.Resources.Values.OfType<IConfigurationTarget>())
             {
-                configurationTarget.Configuration = this.Configuration;
+                if (!object.ReferenceEquals(configurationTarget.Configuration, this.Configuration))
+                {
+                    configurationTarget.Configuration = this.Configuration;
+                }
             }
         }
 
@@ -157,6 +160,7 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
+            this.Loaded -= this.OnLoaded;
             if (this.Configuration is IDisposable disposable)
             {
                 disposable.Dispose();
