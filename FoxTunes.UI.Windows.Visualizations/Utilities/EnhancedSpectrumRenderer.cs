@@ -27,6 +27,8 @@ namespace FoxTunes
 
         public SelectionConfigurationElement Bands { get; private set; }
 
+        public TextConfigurationElement Custom { get; private set; }
+
         public BooleanConfigurationElement ShowPeak { get; private set; }
 
         public BooleanConfigurationElement ShowRms { get; private set; }
@@ -53,6 +55,10 @@ namespace FoxTunes
                    EnhancedSpectrumConfiguration.SECTION,
                    EnhancedSpectrumConfiguration.BANDS_ELEMENT
                );
+                this.Custom = this.Configuration.GetElement<TextConfigurationElement>(
+                   EnhancedSpectrumConfiguration.SECTION,
+                   EnhancedSpectrumConfiguration.BANDS_CUSTOM_ELEMENT
+                );
                 this.ShowPeak = this.Configuration.GetElement<BooleanConfigurationElement>(
                     EnhancedSpectrumConfiguration.SECTION,
                     EnhancedSpectrumConfiguration.PEAK_ELEMENT
@@ -78,6 +84,7 @@ namespace FoxTunes
                    VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
                 );
                 this.Bands.ValueChanged += this.OnValueChanged;
+                this.Custom.ValueChanged += this.OnValueChanged;
                 this.ShowPeak.ValueChanged += this.OnValueChanged;
                 this.ShowRms.ValueChanged += this.OnValueChanged;
                 this.ShowCrestFactor.ValueChanged += this.OnValueChanged;
@@ -108,13 +115,13 @@ namespace FoxTunes
             {
                 return false;
             }
-            var bands = EnhancedSpectrumConfiguration.GetBands(this.Bands.Value);
+            var bands = EnhancedSpectrumConfiguration.GetBands(this.Bands.Value, this.Custom);
             this.RendererData = Create(
                 this.TransformerFactory.Create(bands),
                 width,
                 height,
                 bands,
-                EnhancedSpectrumConfiguration.GetFFTSize(this.FFTSize.Value, this.Bands.Value),
+                EnhancedSpectrumConfiguration.GetFFTSize(this.FFTSize.Value, this.Bands.Value, this.Custom),
                 this.ShowPeak.Value,
                 this.ShowRms.Value,
                 this.ShowCrestFactor.Value,
@@ -315,12 +322,20 @@ namespace FoxTunes
             {
                 return 0;
             }
-            var bands = EnhancedSpectrumConfiguration.GetBands(this.Bands.Value);
+            var bands = EnhancedSpectrumConfiguration.GetBands(this.Bands.Value, this.Custom);
             return base.GetPixelWidth(Math.Max(bands.Length * (Convert.ToInt32(width) / bands.Length), bands.Length));
         }
 
         protected override void OnDisposing()
         {
+            if (this.Bands != null)
+            {
+                this.Bands.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.Custom != null)
+            {
+                this.Custom.ValueChanged -= this.OnValueChanged;
+            }
             if (this.ShowPeak != null)
             {
                 this.ShowPeak.ValueChanged -= this.OnValueChanged;

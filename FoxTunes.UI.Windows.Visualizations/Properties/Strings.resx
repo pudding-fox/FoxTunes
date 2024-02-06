@@ -123,6 +123,9 @@
   <data name="EnhancedSpectrumConfiguration.Bands" xml:space="preserve">
     <value>Bands</value>
   </data>
+  <data name="EnhancedSpectrumConfiguration.Bands.Custom" xml:space="preserve">
+    <value>Config (Min Max Count)</value>
+  </data>
   <data name="EnhancedSpectrumConfiguration.ColorPalette" xml:space="preserve">
     <value>Color Palette</value>
   </data>

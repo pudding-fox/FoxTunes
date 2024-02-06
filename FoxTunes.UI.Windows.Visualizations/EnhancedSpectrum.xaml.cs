@@ -91,6 +91,12 @@ namespace FoxTunes
             {
                 foreach (var option in this.Bands.Options)
                 {
+                    var count = default(int);
+                    var parts = option.Name.Split(new string[] { " " }, 1, StringSplitOptions.RemoveEmptyEntries);
+                    if (!int.TryParse(parts[0], out count))
+                    {
+                        continue;
+                    }
                     yield return new InvocationComponent(
                         CATEGORY,
                         option.Id,

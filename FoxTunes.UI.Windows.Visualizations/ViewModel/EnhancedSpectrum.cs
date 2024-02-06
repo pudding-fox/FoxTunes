@@ -46,27 +46,58 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler BandsChanged;
 
+        public SelectionConfigurationElement BandsElement { get; private set; }
+
+        public TextConfigurationElement CustomElement { get; private set; }
+
         protected override void OnConfigurationChanged()
         {
             if (this.Configuration != null)
             {
-                this.Configuration.GetElement<SelectionConfigurationElement>(
+                this.BandsElement = this.Configuration.GetElement<SelectionConfigurationElement>(
                     EnhancedSpectrumConfiguration.SECTION,
                     EnhancedSpectrumConfiguration.BANDS_ELEMENT
-                ).ConnectValue(value =>
-                {
-                    var bands = EnhancedSpectrumConfiguration.GetBands(value).Select(
-                        band => band < 1000 ? Convert.ToString(band) : string.Format("{0:0.##}K", (float)band / 1000)
-                    );
-                    this.Bands = new StringCollection(bands);
-                });
+                );
+                this.CustomElement = this.Configuration.GetElement<TextConfigurationElement>(
+                    EnhancedSpectrumConfiguration.SECTION,
+                    EnhancedSpectrumConfiguration.BANDS_CUSTOM_ELEMENT
+                );
+                this.BandsElement.ValueChanged += this.OnValueChanged;
+                this.CustomElement.ValueChanged += this.OnValueChanged;
+                this.Refresh();
             }
             base.OnConfigurationChanged();
+        }
+
+        protected virtual void OnValueChanged(object sender, EventArgs e)
+        {
+            this.Refresh();
+        }
+
+        public void Refresh()
+        {
+            var bands = EnhancedSpectrumConfiguration.GetBands(this.BandsElement.Value, this.CustomElement).Select(
+                band => band < 1000 ? Convert.ToString(band) : string.Format("{0:0.##}K", (float)band / 1000)
+            );
+            this.Bands = new StringCollection(bands);
         }
 
         protected override Freezable CreateInstanceCore()
         {
             return new EnhancedSpectrum();
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.BandsElement != null)
+            {
+                this.BandsElement.ValueChanged -= this.OnValueChanged;
+            }
+            if (this.CustomElement != null)
+            {
+                this.CustomElement.ValueChanged -= this.OnValueChanged;
+            }
+            base.OnDisposing();
         }
     }
 }
