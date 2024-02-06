@@ -98,21 +98,22 @@ namespace FoxTunes
             return listBox;
         }
 
-        public ListBox GetInactiveListBox()
+        public IEnumerable<ListBox> GetInactiveListBoxes()
         {
             var itemsControl = this.GetItemsControl();
-            if (itemsControl == null || itemsControl.Items.Count < 2)
+            if (itemsControl != null)
             {
-                return null;
+                for (var a = 0; a < itemsControl.Items.Count - 1; a++)
+                {
+                    var container = itemsControl.ItemContainerGenerator.ContainerFromIndex(a) as ContentPresenter;
+                    if (container != null)
+                    {
+                        container.ApplyTemplate();
+                        var listBox = container.ContentTemplate.FindName("ListBox", container) as ListBox;
+                        yield return listBox;
+                    }
+                }
             }
-            var container = itemsControl.ItemContainerGenerator.ContainerFromIndex(itemsControl.Items.Count - 2) as ContentPresenter;
-            if (container == null)
-            {
-                return null;
-            }
-            container.ApplyTemplate();
-            var listBox = container.ContentTemplate.FindName("ListBox", container) as ListBox;
-            return listBox;
         }
 
         protected virtual void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -180,12 +181,12 @@ namespace FoxTunes
         protected virtual void ApplyBlur()
         {
             var activeListBox = this.GetActiveListBox();
-            var inactiveListBox = this.GetInactiveListBox();
+            var inactiveListBoxes = this.GetInactiveListBoxes();
             if (activeListBox != null)
             {
                 UIElementExtensions.SetTransparentBlur(activeListBox, false);
             }
-            if (inactiveListBox != null)
+            foreach (var inactiveListBox in inactiveListBoxes)
             {
                 UIElementExtensions.SetTransparentBlur(inactiveListBox, true);
             }
