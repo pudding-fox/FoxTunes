@@ -69,14 +69,14 @@ namespace FoxTunes
 
         public ICore Core { get; private set; }
 
-        public IOutput Output { get; private set; }
+        public ThemeLoader ThemeLoader { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
-            this.Output = core.Components.Output;
+            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
             this.Configuration = core.Components.Configuration;
             base.InitializeComponent(core);
         }
@@ -91,6 +91,7 @@ namespace FoxTunes
 
         public override Task Show()
         {
+            this.ThemeLoader.EnsureTheme();
             var registrations = global::FoxTunes.Windows.Registrations.RegistrationsByRole(UserInterfaceWindowRole.Main);
             foreach (var registration in registrations)
             {
