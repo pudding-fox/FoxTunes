@@ -6,7 +6,6 @@ namespace FoxTunes
 {
     [Component(ID)]
     [WindowsUserInterfaceDependency]
-    [ComponentPreference(ReleaseType.Default)]
     public class AdamantineTheme : ThemeBase
     {
         public const string ID = "06464CF4-118F-47EA-9597-303D305EF847";

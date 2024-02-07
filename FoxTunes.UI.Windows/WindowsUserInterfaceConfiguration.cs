@@ -47,7 +47,7 @@ namespace FoxTunes
                 .WithElement(
                     new IntegerConfigurationElement(TIMER_FREQUENCY, Strings.WindowsUserInterfaceConfiguration_TimerFrequency, path: Strings.General_Advanced).WithValue(DEFAULT_TIMER_FREQUENCY).WithValidationRule(new IntegerValidationRule(MIN_TIMER_FREQUENCY, MAX_TIMER_FREQUENCY)))
                 .WithElement(
-                    new BooleanConfigurationElement(TRANSPARENCY, Strings.WindowsUserInterfaceConfiguration_Transparency))
+                    new BooleanConfigurationElement(TRANSPARENCY, Strings.WindowsUserInterfaceConfiguration_Transparency).WithValue(true))
                 .WithElement(
                     new SelectionConfigurationElement(TRANSPARENCY_PROVIDER, Strings.WindowsUserInterfaceConfiguration_TransparencyProvider).DependsOn(SECTION, TRANSPARENCY)
             );
