@@ -288,6 +288,9 @@
   <data name="UIComponentLayoutProviderConfiguration.Preset" xml:space="preserve">
     <value>Preset</value>
   </data>
+  <data name="UIComponentLayoutProviderConfiguration.Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
   <data name="UIComponentLayoutProviderPresets.Main.1" xml:space="preserve">
     <value>Default</value>
   </data>

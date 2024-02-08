@@ -574,6 +574,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Refresh.
+        /// </summary>
+        internal static string UIComponentLayoutProviderConfiguration_Refresh {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProviderConfiguration.Refresh", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Default.
         /// </summary>
         internal static string UIComponentLayoutProviderPresets_Main_1 {

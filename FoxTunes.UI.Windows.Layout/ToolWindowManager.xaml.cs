@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
+using System.Drawing.Design;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,6 +12,8 @@ namespace FoxTunes
     /// </summary>
     public partial class ToolWindowManager : UserControl
     {
+        public static readonly IConfiguration Configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
+
         public ToolWindowManager()
         {
             this.InitializeComponent();
@@ -27,6 +31,8 @@ namespace FoxTunes
             {
                 return;
             }
+            //Ensure any pending changes are committed.
+            Configuration.Save();
             var layoutEditor = new LayoutEditor();
             layoutEditor.Component = toolWindow.Component;
             if (!await Windows.ShowDialog(Core.Instance, Strings.ToolWindowManager_EditLayoutXML, layoutEditor).ConfigureAwait(false))
@@ -56,6 +62,8 @@ namespace FoxTunes
             {
                 return;
             }
+            //Ensure any pending changes are committed.
+            Configuration.Save();
             var converter = new global::FoxTunes.ViewModel.UIComponentConfigurationConverter();
             mainLayout.Value = string.Concat(
                 "<?xml version=\"1.0\" encoding=\"Windows-1252\"?>\r\n<FoxTunes>\r\n",
