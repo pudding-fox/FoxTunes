@@ -88,6 +88,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Min Max Count Function(L = Linear, S = Square).
+        /// </summary>
+        internal static string EnhancedSpectrumConfiguration_Bands_Custom_Description {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Bands.Custom.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Color Palette.
         /// </summary>
         internal static string EnhancedSpectrumConfiguration_ColorPalette {

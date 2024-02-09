@@ -1,11 +1,8 @@
-﻿using FoxDb.Interfaces;
-using FoxTunes.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
 namespace FoxTunes
@@ -60,7 +57,7 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(BANDS_ELEMENT, Strings.EnhancedSpectrumConfiguration_Bands, path: Strings.EnhancedSpectrumConfiguration_Path).WithOptions(GetBandsOptions()))
-                .WithElement(new TextConfigurationElement(BANDS_CUSTOM_ELEMENT, Strings.EnhancedSpectrumConfiguration_Bands_Custom, path: Strings.EnhancedSpectrumConfiguration_Path).WithValue("50 20000 320").DependsOn(SECTION, BANDS_ELEMENT, BANDS_CUSTOM_OPTION))
+                .WithElement(new TextConfigurationElement(BANDS_CUSTOM_ELEMENT, Strings.EnhancedSpectrumConfiguration_Bands_Custom, description: Strings.EnhancedSpectrumConfiguration_Bands_Custom_Description, path: Strings.EnhancedSpectrumConfiguration_Path).WithValue("50 20000 320 S").DependsOn(SECTION, BANDS_ELEMENT, BANDS_CUSTOM_OPTION))
                 .WithElement(new BooleanConfigurationElement(PEAK_ELEMENT, Strings.EnhancedSpectrumConfiguration_Peak, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(true))
                 .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.EnhancedSpectrumConfiguration_Rms, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(true))
                 .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.EnhancedSpectrumConfiguration_Crest, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(false).DependsOn(SECTION, PEAK_ELEMENT).DependsOn(SECTION, RMS_ELEMENT))
@@ -94,15 +91,16 @@ namespace FoxTunes
                 case BANDS_160_OPTION:
                     return GetBands(160);
                 case BANDS_CUSTOM_OPTION:
-                    var parts = custom.Value.Split(new[] { " " }, 3, StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length == 3)
+                    var parts = custom.Value.Split(new[] { " " }, 4, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 4)
                     {
                         var min = default(int);
                         var max = default(int);
                         var count = default(int);
-                        if (int.TryParse(parts[0], out min) && int.TryParse(parts[1], out max) && int.TryParse(parts[2], out count))
+                        var easingFunction = default(EasingFunction);
+                        if (int.TryParse(parts[0], out min) && int.TryParse(parts[1], out max) && int.TryParse(parts[2], out count) && Enum.TryParse(parts[3], out easingFunction))
                         {
-                            return GetBands(min, max, count);
+                            return GetBands(min, max, count, easingFunction);
                         }
                     }
                     break;
@@ -112,16 +110,27 @@ namespace FoxTunes
 
         private static int[] GetBands(int count)
         {
-            return GetBands(50, 20000, count);
+            return GetBands(50, 20000, count, EasingFunction.S);
         }
 
-        private static int[] GetBands(int min, int max, int count)
+        private static int[] GetBands(int min, int max, int count, EasingFunction easingFunction)
         {
-            return Enumerable.Range(0, count)
+            var sequence = Enumerable.Range(0, count)
                 .Select(element => (float)element / count)
-                .Select(element => element * element)
-                .Select(element => Convert.ToInt32(min + (element * max)))
+                .Select(element =>
+                {
+                    switch (easingFunction)
+                    {
+                        case EasingFunction.L:
+                            return element;
+                        case EasingFunction.S:
+                        default:
+                            return element * element;
+                    }
+                });
+            var bands = sequence.Select(element => Convert.ToInt32(min + (element * (max - min))))
                 .ToArray();
+            return bands;
         }
 
         public static string GetDefaultColorPalette()
@@ -156,6 +165,15 @@ namespace FoxTunes
                     break;
             }
             return size;
+        }
+
+        public enum EasingFunction : byte
+        {
+            None,
+            [Description("Linear")]
+            L,
+            [Description("Square")]
+            S
         }
     }
 }

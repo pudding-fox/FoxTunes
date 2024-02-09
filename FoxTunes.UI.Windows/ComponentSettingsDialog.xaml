@@ -80,7 +80,7 @@
                                                 </DataTemplate>
                                             </ContentControl.Resources>
                                         </ContentControl>
-                                        <ContentControl Grid.Column="1" Content="{Binding}">
+                                        <ContentControl Grid.Column="1" Content="{Binding}" ToolTip="{Binding Description}">
                                             <ContentControl.Resources>
                                                 <DataTemplate DataType="{x:Type Core:SelectionConfigurationElement}">
                                                     <Config:SelectionConfigurationElement></Config:SelectionConfigurationElement>
