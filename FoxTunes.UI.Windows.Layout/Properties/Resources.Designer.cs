@@ -127,10 +127,10 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;Windows-1252&quot;?&gt;
         ///&lt;FoxTunes&gt;
-        ///  &lt;UIComponentConfiguration Component=&quot;3451DAA4-C643-4CB2-8105-B441F0277559&quot;&gt;
-        ///    &lt;UIComponentConfiguration Component=&quot;8A4E9DDB-2390-455D-9BA9-57C9A441CD75&quot;&gt;
-        ///      &lt;MetaDataEntry Name=&quot;Configuration_AABBBC99-41C7-4563-BB7E-12EDAC59E57F&quot; Value=&quot;70&quot; /&gt;
-        ///      &lt;MetaDataEntry Name=&quot;Configuration_AAAA1509-4808-419D-93BB-B8D914C60646&quot; Value=&quot;pack://application:,,,/FoxTunes.UI.Windows.Layout;component/Resources/001.jpg &amp;#xD;&amp;#xA;pack://application:,,,/Fo [rest of string was truncated]&quot;;.
+        ///	&lt;UIComponentConfiguration Component=&quot;3451DAA4-C643-4CB2-8105-B441F0277559&quot;&gt;
+        ///		&lt;UIComponentConfiguration Component=&quot;8A4E9DDB-2390-455D-9BA9-57C9A441CD75&quot;&gt;
+        ///			&lt;MetaDataEntry Name=&quot;Configuration_AABBBC99-41C7-4563-BB7E-12EDAC59E57F&quot; Value=&quot;30&quot; /&gt;
+        ///			&lt;MetaDataEntry Name=&quot;Configuration_AAAA1509-4808-419D-93BB-B8D914C60646&quot; Value=&quot;pack://application:,,,/FoxTunes.UI.Windows.Layout;component/Resources/001.jpg &amp;#xD;&amp;#xA;pack://application:,,,/FoxTunes.UI [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Main_5 {
             get {
