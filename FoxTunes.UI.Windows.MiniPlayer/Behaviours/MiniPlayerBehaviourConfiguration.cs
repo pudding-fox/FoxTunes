@@ -19,6 +19,10 @@ namespace FoxTunes
 
         public const string DROP_COMMIT_ELEMENT = "IIIIF490-CE3D-481A-8924-B698BD443D88";
 
+        public const string MARQUEE_INTERVAL_ELEMENT = "JJJJ685A-4D15-4AE1-B7AD-3E5786CB8EDB";
+
+        public const string MARQUEE_STEP_ELEMENT = "KKKKDCB3-69C3-4F73-966C-6A7738E359A1";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.MiniPlayerBehaviourConfiguration_Section)
@@ -37,7 +41,11 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(SHOW_PLAYLIST_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_ShowPlaylist).WithValue(false))
                 .WithElement(
-                    new SelectionConfigurationElement(DROP_COMMIT_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_DropCommit).WithOptions(GetDropBehaviourOptions())
+                    new SelectionConfigurationElement(DROP_COMMIT_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_DropCommit).WithOptions(GetDropBehaviourOptions()))
+                .WithElement(
+                    new IntegerConfigurationElement(MARQUEE_INTERVAL_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_MarqueeInterval).WithValue(50).WithValidationRule(new IntegerValidationRule(10, 1000)))
+                .WithElement(
+                    new DoubleConfigurationElement(MARQUEE_STEP_ELEMENT, Strings.MiniPlayerBehaviourConfiguration_MarqueeStep).WithValue(0.80).WithValidationRule(new DoubleValidationRule(0.80, 10, 0.4))
             );
         }
 

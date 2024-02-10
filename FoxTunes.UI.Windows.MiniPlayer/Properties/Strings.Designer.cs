@@ -97,6 +97,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Marquee Interval.
+        /// </summary>
+        internal static string MiniPlayerBehaviourConfiguration_MarqueeInterval {
+            get {
+                return ResourceManager.GetString("MiniPlayerBehaviourConfiguration.MarqueeInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Marquee Step.
+        /// </summary>
+        internal static string MiniPlayerBehaviourConfiguration_MarqueeStep {
+            get {
+                return ResourceManager.GetString("MiniPlayerBehaviourConfiguration.MarqueeStep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Playing Script.
         /// </summary>
         internal static string MiniPlayerBehaviourConfiguration_NowPlayingScript {

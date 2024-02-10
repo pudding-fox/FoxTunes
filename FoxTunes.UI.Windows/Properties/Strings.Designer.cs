@@ -1582,24 +1582,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Marquee Interval.
-        /// </summary>
-        internal static string WindowsUserInterfaceConfiguration_MarqueeInterval {
-            get {
-                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.MarqueeInterval", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Marquee Step.
-        /// </summary>
-        internal static string WindowsUserInterfaceConfiguration_MarqueeStep {
-            get {
-                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.MarqueeStep", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Appearance.
         /// </summary>
         internal static string WindowsUserInterfaceConfiguration_Section {

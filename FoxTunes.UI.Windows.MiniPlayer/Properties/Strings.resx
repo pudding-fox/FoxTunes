@@ -129,6 +129,12 @@
   <data name="MiniPlayerBehaviourConfiguration.DropCommit" xml:space="preserve">
     <value>Drop Behaviour</value>
   </data>
+  <data name="MiniPlayerBehaviourConfiguration.MarqueeInterval" xml:space="preserve">
+    <value>Marquee Interval</value>
+  </data>
+  <data name="MiniPlayerBehaviourConfiguration.MarqueeStep" xml:space="preserve">
+    <value>Marquee Step</value>
+  </data>
   <data name="MiniPlayerBehaviourConfiguration.NowPlayingScript" xml:space="preserve">
     <value>Playing Script</value>
   </data>

@@ -13,10 +13,6 @@ namespace FoxTunes
 
         public const string LAYOUT_ELEMENT = "BBBB9A67-F909-49EA-A4D3-6E26659A5797";
 
-        public const string MARQUEE_INTERVAL_ELEMENT = "JJJJ685A-4D15-4AE1-B7AD-3E5786CB8EDB";
-
-        public const string MARQUEE_STEP_ELEMENT = "KKKKDCB3-69C3-4F73-966C-6A7738E359A1";
-
         public const string SHOW_CURSOR_ADORNERS_ELEMENT = "NNNN7E23-A1E4-4BB6-9291-B553F4F7AD12";
 
         public const string TIMER_FREQUENCY = "MMMMB95C-C67B-4D27-858A-225E2003503B";
@@ -38,10 +34,6 @@ namespace FoxTunes
                     new SelectionConfigurationElement(THEME_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Theme).WithOptions(GetThemeOptions()))
                 .WithElement(
                     new SelectionConfigurationElement(LAYOUT_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Layout).WithOptions(GetLayoutOptions()))
-                .WithElement(
-                    new IntegerConfigurationElement(MARQUEE_INTERVAL_ELEMENT, Strings.WindowsUserInterfaceConfiguration_MarqueeInterval, path: Strings.General_Advanced).WithValue(50).WithValidationRule(new IntegerValidationRule(10, 1000)))
-                .WithElement(
-                    new DoubleConfigurationElement(MARQUEE_STEP_ELEMENT, Strings.WindowsUserInterfaceConfiguration_MarqueeStep, path: Strings.General_Advanced).WithValue(0.80).WithValidationRule(new DoubleValidationRule(0.80, 10, 0.4)))
                 .WithElement(
                     new BooleanConfigurationElement(SHOW_CURSOR_ADORNERS_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Cursors, path: Strings.General_Advanced).WithValue(Publication.ReleaseType == ReleaseType.Default))
                 .WithElement(

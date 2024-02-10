@@ -624,12 +624,6 @@
   <data name="WindowsUserInterfaceConfiguration.Layout" xml:space="preserve">
     <value>Layout</value>
   </data>
-  <data name="WindowsUserInterfaceConfiguration.MarqueeInterval" xml:space="preserve">
-    <value>Marquee Interval</value>
-  </data>
-  <data name="WindowsUserInterfaceConfiguration.MarqueeStep" xml:space="preserve">
-    <value>Marquee Step</value>
-  </data>
   <data name="WindowsUserInterfaceConfiguration.Section" xml:space="preserve">
     <value>Appearance</value>
   </data>
