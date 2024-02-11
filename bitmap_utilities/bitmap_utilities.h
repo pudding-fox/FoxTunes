@@ -2,13 +2,13 @@
 
 typedef struct Int32Color
 {
-	INT32 Blue;
+	BYTE Blue;
 
-	INT32 Green;
+	BYTE Green;
 
-	INT32 Red;
+	BYTE Red;
 
-	INT32 Alpha;
+	BYTE Alpha;
 } Int32Color;
 
 #define COLOR_FROM_X 1

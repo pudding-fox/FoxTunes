@@ -135,7 +135,7 @@ namespace FoxTunes
 
         }
 
-        public Int32Color(int blue, int green, int red, int alpha)
+        public Int32Color(byte blue, byte green, byte red, byte alpha)
         {
             this.Blue = blue;
             this.Green = green;
@@ -143,13 +143,13 @@ namespace FoxTunes
             this.Alpha = alpha;
         }
 
-        public int Blue;
+        public byte Blue;
 
-        public int Green;
+        public byte Green;
 
-        public int Red;
+        public byte Red;
 
-        public int Alpha;
+        public byte Alpha;
     }
 
     [StructLayout(LayoutKind.Sequential)]
