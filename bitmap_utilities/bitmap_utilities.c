@@ -60,16 +60,14 @@ BOOL write_color(ColorPalette* palette, INT32 position, BYTE* buffer) {
 BOOL blend_color(ColorPalette* palette, INT32 position, BYTE* buffer) {
 	Int32Color* color1 = (Int32Color*)buffer;
 	Int32Color color2;
-	Int32Color color3;
 	if (!get_color(palette, position, &color2)) {
 		return FALSE;
 	}
 	if (color2.Alpha < 0xff) {
-		color3.Blue = ((color2.Blue * color2.Alpha) + (color1->Blue * (255 - color2.Alpha))) / 255;
-		color3.Green = ((color2.Green * color2.Alpha) + (color1->Green * (255 - color2.Alpha))) / 255;
-		color3.Red = ((color2.Red * color2.Alpha) + (color1->Red * (255 - color2.Alpha))) / 255;
-		color3.Alpha = color1->Alpha + (color2.Alpha * (255 - color1->Alpha) / 255);
-		memcpy(buffer, &color3, sizeof(Int32Color));
+		BYTE alpha = 255 - color2.Alpha;
+		color1->Blue = ((color2.Blue * color2.Alpha) + (color1->Blue * alpha)) / 255;
+		color1->Green = ((color2.Green * color2.Alpha) + (color1->Green * alpha)) / 255;
+		color1->Red = ((color2.Red * color2.Alpha) + (color1->Red * alpha)) / 255;
 	}
 	else {
 		memcpy(buffer, &color2, sizeof(Int32Color));
@@ -88,15 +86,16 @@ BOOL WINAPI draw_rectangles(RenderInfo* info, Int32Rect* rectangles, INT32 count
 
 BOOL WINAPI draw_flat_blended_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height) {
 	BOOL result = TRUE;
-	BYTE* topLeft = info->Buffer + ((x * info->BytesPerPixel) + (y * info->Stride));
+	BYTE* buffer = info->Buffer + ((x * info->BytesPerPixel) + (y * info->Stride));
 
-	for (INT32 xposition = 0; xposition < width; xposition++)
+	for (INT32 yposition = 0; yposition < height; yposition++)
 	{
-		for (INT32 yposition = 0; yposition < height; yposition++)
+		for (INT32 xposition = 0; xposition < width; xposition++)
 		{
-			BYTE* pixel = topLeft + ((xposition * info->BytesPerPixel) + (yposition * info->Stride));
-			result &= blend_color(info->Palette, 0, pixel);
+			result &= blend_color(info->Palette, 0, buffer);
+			buffer += info->BytesPerPixel;
 		}
+		buffer += (info->Stride - (width * info->BytesPerPixel));
 	}
 
 	return result;
