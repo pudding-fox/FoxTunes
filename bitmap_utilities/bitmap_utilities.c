@@ -32,45 +32,22 @@ BOOL WINAPI destroy_palette(ColorPalette** palette) {
 	return TRUE;
 }
 
-BOOL get_color(ColorPalette* palette, INT32 position, Int32Color* color) {
-	if (!palette || palette->Count < position) {
-		return FALSE;
-	}
-	*color = palette->Colors[position];
-	return TRUE;
-}
-
-BOOL has_alpha(ColorPalette* palette, INT32 position) {
-	Int32Color color;
-	if (!get_color(palette, position, &color)) {
-		return FALSE;
-	}
-	return color.Alpha != 0xff;
-}
-
 BOOL write_color(ColorPalette* palette, INT32 position, BYTE* buffer) {
-	Int32Color color;
-	if (!get_color(palette, position, &color)) {
-		return FALSE;
-	}
+	Int32Color color = palette->Colors[position];
 	memcpy(buffer, &color, sizeof(Int32Color));
 	return TRUE;
 }
 
-BOOL blend_color(ColorPalette* palette, INT32 position, BYTE* buffer) {
-	Int32Color* color1 = (Int32Color*)buffer;
-	Int32Color color2;
-	if (!get_color(palette, position, &color2)) {
-		return FALSE;
-	}
-	if (color2.Alpha < 0xff) {
-		BYTE alpha = 255 - color2.Alpha;
-		color1->Blue = ((color2.Blue * color2.Alpha) + (color1->Blue * alpha)) / 255;
-		color1->Green = ((color2.Green * color2.Alpha) + (color1->Green * alpha)) / 255;
-		color1->Red = ((color2.Red * color2.Alpha) + (color1->Red * alpha)) / 255;
+BOOL blend_color(ColorPalette* palette, Int32Color* color1, Int32Color* color2) {
+	if (color2->Alpha < 0xff) {
+		BYTE alpha = 0xff - color2->Alpha;
+		color1->Blue = ((color2->Blue * color2->Alpha) + (color1->Blue * alpha)) / 0xff;
+		color1->Green = ((color2->Green * color2->Alpha) + (color1->Green * alpha)) / 0xff;
+		color1->Red = ((color2->Red * color2->Alpha) + (color1->Red * alpha)) / 0xff;
+		color1->Alpha = color2->Alpha;
 	}
 	else {
-		memcpy(buffer, &color2, sizeof(Int32Color));
+		memcpy(color1, color2, sizeof(Int32Color));
 	}
 	return TRUE;
 }
@@ -87,12 +64,13 @@ BOOL WINAPI draw_rectangles(RenderInfo* info, Int32Rect* rectangles, INT32 count
 BOOL WINAPI draw_flat_blended_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height) {
 	BOOL result = TRUE;
 	BYTE* buffer = info->Buffer + ((x * info->BytesPerPixel) + (y * info->Stride));
+	Int32Color color = info->Palette->Colors[0];
 
 	for (INT32 yposition = 0; yposition < height; yposition++)
 	{
 		for (INT32 xposition = 0; xposition < width; xposition++)
 		{
-			result &= blend_color(info->Palette, 0, buffer);
+			result &= blend_color(info->Palette, (Int32Color*)buffer, &color);
 			buffer += info->BytesPerPixel;
 		}
 		buffer += (info->Stride - (width * info->BytesPerPixel));
@@ -101,13 +79,11 @@ BOOL WINAPI draw_flat_blended_rectangle(RenderInfo* info, INT32 x, INT32 y, INT3
 	return result;
 }
 
-BOOL WINAPI draw_horizontal_line(RenderInfo* info, INT32 color, INT32 x, INT32 y, INT32 width) {
+BOOL WINAPI draw_horizontal_line(RenderInfo* info, Int32Color* color, INT32 x, INT32 y, INT32 width) {
 	BYTE* topLeft = info->Buffer + ((x * info->BytesPerPixel) + (y * info->Stride));
 
 	//Set initial pixel.
-	if (!write_color(info->Palette, color, topLeft)) {
-		return FALSE;
-	}
+	memcpy(topLeft, color, sizeof(Int32Color));
 
 	INT32 position = 1;
 	BYTE* linePosition = topLeft + info->BytesPerPixel;
@@ -131,13 +107,11 @@ BOOL WINAPI draw_horizontal_line(RenderInfo* info, INT32 color, INT32 x, INT32 y
 	return TRUE;
 }
 
-BOOL WINAPI draw_vertical_line(RenderInfo* info, INT32 color, INT32 x, INT32 y, INT32 height) {
+BOOL WINAPI draw_vertical_line(RenderInfo* info, Int32Color* color, INT32 x, INT32 y, INT32 height) {
 	BYTE* topLeft = info->Buffer + ((x * info->BytesPerPixel) + (y * info->Stride));
 
 	//Set initial pixel.
-	if (!write_color(info->Palette, color, topLeft)) {
-		return FALSE;
-	}
+	memcpy(topLeft, color, sizeof(Int32Color));
 
 	INT32 position = 1;
 	BYTE* linePosition = topLeft + info->Stride;
@@ -153,21 +127,22 @@ BOOL WINAPI draw_vertical_line(RenderInfo* info, INT32 color, INT32 x, INT32 y, 
 
 BOOL WINAPI draw_vertical_blended_gradient_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height) {
 	BOOL result = TRUE;
-	BYTE* topLeft = info->Buffer + ((x * info->BytesPerPixel) + (y * info->Stride));
+	BYTE* buffer = info->Buffer + ((x * info->BytesPerPixel) + (y * info->Stride));
 
 	for (INT32 yposition = 0; yposition < height; yposition++)
 	{
-		INT32 color = (INT32)(((float)(y + yposition) / info->Height) * info->Palette->Count);
-		if (has_alpha(info->Palette, color)) {
+		Int32Color color = info->Palette->Colors[(INT32)(((float)(y + yposition) / info->Height) * info->Palette->Count)];
+		if (color.Alpha != 0xff) {
 			for (INT32 xposition = 0; xposition < width; xposition++)
 			{
-				BYTE* pixel = topLeft + ((xposition * info->BytesPerPixel) + (yposition * info->Stride));
-				result &= blend_color(info->Palette, color, pixel);
+				result &= blend_color(info->Palette, (Int32Color*)buffer, &color);
+				buffer += info->BytesPerPixel;
 			}
 		}
 		else {
-			result &= draw_horizontal_line(info, color, x, y + yposition, width);
+			result &= draw_horizontal_line(info, &color, x, y + yposition, width);
 		}
+		buffer += (info->Stride - (width * info->BytesPerPixel));
 	}
 
 	return result;
@@ -179,16 +154,16 @@ BOOL WINAPI draw_horizontal_blended_gradient_rectangle(RenderInfo* info, INT32 x
 
 	for (INT32 xposition = 0; xposition < width; xposition++)
 	{
-		INT32 color = (INT32)(((float)(x + xposition) / info->Width) * info->Palette->Count);
-		if (has_alpha(info->Palette, color)) {
+		Int32Color color = info->Palette->Colors[(INT32)(((float)(x + xposition) / info->Width) * info->Palette->Count)];
+		if (color.Alpha != 0xff) {
 			for (INT32 yposition = 0; yposition < height; yposition++)
 			{
 				BYTE* pixel = topLeft + ((xposition * info->BytesPerPixel) + (yposition * info->Stride));
-				result &= blend_color(info->Palette, color, pixel);
+				result &= blend_color(info->Palette, (Int32Color*)pixel, &color);
 			}
 		}
 		else {
-			result &= draw_vertical_line(info, color, x + xposition, y, height);
+			result &= draw_vertical_line(info, &color, x + xposition, y, height);
 		}
 	}
 
@@ -209,11 +184,10 @@ BOOL WINAPI draw_gradient_blended_rectangle(RenderInfo* info, INT32 x, INT32 y, 
 
 BOOL WINAPI draw_flat_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height) {
 	BYTE* topLeft = info->Buffer + ((x * info->BytesPerPixel) + (y * info->Stride));
+	Int32Color color = info->Palette->Colors[0];
 
 	//Set initial pixel.
-	if (!write_color(info->Palette, 0, topLeft)) {
-		return FALSE;
-	}
+	memcpy(topLeft, &color, sizeof(Int32Color));
 
 	//Fill first line by copying initial pixel.
 	INT32 position = 1;
@@ -253,8 +227,8 @@ BOOL WINAPI draw_flat_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width,
 BOOL WINAPI draw_vertical_gradient_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height) {
 	BOOL result = TRUE;
 	for (INT32 position = 0; position < height; position++) {
-		INT32 color = (INT32)(((float)(y + position) / info->Height) * info->Palette->Count);
-		result &= draw_horizontal_line(info, color, x, y + position, width);
+		Int32Color color = info->Palette->Colors[(INT32)(((float)(y + position) / info->Height) * info->Palette->Count)];
+		result &= draw_horizontal_line(info, &color, x, y + position, width);
 	}
 	return result;
 }
@@ -262,8 +236,8 @@ BOOL WINAPI draw_vertical_gradient_rectangle(RenderInfo* info, INT32 x, INT32 y,
 BOOL WINAPI draw_horizontal_gradient_rectangle(RenderInfo* info, INT32 x, INT32 y, INT32 width, INT32 height) {
 	BOOL result = TRUE;
 	for (INT32 position = 0; position < width; position++) {
-		INT32 color = (INT32)(((float)(x + position) / info->Width) * info->Palette->Count);
-		result &= draw_vertical_line(info, color, x + position, y, height);
+		Int32Color color = info->Palette->Colors[(INT32)(((float)(x + position) / info->Width) * info->Palette->Count)];
+		result &= draw_vertical_line(info, &color, x + position, y, height);
 	}
 	return result;
 }
@@ -343,10 +317,10 @@ BOOL WINAPI draw_line(RenderInfo* info, INT32 x1, INT32 y1, INT32 x2, INT32 y2)
 
 	BYTE* source = info->Buffer + ((x1 * info->BytesPerPixel) + (y1 * info->Stride));
 
+	Int32Color color = info->Palette->Colors[0];
+
 	//Set initial pixel.
-	if (!write_color(info->Palette, 0, source)) {
-		return FALSE;
-	}
+	memcpy(source, &color, sizeof(Int32Color));
 
 	//This code influenced by https://rosettacode.org/wiki/Bitmap/Bresenham's_line_algorithm
 	INT32 sx = 0;
