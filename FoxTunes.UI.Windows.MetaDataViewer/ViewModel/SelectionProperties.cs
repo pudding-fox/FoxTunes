@@ -450,11 +450,11 @@ namespace FoxTunes.ViewModel
         protected virtual Task Refresh(IEnumerable<IFileData> fileDatas)
         {
             var metaDatas = this.GetMetaDatas(fileDatas);
-            var tags = this.GetTags(fileDatas, metaDatas);
-            var properties = this.GetProperties(fileDatas, metaDatas);
-            var replaygain = this.GetReplayGain(fileDatas, metaDatas);
-            var filesystem = this.GetFileSystem(fileDatas, metaDatas);
-            var images = this.GetImages(fileDatas, metaDatas);
+            var tags = this.GetTags(fileDatas, metaDatas).ToArray();
+            var properties = this.GetProperties(fileDatas, metaDatas).ToArray();
+            var replaygain = this.GetReplayGain(fileDatas, metaDatas).ToArray();
+            var filesystem = this.GetFileSystem(fileDatas, metaDatas).ToArray();
+            var images = this.GetImages(fileDatas, metaDatas).ToArray();
             //Forking so we don't block the UI.
             this.Debouncer.Exec(() =>
             {
@@ -481,10 +481,10 @@ namespace FoxTunes.ViewModel
 #endif
         }
 
-        protected virtual IDictionary<IFileData, IDictionary<string, string>> GetMetaDatas(IEnumerable<IFileData> fileDatas)
+        protected virtual IDictionary<int, IDictionary<string, string>> GetMetaDatas(IEnumerable<IFileData> fileDatas)
         {
             return fileDatas.ToDictionary(
-                fileData => fileData,
+                fileData => fileData.Id,
                 fileData => this.GetMetaData(fileData)
             );
         }
@@ -505,7 +505,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual IEnumerable<Row> GetTags(IEnumerable<IFileData> fileDatas, IDictionary<IFileData, IDictionary<string, string>> metaDatas)
+        protected virtual IEnumerable<Row> GetTags(IEnumerable<IFileData> fileDatas, IDictionary<int, IDictionary<string, string>> metaDatas)
         {
             if (this.ShowTags)
             {
@@ -516,7 +516,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual IEnumerable<Row> GetProperties(IEnumerable<IFileData> fileDatas, IDictionary<IFileData, IDictionary<string, string>> metaDatas)
+        protected virtual IEnumerable<Row> GetProperties(IEnumerable<IFileData> fileDatas, IDictionary<int, IDictionary<string, string>> metaDatas)
         {
             if (this.ShowProperties)
             {
@@ -527,7 +527,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual IEnumerable<Row> GetReplayGain(IEnumerable<IFileData> fileDatas, IDictionary<IFileData, IDictionary<string, string>> metaDatas)
+        protected virtual IEnumerable<Row> GetReplayGain(IEnumerable<IFileData> fileDatas, IDictionary<int, IDictionary<string, string>> metaDatas)
         {
             if (this.ShowReplayGain)
             {
@@ -538,7 +538,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual IEnumerable<Row> GetFileSystem(IEnumerable<IFileData> fileDatas, IDictionary<IFileData, IDictionary<string, string>> metaDatas)
+        protected virtual IEnumerable<Row> GetFileSystem(IEnumerable<IFileData> fileDatas, IDictionary<int, IDictionary<string, string>> metaDatas)
         {
             if (this.ShowLocation)
             {
@@ -549,7 +549,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual IEnumerable<Row> GetImages(IEnumerable<IFileData> fileDatas, IDictionary<IFileData, IDictionary<string, string>> metaDatas)
+        protected virtual IEnumerable<Row> GetImages(IEnumerable<IFileData> fileDatas, IDictionary<int, IDictionary<string, string>> metaDatas)
         {
             const int LIMIT = 10;
             if (this.ShowImages)
@@ -564,7 +564,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        protected virtual Row GetRow(string name, IEnumerable<IFileData> fileDatas, IDictionary<IFileData, IDictionary<string, string>> metaDatas)
+        protected virtual Row GetRow(string name, IEnumerable<IFileData> fileDatas, IDictionary<int, IDictionary<string, string>> metaDatas)
         {
             var values = new List<object>();
             var provider = this.GetProvider(name);
@@ -572,7 +572,7 @@ namespace FoxTunes.ViewModel
             foreach (var fileData in fileDatas)
             {
                 var metaData = default(IDictionary<string, string>);
-                if (!metaDatas.TryGetValue(fileData, out metaData))
+                if (!metaDatas.TryGetValue(fileData.Id, out metaData))
                 {
                     metaData = null;
                 }
@@ -593,14 +593,14 @@ namespace FoxTunes.ViewModel
             return new Row(name, value);
         }
 
-        protected virtual IEnumerable<Row> GetRows(string name, IEnumerable<IFileData> fileDatas, IDictionary<IFileData, IDictionary<string, string>> metaDatas, int limit)
+        protected virtual IEnumerable<Row> GetRows(string name, IEnumerable<IFileData> fileDatas, IDictionary<int, IDictionary<string, string>> metaDatas, int limit)
         {
             var values = new List<string>();
             var provider = this.GetProvider(name);
             foreach (var fileData in fileDatas)
             {
                 var metaData = default(IDictionary<string, string>);
-                if (!metaDatas.TryGetValue(fileData, out metaData))
+                if (!metaDatas.TryGetValue(fileData.Id, out metaData))
                 {
                     continue;
                 }
