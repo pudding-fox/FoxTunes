@@ -22,6 +22,8 @@ namespace FoxTunes
 
         public const string COLOR_PALETTE_HIGH = "HIGH";
 
+        public const string COLOR_PALETTE_VALUE = "VALUE";
+
         public const string COLOR_PALETTE_BACKGROUND = "BACKGROUND";
 
         public const int SMOOTHING_MIN = 0;
@@ -52,7 +54,7 @@ namespace FoxTunes
         public static IDictionary<string, Color[]> GetColorPalette(string value)
         {
             return value.ToNamedColorStops().ToDictionary(
-                pair => pair.Key,
+                pair => string.IsNullOrEmpty(pair.Key) ? COLOR_PALETTE_VALUE : pair.Key,
                 pair => pair.Value.ToGradient(),
                 StringComparer.OrdinalIgnoreCase
             );

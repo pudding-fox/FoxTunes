@@ -176,7 +176,7 @@ namespace FoxTunes
             {
                 palettes.GetOrAdd(
                     WaveFormStreamPositionConfiguration.COLOR_PALETTE_RMS,
-                    () => DefaultColors.GetRms(colors)
+                    () => DefaultColors.GetRms(background, colors)
                 );
             }
             return palettes.ToDictionary(
@@ -781,11 +781,18 @@ namespace FoxTunes
                 };
             }
 
-            public static Color[] GetRms(Color[] colors)
+            public static Color[] GetRms(Color[] background, Color[] colors)
             {
-                const byte SHADE = 30;
-                var contrast = Color.FromRgb(SHADE, SHADE, SHADE);
-                return colors.Shade(contrast);
+                var transparency = background.Length > 1 || background.FirstOrDefault().A != 255;
+                if (transparency)
+                {
+                    return colors.WithAlpha(-100);
+                }
+                else
+                {
+                    var color = background.FirstOrDefault();
+                    return colors.Interpolate(color, 0.4f);
+                }
             }
 
             public static Color[] GetValue(Color[] colors)

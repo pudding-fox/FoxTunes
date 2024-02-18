@@ -146,26 +146,29 @@ namespace FoxTunes
         {
             var flags = default(int);
             var palettes = BandedWaveFormStreamPositionConfiguration.GetColorPalette(value);
-            var background = palettes.GetOrAdd(
-                BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND,
-                () => DefaultColors.GetBackground()
-            );
-            var element = palettes.GetOrAdd(
-                BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_ELEMENT,
-                () => new[] { this.ForegroundColor }
-            ); ;
-            palettes.GetOrAdd(
-                BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_LOW,
-                () => DefaultColors.GetLow(element)
-            );
-            palettes.GetOrAdd(
-                BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_MID,
-                () => DefaultColors.GetMid(element)
-            );
-            palettes.GetOrAdd(
-                BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_HIGH,
-                () => DefaultColors.GetHigh(element)
-            );
+            {
+                var background = palettes.GetOrAdd(
+                    BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND,
+                    () => DefaultColors.GetBackground()
+                );
+                //Switch the default colors to the VALUE palette if one was provided.
+                var colors = palettes.GetOrAdd(
+                    WaveFormStreamPositionConfiguration.COLOR_PALETTE_VALUE,
+                    () => DefaultColors.GetValue(new[] { this.ForegroundColor })
+                );
+                palettes.GetOrAdd(
+                    BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_LOW,
+                    () => DefaultColors.GetLow(background, colors)
+                );
+                palettes.GetOrAdd(
+                    BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_MID,
+                    () => DefaultColors.GetMid(background, colors)
+                );
+                palettes.GetOrAdd(
+                    BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_HIGH,
+                    () => DefaultColors.GetHigh(colors)
+                );
+            }
             return palettes.ToDictionary(
                 pair => pair.Key,
                 pair =>
@@ -629,28 +632,42 @@ namespace FoxTunes
                 };
             }
 
-            public static Color[] GetLow(Color[] colors)
+            public static Color[] GetLow(Color[] background, Color[] colors)
             {
-                return new[]
+                var transparency = background.Length > 1 || background.FirstOrDefault().A != 255;
+                if (transparency)
                 {
-                    global::System.Windows.Media.Colors.Blue
-                };
+                    return colors.WithAlpha(-200);
+                }
+                else
+                {
+                    var color = background.FirstOrDefault();
+                    return colors.Interpolate(color, 0.8f);
+                }
             }
 
-            public static Color[] GetMid(Color[] colors)
+            public static Color[] GetMid(Color[] background, Color[] colors)
             {
-                return new[]
+                var transparency = background.Length > 1 || background.FirstOrDefault().A != 255;
+                if (transparency)
                 {
-                    global::System.Windows.Media.Colors.Orange.WithAlpha(-100)
-                };
+                    return colors.WithAlpha(-100);
+                }
+                else
+                {
+                    var color = background.FirstOrDefault();
+                    return colors.Interpolate(color, 0.4f);
+                }
             }
 
             public static Color[] GetHigh(Color[] colors)
             {
-                return new[]
-                {
-                    global::System.Windows.Media.Colors.White.WithAlpha(-100)
-                };
+                return colors;
+            }
+
+            public static Color[] GetValue(Color[] colors)
+            {
+                return colors;
             }
         }
     }

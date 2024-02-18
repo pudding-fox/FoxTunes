@@ -18,9 +18,19 @@ namespace FoxTunes
             this.InitializeComponent();
         }
 
+        protected override void InitializeComponent(ICore core)
+        {
+            this.ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
+            base.InitializeComponent(core);
+        }
+
+        public ThemeLoader ThemeLoader { get; private set; }
+
         public BooleanConfigurationElement Logarithmic { get; private set; }
 
         public IntegerConfigurationElement Smoothing { get; private set; }
+
+        public TextConfigurationElement ColorPalette { get; private set; }
 
         protected override void OnConfigurationChanged()
         {
@@ -33,6 +43,10 @@ namespace FoxTunes
                 this.Smoothing = this.Configuration.GetElement<IntegerConfigurationElement>(
                     BandedWaveFormStreamPositionConfiguration.SECTION,
                     BandedWaveFormStreamPositionConfiguration.SMOOTHING_ELEMENT
+                );
+                this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
+                    BandedWaveFormStreamPositionConfiguration.SECTION,
+                    BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_ELEMENT
                 );
             }
             base.OnConfigurationChanged();
@@ -50,6 +64,10 @@ namespace FoxTunes
         {
             get
             {
+                foreach (var component in this.ThemeLoader.SelectColorPalette(CATEGORY, this.ColorPalette, ColorPaletteRole.WaveForm))
+                {
+                    yield return component;
+                }
                 yield return new InvocationComponent(
                     CATEGORY,
                     this.Logarithmic.Id,
@@ -115,6 +133,10 @@ namespace FoxTunes
                 {
                     this.Smoothing.Value = BandedWaveFormStreamPositionConfiguration.SMOOTHING_MAX;
                 }
+            }
+            else if (this.ThemeLoader.SelectColorPalette(this.ColorPalette, component))
+            {
+                //Nothing to do.
             }
             else if (string.Equals(component.Id, SETTINGS, StringComparison.OrdinalIgnoreCase))
             {
