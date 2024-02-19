@@ -271,7 +271,7 @@
     <value>Freeze Top</value>
   </data>
   <data name="UIComponentHorizontalSplitContainer.Name" xml:space="preserve">
-    <value>Horizontal Split</value>
+    <value>Splitter (top | bottom)</value>
   </data>
   <data name="UIComponentLayoutProvider.Description" xml:space="preserve">
     <value />
@@ -385,6 +385,6 @@
     <value>Freeze Right</value>
   </data>
   <data name="UIComponentVerticalSplitContainer.Name" xml:space="preserve">
-    <value>Vertical Split</value>
+    <value>Splitter (left | right)</value>
   </data>
 </root>

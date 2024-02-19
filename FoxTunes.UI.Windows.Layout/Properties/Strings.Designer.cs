@@ -520,7 +520,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Horizontal Split.
+        ///   Looks up a localized string similar to Splitter (top | bottom).
         /// </summary>
         internal static string UIComponentHorizontalSplitContainer_Name {
             get {
@@ -862,7 +862,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Vertical Split.
+        ///   Looks up a localized string similar to Splitter (left | right).
         /// </summary>
         internal static string UIComponentVerticalSplitContainer_Name {
             get {

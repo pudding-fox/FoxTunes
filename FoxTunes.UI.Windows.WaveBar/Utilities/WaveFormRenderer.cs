@@ -783,16 +783,9 @@ namespace FoxTunes
 
             public static Color[] GetRms(Color[] background, Color[] colors)
             {
-                var transparency = background.Length > 1 || background.FirstOrDefault().A != 255;
-                if (transparency)
-                {
-                    return colors.WithAlpha(-100);
-                }
-                else
-                {
-                    var color = background.FirstOrDefault();
-                    return colors.Interpolate(color, 0.4f);
-                }
+                const byte SHADE = 30;
+                var contrast = Color.FromRgb(SHADE, SHADE, SHADE);
+                return colors.Shade(contrast);
             }
 
             public static Color[] GetValue(Color[] colors)
