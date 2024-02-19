@@ -106,15 +106,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Show Crest Factor.
-        /// </summary>
-        internal static string EnhancedSpectrumConfiguration_Crest {
-            get {
-                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Crest", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Duration.
         /// </summary>
         internal static string EnhancedSpectrumConfiguration_Duration {

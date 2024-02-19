@@ -27,8 +27,6 @@ namespace FoxTunes
 
         public BooleanConfigurationElement Rms { get; private set; }
 
-        public BooleanConfigurationElement Crest { get; private set; }
-
         public TextConfigurationElement ColorPalette { get; private set; }
 
         public IntegerConfigurationElement Duration { get; private set; }
@@ -56,10 +54,6 @@ namespace FoxTunes
                 this.Rms = this.Configuration.GetElement<BooleanConfigurationElement>(
                     EnhancedSpectrumConfiguration.SECTION,
                     EnhancedSpectrumConfiguration.RMS_ELEMENT
-                );
-                this.Crest = this.Configuration.GetElement<BooleanConfigurationElement>(
-                    EnhancedSpectrumConfiguration.SECTION,
-                    EnhancedSpectrumConfiguration.CREST_ELEMENT
                 );
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     EnhancedSpectrumConfiguration.SECTION,
@@ -121,15 +115,6 @@ namespace FoxTunes
                     this.Rms.Name,
                     attributes: this.Rms.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
-                if (this.Crest.IsVisible)
-                {
-                    yield return new InvocationComponent(
-                        CATEGORY,
-                        this.Crest.Id,
-                        this.Crest.Name,
-                        attributes: this.Crest.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
-                    );
-                }
                 yield return new InvocationComponent(
                     CATEGORY,
                     this.Duration.Id,
@@ -188,10 +173,6 @@ namespace FoxTunes
             else if (string.Equals(component.Id, this.Rms.Id, StringComparison.OrdinalIgnoreCase))
             {
                 this.Rms.Toggle();
-            }
-            else if (string.Equals(component.Id, this.Crest.Id, StringComparison.OrdinalIgnoreCase))
-            {
-                this.Crest.Toggle();
             }
             else if (this.ThemeLoader.SelectColorPalette(this.ColorPalette, component))
             {

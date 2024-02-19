@@ -457,7 +457,12 @@ namespace FoxTunes
 
         protected static float ToDecibel(float value)
         {
-            return Math.Min(Math.Max((float)(20 * Math.Log10(value)), DB_MIN), DB_MAX);
+            var dB = Math.Min(Math.Max((float)(20 * Math.Log10(value)), DB_MIN), DB_MAX);
+            if (float.IsNaN(dB))
+            {
+                return 0;
+            }
+            return dB;
         }
 
         protected static float ToDecibelFixed(float value)

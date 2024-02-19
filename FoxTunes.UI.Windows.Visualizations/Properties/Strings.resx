@@ -132,9 +132,6 @@
   <data name="EnhancedSpectrumConfiguration.ColorPalette" xml:space="preserve">
     <value>Color Palette</value>
   </data>
-  <data name="EnhancedSpectrumConfiguration.Crest" xml:space="preserve">
-    <value>Show Crest Factor</value>
-  </data>
   <data name="EnhancedSpectrumConfiguration.Duration" xml:space="preserve">
     <value>Duration</value>
   </data>

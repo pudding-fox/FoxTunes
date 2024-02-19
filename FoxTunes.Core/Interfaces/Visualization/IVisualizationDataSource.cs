@@ -72,8 +72,6 @@ namespace FoxTunes.Interfaces
 
         public float[,] Rms;
 
-        public float[,] Crest;
-
         public int Position;
 
         public int Count;
@@ -94,7 +92,6 @@ namespace FoxTunes.Interfaces
         None = 0,
         Average = 1,
         Peak = 2,
-        Rms = 4,
-        Crest = 8
+        Rms = 4
     }
 }

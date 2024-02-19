@@ -31,8 +31,6 @@ namespace FoxTunes
 
         public const string RMS_ELEMENT = "DDDEE2B6A-188E-4FF4-A277-37D140D49C45";
 
-        public const string CREST_ELEMENT = "DEEEFFB9-2014-4004-94F9-E566874317ED";
-
         public const string COLOR_PALETTE_ELEMENT = "EEEE907A-5812-42CD-9844-89362C96C6AF";
 
         public const string COLOR_PALETTE_PEAK = "PEAK";
@@ -40,8 +38,6 @@ namespace FoxTunes
         public const string COLOR_PALETTE_RMS = "RMS";
 
         public const string COLOR_PALETTE_VALUE = "VALUE";
-
-        public const string COLOR_PALETTE_CREST = "CREST";
 
         public const string COLOR_PALETTE_BACKGROUND = "BACKGROUND";
 
@@ -60,7 +56,6 @@ namespace FoxTunes
                 .WithElement(new TextConfigurationElement(BANDS_CUSTOM_ELEMENT, Strings.EnhancedSpectrumConfiguration_Bands_Custom, description: Strings.EnhancedSpectrumConfiguration_Bands_Custom_Description, path: Strings.EnhancedSpectrumConfiguration_Path).WithValue("50 20000 320 S").DependsOn(SECTION, BANDS_ELEMENT, BANDS_CUSTOM_OPTION))
                 .WithElement(new BooleanConfigurationElement(PEAK_ELEMENT, Strings.EnhancedSpectrumConfiguration_Peak, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(true))
                 .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.EnhancedSpectrumConfiguration_Rms, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(true))
-                .WithElement(new BooleanConfigurationElement(CREST_ELEMENT, Strings.EnhancedSpectrumConfiguration_Crest, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(false).DependsOn(SECTION, PEAK_ELEMENT).DependsOn(SECTION, RMS_ELEMENT))
                 .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.EnhancedSpectrumConfiguration_ColorPalette, path: string.Format("{0}/{1}", Strings.EnhancedSpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
                 .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.EnhancedSpectrumConfiguration_Duration, path: Strings.EnhancedSpectrumConfiguration_Path).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX))
             );
