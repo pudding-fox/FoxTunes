@@ -369,6 +369,9 @@
   <data name="UIComponentTabContainer.TabName" xml:space="preserve">
     <value>Tab Name</value>
   </data>
+  <data name="UIComponentToolbar.Name" xml:space="preserve">
+    <value>Standard Toolbar</value>
+  </data>
   <data name="UIComponentVerticalGridContainer.Name" xml:space="preserve">
     <value>Vertical Grid</value>
   </data>

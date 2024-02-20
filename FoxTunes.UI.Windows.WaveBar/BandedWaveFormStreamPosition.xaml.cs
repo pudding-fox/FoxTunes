@@ -9,6 +9,7 @@ namespace FoxTunes
     /// Interaction logic for BandedWaveFormStreamPosition.xaml
     /// </summary>
     [UIComponent("6EDA5DCD-7A00-4933-A2EF-C70C99F7B36A", role: UIComponentRole.Playback)]
+    [UIComponentToolbar(900, UIComponentToolbarAlignment.Stretch, false)]
     public partial class BandedWaveFormStreamPosition : ConfigurableUIComponentBase
     {
         public const string CATEGORY = "BEE11F64-A91C-461C-9199-98854BF68708";

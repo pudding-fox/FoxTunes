@@ -817,6 +817,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Standard Toolbar.
+        /// </summary>
+        internal static string UIComponentToolbar_Name {
+            get {
+                return ResourceManager.GetString("UIComponentToolbar.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Vertical Grid.
         /// </summary>
         internal static string UIComponentVerticalGridContainer_Name {

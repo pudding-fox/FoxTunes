@@ -10,6 +10,7 @@ namespace FoxTunes
     /// Interaction logic for WaveFormStreamPosition.xaml
     /// </summary>
     [UIComponent("1CABFBE6-C5BD-4818-A092-2D79509D3A52", role: UIComponentRole.Playback)]
+    [UIComponentToolbar(800, UIComponentToolbarAlignment.Stretch, false)]
     public partial class WaveFormStreamPosition : ConfigurableUIComponentBase
     {
         public const string CATEGORY = "0E698392-FF2C-415A-BB6E-754604DFAB57";

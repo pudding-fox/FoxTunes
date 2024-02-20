@@ -10,6 +10,7 @@ namespace FoxTunes
     /// Interaction logic for Spectrogram.xaml
     /// </summary>
     [UIComponent("9AB8D410-B94D-492E-BF00-022A3E77762D", role: UIComponentRole.Visualization)]
+    [UIComponentToolbar(600, UIComponentToolbarAlignment.Left, false)]
     public partial class Spectrogram : ConfigurableUIComponentBase
     {
         public const string CATEGORY = "79A019D3-4DA7-47E1-BED7-318B40B2493E";

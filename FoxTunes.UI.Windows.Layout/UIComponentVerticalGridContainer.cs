@@ -59,7 +59,7 @@ namespace FoxTunes
                 {
                     return string.Equals(value, alignment, StringComparison.OrdinalIgnoreCase);
                 }
-                //Align left by default.
+                //Align top by default.
                 return string.Equals(alignment, AlignTop, StringComparison.OrdinalIgnoreCase);
             });
         }

@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,6 +11,7 @@ namespace FoxTunes
     /// Interaction logic for PeakMeter.xaml
     /// </summary>
     [UIComponent("F8231616-9D5E-45C8-BD72-506FC5FC9C95", role: UIComponentRole.Visualization)]
+    [UIComponentToolbar(500, UIComponentToolbarAlignment.Left, false)]
     public partial class PeakMeter : ConfigurableUIComponentBase
     {
         public const string CATEGORY = "F58AE444-E7F1-4D3D-9CE6-D1612892CF28";

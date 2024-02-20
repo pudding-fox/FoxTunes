@@ -10,6 +10,7 @@ namespace FoxTunes
     /// Interaction logic for Spectrum.xaml
     /// </summary>
     [UIComponent("381328C3-C2CE-4FDA-AC92-71A15C3FC387", role: UIComponentRole.Visualization)]
+    [UIComponentToolbar(300, UIComponentToolbarAlignment.Left, true)]
     public partial class Spectrum : ConfigurableUIComponentBase, IInvocableComponent
     {
         public const string CATEGORY = "3DF40656-FDD5-4B98-A25C-66DDFFD66CA0";
