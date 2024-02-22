@@ -1,6 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,6 +18,12 @@ namespace FoxTunes
         {
             this.Grid = new Grid();
             this.Content = this.Grid;
+            this.ContextMenu = new Menu()
+            {
+                Components = new ObservableCollection<IInvocableComponent>(new[] { this }),
+                Source = this,
+                ExplicitOrdering = true
+            };
         }
 
         public Grid Grid { get; private set; }

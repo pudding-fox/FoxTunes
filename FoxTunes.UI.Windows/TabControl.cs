@@ -160,6 +160,7 @@ namespace FoxTunes
             this._TabControl.PreviewMouseDown += this.OnPreviewMouseDown;
             this._TabControl.SelectionChanged += this.OnSelectionChanged;
             TabControlExtensions.SetDragOverSelection(this._TabControl, true);
+            TabControlExtensions.SetRightButtonSelect(this._TabControl, true);
             this.AddVisualChild(this._TabControl);
         }
 

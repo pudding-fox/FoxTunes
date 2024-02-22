@@ -292,11 +292,7 @@ namespace FoxTunes.ViewModel
                     {
                         continue;
                     }
-
-                    //TODO: Hack to set some kind of invocation context.
-                    invocation.Source = this.Source;
-
-                    var item = new MenuItem(component, invocation);
+                    var item = new MenuItem(this, component, invocation);
                     if (string.IsNullOrEmpty(invocation.Path))
                     {
                         items.Add(item);
@@ -377,6 +373,7 @@ namespace FoxTunes.ViewModel
             }
             {
                 var item = new MenuItem(
+                    this,
                     component,
                     new InvocationComponent(
                         invocation.Category,
@@ -429,9 +426,10 @@ namespace FoxTunes.ViewModel
             this.Children = new ObservableCollection<MenuItem>();
         }
 
-        public MenuItem(IInvocableComponent component, IInvocationComponent invocation)
+        public MenuItem(Menu menu, IInvocableComponent component, IInvocationComponent invocation)
             : this()
         {
+            this.Menu = menu;
             this.Component = component;
             this.Invocation = invocation;
             this.Invocation.AttributesChanged += this.OnAttributesChanged;
@@ -441,6 +439,8 @@ namespace FoxTunes.ViewModel
         {
             var task = Windows.Invoke(new Action(this.OnSelectedChanged));
         }
+
+        public Menu Menu { get; private set; }
 
         public IInvocableComponent Component { get; private set; }
 
@@ -485,9 +485,11 @@ namespace FoxTunes.ViewModel
 
         public ObservableCollection<MenuItem> Children { get; private set; }
 
-        protected virtual Task OnInvoke()
+        protected virtual async Task OnInvoke()
         {
-            return this.Component.InvokeAsync(this.Invocation);
+            //TODO: Hack to set some kind of invocation context.
+            await Windows.Invoke(() => this.Invocation.Source = this.Menu.Source).ConfigureAwait(false);
+            await this.Component.InvokeAsync(this.Invocation).ConfigureAwait(false);
         }
 
         protected override void OnDisposing()

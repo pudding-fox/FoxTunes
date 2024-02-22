@@ -1,8 +1,10 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -31,7 +33,25 @@ namespace FoxTunes
                 AllowDrop = true
             };
             TabControlExtensions.SetDragOverSelection(this.TabControl, true);
+            TabControlExtensions.SetRightButtonSelect(this.TabControl, true);
             this.Content = this.TabControl;
+            this.ContextMenu = new Menu()
+            {
+                Components = new ObservableCollection<IInvocableComponent>(new[] { this }),
+                Source = this,
+                ExplicitOrdering = true
+            };
+            this.ContextMenu.Opened += this.OnOpened;
+        }
+
+        protected virtual void OnOpened(object sender, RoutedEventArgs e)
+        {
+            var menu = sender as Menu;
+            if (menu == null)
+            {
+                return;
+            }
+            menu.Source = this.TabControl.SelectedContent as UIComponentContainer;
         }
 
         public global::System.Windows.Controls.TabControl TabControl { get; private set; }
@@ -163,7 +183,7 @@ namespace FoxTunes
                     InvocationComponent.CATEGORY_GLOBAL,
                     ADD,
                     Strings.UIComponentTabContainer_Add
-                    );
+                );
                 yield return new InvocationComponent(
                     InvocationComponent.CATEGORY_GLOBAL,
                     REMOVE,
@@ -235,11 +255,11 @@ namespace FoxTunes
                         continue;
                     }
                     this.Configuration.Children.RemoveAt(a);
-                    this.RemoveComponent(a);
                     if (this.Configuration.Children.Count == 0)
                     {
                         var task = this.Add();
                     }
+                    this.UpdateChildren();
                     return;
                 }
                 //TODO: Component was not found.
