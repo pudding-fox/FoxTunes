@@ -28,6 +28,10 @@ namespace FoxTunes
                         //Nothing can be done.
                     }
                 }
+                foreach (var behaviour in element.GetActive())
+                {
+                    behaviour.Dispose();
+                }
                 Dispose(element.Resources);
                 if (flags.HasFlag(UIDisposerFlags.VisualTree))
                 {

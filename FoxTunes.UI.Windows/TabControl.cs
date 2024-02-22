@@ -463,6 +463,17 @@ namespace FoxTunes
             {
                 collectionChanged.CollectionChanged -= this.OnCollectionChanged;
             }
+            if (this._TabControl != null)
+            {
+                foreach (var tabItem in this._TabControl.Items.Cast<TabItem>())
+                {
+                    if (object.ReferenceEquals(this._TabControl.SelectedItem, tabItem))
+                    {
+                        continue;
+                    }
+                    UIDisposer.Dispose(tabItem, UIDisposerFlags.All);
+                }
+            }
         }
 
         ~TabControl()

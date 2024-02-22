@@ -57,9 +57,9 @@ namespace FoxTunes
             }
         }
 
-        private class UpdatePlaylistItemsBehaviour : UIBehaviour
+        private class UpdatePlaylistItemsBehaviour : UIBehaviour<RatingBase>
         {
-            public UpdatePlaylistItemsBehaviour(RatingBase rating)
+            public UpdatePlaylistItemsBehaviour(RatingBase rating) : base(rating)
             {
                 this.Rating = rating;
                 this.Rating.ValueChanged += this.OnValueChanged;

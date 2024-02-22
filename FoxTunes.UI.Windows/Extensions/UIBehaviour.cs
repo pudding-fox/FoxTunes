@@ -107,4 +107,27 @@ namespace FoxTunes
             }
         }
     }
+
+    public abstract class UIBehaviour<T> : UIBehaviour, IUIBehaviour<T>
+    {
+        protected UIBehaviour(T subject)
+        {
+            this.Subject = subject;
+        }
+
+        public T Subject { get; private set; }
+    }
+
+    public interface IUIBehaviour<out T> : IDisposable
+    {
+        T Subject { get; }
+    }
+
+    public static partial class Extensions
+    {
+        public static IEnumerable<IUIBehaviour<T>> GetActive<T>(this T subject)
+        {
+            return UIBehaviour.Active.OfType<IUIBehaviour<T>>().Where(behaviour => object.ReferenceEquals(behaviour.Subject, subject));
+        }
+    }
 }
