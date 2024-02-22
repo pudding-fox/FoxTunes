@@ -826,6 +826,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reset.
+        /// </summary>
+        internal static string UIComponentToolbar_Reset {
+            get {
+                return ResourceManager.GetString("UIComponentToolbar.Reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Vertical Grid.
         /// </summary>
         internal static string UIComponentVerticalGridContainer_Name {

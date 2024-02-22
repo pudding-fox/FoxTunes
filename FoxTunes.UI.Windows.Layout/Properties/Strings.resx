@@ -372,6 +372,9 @@
   <data name="UIComponentToolbar.Name" xml:space="preserve">
     <value>Standard Toolbar</value>
   </data>
+  <data name="UIComponentToolbar.Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
   <data name="UIComponentVerticalGridContainer.Name" xml:space="preserve">
     <value>Vertical Grid</value>
   </data>

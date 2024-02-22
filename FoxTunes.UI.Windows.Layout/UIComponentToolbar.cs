@@ -12,6 +12,8 @@ namespace FoxTunes
     [UIComponent("79EB216A-2BB0-40D9-8CF3-64645BCA50A2", role: UIComponentRole.System)]
     public class UIComponentToolbar : UIComponentPanel
     {
+        const string RESET = "ZZZZ";
+
         public const string Alignment = "Alignment";
 
         public UIComponentToolbar()
@@ -113,6 +115,11 @@ namespace FoxTunes
                     this.Configuration.Children.RemoveAt(a);
                 }
             }
+        }
+
+        protected virtual void ResetChildren()
+        {
+            this.Configuration.Children.Clear();
         }
 
         protected virtual void AddLeft(IEnumerable<UIComponentConfiguration> components)
@@ -219,6 +226,12 @@ namespace FoxTunes
                         attributes: this.HasComponent(component.Key) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                     );
                 }
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_GLOBAL,
+                    RESET,
+                    Strings.UIComponentToolbar_Reset,
+                    attributes: InvocationComponent.ATTRIBUTE_SEPARATOR
+                );
             }
         }
 
@@ -226,14 +239,21 @@ namespace FoxTunes
         {
             return Windows.Invoke(() =>
             {
-                var pair = this.GetComponents().FirstOrDefault(_pair => string.Equals(_pair.Key.Id, component.Id, StringComparison.OrdinalIgnoreCase));
-                if (this.HasComponent(pair.Key))
+                if (string.Equals(component.Id, RESET, StringComparison.OrdinalIgnoreCase))
                 {
-                    this.RemoveChild(pair.Key);
+                    this.ResetChildren();
                 }
                 else
                 {
-                    this.AddChild(pair.Key, pair.Value);
+                    var pair = this.GetComponents().FirstOrDefault(_pair => string.Equals(_pair.Key.Id, component.Id, StringComparison.OrdinalIgnoreCase));
+                    if (this.HasComponent(pair.Key))
+                    {
+                        this.RemoveChild(pair.Key);
+                    }
+                    else
+                    {
+                        this.AddChild(pair.Key, pair.Value);
+                    }
                 }
                 this.UpdateChildren();
             });
