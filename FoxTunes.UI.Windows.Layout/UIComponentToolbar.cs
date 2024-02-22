@@ -139,15 +139,6 @@ namespace FoxTunes
 
         protected virtual void AddContainer(IEnumerable<UIComponentConfiguration> components, HorizontalAlignment alignment, GridLength width)
         {
-            if (!components.Any())
-            {
-                //Create an empty column so other things align correctly.
-                this.Grid.ColumnDefinitions.Add(new ColumnDefinition()
-                {
-                    Width = width
-                });
-                return;
-            }
             foreach (var component in components)
             {
                 this.AddContainer(alignment, width, component);
@@ -171,38 +162,8 @@ namespace FoxTunes
                 Margin = margin,
                 HorizontalAlignment = alignment,
             };
-            //TODO: Don't like anonymous event handlers, they can't be unsubscribed.
-            container.ConfigurationChanged += (sender, e) =>
-            {
-                this.UpdateComponent(component, container.Configuration);
-            };
             Grid.SetColumn(container, this.Grid.ColumnDefinitions.Count - 1);
             this.Grid.Children.Add(container);
-        }
-
-        protected virtual void UpdateComponent(UIComponentConfiguration originalComponent, UIComponentConfiguration newComponent)
-        {
-            for (var a = 0; a < this.Configuration.Children.Count; a++)
-            {
-                if (!object.ReferenceEquals(this.Configuration.Children[a], originalComponent))
-                {
-                    continue;
-                }
-                this.Configuration.Children[a] = newComponent;
-                this.UpdateChildren();
-                return;
-            }
-            //TODO: Component was not found.
-            throw new NotImplementedException();
-        }
-
-        protected virtual void OnComponentChanged(object sender, EventArgs e)
-        {
-            var container = sender as UIComponentContainer;
-            if (container == null)
-            {
-                return;
-            }
         }
 
         public override IEnumerable<string> InvocationCategories
