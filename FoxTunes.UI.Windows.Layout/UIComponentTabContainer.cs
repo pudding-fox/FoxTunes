@@ -28,6 +28,7 @@ namespace FoxTunes
 
         public UIComponentTabContainer()
         {
+            this.EventHandlers = new Dictionary<UIComponentContainer, RoutedPropertyChangedEventHandler<UIComponentConfiguration>>();
             this.TabControl = new global::System.Windows.Controls.TabControl()
             {
                 AllowDrop = true
@@ -53,6 +54,8 @@ namespace FoxTunes
             }
             menu.Source = this.TabControl.SelectedContent as UIComponentContainer;
         }
+
+        public IDictionary<UIComponentContainer, RoutedPropertyChangedEventHandler<UIComponentConfiguration>> EventHandlers { get; private set; }
 
         public global::System.Windows.Controls.TabControl TabControl { get; private set; }
 
@@ -104,11 +107,12 @@ namespace FoxTunes
             {
                 Configuration = component
             };
-            //TODO: Don't like anonymous event handlers, they can't be unsubscribed.
-            container.ConfigurationChanged += (sender, e) =>
+            var eventHandler = new RoutedPropertyChangedEventHandler<UIComponentConfiguration>((sender, e) =>
             {
                 this.UpdateComponent(component, container.Configuration);
-            };
+            });
+            container.ConfigurationChanged += eventHandler;
+            this.EventHandlers.Add(container, eventHandler);
             var item = new TabItem()
             {
                 Header = this.GetHeader(container),
@@ -364,6 +368,13 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
+            if (this.EventHandlers != null)
+            {
+                foreach (var pair in this.EventHandlers)
+                {
+                    pair.Key.ConfigurationChanged -= pair.Value;
+                }
+            }
             if (this.TabControl != null)
             {
                 foreach (var tabItem in this.TabControl.Items.Cast<TabItem>())

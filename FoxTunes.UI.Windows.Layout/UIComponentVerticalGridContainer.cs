@@ -38,9 +38,12 @@ namespace FoxTunes
 
         public UIComponentVerticalGridContainer()
         {
+            this.EventHandlers = new Dictionary<UIComponentContainer, RoutedPropertyChangedEventHandler<UIComponentConfiguration>>();
             this.Grid = new Grid();
             this.Content = this.Grid;
         }
+
+        public IDictionary<UIComponentContainer, RoutedPropertyChangedEventHandler<UIComponentConfiguration>> EventHandlers { get; private set; }
 
         public Grid Grid { get; private set; }
 
@@ -131,11 +134,12 @@ namespace FoxTunes
                 Margin = margin,
                 VerticalAlignment = alignment,
             };
-            //TODO: Don't like anonymous event handlers, they can't be unsubscribed.
-            container.ConfigurationChanged += (sender, e) =>
+            var eventHandler = new RoutedPropertyChangedEventHandler<UIComponentConfiguration>((sender, e) =>
             {
                 this.UpdateComponent(component, container.Configuration);
-            };
+            });
+            container.ConfigurationChanged += eventHandler;
+            this.EventHandlers.Add(container, eventHandler);
             Grid.SetRow(container, this.Grid.RowDefinitions.Count - 1);
             this.Grid.Children.Add(container);
         }
@@ -367,6 +371,18 @@ namespace FoxTunes
                 container.Configuration.MetaData.AddOrUpdate(Alignment, alignment);
                 this.UpdateChildren();
             });
+        }
+
+        protected override void OnDisposing()
+        {
+            if (this.EventHandlers != null)
+            {
+                foreach (var pair in this.EventHandlers)
+                {
+                    pair.Key.ConfigurationChanged -= pair.Value;
+                }
+            }
+            base.OnDisposing();
         }
     }
 }
