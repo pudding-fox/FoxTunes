@@ -38,13 +38,13 @@ BOOL write_color(ColorPalette* palette, INT32 position, BYTE* buffer) {
 	return TRUE;
 }
 
-inline BYTE blend_channel(BYTE color1, BYTE color2, BYTE alpha) {
+static __inline BYTE blend_channel(BYTE color1, BYTE color2, BYTE alpha) {
 	WORD blend = (alpha * color1 + (0xFF - alpha) * color2);
 	WORD h = blend >> 8;
 	return (BYTE)h;
 }
 
-inline BOOL blend_color(ColorPalette* palette, Int32Color* color1, Int32Color* color2) {
+BOOL __inline blend_color(ColorPalette* palette, Int32Color* color1, Int32Color* color2) {
 	if (color2->Alpha < 0xff) {
 		BYTE alpha = 0xff - color2->Alpha;
 		color1->Blue = blend_channel(color1->Blue, color2->Blue, alpha);
