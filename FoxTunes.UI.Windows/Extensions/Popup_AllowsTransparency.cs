@@ -47,9 +47,9 @@ namespace FoxTunes
             }
         }
 
-        private class AllowsTransparencyBehaviour : UIBehaviour
+        private class AllowsTransparencyBehaviour : UIBehaviour<global::System.Windows.Controls.Primitives.Popup>
         {
-            public AllowsTransparencyBehaviour(global::System.Windows.Controls.Primitives.Popup popup)
+            public AllowsTransparencyBehaviour(global::System.Windows.Controls.Primitives.Popup popup) : base(popup)
             {
                 this.Popup = popup;
                 this.Popup.Opened += this.OnOpened;
@@ -62,6 +62,15 @@ namespace FoxTunes
             {
                 var source = (HwndSource)HwndSource.FromVisual(this.Popup.Child);
                 WindowExtensions.EnableBlur(source.Handle);
+            }
+
+            protected override void OnDisposing()
+            {
+                if (this.Popup != null)
+                {
+                    this.Popup.Opened += this.OnOpened;
+                }
+                base.OnDisposing();
             }
         }
     }

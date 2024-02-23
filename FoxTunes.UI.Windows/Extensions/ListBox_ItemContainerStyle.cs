@@ -46,9 +46,9 @@ namespace FoxTunes
             }
         }
 
-        private class ItemContainerStyleBehaviour : DynamicStyleBehaviour
+        private class ItemContainerStyleBehaviour : DynamicStyleBehaviour<ListBox>
         {
-            public ItemContainerStyleBehaviour(ListBox listBox)
+            public ItemContainerStyleBehaviour(ListBox listBox) : base(listBox)
             {
                 this.ListBox = listBox;
                 this.Apply();

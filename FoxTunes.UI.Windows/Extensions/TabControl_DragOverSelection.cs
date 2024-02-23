@@ -53,17 +53,13 @@ namespace FoxTunes
             source.SetValue(DragOverSelectionProperty, value);
         }
 
-        private class DragOverSelectionBehaviour : UIBehaviour
+        private class DragOverSelectionBehaviour : UIBehaviour<global::System.Windows.Controls.TabControl>
         {
             public static readonly TimeSpan TIMEOUT = TimeSpan.FromMilliseconds(500);
 
-            private DragOverSelectionBehaviour()
+            public DragOverSelectionBehaviour(global::System.Windows.Controls.TabControl tabControl) : base(tabControl)
             {
                 this.Debouncer = new Debouncer(TIMEOUT);
-            }
-
-            public DragOverSelectionBehaviour(global::System.Windows.Controls.TabControl tabControl) : this()
-            {
                 this.TabControl = tabControl;
                 this.TabControl.DragOver += this.OnDragOver;
             }

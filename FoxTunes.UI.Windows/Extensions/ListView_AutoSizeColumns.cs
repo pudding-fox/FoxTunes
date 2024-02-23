@@ -51,18 +51,14 @@ namespace FoxTunes
             }
         }
 
-        private class AutoSizeColumnsBehaviour : UIBehaviour
+        private class AutoSizeColumnsBehaviour : UIBehaviour<ListView>
         {
             public static readonly TimeSpan TIMEOUT = TimeSpan.FromMilliseconds(500);
 
-            private AutoSizeColumnsBehaviour()
+            public AutoSizeColumnsBehaviour(ListView listView) : base(listView)
             {
                 this.Columns = new Dictionary<GridViewColumn, IList<AutoSizeColumn>>();
                 this.Debouncer = new Debouncer(TIMEOUT);
-            }
-
-            public AutoSizeColumnsBehaviour(ListView listView) : this()
-            {
                 this.ListView = listView;
                 this.ListView.ItemContainerGenerator.StatusChanged += this.OnStatusChanged;
             }

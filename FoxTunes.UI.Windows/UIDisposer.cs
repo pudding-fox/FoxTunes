@@ -28,6 +28,10 @@ namespace FoxTunes
                         //Nothing can be done.
                     }
                 }
+                if (element.ContextMenu is IDisposable contextMenu)
+                {
+                    contextMenu.Dispose();
+                }
                 foreach (var behaviour in element.GetActive())
                 {
                     behaviour.Dispose();

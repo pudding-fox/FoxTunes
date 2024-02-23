@@ -51,9 +51,9 @@ namespace FoxTunes
             }
         }
 
-        private class EnsureSelectedItemVisibleBehaviour : UIBehaviour
+        private class EnsureSelectedItemVisibleBehaviour : UIBehaviour<ListView>
         {
-            public EnsureSelectedItemVisibleBehaviour(ListView listView)
+            public EnsureSelectedItemVisibleBehaviour(ListView listView) : base(listView)
             {
                 this.ListView = listView;
                 this.ListView.SelectionChanged += this.OnSelectionChanged;

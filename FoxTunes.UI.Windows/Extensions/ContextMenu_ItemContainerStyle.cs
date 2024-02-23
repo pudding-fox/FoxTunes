@@ -27,30 +27,30 @@ namespace FoxTunes
 
         private static void OnItemContainerStylePropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var ContextMenu = sender as ContextMenu;
-            if (ContextMenu == null)
+            var contextMenu = sender as ContextMenu;
+            if (contextMenu == null)
             {
                 return;
             }
-            if (GetItemContainerStyle(ContextMenu) != null)
+            if (GetItemContainerStyle(contextMenu) != null)
             {
                 var behaviour = default(ItemContainerStyleBehaviour);
-                if (!ItemContainerStyleBehaviours.TryGetValue(ContextMenu, out behaviour))
+                if (!ItemContainerStyleBehaviours.TryGetValue(contextMenu, out behaviour))
                 {
-                    ItemContainerStyleBehaviours.Add(ContextMenu, new ItemContainerStyleBehaviour(ContextMenu));
+                    ItemContainerStyleBehaviours.Add(contextMenu, new ItemContainerStyleBehaviour(contextMenu));
                 }
             }
             else
             {
-                ItemContainerStyleBehaviours.Remove(ContextMenu);
+                ItemContainerStyleBehaviours.Remove(contextMenu);
             }
         }
 
-        private class ItemContainerStyleBehaviour : DynamicStyleBehaviour
+        private class ItemContainerStyleBehaviour : DynamicStyleBehaviour<ContextMenu>
         {
-            public ItemContainerStyleBehaviour(ContextMenu ContextMenu)
+            public ItemContainerStyleBehaviour(ContextMenu contextMenu) : base(contextMenu)
             {
-                this.ContextMenu = ContextMenu;
+                this.ContextMenu = contextMenu;
                 this.Apply();
             }
 

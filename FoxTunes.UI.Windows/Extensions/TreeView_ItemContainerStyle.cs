@@ -46,9 +46,9 @@ namespace FoxTunes
             }
         }
 
-        private class ItemContainerStyleBehaviour : DynamicStyleBehaviour
+        private class ItemContainerStyleBehaviour : DynamicStyleBehaviour<TreeView>
         {
-            public ItemContainerStyleBehaviour(TreeView treeView)
+            public ItemContainerStyleBehaviour(TreeView treeView) : base(treeView)
             {
                 this.TreeView = treeView;
                 this.Apply();

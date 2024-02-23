@@ -48,9 +48,9 @@ namespace FoxTunes
             }
         }
 
-        private class RightButtonSelectBehaviour : UIBehaviour
+        private class RightButtonSelectBehaviour : UIBehaviour<TreeView>
         {
-            public RightButtonSelectBehaviour(TreeView treeView)
+            public RightButtonSelectBehaviour(TreeView treeView) : base(treeView)
             {
                 this.TreeView = treeView;
                 this.TreeView.PreviewMouseRightButtonDown += this.OnPreviewMouseRightButtonDown;

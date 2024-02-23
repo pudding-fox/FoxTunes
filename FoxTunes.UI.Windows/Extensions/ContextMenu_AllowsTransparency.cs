@@ -47,9 +47,9 @@ namespace FoxTunes
             }
         }
 
-        private class AllowsTransparencyBehaviour : UIBehaviour
+        private class AllowsTransparencyBehaviour : UIBehaviour<ContextMenu>
         {
-            public AllowsTransparencyBehaviour(ContextMenu contextMenu)
+            public AllowsTransparencyBehaviour(ContextMenu contextMenu) : base(contextMenu)
             {
                 this.ContextMenu = contextMenu;
                 this.ContextMenu.Loaded += this.OnLoaded;
@@ -61,6 +61,15 @@ namespace FoxTunes
             {
                 var source = (HwndSource)HwndSource.FromVisual(this.ContextMenu);
                 WindowExtensions.EnableBlur(source.Handle);
+            }
+
+            protected override void OnDisposing()
+            {
+                if (this.ContextMenu != null)
+                {
+                    this.ContextMenu.Loaded -= this.OnLoaded;
+                }
+                base.OnDisposing();
             }
         }
     }

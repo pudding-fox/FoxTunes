@@ -39,9 +39,9 @@ namespace FoxTunes
             }
         }
 
-        private class TextBehaviour : UIBehaviour
+        private class TextBehaviour : UIBehaviour<PasswordBox>
         {
-            public TextBehaviour(PasswordBox passwordBox)
+            public TextBehaviour(PasswordBox passwordBox) : base(passwordBox)
             {
                 this.PasswordBox = passwordBox;
                 this.PasswordBox.PasswordChanged += this.OnPasswordChanged;

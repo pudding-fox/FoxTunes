@@ -47,9 +47,9 @@ namespace FoxTunes
             }
         }
 
-        private class GifBehaviour : UIBehaviour
+        private class GifBehaviour : UIBehaviour<Image>
         {
-            public GifBehaviour(Image image, Uri uri)
+            public GifBehaviour(Image image, Uri uri) : base(image)
             {
                 this.Image = image;
                 this.Decoder = new GifBitmapDecoder(uri, BitmapCreateOptions.None, BitmapCacheOption.Default);

@@ -26,30 +26,30 @@ namespace FoxTunes
 
         private static void OnStylePropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var FrameworkElement = sender as FrameworkElement;
-            if (FrameworkElement == null)
+            var frameworkElement = sender as FrameworkElement;
+            if (frameworkElement == null)
             {
                 return;
             }
-            if (GetStyle(FrameworkElement) != null)
+            if (GetStyle(frameworkElement) != null)
             {
                 var behaviour = default(StyleBehaviour);
-                if (!StyleBehaviours.TryGetValue(FrameworkElement, out behaviour))
+                if (!StyleBehaviours.TryGetValue(frameworkElement, out behaviour))
                 {
-                    StyleBehaviours.Add(FrameworkElement, new StyleBehaviour(FrameworkElement));
+                    StyleBehaviours.Add(frameworkElement, new StyleBehaviour(frameworkElement));
                 }
             }
             else
             {
-                StyleBehaviours.Remove(FrameworkElement);
+                StyleBehaviours.Remove(frameworkElement);
             }
         }
 
-        private class StyleBehaviour : DynamicStyleBehaviour
+        private class StyleBehaviour : DynamicStyleBehaviour<FrameworkElement>
         {
-            public StyleBehaviour(FrameworkElement FrameworkElement)
+            public StyleBehaviour(FrameworkElement frameworkElement) : base(frameworkElement)
             {
-                this.FrameworkElement = FrameworkElement;
+                this.FrameworkElement = frameworkElement;
                 this.Apply();
             }
 

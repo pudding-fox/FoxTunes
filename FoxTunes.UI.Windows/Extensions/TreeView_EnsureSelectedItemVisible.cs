@@ -55,9 +55,9 @@ namespace FoxTunes
             }
         }
 
-        private class EnsureSelectedItemVisibleBehaviour : UIBehaviour
+        private class EnsureSelectedItemVisibleBehaviour : UIBehaviour<TreeView>
         {
-            public EnsureSelectedItemVisibleBehaviour(TreeView treeView)
+            public EnsureSelectedItemVisibleBehaviour(TreeView treeView) : base(treeView)
             {
                 this.TreeView = treeView;
                 BindingHelper.AddHandler(this.TreeView, TreeView.ItemsSourceProperty, typeof(TreeView), this.OnItemsSourceChanged);

@@ -117,19 +117,15 @@ namespace FoxTunes
             source.SetValue(DropInsertValueProperty, value);
         }
 
-        private class DropInsertBehaviour : UIBehaviour
+        private class DropInsertBehaviour : UIBehaviour<ListView>
         {
             public static readonly TimeSpan INTERVAL = TimeSpan.FromSeconds(1);
 
-            private DropInsertBehaviour()
+            public DropInsertBehaviour(ListView listView) : base(listView)
             {
                 this.Timer = new global::System.Windows.Threading.DispatcherTimer();
                 this.Timer.Interval = INTERVAL;
                 this.Timer.Tick += this.OnTick;
-            }
-
-            public DropInsertBehaviour(ListView listView) : this()
-            {
                 this.ListView = listView;
                 this.ListView.DragEnter += this.OnDragEnter;
                 this.ListView.DragOver += this.OnDragOver;

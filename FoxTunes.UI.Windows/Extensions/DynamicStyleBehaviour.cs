@@ -6,11 +6,11 @@ using System.Xml;
 
 namespace FoxTunes
 {
-    public abstract class DynamicStyleBehaviour : UIBehaviour
+    public abstract class DynamicStyleBehaviour<T> : UIBehaviour<T>
     {
         private static readonly ThemeLoader ThemeLoader = ComponentRegistry.Instance.GetComponent<ThemeLoader>();
 
-        protected DynamicStyleBehaviour()
+        protected DynamicStyleBehaviour(T subject) : base(subject)
         {
             if (ThemeLoader != null)
             {

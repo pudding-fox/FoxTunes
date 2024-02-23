@@ -74,9 +74,9 @@ namespace FoxTunes
             }
         }
 
-        private class SelectedItemsBehaviour : UIBehaviour
+        private class SelectedItemsBehaviour : UIBehaviour<ListView>
         {
-            public SelectedItemsBehaviour(ListView listView)
+            public SelectedItemsBehaviour(ListView listView) : base(listView)
             {
                 this.ListView = listView;
                 this.ListView.SelectionChanged += this.OnSelectionChanged;

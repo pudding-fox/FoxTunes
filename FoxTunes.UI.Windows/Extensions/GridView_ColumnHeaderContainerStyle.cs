@@ -53,18 +53,14 @@ namespace FoxTunes
         /// TODO: We use Windows.ActiveWindow instead which means scope is ignored.
         /// TODO: If Windows.ActiveWindow is null we need to wait for it (using Windows.ActiveWindowChanged).....
         /// </summary>
-        private class ColumnHeaderContainerStyleBehaviour : DynamicStyleBehaviour
+        private class ColumnHeaderContainerStyleBehaviour : DynamicStyleBehaviour<GridView>
         {
-            private ColumnHeaderContainerStyleBehaviour()
+            public ColumnHeaderContainerStyleBehaviour(GridView gridView) : base(gridView)
             {
                 Windows.Registrations.AddCreated(
                     Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main),
                     this.OnWindowCreated
                 );
-            }
-
-            public ColumnHeaderContainerStyleBehaviour(GridView gridView) : this()
-            {
                 this.GridView = gridView;
                 this.Apply();
             }

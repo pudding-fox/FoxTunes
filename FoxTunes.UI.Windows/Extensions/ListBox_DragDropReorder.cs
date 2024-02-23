@@ -66,9 +66,9 @@ namespace FoxTunes
             source.SetValue(DragDropReorderCommandProperty, value);
         }
 
-        private class DragDropReorderBehaviour : UIBehaviour
+        private class DragDropReorderBehaviour : UIBehaviour<ListBox>
         {
-            public DragDropReorderBehaviour(ListBox listBox)
+            public DragDropReorderBehaviour(ListBox listBox) : base(listBox)
             {
                 this.ListBox = listBox;
                 this.ListBox.AllowDrop = true;

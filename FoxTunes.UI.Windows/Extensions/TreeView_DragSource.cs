@@ -98,9 +98,9 @@ namespace FoxTunes
             public object Data { get; private set; }
         }
 
-        private class DragSourceBehaviour : UIBehaviour
+        private class DragSourceBehaviour : UIBehaviour<TreeView>
         {
-            public DragSourceBehaviour(TreeView treeView)
+            public DragSourceBehaviour(TreeView treeView) : base(treeView)
             {
                 this.TreeView = treeView;
                 this.TreeView.PreviewMouseDown += this.OnMouseDown;

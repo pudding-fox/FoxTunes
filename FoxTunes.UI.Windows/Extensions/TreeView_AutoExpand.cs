@@ -56,11 +56,11 @@ namespace FoxTunes
             }
         }
 
-        private class AutoExpandBehaviour : UIBehaviour
+        private class AutoExpandBehaviour : UIBehaviour<TreeView>
         {
             const int EXPAND_ALL_LIMIT = 5;
 
-            public AutoExpandBehaviour(TreeView treeView)
+            public AutoExpandBehaviour(TreeView treeView) : base(treeView)
             {
                 this.TreeView = treeView;
                 BindingHelper.AddHandler(

@@ -41,11 +41,11 @@ namespace FoxTunes
             }
         }
 
-        public class PositionBehaviour : UIBehaviour
+        public class PositionBehaviour : UIBehaviour<GridViewColumn>
         {
             private static volatile bool IsUpdating;
 
-            public PositionBehaviour(GridViewColumn gridViewColumn)
+            public PositionBehaviour(GridViewColumn gridViewColumn) : base(gridViewColumn)
             {
                 this.GridViewColumn = gridViewColumn;
                 InheritanceContextHelper.AddEventHandler(this.GridViewColumn, this.OnInheritanceContextChanged);
@@ -122,6 +122,10 @@ namespace FoxTunes
 
             protected override void OnDisposing()
             {
+                if (this.GridView != null)
+                {
+                    this.GridView.Columns.CollectionChanged -= this.OnColumnsChanged;
+                }
                 if (this.GridViewColumn != null)
                 {
                     InheritanceContextHelper.RemoveEventHandler(this.GridViewColumn, this.OnInheritanceContextChanged);

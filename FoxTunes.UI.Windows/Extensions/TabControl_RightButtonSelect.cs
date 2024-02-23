@@ -48,9 +48,9 @@ namespace FoxTunes
             }
         }
 
-        private class RightButtonSelectBehaviour : UIBehaviour
+        private class RightButtonSelectBehaviour : UIBehaviour<global::System.Windows.Controls.TabControl>
         {
-            public RightButtonSelectBehaviour(global::System.Windows.Controls.TabControl tabControl)
+            public RightButtonSelectBehaviour(global::System.Windows.Controls.TabControl tabControl) : base(tabControl)
             {
                 this.TabControl = tabControl;
                 this.TabControl.PreviewMouseRightButtonDown += this.OnPreviewMouseRightButtonDown;

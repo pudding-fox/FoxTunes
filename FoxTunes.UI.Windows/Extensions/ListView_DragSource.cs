@@ -122,9 +122,9 @@ namespace FoxTunes
             public object Data { get; private set; }
         }
 
-        private class DragSourceBehaviour : UIBehaviour
+        private class DragSourceBehaviour : UIBehaviour<ListView>
         {
-            public DragSourceBehaviour(ListView listView)
+            public DragSourceBehaviour(ListView listView) : base(listView)
             {
                 this.ListView = listView;
                 this.ListView.PreviewMouseDown += this.OnMouseDown;

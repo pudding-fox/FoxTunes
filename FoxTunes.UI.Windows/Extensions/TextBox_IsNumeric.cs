@@ -41,11 +41,11 @@ namespace FoxTunes
             }
         }
 
-        private class NumericBehaviour : UIBehaviour
+        private class NumericBehaviour : UIBehaviour<TextBox>
         {
             private static readonly Regex Pattern = new Regex(@"^\d+$", RegexOptions.Compiled); //TODO: Positive (or zero) integer only.
 
-            public NumericBehaviour(TextBox textBox)
+            public NumericBehaviour(TextBox textBox) : base(textBox)
             {
                 this.TextBox = textBox;
                 this.TextBox.PreviewTextInput += this.OnPreviewTextInput;
