@@ -494,7 +494,7 @@ namespace FoxTunes
             }
             if (orientation == Orientation.Horizontal)
             {
-                var step = (height / values.Length) + margin;
+                var step = Math.Max(height / values.Length, 1);
                 for (var a = 0; a < values.Length; a++)
                 {
                     var elementWidth = Math.Max(Convert.ToInt32(values[a] * width), 1);
@@ -514,7 +514,7 @@ namespace FoxTunes
             }
             else if (orientation == Orientation.Vertical)
             {
-                var step = (width / values.Length) + margin;
+                var step = Math.Max(width / values.Length, 1);
                 for (var a = 0; a < values.Length; a++)
                 {
                     var elementWidth = step - margin;

@@ -265,7 +265,7 @@ namespace FoxTunes
                 else
                 {
                     UpdateValues(data);
-                    if (!data.LastUpdated.Equals(default(DateTime)))
+                    if (!data.LastUpdated.Equals(default(DateTime)) && data.Height >= 150)
                     {
                         UpdateElementsSmooth(data);
                     }

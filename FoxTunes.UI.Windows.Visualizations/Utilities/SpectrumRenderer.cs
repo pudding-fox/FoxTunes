@@ -244,7 +244,7 @@ namespace FoxTunes
                     return;
                 }
                 UpdateValues(data);
-                if (!data.LastUpdated.Equals(default(DateTime)))
+                if (!data.LastUpdated.Equals(default(DateTime)) && data.Height >= 150)
                 {
                     UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, data.Margin, Orientation.Vertical);
                 }
