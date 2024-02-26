@@ -321,4 +321,7 @@
   <data name="SearchBehaviourConfiguration.Section" xml:space="preserve">
     <value>Search</value>
   </data>
+  <data name="SelectionFollowsPlaybackBehaviourConfiguration.SelectionFollowsPlayback" xml:space="preserve">
+    <value>Selection Follows Playback</value>
+  </data>
 </root>

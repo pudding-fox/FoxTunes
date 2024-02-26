@@ -671,5 +671,14 @@ namespace FoxTunes {
                 return ResourceManager.GetString("SearchBehaviourConfiguration.Section", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selection Follows Playback.
+        /// </summary>
+        internal static string SelectionFollowsPlaybackBehaviourConfiguration_SelectionFollowsPlayback {
+            get {
+                return ResourceManager.GetString("SelectionFollowsPlaybackBehaviourConfiguration.SelectionFollowsPlayback", resourceCulture);
+            }
+        }
     }
 }
