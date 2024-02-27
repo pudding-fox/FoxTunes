@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace FoxTunes
 {
@@ -72,6 +73,7 @@ namespace FoxTunes
             get
             {
                 yield return InvocationComponent.CATEGORY_PLAYLIST;
+                yield return InvocationComponent.CATEGORY_PLAYBACK;
             }
         }
 
@@ -83,7 +85,15 @@ namespace FoxTunes
                     InvocationComponent.CATEGORY_PLAYLIST,
                     this.SelectionFollowsPlayback.Id,
                     this.SelectionFollowsPlayback.Name,
-                    attributes: this.SelectionFollowsPlayback.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    path: Strings.PlaylistBehaviour_Order,
+                    attributes: (byte)((this.SelectionFollowsPlayback.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
+                );
+                yield return new InvocationComponent(
+                    InvocationComponent.CATEGORY_PLAYBACK,
+                    this.SelectionFollowsPlayback.Id,
+                    this.SelectionFollowsPlayback.Name,
+                    path: Strings.PlaylistBehaviour_Order,
+                    attributes: (byte)((this.SelectionFollowsPlayback.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE) | InvocationComponent.ATTRIBUTE_SEPARATOR)
                 );
             }
         }

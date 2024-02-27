@@ -26,6 +26,7 @@ namespace FoxTunes
         {
             get
             {
+                yield return InvocationComponent.CATEGORY_PLAYLIST;
                 yield return InvocationComponent.CATEGORY_PLAYBACK;
             }
         }
@@ -34,6 +35,16 @@ namespace FoxTunes
         {
             get
             {
+                foreach (var option in this.Order.Options)
+                {
+                    yield return new InvocationComponent(
+                        InvocationComponent.CATEGORY_PLAYLIST,
+                        option.Id,
+                        option.Name,
+                        path: Strings.PlaylistBehaviour_Order,
+                        attributes: string.Equals(option.Id, this.Order.Value.Id, StringComparison.OrdinalIgnoreCase) ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    );
+                }
                 foreach (var option in this.Order.Options)
                 {
                     yield return new InvocationComponent(
