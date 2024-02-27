@@ -1,7 +1,9 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FoxTunes
 {
@@ -100,22 +102,25 @@ namespace FoxTunes
 
         protected virtual void LoadConfiguration()
         {
-            ComponentRegistry.Instance.ForEach<IConfigurableComponent>(component =>
+            var components = ComponentRegistry.Instance.GetComponents<IConfigurableComponent>();
+            var sections = new ConcurrentBag<ConfigurationSection>();
+            Parallel.ForEach(components, component =>
             {
-                Logger.Write(this, LogLevel.Debug, "Registering configuration for component {0}.", component.GetType().Name);
+                Logger.Write(this, LogLevel.Debug, "Getting configuration for component {0}.", component.GetType().Name);
                 try
                 {
-                    var sections = component.GetConfigurationSections();
-                    foreach (var section in sections)
-                    {
-                        this.Components.Configuration.WithSection(section);
-                    }
+                    sections.AddRange(component.GetConfigurationSections());
+
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to register configuration for component {0}: {1}", component.GetType().Name, e.Message);
+                    Logger.Write(this, LogLevel.Warn, "Failed to get configuration for component {0}: {1}", component.GetType().Name, e.Message);
                 }
             });
+            foreach (var section in sections)
+            {
+                this.Components.Configuration.WithSection(section);
+            }
             this.Components.Configuration.Load();
             this.Components.Configuration.ConnectDependencies();
         }

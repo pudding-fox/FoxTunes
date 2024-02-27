@@ -628,5 +628,13 @@ namespace FoxTunes
         {
             return keys.Any(key => predicate(sequence.GetValueOrDefault(key)));
         }
+
+        public static void AddRange<T>(this ConcurrentBag<T> bag, IEnumerable<T> values)
+        {
+            foreach (var value in values)
+            {
+                bag.Add(value);
+            }
+        }
     }
 }
