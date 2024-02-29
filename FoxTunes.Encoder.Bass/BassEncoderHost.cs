@@ -34,13 +34,6 @@ namespace FoxTunes
 
         public static void Init()
         {
-            LogManager.FileName = Path.Combine(
-                Publication.StoragePath,
-                string.Format(
-                    "Log_Converter_{0}.txt",
-                    DateTime.UtcNow.ToFileTime()
-                )
-            );
             AssemblyResolver.Instance.EnableExecution();
             AssemblyResolver.Instance.EnableReflectionOnly();
         }
