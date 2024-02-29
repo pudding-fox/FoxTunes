@@ -112,7 +112,7 @@ namespace FoxTunes
             core.Components.Configuration.GetElement<TextConfigurationElement>(
                 WindowSnappingBehaviourConfiguration.SECTION,
                 WindowSnappingBehaviourConfiguration.STICKY
-            ).ConnectValue(value => this.IsSticky = WindowSnappingBehaviourConfiguration.GetIsSticky(value, this.Adapter.Id));
+            ).ConnectValue(value => this.IsSticky = WindowSnappingBehaviourConfiguration.GetIsSticky(value, this.Adapter.Id, this.Adapter.Role));
 
             lock (Instances)
             {

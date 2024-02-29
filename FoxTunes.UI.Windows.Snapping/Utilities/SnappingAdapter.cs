@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using System.Windows.Interop;
 
 namespace FoxTunes
@@ -27,6 +28,18 @@ namespace FoxTunes
                     return string.Empty;
                 }
                 return window.Id;
+            }
+        }
+
+        public UserInterfaceWindowRole Role
+        {
+            get
+            {
+                if (!(this.Window is IUserInterfaceWindow window))
+                {
+                    return UserInterfaceWindowRole.None;
+                }
+                return window.Role;
             }
         }
 
@@ -134,15 +147,15 @@ namespace FoxTunes
                 //Already on top.
                 return;
             }
-            if (!this.Window.HasBinding(global::System.Windows.Window.TopmostProperty))
-            {
-                this.Window.Topmost = true;
-                this.Window.Topmost = false;
-            }
-            else
-            {
-                //TODO: Can't use topmost hack to bring window to front, property is data bound.
-            }
+            SetWindowPos(
+                this.Handle,
+                HWND_TOP,
+                0,
+                0,
+                0,
+                0,
+                SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE
+            );
         }
 
         public void SetCursor(ResizeDirection direction)
@@ -207,10 +220,18 @@ namespace FoxTunes
         [DllImport("user32.dll")]
         public static extern IntPtr WindowFromPoint(POINT lpPoint);
 
+        const uint SWP_NOSIZE = 0x0001;
+
+        const uint SWP_NOMOVE = 0x0002;
+
         const uint SWP_NOZORDER = 0x0004;
 
         const uint SWP_NOACTIVATE = 0x0010;
 
         const uint SWP_NOOWNERZORDER = 0x0200;
+
+        static readonly IntPtr HWND_TOP = new IntPtr(0);
+
+        static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
     }
 }

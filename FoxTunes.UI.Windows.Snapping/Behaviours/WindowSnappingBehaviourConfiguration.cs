@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace FoxTunes
@@ -21,8 +22,13 @@ namespace FoxTunes
                 .WithElement(new TextConfigurationElement(STICKY, "Sticky").WithValue(string.Empty).WithFlags(ConfigurationElementFlags.MultiLine));
         }
 
-        public static bool GetIsSticky(string value, string id)
+        public static bool GetIsSticky(string value, string id, UserInterfaceWindowRole role)
         {
+            if (role == UserInterfaceWindowRole.Main)
+            {
+                //Main windows are always sticky.
+                return true;
+            }
             var sequence = value.Split(new[]
             {
                 Environment.NewLine
