@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class SelectionFollowsPlaybackBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public IPlaylistManager PlaylistManager { get; private set; }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
+    [ComponentDependency(Slot = ComponentSlots.Database)]
     public class ExternalPlaylistBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent, IFileActionHandler
     {
         public const string LOAD_PLAYLIST = "YYYZ";

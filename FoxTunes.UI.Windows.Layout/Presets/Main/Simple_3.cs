@@ -1,5 +1,6 @@
 ﻿namespace FoxTunes
 {
+    [WindowsUserInterfaceDependency]
     public class Simple_3 : UIComponentLayoutProviderPreset
     {
         public const string ID = "FFFFF311-4D91-431E-9F38-5937E6B11ACD";
