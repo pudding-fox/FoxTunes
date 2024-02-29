@@ -22,7 +22,7 @@ namespace FoxTunes
         {
             var position = default(int);
 
-            for (int a = FrequencyToIndex(this.MinBand, source.FFTSize, source.Rate), b = a; a < source.FFTSize; a++)
+            for (int a = 0, b = 0; a < source.FFTSize; a++)
             {
                 var frequency = IndexToFrequency(a, source.FFTSize, source.Rate);
                 while (frequency > this.Bands[position])
@@ -84,14 +84,8 @@ namespace FoxTunes
             else
             {
                 //If we don't have data then average the closest available bins.
-                if (start > 0)
-                {
-                    start--;
-                }
-                if (end < source.FFTSize)
-                {
-                    end++;
-                }
+                start = Math.Max(start - 1, 0);
+                end = Math.Min(end + 1, source.FFTSize);
                 count = end - start;
                 if (count == 0)
                 {

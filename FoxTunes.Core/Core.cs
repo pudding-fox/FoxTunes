@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -93,15 +95,27 @@ namespace FoxTunes
 
         protected virtual void LoadComponents()
         {
+#if DEBUG
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+#endif
             ComponentRegistry.Instance.AddComponents(
                 ComponentActivator.Instance.Activate(
                     ComponentScanner.Instance.GetComponents()
                 )
             );
+#if DEBUG
+            stopwatch.Stop();
+            Logger.Write(this, LogLevel.Trace, "Components loaded in {0}ms.", stopwatch.ElapsedMilliseconds);
+#endif
         }
 
         protected virtual void LoadConfiguration()
         {
+#if DEBUG
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+#endif
             var components = ComponentRegistry.Instance.GetComponents<IConfigurableComponent>();
             var sections = new ConcurrentBag<ConfigurationSection>();
             Parallel.ForEach(components, component =>
@@ -123,6 +137,10 @@ namespace FoxTunes
             }
             this.Components.Configuration.Load();
             this.Components.Configuration.ConnectDependencies();
+#if DEBUG
+            stopwatch.Stop();
+            Logger.Write(this, LogLevel.Trace, "Configuration loaded in {0}ms.", stopwatch.ElapsedMilliseconds);
+#endif
         }
 
         protected virtual void InitializeComponents()

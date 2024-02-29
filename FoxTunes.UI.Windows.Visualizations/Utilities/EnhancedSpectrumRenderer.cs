@@ -114,7 +114,7 @@ namespace FoxTunes
                 width,
                 height,
                 bands,
-                EnhancedSpectrumConfiguration.GetFFTSize(this.FFTSize.Value, this.Bands.Value, this.Custom),
+                VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeak.Value,
                 this.ShowRms.Value,
                 this.Duration.Value,

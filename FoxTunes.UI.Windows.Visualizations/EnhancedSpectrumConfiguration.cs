@@ -144,24 +144,6 @@ namespace FoxTunes
             return palettes;
         }
 
-        public static int GetFFTSize(SelectionConfigurationOption fftSize, SelectionConfigurationOption bands, TextConfigurationElement custom)
-        {
-            var size = VisualizationBehaviourConfiguration.GetFFTSize(fftSize);
-            var count = GetBands(bands, custom).Length;
-            //More bands requires more FFT bins, increase if required.
-            switch (count)
-            {
-                case 40:
-                case 80:
-                    size = Math.Max(size, 8192);
-                    break;
-                case 160:
-                    size = Math.Max(size, 16384);
-                    break;
-            }
-            return size;
-        }
-
         public enum EasingFunction : byte
         {
             None,
