@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core"
              xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
-             mc:Ignorable="d" d:DesignHeight="30" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" Focusable="False" MouseDown="OnMouseDown">
+             mc:Ignorable="d" d:DesignHeight="30" d:DesignWidth="300" d:DataContext="{d:DesignInstance Core:Core, IsDesignTimeCreatable=False}" Focusable="False">
     <UserControl.Resources>
         <ViewModel:Titlebar x:Key="ViewModel" Window="{Binding Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
         <ViewModel:WindowStateConverter x:Key="WindowStateConverter"/>

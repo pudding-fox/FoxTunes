@@ -382,6 +382,10 @@ namespace FoxTunes
 
         protected virtual void StartResize(ResizeDirection direction)
         {
+            if (!this.Adapter.CanResize)
+            {
+                return;
+            }
             if (!this.Adapter.Capture)
             {
                 this.Adapter.Capture = true;
@@ -449,6 +453,10 @@ namespace FoxTunes
 
         protected virtual void Resize(SnappingWindow snappingWindow, Point offset, SnapDirection direction)
         {
+            if (!snappingWindow.Adapter.CanResize)
+            {
+                return;
+            }
             var bounds = snappingWindow.Adapter.Bounds;
 
             if (this.ResizeDirection.HasFlag(ResizeDirection.Left))

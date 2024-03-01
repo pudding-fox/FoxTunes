@@ -22,17 +22,5 @@ namespace FoxTunes
             this.MaximizeRestore.SetValue(WindowChrome.IsHitTestVisibleInChromeProperty, true);
             this.Close.SetValue(WindowChrome.IsHitTestVisibleInChromeProperty, true);
         }
-
-        protected virtual void OnMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                var window = this.FindAncestor<Window>();
-                if (window != null)
-                {
-                    window.DragMove();
-                }
-            }
-        }
     }
 }

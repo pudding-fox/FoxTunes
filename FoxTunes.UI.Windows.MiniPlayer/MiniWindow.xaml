@@ -21,7 +21,7 @@
     </Window.Topmost>
     <Border Padding="5" Background="{DynamicResource ControlBrush}" BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="1">
         <Grid>
-            <LocalWindows:Mini MouseDown="OnMouseDown"></LocalWindows:Mini>
+            <LocalWindows:Mini></LocalWindows:Mini>
             <Windows:Components></Windows:Components>
         </Grid>
     </Border>

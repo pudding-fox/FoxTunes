@@ -74,6 +74,14 @@ namespace FoxTunes
             }
         }
 
+        protected virtual bool ApplyWindowChrome
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         private void InitializeComponent()
         {
             this.WindowStyle = WindowStyle.None;
@@ -82,6 +90,9 @@ namespace FoxTunes
             if (this.ApplyTemplate)
             {
                 this.Template = TemplateFactory.Template;
+            }
+            if (this.ApplyWindowChrome)
+            {
                 this.SetValue(WindowChrome.WindowChromeProperty, new WindowChrome()
                 {
                     CaptionHeight = 30,

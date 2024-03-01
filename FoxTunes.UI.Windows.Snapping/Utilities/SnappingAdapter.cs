@@ -103,6 +103,14 @@ namespace FoxTunes
             }
         }
 
+        public bool CanResize
+        {
+            get
+            {
+                return this.Window.ResizeMode == global::System.Windows.ResizeMode.CanResize;
+            }
+        }
+
         public void AddHook(HwndSourceHook hook)
         {
             var source = HwndSource.FromHwnd(this.Handle);
