@@ -31,20 +31,29 @@ namespace FoxTunes
         {
             lock (this.SyncRoot)
             {
-                if (this.Timer != null)
+                if (this.Timer1 != null)
                 {
-                    this.Timer.Interval = this.UpdateInterval;
+                    this.Timer1.Interval = this.UpdateInterval;
+                }
+                if (this.Timer2 != null)
+                {
+                    this.Timer2.Interval = this.UpdateInterval;
                 }
             }
         }
 
-        protected global::System.Timers.Timer Timer { get; private set; }
+        protected global::System.Timers.Timer Timer1 { get; private set; }
+
+        protected global::System.Timers.Timer Timer2 { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
-            this.Timer = new global::System.Timers.Timer();
-            this.Timer.AutoReset = false;
-            this.Timer.Elapsed += this.OnElapsed;
+            this.Timer1 = new global::System.Timers.Timer();
+            this.Timer1.AutoReset = false;
+            this.Timer1.Elapsed += this.OnUpdateData;
+            this.Timer2 = new global::System.Timers.Timer();
+            this.Timer2.AutoReset = false;
+            this.Timer2.Elapsed += this.OnUpdateDisplay;
             PlaybackStateNotifier.IsStartedChanged += this.OnIsStartedChanged;
             PlaybackStateNotifier.IsPlayingChanged += this.OnIsPlayingChanged;
             base.InitializeComponent(core);
@@ -95,15 +104,19 @@ namespace FoxTunes
         {
             lock (this.SyncRoot)
             {
-                if (this.Timer != null)
+                if (this.Timer1 != null)
                 {
-                    this.Timer.Start();
-                    this.Enabled = true;
+                    this.Timer1.Start();
                 }
+                if (this.Timer2 != null)
+                {
+                    this.Timer2.Start();
+                }
+                this.Enabled = true;
             }
         }
 
-        protected virtual void Restart()
+        protected virtual void BeginUpdateData()
         {
             lock (this.SyncRoot)
             {
@@ -111,7 +124,25 @@ namespace FoxTunes
                 {
                     return;
                 }
-                this.Start();
+                if (this.Timer1 != null)
+                {
+                    this.Timer1.Start();
+                }
+            }
+        }
+
+        protected virtual void BeginUpdateDisplay()
+        {
+            lock (this.SyncRoot)
+            {
+                if (!this.Enabled)
+                {
+                    return;
+                }
+                if (this.Timer2 != null)
+                {
+                    this.Timer2.Start();
+                }
             }
         }
 
@@ -119,15 +150,21 @@ namespace FoxTunes
         {
             lock (this.SyncRoot)
             {
-                if (this.Timer != null)
+                if (this.Timer1 != null)
                 {
-                    this.Timer.Stop();
-                    this.Enabled = false;
+                    this.Timer1.Stop();
                 }
+                if (this.Timer2 != null)
+                {
+                    this.Timer2.Stop();
+                }
+                this.Enabled = false;
             }
         }
 
-        protected abstract void OnElapsed(object sender, ElapsedEventArgs e);
+        protected abstract void OnUpdateData(object sender, ElapsedEventArgs e);
+
+        protected abstract void OnUpdateDisplay(object sender, ElapsedEventArgs e);
 
 #if DEBUG
 
@@ -162,11 +199,17 @@ namespace FoxTunes
             PlaybackStateNotifier.IsPlayingChanged -= this.OnIsPlayingChanged;
             lock (this.SyncRoot)
             {
-                if (this.Timer != null)
+                if (this.Timer1 != null)
                 {
-                    this.Timer.Elapsed -= this.OnElapsed;
-                    this.Timer.Dispose();
-                    this.Timer = null;
+                    this.Timer1.Elapsed -= this.OnUpdateData;
+                    this.Timer1.Dispose();
+                    this.Timer1 = null;
+                }
+                if (this.Timer2 != null)
+                {
+                    this.Timer2.Elapsed -= this.OnUpdateDisplay;
+                    this.Timer2.Dispose();
+                    this.Timer2 = null;
                 }
             }
             base.OnDisposing();

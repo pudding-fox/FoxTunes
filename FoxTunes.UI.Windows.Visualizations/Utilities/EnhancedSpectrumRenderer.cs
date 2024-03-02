@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -206,13 +207,11 @@ namespace FoxTunes
                 var bitmap = this.Bitmap;
                 if (bitmap == null)
                 {
-                    this.Restart();
                     return;
                 }
 
                 if (!bitmap.TryLock(LockTimeout))
                 {
-                    this.Restart();
                     return;
                 }
                 var success = default(bool);
@@ -243,23 +242,22 @@ namespace FoxTunes
                     Interlocked.Increment(ref this.ViewModel.Frames);
                 }
 #endif
-                this.Restart();
             }, DISPATCHER_PRIORITY);
         }
 
-        protected override void OnElapsed(object sender, ElapsedEventArgs e)
+        protected override void OnUpdateData(object sender, ElapsedEventArgs e)
         {
             var data = this.RendererData;
             if (data == null)
             {
-                this.Restart();
+                this.BeginUpdateData();
                 return;
             }
             try
             {
                 if (!this.VisualizationDataSource.Update(data))
                 {
-                    this.Restart();
+                    this.BeginUpdateData();
                     return;
                 }
                 else
@@ -276,15 +274,40 @@ namespace FoxTunes
                     data.LastUpdated = DateTime.UtcNow;
                 }
 
-                var task = this.Render(data);
+                this.BeginUpdateData();
             }
             catch (Exception exception)
             {
 #if DEBUG
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data: {0}", exception.Message);
-                this.Restart();
+                this.BeginUpdateData();
 #else
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data, disabling: {0}", exception.Message);
+#endif
+            }
+        }
+
+        protected override async void OnUpdateDisplay(object sender, ElapsedEventArgs e)
+        {
+            var data = this.RendererData;
+            if (data == null)
+            {
+                this.BeginUpdateDisplay();
+                return;
+            }
+            try
+            {
+                await this.Render(data).ConfigureAwait(false);
+
+                this.BeginUpdateDisplay();
+            }
+            catch (Exception exception)
+            {
+#if DEBUG
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum data: {0}", exception.Message);
+                this.BeginUpdateData();
+#else
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum data, disabling: {0}", exception.Message);
 #endif
             }
         }

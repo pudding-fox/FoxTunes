@@ -19,6 +19,8 @@ namespace FoxTunes
 
         public const int WM_LBUTTONUP = 0x0202;
 
+        public const int WM_SIZE = 0x0005;
+
         public const int WA_ACTIVE = 1;
 
         public const int WA_CLICKACTIVE = 2;
@@ -42,6 +44,10 @@ namespace FoxTunes
         public const int HT_BOTTOMRIGHT = 17;
 
         public const int VK_ESCAPE = 0x1B;
+
+        public const int SIZE_RESTORED = 0;
+
+        public const int SIZE_MINIMIZED = 1;
 
         static SnappingWindow()
         {
@@ -160,6 +166,17 @@ namespace FoxTunes
                         {
                             return new IntPtr(1);
                         }
+                    }
+                    break;
+                case WM_SIZE:
+                    switch (wParam.ToInt32())
+                    {
+                        case SIZE_RESTORED:
+                            ForEachStickyWindow(this, snappingWindow => snappingWindow.Adapter.Restore());
+                            break;
+                        case SIZE_MINIMIZED:
+                            ForEachStickyWindow(this, snappingWindow => snappingWindow.Adapter.Minimize());
+                            break;
                     }
                     break;
             }

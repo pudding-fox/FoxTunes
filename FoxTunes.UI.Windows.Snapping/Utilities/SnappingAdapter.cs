@@ -166,6 +166,16 @@ namespace FoxTunes
             );
         }
 
+        public void Minimize()
+        {
+            this.Window.WindowState = global::System.Windows.WindowState.Minimized;
+        }
+
+        public void Restore()
+        {
+            this.Window.WindowState = global::System.Windows.WindowState.Normal;
+        }
+
         public void SetCursor(ResizeDirection direction)
         {
             var cursor = default(global::System.Windows.Input.Cursor);
