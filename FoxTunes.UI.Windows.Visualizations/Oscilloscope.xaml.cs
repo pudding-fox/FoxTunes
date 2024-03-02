@@ -45,7 +45,7 @@ namespace FoxTunes
                     OscilloscopeConfiguration.DURATION_ELEMENT
                 );
                 this.Interval = this.Configuration.GetElement<IntegerConfigurationElement>(
-                    OscilloscopeConfiguration.SECTION,
+                    VisualizationBehaviourConfiguration.SECTION,
                     VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
                 );
             }

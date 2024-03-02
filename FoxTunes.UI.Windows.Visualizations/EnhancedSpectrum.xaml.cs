@@ -64,7 +64,7 @@ namespace FoxTunes
                     EnhancedSpectrumConfiguration.DURATION_ELEMENT
                 );
                 this.Interval = this.Configuration.GetElement<IntegerConfigurationElement>(
-                    EnhancedSpectrumConfiguration.SECTION,
+                    VisualizationBehaviourConfiguration.SECTION,
                     VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
                 );
             }

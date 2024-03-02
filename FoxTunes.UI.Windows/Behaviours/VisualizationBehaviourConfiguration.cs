@@ -4,6 +4,8 @@ namespace FoxTunes
 {
     public static class VisualizationBehaviourConfiguration
     {
+        public const string SECTION = "B06236E7-F320-4D87-A1A6-9937E0B399BB";
+
         public const string INTERVAL_ELEMENT = "FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438";
 
         public const int MIN_INTERVAL = 5;

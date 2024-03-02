@@ -76,7 +76,7 @@ namespace FoxTunes
             if (this.Configuration != null)
             {
                 this.Configuration.GetElement<IntegerConfigurationElement>(
-                   this.Configuration.Sections.First().Id, //TODO: Assuming a single section.
+                   VisualizationBehaviourConfiguration.SECTION,
                    VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
                 ).ConnectValue(value => this.UpdateInterval = value);
             }

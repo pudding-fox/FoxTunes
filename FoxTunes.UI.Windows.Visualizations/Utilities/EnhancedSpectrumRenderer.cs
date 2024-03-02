@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
-using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 

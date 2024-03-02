@@ -61,7 +61,7 @@ namespace FoxTunes
                     PeakMeterConfiguration.DURATION
                 );
                 this.Interval = this.Configuration.GetElement<IntegerConfigurationElement>(
-                    PeakMeterConfiguration.SECTION,
+                    VisualizationBehaviourConfiguration.SECTION,
                     VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
                 );
             }

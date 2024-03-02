@@ -60,7 +60,7 @@ namespace FoxTunes
                     SpectrumConfiguration.COLOR_PALETTE_ELEMENT
                 );
                 this.Interval = this.Configuration.GetElement<IntegerConfigurationElement>(
-                    SpectrumConfiguration.SECTION,
+                    VisualizationBehaviourConfiguration.SECTION,
                     VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
                 );
             }

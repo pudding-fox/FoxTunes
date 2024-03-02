@@ -8,7 +8,7 @@ namespace FoxTunes
 {
     public static class OscilloscopeConfiguration
     {
-        public const string SECTION = "992CFAE9-744B-4CCE-8243-EEEA4C1130CA";
+        public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
 
         public const string MODE_ELEMENT = "AAAAD149-F777-46CB-92C0-F479CEE72A91";
 
@@ -44,7 +44,8 @@ namespace FoxTunes
                 .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.OscilloscopeConfiguration_Mode).WithOptions(GetModeOptions()))
                 .WithElement(new IntegerConfigurationElement(WINDOW_ELEMENT, Strings.OscilloscopeConfiguration_Window).WithValue(WINDOW_DEFAULT).WithValidationRule(new IntegerValidationRule(WINDOW_MIN, WINDOW_MAX, 10)))
                 .WithElement(new TextConfigurationElement(COLOR_PALETTE, Strings.OscilloscopeConfiguration_ColorPalette, path: Strings.General_Advanced).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
-                .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.OscilloscopeConfiguration_Duration).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10))
+                .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.OscilloscopeConfiguration_Duration).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10)))
+                .WithElement(new IntegerConfigurationElement(VisualizationBehaviourConfiguration.INTERVAL_ELEMENT, Strings.VisualizationBehaviourConfiguration_Interval, path: Strings.General_Advanced).WithValue(VisualizationBehaviourConfiguration.DEFAULT_INTERVAL).WithValidationRule(new IntegerValidationRule(VisualizationBehaviourConfiguration.MIN_INTERVAL, VisualizationBehaviourConfiguration.MAX_INTERVAL))
             );
         }
 

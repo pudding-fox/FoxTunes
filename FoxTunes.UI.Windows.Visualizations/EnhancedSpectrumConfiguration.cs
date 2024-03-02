@@ -9,7 +9,7 @@ namespace FoxTunes
 {
     public static class EnhancedSpectrumConfiguration
     {
-        public const string SECTION = "0233F73A-B189-4CC9-B4EF-01AFB13FC7CC";
+        public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
 
         public const string BANDS_ELEMENT = "AABBF573-83D3-498E-BEF8-F1DB5A329B9D";
 
@@ -56,7 +56,7 @@ namespace FoxTunes
                 .WithElement(new TextConfigurationElement(BANDS_CUSTOM_ELEMENT, Strings.EnhancedSpectrumConfiguration_Bands_Custom, description: Strings.EnhancedSpectrumConfiguration_Bands_Custom_Description).WithValue("50 20000 320 S").DependsOn(SECTION, BANDS_ELEMENT, BANDS_CUSTOM_OPTION))
                 .WithElement(new BooleanConfigurationElement(PEAK_ELEMENT, Strings.EnhancedSpectrumConfiguration_Peak).WithValue(true))
                 .WithElement(new BooleanConfigurationElement(RMS_ELEMENT, Strings.EnhancedSpectrumConfiguration_Rms).WithValue(true))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.EnhancedSpectrumConfiguration_ColorPalette, Strings.General_Advanced).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.EnhancedSpectrumConfiguration_ColorPalette, path: Strings.General_Advanced).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
                 .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.EnhancedSpectrumConfiguration_Duration).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX)))
                 .WithElement(new IntegerConfigurationElement(VisualizationBehaviourConfiguration.INTERVAL_ELEMENT, Strings.VisualizationBehaviourConfiguration_Interval, path: Strings.General_Advanced).WithValue(VisualizationBehaviourConfiguration.DEFAULT_INTERVAL).WithValidationRule(new IntegerValidationRule(VisualizationBehaviourConfiguration.MIN_INTERVAL, VisualizationBehaviourConfiguration.MAX_INTERVAL)))
                 .WithElement(new SelectionConfigurationElement(VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT, Strings.VisualizationBehaviourConfiguration_FFTSize, path: Strings.General_Advanced).WithOptions(VisualizationBehaviourConfiguration.GetFFTOptions(VisualizationBehaviourConfiguration.FFT_4096_OPTION))

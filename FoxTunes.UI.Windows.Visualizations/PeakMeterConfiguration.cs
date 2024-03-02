@@ -8,7 +8,7 @@ namespace FoxTunes
 {
     public static class PeakMeterConfiguration
     {
-        public const string SECTION = "234B888E-EC27-4B77-B33B-81FE330C708D";
+        public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
 
         public const string PEAKS = "BBBBFFA3-8F13-4838-9429-69C5E208963D";
 
@@ -38,7 +38,8 @@ namespace FoxTunes
                 .WithElement(new BooleanConfigurationElement(PEAKS, Strings.PeakMeterConfiguration_Peaks).WithValue(true))
                 .WithElement(new BooleanConfigurationElement(RMS, Strings.PeakMeterConfiguration_Rms).WithValue(false))
                 .WithElement(new TextConfigurationElement(COLOR_PALETTE, Strings.PeakMeterConfiguration_ColorPalette, path: Strings.General_Advanced).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
-                .WithElement(new IntegerConfigurationElement(DURATION, Strings.PeakMeterConfiguration_Duration, path: Strings.PeakMeterConfiguration_Section).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX))
+                .WithElement(new IntegerConfigurationElement(DURATION, Strings.PeakMeterConfiguration_Duration).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX)))
+                .WithElement(new IntegerConfigurationElement(VisualizationBehaviourConfiguration.INTERVAL_ELEMENT, Strings.VisualizationBehaviourConfiguration_Interval, path: Strings.General_Advanced).WithValue(VisualizationBehaviourConfiguration.DEFAULT_INTERVAL).WithValidationRule(new IntegerValidationRule(VisualizationBehaviourConfiguration.MIN_INTERVAL, VisualizationBehaviourConfiguration.MAX_INTERVAL))
             );
         }
 
