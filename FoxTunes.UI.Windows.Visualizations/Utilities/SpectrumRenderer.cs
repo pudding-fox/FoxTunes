@@ -65,7 +65,7 @@ namespace FoxTunes
                     SpectrumConfiguration.PRE_AMP_ELEMENT
                 );
                 this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
-                   VisualizationBehaviourConfiguration.SECTION,
+                   SpectrumConfiguration.SECTION,
                    VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
                 );
                 this.Bars.ValueChanged += this.OnValueChanged;

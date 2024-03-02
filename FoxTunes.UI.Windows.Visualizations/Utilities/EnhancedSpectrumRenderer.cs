@@ -75,7 +75,7 @@ namespace FoxTunes
                     EnhancedSpectrumConfiguration.DURATION_ELEMENT
                 );
                 this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
-                   VisualizationBehaviourConfiguration.SECTION,
+                   EnhancedSpectrumConfiguration.SECTION,
                    VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
                 );
                 this.Bands.ValueChanged += this.OnValueChanged;

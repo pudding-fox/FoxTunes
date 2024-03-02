@@ -144,14 +144,14 @@
   <data name="EnhancedSpectrumConfiguration.Duration.Medium" xml:space="preserve">
     <value>Medium</value>
   </data>
-  <data name="EnhancedSpectrumConfiguration.Path" xml:space="preserve">
-    <value>Spectrum</value>
-  </data>
   <data name="EnhancedSpectrumConfiguration.Peak" xml:space="preserve">
     <value>Show Peak</value>
   </data>
   <data name="EnhancedSpectrumConfiguration.Rms" xml:space="preserve">
     <value>Show RMS</value>
+  </data>
+  <data name="EnhancedSpectrumConfiguration.Section" xml:space="preserve">
+    <value>Spectrum</value>
   </data>
   <data name="General.Advanced" xml:space="preserve">
     <value>Advanced</value>
@@ -174,7 +174,7 @@
   <data name="OscilloscopeConfiguration.Mode.Seperate" xml:space="preserve">
     <value>Seperate</value>
   </data>
-  <data name="OscilloscopeConfiguration.Path" xml:space="preserve">
+  <data name="OscilloscopeConfiguration.Section" xml:space="preserve">
     <value>Oscilloscope</value>
   </data>
   <data name="OscilloscopeConfiguration.Window" xml:space="preserve">
@@ -198,14 +198,14 @@
   <data name="PeakMeterConfiguration.Duration.Medium" xml:space="preserve">
     <value>Medium</value>
   </data>
-  <data name="PeakMeterConfiguration.Path" xml:space="preserve">
-    <value>Peak Meter</value>
-  </data>
   <data name="PeakMeterConfiguration.Peaks" xml:space="preserve">
     <value>Show Peaks</value>
   </data>
   <data name="PeakMeterConfiguration.Rms" xml:space="preserve">
     <value>Show RMS</value>
+  </data>
+  <data name="PeakMeterConfiguration.Section" xml:space="preserve">
+    <value>Peak Meter</value>
   </data>
   <data name="Speakers.Center" xml:space="preserve">
     <value>C</value>
@@ -252,9 +252,6 @@
   <data name="SpectrogramConfiguration.Mode.Seperate" xml:space="preserve">
     <value>Seperate</value>
   </data>
-  <data name="SpectrogramConfiguration.Path" xml:space="preserve">
-    <value>Spectrogram</value>
-  </data>
   <data name="SpectrogramConfiguration.Scale" xml:space="preserve">
     <value>Scale</value>
   </data>
@@ -263,6 +260,9 @@
   </data>
   <data name="SpectrogramConfiguration.Scale.Logarithmic" xml:space="preserve">
     <value>Logarithmic</value>
+  </data>
+  <data name="SpectrogramConfiguration.Section" xml:space="preserve">
+    <value>Spectrogram</value>
   </data>
   <data name="SpectrogramConfiguration.Smoothing" xml:space="preserve">
     <value>Smoothing</value>
@@ -285,14 +285,14 @@
   <data name="SpectrumConfiguration.MaxFrequency" xml:space="preserve">
     <value>Max Frequency (KHz)</value>
   </data>
-  <data name="SpectrumConfiguration.Path" xml:space="preserve">
-    <value>Spectrum (Basic)</value>
-  </data>
   <data name="SpectrumConfiguration.Peaks" xml:space="preserve">
     <value>Show Peaks</value>
   </data>
   <data name="SpectrumConfiguration.PreAmp" xml:space="preserve">
     <value>Pre Amp (dB)</value>
+  </data>
+  <data name="SpectrumConfiguration.Section" xml:space="preserve">
+    <value>Spectrum (Basic)</value>
   </data>
   <data name="Visualization.Speed.Default" xml:space="preserve">
     <value>Default</value>
@@ -302,5 +302,11 @@
   </data>
   <data name="Visualization.Speed.Slow" xml:space="preserve">
     <value>Slow</value>
+  </data>
+  <data name="VisualizationBehaviourConfiguration.FFTSize" xml:space="preserve">
+    <value>FFT Size</value>
+  </data>
+  <data name="VisualizationBehaviourConfiguration.Interval" xml:space="preserve">
+    <value>Update Interval</value>
   </data>
 </root>

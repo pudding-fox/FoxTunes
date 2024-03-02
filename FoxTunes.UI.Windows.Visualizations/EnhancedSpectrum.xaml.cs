@@ -64,7 +64,7 @@ namespace FoxTunes
                     EnhancedSpectrumConfiguration.DURATION_ELEMENT
                 );
                 this.Interval = this.Configuration.GetElement<IntegerConfigurationElement>(
-                    VisualizationBehaviourConfiguration.SECTION,
+                    EnhancedSpectrumConfiguration.SECTION,
                     VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
                 );
             }
@@ -230,7 +230,7 @@ namespace FoxTunes
         protected override Task<bool> ShowSettings()
         {
             return this.ShowSettings(
-                Strings.EnhancedSpectrumConfiguration_Path,
+                Strings.EnhancedSpectrumConfiguration_Section,
                 EnhancedSpectrumConfiguration.SECTION
             );
         }

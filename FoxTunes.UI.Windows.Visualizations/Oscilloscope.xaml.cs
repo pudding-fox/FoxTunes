@@ -45,7 +45,7 @@ namespace FoxTunes
                     OscilloscopeConfiguration.DURATION_ELEMENT
                 );
                 this.Interval = this.Configuration.GetElement<IntegerConfigurationElement>(
-                    VisualizationBehaviourConfiguration.SECTION,
+                    OscilloscopeConfiguration.SECTION,
                     VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
                 );
             }
@@ -183,7 +183,7 @@ namespace FoxTunes
         protected override Task<bool> ShowSettings()
         {
             return this.ShowSettings(
-                Strings.OscilloscopeConfiguration_Path,
+                Strings.OscilloscopeConfiguration_Section,
                 OscilloscopeConfiguration.SECTION
             );
         }

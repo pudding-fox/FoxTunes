@@ -61,7 +61,7 @@ namespace FoxTunes
                     PeakMeterConfiguration.DURATION
                 );
                 this.Interval = this.Configuration.GetElement<IntegerConfigurationElement>(
-                    VisualizationBehaviourConfiguration.SECTION,
+                    PeakMeterConfiguration.SECTION,
                     VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
                 );
             }
@@ -231,7 +231,7 @@ namespace FoxTunes
         protected override Task<bool> ShowSettings()
         {
             return this.ShowSettings(
-                Strings.PeakMeterConfiguration_Path,
+                Strings.PeakMeterConfiguration_Section,
                 PeakMeterConfiguration.SECTION
             );
         }

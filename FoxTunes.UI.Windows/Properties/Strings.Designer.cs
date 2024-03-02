@@ -1474,33 +1474,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FFT Size.
-        /// </summary>
-        internal static string VisualizationBehaviourConfiguration_FFTSize {
-            get {
-                return ResourceManager.GetString("VisualizationBehaviourConfiguration.FFTSize", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Update Interval.
-        /// </summary>
-        internal static string VisualizationBehaviourConfiguration_Interval {
-            get {
-                return ResourceManager.GetString("VisualizationBehaviourConfiguration.Interval", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Visualizations.
-        /// </summary>
-        internal static string VisualizationBehaviourConfiguration_Section {
-            get {
-                return ResourceManager.GetString("VisualizationBehaviourConfiguration.Section", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Volume.
         /// </summary>
         internal static string Volume_Name {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Media;
 
@@ -9,7 +8,7 @@ namespace FoxTunes
 {
     public static class SpectrogramConfiguration
     {
-        public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
+        public const string SECTION = "B5305718-D610-47E4-871D-C6A9AB036D7B";
 
         public const string MODE_ELEMENT = "AAAA4D78-941A-42D3-A704-88E295D17324";
 
@@ -47,12 +46,13 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION)
-                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.SpectrogramConfiguration_Mode, path: Strings.SpectrogramConfiguration_Path).WithOptions(GetModeOptions()))
-                .WithElement(new SelectionConfigurationElement(SCALE_ELEMENT, Strings.SpectrogramConfiguration_Scale, path: Strings.SpectrogramConfiguration_Path).WithOptions(GetScaleOptions()))
-                .WithElement(new IntegerConfigurationElement(SMOOTHING_ELEMENT, Strings.SpectrogramConfiguration_Smoothing, path: Strings.SpectrogramConfiguration_Path).WithValue(SMOOTHING_DEFAULT).WithValidationRule(new IntegerValidationRule(SMOOTHING_MIN, SMOOTHING_MAX)))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrogramConfiguration_ColorPalette, path: Strings.SpectrogramConfiguration_Path).WithFlags(ConfigurationElementFlags.MultiLine))
-                .WithElement(new IntegerConfigurationElement(HISTORY_ELEMENT, Strings.SpectrogramConfiguration_History, path: Strings.SpectrogramConfiguration_Path).WithValue(Publication.ReleaseType == ReleaseType.Default ? HISTORY_DEFAULT : HISTORY_MIN).WithValidationRule(new IntegerValidationRule(HISTORY_MIN, HISTORY_MAX))
+            yield return new ConfigurationSection(SECTION, Strings.SpectrogramConfiguration_Section)
+                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.SpectrogramConfiguration_Mode, path: Strings.SpectrogramConfiguration_Section).WithOptions(GetModeOptions()))
+                .WithElement(new SelectionConfigurationElement(SCALE_ELEMENT, Strings.SpectrogramConfiguration_Scale, path: Strings.SpectrogramConfiguration_Section).WithOptions(GetScaleOptions()))
+                .WithElement(new IntegerConfigurationElement(SMOOTHING_ELEMENT, Strings.SpectrogramConfiguration_Smoothing, path: Strings.SpectrogramConfiguration_Section).WithValue(SMOOTHING_DEFAULT).WithValidationRule(new IntegerValidationRule(SMOOTHING_MIN, SMOOTHING_MAX)))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrogramConfiguration_ColorPalette, path: Strings.SpectrogramConfiguration_Section).WithFlags(ConfigurationElementFlags.MultiLine))
+                .WithElement(new IntegerConfigurationElement(HISTORY_ELEMENT, Strings.SpectrogramConfiguration_History, path: Strings.SpectrogramConfiguration_Section).WithValue(Publication.ReleaseType == ReleaseType.Default ? HISTORY_DEFAULT : HISTORY_MIN).WithValidationRule(new IntegerValidationRule(HISTORY_MIN, HISTORY_MAX)))
+                .WithElement(new SelectionConfigurationElement(VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT, Strings.VisualizationBehaviourConfiguration_FFTSize, path: Strings.General_Advanced).WithOptions(VisualizationBehaviourConfiguration.GetFFTOptions(VisualizationBehaviourConfiguration.FFT_512_OPTION))
             );
         }
 

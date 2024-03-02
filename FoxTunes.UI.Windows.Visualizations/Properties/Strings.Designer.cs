@@ -142,15 +142,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Spectrum.
-        /// </summary>
-        internal static string EnhancedSpectrumConfiguration_Path {
-            get {
-                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Path", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Show Peak.
         /// </summary>
         internal static string EnhancedSpectrumConfiguration_Peak {
@@ -165,6 +156,15 @@ namespace FoxTunes {
         internal static string EnhancedSpectrumConfiguration_Rms {
             get {
                 return ResourceManager.GetString("EnhancedSpectrumConfiguration.Rms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spectrum.
+        /// </summary>
+        internal static string EnhancedSpectrumConfiguration_Section {
+            get {
+                return ResourceManager.GetString("EnhancedSpectrumConfiguration.Section", resourceCulture);
             }
         }
         
@@ -234,9 +234,9 @@ namespace FoxTunes {
         /// <summary>
         ///   Looks up a localized string similar to Oscilloscope.
         /// </summary>
-        internal static string OscilloscopeConfiguration_Path {
+        internal static string OscilloscopeConfiguration_Section {
             get {
-                return ResourceManager.GetString("OscilloscopeConfiguration.Path", resourceCulture);
+                return ResourceManager.GetString("OscilloscopeConfiguration.Section", resourceCulture);
             }
         }
         
@@ -304,15 +304,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Peak Meter.
-        /// </summary>
-        internal static string PeakMeterConfiguration_Path {
-            get {
-                return ResourceManager.GetString("PeakMeterConfiguration.Path", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Show Peaks.
         /// </summary>
         internal static string PeakMeterConfiguration_Peaks {
@@ -327,6 +318,15 @@ namespace FoxTunes {
         internal static string PeakMeterConfiguration_Rms {
             get {
                 return ResourceManager.GetString("PeakMeterConfiguration.Rms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Peak Meter.
+        /// </summary>
+        internal static string PeakMeterConfiguration_Section {
+            get {
+                return ResourceManager.GetString("PeakMeterConfiguration.Section", resourceCulture);
             }
         }
         
@@ -466,15 +466,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Spectrogram.
-        /// </summary>
-        internal static string SpectrogramConfiguration_Path {
-            get {
-                return ResourceManager.GetString("SpectrogramConfiguration.Path", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Scale.
         /// </summary>
         internal static string SpectrogramConfiguration_Scale {
@@ -498,6 +489,15 @@ namespace FoxTunes {
         internal static string SpectrogramConfiguration_Scale_Logarithmic {
             get {
                 return ResourceManager.GetString("SpectrogramConfiguration.Scale.Logarithmic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spectrogram.
+        /// </summary>
+        internal static string SpectrogramConfiguration_Section {
+            get {
+                return ResourceManager.GetString("SpectrogramConfiguration.Section", resourceCulture);
             }
         }
         
@@ -565,15 +565,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Spectrum (Basic).
-        /// </summary>
-        internal static string SpectrumConfiguration_Path {
-            get {
-                return ResourceManager.GetString("SpectrumConfiguration.Path", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Show Peaks.
         /// </summary>
         internal static string SpectrumConfiguration_Peaks {
@@ -588,6 +579,15 @@ namespace FoxTunes {
         internal static string SpectrumConfiguration_PreAmp {
             get {
                 return ResourceManager.GetString("SpectrumConfiguration.PreAmp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spectrum (Basic).
+        /// </summary>
+        internal static string SpectrumConfiguration_Section {
+            get {
+                return ResourceManager.GetString("SpectrumConfiguration.Section", resourceCulture);
             }
         }
         
@@ -615,6 +615,24 @@ namespace FoxTunes {
         internal static string Visualization_Speed_Slow {
             get {
                 return ResourceManager.GetString("Visualization.Speed.Slow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FFT Size.
+        /// </summary>
+        internal static string VisualizationBehaviourConfiguration_FFTSize {
+            get {
+                return ResourceManager.GetString("VisualizationBehaviourConfiguration.FFTSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update Interval.
+        /// </summary>
+        internal static string VisualizationBehaviourConfiguration_Interval {
+            get {
+                return ResourceManager.GetString("VisualizationBehaviourConfiguration.Interval", resourceCulture);
             }
         }
     }

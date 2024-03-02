@@ -8,7 +8,7 @@ namespace FoxTunes
 {
     public static class PeakMeterConfiguration
     {
-        public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
+        public const string SECTION = "234B888E-EC27-4B77-B33B-81FE330C708D";
 
         public const string PEAKS = "BBBBFFA3-8F13-4838-9429-69C5E208963D";
 
@@ -34,11 +34,11 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION)
-                .WithElement(new BooleanConfigurationElement(PEAKS, Strings.PeakMeterConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.PeakMeterConfiguration_Path, Strings.General_Advanced)).WithValue(true))
-                .WithElement(new BooleanConfigurationElement(RMS, Strings.PeakMeterConfiguration_Rms, path: string.Format("{0}/{1}", Strings.PeakMeterConfiguration_Path, Strings.General_Advanced)).WithValue(false))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE, Strings.PeakMeterConfiguration_ColorPalette, path: string.Format("{0}/{1}", Strings.PeakMeterConfiguration_Path, Strings.General_Advanced)).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
-                .WithElement(new IntegerConfigurationElement(DURATION, Strings.PeakMeterConfiguration_Duration, path: Strings.PeakMeterConfiguration_Path).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX))
+            yield return new ConfigurationSection(SECTION, Strings.PeakMeterConfiguration_Section)
+                .WithElement(new BooleanConfigurationElement(PEAKS, Strings.PeakMeterConfiguration_Peaks).WithValue(true))
+                .WithElement(new BooleanConfigurationElement(RMS, Strings.PeakMeterConfiguration_Rms).WithValue(false))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE, Strings.PeakMeterConfiguration_ColorPalette, path: Strings.General_Advanced).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
+                .WithElement(new IntegerConfigurationElement(DURATION, Strings.PeakMeterConfiguration_Duration, path: Strings.PeakMeterConfiguration_Section).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX))
             );
         }
 

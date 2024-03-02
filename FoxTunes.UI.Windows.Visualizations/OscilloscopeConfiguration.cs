@@ -8,7 +8,7 @@ namespace FoxTunes
 {
     public static class OscilloscopeConfiguration
     {
-        public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
+        public const string SECTION = "992CFAE9-744B-4CCE-8243-EEEA4C1130CA";
 
         public const string MODE_ELEMENT = "AAAAD149-F777-46CB-92C0-F479CEE72A91";
 
@@ -40,11 +40,11 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION)
-                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.OscilloscopeConfiguration_Mode, path: Strings.OscilloscopeConfiguration_Path).WithOptions(GetModeOptions()))
-                .WithElement(new IntegerConfigurationElement(WINDOW_ELEMENT, Strings.OscilloscopeConfiguration_Window, path: Strings.OscilloscopeConfiguration_Path).WithValue(WINDOW_DEFAULT).WithValidationRule(new IntegerValidationRule(WINDOW_MIN, WINDOW_MAX, 10)))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE, Strings.OscilloscopeConfiguration_ColorPalette, path: string.Format("{0}/{1}", Strings.OscilloscopeConfiguration_Path, Strings.General_Advanced)).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
-                .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.OscilloscopeConfiguration_Duration, path: Strings.OscilloscopeConfiguration_Path).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10))
+            yield return new ConfigurationSection(SECTION, Strings.OscilloscopeConfiguration_Section)
+                .WithElement(new SelectionConfigurationElement(MODE_ELEMENT, Strings.OscilloscopeConfiguration_Mode).WithOptions(GetModeOptions()))
+                .WithElement(new IntegerConfigurationElement(WINDOW_ELEMENT, Strings.OscilloscopeConfiguration_Window).WithValue(WINDOW_DEFAULT).WithValidationRule(new IntegerValidationRule(WINDOW_MIN, WINDOW_MAX, 10)))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE, Strings.OscilloscopeConfiguration_ColorPalette, path: Strings.General_Advanced).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
+                .WithElement(new IntegerConfigurationElement(DURATION_ELEMENT, Strings.OscilloscopeConfiguration_Duration).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX, 10))
             );
         }
 

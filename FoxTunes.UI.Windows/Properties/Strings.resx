@@ -588,15 +588,6 @@
   <data name="Visualization.UnavailableDetail" xml:space="preserve">
     <value>Mixer is required for rendering, check your output settings.</value>
   </data>
-  <data name="VisualizationBehaviourConfiguration.FFTSize" xml:space="preserve">
-    <value>FFT Size</value>
-  </data>
-  <data name="VisualizationBehaviourConfiguration.Interval" xml:space="preserve">
-    <value>Update Interval</value>
-  </data>
-  <data name="VisualizationBehaviourConfiguration.Section" xml:space="preserve">
-    <value>Visualizations</value>
-  </data>
   <data name="Volume.Name" xml:space="preserve">
     <value>Volume</value>
   </data>

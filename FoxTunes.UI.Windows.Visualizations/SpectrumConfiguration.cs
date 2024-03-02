@@ -8,7 +8,7 @@ namespace FoxTunes
 {
     public static class SpectrumConfiguration
     {
-        public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
+        public const string SECTION = "A7BF9B7A-7BAA-429F-8730-A5C5A944DD8C";
 
         public const string BARS_ELEMENT = "AAAA0663-7CBF-4EE4-99C8-A0A096D4E876";
 
@@ -64,13 +64,15 @@ namespace FoxTunes
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
-            yield return new ConfigurationSection(SECTION)
-                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, Strings.SpectrumConfiguration_Bars, path: Strings.SpectrumConfiguration_Path).WithOptions(GetBarsOptions()))
-                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.SpectrumConfiguration_Peaks, path: string.Format("{0}/{1}", Strings.SpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(true))
-                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.SpectrumConfiguration_Hold, path: string.Format("{0}/{1}", Strings.SpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_HOLD).WithValidationRule(new IntegerValidationRule(MIN_HOLD, MAX_HOLD)).DependsOn(SECTION, PEAKS_ELEMENT))
-                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrumConfiguration_ColorPalette, path: Strings.SpectrumConfiguration_Path).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
-                .WithElement(new IntegerConfigurationElement(CUT_OFF_ELEMENT, Strings.SpectrumConfiguration_MaxFrequency, path: string.Format("{0}/{1}", Strings.SpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_CUT_OFF).WithValidationRule(new IntegerValidationRule(MIN_CUT_OFF, MAX_CUT_OFF)))
-                .WithElement(new IntegerConfigurationElement(PRE_AMP_ELEMENT, Strings.SpectrumConfiguration_PreAmp, path: string.Format("{0}/{1}", Strings.SpectrumConfiguration_Path, Strings.General_Advanced)).WithValue(DEFAULT_PRE_AMP).WithValidationRule(new IntegerValidationRule(MIN_PRE_AMP, MAX_PRE_AMP))
+            yield return new ConfigurationSection(SECTION, Strings.SpectrumConfiguration_Section)
+                .WithElement(new SelectionConfigurationElement(BARS_ELEMENT, Strings.SpectrumConfiguration_Bars).WithOptions(GetBarsOptions()))
+                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.SpectrumConfiguration_Peaks, path: Strings.General_Advanced).WithValue(true))
+                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.SpectrumConfiguration_Hold, path: Strings.General_Advanced).WithValue(DEFAULT_HOLD).WithValidationRule(new IntegerValidationRule(MIN_HOLD, MAX_HOLD)).DependsOn(SECTION, PEAKS_ELEMENT))
+                .WithElement(new TextConfigurationElement(COLOR_PALETTE_ELEMENT, Strings.SpectrumConfiguration_ColorPalette).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
+                .WithElement(new IntegerConfigurationElement(CUT_OFF_ELEMENT, Strings.SpectrumConfiguration_MaxFrequency, path: Strings.General_Advanced).WithValue(DEFAULT_CUT_OFF).WithValidationRule(new IntegerValidationRule(MIN_CUT_OFF, MAX_CUT_OFF)))
+                .WithElement(new IntegerConfigurationElement(PRE_AMP_ELEMENT, Strings.SpectrumConfiguration_PreAmp, path: Strings.General_Advanced).WithValue(DEFAULT_PRE_AMP).WithValidationRule(new IntegerValidationRule(MIN_PRE_AMP, MAX_PRE_AMP)))
+                .WithElement(new IntegerConfigurationElement(VisualizationBehaviourConfiguration.INTERVAL_ELEMENT, Strings.VisualizationBehaviourConfiguration_Interval, path: Strings.General_Advanced).WithValue(VisualizationBehaviourConfiguration.DEFAULT_INTERVAL).WithValidationRule(new IntegerValidationRule(VisualizationBehaviourConfiguration.MIN_INTERVAL, VisualizationBehaviourConfiguration.MAX_INTERVAL)))
+                .WithElement(new SelectionConfigurationElement(VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT, Strings.VisualizationBehaviourConfiguration_FFTSize, path: Strings.General_Advanced).WithOptions(VisualizationBehaviourConfiguration.GetFFTOptions(VisualizationBehaviourConfiguration.FFT_512_OPTION))
             );
         }
 

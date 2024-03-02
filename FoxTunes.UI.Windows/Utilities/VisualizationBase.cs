@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Controls;
@@ -75,7 +76,7 @@ namespace FoxTunes
             if (this.Configuration != null)
             {
                 this.Configuration.GetElement<IntegerConfigurationElement>(
-                   VisualizationBehaviourConfiguration.SECTION,
+                   this.Configuration.Sections.First().Id, //TODO: Assuming a single section.
                    VisualizationBehaviourConfiguration.INTERVAL_ELEMENT
                 ).ConnectValue(value => this.UpdateInterval = value);
             }

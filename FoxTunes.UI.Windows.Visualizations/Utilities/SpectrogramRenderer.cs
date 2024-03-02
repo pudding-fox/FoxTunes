@@ -50,7 +50,7 @@ namespace FoxTunes
                    SpectrogramConfiguration.HISTORY_ELEMENT
                 );
                 this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
-                   VisualizationBehaviourConfiguration.SECTION,
+                   SpectrogramConfiguration.SECTION,
                    VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
                 );
                 this.Mode.ValueChanged += this.OnValueChanged;
