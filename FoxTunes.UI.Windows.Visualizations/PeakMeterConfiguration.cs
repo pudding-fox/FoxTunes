@@ -12,6 +12,8 @@ namespace FoxTunes
 
         public const string COLOR_PALETTE = "EEEE1493-AF31-4450-A39B-396014866DDF";
 
+        public const string COLOR_PALETTE_PEAK = "PEAK";
+
         public const string COLOR_PALETTE_VALUE = "VALUE";
 
         public const string COLOR_PALETTE_BACKGROUND = "BACKGROUND";

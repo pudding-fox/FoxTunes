@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -132,6 +133,10 @@ namespace FoxTunes
                 PeakMeterConfiguration.COLOR_PALETTE_VALUE,
                 () => DefaultColors.GetValue(new[] { this.ForegroundColor })
             );
+            palettes.GetOrAdd(
+                PeakMeterConfiguration.COLOR_PALETTE_PEAK,
+                () => DefaultColors.GetValue(colors)
+            );
             return palettes.ToDictionary(
                 pair => pair.Key,
                 pair =>
@@ -260,6 +265,7 @@ namespace FoxTunes
                 {
                     UpdateElementsFast(data);
                 }
+                UpdatePeaks(data, this.UpdateInterval, 1000, data.Orientation);
                 data.LastUpdated = DateTime.UtcNow;
 
                 this.BeginUpdateData();
@@ -318,7 +324,8 @@ namespace FoxTunes
             return new PeakRenderInfo()
             {
                 Background = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND]),
-                Value = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_VALUE])
+                Value = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_VALUE]),
+                Peak = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_PEAK])
             };
         }
 
@@ -338,7 +345,14 @@ namespace FoxTunes
                 return;
             }
 
-            BitmapHelper.DrawRectangles(ref info.Value, data.Elements, data.Elements.Length);
+            if (data.PeakElements != null)
+            {
+                BitmapHelper.DrawRectangles(ref info.Peak, data.PeakElements, data.PeakElements.Length);
+            }
+            if (data.ValueElements != null)
+            {
+                BitmapHelper.DrawRectangles(ref info.Value, data.ValueElements, data.ValueElements.Length);
+            }
         }
 
         private static void UpdateValues(PeakRendererData data)
@@ -354,14 +368,37 @@ namespace FoxTunes
             }
         }
 
+        private static void UpdatePeaks(PeakRendererData data, int updateInterval, int holdInterval, Orientation orientation)
+        {
+            for (var a = 0; a < data.Peaks.Length; a++)
+            {
+                switch (orientation)
+                {
+                    case Orientation.Horizontal:
+                        data.Peaks[a] = data.ValueElements[a].Width;
+                        break;
+                    case Orientation.Vertical:
+                        data.Peaks[a] = data.ValueElements[a].Y;
+                        break;
+                }
+            }
+            var duration = Convert.ToInt32(
+                Math.Min(
+                    (DateTime.UtcNow - data.LastUpdated).TotalMilliseconds,
+                    updateInterval * 100
+                )
+            );
+            UpdateElementsSmooth(data.Peaks, data.PeakElements, data.Holds, data.Width, data.Height, MARGIN, holdInterval, duration, data.Orientation);
+        }
+
         private static void UpdateElementsFast(PeakRendererData data)
         {
-            UpdateElementsFast(data.Values, data.Elements, data.Width, data.Height, MARGIN, data.Orientation);
+            UpdateElementsFast(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, data.Orientation);
         }
 
         private static void UpdateElementsSmooth(PeakRendererData data)
         {
-            UpdateElementsSmooth(data.Values, data.Elements, data.Width, data.Height, MARGIN, data.Orientation);
+            UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, data.Orientation);
         }
 
         public static PeakRendererData Create(PeakRenderer renderer, int width, int height, int history, IDictionary<string, IntPtr> colors, Orientation orientation)
@@ -379,6 +416,18 @@ namespace FoxTunes
             };
             return data;
         }
+
+        private static Int32Rect[] CreatePeaks(int count)
+        {
+            var peaks = new Int32Rect[count];
+            for (var a = 0; a < count; a++)
+            {
+                peaks[a].X = int.MinValue;
+                peaks[a].Y = int.MaxValue;
+            }
+            return peaks;
+        }
+
         public class PeakRendererData : PCMVisualizationData
         {
             public PeakRendererData(int history)
@@ -403,14 +452,23 @@ namespace FoxTunes
 
             public float[] Values;
 
-            public Int32Rect[] Elements;
+            public Int32Rect[] ValueElements;
+
+            public Int32Rect[] PeakElements;
+
+            public int[] Peaks;
+
+            public int[] Holds;
 
             public DateTime LastUpdated;
 
             public override void OnAllocated()
             {
                 this.Values = new float[this.Channels];
-                this.Elements = new Int32Rect[this.Channels];
+                this.Peaks = new int[this.Channels];
+                this.Holds = new int[this.Channels];
+                this.ValueElements = new Int32Rect[this.Channels];
+                this.PeakElements = CreatePeaks(this.Channels);
                 base.OnAllocated();
             }
 
@@ -439,8 +497,6 @@ namespace FoxTunes
         public struct PeakRenderInfo
         {
             public BitmapHelper.RenderInfo Peak;
-
-            public BitmapHelper.RenderInfo Rms;
 
             public BitmapHelper.RenderInfo Value;
 
