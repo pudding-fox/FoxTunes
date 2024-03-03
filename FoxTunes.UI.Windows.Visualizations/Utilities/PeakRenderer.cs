@@ -135,7 +135,7 @@ namespace FoxTunes
             );
             palettes.GetOrAdd(
                 PeakMeterConfiguration.COLOR_PALETTE_PEAK,
-                () => DefaultColors.GetValue(colors)
+                () => DefaultColors.GetPeak(colors)
             );
             return palettes.ToDictionary(
                 pair => pair.Key,
@@ -513,60 +513,13 @@ namespace FoxTunes
                 };
             }
 
-            public static Color[] GetPeak(Color[] background, bool showRms, Color[] colors)
+            public static Color[] GetPeak(Color[] colors)
             {
-                var transparency = background.Length > 1 || background.FirstOrDefault().A != 255;
-                if (transparency)
+                var color = colors.FirstOrDefault();
+                return new[]
                 {
-                    if (showRms)
-                    {
-                        return colors.WithAlpha(-200);
-                    }
-                    else
-                    {
-                        return colors.WithAlpha(-100);
-                    }
-                }
-                else
-                {
-                    var color = background.FirstOrDefault();
-                    if (showRms)
-                    {
-                        return colors.Interpolate(color, 0.8f);
-                    }
-                    else
-                    {
-                        return colors.Interpolate(color, 0.4f);
-                    }
-                }
-            }
-
-            public static Color[] GetRms(Color[] background, bool showPeak, Color[] colors)
-            {
-                var transparency = background.Length > 1 || background.FirstOrDefault().A != 255;
-                if (transparency)
-                {
-                    if (showPeak)
-                    {
-                        return colors.WithAlpha(-100);
-                    }
-                    else
-                    {
-                        return colors.WithAlpha(-50);
-                    }
-                }
-                else
-                {
-                    var color = background.FirstOrDefault();
-                    if (showPeak)
-                    {
-                        return colors.Interpolate(color, 0.4f);
-                    }
-                    else
-                    {
-                        return colors.Interpolate(color, 0.2f);
-                    }
-                }
+                    color
+                };
             }
 
             public static Color[] GetValue(Color[] colors)
