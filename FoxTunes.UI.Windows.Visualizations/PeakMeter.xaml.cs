@@ -23,10 +23,6 @@ namespace FoxTunes
 
         public ThemeLoader ThemeLoader { get; private set; }
 
-        public BooleanConfigurationElement Peaks { get; private set; }
-
-        public BooleanConfigurationElement Rms { get; private set; }
-
         public TextConfigurationElement ColorPalette { get; private set; }
 
         public IntegerConfigurationElement Duration { get; private set; }
@@ -44,14 +40,6 @@ namespace FoxTunes
         {
             if (this.Configuration != null)
             {
-                this.Peaks = this.Configuration.GetElement<BooleanConfigurationElement>(
-                   PeakMeterConfiguration.SECTION,
-                   PeakMeterConfiguration.PEAKS
-               );
-                this.Rms = this.Configuration.GetElement<BooleanConfigurationElement>(
-                    PeakMeterConfiguration.SECTION,
-                    PeakMeterConfiguration.RMS
-                );
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     PeakMeterConfiguration.SECTION,
                     PeakMeterConfiguration.COLOR_PALETTE
@@ -114,18 +102,6 @@ namespace FoxTunes
                 }
                 yield return new InvocationComponent(
                     CATEGORY,
-                    this.Peaks.Id,
-                    this.Peaks.Name,
-                    attributes: this.Peaks.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
-                );
-                yield return new InvocationComponent(
-                    CATEGORY,
-                    this.Rms.Id,
-                    this.Rms.Name,
-                    attributes: this.Rms.Value ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
-                );
-                yield return new InvocationComponent(
-                    CATEGORY,
                     this.Duration.Id,
                     Strings.PeakMeterConfiguration_Duration_Low,
                     path: this.Duration.Name,
@@ -175,15 +151,7 @@ namespace FoxTunes
 
         public override Task InvokeAsync(IInvocationComponent component)
         {
-            if (string.Equals(component.Id, this.Peaks.Id, StringComparison.OrdinalIgnoreCase))
-            {
-                this.Peaks.Toggle();
-            }
-            else if (string.Equals(component.Id, this.Rms.Id, StringComparison.OrdinalIgnoreCase))
-            {
-                this.Rms.Toggle();
-            }
-            else if (this.ThemeLoader.SelectColorPalette(this.ColorPalette, component))
+            if (this.ThemeLoader.SelectColorPalette(this.ColorPalette, component))
             {
                 //Nothing to do.
             }

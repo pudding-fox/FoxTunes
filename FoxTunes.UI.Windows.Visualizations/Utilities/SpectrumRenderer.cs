@@ -339,15 +339,15 @@ namespace FoxTunes
         {
             var info = new SpectrumRenderInfo()
             {
-                Background = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND])
+                Background = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[SpectrumConfiguration.COLOR_PALETTE_BACKGROUND])
             };
             if (data.PeakElements != null)
             {
-                info.Peak = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_PEAK]);
+                info.Peak = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[SpectrumConfiguration.COLOR_PALETTE_PEAK]);
             }
             if (data.ValueElements != null)
             {
-                info.Value = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_VALUE]);
+                info.Value = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[SpectrumConfiguration.COLOR_PALETTE_VALUE]);
             }
             return info;
         }

@@ -46,10 +46,6 @@ namespace FoxTunes
 
         public PeakRendererData RendererData { get; private set; }
 
-        public BooleanConfigurationElement ShowPeaks { get; private set; }
-
-        public BooleanConfigurationElement ShowRms { get; private set; }
-
         public TextConfigurationElement ColorPalette { get; private set; }
 
         public IntegerConfigurationElement Duration { get; private set; }
@@ -86,14 +82,6 @@ namespace FoxTunes
         {
             if (this.Configuration != null)
             {
-                this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
-                   PeakMeterConfiguration.SECTION,
-                   PeakMeterConfiguration.PEAKS
-                );
-                this.ShowRms = this.Configuration.GetElement<BooleanConfigurationElement>(
-                    PeakMeterConfiguration.SECTION,
-                    PeakMeterConfiguration.RMS
-                );
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     PeakMeterConfiguration.SECTION,
                     PeakMeterConfiguration.COLOR_PALETTE
@@ -102,8 +90,6 @@ namespace FoxTunes
                     PeakMeterConfiguration.SECTION,
                     PeakMeterConfiguration.DURATION
                 );
-                this.ShowPeaks.ValueChanged += this.OnValueChanged;
-                this.ShowRms.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
                 this.Duration.ValueChanged += this.OnValueChanged;
                 var task = this.CreateBitmap();
@@ -126,16 +112,14 @@ namespace FoxTunes
                 this,
                 width,
                 height,
-                this.ShowPeaks.Value,
-                this.ShowRms.Value,
                 this.Duration.Value,
-                this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), this.ShowPeaks.Value, this.ShowRms.Value, this.Orientation),
+                this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), this.Orientation),
                 this.Orientation
             );
             return true;
         }
 
-        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, bool showPeak, bool showRms, Orientation orientation)
+        protected virtual IDictionary<string, IntPtr> GetColorPalettes(string value, Orientation orientation)
         {
             var flags = default(int);
             var palettes = PeakMeterConfiguration.GetColorPalette(value);
@@ -148,28 +132,6 @@ namespace FoxTunes
                 PeakMeterConfiguration.COLOR_PALETTE_VALUE,
                 () => DefaultColors.GetValue(new[] { this.ForegroundColor })
             );
-            if (showPeak)
-            {
-                palettes.GetOrAdd(
-                    PeakMeterConfiguration.COLOR_PALETTE_PEAK,
-                    () => DefaultColors.GetPeak(background, showRms, colors)
-                );
-            }
-            if (showRms)
-            {
-                palettes.GetOrAdd(
-                    PeakMeterConfiguration.COLOR_PALETTE_RMS,
-                    () => DefaultColors.GetRms(background, showPeak, colors)
-                );
-            }
-            if (showPeak || showRms)
-            {
-                colors = palettes[EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE];
-                if (!colors.Any(color => color.A != byte.MaxValue))
-                {
-                    palettes[EnhancedSpectrumConfiguration.COLOR_PALETTE_VALUE] = colors.WithAlpha(-50);
-                }
-            }
             return palettes.ToDictionary(
                 pair => pair.Key,
                 pair =>
@@ -217,7 +179,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    var palettes = this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), false, false, this.Orientation);
+                    var palettes = this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), this.Orientation);
                     info = BitmapHelper.CreateRenderInfo(bitmap, palettes[PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND]);
                 }
                 BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);
@@ -340,14 +302,6 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
-            if (this.ShowPeaks != null)
-            {
-                this.ShowPeaks.ValueChanged -= this.OnValueChanged;
-            }
-            if (this.ShowRms != null)
-            {
-                this.ShowRms.ValueChanged -= this.OnValueChanged;
-            }
             if (this.ColorPalette != null)
             {
                 this.ColorPalette.ValueChanged -= this.OnValueChanged;
@@ -361,23 +315,11 @@ namespace FoxTunes
 
         private static PeakRenderInfo GetRenderInfo(WriteableBitmap bitmap, PeakRendererData data)
         {
-            var info = new PeakRenderInfo()
+            return new PeakRenderInfo()
             {
-                Background = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND])
+                Background = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_BACKGROUND]),
+                Value = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_VALUE])
             };
-            if (data.PeakElements != null)
-            {
-                info.Peak = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_PEAK]);
-            }
-            if (data.RmsElements != null)
-            {
-                info.Rms = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_RMS]);
-            }
-            if (data.ValueElements != null)
-            {
-                info.Value = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[PeakMeterConfiguration.COLOR_PALETTE_VALUE]);
-            }
-            return info;
         }
 
         private static void Render(ref PeakRenderInfo info, PeakRendererData data)
@@ -396,81 +338,35 @@ namespace FoxTunes
                 return;
             }
 
-            if (data.PeakElements != null)
-            {
-                BitmapHelper.DrawRectangles(ref info.Peak, data.PeakElements, data.PeakElements.Length);
-            }
-            if (data.RmsElements != null)
-            {
-                BitmapHelper.DrawRectangles(ref info.Rms, data.RmsElements, data.RmsElements.Length);
-            }
-            if (data.ValueElements != null)
-            {
-                BitmapHelper.DrawRectangles(ref info.Value, data.ValueElements, data.ValueElements.Length);
-            }
+            BitmapHelper.DrawRectangles(ref info.Value, data.Elements, data.Elements.Length);
         }
 
         private static void UpdateValues(PeakRendererData data)
         {
             Array.Clear(data.Values, 0, data.Values.Length);
-            if (data.PeakValues != null)
-            {
-                Array.Clear(data.PeakValues, 0, data.PeakValues.Length);
-            }
-            if (data.RmsValues != null)
-            {
-                Array.Clear(data.RmsValues, 0, data.RmsValues.Length);
-            }
-
             for (var channel = 0; channel < data.Channels; channel++)
             {
                 for (var position = 0; position < data.SampleCount; position++)
                 {
-                    var value = Math.Min(Math.Max(Math.Abs(data.Data[channel, position]), 0.0f), 1.0f);
-                    data.Values[channel] = Math.Max(data.Values[channel], value);
-                    if (data.PeakValues != null)
-                    {
-                        value = Math.Min(Math.Max(Math.Abs(data.History.Peak[channel, position]), 0.0f), 1.0f);
-                        data.PeakValues[channel] = Math.Max(data.PeakValues[channel], value);
-                    }
-                    if (data.RmsValues != null)
-                    {
-                        value = Math.Min(Math.Max(Math.Abs(data.History.Rms[channel, position]), 0.0f), 1.0f);
-                        data.RmsValues[channel] = Math.Max(data.RmsValues[channel], value);
-                    }
+                    data.Values[channel] += data.History.Rms[channel, position];
                 }
+                data.Values[channel] = ToDecibelFixed(data.Values[channel] / data.SampleCount);
             }
         }
 
         private static void UpdateElementsFast(PeakRendererData data)
         {
-            UpdateElementsFast(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, data.Orientation);
-            if (data.PeakValues != null && data.PeakElements != null)
-            {
-                UpdateElementsFast(data.PeakValues, data.PeakElements, data.Width, data.Height, MARGIN, data.Orientation);
-            }
-            if (data.RmsValues != null && data.RmsElements != null)
-            {
-                UpdateElementsFast(data.RmsValues, data.RmsElements, data.Width, data.Height, MARGIN, data.Orientation);
-            }
+            UpdateElementsFast(data.Values, data.Elements, data.Width, data.Height, MARGIN, data.Orientation);
         }
 
         private static void UpdateElementsSmooth(PeakRendererData data)
         {
-            UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, data.Orientation);
-            if (data.PeakValues != null && data.PeakElements != null)
-            {
-                UpdateElementsSmooth(data.PeakValues, data.PeakElements, data.Width, data.Height, MARGIN, data.Orientation);
-            }
-            if (data.RmsValues != null && data.RmsElements != null)
-            {
-                UpdateElementsSmooth(data.RmsValues, data.RmsElements, data.Width, data.Height, MARGIN, data.Orientation);
-            }
+            UpdateElementsSmooth(data.Values, data.Elements, data.Width, data.Height, MARGIN, data.Orientation);
         }
 
-        public static PeakRendererData Create(PeakRenderer renderer, int width, int height, bool showPeak, bool showRms, int history, IDictionary<string, IntPtr> colors, Orientation orientation)
+        public static PeakRendererData Create(PeakRenderer renderer, int width, int height, int history, IDictionary<string, IntPtr> colors, Orientation orientation)
         {
-            var data = new PeakRendererData(history, showPeak, showRms)
+            var data = new PeakRendererData(history)
             {
                 Renderer = renderer,
                 Width = width,
@@ -485,21 +381,14 @@ namespace FoxTunes
         }
         public class PeakRendererData : PCMVisualizationData
         {
-            public PeakRendererData(int history, bool showPeak, bool showRms)
+            public PeakRendererData(int history)
             {
                 this.History = new VisualizationDataHistory()
                 {
                     Capacity = history,
                     Flags = VisualizationDataHistoryFlags.None
                 };
-                if (showPeak)
-                {
-                    this.History.Flags |= VisualizationDataHistoryFlags.Peak;
-                }
-                if (showRms)
-                {
-                    this.History.Flags |= VisualizationDataHistoryFlags.Rms;
-                }
+                this.History.Flags |= VisualizationDataHistoryFlags.Rms;
             }
 
             public PeakRenderer Renderer;
@@ -514,33 +403,14 @@ namespace FoxTunes
 
             public float[] Values;
 
-            public float[] PeakValues;
-
-            public float[] RmsValues;
-
-            public Int32Rect[] ValueElements;
-
-            public Int32Rect[] PeakElements;
-
-            public Int32Rect[] RmsElements;
+            public Int32Rect[] Elements;
 
             public DateTime LastUpdated;
 
             public override void OnAllocated()
             {
                 this.Values = new float[this.Channels];
-                this.ValueElements = new Int32Rect[this.Channels];
-
-                if (this.Renderer.ShowRms.Value)
-                {
-                    this.RmsValues = new float[this.Channels];
-                    this.RmsElements = new Int32Rect[this.Channels];
-                }
-                if (this.Renderer.ShowPeaks.Value)
-                {
-                    this.PeakValues = new float[this.Channels];
-                    this.PeakElements = new Int32Rect[this.Channels];
-                }
+                this.Elements = new Int32Rect[this.Channels];
                 base.OnAllocated();
             }
 
