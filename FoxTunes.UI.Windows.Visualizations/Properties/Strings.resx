@@ -198,6 +198,9 @@
   <data name="PeakMeterConfiguration.Duration.Medium" xml:space="preserve">
     <value>Medium</value>
   </data>
+  <data name="PeakMeterConfiguration.Hold" xml:space="preserve">
+    <value>Hold Duration</value>
+  </data>
   <data name="PeakMeterConfiguration.Peaks" xml:space="preserve">
     <value>Show Peaks</value>
   </data>

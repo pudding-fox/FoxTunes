@@ -304,6 +304,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hold Duration.
+        /// </summary>
+        internal static string PeakMeterConfiguration_Hold {
+            get {
+                return ResourceManager.GetString("PeakMeterConfiguration.Hold", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Peaks.
         /// </summary>
         internal static string PeakMeterConfiguration_Peaks {

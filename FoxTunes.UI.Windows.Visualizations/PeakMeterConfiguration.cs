@@ -10,6 +10,16 @@ namespace FoxTunes
     {
         public const string SECTION = VisualizationBehaviourConfiguration.SECTION;
 
+        public const string PEAKS_ELEMENT = "AAAA3C5D-D292-4CD2-B258-A7652DBC77C6";
+
+        public const string HOLD_ELEMENT = "BBBBD8E3-C38C-4B44-A080-DAE2E859D444";
+
+        public const int MIN_HOLD = 500;
+
+        public const int MAX_HOLD = 5000;
+
+        public const int DEFAULT_HOLD = 1000;
+
         public const string COLOR_PALETTE = "EEEE1493-AF31-4450-A39B-396014866DDF";
 
         public const string COLOR_PALETTE_PEAK = "PEAK";
@@ -29,6 +39,8 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.PeakMeterConfiguration_Section)
+                .WithElement(new BooleanConfigurationElement(PEAKS_ELEMENT, Strings.PeakMeterConfiguration_Peaks).WithValue(true))
+                .WithElement(new IntegerConfigurationElement(HOLD_ELEMENT, Strings.PeakMeterConfiguration_Hold, path: Strings.General_Advanced).WithValue(DEFAULT_HOLD).WithValidationRule(new IntegerValidationRule(MIN_HOLD, MAX_HOLD)).DependsOn(SECTION, PEAKS_ELEMENT))
                 .WithElement(new TextConfigurationElement(COLOR_PALETTE, Strings.PeakMeterConfiguration_ColorPalette, path: Strings.General_Advanced).WithValue(GetDefaultColorPalette()).WithFlags(ConfigurationElementFlags.MultiLine))
                 .WithElement(new IntegerConfigurationElement(DURATION, Strings.PeakMeterConfiguration_Duration).WithValue(DURATION_DEFAULT).WithValidationRule(new IntegerValidationRule(DURATION_MIN, DURATION_MAX)))
                 .WithElement(new IntegerConfigurationElement(VisualizationBehaviourConfiguration.INTERVAL_ELEMENT, Strings.VisualizationBehaviourConfiguration_Interval, path: Strings.General_Advanced).WithValue(VisualizationBehaviourConfiguration.DEFAULT_INTERVAL).WithValidationRule(new IntegerValidationRule(VisualizationBehaviourConfiguration.MIN_INTERVAL, VisualizationBehaviourConfiguration.MAX_INTERVAL))

@@ -47,6 +47,10 @@ namespace FoxTunes
 
         public PeakRendererData RendererData { get; private set; }
 
+        public BooleanConfigurationElement ShowPeaks { get; private set; }
+
+        public IntegerConfigurationElement HoldInterval { get; private set; }
+
         public TextConfigurationElement ColorPalette { get; private set; }
 
         public IntegerConfigurationElement Duration { get; private set; }
@@ -83,6 +87,14 @@ namespace FoxTunes
         {
             if (this.Configuration != null)
             {
+                this.ShowPeaks = this.Configuration.GetElement<BooleanConfigurationElement>(
+                    PeakMeterConfiguration.SECTION,
+                    PeakMeterConfiguration.PEAKS_ELEMENT
+                 );
+                this.HoldInterval = this.Configuration.GetElement<IntegerConfigurationElement>(
+                   PeakMeterConfiguration.SECTION,
+                   PeakMeterConfiguration.HOLD_ELEMENT
+                );
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     PeakMeterConfiguration.SECTION,
                     PeakMeterConfiguration.COLOR_PALETTE
@@ -90,7 +102,8 @@ namespace FoxTunes
                 this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
                     PeakMeterConfiguration.SECTION,
                     PeakMeterConfiguration.DURATION
-                );
+                ); 
+                this.ShowPeaks.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
                 this.Duration.ValueChanged += this.OnValueChanged;
                 var task = this.CreateBitmap();
@@ -110,9 +123,9 @@ namespace FoxTunes
                 return false;
             }
             this.RendererData = Create(
-                this,
                 width,
                 height,
+                this.ShowPeaks.Value,
                 this.Duration.Value,
                 this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), this.Orientation),
                 this.Orientation
@@ -265,7 +278,7 @@ namespace FoxTunes
                 {
                     UpdateElementsFast(data);
                 }
-                UpdatePeaks(data, this.UpdateInterval, 1000, data.Orientation);
+                UpdatePeaks(data, this.UpdateInterval, this.HoldInterval.Value, data.Orientation);
                 data.LastUpdated = DateTime.UtcNow;
 
                 this.BeginUpdateData();
@@ -308,6 +321,10 @@ namespace FoxTunes
 
         protected override void OnDisposing()
         {
+            if (this.ShowPeaks != null)
+            {
+                this.ShowPeaks.ValueChanged -= this.OnValueChanged;
+            }
             if (this.ColorPalette != null)
             {
                 this.ColorPalette.ValueChanged -= this.OnValueChanged;
@@ -401,13 +418,13 @@ namespace FoxTunes
             UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, data.Orientation);
         }
 
-        public static PeakRendererData Create(PeakRenderer renderer, int width, int height, int history, IDictionary<string, IntPtr> colors, Orientation orientation)
+        public static PeakRendererData Create(int width, int height, bool showPeaks, int history, IDictionary<string, IntPtr> colors, Orientation orientation)
         {
             var data = new PeakRendererData(history)
             {
-                Renderer = renderer,
                 Width = width,
                 Height = height,
+                ShowPeaks = showPeaks,
                 Colors = colors,
                 Orientation = orientation,
                 //TODO: This should be PeakRenderer.UpdateInterval I think.
@@ -440,11 +457,11 @@ namespace FoxTunes
                 this.History.Flags |= VisualizationDataHistoryFlags.Rms;
             }
 
-            public PeakRenderer Renderer;
-
             public int Width;
 
             public int Height;
+
+            public bool ShowPeaks;
 
             public IDictionary<string, IntPtr> Colors;
 
@@ -465,10 +482,13 @@ namespace FoxTunes
             public override void OnAllocated()
             {
                 this.Values = new float[this.Channels];
-                this.Peaks = new int[this.Channels];
-                this.Holds = new int[this.Channels];
                 this.ValueElements = new Int32Rect[this.Channels];
-                this.PeakElements = CreatePeaks(this.Channels);
+                if (this.ShowPeaks)
+                {
+                    this.Peaks = new int[this.Channels];
+                    this.Holds = new int[this.Channels];
+                    this.PeakElements = CreatePeaks(this.Channels);
+                }
                 base.OnAllocated();
             }
 
