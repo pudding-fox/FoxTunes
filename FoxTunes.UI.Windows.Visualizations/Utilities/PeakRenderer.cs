@@ -102,7 +102,7 @@ namespace FoxTunes
                 this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
                     PeakMeterConfiguration.SECTION,
                     PeakMeterConfiguration.DURATION
-                ); 
+                );
                 this.ShowPeaks.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
                 this.Duration.ValueChanged += this.OnValueChanged;
@@ -278,7 +278,10 @@ namespace FoxTunes
                 {
                     UpdateElementsFast(data);
                 }
-                UpdatePeaks(data, this.UpdateInterval, this.HoldInterval.Value, data.Orientation);
+                if (data.Peaks != null)
+                {
+                    UpdatePeaks(data, this.UpdateInterval, this.HoldInterval.Value, data.Orientation);
+                }
                 data.LastUpdated = DateTime.UtcNow;
 
                 this.BeginUpdateData();
@@ -374,14 +377,18 @@ namespace FoxTunes
 
         private static void UpdateValues(PeakRendererData data)
         {
-            Array.Clear(data.Values, 0, data.Values.Length);
+            const int MIN_FREQ = 5000;
+            const int MAX_FREQ = 10000;
+            var min = FrequencyToIndex(MIN_FREQ, data.FFTSize, data.Rate);
+            var max = FrequencyToIndex(MAX_FREQ, data.FFTSize, data.Rate);
             for (var channel = 0; channel < data.Channels; channel++)
             {
-                for (var position = 0; position < data.SampleCount; position++)
+                data.Values[channel] = 0;
+                for (var a = min; a < max; a++)
                 {
-                    data.Values[channel] += data.History.Rms[channel, position];
+                    data.Values[channel] = Math.Max(data.History.Peak[channel, a], data.Values[channel]);
                 }
-                data.Values[channel] = ToDecibelFixed(data.Values[channel] / data.SampleCount);
+                data.Values[channel] = ToDecibelFixed(data.Values[channel]);
             }
         }
 
@@ -445,16 +452,28 @@ namespace FoxTunes
             return peaks;
         }
 
-        public class PeakRendererData : PCMVisualizationData
+        public static int FrequencyToIndex(int frequency, int fftSize, int rate)
+        {
+            var index = (int)Math.Floor((double)fftSize * (double)frequency / (double)rate);
+            if (index > fftSize / 2 - 1)
+            {
+                index = fftSize / 2 - 1;
+            }
+            return index;
+        }
+
+        public class PeakRendererData : FFTVisualizationData
         {
             public PeakRendererData(int history)
             {
+                this.FFTSize = 256;
+                this.Flags = VisualizationDataFlags.Individual;
                 this.History = new VisualizationDataHistory()
                 {
                     Capacity = history,
                     Flags = VisualizationDataHistoryFlags.None
                 };
-                this.History.Flags |= VisualizationDataHistoryFlags.Rms;
+                this.History.Flags |= VisualizationDataHistoryFlags.Peak;
             }
 
             public int Width;
