@@ -30,11 +30,11 @@ namespace FoxTunes
 
         public const string DURATION = "FFFF6E54-7313-45D9-9E30-6D7205725365";
 
-        public const int DURATION_MIN = 16;
+        public const int DURATION_MIN = 4;
 
-        public const int DURATION_MAX = 64;
+        public const int DURATION_MAX = 16;
 
-        public const int DURATION_DEFAULT = 32;
+        public const int DURATION_DEFAULT = 8;
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
