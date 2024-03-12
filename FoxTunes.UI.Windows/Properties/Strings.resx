@@ -207,6 +207,9 @@
   <data name="LibraryActionsBehaviour.AppendPlaylist" xml:space="preserve">
     <value>Add To Playlist</value>
   </data>
+  <data name="LibraryActionsBehaviour.Folders" xml:space="preserve">
+    <value>Folders</value>
+  </data>
   <data name="LibraryActionsBehaviour.Library" xml:space="preserve">
     <value>Library</value>
   </data>

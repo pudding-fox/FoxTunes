@@ -15,6 +15,8 @@ namespace FoxTunes
 
         public const string RESCAN = "ZZAB";
 
+        public const string FOLDERS = "ZZAC";
+
         public const string SETTINGS = "ZZZZ";
 
         public ICore Core { get; private set; }
@@ -62,7 +64,8 @@ namespace FoxTunes
                 }
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, REBUILD, Strings.LibraryActionsBehaviour_Rebuild, path: Strings.LibraryActionsBehaviour_Library);
                 yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, RESCAN, Strings.LibraryActionsBehaviour_Rescan, path: Strings.LibraryActionsBehaviour_Library);
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, SETTINGS, Strings.LibraryActionsBehaviour_Settings, path: Strings.LibraryActionsBehaviour_Library, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, FOLDERS, Strings.LibraryActionsBehaviour_Folders, path: Strings.LibraryActionsBehaviour_Library, attributes: InvocationComponent.ATTRIBUTE_SEPARATOR);
+                yield return new InvocationComponent(InvocationComponent.CATEGORY_LIBRARY, SETTINGS, Strings.LibraryActionsBehaviour_Settings, path: Strings.LibraryActionsBehaviour_Library);
             }
         }
 
@@ -78,6 +81,8 @@ namespace FoxTunes
                     return this.Rebuild();
                 case RESCAN:
                     return this.Rescan();
+                case FOLDERS:
+                    return this.Folders();
                 case SETTINGS:
                     return this.Settings();
             }
@@ -114,6 +119,11 @@ namespace FoxTunes
         protected virtual Task Rescan()
         {
             return this.LibraryManager.Rescan(false);
+        }
+
+        protected virtual Task Folders()
+        {
+            return Windows.ShowDialog<LibraryRootsDialog>(this.Core, Strings.General_Settings);
         }
 
         protected virtual Task Settings()

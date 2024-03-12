@@ -331,6 +331,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Folders.
+        /// </summary>
+        internal static string LibraryActionsBehaviour_Folders {
+            get {
+                return ResourceManager.GetString("LibraryActionsBehaviour.Folders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Library.
         /// </summary>
         internal static string LibraryActionsBehaviour_Library {
