@@ -31,7 +31,6 @@ namespace FoxTunes
             {
                 this._Enabled = value;
                 Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
-                var task = this.Output.Shutdown();
             }
         }
 
@@ -68,10 +67,6 @@ namespace FoxTunes
 
         protected virtual void OnCreatingPipeline(object sender, CreatingPipelineEventArgs e)
         {
-            if (!this.Enabled)
-            {
-                return;
-            }
             if (!BassOutputTempoStreamComponent.ShouldCreate(this, e.Stream, e.Query))
             {
                 Logger.Write(this, LogLevel.Debug, "Cannot create component, the stream is not supported.");

@@ -452,16 +452,6 @@ namespace FoxTunes
             return peaks;
         }
 
-        public static int FrequencyToIndex(int frequency, int fftSize, int rate)
-        {
-            var index = (int)Math.Floor((double)fftSize * (double)frequency / (double)rate);
-            if (index > fftSize / 2 - 1)
-            {
-                index = fftSize / 2 - 1;
-            }
-            return index;
-        }
-
         public class PeakRendererData : FFTVisualizationData
         {
             public PeakRendererData(int history)
