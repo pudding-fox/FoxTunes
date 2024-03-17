@@ -456,6 +456,9 @@
   <data name="PlaylistsActionsBehaviour.Remove" xml:space="preserve">
     <value>Remove Playlist</value>
   </data>
+  <data name="PlaylistSearch.Name" xml:space="preserve">
+    <value>Playlist Search</value>
+  </data>
   <data name="PlaylistSelector.Name" xml:space="preserve">
     <value>Playlist Selector</value>
   </data>

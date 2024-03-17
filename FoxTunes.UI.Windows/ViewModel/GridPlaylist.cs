@@ -18,8 +18,6 @@ namespace FoxTunes.ViewModel
 
         public PlaylistGridViewColumnFactory GridViewColumnFactory { get; private set; }
 
-        public IFileActionHandlerManager FileActionHandlerManager { get; private set; }
-
         public IList SelectedItems
         {
             get
@@ -135,7 +133,6 @@ namespace FoxTunes.ViewModel
             this.PlaylistManager.SelectedItemsChanged += this.OnSelectedItemsChanged;
             this.PlaylistSortingBehaviour = ComponentRegistry.Instance.GetComponent<PlaylistSortingBehaviour>();
             this.GridViewColumnFactory = ComponentRegistry.Instance.GetComponent<PlaylistGridViewColumnFactory>();
-            this.FileActionHandlerManager = core.Managers.FileActionHandler;
         }
 
         protected virtual void OnSelectedItemsChanged(object sender, EventArgs e)

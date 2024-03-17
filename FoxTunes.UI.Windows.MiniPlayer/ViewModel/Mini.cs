@@ -13,6 +13,8 @@ namespace FoxTunes.ViewModel
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IFileActionHandlerManager FileActionHandlerManager { get; private set; }
+
         public IConfiguration Configuration { get; private set; }
 
         private BooleanConfigurationElement _Topmost { get; set; }
@@ -170,36 +172,38 @@ namespace FoxTunes.ViewModel
         {
             get
             {
-                return CommandFactory.Instance.CreateCommand<DragEventArgs>(
-                    new Func<DragEventArgs, Task>(this.OnDrop)
-                );
+                return CommandFactory.Instance.CreateCommand<DragEventArgs>(this.OnDrop);
             }
         }
 
-        protected virtual Task OnDrop(DragEventArgs e)
+        protected virtual void OnDrop(DragEventArgs e)
         {
+            if (e.OriginalSource is DependencyObject dependencyObject)
+            {
+                if (dependencyObject.FindAncestor<global::FoxTunes.MiniPlaylist>() != null)
+                {
+                    //Hack hack hack ... cannot find a way to "handle" this async event.
+                    //The action would be duplicated between us and MiniPlaylist.
+                    return;
+                }
+            }
             try
             {
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
                     var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
-                    return this.AddToPlaylist(paths);
+                    var task = this.AddToPlaylist(paths);
                 }
                 if (ShellIDListHelper.GetDataPresent(e.Data))
                 {
                     var paths = ShellIDListHelper.GetData(e.Data);
-                    return this.AddToPlaylist(paths);
+                    var task = this.AddToPlaylist(paths);
                 }
             }
             catch (Exception exception)
             {
                 Logger.Write(this, LogLevel.Warn, "Failed to process clipboard contents: {0}", exception.Message);
             }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
         }
 
         private async Task AddToPlaylist(IEnumerable<string> paths)
@@ -227,9 +231,11 @@ namespace FoxTunes.ViewModel
             }
             var playlist = this.GetPlaylist();
             var index = this.PlaylistBrowser.GetInsertIndex(playlist);
-#pragma warning disable 612, 618
-            await this.PlaylistManager.Add(playlist, paths, clear).ConfigureAwait(false);
-#pragma warning restore 612, 618
+            if (clear)
+            {
+                await this.PlaylistManager.Clear(playlist);
+            }
+            await this.FileActionHandlerManager.RunPaths(paths, index, FileActionType.Playlist).ConfigureAwait(false);
             if (play)
             {
                 await this.PlaylistManager.Play(playlist, index).ConfigureAwait(false);
@@ -249,6 +255,7 @@ namespace FoxTunes.ViewModel
         {
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.PlaylistManager = core.Managers.Playlist;
+            this.FileActionHandlerManager = core.Managers.FileActionHandler;
             this.Configuration = core.Components.Configuration;
             this.Topmost = this.Configuration.GetElement<BooleanConfigurationElement>(
               MiniPlayerBehaviourConfiguration.SECTION,

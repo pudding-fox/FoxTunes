@@ -43,6 +43,8 @@ namespace FoxTunes.ViewModel
 
         public IPlaylistManager PlaylistManager { get; private set; }
 
+        public IFileActionHandlerManager FileActionHandlerManager { get; private set; }
+
         public IErrorEmitter ErrorEmitter { get; private set; }
 
         private PlaylistItem[] _Items { get; set; }
@@ -177,6 +179,7 @@ namespace FoxTunes.ViewModel
             this.ScriptingRuntime = core.Components.ScriptingRuntime;
             this.PlaylistManager = core.Managers.Playlist;
             this.PlaybackManager = core.Managers.Playback;
+            this.FileActionHandlerManager = core.Managers.FileActionHandler;
             this.ErrorEmitter = core.Components.ErrorEmitter;
             //TODO: Bad .Wait().
             this.RefreshStatus().Wait();

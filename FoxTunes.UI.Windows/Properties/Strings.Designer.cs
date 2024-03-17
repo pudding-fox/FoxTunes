@@ -1078,6 +1078,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Playlist Search.
+        /// </summary>
+        internal static string PlaylistSearch_Name {
+            get {
+                return ResourceManager.GetString("PlaylistSearch.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Playlist Selector.
         /// </summary>
         internal static string PlaylistSelector_Name {
