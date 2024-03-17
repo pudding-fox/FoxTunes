@@ -209,6 +209,10 @@ namespace FoxTunes.ViewModel
                 {
                     effects = DragDropEffects.Copy;
                 }
+                if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
+                {
+                    effects = DragDropEffects.Copy;
+                }
                 if (ShellIDListHelper.GetDataPresent(e.Data))
                 {
                     effects = DragDropEffects.Copy;

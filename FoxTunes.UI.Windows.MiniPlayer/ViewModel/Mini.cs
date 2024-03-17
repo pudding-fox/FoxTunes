@@ -156,6 +156,10 @@ namespace FoxTunes.ViewModel
                 {
                     effects = DragDropEffects.Copy;
                 }
+                if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
+                {
+                    effects = DragDropEffects.Copy;
+                }
                 if (ShellIDListHelper.GetDataPresent(e.Data))
                 {
                     effects = DragDropEffects.Copy;
@@ -193,6 +197,11 @@ namespace FoxTunes.ViewModel
                 {
                     var paths = e.Data.GetData(DataFormats.FileDrop) as IEnumerable<string>;
                     var task = this.AddToPlaylist(paths);
+                }
+                if (e.Data.GetDataPresent(typeof(LibraryHierarchyNode)))
+                {
+                    var libraryHierarchyNode = e.Data.GetData(typeof(LibraryHierarchyNode)) as LibraryHierarchyNode;
+                    var task = this.AddToPlaylist(libraryHierarchyNode);
                 }
                 if (ShellIDListHelper.GetDataPresent(e.Data))
                 {
@@ -240,6 +249,20 @@ namespace FoxTunes.ViewModel
             {
                 await this.PlaylistManager.Play(playlist, index).ConfigureAwait(false);
             }
+        }
+
+        private Task AddToPlaylist(LibraryHierarchyNode libraryHierarchyNode)
+        {
+            var playlist = this.GetPlaylist();
+            if (playlist != null)
+            {
+                return this.PlaylistManager.Add(playlist, libraryHierarchyNode, false);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         public Playlist GetPlaylist()
