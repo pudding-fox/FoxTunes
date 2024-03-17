@@ -25,18 +25,33 @@ namespace FoxTunes.ViewModel
 
         public IConfiguration Configuration { get; private set; }
 
-        private PlaylistItem _SelectedItem { get; set; }
-
         public PlaylistItem SelectedItem
         {
             get
             {
-                return this._SelectedItem;
+                var playlistItems = this.PlaylistManager.SelectedItems;
+                if (playlistItems != null && playlistItems.Length > 0)
+                {
+                    return playlistItems[0];
+                }
+                else
+                {
+                    return null;
+                }
             }
             set
             {
-                this._SelectedItem = value;
-                this.OnSelectedItemChanged();
+                if (value != null)
+                {
+                    this.PlaylistManager.SelectedItems = new[]
+                    {
+                        value
+                    };
+                }
+                else
+                {
+                    this.PlaylistManager.SelectedItems = null;
+                }
             }
         }
 
@@ -91,7 +106,7 @@ namespace FoxTunes.ViewModel
             this.ScriptingContext = this.ScriptingRuntime.CreateContext();
             this.PlaylistManager.CurrentPlaylistChanged += this.OnCurrentPlaylistChanged;
             this.PlaylistManager.SelectedPlaylistChanged += this.OnSelectedPlaylistChanged;
-            this.PlaylistManager.CurrentItemChanged += this.OnCurrentItemChanged;
+            this.PlaylistManager.SelectedItemsChanged += this.OnSelectedItemsChanged;
             this.Configuration = core.Components.Configuration;
             this.Configuration.GetElement<TextConfigurationElement>(
                 MiniPlayerBehaviourConfiguration.SECTION,
@@ -109,10 +124,9 @@ namespace FoxTunes.ViewModel
             var task = this.RefreshIfRequired();
         }
 
-        protected virtual void OnCurrentItemChanged(object sender, EventArgs e)
+        protected virtual void OnSelectedItemsChanged(object sender, EventArgs e)
         {
-            //Critical: Don't block in this event handler, it causes a deadlock.
-            this.Dispatch(this.RefreshSelectedItem);
+            var task = Windows.Invoke(this.OnSelectedItemChanged);
         }
 
         protected virtual Task RefreshIfRequired()
@@ -133,31 +147,6 @@ namespace FoxTunes.ViewModel
         {
             this.CurrentPlaylist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
             await base.Refresh().ConfigureAwait(false);
-            await this.RefreshSelectedItem().ConfigureAwait(false);
-        }
-
-        public virtual Task RefreshSelectedItem()
-        {
-            if (this.PlaybackManager == null)
-            {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
-            }
-            var outputStream = this.PlaybackManager.CurrentStream;
-            return Windows.Invoke(() =>
-            {
-                if (outputStream != null)
-                {
-                    this.SelectedItem = outputStream.PlaylistItem;
-                }
-                else
-                {
-                    this.SelectedItem = null;
-                }
-            });
         }
 
         public ICommand PlaySelectedItemCommand
@@ -308,7 +297,7 @@ namespace FoxTunes.ViewModel
             {
                 this.PlaylistManager.CurrentPlaylistChanged -= this.OnCurrentPlaylistChanged;
                 this.PlaylistManager.SelectedPlaylistChanged -= this.OnSelectedPlaylistChanged;
-                this.PlaylistManager.CurrentItemChanged -= this.OnCurrentItemChanged;
+                this.PlaylistManager.SelectedItemsChanged -= this.OnSelectedItemsChanged;
             }
             if (this.ScriptingContext != null)
             {
