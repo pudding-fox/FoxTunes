@@ -619,11 +619,20 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Development.
+        ///   Looks up a localized string similar to Development 1.
         /// </summary>
         internal static string UIComponentLayoutProviderPresets_Main_5 {
             get {
                 return ResourceManager.GetString("UIComponentLayoutProviderPresets.Main.5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Development 2.
+        /// </summary>
+        internal static string UIComponentLayoutProviderPresets_Main_6 {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProviderPresets.Main.6", resourceCulture);
             }
         }
         

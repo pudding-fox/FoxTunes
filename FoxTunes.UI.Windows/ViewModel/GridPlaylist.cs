@@ -247,7 +247,7 @@ namespace FoxTunes.ViewModel
                         }
                         return this.PlaylistManager.Play(playlistItem);
                     },
-                    () => this.PlaylistManager != null && this.SelectedItems.Count > 0
+                    () => this.PlaylistManager != null && this.SelectedItems != null && this.SelectedItems.Count > 0
                 );
             }
         }

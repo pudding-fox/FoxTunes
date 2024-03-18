@@ -304,7 +304,10 @@
     <value>Default (With Visualizations + Properties)</value>
   </data>
   <data name="UIComponentLayoutProviderPresets.Main.5" xml:space="preserve">
-    <value>Development</value>
+    <value>Development 1</value>
+  </data>
+  <data name="UIComponentLayoutProviderPresets.Main.6" xml:space="preserve">
+    <value>Development 2</value>
   </data>
   <data name="UIComponentLayoutProviderPresets.Simple.1" xml:space="preserve">
     <value>Simple</value>

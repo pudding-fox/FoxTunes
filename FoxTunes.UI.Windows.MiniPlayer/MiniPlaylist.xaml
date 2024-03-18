@@ -10,7 +10,7 @@
              xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" IsVisibleChanged="OnIsVisibleChanged" AllowDrop="True">
+             d:DesignHeight="300" d:DesignWidth="300" AllowDrop="True">
     <UserControl.Resources>
         <LocalViewModel:MiniPlaylist x:Key="ViewModel"/>
     </UserControl.Resources>
@@ -34,11 +34,11 @@
                 Name="ListBox"
                 ItemsSource="{Binding Items, Source={StaticResource ViewModel}, IsAsync=True}" 
                 SelectedValue="{Binding SelectedItem, Source={StaticResource ViewModel}}" 
-                SelectionChanged="OnSelectionChanged" 
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                 Width="{Binding ActualWidth, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}}"
                 Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}}"
-                Background="Transparent">
+                Background="Transparent"
+                Windows:ListBoxExtensions.EnsureSelectedItemVisible="True">
                 <Interactivity:Interaction.Triggers>
                     <Interactivity:EventTrigger EventName="MouseDoubleClick">
                         <Interactivity:InvokeCommandAction Command="{Binding PlaySelectedItemCommand, Source={StaticResource ViewModel}}"/>
