@@ -16,9 +16,13 @@
         </UIComponentConfiguration>
         <UIComponentConfiguration Component="1155473E-FA29-4D31-8A28-4E4F5582261A" />
         <UIComponentConfiguration Component="18E98420-F039-4504-A116-3D0F26BEAAD5">
-          <UIComponentConfiguration Component="F8231616-9D5E-45C8-BD72-506FC5FC9C95" />
+          <UIComponentConfiguration Component="F8231616-9D5E-45C8-BD72-506FC5FC9C95">
+            <MetaDataEntry Name="Configuration_FFFF6E54-7313-45D9-9E30-6D7205725365" Value="4" />
+            <MetaDataEntry Name="Configuration_FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438" Value="5" />
+          </UIComponentConfiguration>
           <UIComponentConfiguration Component="9A696BBC-F6AB-4180-8661-353A79253AA9">
             <MetaDataEntry Name="Configuration_AABBF573-83D3-498E-BEF8-F1DB5A329B9D" Value="GGGG5E28-CC67-43F2-8778-61570785C766" />
+            <MetaDataEntry Name="Configuration_FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438" Value="5" />
           </UIComponentConfiguration>
           <MetaDataEntry Name="SplitterDistance" Value="0.3*" />
           <MetaDataEntry Name="Header" Value="Visualization 1" />
@@ -27,6 +31,7 @@
         <UIComponentConfiguration Component="18E98420-F039-4504-A116-3D0F26BEAAD5">
           <UIComponentConfiguration Component="9AB8D410-B94D-492E-BF00-022A3E77762D">
             <MetaDataEntry Name="Configuration_AAAA4D78-941A-42D3-A704-88E295D17324" Value="CCCC8D37-067D-4A43-8AE8-7AD000E3E176" />
+            <MetaDataEntry Name="Configuration_FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438" Value="5" />
           </UIComponentConfiguration>
           <UIComponentConfiguration Component="D3FBE95D-3B9E-4DAB-B3AD-B66A53AF5F85">
             <MetaDataEntry Name="Configuration_AAAAD149-F777-46CB-92C0-F479CEE72A91" Value="CCCCD496-E88A-4B42-8A89-75FFB9A1CD49" />
