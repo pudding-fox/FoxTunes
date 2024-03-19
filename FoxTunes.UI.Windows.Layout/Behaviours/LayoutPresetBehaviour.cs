@@ -106,7 +106,7 @@ namespace FoxTunes
             {
                 if (this.Enabled)
                 {
-                    foreach (var option in this.MainPreset.Options)
+                    foreach (var option in this.MainPreset.Options.OrderBy(option => option.Name))
                     {
                         var preset = UIComponentLayoutProviderPresets.Instance.GetPresetById(
                             option.Id,

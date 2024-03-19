@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace FoxTunes
@@ -11,7 +11,7 @@ namespace FoxTunes
         {
             this.Id = Guid.NewGuid();
             this.Component = UIComponent.None;
-            this.Children = new ObservableCollection<UIComponentConfiguration>();
+            this.Children = new List<UIComponentConfiguration>();
             this.MetaData = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
@@ -52,9 +52,9 @@ namespace FoxTunes
 
         public event EventHandler ComponentChanged;
 
-        private ObservableCollection<UIComponentConfiguration> _Children { get; set; }
+        private IList<UIComponentConfiguration> _Children { get; set; }
 
-        public ObservableCollection<UIComponentConfiguration> Children
+        public IList<UIComponentConfiguration> Children
         {
             get
             {

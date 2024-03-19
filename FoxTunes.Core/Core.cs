@@ -124,7 +124,6 @@ namespace FoxTunes
                 try
                 {
                     sections.AddRange(component.GetConfigurationSections());
-
                 }
                 catch (Exception e)
                 {

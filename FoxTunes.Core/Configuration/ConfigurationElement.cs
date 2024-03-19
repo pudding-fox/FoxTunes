@@ -1,11 +1,8 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Configuration;
 using System.Linq;
-using System.Xml.Linq;
 
 namespace FoxTunes
 {
@@ -122,9 +119,9 @@ namespace FoxTunes
             return this;
         }
 
-        private ObservableCollection<Dependency> _Dependencies;
+        private IList<Dependency> _Dependencies;
 
-        public ObservableCollection<Dependency> Dependencies
+        public IList<Dependency> Dependencies
         {
             get
             {
@@ -171,7 +168,7 @@ namespace FoxTunes
             {
                 if (this.ValidationRules == null)
                 {
-                    this.ValidationRules = new ObservableCollection<ValidationRule>(element.ValidationRules);
+                    this.ValidationRules = new List<ValidationRule>(element.ValidationRules);
                 }
                 else
                 {
@@ -183,7 +180,7 @@ namespace FoxTunes
             {
                 if (this.Dependencies == null)
                 {
-                    this.Dependencies = new ObservableCollection<Dependency>(element.Dependencies);
+                    this.Dependencies = new List<Dependency>(element.Dependencies);
                 }
                 else
                 {
@@ -220,7 +217,7 @@ namespace FoxTunes
         {
             if (this.Dependencies == null)
             {
-                this.Dependencies = new ObservableCollection<Dependency>();
+                this.Dependencies = new List<Dependency>();
             }
             this.Dependencies.Add(dependency);
             return this;

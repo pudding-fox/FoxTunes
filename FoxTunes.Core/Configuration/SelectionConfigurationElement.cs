@@ -11,10 +11,10 @@ namespace FoxTunes
         public SelectionConfigurationElement(string id, string name = null, string description = null, string path = null)
             : base(id, name, description, path)
         {
-            this.Options = new ObservableCollection<SelectionConfigurationOption>();
+            this.Options = new List<SelectionConfigurationOption>();
         }
 
-        public ObservableCollection<SelectionConfigurationOption> Options { get; set; }
+        public IList<SelectionConfigurationOption> Options { get; set; }
 
         private bool Contains(string id)
         {
