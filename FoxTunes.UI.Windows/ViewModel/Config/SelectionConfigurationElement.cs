@@ -68,7 +68,7 @@ namespace FoxTunes.ViewModel.Config
                 {
                     return Enumerable.Empty<SelectionConfigurationOption>();
                 }
-                return this.Element.Options.OrderBy(option => option.Name);
+                return this.Element.Options.OrderBy(option => option.Name, NumericFallbackComparer.Instance);
             }
         }
 

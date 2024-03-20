@@ -466,7 +466,7 @@ namespace FoxTunes
         {
             public PeakRendererData(int history)
             {
-                this.FFTSize = 256;
+                this.FFTSize = 512;
                 this.Flags = VisualizationDataFlags.Individual;
                 this.History = new VisualizationDataHistory()
                 {

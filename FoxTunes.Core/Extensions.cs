@@ -637,4 +637,26 @@ namespace FoxTunes
             }
         }
     }
+
+    public class NumericFallbackComparer : IComparer<string>
+    {
+        public int Compare(string x, string y)
+        {
+            var value1 = default(int);
+            var value2 = default(int);
+            if (int.TryParse(x, out value1) && int.TryParse(y, out value2))
+            {
+                return value1.CompareTo(value2);
+            }
+            return StringComparer.OrdinalIgnoreCase.Compare(x, y);
+        }
+
+        public static IComparer<string> Instance
+        {
+            get
+            {
+                return new NumericFallbackComparer();
+            }
+        }
+    }
 }
