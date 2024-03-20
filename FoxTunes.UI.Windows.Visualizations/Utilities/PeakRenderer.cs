@@ -55,6 +55,10 @@ namespace FoxTunes
 
         public IntegerConfigurationElement Duration { get; private set; }
 
+        public IntegerConfigurationElement MinFrequency { get; private set; }
+
+        public IntegerConfigurationElement MaxFrequency { get; private set; }
+
         public Orientation Orientation
         {
             get
@@ -102,6 +106,14 @@ namespace FoxTunes
                 this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
                     PeakMeterConfiguration.SECTION,
                     PeakMeterConfiguration.DURATION
+                );
+                this.MinFrequency = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    PeakMeterConfiguration.SECTION,
+                    PeakMeterConfiguration.MIN_FREQUENCY
+                );
+                this.MaxFrequency = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    PeakMeterConfiguration.SECTION,
+                    PeakMeterConfiguration.MAX_FREQUENCY
                 );
                 this.ShowPeaks.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
@@ -269,7 +281,7 @@ namespace FoxTunes
                     this.BeginUpdateData();
                     return;
                 }
-                UpdateValues(data);
+                UpdateValues(data, this.MinFrequency.Value, this.MaxFrequency.Value);
                 if (!data.LastUpdated.Equals(default(DateTime)))
                 {
                     UpdateElementsSmooth(data);
@@ -375,12 +387,10 @@ namespace FoxTunes
             }
         }
 
-        private static void UpdateValues(PeakRendererData data)
+        private static void UpdateValues(PeakRendererData data, int minFrequency, int maxFrequency)
         {
-            const int MIN_FREQ = 5000;
-            const int MAX_FREQ = 10000;
-            var min = FrequencyToIndex(MIN_FREQ, data.FFTSize, data.Rate);
-            var max = FrequencyToIndex(MAX_FREQ, data.FFTSize, data.Rate);
+            var min = FrequencyToIndex(minFrequency, data.FFTSize, data.Rate);
+            var max = FrequencyToIndex(maxFrequency, data.FFTSize, data.Rate);
             for (var channel = 0; channel < data.Channels; channel++)
             {
                 data.Values[channel] = 0;

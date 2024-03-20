@@ -201,6 +201,12 @@
   <data name="PeakMeterConfiguration.Hold" xml:space="preserve">
     <value>Hold Duration</value>
   </data>
+  <data name="PeakMeterConfiguration.MaxFrequency" xml:space="preserve">
+    <value>Max Frequency (Hz)</value>
+  </data>
+  <data name="PeakMeterConfiguration.MinFrequency" xml:space="preserve">
+    <value>Min Frequency (Hz)</value>
+  </data>
   <data name="PeakMeterConfiguration.Peaks" xml:space="preserve">
     <value>Show Peaks</value>
   </data>

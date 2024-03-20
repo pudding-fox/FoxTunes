@@ -313,6 +313,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Max Frequency (Hz).
+        /// </summary>
+        internal static string PeakMeterConfiguration_MaxFrequency {
+            get {
+                return ResourceManager.GetString("PeakMeterConfiguration.MaxFrequency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Min Frequency (Hz).
+        /// </summary>
+        internal static string PeakMeterConfiguration_MinFrequency {
+            get {
+                return ResourceManager.GetString("PeakMeterConfiguration.MinFrequency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Peaks.
         /// </summary>
         internal static string PeakMeterConfiguration_Peaks {
