@@ -475,6 +475,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Group Box.
+        /// </summary>
+        internal static string UIComponentGroupContainer_Name {
+            get {
+                return ResourceManager.GetString("UIComponentGroupContainer.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rename.
+        /// </summary>
+        internal static string UIComponentGroupContainer_Rename {
+            get {
+                return ResourceManager.GetString("UIComponentGroupContainer.Rename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Horizontal Grid.
         /// </summary>
         internal static string UIComponentHorizontalGridContainer_Name {

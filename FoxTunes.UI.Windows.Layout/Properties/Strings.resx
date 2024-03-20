@@ -255,6 +255,12 @@
   <data name="UIComponentGridContainer.Remove" xml:space="preserve">
     <value>Remove</value>
   </data>
+  <data name="UIComponentGroupContainer.Name" xml:space="preserve">
+    <value>Group Box</value>
+  </data>
+  <data name="UIComponentGroupContainer.Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
   <data name="UIComponentHorizontalGridContainer.Name" xml:space="preserve">
     <value>Horizontal Grid</value>
   </data>

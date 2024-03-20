@@ -20,6 +20,8 @@ namespace FoxTunes
 
         public const int NO_CHILDREN = 0;
 
+        public const int ONE_CHILD = 1;
+
         public const int UNLIMITED_CHILDREN = -1; 
     }
 
