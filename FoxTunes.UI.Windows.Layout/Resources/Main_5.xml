@@ -48,7 +48,11 @@
                 <MetaDataEntry Name="SplitterDirection" Value="Left" />
               </UIComponentConfiguration>
               <UIComponentConfiguration Component="3E899F79-380C-4EF7-8570-4B4E3B3467CB">
-                <UIComponentConfiguration Component="12023E31-CB53-4F9C-8A5B-A0593706F37E" />
+                <UIComponentConfiguration Component="3E899F79-380C-4EF7-8570-4B4E3B3467CB">
+                  <UIComponentConfiguration Component="12023E31-CB53-4F9C-8A5B-A0593706F37E" />
+                  <UIComponentConfiguration Component="381FD755-F0BA-4E96-A7A9-8992C9C27C56" />
+                  <MetaDataEntry Name="DockLocation" Value="Top" />
+                </UIComponentConfiguration>
                 <UIComponentConfiguration Component="868C483E-C23A-4960-A60F-B3AD9A4460C2" />
                 <MetaDataEntry Name="DockLocation" Value="Bottom" />
               </UIComponentConfiguration>
