@@ -53,11 +53,13 @@ namespace FoxTunes
 
         public TextConfigurationElement ColorPalette { get; private set; }
 
-        public IntegerConfigurationElement Duration { get; private set; }
-
         public IntegerConfigurationElement MinFrequency { get; private set; }
 
         public IntegerConfigurationElement MaxFrequency { get; private set; }
+
+        public IntegerConfigurationElement Duration { get; private set; }
+
+        public SelectionConfigurationElement FFTSize { get; private set; }
 
         public Orientation Orientation
         {
@@ -103,10 +105,6 @@ namespace FoxTunes
                     PeakMeterConfiguration.SECTION,
                     PeakMeterConfiguration.COLOR_PALETTE
                 );
-                this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
-                    PeakMeterConfiguration.SECTION,
-                    PeakMeterConfiguration.DURATION
-                );
                 this.MinFrequency = this.Configuration.GetElement<IntegerConfigurationElement>(
                     PeakMeterConfiguration.SECTION,
                     PeakMeterConfiguration.MIN_FREQUENCY
@@ -115,9 +113,18 @@ namespace FoxTunes
                     PeakMeterConfiguration.SECTION,
                     PeakMeterConfiguration.MAX_FREQUENCY
                 );
+                this.Duration = this.Configuration.GetElement<IntegerConfigurationElement>(
+                    PeakMeterConfiguration.SECTION,
+                    PeakMeterConfiguration.DURATION
+                );
+                this.FFTSize = this.Configuration.GetElement<SelectionConfigurationElement>(
+                   EnhancedSpectrumConfiguration.SECTION,
+                   VisualizationBehaviourConfiguration.FFT_SIZE_ELEMENT
+                );
                 this.ShowPeaks.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
                 this.Duration.ValueChanged += this.OnValueChanged;
+                this.FFTSize.ValueChanged += this.OnValueChanged;
                 var task = this.CreateBitmap();
             }
             base.OnConfigurationChanged();
@@ -137,6 +144,7 @@ namespace FoxTunes
             this.RendererData = Create(
                 width,
                 height,
+                VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
                 this.ShowPeaks.Value,
                 this.Duration.Value,
                 this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), this.Orientation),
@@ -391,14 +399,19 @@ namespace FoxTunes
         {
             var min = FrequencyToIndex(minFrequency, data.FFTSize, data.Rate);
             var max = FrequencyToIndex(maxFrequency, data.FFTSize, data.Rate);
+            var count = max - min;
+            if (count == 0)
+            {
+                return;
+            }
             for (var channel = 0; channel < data.Channels; channel++)
             {
                 data.Values[channel] = 0;
                 for (var a = min; a < max; a++)
                 {
-                    data.Values[channel] = Math.Max(data.History.Peak[channel, a], data.Values[channel]);
+                    data.Values[channel] += data.History.Peak[channel, a];
                 }
-                data.Values[channel] = ToDecibelFixed(data.Values[channel]);
+                data.Values[channel] = ToDecibelFixed(data.Values[channel] / count);
             }
         }
 
@@ -435,12 +448,13 @@ namespace FoxTunes
             UpdateElementsSmooth(data.Values, data.ValueElements, data.Width, data.Height, MARGIN, data.Orientation);
         }
 
-        public static PeakRendererData Create(int width, int height, bool showPeaks, int history, IDictionary<string, IntPtr> colors, Orientation orientation)
+        public static PeakRendererData Create(int width, int height, int fftSize, bool showPeaks, int history, IDictionary<string, IntPtr> colors, Orientation orientation)
         {
             var data = new PeakRendererData(history)
             {
                 Width = width,
                 Height = height,
+                FFTSize = fftSize,
                 ShowPeaks = showPeaks,
                 Colors = colors,
                 Orientation = orientation,
@@ -466,7 +480,6 @@ namespace FoxTunes
         {
             public PeakRendererData(int history)
             {
-                this.FFTSize = 512;
                 this.Flags = VisualizationDataFlags.Individual;
                 this.History = new VisualizationDataHistory()
                 {
