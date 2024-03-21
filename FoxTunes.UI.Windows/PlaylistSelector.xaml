@@ -15,20 +15,22 @@
         <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYLISTS}}"></Windows:Menu>
     </Windows:UIComponentBase.ContextMenu>
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <ListBox 
-            ItemsSource="{Binding Items.OrderedItemsSource, Source={StaticResource ViewModel}}"
-            SelectedItem="{Binding Items.SelectedValue, Source={StaticResource ViewModel}}"
-            DisplayMemberPath="Name"
-            Windows:ListBoxExtensions.DragDropReorder="True"
-            Windows:ListBoxExtensions.DragDropReorderCommand="{Binding Items.ExchangeCommand, Mode=OneWay, Source={StaticResource ViewModel}}">
-        </ListBox>
-        <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding AddPlaylistCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
-            <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding RemovePlaylistCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
-        </StackPanel>
+        <ComboBox Grid.Column="0" Grid.Row="0" ItemsSource="{Binding Items.OrderedItemsSource, Source={StaticResource ViewModel}}" SelectedValue="{Binding Items.SelectedValue, Source={StaticResource ViewModel}}" MinWidth="200">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"></TextBlock>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button Grid.Column="1" Grid.Row="0" Margin="2,0,0,0" Command="{Binding AddPlaylistCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="+" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"></Button>
+        <Button Grid.Column="2" Grid.Row="0" Margin="2,0,0,0" Command="{Binding RemovePlaylistCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Content="-" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"></Button>
     </Grid>
 </Windows:UIComponentBase>
