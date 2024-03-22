@@ -44,7 +44,7 @@ namespace FoxTunes
 
         public const int MIN_FREQUENCY_DEFAULT = 5000;
 
-        public const string MAX_FREQUENCY = "HHHHD915-611C-41A1-B4CB-36A118E5D222";
+        public const string MAX_FREQUENCY = "GGGG3915-611C-41A1-B4CB-36A118E5D222";
 
         public const int MAX_FREQUENCY_MIN = 0;
 
