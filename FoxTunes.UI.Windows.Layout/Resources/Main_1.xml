@@ -14,7 +14,10 @@
             <MetaDataEntry Name="DockLocation" Value="Top" />
             <MetaDataEntry Name="Collapse" Value="True" />
           </UIComponentConfiguration>
-          <UIComponentConfiguration Component="5D6C1128-B84F-4748-941D-C5DE341B6C49" />
+          <UIComponentConfiguration Component="D5407817-6EBB-4D79-870D-664CBEB2D069">
+            <UIComponentConfiguration Component="5D6C1128-B84F-4748-941D-C5DE341B6C49" />
+            <MetaDataEntry Name="Header" Value="Now Playing" />
+          </UIComponentConfiguration>
           <MetaDataEntry Name="DockLocation" Value="Bottom" />
           <MetaDataEntry Name="Collapse" Value="True" />
         </UIComponentConfiguration>
@@ -25,7 +28,10 @@
             <MetaDataEntry Name="SplitterDistance" Value="1*" />
             <MetaDataEntry Name="SplitterDirection" Value="Bottom" />
           </UIComponentConfiguration>
-          <UIComponentConfiguration Component="F7774E81-26FC-4F0C-8E0A-67214D155547" />
+          <UIComponentConfiguration Component="D5407817-6EBB-4D79-870D-664CBEB2D069">
+            <UIComponentConfiguration Component="F7774E81-26FC-4F0C-8E0A-67214D155547" />
+            <MetaDataEntry Name="Header" Value="Lyrics" />
+          </UIComponentConfiguration>
           <MetaDataEntry Name="SplitterDistance" Value="0.35*" />
           <MetaDataEntry Name="CollapseRight" Value="True" />
           <MetaDataEntry Name="SplitterDirection" Value="Right" />

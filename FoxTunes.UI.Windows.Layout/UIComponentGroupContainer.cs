@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace FoxTunes
 {
@@ -19,11 +20,25 @@ namespace FoxTunes
             this.EventHandlers = new Dictionary<UIComponentContainer, RoutedPropertyChangedEventHandler<UIComponentConfiguration>>();
             this.GroupBox = new GroupBox();
             this.Content = this.GroupBox;
+            this.CreateBindings();
         }
 
         public IDictionary<UIComponentContainer, RoutedPropertyChangedEventHandler<UIComponentConfiguration>> EventHandlers { get; private set; }
 
         public GroupBox GroupBox { get; private set; }
+
+        new protected virtual void CreateBindings()
+        {
+            this.SetBinding(
+                IsComponentEnabledProperty,
+                new Binding()
+                {
+                    Source = this.GroupBox,
+                    Path = new PropertyPath("Content.Content.IsComponentEnabled"),
+                    FallbackValue = true
+                }
+            );
+        }
 
         protected override void OnConfigurationChanged()
         {
