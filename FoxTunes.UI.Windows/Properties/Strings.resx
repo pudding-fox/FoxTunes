@@ -435,6 +435,12 @@
   <data name="PlaylistConfigDialog.MinRating" xml:space="preserve">
     <value>Min Rating</value>
   </data>
+  <data name="PlaylistGroupingBehaviourConfiguration.Enabled" xml:space="preserve">
+    <value>Grouping</value>
+  </data>
+  <data name="PlaylistGroupingBehaviourConfiguration.Script" xml:space="preserve">
+    <value>Grouping Script</value>
+  </data>
   <data name="PlaylistManager.Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>

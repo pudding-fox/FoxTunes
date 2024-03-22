@@ -35,6 +35,8 @@
                   Windows:ListViewExtensions.DropInsertValue="{Binding InsertItem, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.DragSource="True"
                   Windows:ListViewExtensions.DragSourceInitialized="DragSourceInitialized"
+                  Windows:ListViewExtensions.GroupStyle="{Binding GroupingEnabled, Source={StaticResource ViewModel}}"
+                  Windows:ListViewExtensions.GroupScript="{Binding GroupingScript, Source={StaticResource ViewModel}}"
                   Windows:ListViewExtensions.AutoSizeColumns="True"
                   Windows:ListViewExtensions.EnsureSelectedItemVisible="True"
                   VirtualizingStackPanel.IsVirtualizing="True"
@@ -67,6 +69,18 @@
                     </Windows:GridViewExtensions.ColumnHeaderContainerStyle>
                 </GridView>
             </ListView.View>
+            <Windows:ListViewExtensions.GroupHeaderTemplate>
+                <DataTemplate DataType="{x:Type CollectionViewGroup}">
+                    <Grid HorizontalAlignment="Stretch" Margin="4" IsHitTestVisible="True" Background="Transparent" MouseDown="OnGroupHeaderMouseDown">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Name}" Foreground="{DynamicResource TextBrush}" FontSize="16" Margin="0,-2,10,0"></TextBlock>
+                        <Separator Grid.Column="1"></Separator>
+                    </Grid>
+                </DataTemplate>
+            </Windows:ListViewExtensions.GroupHeaderTemplate>
         </ListView>
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding StatusMessage, Mode=OneWay, Source={StaticResource ViewModel}}" IsHitTestVisible="False" Foreground="{DynamicResource TextBrush}">
             <TextBlock.Style>

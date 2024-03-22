@@ -1015,6 +1015,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Grouping.
+        /// </summary>
+        internal static string PlaylistGroupingBehaviourConfiguration_Enabled {
+            get {
+                return ResourceManager.GetString("PlaylistGroupingBehaviourConfiguration.Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Grouping Script.
+        /// </summary>
+        internal static string PlaylistGroupingBehaviourConfiguration_Script {
+            get {
+                return ResourceManager.GetString("PlaylistGroupingBehaviourConfiguration.Script", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         internal static string PlaylistManager_Cancel {
