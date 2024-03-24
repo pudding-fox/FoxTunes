@@ -200,6 +200,7 @@ namespace FoxTunes
         None = 0,
         Selection = 1,
         Dynamic = 2,
-        Smart = 3
+        Smart = 3,
+        Everything = 4
     }
 }

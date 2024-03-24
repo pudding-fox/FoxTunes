@@ -521,6 +521,9 @@ namespace FoxTunes
                 case PlaylistType.Smart:
                     behaviour = ComponentRegistry.Instance.GetComponent<SmartPlaylistBehaviour>();
                     break;
+                case PlaylistType.Everything:
+                    behaviour = ComponentRegistry.Instance.GetComponent<EverythingPlaylistBehaviour>();
+                    break;
             }
             if (behaviour != null)
             {
