@@ -106,11 +106,29 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open SACD.
+        /// </summary>
+        internal static string BassSacdBehaviour_Open {
+            get {
+                return ResourceManager.GetString("BassSacdBehaviour.Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Creating memory stream.
         /// </summary>
         internal static string LoadingTask_Name {
             get {
                 return ResourceManager.GetString("LoadingTask.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reading image.
+        /// </summary>
+        internal static string SacdItemFactory_Name {
+            get {
+                return ResourceManager.GetString("SacdItemFactory.Name", resourceCulture);
             }
         }
     }

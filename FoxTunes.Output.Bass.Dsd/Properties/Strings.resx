@@ -132,7 +132,13 @@
   <data name="BassDsdMemoryStreamComponent.Name" xml:space="preserve">
     <value>Memory</value>
   </data>
+  <data name="BassSacdBehaviour.Open" xml:space="preserve">
+    <value>Open SACD</value>
+  </data>
   <data name="LoadingTask.Name" xml:space="preserve">
     <value>Creating memory stream</value>
+  </data>
+  <data name="SacdItemFactory.Name" xml:space="preserve">
+    <value>Reading image</value>
   </data>
 </root>

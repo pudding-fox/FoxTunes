@@ -17,12 +17,18 @@
 		<Reference Include="ManagedBass.Dsd" Condition="'$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'net48'">
 			<HintPath>..\lib\net462\ManagedBass.Dsd.dll</HintPath>
 		</Reference>
+    <Reference Include="SacdSharp" Condition="'$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'net48'">
+      <HintPath>..\lib\net462\SacdSharp.dll</HintPath>
+    </Reference>
 	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="..\lib\x86\bassdsd.dll" Link="x86\Addon\bassdsd.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+    <None Include="..\lib\x86\sacd_extract.exe" Link="x86\sacd_extract.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -58,6 +64,15 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>Strings.resx</DependentUpon>
 		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Decoders\sacd_extract.exe">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Decoders\sacd_extract.txt">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>
