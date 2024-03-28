@@ -135,6 +135,24 @@
   <data name="BassSacdBehaviour.Open" xml:space="preserve">
     <value>Open SACD</value>
   </data>
+  <data name="BassSacdBehaviourConfiguration.Area" xml:space="preserve">
+    <value>Area</value>
+  </data>
+  <data name="BassSacdBehaviourConfiguration.Area.MultiChannel" xml:space="preserve">
+    <value>Multi Channel</value>
+  </data>
+  <data name="BassSacdBehaviourConfiguration.Area.Stereo" xml:space="preserve">
+    <value>Stereo</value>
+  </data>
+  <data name="BassSacdBehaviourConfiguration.Cleanup" xml:space="preserve">
+    <value>Cleanup Temp FIles</value>
+  </data>
+  <data name="BassSacdBehaviourConfiguration.Enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="BassSacdBehaviourConfiguration.Section" xml:space="preserve">
+    <value>SACD</value>
+  </data>
   <data name="LoadingTask.Name" xml:space="preserve">
     <value>Creating memory stream</value>
   </data>

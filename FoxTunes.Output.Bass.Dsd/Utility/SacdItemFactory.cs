@@ -14,16 +14,27 @@ namespace FoxTunes
 
         const string FILE_SUFFIX = ".dsf";
 
-        public SacdItemFactory(bool reportProgress) : base(reportProgress)
+        public SacdItemFactory(BackgroundTask task) : base(task.Visible)
         {
-
+            this.Task = task;
         }
 
+        public BackgroundTask Task { get; private set; }
+
         public IMetaDataSourceFactory MetaDataSourceFactory { get; private set; }
+
+        public IConfiguration Configuration { get; private set; }
+
+        public SelectionConfigurationElement Area { get; private set; }
 
         public override void InitializeComponent(ICore core)
         {
             this.MetaDataSourceFactory = core.Factories.MetaDataSource;
+            this.Configuration = core.Components.Configuration;
+            this.Area = this.Configuration.GetElement<SelectionConfigurationElement>(
+                BassSacdBehaviourConfiguration.SECTION,
+                BassSacdBehaviourConfiguration.AREA
+            );
             base.InitializeComponent(core);
         }
 
@@ -41,9 +52,27 @@ namespace FoxTunes
                 sacd.InitialiseComponent();
                 foreach (var area in sacd.Areas)
                 {
+                    var areaDescription = default(string);
+                    if (area.Info.TryGetValue(global::SacdSharp.Constants.AREA_DESCRIPTION, out areaDescription))
+                    {
+                        var stereo = string.Equals(areaDescription, global::SacdSharp.Constants.STEREO, StringComparison.OrdinalIgnoreCase);
+                        if (this.Area.Value.Id == BassSacdBehaviourConfiguration.AREA_STEREO && !stereo)
+                        {
+                            continue;
+                        }
+                        else if (this.Area.Value.Id == BassSacdBehaviourConfiguration.AREA_MULTI_CHANNEL && stereo)
+                        {
+                            continue;
+                        }
+                    }
+                    this.Count = area.Tracks.Count * 100;
                     foreach (var track in area.Tracks)
                     {
                         await this.Create(sacd, area, track, path, items).ConfigureAwait(false);
+                        if (this.Task.IsCancellationRequested)
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -62,38 +91,43 @@ namespace FoxTunes
                 }
                 this.Description = title;
             }
-            var fileName = default(string);
             var directoryName = Path.GetTempPath();
             var extractor = SacdFactory.Instance.Create(sacd, area, track);
-            if (!extractor.IsExtracted(directoryName, out fileName))
+            extractor.Progress += (sender, e) =>
             {
-                if (!extractor.Extract(directoryName, out fileName))
+                this.Position = (area.Tracks.IndexOf(track) * 100) + e.Value;
+                if (this.Task.IsCancellationRequested)
                 {
-                    return;
+                    extractor.Cancel();
                 }
+            };
+            var inputFileName = extractor.GetFileName(directoryName);
+            var outputFileName = Path.Combine(
+               directoryName,
+               string.Concat(FILE_PREFIX, Math.Abs(inputFileName.GetHashCode()), FILE_SUFFIX)
+           );
+            if (!File.Exists(outputFileName))
+            {
+                if (!File.Exists(inputFileName))
+                {
+                    if (!extractor.Extract(directoryName, out inputFileName))
+                    {
+                        return;
+                    }
+                }
+                File.Move(inputFileName, outputFileName);
             }
-            fileName = this.Import(fileName);
             var item = new T()
             {
                 DirectoryName = path,
-                FileName = fileName
+                FileName = outputFileName
             };
             item.MetaDatas = (
-                await metaDataSource.GetMetaData(fileName).ConfigureAwait(false)
+                await metaDataSource.GetMetaData(outputFileName).ConfigureAwait(false)
             ).ToList();
-            this.EnsureMetaData(fileName, sacd, area, track, item);
+            this.EnsureMetaData(outputFileName, sacd, area, track, item);
             items.Add(item);
-        }
-
-        protected virtual string Import(string fileName)
-        {
-            var name = string.Concat(FILE_PREFIX, Math.Abs(fileName.GetHashCode()), FILE_SUFFIX);
-            var temp = Path.Combine(Path.GetTempPath(), name);
-            if (!File.Exists(temp))
-            {
-                File.Move(fileName, temp);
-            }
-            return temp;
+            this.Position = (area.Tracks.IndexOf(track) + 1) * 100;
         }
 
         protected virtual void EnsureMetaData(string path, Sacd sacd, SacdArea area, SacdTrack track, T item)
@@ -132,6 +166,23 @@ namespace FoxTunes
             {
                 Value = path
             });
+        }
+
+        public static void Cleanup()
+        {
+            var directoryName = Path.GetTempPath();
+            var fileNames = Directory.GetFiles(directoryName, string.Concat(FILE_PREFIX, "*", FILE_SUFFIX));
+            foreach (var fileName in fileNames)
+            {
+                try
+                {
+                    File.Delete(fileName);
+                }
+                catch
+                {
+                    //Nothing can be done.
+                }
+            }
         }
     }
 }

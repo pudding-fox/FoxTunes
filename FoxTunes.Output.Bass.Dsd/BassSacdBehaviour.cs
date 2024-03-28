@@ -1,12 +1,14 @@
 ﻿using FoxDb;
 using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassSacdBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
+    public class BassSacdBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent, IFileActionHandler
     {
         public const string ISO = ".iso";
 
@@ -22,6 +24,10 @@ namespace FoxTunes
 
         public IBackgroundTaskEmitter BackgroundTaskEmitter { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public BooleanConfigurationElement Enabled { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Core = core;
@@ -29,6 +35,11 @@ namespace FoxTunes
             this.PlaylistBrowser = core.Components.PlaylistBrowser;
             this.FileSystemBrowser = core.Components.FileSystemBrowser;
             this.BackgroundTaskEmitter = core.Components.BackgroundTaskEmitter;
+            this.Configuration = core.Components.Configuration;
+            this.Enabled = this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassSacdBehaviourConfiguration.SECTION,
+                BassSacdBehaviourConfiguration.ENABLED
+            );
             base.InitializeComponent(core);
         }
 
@@ -44,7 +55,10 @@ namespace FoxTunes
         {
             get
             {
-                yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_SACD, Strings.BassSacdBehaviour_Open);
+                if (this.Enabled.Value)
+                {
+                    yield return new InvocationComponent(InvocationComponent.CATEGORY_PLAYLIST, OPEN_SACD, Strings.BassSacdBehaviour_Open);
+                }
             }
         }
 
@@ -54,6 +68,55 @@ namespace FoxTunes
             {
                 case OPEN_SACD:
                     return this.OpenSacd();
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
+        public bool CanHandle(string path, FileActionType type)
+        {
+            if (!this.Enabled.Value)
+            {
+                return false;
+            }
+            if (type != FileActionType.Playlist && type != FileActionType.Library)
+            {
+                return false;
+            }
+            if (!File.Exists(path) || !string.Equals(path.GetExtension(), "iso", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public Task Handle(IEnumerable<string> paths, FileActionType type)
+        {
+            switch (type)
+            {
+                case FileActionType.Playlist:
+                    var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+                    return this.AddSacdToPlaylist(playlist, paths);
+                case FileActionType.Library:
+                    return this.AddSacdToLibrary(paths);
+            }
+#if NET40
+            return TaskEx.FromResult(false);
+#else
+            return Task.CompletedTask;
+#endif
+        }
+
+        public Task Handle(IEnumerable<string> paths, int index, FileActionType type)
+        {
+            switch (type)
+            {
+                case FileActionType.Playlist:
+                    var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+                    return this.AddSacdToPlaylist(playlist, index, paths);
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -86,6 +149,11 @@ namespace FoxTunes
 #endif
             }
             return this.AddSacdToPlaylist(this.PlaylistManager.SelectedPlaylist, result.Paths);
+        }
+
+        public Task AddSacdToLibrary(IEnumerable<string> paths)
+        {
+            throw new NotImplementedException();
         }
 
         public Task AddSacdToPlaylist(Playlist playlist, IEnumerable<string> paths)
@@ -125,6 +193,14 @@ namespace FoxTunes
                 }
             }
 
+            public override bool Cancellable
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
             public IEnumerable<string> Paths { get; private set; }
 
             public bool Clear { get; private set; }
@@ -133,7 +209,7 @@ namespace FoxTunes
 
             public override void InitializeComponent(ICore core)
             {
-                this.Factory = new SacdPlaylistItemFactory(this.Visible);
+                this.Factory = new SacdPlaylistItemFactory(this);
                 this.Factory.InitializeComponent(core);
                 base.InitializeComponent(core);
             }

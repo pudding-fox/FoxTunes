@@ -115,6 +115,60 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Area.
+        /// </summary>
+        internal static string BassSacdBehaviourConfiguration_Area {
+            get {
+                return ResourceManager.GetString("BassSacdBehaviourConfiguration.Area", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multi Channel.
+        /// </summary>
+        internal static string BassSacdBehaviourConfiguration_Area_MultiChannel {
+            get {
+                return ResourceManager.GetString("BassSacdBehaviourConfiguration.Area.MultiChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stereo.
+        /// </summary>
+        internal static string BassSacdBehaviourConfiguration_Area_Stereo {
+            get {
+                return ResourceManager.GetString("BassSacdBehaviourConfiguration.Area.Stereo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cleanup Temp FIles.
+        /// </summary>
+        internal static string BassSacdBehaviourConfiguration_Cleanup {
+            get {
+                return ResourceManager.GetString("BassSacdBehaviourConfiguration.Cleanup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        internal static string BassSacdBehaviourConfiguration_Enabled {
+            get {
+                return ResourceManager.GetString("BassSacdBehaviourConfiguration.Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SACD.
+        /// </summary>
+        internal static string BassSacdBehaviourConfiguration_Section {
+            get {
+                return ResourceManager.GetString("BassSacdBehaviourConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Creating memory stream.
         /// </summary>
         internal static string LoadingTask_Name {

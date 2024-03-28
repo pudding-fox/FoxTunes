@@ -1,10 +1,8 @@
-﻿using System.IO;
-
-namespace FoxTunes
+﻿namespace FoxTunes
 {
     public class SacdPlaylistItemFactory : SacdItemFactory<PlaylistItem>
     {
-        public SacdPlaylistItemFactory(bool reportProgress) : base(reportProgress)
+        public SacdPlaylistItemFactory(BackgroundTask task) : base(task)
         {
 
         }
