@@ -434,8 +434,10 @@ namespace FoxTunes
                         "x64/addon/bassdsd.dll",
                         "FoxTunes.Output.Bass.Dsd.dll",
                         "ManagedBass.Dsd.dll",
+                        "SacdSharp.dll",
                         new PackageElement("x86/bass_memory_dsd.dll", "x86/addon"),
-                        new PackageElement("x64/bass_memory_dsd.dll", "x64/addon")
+                        new PackageElement("x64/bass_memory_dsd.dll", "x64/addon"),
+                        "x86/sacd_extract.exe"
                     },
                     PackageFlags.Default
                 ),
