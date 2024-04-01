@@ -91,7 +91,7 @@ namespace FoxTunes
 
         protected virtual async void OnValueChanged(object sender, EventArgs e)
         {
-            if (object.ReferenceEquals(sender, this.Bands))
+            if (object.ReferenceEquals(sender, this.Bands) || object.ReferenceEquals(sender, this.Custom))
             {
                 //Changing bands requires full refresh.
                 if (await this.CreateBitmap().ConfigureAwait(false))
