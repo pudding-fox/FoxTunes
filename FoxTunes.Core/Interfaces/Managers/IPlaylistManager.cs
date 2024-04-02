@@ -49,6 +49,8 @@ namespace FoxTunes.Interfaces
 
         Task Next();
 
+        Task Next(bool wrap);
+
         Task Previous();
 
         Task Clear(Playlist playlist);

@@ -26,13 +26,13 @@ namespace FoxTunes.Interfaces
 
         PlaylistItem GetLastItem(Playlist playlist);
 
-        PlaylistItem GetNextItem(Playlist playlist);
+        PlaylistItem GetNextItem(Playlist playlist, bool wrap);
 
-        PlaylistItem GetNextItem(PlaylistItem playlistItem);
+        PlaylistItem GetNextItem(PlaylistItem playlistItem, bool wrap);
 
-        PlaylistItem GetPreviousItem(Playlist playlist);
+        PlaylistItem GetPreviousItem(Playlist playlist, bool wrap);
 
-        PlaylistItem GetPreviousItem(PlaylistItem playlistItem);
+        PlaylistItem GetPreviousItem(PlaylistItem playlistItem, bool wrap);
 
         int GetInsertIndex(Playlist playlist);
     }

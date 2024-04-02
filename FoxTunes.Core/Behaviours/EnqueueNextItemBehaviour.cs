@@ -29,6 +29,8 @@ namespace FoxTunes
 
         public IntegerConfigurationElement Count { get; private set; }
 
+        public BooleanConfigurationElement Wrap { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
@@ -38,8 +40,12 @@ namespace FoxTunes
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.Configuration = core.Components.Configuration;
             this.Count = this.Configuration.GetElement<IntegerConfigurationElement>(
-                PlaybackBehaviourConfiguration.SECTION,
+                EnqueueNextItemBehaviourConfiguration.SECTION,
                 EnqueueNextItemBehaviourConfiguration.COUNT
+            );
+            this.Wrap = this.Configuration.GetElement<BooleanConfigurationElement>(
+                EnqueueNextItemBehaviourConfiguration.SECTION,
+                EnqueueNextItemBehaviourConfiguration.WRAP
             );
             base.InitializeComponent(core);
         }
@@ -65,7 +71,7 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Debug, "Output was stopped, cancelling.");
                     break;
                 }
-                playlistItem = this.PlaylistBrowser.GetNextItem(playlistItem);
+                playlistItem = this.PlaylistBrowser.GetNextItem(playlistItem, this.Wrap.Value);
                 if (playlistItem == null)
                 {
                     return;

@@ -70,6 +70,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Continuous.
+        /// </summary>
+        internal static string EnqueueNextItemBehaviourConfiguration_Wrap {
+            get {
+                return ResourceManager.GetString("EnqueueNextItemBehaviourConfiguration.Wrap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select Playlist.
         /// </summary>
         internal static string ExternalPlaylistBehaviour_Browse_Title {

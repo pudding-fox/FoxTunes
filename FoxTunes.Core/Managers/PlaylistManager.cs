@@ -408,7 +408,12 @@ namespace FoxTunes
             }
         }
 
-        public async Task Next()
+        public Task Next()
+        {
+            return this.Next(true);
+        }
+
+        public async Task Next(bool wrap)
         {
             if (this.SelectedPlaylist == null)
             {
@@ -424,13 +429,17 @@ namespace FoxTunes
             try
             {
                 this.IsNavigating = true;
-                var playlistItem = this.PlaylistBrowser.GetNextItem(this.CurrentPlaylist);
+                var playlistItem = this.PlaylistBrowser.GetNextItem(this.CurrentPlaylist, wrap);
                 if (playlistItem == null)
                 {
-                    return;
+                    Logger.Write(this, LogLevel.Debug, "Playlist ended, stopping.");
+                    await this.PlaybackManager.Stop();
                 }
-                Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
-                await this.Play(playlistItem).ConfigureAwait(false);
+                else
+                {
+                    Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
+                    await this.Play(playlistItem).ConfigureAwait(false);
+                }
             }
             finally
             {
@@ -454,7 +463,7 @@ namespace FoxTunes
             try
             {
                 this.IsNavigating = true;
-                var playlistItem = this.PlaylistBrowser.GetPreviousItem(this.CurrentPlaylist);
+                var playlistItem = this.PlaylistBrowser.GetPreviousItem(this.CurrentPlaylist, true);
                 if (playlistItem == null)
                 {
                     return;

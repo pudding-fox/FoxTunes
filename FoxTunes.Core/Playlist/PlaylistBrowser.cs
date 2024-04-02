@@ -223,24 +223,24 @@ namespace FoxTunes
             return this.GetItems(playlist).LastOrDefault();
         }
 
-        public PlaylistItem GetNextItem(Playlist playlist)
+        public PlaylistItem GetNextItem(Playlist playlist, bool wrap)
         {
-            return this.NavigationStrategy.GetNext(this.PlaylistManager.CurrentItem);
+            return this.NavigationStrategy.GetNext(this.PlaylistManager.CurrentItem, wrap);
         }
 
-        public PlaylistItem GetNextItem(PlaylistItem playlistItem)
+        public PlaylistItem GetNextItem(PlaylistItem playlistItem, bool wrap)
         {
-            return this.NavigationStrategy.GetNext(playlistItem);
+            return this.NavigationStrategy.GetNext(playlistItem, wrap);
         }
 
-        public PlaylistItem GetPreviousItem(Playlist playlist)
+        public PlaylistItem GetPreviousItem(Playlist playlist, bool wrap)
         {
-            return this.NavigationStrategy.GetPrevious(this.PlaylistManager.CurrentItem);
+            return this.NavigationStrategy.GetPrevious(this.PlaylistManager.CurrentItem, wrap);
         }
 
-        public PlaylistItem GetPreviousItem(PlaylistItem playlistItem)
+        public PlaylistItem GetPreviousItem(PlaylistItem playlistItem, bool wrap)
         {
-            return this.NavigationStrategy.GetPrevious(playlistItem);
+            return this.NavigationStrategy.GetPrevious(playlistItem, wrap);
         }
 
         public int GetInsertIndex(Playlist playlist)

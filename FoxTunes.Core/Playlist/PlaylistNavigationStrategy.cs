@@ -30,7 +30,7 @@ namespace FoxTunes
             return this.PlaylistBrowser.GetPlaylist(playlistItem) ?? this.PlaylistManager.SelectedPlaylist;
         }
 
-        public PlaylistItem GetNext(PlaylistItem playlistItem)
+        public PlaylistItem GetNext(PlaylistItem playlistItem, bool wrap)
         {
             var playlist = this.GetPlaylist(playlistItem);
             if (playlist == null)
@@ -39,23 +39,22 @@ namespace FoxTunes
             }
             return
                 this.PlaylistQueue.GetNext(playlistItem) ??
-                this.GetNext(playlist, playlistItem);
+                this.GetNext(playlist, playlistItem, wrap);
         }
 
-        protected abstract PlaylistItem GetNext(Playlist playlist, PlaylistItem playlistItem);
+        protected abstract PlaylistItem GetNext(Playlist playlist, PlaylistItem playlistItem, bool wrap);
 
-        public PlaylistItem GetPrevious(PlaylistItem playlistItem)
+        public PlaylistItem GetPrevious(PlaylistItem playlistItem, bool wrap)
         {
             var playlist = this.GetPlaylist(playlistItem);
             if (playlist == null)
             {
                 return null;
             }
-            return
-                this.GetPrevious(playlist, playlistItem);
+            return this.GetPrevious(playlist, playlistItem, wrap);
         }
 
-        protected abstract PlaylistItem GetPrevious(Playlist playlist, PlaylistItem playlistItem);
+        protected abstract PlaylistItem GetPrevious(Playlist playlist, PlaylistItem playlistItem, bool wrap);
 
         public override void InitializeComponent(ICore core)
         {
@@ -76,7 +75,7 @@ namespace FoxTunes
 
         public ConcurrentDictionary<Tuple<QueryOperator, OrderByDirection>, IDatabaseQuery> SequenceQueries { get; private set; }
 
-        protected override PlaylistItem GetNext(Playlist playlist, PlaylistItem playlistItem)
+        protected override PlaylistItem GetNext(Playlist playlist, PlaylistItem playlistItem, bool wrap)
         {
             if (playlistItem == null)
             {
@@ -91,14 +90,18 @@ namespace FoxTunes
                     playlistItem = this.PlaylistBrowser.GetFirstItem(playlist);
                 }
             }
-            else
+            else if (wrap)
             {
                 playlistItem = this.PlaylistBrowser.GetFirstItem(playlist);
+            }
+            else
+            {
+                playlistItem = default(PlaylistItem);
             }
             return playlistItem;
         }
 
-        protected override PlaylistItem GetPrevious(Playlist playlist, PlaylistItem playlistItem)
+        protected override PlaylistItem GetPrevious(Playlist playlist, PlaylistItem playlistItem, bool wrap)
         {
             if (playlistItem == null)
             {
@@ -113,9 +116,13 @@ namespace FoxTunes
                     return this.PlaylistBrowser.GetLastItem(playlist);
                 }
             }
-            else
+            else if (wrap)
             {
                 playlistItem = this.PlaylistBrowser.GetLastItem(playlist);
+            }
+            else
+            {
+                playlistItem = default(PlaylistItem);
             }
             return playlistItem;
         }
@@ -293,7 +300,7 @@ namespace FoxTunes
             }
         }
 
-        protected override PlaylistItem GetNext(Playlist playlist, PlaylistItem playlistItem)
+        protected override PlaylistItem GetNext(Playlist playlist, PlaylistItem playlistItem, bool wrap)
         {
             if (this.Playlist == null || this.Playlist != playlist)
             {
@@ -313,7 +320,14 @@ namespace FoxTunes
                     position = this.Sequences.IndexOf(playlistItem.Sequence);
                     if (position >= this.Sequences.Count - 1)
                     {
-                        position = 0;
+                        if (wrap)
+                        {
+                            position = 0;
+                        }
+                        else
+                        {
+                            return default(PlaylistItem);
+                        }
                     }
                     else
                     {
@@ -333,7 +347,7 @@ namespace FoxTunes
             }
         }
 
-        protected override PlaylistItem GetPrevious(Playlist playlist, PlaylistItem playlistItem)
+        protected override PlaylistItem GetPrevious(Playlist playlist, PlaylistItem playlistItem, bool wrap)
         {
             if (this.Playlist == null || this.Playlist != playlist)
             {
@@ -353,7 +367,14 @@ namespace FoxTunes
                     position = this.Sequences.IndexOf(playlistItem.Sequence);
                     if (position == 0)
                     {
-                        position = this.Sequences.Count - 1;
+                        if (wrap)
+                        {
+                            position = this.Sequences.Count - 1;
+                        }
+                        else
+                        {
+                            return default(PlaylistItem);
+                        }
                     }
                     else
                     {

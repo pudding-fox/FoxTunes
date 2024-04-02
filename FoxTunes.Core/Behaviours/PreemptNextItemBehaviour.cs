@@ -17,6 +17,10 @@ namespace FoxTunes
 
         public IOutputStreamQueue OutputStreamQueue { get; private set; }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public BooleanConfigurationElement Wrap { get; private set; }
+
         public override void InitializeComponent(ICore core)
         {
             this.Output = core.Components.Output;
@@ -25,6 +29,11 @@ namespace FoxTunes
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.Ending += this.OnEnding;
             this.OutputStreamQueue = core.Components.OutputStreamQueue;
+            this.Configuration = core.Components.Configuration;
+            this.Wrap = this.Configuration.GetElement<BooleanConfigurationElement>(
+                EnqueueNextItemBehaviourConfiguration.SECTION,
+                EnqueueNextItemBehaviourConfiguration.WRAP
+            );
             base.InitializeComponent(core);
         }
 
@@ -40,7 +49,7 @@ namespace FoxTunes
             {
                 return;
             }
-            var playlistItem = this.PlaylistBrowser.GetNextItem(playlist);
+            var playlistItem = this.PlaylistBrowser.GetNextItem(playlist, this.Wrap.Value);
             if (playlistItem == null)
             {
                 return;
