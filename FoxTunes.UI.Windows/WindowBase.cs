@@ -89,16 +89,36 @@ namespace FoxTunes
             WindowExtensions.SetAllowsTransparency(this, true);
             if (this.ApplyTemplate)
             {
-                this.Template = TemplateFactory.Template;
+                this.ShowTemplate();
             }
             if (this.ApplyWindowChrome)
             {
-                this.SetValue(WindowChrome.WindowChromeProperty, new WindowChrome()
-                {
-                    CaptionHeight = 30,
-                    ResizeBorderThickness = new Thickness(5)
-                });
+                this.ShowWindowChrome();
             }
+        }
+
+        public virtual void ShowTemplate()
+        {
+            this.Template = TemplateFactory.Template;
+        }
+
+        public virtual void HideTemplate()
+        {
+            this.Template = TemplateFactory.DefaultTemplate;
+        }
+
+        public virtual void ShowWindowChrome()
+        {
+            this.SetValue(WindowChrome.WindowChromeProperty, new WindowChrome()
+            {
+                CaptionHeight = 30,
+                ResizeBorderThickness = new Thickness(5)
+            });
+        }
+
+        public virtual void HideWindowChrome()
+        {
+            this.SetValue(WindowChrome.WindowChromeProperty, null);
         }
 
         protected override void OnContentRendered(EventArgs e)
@@ -179,6 +199,8 @@ namespace FoxTunes
         {
             private static Lazy<ControlTemplate> _Template = new Lazy<ControlTemplate>(GetTemplate);
 
+            private static Lazy<ControlTemplate> _DefaultTemplate = new Lazy<ControlTemplate>(GetDefaultTemplate);
+
             public static ControlTemplate Template
             {
                 get
@@ -187,9 +209,27 @@ namespace FoxTunes
                 }
             }
 
+            public static ControlTemplate DefaultTemplate
+            {
+                get
+                {
+                    return _DefaultTemplate.Value;
+                }
+            }
+
             private static ControlTemplate GetTemplate()
             {
                 using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(global::FoxTunes.Resources.WindowBase)))
+                {
+                    var template = (ControlTemplate)XamlReader.Load(stream);
+                    template.Seal();
+                    return template;
+                }
+            }
+
+            private static ControlTemplate GetDefaultTemplate()
+            {
+                using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(global::FoxTunes.Resources.WindowBaseMinimal)))
                 {
                     var template = (ControlTemplate)XamlReader.Load(stream);
                     template.Seal();

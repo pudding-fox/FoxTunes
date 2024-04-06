@@ -183,6 +183,9 @@
   <data name="KeyBindingsBehaviourConfiguration.Equalizer" xml:space="preserve">
     <value>Equalizer</value>
   </data>
+  <data name="KeyBindingsBehaviourConfiguration.FullScreen" xml:space="preserve">
+    <value>Full Screen</value>
+  </data>
   <data name="KeyBindingsBehaviourConfiguration.Next" xml:space="preserve">
     <value>Next</value>
   </data>

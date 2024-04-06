@@ -20,6 +20,8 @@ namespace FoxTunes
 
         public const string EQUALIZER_ELEMENT = "HHHHFEB5-DD2D-4332-9C2A-F5EF41F71B40";
 
+        public const string FULL_SCREEN_ELEMENT = "IIII9FDD-6588-4BC5-AC6F-735070E770F6";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.KeyBindingsBehaviourConfiguration_Section)
@@ -43,7 +45,10 @@ namespace FoxTunes
                         .WithValue("Alt+F"))
                 .WithElement(
                     new TextConfigurationElement(EQUALIZER_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_Equalizer)
-                        .WithValue("Alt+E")
+                        .WithValue("Alt+E"))
+                .WithElement(
+                    new TextConfigurationElement(FULL_SCREEN_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_FullScreen)
+                        .WithValue("F11")
             );
         }
     }

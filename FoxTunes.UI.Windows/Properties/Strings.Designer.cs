@@ -259,6 +259,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Full Screen.
+        /// </summary>
+        internal static string KeyBindingsBehaviourConfiguration_FullScreen {
+            get {
+                return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.FullScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Next.
         /// </summary>
         internal static string KeyBindingsBehaviourConfiguration_Next {

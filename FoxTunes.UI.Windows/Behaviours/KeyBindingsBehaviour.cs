@@ -24,10 +24,8 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            Windows.Registrations.AddCreated(
-                Windows.Registrations.IdsByRole(UserInterfaceWindowRole.Main),
-                this.OnWindowCreated
-            );
+            WindowBase.Created += this.OnWindowCreated;
+            WindowBase.Destroyed += this.OnWindowDestroyed;
             this.ErrorEmitter = core.Components.ErrorEmitter;
             base.InitializeComponent(core);
         }
@@ -40,9 +38,17 @@ namespace FoxTunes
             }
         }
 
+        protected virtual void OnWindowDestroyed(object sender, EventArgs e)
+        {
+            if (sender is Window window)
+            {
+                this.RemoveCommandBindings(window);
+            }
+        }
+
         protected virtual void AddCommandBindings()
         {
-            foreach (var window in Windows.Registrations.WindowsByRole(UserInterfaceWindowRole.Main))
+            foreach (var window in Application.Current.Windows.OfType<Window>())
             {
                 this.AddCommandBindings(window);
             }
@@ -58,7 +64,7 @@ namespace FoxTunes
 
         protected virtual void AddCommandBinding(string id, string keys, ICommand command)
         {
-            foreach (var window in Windows.Registrations.WindowsByRole(UserInterfaceWindowRole.Main))
+            foreach (var window in Application.Current.Windows.OfType<Window>())
             {
                 this.AddCommandBinding(window, id, keys, command);
             }
@@ -96,7 +102,7 @@ namespace FoxTunes
 
         protected virtual void RemoveCommandBindings()
         {
-            foreach (var window in Windows.Registrations.WindowsByRole(UserInterfaceWindowRole.Main))
+            foreach (var window in Application.Current.Windows.OfType<Window>())
             {
                 this.RemoveCommandBindings(window);
             }
@@ -119,7 +125,7 @@ namespace FoxTunes
 
         protected virtual void RemoveCommandBinding(string id)
         {
-            foreach (var window in Windows.Registrations.WindowsByRole(UserInterfaceWindowRole.Main))
+            foreach (var window in Application.Current.Windows.OfType<Window>())
             {
                 this.RemoveCommandBinding(window, id);
             }
@@ -165,7 +171,7 @@ namespace FoxTunes
             {
                 this.RemoveCommandBinding(id);
                 return this.Add(id, keys, command);
-            }           
+            }
             return false;
         }
 
