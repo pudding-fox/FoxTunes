@@ -82,7 +82,7 @@ namespace FoxTunes
                     var scrollViewer = this.ListView.FindChild<ScrollViewer>();
                     if (scrollViewer != null)
                     {
-                        if (scrollViewer.ScrollToItemOffset<ListBoxItem>(index, this.OnItemLoaded))
+                        if (scrollViewer.ScrollToItemOffset<ListBoxItem>(index, false, this.OnItemLoaded))
                         {
                             this.ListView.UpdateLayout();
                             item = this.ListView.ItemContainerGenerator.ContainerFromItem(value) as ListBoxItem;

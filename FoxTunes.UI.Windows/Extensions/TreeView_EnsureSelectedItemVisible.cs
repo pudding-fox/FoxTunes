@@ -149,7 +149,7 @@ namespace FoxTunes
                 }
                 else if (scrollViewer != null)
                 {
-                    if (scrollViewer.ScrollToItemOffset<TreeViewItem>(offset + index, this.OnItemLoaded))
+                    if (scrollViewer.ScrollToItemOffset<TreeViewItem>(offset + index, true, this.OnItemLoaded))
                     {
                         items.UpdateLayout();
                         item = items.ItemContainerGenerator.ContainerFromItem(value) as TreeViewItem;
