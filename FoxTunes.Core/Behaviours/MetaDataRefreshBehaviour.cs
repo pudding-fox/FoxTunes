@@ -67,6 +67,7 @@ namespace FoxTunes
                 MetaDataBehaviourConfiguration.READ_LOOSE_IMAGES,
                 MetaDataBehaviourConfiguration.LOOSE_IMAGES_FRONT,
                 MetaDataBehaviourConfiguration.LOOSE_IMAGES_BACK,
+                MetaDataBehaviourConfiguration.LOOSE_IMAGES_FOLDER,
                 MetaDataBehaviourConfiguration.IMAGES_PREFERENCE,
                 MetaDataBehaviourConfiguration.MAX_IMAGE_SIZE,
                 MetaDataBehaviourConfiguration.READ_EXTENDED_TAGS,

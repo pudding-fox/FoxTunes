@@ -141,13 +141,14 @@ namespace FoxTunes
         public IEnumerable<string> GetDirectoryNames(string root)
         {
             yield return root;
-            foreach (var folder in this.Folders)
+            foreach (var path in this.Folders)
             {
+                var folder = Path.Combine(root, path);
                 if (!Directory.Exists(folder))
                 {
                     continue;
                 }
-                yield return Path.Combine(root, folder);
+                yield return folder;
             }
         }
 
