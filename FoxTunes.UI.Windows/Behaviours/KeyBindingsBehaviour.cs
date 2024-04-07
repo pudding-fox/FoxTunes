@@ -109,6 +109,10 @@ namespace FoxTunes
 
         protected virtual void RemoveCommandBinding(string id)
         {
+            if (Application.Current == null)
+            {
+                return;
+            }
             foreach (var window in Application.Current.Windows.OfType<Window>())
             {
                 this.RemoveCommandBinding(window, id);
