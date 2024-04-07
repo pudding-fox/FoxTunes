@@ -46,14 +46,6 @@ namespace FoxTunes
             }
         }
 
-        protected virtual void AddCommandBindings()
-        {
-            foreach (var window in Application.Current.Windows.OfType<Window>())
-            {
-                this.AddCommandBindings(window);
-            }
-        }
-
         protected virtual void AddCommandBindings(Window window)
         {
             foreach (var pair in this.Commands)
@@ -90,21 +82,13 @@ namespace FoxTunes
             {
                 var gesture = new KeyGesture(key, modifiers);
                 var binding = new InputBinding(command, gesture);
-                this.Bindings.GetOrAdd(window, () => new Dictionary<string, InputBinding>(StringComparer.OrdinalIgnoreCase)).Add(id, binding);
+                this.Bindings.GetOrAdd(window, () => new Dictionary<string, InputBinding>(StringComparer.OrdinalIgnoreCase))[id] = binding;
                 window.InputBindings.Add(binding);
                 Logger.Write(this, LogLevel.Debug, "AddCommandBinding: {0}/{1} => {2}", window.GetType().Name, window.Title, id);
             }
             catch (Exception e)
             {
                 this.ErrorEmitter.Send(this, string.Format("Failed to register input hook {0}: {1}", id, e.Message));
-            }
-        }
-
-        protected virtual void RemoveCommandBindings()
-        {
-            foreach (var window in Application.Current.Windows.OfType<Window>())
-            {
-                this.RemoveCommandBindings(window);
             }
         }
 
