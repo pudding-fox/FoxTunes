@@ -62,33 +62,6 @@ namespace FoxTunes {
         
         /// <summary>
         ///   Looks up a localized string similar to (function () {
-        ///    var parts = [];
-        ///    if (tag.iscompilation || tag.__ft_variousartists) {
-        ///        parts.push(strings.general_variousartists);
-        ///    }
-        ///    else if (tag.artist) {
-        ///        parts.push(tag.artist);
-        ///    }
-        ///    if (tag.year) {
-        ///        parts.push(tag.year);
-        ///    }
-        ///    if (tag.album) {
-        ///        parts.push(tag.album);
-        ///    }
-        ///    else {
-        ///        parts.push(directoryname(file));
-        ///    }
-        ///    return parts.join(&quot; - &quot;);
-        ///})().
-        /// </summary>
-        internal static string Grouping {
-            get {
-                return ResourceManager.GetString("Grouping", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to (function () {
         ///    if (!file) {
         ///        return version();
         ///    }
@@ -161,32 +134,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FoxTunes - Scripting
-        ///
-        ///Scripts are written in JavaScript. They are a single expression and must return a value:
-        ///
-        ///tag.title
-        ///
-        ///If multiple statements are required, wrap them in a function an execute it:
-        ///
-        ///(function () {
-        ///    var title = [tag.title || strings.general_notitle];
-        ///    return title;
-        ///})()
-        ///
-        ///Values are grouped by cartegory:
-        ///1) tag
-        ///2) property
-        ///3) document
-        ///4) file
-        ///5) folder
-        ///
-        ///Depending on your settings, more or less values are available:
-        ///
-        ///tag:
-        ///    album
-        ///    artist
-        ///    beatsperminute        /// [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to .
         /// </summary>
         internal static string Scripting {
             get {

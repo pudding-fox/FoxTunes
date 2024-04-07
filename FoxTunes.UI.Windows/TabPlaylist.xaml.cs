@@ -41,12 +41,6 @@ namespace FoxTunes
         public TabPlaylist()
         {
             this.InitializeComponent();
-#if NET40
-            //VirtualizingStackPanel.IsVirtualizingWhenGrouping is not supported.
-            //The behaviour which requires this feature is disabled.
-#else
-            VirtualizingStackPanel.SetIsVirtualizingWhenGrouping(this.ListView, true);
-#endif
         }
 
         public Playlist Playlist
