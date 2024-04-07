@@ -310,7 +310,7 @@ namespace FoxTunes
             return BindingOperations.GetBindingExpression(element, property) != null;
         }
 
-        public static bool ScrollToItemOffset<T>(this ScrollViewer scrollViewer, int offset, bool logicalOffset, RoutedEventHandler callback) where T : FrameworkElement
+        public static bool ScrollToItemOffset<T>(this ScrollViewer scrollViewer, int offset, RoutedEventHandler callback) where T : FrameworkElement
         {
             var item = scrollViewer.FindChild<T>();
             if (item == null)
@@ -331,7 +331,7 @@ namespace FoxTunes
                     return false;
                 }
             }
-            if (logicalOffset)
+            if (scrollViewer.CanContentScroll)
             {
                 scrollViewer.ScrollToVerticalOffset(offset);
             }
