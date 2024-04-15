@@ -3,10 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using System.Timers;
+using Windows.Graphics.Imaging;
 using Windows.Media;
 using Windows.Media.Playback;
+using Windows.Storage;
 using Windows.Storage.Streams;
 
 namespace FoxTunes
@@ -217,14 +220,6 @@ namespace FoxTunes
             {
                 var outputStream = this.PlaybackManager.CurrentStream;
                 var updater = this.TransportControls.DisplayUpdater;
-                if (updater.Thumbnail != null)
-                {
-                    var disposable = updater.Thumbnail.OpenReadAsync() as IDisposable;
-                    if (disposable != null)
-                    {
-                        disposable.Dispose();
-                    }
-                }
                 if (outputStream != null)
                 {
                     var fileName = await this.ArtworkProvider.Find(outputStream.PlaylistItem, ArtworkType.FrontCover).ConfigureAwait(false);
@@ -244,16 +239,27 @@ namespace FoxTunes
 
         protected virtual async Task<IRandomAccessStream> GetThumbnail(string fileName)
         {
-            //TODO: For some reason we can't just return FileRandomAccessStream.OpenAsync(metaDataItem.Value, FileAccessMode.Read);
-            using (var fileStream = File.OpenRead(fileName))
+            var output = new InMemoryRandomAccessStream();
+            var file = await StorageFile.GetFileFromPathAsync(
+                FileSystemHelper.GetAbsolutePath(Publication.StoragePath, fileName)
+            );
+            using (var input = await file.OpenReadAsync())
             {
-                using (var memoryStream = new MemoryStream())
-                {
-                    await fileStream.CopyToAsync(memoryStream).ConfigureAwait(false);
-                    memoryStream.Seek(0, SeekOrigin.Begin);
-                    return memoryStream.ToArray().ToRandomAccessStream();
-                }
+                var decoder = await BitmapDecoder.CreateAsync(input);
+                var data = await decoder.GetPixelDataAsync();
+                var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.BmpEncoderId, output);
+                encoder.SetPixelData(
+                    BitmapPixelFormat.Bgra8,
+                    BitmapAlphaMode.Ignore,
+                    decoder.PixelWidth,
+                    decoder.PixelHeight,
+                    decoder.DpiX,
+                    decoder.DpiY,
+                    data.DetachPixelData()
+                );
+                await encoder.FlushAsync();
             }
+            return output;
         }
 
         //protected virtual void UpdateTimeline(SystemMediaTransportControlsTimelineProperties properties)

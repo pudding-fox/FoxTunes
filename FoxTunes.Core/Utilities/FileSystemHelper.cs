@@ -194,6 +194,16 @@ namespace FoxTunes
             return builder.ToString();
         }
 
+        public static string GetAbsolutePath(string path1, string path2)
+        {
+            var uri = new Uri(path2, UriKind.RelativeOrAbsolute);
+            if (uri.IsAbsoluteUri)
+            {
+                return path2;
+            }
+            return Path.Combine(path1, path2.TrimStart('.', Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        }
+
         public class Cache
         {
             public Cache(int capacity)
