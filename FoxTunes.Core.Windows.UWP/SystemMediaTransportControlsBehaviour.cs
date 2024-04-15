@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using System.Timers;
+using Windows.Graphics.Imaging;
 using Windows.Media;
 using Windows.Media.Playback;
 using Windows.Storage.Streams;
@@ -245,15 +247,30 @@ namespace FoxTunes
         protected virtual async Task<IRandomAccessStream> GetThumbnail(string fileName)
         {
             //TODO: For some reason we can't just return FileRandomAccessStream.OpenAsync(metaDataItem.Value, FileAccessMode.Read);
-            using (var fileStream = File.OpenRead(fileName))
+            var output = new InMemoryRandomAccessStream();
+            using (var input = new InMemoryRandomAccessStream()) 
             {
-                using (var memoryStream = new MemoryStream())
+                using (var fileStream = File.OpenRead(fileName))
                 {
-                    await fileStream.CopyToAsync(memoryStream).ConfigureAwait(false);
-                    memoryStream.Seek(0, SeekOrigin.Begin);
-                    return memoryStream.ToArray().ToRandomAccessStream();
+                    await fileStream.CopyToAsync(input.AsStreamForWrite());
+                    var decoder = await BitmapDecoder.CreateAsync(input);
+                    var width = decoder.PixelWidth;
+                    var height = decoder.PixelHeight;
+                    var pixels = (await decoder.GetPixelDataAsync()).DetachPixelData();
+                    var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, output);
+                    encoder.SetPixelData(
+                        BitmapPixelFormat.Bgra8,
+                        BitmapAlphaMode.Ignore,
+                        width,
+                        height,
+                        96.0,
+                        96.0,
+                        pixels
+                    );
+                    await encoder.FlushAsync();
                 }
             }
+            return output;
         }
 
         //protected virtual void UpdateTimeline(SystemMediaTransportControlsTimelineProperties properties)
