@@ -53,6 +53,7 @@ namespace FoxTunes.ViewModel
             if (window is WindowBase windowBase)
             {
                 windowBase.HideTemplate();
+                windowBase.HideWindowChrome();
             }
             window.StateChanged += this.OnStateChanged;
         }
@@ -66,6 +67,7 @@ namespace FoxTunes.ViewModel
             if (window is WindowBase windowBase)
             {
                 windowBase.ShowTemplate();
+                windowBase.ShowWindowChrome();
             }
         }
 

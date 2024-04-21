@@ -118,7 +118,11 @@ namespace FoxTunes
 
         public virtual void HideWindowChrome()
         {
-            this.SetValue(WindowChrome.WindowChromeProperty, null);
+            this.SetValue(WindowChrome.WindowChromeProperty, new WindowChrome()
+            {
+                CaptionHeight = 0,
+                ResizeBorderThickness = new Thickness(0)
+            });
         }
 
         protected override void OnContentRendered(EventArgs e)
