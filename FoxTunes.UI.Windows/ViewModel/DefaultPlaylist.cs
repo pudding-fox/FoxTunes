@@ -11,8 +11,7 @@ namespace FoxTunes.ViewModel
 
         protected override Playlist GetPlaylist()
         {
-            var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
-            return playlist;
+            return this.PlaylistManager.SelectedPlaylist;
         }
 
         protected override void InitializeComponent(ICore core)
@@ -35,7 +34,7 @@ namespace FoxTunes.ViewModel
 
         protected virtual Task RefreshIfRequired()
         {
-            var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+            var playlist = this.GetPlaylist();
             if (object.ReferenceEquals(this.CurrentPlaylist, playlist))
             {
 #if NET40
@@ -49,7 +48,7 @@ namespace FoxTunes.ViewModel
 
         public override Task Refresh()
         {
-            this.CurrentPlaylist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+            this.CurrentPlaylist = this.GetPlaylist();
             return base.Refresh();
         }
 
