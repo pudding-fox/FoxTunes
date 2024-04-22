@@ -98,7 +98,7 @@ namespace FoxTunes
             switch (type)
             {
                 case FileActionType.Playlist:
-                    var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+                    var playlist = this.PlaylistManager.SelectedPlaylist;
                     return this.AddSacdToPlaylist(playlist, paths);
                 case FileActionType.Library:
                     return this.AddSacdToLibrary(paths);
@@ -115,7 +115,7 @@ namespace FoxTunes
             switch (type)
             {
                 case FileActionType.Playlist:
-                    var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+                    var playlist = this.PlaylistManager.SelectedPlaylist;
                     return this.AddSacdToPlaylist(playlist, index, paths);
             }
 #if NET40

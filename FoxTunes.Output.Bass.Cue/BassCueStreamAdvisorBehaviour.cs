@@ -140,7 +140,7 @@ namespace FoxTunes
             switch (type)
             {
                 case FileActionType.Playlist:
-                    var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+                    var playlist = this.PlaylistManager.SelectedPlaylist;
                     foreach (var path in paths)
                     {
                         await this.AddCueToPlaylist(playlist, path).ConfigureAwait(false);
@@ -160,7 +160,7 @@ namespace FoxTunes
             switch (type)
             {
                 case FileActionType.Playlist:
-                    var playlist = this.PlaylistManager.CurrentPlaylist ?? this.PlaylistManager.SelectedPlaylist;
+                    var playlist = this.PlaylistManager.SelectedPlaylist;
                     foreach (var path in paths)
                     {
                         await this.AddCueToPlaylist(playlist, index, path).ConfigureAwait(false);
