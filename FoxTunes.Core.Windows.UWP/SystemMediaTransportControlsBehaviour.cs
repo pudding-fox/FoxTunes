@@ -243,23 +243,7 @@ namespace FoxTunes
             var file = await StorageFile.GetFileFromPathAsync(
                 FileSystemHelper.GetAbsolutePath(Publication.StoragePath, fileName)
             );
-            using (var input = await file.OpenReadAsync())
-            {
-                var decoder = await BitmapDecoder.CreateAsync(input);
-                var data = await decoder.GetPixelDataAsync();
-                var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.BmpEncoderId, output);
-                encoder.SetPixelData(
-                    BitmapPixelFormat.Bgra8,
-                    BitmapAlphaMode.Ignore,
-                    decoder.PixelWidth,
-                    decoder.PixelHeight,
-                    decoder.DpiX,
-                    decoder.DpiY,
-                    data.DetachPixelData()
-                );
-                await encoder.FlushAsync();
-            }
-            return output;
+            return await file.OpenReadAsync();
         }
 
         //protected virtual void UpdateTimeline(SystemMediaTransportControlsTimelineProperties properties)
