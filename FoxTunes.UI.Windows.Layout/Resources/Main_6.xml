@@ -21,9 +21,9 @@
               <UIComponentConfiguration Component="A6820FDA-E415-40C6-AEFB-A73B6FBE4C93">
                 <UIComponentConfiguration Component="D5407817-6EBB-4D79-870D-664CBEB2D069">
                   <UIComponentConfiguration Component="F8231616-9D5E-45C8-BD72-506FC5FC9C95">
+                    <MetaDataEntry Name="Configuration_GGGG3915-611C-41A1-B4CB-36A118E5D222" Value="250" />
                     <MetaDataEntry Name="Configuration_FFFF6E54-7313-45D9-9E30-6D7205725365" Value="4" />
                     <MetaDataEntry Name="Configuration_GGGG2086-53C8-4A38-98CD-73E756A190A9" Value="16" />
-                    <MetaDataEntry Name="Configuration_HHHHD915-611C-41A1-B4CB-36A118E5D222" Value="250" />
                     <MetaDataEntry Name="Configuration_FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438" Value="5" />
                   </UIComponentConfiguration>
                   <MetaDataEntry Name="Configuration_FFFF6E54-7313-45D9-9E30-6D7205725365" Value="4" />
@@ -32,8 +32,8 @@
                 </UIComponentConfiguration>
                 <UIComponentConfiguration Component="D5407817-6EBB-4D79-870D-664CBEB2D069">
                   <UIComponentConfiguration Component="F8231616-9D5E-45C8-BD72-506FC5FC9C95">
+                    <MetaDataEntry Name="Configuration_GGGG3915-611C-41A1-B4CB-36A118E5D222" Value="6000" />
                     <MetaDataEntry Name="Configuration_GGGG2086-53C8-4A38-98CD-73E756A190A9" Value="250" />
-                    <MetaDataEntry Name="Configuration_HHHHD915-611C-41A1-B4CB-36A118E5D222" Value="4000" />
                     <MetaDataEntry Name="Configuration_FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438" Value="5" />
                   </UIComponentConfiguration>
                   <MetaDataEntry Name="Header" Value="Mid" />
@@ -45,8 +45,8 @@
               </UIComponentConfiguration>
               <UIComponentConfiguration Component="D5407817-6EBB-4D79-870D-664CBEB2D069">
                 <UIComponentConfiguration Component="F8231616-9D5E-45C8-BD72-506FC5FC9C95">
-                  <MetaDataEntry Name="Configuration_GGGG2086-53C8-4A38-98CD-73E756A190A9" Value="4000" />
-                  <MetaDataEntry Name="Configuration_HHHHD915-611C-41A1-B4CB-36A118E5D222" Value="20000" />
+                  <MetaDataEntry Name="Configuration_GGGG3915-611C-41A1-B4CB-36A118E5D222" Value="20000" />
+                  <MetaDataEntry Name="Configuration_GGGG2086-53C8-4A38-98CD-73E756A190A9" Value="6000" />
                   <MetaDataEntry Name="Configuration_FFFF5F0C-6574-472A-B9EB-2BDBC1F3C438" Value="5" />
                 </UIComponentConfiguration>
                 <MetaDataEntry Name="Header" Value="High" />
