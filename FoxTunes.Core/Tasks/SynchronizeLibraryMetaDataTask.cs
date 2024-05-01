@@ -77,6 +77,7 @@ namespace FoxTunes
                 {
                     Logger.Write(this, LogLevel.Debug, "File \"{0}\" could not be written: {1}", libraryItem.FileName, e.Message);
                     this.AddError(libraryItem, string.Format("File \"{0}\" could not be written: {1}", libraryItem.FileName, e.Message));
+                    await this.Deschedule(libraryItem).ConfigureAwait(false);
                 }
             }
         }
