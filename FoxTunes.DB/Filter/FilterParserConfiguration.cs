@@ -12,10 +12,14 @@ namespace FoxTunes
 
         public static readonly string[] DefaultSearchNames = new[]
         {
+            //Common.
             CommonMetaData.Artist,
             CommonMetaData.Performer,
             CommonMetaData.Album,
-            CommonMetaData.Title
+            CommonMetaData.Title,
+            //Path.
+            FileSystemProperties.FileName,
+            FileSystemProperties.DirectoryName
         };
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()

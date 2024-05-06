@@ -170,7 +170,10 @@ namespace FoxTunes
                     {
                         this.AddProperties(metaData, file.Properties);
                     }
-                    this.Try(() => FileSystemManager.Read(this, metaData, file), this.ErrorHandler);
+                    if (this.FileSystem.Value)
+                    {
+                        this.Try(() => FileSystemManager.Read(this, metaData, file), this.ErrorHandler);
+                    }
                     if (this.Popularimeter.Value)
                     {
                         this.Try(() => PopularimeterManager.Read(this, metaData, file), this.ErrorHandler);
