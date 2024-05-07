@@ -38,8 +38,6 @@
                   Windows:TreeViewExtensions.DragSource="True"
                   Windows:TreeViewExtensions.DragSourceInitialized="DragSourceInitialized"
                   Windows:TreeViewExtensions.AutoExpand="True"
-                  VirtualizingStackPanel.IsVirtualizing="True"
-                  VirtualizingStackPanel.VirtualizationMode="Recycling"
                   IsTextSearchEnabled="True"
                   TextSearch.TextPath="Value"
                   Background="{DynamicResource ControlBackgroundBrush}">
