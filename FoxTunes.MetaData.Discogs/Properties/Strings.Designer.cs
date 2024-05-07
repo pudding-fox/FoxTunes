@@ -106,6 +106,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Confirm Lookup.
+        /// </summary>
+        internal static string DiscogsBehaviourConfiguration_ConfirmLookup {
+            get {
+                return ResourceManager.GetString("DiscogsBehaviourConfiguration.ConfirmLookup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Consumer Key.
         /// </summary>
         internal static string DiscogsBehaviourConfiguration_ConsumerKey {

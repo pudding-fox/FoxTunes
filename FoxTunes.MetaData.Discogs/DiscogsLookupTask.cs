@@ -40,6 +40,8 @@ namespace FoxTunes
 
         public DoubleConfigurationElement MinConfidence { get; private set; }
 
+        public BooleanConfigurationElement Confirm { get; private set; }
+
         public BooleanConfigurationElement WriteTags { get; private set; }
 
         public override void InitializeComponent(ICore core)
@@ -51,6 +53,10 @@ namespace FoxTunes
             this.MinConfidence = this.Configuration.GetElement<DoubleConfigurationElement>(
                 DiscogsBehaviourConfiguration.SECTION,
                 DiscogsBehaviourConfiguration.MIN_CONFIDENCE
+            );
+            this.Confirm = this.Configuration.GetElement<BooleanConfigurationElement>(
+                DiscogsBehaviourConfiguration.SECTION,
+                DiscogsBehaviourConfiguration.CONFIRM_LOOKUP
             );
             this.WriteTags = this.Configuration.GetElement<BooleanConfigurationElement>(
                 DiscogsBehaviourConfiguration.SECTION,
@@ -163,7 +169,7 @@ namespace FoxTunes
                 //Select result.
                 pair => pair.Key
             ).ToArray();
-            if (releases.Length < 2)
+            if (!this.Confirm.Value || releases.Length < 2)
             {
                 return releases.FirstOrDefault();
             }

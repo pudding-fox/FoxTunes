@@ -132,6 +132,9 @@
   <data name="DiscogsBehaviourConfiguration.BaseUrl" xml:space="preserve">
     <value>Base Url</value>
   </data>
+  <data name="DiscogsBehaviourConfiguration.ConfirmLookup" xml:space="preserve">
+    <value>Confirm Lookup</value>
+  </data>
   <data name="DiscogsBehaviourConfiguration.ConsumerKey" xml:space="preserve">
     <value>Consumer Key</value>
   </data>

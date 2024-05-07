@@ -20,20 +20,20 @@ namespace FoxTunes
 
         public const string AUTO_LOOKUP = "FFGG9A7F-90EF-42D8-827F-5638A586B398";
 
+        public const string CONFIRM_LOOKUP = "FGGGDF0F-C720-43C7-B8AC-D47F1DE17F8B";
+
         public const string WRITE_TAGS = "GGGG4763-D42F-46E2-BB25-E225EF15CE67";
 
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.DiscogsBehaviourConfiguration_Section)
                 .WithElement(new BooleanConfigurationElement(ENABLED, Strings.DiscogsBehaviourConfiguration_Enabled)
-                    .WithValue(false)
-                    )
+                    .WithValue(false))
                 .WithElement(new TextConfigurationElement(BASE_URL, Strings.DiscogsBehaviourConfiguration_BaseUrl, path: Strings.General_Advanced)
                     .WithValue(Discogs.BASE_URL)
                     .DependsOn(SECTION, ENABLED))
                 .WithElement(new TextConfigurationElement(CONSUMER_KEY, Strings.DiscogsBehaviourConfiguration_ConsumerKey, path: Strings.General_Advanced)
                     .WithValue(Discogs.KEY)
-                    
                     .DependsOn(SECTION, ENABLED)
                     .WithFlags(ConfigurationElementFlags.Secret))
                 .WithElement(new TextConfigurationElement(CONSUMER_SECRET, Strings.DiscogsBehaviourConfiguration_ConsumerSecret, path: Strings.General_Advanced)
@@ -49,6 +49,9 @@ namespace FoxTunes
                     .WithValidationRule(new DoubleValidationRule(0, 1, 0.1))
                     .DependsOn(SECTION, ENABLED))
                 .WithElement(new BooleanConfigurationElement(AUTO_LOOKUP, Strings.DiscogsBehaviourConfiguration_AutoLookup)
+                    .DependsOn(SECTION, ENABLED))
+                .WithElement(new BooleanConfigurationElement(CONFIRM_LOOKUP, Strings.DiscogsBehaviourConfiguration_ConfirmLookup)
+                    .WithValue(true)
                     .DependsOn(SECTION, ENABLED))
                 .WithElement(new BooleanConfigurationElement(WRITE_TAGS, Strings.DiscogsBehaviourConfiguration_WriteTags)
                     .WithValue(true)
