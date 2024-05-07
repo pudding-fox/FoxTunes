@@ -71,6 +71,8 @@ If you have a supported NET MD device, physical disks can be created and modifie
 
 ## Windows XP support
 
+THE LAST VERSION TO SUPPORT WINDOWS XP WAS [3.1.1](https://github.com/pudding-fox/FoxTunes/releases/tag/3.1.1), FORK THIS TAG TO CREATE A NET40 BUILD.
+
 A Windows XP compatibile .NET 4.0 build can be created (raise an issue if you think this should be automated) by manually running the Nightly Build (Legacy) pipeline.
 It needs at least;
 * [KB2468871](https://www.microsoft.com/en-us/download/details.aspx?id=3556) - Portable class libraries patch.
