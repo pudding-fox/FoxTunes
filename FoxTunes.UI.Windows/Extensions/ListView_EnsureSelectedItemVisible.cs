@@ -67,6 +67,11 @@ namespace FoxTunes
                 {
                     return;
                 }
+                if (this.ListView.IsGrouping)
+                {
+                    //If grouping there's no (simple) way to locate the item. 
+                    return;
+                }
                 var index = this.ListView.Items.IndexOf(value);
                 if (index < 0)
                 {

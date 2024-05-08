@@ -61,6 +61,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Grouped Playlist.
+        /// </summary>
+        internal static string GroupedPlaylist_Name {
+            get {
+                return ResourceManager.GetString("GroupedPlaylist.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Grouping Script.
         /// </summary>
         internal static string PlaylistGroupingBehaviourConfiguration_Script {

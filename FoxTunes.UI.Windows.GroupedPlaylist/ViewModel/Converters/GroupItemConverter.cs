@@ -30,6 +30,11 @@ namespace FoxTunes.ViewModel
                         }
                     }
                 }
+                if (metaDatas.Count == 0)
+                {
+                    //Show placeholder.
+                    metaDatas.Add(new MetaDataItem());
+                }
                 parent.MetaDatas = metaDatas.ToList();
                 return parent;
             }
@@ -65,8 +70,14 @@ namespace FoxTunes.ViewModel
                 var hashCode = 0;
                 unchecked
                 {
-                    hashCode += obj.Name.ToLower().GetHashCode();
-                    hashCode += obj.Value.ToLower().GetHashCode();
+                    if (!string.IsNullOrEmpty(obj.Name))
+                    {
+                        hashCode += obj.Name.ToLower().GetHashCode();
+                    }
+                    if (!string.IsNullOrEmpty(obj.Value))
+                    {
+                        hashCode += obj.Value.ToLower().GetHashCode();
+                    }
                 }
                 return hashCode;
             }
