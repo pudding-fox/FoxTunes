@@ -77,7 +77,7 @@ namespace FoxTunes
                 return;
             }
             var group = element.DataContext as CollectionViewGroup;
-            if (group == null)
+              if (group == null)
             {
                 return;
             }
