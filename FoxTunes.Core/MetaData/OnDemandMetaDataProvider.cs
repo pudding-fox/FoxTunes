@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using AsyncKeyedLock;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,11 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     public class OnDemandMetaDataProvider : StandardComponent, IOnDemandMetaDataProvider
     {
-        public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
+        public static readonly AsyncKeyedLocker<string> KeyLock = new AsyncKeyedLocker<string>(o =>
+        {
+            o.PoolSize = 20;
+            o.PoolInitialFill = 1;
+        }, StringComparer.OrdinalIgnoreCase);
 
         public OnDemandMetaDataProvider()
         {
