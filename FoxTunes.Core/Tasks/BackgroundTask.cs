@@ -1,9 +1,8 @@
-﻿using FoxTunes.Interfaces;
+﻿using AsyncKeyedLock;
+using FoxTunes.Interfaces;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -13,12 +12,15 @@ namespace FoxTunes
         static BackgroundTask()
         {
             Instances = new List<WeakReference<IBackgroundTask>>();
-            Semaphores = new ConcurrentDictionary<string, SemaphoreSlim>();
         }
 
         private static IList<WeakReference<IBackgroundTask>> Instances { get; set; }
 
-        private static ConcurrentDictionary<string, SemaphoreSlim> Semaphores { get; set; }
+        public static readonly AsyncKeyedLocker<string> KeyLock = new AsyncKeyedLocker<string>(o =>
+        {
+            o.PoolSize = 20;
+            o.PoolInitialFill = 1;
+        }, StringComparer.OrdinalIgnoreCase);
 
         public static IEnumerable<IBackgroundTask> Active
         {
@@ -87,14 +89,6 @@ namespace FoxTunes
             get
             {
                 return 1;
-            }
-        }
-
-        public SemaphoreSlim Semaphore
-        {
-            get
-            {
-                return Semaphores.GetOrAdd(this.Id, key => new SemaphoreSlim(this.Concurrency, this.Concurrency));
             }
         }
 
@@ -216,20 +210,11 @@ namespace FoxTunes
         {
             Logger.Write(this, LogLevel.Debug, "Running background task.");
             await this.OnStarted().ConfigureAwait(false);
-#if NET40
-            Semaphore.Wait();
-#else
-            await Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
             try
             {
-                try
+                using (KeyLock.Lock(this.Id))
                 {
                     await this.OnRun().ConfigureAwait(false);
-                }
-                finally
-                {
-                    this.Semaphore.Release();
                 }
                 Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
                 await this.OnCompleted().ConfigureAwait(false);
