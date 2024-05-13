@@ -256,6 +256,7 @@ namespace FoxTunes
                 "FoxTunes.Scripting.dll",
                 "FoxTunes.Scripting.JS.dll",
                 "FoxTunes.UI.dll",
+                "System.Runtime.CompilerServices.Unsafe.dll",
                 "System.Threading.Tasks.Extensions.dll",
                 "System.Windows.Interactivity.dll"
             });
@@ -726,7 +727,8 @@ namespace FoxTunes
                     new PackageElement[]
                     {
                         "FoxTunes.Core.Windows.dll",
-                        new PackageElement("FoxTunes.Core.Windows.UWP.dll", PackageElementFlags.FrameworkNET48)
+                        new PackageElement("FoxTunes.Core.Windows.UWP.dll", PackageElementFlags.FrameworkNET48),
+                        new PackageElement("System.Runtime.WindowsRuntime.dll", PackageElementFlags.FrameworkNET48)
                     },
                     PackageFlags.Default
                 ),
