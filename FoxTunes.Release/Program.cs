@@ -16,10 +16,6 @@ namespace FoxTunes
 
         const string PLUGINS = "plugins";
 
-        const string NET40 = "net40";
-
-        const string NET462 = "net462";
-
         const string NET48 = "net48";
 
         const string LIB = "lib";
@@ -40,8 +36,6 @@ namespace FoxTunes
                 version = string.Format("{0}-{1}", DateTime.UtcNow.ToString("ddmmyyyy"), NIGHTLY);
             }
             Console.WriteLine("Version: {0}", version);
-            CreateRelease(version, ReleaseFlags.FrameworkNET40 | ReleaseFlags.L10N_FR);
-            CreateRelease(version, ReleaseFlags.FrameworkNET462 | ReleaseFlags.L10N_FR);
             CreateRelease(version, ReleaseFlags.FrameworkNET48 | ReleaseFlags.L10N_FR);
         }
 
@@ -97,16 +91,8 @@ namespace FoxTunes
             if (!force)
             {
                 //Filter by framework.
-                if (package.Flags.HasFlag(PackageFlags.FrameworkNET40) || package.Flags.HasFlag(PackageFlags.FrameworkNET462) || package.Flags.HasFlag(PackageFlags.FrameworkNET48))
+                if (package.Flags.HasFlag(PackageFlags.FrameworkNET48))
                 {
-                    if (flags.HasFlag(ReleaseFlags.FrameworkNET40) && !package.Flags.HasFlag(PackageFlags.FrameworkNET40))
-                    {
-                        return;
-                    }
-                    if (flags.HasFlag(ReleaseFlags.FrameworkNET462) && !package.Flags.HasFlag(PackageFlags.FrameworkNET462))
-                    {
-                        return;
-                    }
                     if (flags.HasFlag(ReleaseFlags.FrameworkNET48) && !package.Flags.HasFlag(PackageFlags.FrameworkNET48))
                     {
                         return;
@@ -123,16 +109,8 @@ namespace FoxTunes
         private static void AddPackageElement(string target, Package package, PackageElement element, ReleaseFlags flags)
         {
             //Filter by framework.
-            if (element.Flags.HasFlag(PackageElementFlags.FrameworkNET40) || element.Flags.HasFlag(PackageElementFlags.FrameworkNET462) || element.Flags.HasFlag(PackageElementFlags.FrameworkNET48))
+            if (element.Flags.HasFlag(PackageElementFlags.FrameworkNET48))
             {
-                if (flags.HasFlag(ReleaseFlags.FrameworkNET40) && !element.Flags.HasFlag(PackageElementFlags.FrameworkNET40))
-                {
-                    return;
-                }
-                if (flags.HasFlag(ReleaseFlags.FrameworkNET462) && !element.Flags.HasFlag(PackageElementFlags.FrameworkNET462))
-                {
-                    return;
-                }
                 if (flags.HasFlag(ReleaseFlags.FrameworkNET48) && !element.Flags.HasFlag(PackageElementFlags.FrameworkNET48))
                 {
                     return;
@@ -207,14 +185,6 @@ namespace FoxTunes
                 "..",
                 DISTRIBUTION
             };
-            if (flags.HasFlag(ReleaseFlags.FrameworkNET40))
-            {
-                parts.Add(NET40);
-            }
-            if (flags.HasFlag(ReleaseFlags.FrameworkNET462))
-            {
-                parts.Add(NET462);
-            }
             if (flags.HasFlag(ReleaseFlags.FrameworkNET48))
             {
                 parts.Add(NET48);
@@ -253,14 +223,6 @@ namespace FoxTunes
         private static string GetTarget(ReleaseFlags flags)
         {
             var parts = new List<string>();
-            if (flags.HasFlag(ReleaseFlags.FrameworkNET40))
-            {
-                parts.Add(NET40);
-            }
-            if (flags.HasFlag(ReleaseFlags.FrameworkNET462))
-            {
-                parts.Add(NET462);
-            }
             if (flags.HasFlag(ReleaseFlags.FrameworkNET48))
             {
                 parts.Add(NET48);
@@ -294,13 +256,7 @@ namespace FoxTunes
                 "FoxTunes.Scripting.dll",
                 "FoxTunes.Scripting.JS.dll",
                 "FoxTunes.UI.dll",
-                new PackageElement("Microsoft.Threading.Tasks.Extensions.Desktop.dll", PackageElementFlags.FrameworkNET40),
                 "Microsoft.Threading.Tasks.Extensions.dll",
-                new PackageElement("Microsoft.Threading.Tasks.dll", PackageElementFlags.FrameworkNET40),
-                new PackageElement("Microsoft.Windows.Shell.dll", PackageElementFlags.FrameworkNET40),
-                new PackageElement("System.IO.dll", PackageElementFlags.FrameworkNET40),
-                new PackageElement("System.Runtime.dll",PackageElementFlags.FrameworkNET40),
-                new PackageElement("System.Threading.Tasks.dll", PackageElementFlags.FrameworkNET40),
                 "System.Windows.Interactivity.dll"
             });
         }
@@ -511,7 +467,7 @@ namespace FoxTunes
                         "x64/msvcp100.dll",
                         "x64/msvcr100.dll"
                     },
-                    PackageFlags.Default | PackageFlags.Minimal | PackageFlags.FrameworkNET40
+                    PackageFlags.Default | PackageFlags.Minimal
                 ),
                 new Package(
                     "clearscript",
@@ -526,10 +482,8 @@ namespace FoxTunes
                         new PackageElement("ClearScriptV8.win-x86.dll", "x86"),
                         new PackageElement("ClearScriptV8.win-x64.dll", "x64"),
                         "Newtonsoft.Json.dll",
-                        new PackageElement("System.ValueTuple.dll", PackageElementFlags.FrameworkNET462),
-                        new PackageElement("System.Runtime.InteropServices.RuntimeInformation.dll", PackageElementFlags.FrameworkNET462),
                     },
-                    PackageFlags.Default | PackageFlags.Minimal | PackageFlags.FrameworkNET462 | PackageFlags.FrameworkNET48
+                    PackageFlags.Default | PackageFlags.Minimal | PackageFlags.FrameworkNET48
                 ),
                 new Package(
                      "v8net",
@@ -772,7 +726,7 @@ namespace FoxTunes
                     new PackageElement[]
                     {
                         "FoxTunes.Core.Windows.dll",
-                        new PackageElement("FoxTunes.Core.Windows.UWP.dll", PackageElementFlags.FrameworkNET462 | PackageElementFlags.FrameworkNET48)
+                        new PackageElement("FoxTunes.Core.Windows.UWP.dll", PackageElementFlags.FrameworkNET48)
                     },
                     PackageFlags.Default
                 ),
@@ -794,8 +748,6 @@ namespace FoxTunes
         public enum ReleaseFlags : byte
         {
             None = 0,
-            FrameworkNET40 = 1,
-            FrameworkNET462 = 2,
             FrameworkNET48 = 4,
             L10N_FR = 32
         }
@@ -827,8 +779,6 @@ namespace FoxTunes
             None = 0,
             Default = 1,
             Minimal = 2,
-            FrameworkNET40 = 4,
-            FrameworkNET462 = 8,
             FrameworkNET48 = 16
         }
 
@@ -861,8 +811,6 @@ namespace FoxTunes
         public enum PackageElementFlags : byte
         {
             None = 0,
-            FrameworkNET40 = 1,
-            FrameworkNET462 = 2,
             FrameworkNET48 = 4
         }
     }
