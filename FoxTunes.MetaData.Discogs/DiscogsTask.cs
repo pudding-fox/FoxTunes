@@ -1,4 +1,5 @@
-﻿using FoxTunes.Interfaces;
+﻿using AsyncKeyedLock;
+using FoxTunes.Interfaces;
 using System;
 
 namespace FoxTunes
@@ -7,7 +8,11 @@ namespace FoxTunes
     {
         public const string ID = "926C84B8-2821-4462-BA4E-C1667C296847";
 
-        public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
+        public static readonly AsyncKeyedLocker<string> KeyLock = new AsyncKeyedLocker<string>(o =>
+        {
+            o.PoolSize = 20;
+            o.PoolInitialFill = 1;
+        }, StringComparer.OrdinalIgnoreCase);
 
         protected DiscogsTask() : base(ID)
         {

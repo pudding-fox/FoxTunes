@@ -283,6 +283,7 @@ namespace FoxTunes
         {
             return new Package(new PackageElement[]
             {
+                "AsyncKeyedLock.dll",
                 "FoxDb.Core.dll",
                 "FoxDb.Linq.dll",
                 "FoxDb.Sql.dll",
@@ -294,7 +295,7 @@ namespace FoxTunes
                 "FoxTunes.Scripting.JS.dll",
                 "FoxTunes.UI.dll",
                 new PackageElement("Microsoft.Threading.Tasks.Extensions.Desktop.dll", PackageElementFlags.FrameworkNET40),
-                new PackageElement("Microsoft.Threading.Tasks.Extensions.dll", PackageElementFlags.FrameworkNET40),
+                "Microsoft.Threading.Tasks.Extensions.dll",
                 new PackageElement("Microsoft.Threading.Tasks.dll", PackageElementFlags.FrameworkNET40),
                 new PackageElement("Microsoft.Windows.Shell.dll", PackageElementFlags.FrameworkNET40),
                 new PackageElement("System.IO.dll", PackageElementFlags.FrameworkNET40),
