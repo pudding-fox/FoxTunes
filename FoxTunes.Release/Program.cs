@@ -256,7 +256,7 @@ namespace FoxTunes
                 "FoxTunes.Scripting.dll",
                 "FoxTunes.Scripting.JS.dll",
                 "FoxTunes.UI.dll",
-                "Microsoft.Threading.Tasks.Extensions.dll",
+                "System.Threading.Tasks.Extensions.dll",
                 "System.Windows.Interactivity.dll"
             });
         }
