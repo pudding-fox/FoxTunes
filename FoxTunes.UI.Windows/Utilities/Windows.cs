@@ -106,6 +106,11 @@ namespace FoxTunes
                     Logger.Write(typeof(Windows), LogLevel.Debug, "Closing window: {0}/{1}", window.GetType().Name, window.Title);
                     window.Close();
                 }
+                foreach (var window in WindowBase.Active)
+                {
+                    Logger.Write(typeof(Windows), LogLevel.Debug, "Closing window: {0}/{1}", window.GetType().Name, window.Title);
+                    window.Close();
+                }
                 UIBehaviour.Shutdown();
             });
         }
