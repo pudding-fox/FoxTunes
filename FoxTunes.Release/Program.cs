@@ -497,6 +497,14 @@ namespace FoxTunes
                      }
                  ),
                 new Package(
+                    "groupedplaylist",
+                    new PackageElement[]
+                    {
+                        "FoxTunes.UI.Windows.GroupedPlaylist.dll"
+                    },
+                    PackageFlags.Default
+                ),
+                new Package(
                     "layout",
                     new PackageElement[]
                     {
