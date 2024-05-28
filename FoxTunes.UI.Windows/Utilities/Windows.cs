@@ -541,6 +541,7 @@ namespace FoxTunes
                     Logger.Write(this, LogLevel.Debug, "Creating window: {0}", this.Id);
                     var window = factory();
                     Logger.Write(this, LogLevel.Debug, "Created window: {0}/{1}", window.GetType().Name, window.Title);
+                    window.Owner = Windows.ActiveWindow;
                     window.IsVisibleChanged += this.OnIsVisibleChanged;
                     window.Closed += this.OnClosed;
                     this.OnCreated(window, EventArgs.Empty);

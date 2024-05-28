@@ -82,6 +82,7 @@ namespace FoxTunes.ViewModel
         protected virtual Task OnBackgroundTask(object sender, IBackgroundTask backgroundTask)
         {
             backgroundTask.Faulted += this.OnFaulted;
+            backgroundTask.Completed += this.OnCompleted;
 #if NET40
             return TaskEx.FromResult(false);
 #else
@@ -110,7 +111,17 @@ namespace FoxTunes.ViewModel
             {
                 await this.Add(new ComponentError(backgroundTask, backgroundTask.Exception.Message, backgroundTask.Exception)).ConfigureAwait(false);
             }
+            backgroundTask.Faulted -= this.OnFaulted;
+            backgroundTask.Completed -= this.OnCompleted;
         }
+
+        protected virtual void OnCompleted(object sender, EventArgs e)
+        {
+            var backgroundTask = sender as IBackgroundTask;
+            backgroundTask.Faulted -= this.OnFaulted;
+            backgroundTask.Completed -= this.OnCompleted;
+        }
+
 
         public Task Add(ComponentError error)
         {
