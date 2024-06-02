@@ -101,6 +101,7 @@ It needs at least;
   * Can rip CDs with the CD plugin.
   * Can up/down sample rate/depth with the Resampler plugin.
 * **GAPLESS** - A "true" gapless input transport.
+* **GroupedPlaylist** - A scriptable playlist with grouping and artwork. 
 * **Noesis** - Use Noesis.Javascript for scriptable elements.
 * **ClearScript** - Use Microsoft.ClearScript for scriptable elements.  
 * **Layout** - A flexible layout system with various panel types. 
