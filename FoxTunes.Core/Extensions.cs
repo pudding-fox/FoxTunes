@@ -1,4 +1,5 @@
 ﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -158,22 +159,69 @@ namespace FoxTunes
 
         public static string GetName(this string fileName)
         {
-            if (string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            var absolutePath = default(string);
+            if (!fileName.GetAbsolutePath(out absolutePath))
             {
                 return fileName;
             }
-            var name = Path.GetFileName(fileName);
+            var name = Path.GetFileName(absolutePath);
             return name;
         }
 
         public static string GetExtension(this string fileName)
         {
-            var extension = Path.GetExtension(fileName);
+            var extension = Path.GetExtension(fileName.GetAbsolutePath());
             if (string.IsNullOrEmpty(extension) || extension.Length <= 1)
             {
                 return string.Empty;
             }
             return extension.Substring(1).ToLower(CultureInfo.InvariantCulture);
+        }
+
+        public static string GetAbsolutePath(this string fileName)
+        {
+            var absolutePath = default(string);
+            if (fileName.GetAbsolutePath(out absolutePath))
+            {
+                return absolutePath;
+            }
+            return fileName;
+        }
+
+        public static bool GetAbsolutePath(this string fileName, out string absolutePath)
+        {
+            if (!fileName.HasDirectory() || !string.IsNullOrEmpty(Path.GetPathRoot(fileName)))
+            {
+                absolutePath = fileName;
+                return true;
+            }
+            try
+            {
+                var url = new Uri(fileName);
+                absolutePath = Uri.UnescapeDataString(
+                    url.AbsolutePath
+                ).Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                return true;
+            }
+            catch
+            {
+                //Nothing can be done.
+            }
+            absolutePath = null;
+            return false;
+        }
+
+        public static bool HasDirectory(this string fileName)
+        {
+            if (fileName.IndexOf(Path.DirectorySeparatorChar) >= 0)
+            {
+                return true;
+            }
+            else if (fileName.IndexOf(Path.AltDirectorySeparatorChar) >= 0)
+            {
+                return true;
+            }
+            return false;
         }
 
         public static string UCFirst(this string value)

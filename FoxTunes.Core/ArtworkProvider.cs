@@ -113,11 +113,12 @@ namespace FoxTunes
 
         public string GetFileName(string path, string extension, ArtworkType type)
         {
-            if (string.IsNullOrEmpty(Path.GetPathRoot(path)))
+            var absolutePath = default(string);
+            if (!path.GetAbsolutePath(out absolutePath))
             {
-                return null;
+                return string.Empty;
             }
-            var directoryName = Path.GetDirectoryName(path);
+            var directoryName = Path.GetDirectoryName(absolutePath);
             var names = default(string[]);
             switch (type)
             {
@@ -154,11 +155,12 @@ namespace FoxTunes
 
         public string Find(string path, ArtworkType type)
         {
-            if (string.IsNullOrEmpty(Path.GetPathRoot(path)))
+            var absolutePath = default(string);
+            if (!path.GetAbsolutePath(out absolutePath))
             {
-                return null;
+                return string.Empty;
             }
-            var root = Path.GetDirectoryName(path);
+            var root = Path.GetDirectoryName(absolutePath);
             return this.Store.GetOrAdd(root, type, () =>
             {
                 var names = default(string[]);
@@ -221,11 +223,12 @@ namespace FoxTunes
 
         public void Reset(string path, ArtworkType type)
         {
-            if (string.IsNullOrEmpty(Path.GetPathRoot(path)))
+            var absolutePath = default(string);
+            if (!path.GetAbsolutePath(out absolutePath))
             {
                 return;
             }
-            var directoryName = Path.GetDirectoryName(path);
+            var directoryName = Path.GetDirectoryName(absolutePath);
             this.Store.TryRemove(directoryName, type);
         }
 
