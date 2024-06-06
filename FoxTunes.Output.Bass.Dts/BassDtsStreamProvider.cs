@@ -9,8 +9,12 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    public class BassDtsStreamProvider : BassStreamProvider
+    public class BassDtsStreamProvider : BassStreamProvider, IConfigurableComponent
     {
+        public const string DTS = "dts";
+
+        public const string WAV = "wav";
+
         public static string Location
         {
             get
@@ -19,24 +23,52 @@ namespace FoxTunes
             }
         }
 
-        public static readonly string[] EXTENSIONS = new[]
-        {
-            "dts"
-        };
-
         public BassDtsStreamProvider()
         {
             BassLoader.AddPath(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", BassLoader.DIRECTORY_NAME_ADDON));
             BassLoader.AddPath(Path.Combine(Location, Environment.Is64BitProcess ? "x64" : "x86", "bass_dts.dll"));
         }
 
+        public IConfiguration Configuration { get; private set; }
+
+        public BooleanConfigurationElement ProbeWavFiles { get; private set; }
+
+        public override void InitializeComponent(ICore core)
+        {
+            this.Configuration = core.Components.Configuration;
+            this.ProbeWavFiles = this.Configuration.GetElement<BooleanConfigurationElement>(
+                BassDtsStreamProviderConfiguration.SECTION,
+                BassDtsStreamProviderConfiguration.PROBE_WAV_FILES
+            );
+            base.InitializeComponent(core);
+        }
+
         public override bool CanCreateStream(PlaylistItem playlistItem)
         {
-            if (!EXTENSIONS.Contains(playlistItem.FileName.GetExtension(), StringComparer.OrdinalIgnoreCase))
+            var extension = playlistItem.FileName.GetExtension();
+            if (string.Equals(extension, DTS, StringComparison.OrdinalIgnoreCase))
             {
-                return false;
+                return true;
             }
-            return true;
+            else if (string.Equals(extension, WAV, StringComparison.OrdinalIgnoreCase))
+            {
+                if (this.ProbeWavFiles.Value)
+                {
+                    Logger.Write(this, LogLevel.Debug, "Probing file \"{0}\" for DTS stream..", playlistItem.FileName);
+                    var channelHandle = BassDts.CreateStream(playlistItem.FileName);
+                    if (channelHandle != 0)
+                    {
+                        Logger.Write(this, LogLevel.Debug, "Found DTS stream in file \"{0}\".", playlistItem.FileName);
+                        Bass.StreamFree(channelHandle);
+                        return true;
+                    }
+                }
+                else
+                {
+                    Logger.Write(this, LogLevel.Debug, "Probing for DTS streams is disabled.");
+                }
+            }
+            return false;
         }
 
         public override IBassStream CreateBasicStream(PlaylistItem playlistItem, IEnumerable<IBassStreamAdvice> advice, BassFlags flags)
@@ -59,6 +91,11 @@ namespace FoxTunes
                 Logger.Write(this, LogLevel.Warn, "Failed to create DTS stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
             }
             return this.CreateInteractiveStream(channelHandle, advice, flags);
+        }
+
+        public IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return BassDtsStreamProviderConfiguration.GetConfigurationSections();
         }
     }
 }
