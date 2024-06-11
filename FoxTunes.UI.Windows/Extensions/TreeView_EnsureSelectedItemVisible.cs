@@ -65,8 +65,6 @@ namespace FoxTunes
 
             public TreeView TreeView { get; private set; }
 
-            public BehaviourStatus Status { get; private set; }
-
             protected virtual bool EnsureVisible(object value)
             {
                 if (value is IHierarchical hierarchical)
@@ -170,15 +168,10 @@ namespace FoxTunes
 
             protected virtual void OnItemsSourceChanged(object sender, EventArgs e)
             {
-                if (this.Status == BehaviourStatus.Restoring)
-                {
-                    return;
-                }
                 var value = GetSelectedItem(this.TreeView);
                 if (value is IHierarchical)
                 {
                     this.TreeView.ItemContainerGenerator.StatusChanged += this.OnStatusChanged;
-                    this.Status = BehaviourStatus.Restoring;
                 }
                 else
                 {
@@ -192,16 +185,12 @@ namespace FoxTunes
                 {
                     return;
                 }
+                this.TreeView.ItemContainerGenerator.StatusChanged -= this.OnStatusChanged;
                 var value = GetSelectedItem(this.TreeView);
                 if (value != null)
                 {
-                    if (!this.EnsureVisible(value))
-                    {
-                        return;
-                    }
+                    this.EnsureVisible(value);
                 }
-                this.TreeView.ItemContainerGenerator.StatusChanged -= this.OnStatusChanged;
-                this.Status = BehaviourStatus.None;
             }
 
             protected override void OnDisposing()
@@ -212,12 +201,6 @@ namespace FoxTunes
                     this.TreeView.ItemContainerGenerator.StatusChanged -= this.OnStatusChanged;
                 }
                 base.OnDisposing();
-            }
-
-            public enum BehaviourStatus : byte
-            {
-                None,
-                Restoring
             }
         }
     }

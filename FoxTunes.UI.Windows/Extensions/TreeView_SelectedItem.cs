@@ -79,10 +79,6 @@ namespace FoxTunes
 
             protected virtual void OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
             {
-                if (this.Status == BehaviourStatus.Restoring)
-                {
-                    return;
-                }
                 if (e.NewValue == null || object.ReferenceEquals(GetSelectedItem(this.TreeView), e.NewValue))
                 {
                     return;
