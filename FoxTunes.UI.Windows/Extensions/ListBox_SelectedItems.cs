@@ -6,27 +6,27 @@ using System.Windows.Controls;
 
 namespace FoxTunes
 {
-    public static partial class ListViewExtensions
+    public static partial class ListBoxExtensions
     {
         public const int MAX_SELECTED_ITEMS = 750;
 
-        private static readonly ConditionalWeakTable<ListView, SelectedItemsBehaviour> SelectedItemsBehaviours = new ConditionalWeakTable<ListView, SelectedItemsBehaviour>();
+        private static readonly ConditionalWeakTable<ListBox, SelectedItemsBehaviour> SelectedItemsBehaviours = new ConditionalWeakTable<ListBox, SelectedItemsBehaviour>();
 
         public static bool IsSuspended { get; private set; }
 
         public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.RegisterAttached(
             "SelectedItems",
             typeof(IList),
-            typeof(ListViewExtensions),
+            typeof(ListBoxExtensions),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, new PropertyChangedCallback(OnSelectedItemsPropertyChanged))
         );
 
-        public static IList GetSelectedItems(ListView source)
+        public static IList GetSelectedItems(ListBox source)
         {
             return (IList)source.GetValue(SelectedItemsProperty);
         }
 
-        public static void SetSelectedItems(ListView source, IList value)
+        public static void SetSelectedItems(ListBox source, IList value)
         {
             source.SetValue(SelectedItemsProperty, value);
         }
@@ -37,15 +37,15 @@ namespace FoxTunes
             {
                 return;
             }
-            var listView = sender as ListView;
-            if (listView == null)
+            var listBox = sender as ListBox;
+            if (listBox == null)
             {
                 return;
             }
             var behaviour = default(SelectedItemsBehaviour);
-            if (!SelectedItemsBehaviours.TryGetValue(listView, out behaviour))
+            if (!SelectedItemsBehaviours.TryGetValue(listBox, out behaviour))
             {
-                SelectedItemsBehaviours.Add(listView, new SelectedItemsBehaviour(listView));
+                SelectedItemsBehaviours.Add(listBox, new SelectedItemsBehaviour(listBox));
             }
             IsSuspended = true;
             try
@@ -57,14 +57,14 @@ namespace FoxTunes
                 {
                     return;
                 }
-                if (Enumerable.SequenceEqual(listView.SelectedItems.Cast<object>(), items.Cast<object>()))
+                if (Enumerable.SequenceEqual(listBox.SelectedItems.Cast<object>(), items.Cast<object>()))
                 {
                     return;
                 }
-                listView.SelectedItems.Clear();
+                listBox.SelectedItems.Clear();
                 foreach (var item in items)
                 {
-                    listView.SelectedItems.Add(item);
+                    listBox.SelectedItems.Add(item);
                 }
             }
             finally
@@ -73,26 +73,26 @@ namespace FoxTunes
             }
         }
 
-        private class SelectedItemsBehaviour : UIBehaviour<ListView>
+        private class SelectedItemsBehaviour : UIBehaviour<ListBox>
         {
-            public SelectedItemsBehaviour(ListView listView) : base(listView)
+            public SelectedItemsBehaviour(ListBox listBox) : base(listBox)
             {
-                this.ListView = listView;
-                this.ListView.SelectionChanged += this.OnSelectionChanged;
+                this.ListBox = listBox;
+                this.ListBox.SelectionChanged += this.OnSelectionChanged;
             }
 
-            public ListView ListView { get; private set; }
+            public ListBox ListBox { get; private set; }
 
             protected virtual void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
             {
-                SetSelectedItems(this.ListView, this.ListView.SelectedItems);
+                SetSelectedItems(this.ListBox, this.ListBox.SelectedItems);
             }
 
             protected override void OnDisposing()
             {
-                if (this.ListView != null)
+                if (this.ListBox != null)
                 {
-                    this.ListView.SelectionChanged -= this.OnSelectionChanged;
+                    this.ListBox.SelectionChanged -= this.OnSelectionChanged;
                 }
                 base.OnDisposing();
             }

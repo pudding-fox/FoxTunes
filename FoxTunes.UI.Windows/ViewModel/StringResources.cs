@@ -350,6 +350,14 @@
             }
         }
 
+        public static string PlaylistConfigDialog_Genres
+        {
+            get
+            {
+                return Strings.PlaylistConfigDialog_Genres;
+            }
+        }
+
         public static string PlaylistConfigDialog_MinRating
         {
             get

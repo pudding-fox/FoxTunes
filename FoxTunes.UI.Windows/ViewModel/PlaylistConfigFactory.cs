@@ -76,6 +76,31 @@ namespace FoxTunes.ViewModel
 
         }
 
+        public string Genres
+        {
+            get
+            {
+                return this.Config.GetValueOrDefault(nameof(Genres), Convert.ToString(SmartPlaylistBehaviour.DefaultGenres));
+            }
+            set
+            {
+                this.Config[nameof(Genres)] = value;
+                this.OnGenresChanged();
+            }
+        }
+
+        protected virtual void OnGenresChanged()
+        {
+            this.Config.Save();
+            if (this.GenresChanged != null)
+            {
+                this.GenresChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Genres");
+        }
+
+        public event EventHandler GenresChanged;
+
         public int MinRating
         {
             get
