@@ -33,16 +33,19 @@
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Label Grid.Column="0" Grid.Row="0" Content="{x:Static ViewModel:StringResources.PlaylistConfigDialog_MinRating}"></Label>
-                    <Slider Grid.Column="1" Grid.Row="0" Minimum="0" Maximum="5" IsSnapToTickEnabled="True" SmallChange="1" LargeChange="1" TickFrequency="1" Value="{Binding MinRating}" ToolTip="{Binding MinRating}"></Slider>
-                    <Label Grid.Column="0" Grid.Row="1" Content="{x:Static ViewModel:StringResources.PlaylistConfigDialog_MinAge}"></Label>
-                    <Slider Grid.Column="1" Grid.Row="1" Minimum="0" Maximum="90" IsSnapToTickEnabled="True" SmallChange="1" LargeChange="10" TickFrequency="1" Value="{Binding MinAge}" ToolTip="{Binding MinAge}"></Slider>
-                    <Label Grid.Column="0" Grid.Row="2" Content="{x:Static ViewModel:StringResources.PlaylistConfigDialog_Count}"></Label>
-                    <Slider Grid.Column="1" Grid.Row="2" Minimum="12" Maximum="30" IsSnapToTickEnabled="True" SmallChange="1" LargeChange="5" TickFrequency="1" Value="{Binding Count}" ToolTip="{Binding Count}"></Slider>
+                    <Label Grid.Column="0" Grid.Row="0" Content="{x:Static ViewModel:StringResources.PlaylistConfigDialog_Genres}"></Label>
+                    <Windows:Genres Grid.Column="1" Grid.Row="0" Margin="0,0,0,4" SelectedGenres="{Binding Genres}"></Windows:Genres>
+                    <Label Grid.Column="0" Grid.Row="1" Content="{x:Static ViewModel:StringResources.PlaylistConfigDialog_MinRating}"></Label>
+                    <Slider Grid.Column="1" Grid.Row="1" Minimum="0" Maximum="5" IsSnapToTickEnabled="True" SmallChange="1" LargeChange="1" TickFrequency="1" Value="{Binding MinRating}" ToolTip="{Binding MinRating}"></Slider>
+                    <Label Grid.Column="0" Grid.Row="2" Content="{x:Static ViewModel:StringResources.PlaylistConfigDialog_MinAge}"></Label>
+                    <Slider Grid.Column="1" Grid.Row="2" Minimum="0" Maximum="90" IsSnapToTickEnabled="True" SmallChange="1" LargeChange="10" TickFrequency="1" Value="{Binding MinAge}" ToolTip="{Binding MinAge}"></Slider>
+                    <Label Grid.Column="0" Grid.Row="3" Content="{x:Static ViewModel:StringResources.PlaylistConfigDialog_Count}"></Label>
+                    <Slider Grid.Column="1" Grid.Row="4" Minimum="12" Maximum="30" IsSnapToTickEnabled="True" SmallChange="1" LargeChange="5" TickFrequency="1" Value="{Binding Count}" ToolTip="{Binding Count}"></Slider>
                 </Grid>
             </DataTemplate>
         </ContentControl.Resources>

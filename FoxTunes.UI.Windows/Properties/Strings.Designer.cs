@@ -1006,6 +1006,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Genres.
+        /// </summary>
+        internal static string PlaylistConfigDialog_Genres {
+            get {
+                return ResourceManager.GetString("PlaylistConfigDialog.Genres", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Min Age (Days).
         /// </summary>
         internal static string PlaylistConfigDialog_MinAge {

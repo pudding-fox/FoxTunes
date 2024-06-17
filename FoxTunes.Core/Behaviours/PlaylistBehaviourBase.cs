@@ -2,7 +2,6 @@
 using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Design;
 using System.Linq;
 using System.Threading.Tasks;
 

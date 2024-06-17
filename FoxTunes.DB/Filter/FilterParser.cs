@@ -51,7 +51,7 @@ namespace FoxTunes
                 }
                 if (groups.Any())
                 {
-                    return new FilterParserResult(groups);
+                    return new FilterParserResult(this.PostProcess(groups));
                 }
                 else
                 {
@@ -79,6 +79,19 @@ namespace FoxTunes
                 }
             }
             return false;
+        }
+
+        protected virtual IEnumerable<IFilterParserResultGroup> PostProcess(IEnumerable<IFilterParserResultGroup> groups)
+        {
+            var result = new Dictionary<string, IList<IFilterParserResultEntry>>(StringComparer.OrdinalIgnoreCase);
+            foreach (var group in groups)
+            {
+                foreach (var entry in group.Entries)
+                {
+                    result.GetOrAdd(entry.Name, () => new List<IFilterParserResultEntry>()).Add(entry);
+                }
+            }
+            return result.Values.Select(entries => new FilterParserResultGroup(entries)).ToArray();
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -146,13 +159,13 @@ namespace FoxTunes
         [ComponentDependency(Slot = ComponentSlots.Database)]
         public class KeyValueFilterParserProvider : FilterParserProvider
         {
-            const string ENTRY = "ENTRY";
+            protected const string ENTRY = "ENTRY";
 
-            const string NAME = "NAME";
+            protected const string NAME = "NAME";
 
-            const string OPERATOR = "OPERATOR";
+            protected const string OPERATOR = "OPERATOR";
 
-            const string VALUE = "VALUE";
+            protected const string VALUE = "VALUE";
 
             public KeyValueFilterParserProvider()
             {
@@ -165,12 +178,17 @@ namespace FoxTunes
                     FilterParserResultEntry.EQUAL
                 }.Select(element => "(" + Regex.Escape(element) + ")"));
                 this.Regex = new Regex(
-                    "^(?:(?<" + ENTRY + ">(?<" + NAME + ">[a-z]+)\\s*(?<" + OPERATOR + ">" + operators + ")\\s*(?<" + VALUE + ">.+?)))+$",
+                   this.GetExpression(operators),
                     RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture
                 );
             }
 
             public Regex Regex { get; private set; }
+
+            protected virtual string GetExpression(string operators)
+            {
+                return "^(?:(?<" + ENTRY + ">(?<" + NAME + ">[a-z]+)\\s*(?<" + OPERATOR + ">" + operators + ")\\s*(?<" + VALUE + ">.+?)))+$";
+            }
 
             public override bool TryParse(ref string filter, out IEnumerable<IFilterParserResultGroup> groups)
             {

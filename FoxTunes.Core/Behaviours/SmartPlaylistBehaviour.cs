@@ -1,5 +1,7 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -7,11 +9,15 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class SmartPlaylistBehaviour : PlaylistBehaviourBase
     {
+        public const string Genres = "Genres";
+
         public const string MinRating = "MinRating";
 
         public const string MinAge = "MinAge";
 
         public const string Count = "Count";
+
+        public const string DefaultGenres = "";
 
         public const int DefaultMinRating = 4;
 
@@ -30,8 +36,13 @@ namespace FoxTunes
         protected virtual void GetConfig(Playlist playlist, out string expression, out int count)
         {
             var config = this.GetConfig(playlist);
+            var genres = default(string);
             var minRating = default(int);
             var minAge = default(int);
+            if (!config.TryGetValue(Genres, out genres))
+            {
+                genres = DefaultGenres;
+            }
             if (!int.TryParse(config.GetValueOrDefault(MinRating), out minRating))
             {
                 minRating = DefaultMinRating;
@@ -44,11 +55,29 @@ namespace FoxTunes
             {
                 count = DefaultCount;
             }
-            expression = string.Format(
-                "rating>:{0} lastplayed<{1}",
-                minRating,
-                DateTimeHelper.ToShortString(DateTime.Now.AddDays(minAge * -1).Date)
+            var builder = new StringBuilder();
+            if (!string.IsNullOrEmpty(genres))
+            {
+                foreach (var genre in genres.Split('\t'))
+                {
+                    builder.Append(
+                        string.Concat(
+                            "genre:",
+                            genre,
+                            " "
+                        )
+                    );
+                }
+            }
+            builder.Append(
+                string.Concat(
+                    "rating>:",
+                    minRating,
+                    " lastplayed<",
+                    DateTimeHelper.ToShortString(DateTime.Now.AddDays(minAge * -1).Date)
+                )
             );
+            expression = builder.ToString();
         }
 
         public ICore Core { get; private set; }
