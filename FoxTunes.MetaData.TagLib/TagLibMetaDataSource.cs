@@ -141,14 +141,19 @@ namespace FoxTunes
 
         public async Task<IEnumerable<MetaDataItem>> GetMetaData(string fileName, Func<File> factory)
         {
+            var metaData = new List<MetaDataItem>();
             if (!this.IsSupported(fileName))
             {
                 Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
                 this.AddWarning(fileName, "Unsupported file format.");
-                return Enumerable.Empty<MetaDataItem>();
+                //Add minimal meta data so library is happy.
+                if (this.FileSystem.Value)
+                {
+                    this.Try(() => FileSystemManager.Read(this, metaData, fileName), this.ErrorHandler);
+                }
+                return metaData;
             }
             var collect = default(bool);
-            var metaData = new List<MetaDataItem>();
             Logger.Write(this, LogLevel.Trace, "Reading meta data for file: {0}", fileName);
             try
             {

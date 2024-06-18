@@ -19,7 +19,7 @@ namespace FoxTunes
             }
         }
 
-        private static void Read(TagLibMetaDataSource source, IList<MetaDataItem> metaData, IFileAbstraction fileAbstraction)
+        public static void Read(TagLibMetaDataSource source, IList<MetaDataItem> metaData, IFileAbstraction fileAbstraction)
         {
             source.AddTag(metaData, FileSystemProperties.FileName, fileAbstraction.FileName);
             source.AddTag(metaData, FileSystemProperties.DirectoryName, fileAbstraction.DirectoryName);
@@ -29,7 +29,7 @@ namespace FoxTunes
             source.AddTag(metaData, FileSystemProperties.FileModificationTime, DateTimeHelper.ToString(fileAbstraction.FileModificationTime));
         }
 
-        private static void Read(TagLibMetaDataSource source, IList<MetaDataItem> metaData, string fileName)
+        public static void Read(TagLibMetaDataSource source, IList<MetaDataItem> metaData, string fileName)
         {
             var info = new global::System.IO.FileInfo(fileName);
             if (!info.Exists)
