@@ -21,6 +21,8 @@ namespace FoxTunes
                             new FilterParserResultEntry(CommonMetaData.Performer, FilterParserEntryOperator.Match, "*Hello World!*"),
                             new FilterParserResultEntry(CommonMetaData.Album, FilterParserEntryOperator.Match, "*Hello World!*"),
                             new FilterParserResultEntry(CommonMetaData.Title, FilterParserEntryOperator.Match, "*Hello World!*"),
+                            new FilterParserResultEntry(FileSystemProperties.FileName, FilterParserEntryOperator.Match, "*Hello World!*"),
+                            new FilterParserResultEntry(FileSystemProperties.DirectoryName, FilterParserEntryOperator.Match, "*Hello World!*"),
                         }
                     )
                 }
@@ -119,6 +121,8 @@ namespace FoxTunes
                             new FilterParserResultEntry(CommonMetaData.Performer, FilterParserEntryOperator.Match,  "*cream cakes*"),
                             new FilterParserResultEntry(CommonMetaData.Album, FilterParserEntryOperator.Match, "*cream cakes*"),
                             new FilterParserResultEntry(CommonMetaData.Title, FilterParserEntryOperator.Match, "*cream cakes*"),
+                            new FilterParserResultEntry(FileSystemProperties.FileName, FilterParserEntryOperator.Match, "*cream cakes*"),
+                            new FilterParserResultEntry(FileSystemProperties.DirectoryName, FilterParserEntryOperator.Match, "*cream cakes*"),
                         }
                     )
                 }
