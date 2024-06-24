@@ -1,4 +1,5 @@
 ﻿using FoxDb;
+using FoxDb.Interfaces;
 using FoxTunes.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,15 +21,34 @@ namespace FoxTunes.ViewModel
         {
             using (var database = core.Factories.Database.Create())
             {
+#pragma warning disable CS0612 
+                var name = database.Tables.MetaDataItem.Column("Name");
+                var value = database.Tables.MetaDataItem.Column("Value");
+#pragma warning restore CS0612
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    var set = database.Set<MetaDataItem>(transaction);
-                    var query = set.AsQueryable()
-                        .Where(metaDataItem => metaDataItem.Name == CommonMetaData.Genre)
-                        .GroupBy(metaDataItem => metaDataItem.Value)
-                        .Select(group => group.Key)
-                        .OrderBy(name => name);
-                    return query.ToArray();
+                    var builder = database.QueryFactory.Build();
+                    builder.Output.AddColumn(value);
+                    builder.Filter.AddColumn(name);
+                    builder.Source.AddTable(database.Tables.MetaDataItem);
+                    builder.Aggregate.AddColumn(value);
+                    builder.Sort.AddColumn(value);
+                    var query = builder.Build();
+                    using (var reader = database.ExecuteReader(query, (parameters, phase) =>
+                    {
+                        switch (phase)
+                        {
+                            case DatabaseParameterPhase.Fetch:
+                                parameters[name] = CommonMetaData.Genre;
+                                break;
+                        }
+                    }, transaction))
+                    {
+                        foreach (var record in reader)
+                        {
+                            yield return record.Get<string>(value);
+                        }
+                    }
                 }
             }
         }
