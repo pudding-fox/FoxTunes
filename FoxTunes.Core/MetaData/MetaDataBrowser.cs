@@ -11,16 +11,6 @@ namespace FoxTunes
     [ComponentDependency(Slot = ComponentSlots.Database)]
     public class MetaDataBrowser : StandardComponent, IMetaDataBrowser
     {
-        public MetaDataBrowser()
-        {
-            this.LibraryQueries = new ConcurrentDictionary<string, Lazy<IDatabaseQuery>>(StringComparer.OrdinalIgnoreCase);
-            this.PlaylistQueries = new ConcurrentDictionary<int, Lazy<IDatabaseQuery>>();
-        }
-
-        public ConcurrentDictionary<string, Lazy<IDatabaseQuery>> LibraryQueries { get; private set; }
-
-        public ConcurrentDictionary<int, Lazy<IDatabaseQuery>> PlaylistQueries { get; private set; }
-
         public IMetaDataCache MetaDataCache { get; private set; }
 
         public ILibraryHierarchyBrowser LibraryHierarchyBrowser { get; private set; }
@@ -70,10 +60,7 @@ namespace FoxTunes
 
         private IDatabaseReader GetReader(IDatabaseComponent database, LibraryHierarchyNode libraryHierarchyNode, string name, MetaDataItemType type, int limit, ITransactionSource transaction)
         {
-            var query = this.LibraryQueries.GetOrAdd(
-                this.LibraryHierarchyBrowser.Filter,
-                () => new Lazy<IDatabaseQuery>(() => database.Queries.GetLibraryHierarchyMetaData(this.LibraryHierarchyBrowser.Filter, limit))
-            ).Value;
+            var query = database.Queries.GetLibraryHierarchyMetaData(this.LibraryHierarchyBrowser.Filter, limit);
             return database.ExecuteReader(query, (parameters, phase) =>
             {
                 switch (phase)
