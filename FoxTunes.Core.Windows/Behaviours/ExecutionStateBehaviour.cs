@@ -113,7 +113,7 @@ namespace FoxTunes
                 }
                 return true;
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Error, "Failed to set thread execution state: {0}", e.Message);
                 return false;

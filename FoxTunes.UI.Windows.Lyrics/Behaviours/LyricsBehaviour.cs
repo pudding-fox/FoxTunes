@@ -208,7 +208,7 @@ namespace FoxTunes
                 {
                     File.Delete(fileName);
                 }
-                catch (Exception e)
+                catch
                 {
                     //Logger.Write(this, LogLevel.Warn, "Failed to delete temp file \"{0}\":", fileName, e.Message);
                 }

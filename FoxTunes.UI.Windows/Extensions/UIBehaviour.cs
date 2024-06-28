@@ -96,7 +96,7 @@ namespace FoxTunes
                 {
                     instance.Dispose();
                 }
-                catch (Exception e)
+                catch
                 {
                     //Logger.Write(typeof(UIBehaviour), LogLevel.Warn, "Instance failed to dispose: {0}", e.Message);
                 }

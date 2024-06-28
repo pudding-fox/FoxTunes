@@ -129,7 +129,7 @@ namespace FoxTunes
             {
                 FileMetaDataStore.Clear(PREFIX);
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to clear storage \"{0}\": {1}", PREFIX, e.Message);
             }

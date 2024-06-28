@@ -218,7 +218,7 @@ namespace FoxTunes.ViewModel
                     effects = DragDropEffects.Copy;
                 }
             }
-            catch (Exception exception)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to query clipboard contents: {0}", exception.Message);
             }
@@ -255,7 +255,7 @@ namespace FoxTunes.ViewModel
                     return this.AddToPlaylist(paths);
                 }
             }
-            catch (Exception exception)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to process clipboard contents: {0}", exception.Message);
             }

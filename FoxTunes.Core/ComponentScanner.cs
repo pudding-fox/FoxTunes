@@ -72,7 +72,7 @@ namespace FoxTunes
                 //Logger.Write(typeof(ComponentScanner), LogLevel.Trace, "Error was handled while getting exported types for assembly {0}: {1}", fileName, e.Message);
                 return e.Types;
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(typeof(ComponentScanner), LogLevel.Warn, "Failed to get exported types for assembly {0}: {1}", fileName, e.Message);
                 return Enumerable.Empty<Type>();

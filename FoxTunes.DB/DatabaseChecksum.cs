@@ -35,7 +35,7 @@ namespace FoxTunes
                     }
                 }
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to retrieve checksum from database: {0}", e.Message);
                 return null;

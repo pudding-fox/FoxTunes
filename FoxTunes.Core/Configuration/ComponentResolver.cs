@@ -80,7 +80,7 @@ namespace FoxTunes
                     }
                 }
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(typeof(ComponentResolver), LogLevel.Warn, "Failed to load component slots: {0}", e.Message);
             }
@@ -114,7 +114,7 @@ namespace FoxTunes
                     Serializer.Save(stream, this.Slots);
                 }
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(typeof(ComponentResolver), LogLevel.Warn, "Failed to save component slots: {0}", e.Message);
             }

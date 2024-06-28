@@ -201,7 +201,7 @@ namespace FoxTunes
                     Render(ref info, data);
                     success = true;
                 }
-                catch (Exception e)
+                catch 
                 {
 #if DEBUG
                     //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum: {0}", e.Message);
@@ -257,7 +257,7 @@ namespace FoxTunes
 
                 this.BeginUpdateData();
             }
-            catch (Exception exception)
+            catch
             {
 #if DEBUG
                 //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data: {0}", exception.Message);
@@ -282,7 +282,7 @@ namespace FoxTunes
 
                 this.BeginUpdateDisplay();
             }
-            catch (Exception exception)
+            catch 
             {
 #if DEBUG
                 //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum data: {0}", exception.Message);

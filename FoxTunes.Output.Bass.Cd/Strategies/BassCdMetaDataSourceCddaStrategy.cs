@@ -53,7 +53,7 @@ namespace FoxTunes
                         }
                     }
                 }
-                catch (Exception e)
+                catch 
                 {
                     //Logger.Write(this, LogLevel.Warn, "Failed to query CDDB for drive {0}: {1}", this.Drive, e.Message);
                 }

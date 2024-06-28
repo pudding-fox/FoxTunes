@@ -142,7 +142,7 @@ namespace FoxTunes
                 window.InputBindings.Remove(binding);
                 //Logger.Write(this, LogLevel.Debug, "RemoveCommandBinding: {0}/{1} => {2}", window.GetType().Name, window.Title, id);
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to remove command binding {0}: {1}", id, e.Message);
             }

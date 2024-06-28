@@ -147,7 +147,7 @@ namespace FoxTunes
                         this.MainComponent = Serializer.LoadComponent(stream);
                     }
                 }
-                catch (Exception e)
+                catch
                 {
                     //Logger.Write(this, LogLevel.Warn, "Failed to load component: {0}", e.Message);
                 }
@@ -224,7 +224,7 @@ namespace FoxTunes
                     this.IsSaving = false;
                 }
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to save config: {0}", e.Message);
             }

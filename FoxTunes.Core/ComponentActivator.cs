@@ -36,7 +36,7 @@ namespace FoxTunes
                     return default(T);
                 }
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Failed to activate component {0}: {1}.", type.Name, e.Message);
                 return default(T);

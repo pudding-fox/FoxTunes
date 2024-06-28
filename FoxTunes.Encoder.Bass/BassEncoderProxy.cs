@@ -103,7 +103,7 @@ namespace FoxTunes
                 //Logger.Write(this, LogLevel.Warn, "Encoder container process did not exit after {0}ms, terminating it.", TIMEOUT);
                 this.Process.Kill();
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Error, "Failed to terminate encoder container process: {0}", e.Message);
             }

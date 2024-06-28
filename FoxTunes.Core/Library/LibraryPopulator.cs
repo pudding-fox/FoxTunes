@@ -92,7 +92,7 @@ namespace FoxTunes
                 await writer.Write(libraryItem).ConfigureAwait(false);
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Debug, "Failed to add file \"{0}\" to library: {0}", fileName, e.Message);
                 return false;

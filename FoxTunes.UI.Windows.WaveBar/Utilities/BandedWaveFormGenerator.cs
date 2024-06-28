@@ -126,7 +126,7 @@ namespace FoxTunes
             {
                 this.Cache.Save(stream, data);
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to save wave form data for file \"{0}\": {1}", stream.FileName, e.Message);
             }

@@ -77,7 +77,7 @@ namespace FoxTunes
                     return true;
                 }
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to load wave form from file \"{0}\": {1}", fileName, e.Message);
             }
@@ -108,7 +108,7 @@ namespace FoxTunes
                     stream.Seek(0, SeekOrigin.Begin);
                 }
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to save wave form: {0}", e.Message);
             }
@@ -142,7 +142,7 @@ namespace FoxTunes
                 }
                 FileMetaDataStore.Clear(PREFIX);
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(typeof(WaveFormCache), LogLevel.Warn, "Failed to clear caches: {0}", e.Message);
             }

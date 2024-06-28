@@ -68,7 +68,7 @@ namespace FoxTunes
                         await this.MetaDataSource.GetMetaData(fileName).ConfigureAwait(false)
                     ).ToArray();
                 }
-                catch (Exception e)
+                catch 
                 {
                     metaData = new MetaDataItem[] { };
                     //Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", fileName, e.Message);

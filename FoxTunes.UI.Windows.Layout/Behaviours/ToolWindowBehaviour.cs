@@ -87,7 +87,7 @@ namespace FoxTunes
                     }
                 }
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to load config: {0}", e.Message);
             }
@@ -117,7 +117,7 @@ namespace FoxTunes
                 this.OnLoaded(config, window);
                 return window;
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to load config: {0}", e.Message);
                 return null;
@@ -261,7 +261,7 @@ namespace FoxTunes
                 }
                 //Logger.Write(this, LogLevel.Debug, "Saved config for {0} windows.", this.Windows.Count);
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to save config: {0}", e.Message);
             }

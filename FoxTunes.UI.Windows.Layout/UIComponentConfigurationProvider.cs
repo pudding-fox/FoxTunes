@@ -255,7 +255,7 @@ namespace FoxTunes
                     }
                 }
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
             }

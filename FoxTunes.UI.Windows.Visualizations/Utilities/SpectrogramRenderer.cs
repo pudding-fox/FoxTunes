@@ -137,7 +137,7 @@ namespace FoxTunes
                         }
                     }
                 }
-                catch (Exception e)
+                catch 
                 {
                     //Logger.Write(this, LogLevel.Error, "Failed to restore spectrogram from history: {0}", e.Message);
                 }
@@ -196,7 +196,7 @@ namespace FoxTunes
                         success = true;
                     }
                 }
-                catch (Exception e)
+                catch
                 {
 #if DEBUG
                     //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrogram: {0}", e.Message);
@@ -248,7 +248,7 @@ namespace FoxTunes
 
                 this.BeginUpdateData();
             }
-            catch (Exception exception)
+            catch
             {
 #if DEBUG
                 //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrogram data: {0}", exception.Message);
@@ -273,7 +273,7 @@ namespace FoxTunes
 
                 this.BeginUpdateDisplay();
             }
-            catch (Exception exception)
+            catch
             {
 #if DEBUG
                 //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrogram data: {0}", exception.Message);

@@ -73,7 +73,7 @@ namespace FoxTunes
                 ComponentRegistry.Instance.AddComponents(components);
                 this.LoadConfiguration();
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Debug, "Failed to load the core, we will crash soon: {0}", e.Message);
                 throw;
@@ -86,7 +86,7 @@ namespace FoxTunes
             {
                 this.InitializeComponents();
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Debug, "Failed to initialize the core, we will crash soon: {0}", e.Message);
                 throw;
@@ -125,7 +125,7 @@ namespace FoxTunes
                 {
                     sections.AddRange(component.GetConfigurationSections());
                 }
-                catch (Exception e)
+                catch
                 {
                     //Logger.Write(this, LogLevel.Warn, "Failed to get configuration for component {0}: {1}", component.GetType().Name, e.Message);
                 }
@@ -150,7 +150,7 @@ namespace FoxTunes
                 {
                     component.InitializeComponent(this);
                 }
-                catch (Exception e)
+                catch
                 {
                     //Logger.Write(this, LogLevel.Warn, "Failed to initialize component {0}: {1}", component.GetType().Name, e.Message);
                 }
@@ -165,7 +165,7 @@ namespace FoxTunes
                 {
                     component.InitializeDatabase(database, type);
                 }
-                catch (Exception e)
+                catch 
                 {
                     //Logger.Write(this, LogLevel.Warn, "Failed to initialize database {0}: {1}", component.GetType().Name, e.Message);
                 }
@@ -213,7 +213,7 @@ namespace FoxTunes
                 {
                     component.Dispose();
                 }
-                catch (Exception e)
+                catch 
                 {
                     //Logger.Write(this, LogLevel.Warn, "Failed to dispose component {0}: {1}", component.GetType().Name, e.Message);
                 }

@@ -327,7 +327,7 @@ namespace FoxTunes
             {
                 track = disc.Tracks.Add(minidiscTrack.FileName, compression);
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Error, "Error adding track \"{0}\" to disc: {1}", minidiscTrack.FileName, e.Message);
                 throw;

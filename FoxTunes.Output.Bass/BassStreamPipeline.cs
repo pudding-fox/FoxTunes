@@ -163,7 +163,7 @@ namespace FoxTunes
                 {
                     component.Dispose();
                 }
-                catch (Exception e)
+                catch 
                 {
                     //Logger.Write(this, LogLevel.Error, "Pipeline component \"{0}\" could not be disposed: {1}", component.GetType().Name, e.Message);
                 }

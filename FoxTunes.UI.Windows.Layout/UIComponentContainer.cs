@@ -382,7 +382,7 @@ namespace FoxTunes
                     configuration.WithSection(section);
                 }
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to register configuration for component {0}: {1}", component.GetType().Name, e.Message);
             }

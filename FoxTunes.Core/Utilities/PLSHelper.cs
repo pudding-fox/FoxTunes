@@ -270,7 +270,7 @@ namespace FoxTunes
                             var metaData = await metaDataSource.GetMetaData(playlistItem.FileName).ConfigureAwait(false);
                             playlistItem.AddOrUpdate(metaData, out names);
                         }
-                        catch (Exception e)
+                        catch 
                         {
                             //Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", fileName, e.Message);
                         }

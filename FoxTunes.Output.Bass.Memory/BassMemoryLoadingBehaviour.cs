@@ -51,7 +51,7 @@ namespace FoxTunes
                     BassMemory.Progress(this.Handler);
                     //Logger.Write(this, LogLevel.Debug, "Registered progress handler.");
                 }
-                catch (Exception ex)
+                catch 
                 {
                     //Logger.Write(this, LogLevel.Warn, "Failed to register progress handler: {0}", ex.Message);
                 }

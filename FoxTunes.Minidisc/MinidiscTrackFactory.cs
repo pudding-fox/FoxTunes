@@ -190,7 +190,7 @@ namespace FoxTunes
             {
                 Directory.Delete(TempPath, true);
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(typeof(MinidiscBehaviour), LogLevel.Warn, "Failed to cleanup temp files: {0}", e.Message);
             }

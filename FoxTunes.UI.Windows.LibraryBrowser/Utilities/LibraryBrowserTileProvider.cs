@@ -93,7 +93,7 @@ namespace FoxTunes
                 }
                 return this.CreateImageSourceCore(libraryHierarchyNode, metaDataItems, width, height, mode, cache);
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Error, "Error creating image source: {0}", e.Message);
                 return null;
@@ -325,7 +325,7 @@ namespace FoxTunes
                     this.GetCachePrefix(libraryHierarchyNode)
                 );
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to clear storage \"{0}\": {1}", this.GetCachePrefix(libraryHierarchyNode), e.Message);
             }
@@ -337,7 +337,7 @@ namespace FoxTunes
             {
                 FileMetaDataStore.Clear(PREFIX);
             }
-            catch (Exception e)
+            catch 
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to clear storage \"{0}\": {1}", PREFIX, e.Message);
             }

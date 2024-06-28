@@ -62,7 +62,7 @@ namespace FoxTunes
             }
             else
             {
-                Logger.Write(this, LogLevel.Warn, "Platform is not supported.");
+                //Logger.Write(this, LogLevel.Warn, "Platform is not supported.");
             }
             base.InitializeComponent(core);
         }
@@ -98,7 +98,7 @@ namespace FoxTunes
             this.Timer.Start();
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.Refresh();
-            Logger.Write(this, LogLevel.Debug, "SystemMediaTransportControls enabled.");
+            //Logger.Write(this, LogLevel.Debug, "SystemMediaTransportControls enabled.");
         }
 
         public void Disable()
@@ -121,7 +121,7 @@ namespace FoxTunes
             //this.TransportControls.ShuffleEnabledChangeRequested -= this.OnShuffleEnabledChangeRequested;
             //this.TransportControls.PropertyChanged -= this.OnPropertyChanged;
             this.TransportControls = null;
-            Logger.Write(this, LogLevel.Debug, "SystemMediaTransportControls disabled.");
+            //Logger.Write(this, LogLevel.Debug, "SystemMediaTransportControls disabled.");
         }
 
         public void Refresh()
@@ -207,7 +207,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Error, "Failed to update music properties: {0}", e.Message);
+                //Logger.Write(this, LogLevel.Error, "Failed to update music properties: {0}", e.Message);
             }
             return Task.CompletedTask;
         }
@@ -231,7 +231,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Error, "Failed to update music thumbnail: {0}", e.Message);
+                //Logger.Write(this, LogLevel.Error, "Failed to update music thumbnail: {0}", e.Message);
             }
         }
 
@@ -293,7 +293,7 @@ namespace FoxTunes
                     break;
             }
             this.RefreshState();
-            Logger.Write(this, LogLevel.Debug, "Handled button press: {0}", Enum.GetName(typeof(SystemMediaTransportControlsButton), args.Button));
+            //Logger.Write(this, LogLevel.Debug, "Handled button press: {0}", Enum.GetName(typeof(SystemMediaTransportControlsButton), args.Button));
         }
 
         //protected virtual void OnAutoRepeatModeChangeRequested(SystemMediaTransportControls sender, AutoRepeatModeChangeRequestedEventArgs args)
@@ -398,7 +398,7 @@ namespace FoxTunes
 
         private void ErrorHandler(Exception e)
         {
-            Logger.Write(this, LogLevel.Error, "Failed to set music properties: {0}", e.Message);
+            //Logger.Write(this, LogLevel.Error, "Failed to set music properties: {0}", e.Message);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -431,7 +431,7 @@ namespace FoxTunes
 
         ~SystemMediaTransportControlsBehaviour()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

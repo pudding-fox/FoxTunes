@@ -146,7 +146,7 @@ namespace FoxTunes
             {
                 await this.StatisticsManager.IncrementPlayCount(playlistItem).ConfigureAwait(false);
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Error, "Failed to update play count for file \"{0}\": {1}", playlistItem.FileName, e.Message);
             }

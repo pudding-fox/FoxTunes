@@ -74,7 +74,7 @@ namespace FoxTunes
             }
             else
             {
-                Logger.Write(this, LogLevel.Warn, "Platform is not supported.");
+                //Logger.Write(this, LogLevel.Warn, "Platform is not supported.");
             }
             base.InitializeComponent(core);
         }
@@ -105,7 +105,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to enable: {0}", e.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to enable: {0}", e.Message);
             }
         }
 
@@ -133,7 +133,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to disable: {0}", e.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to disable: {0}", e.Message);
             }
             this.ToastNotifier = null;
         }
@@ -158,7 +158,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to show notification: {0}", e.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to show notification: {0}", e.Message);
             }
         }
 
@@ -328,7 +328,7 @@ namespace FoxTunes
 
         ~ToastNotificationManagerBehaviour()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

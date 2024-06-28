@@ -161,7 +161,7 @@ namespace FoxTunes
                             continue;
                         }
                     }
-                    catch (Exception e)
+                    catch 
                     {
                         //Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", path, e.Message);
                     }
@@ -178,7 +178,7 @@ namespace FoxTunes
                                 continue;
                             }
                         }
-                        catch (Exception e)
+                        catch 
                         {
                             //Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", fileName, e.Message);
                         }
@@ -196,7 +196,7 @@ namespace FoxTunes
                     {
                         this.Load(fileName);
                     }
-                    catch (Exception e)
+                    catch
                     {
                         //Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", fileName, e.Message);
                     }

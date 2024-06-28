@@ -127,7 +127,7 @@ namespace FoxTunes
                                     }
                                 }
                             }
-                            catch (Exception e)
+                            catch 
                             {
                                 //Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", path, e.Message);
                             }

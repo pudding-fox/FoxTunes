@@ -75,7 +75,7 @@ namespace FoxTunes
                         }
                     }
                 }
-                catch (Exception e)
+                catch
                 {
                     metaData = Enumerable.Empty<MetaDataItem>();
                     //Logger.Write(this, LogLevel.Warn, "Failed to read meta data from file \"{0}\": {1}", target, e.Message);

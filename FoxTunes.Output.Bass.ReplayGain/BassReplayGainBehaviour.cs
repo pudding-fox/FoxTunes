@@ -267,7 +267,7 @@ namespace FoxTunes
                     //Logger.Write(this, LogLevel.Warn, "Failed to calculate track replay gain for file \"{0}\".", stream.FileName);
                 }
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to calculate track replay gain for file \"{0}\": {1}", stream.FileName, e.Message);
             }

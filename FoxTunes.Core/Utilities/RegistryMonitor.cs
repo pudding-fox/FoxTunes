@@ -115,7 +115,8 @@ namespace FoxTunes
                     var waitHandles = new WaitHandle[] { notifyEvent, this.Event };
                     while (!this.Event.WaitOne(0, true))
                     {
-                        var result = RegNotifyChangeKeyValue(registryKey, true, this.Filter, notifyEvent.Handle, true);
+                        var handle = notifyEvent.GetSafeWaitHandle().DangerousGetHandle();
+                        var result = RegNotifyChangeKeyValue(registryKey, true, this.Filter, handle, true);
                         if (result != 0)
                         {
                             throw new Win32Exception(result);

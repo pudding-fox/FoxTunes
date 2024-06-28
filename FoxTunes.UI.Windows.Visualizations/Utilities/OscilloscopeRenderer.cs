@@ -161,7 +161,7 @@ namespace FoxTunes
                     Render(info, data);
                     success = true;
                 }
-                catch (Exception e)
+                catch 
                 {
 #if DEBUG
                     //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render oscilloscope: {0}", e.Message);
@@ -229,7 +229,7 @@ namespace FoxTunes
 
                 this.BeginUpdateData();
             }
-            catch (Exception exception)
+            catch
             {
 #if DEBUG
                 //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update oscilloscope data: {0}", exception.Message);
@@ -254,7 +254,7 @@ namespace FoxTunes
 
                 this.BeginUpdateDisplay();
             }
-            catch (Exception exception)
+            catch
             {
 #if DEBUG
                 //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render oscilloscope data: {0}", exception.Message);
