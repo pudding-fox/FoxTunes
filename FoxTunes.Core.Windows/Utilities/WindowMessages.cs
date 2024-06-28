@@ -5,14 +5,6 @@ namespace FoxTunes
 {
     public static class WindowMessages
     {
-        private static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
         public static readonly int WM_TASKBARCREATED;
 
         static WindowMessages()
@@ -23,7 +15,7 @@ namespace FoxTunes
             }
             catch
             {
-                Logger.Write(typeof(TaskbarButtonsBehaviour), LogLevel.Warn, "Failed to register window message: TaskbarCreated");
+                //Logger.Write(typeof(TaskbarButtonsBehaviour), LogLevel.Warn, "Failed to register window message: TaskbarCreated");
             }
         }
 

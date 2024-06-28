@@ -23,15 +23,7 @@ namespace FoxTunes
             typeof(IStandardBehaviour)
         };
 
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        public static string Location
+                public static string Location
         {
             get
             {
@@ -77,12 +69,12 @@ namespace FoxTunes
             }
             catch (ReflectionTypeLoadException e)
             {
-                Logger.Write(typeof(ComponentScanner), LogLevel.Trace, "Error was handled while getting exported types for assembly {0}: {1}", fileName, e.Message);
+                //Logger.Write(typeof(ComponentScanner), LogLevel.Trace, "Error was handled while getting exported types for assembly {0}: {1}", fileName, e.Message);
                 return e.Types;
             }
             catch (Exception e)
             {
-                Logger.Write(typeof(ComponentScanner), LogLevel.Warn, "Failed to get exported types for assembly {0}: {1}", fileName, e.Message);
+                //Logger.Write(typeof(ComponentScanner), LogLevel.Warn, "Failed to get exported types for assembly {0}: {1}", fileName, e.Message);
                 return Enumerable.Empty<Type>();
             }
         }
@@ -110,7 +102,7 @@ namespace FoxTunes
                 .ThenBy(ComponentSorter.Priority);
             if (!ComponentResolver.Instance.Enabled)
             {
-                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Component set is fixed, skipping config/dependency checks.");
+                //Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Component set is fixed, skipping config/dependency checks.");
                 return types.ToArray();
             }
             try
@@ -142,7 +134,7 @@ namespace FoxTunes
                 .ThenBy(ComponentSorter.Priority);
             if (!ComponentResolver.Instance.Enabled)
             {
-                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Component set is fixed, skipping config/dependency checks.");
+                //Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Component set is fixed, skipping config/dependency checks.");
                 return types.ToArray();
             }
             return types
@@ -237,12 +229,12 @@ namespace FoxTunes
                             }
                             else if (string.Equals(id, ComponentSlots.Blocked, StringComparison.OrdinalIgnoreCase))
                             {
-                                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires slot {1}", type.FullName, dependency.Slot);
+                                //Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires slot {1}", type.FullName, dependency.Slot);
                                 return false;
                             }
                             else if (!string.IsNullOrEmpty(dependency.Id) && !string.Equals(dependency.Id, id, StringComparison.OrdinalIgnoreCase))
                             {
-                                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires component {1}", type.FullName, dependency.Id);
+                                //Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires component {1}", type.FullName, dependency.Id);
                                 return false;
                             }
                         }
@@ -276,7 +268,7 @@ namespace FoxTunes
                         var version = new Version(dependency.Major, dependency.Minor);
                         if (Environment.OSVersion.Version < version)
                         {
-                            Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires platform {1}.{2}.", type.FullName, dependency.Major, dependency.Minor);
+                            //Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires platform {1}.{2}.", type.FullName, dependency.Major, dependency.Minor);
                             return false;
                         }
                         else if (dependency.Build > 0)
@@ -284,7 +276,7 @@ namespace FoxTunes
                             var osVersion = new OsVersion();
                             if (RtlGetVersion(ref osVersion) != 0 || osVersion.BuildNumber < dependency.Build)
                             {
-                                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires platform {1}.{2}.", type.FullName, dependency.Major, dependency.Minor);
+                                //Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires platform {1}.{2}.", type.FullName, dependency.Major, dependency.Minor);
                                 return false;
                             }
                         }
@@ -294,12 +286,12 @@ namespace FoxTunes
                             var is34BitProcess = !is64BitProcess;
                             if (dependency.Architecture == ProcessorArchitecture.X86 && is64BitProcess)
                             {
-                                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires platform X86.", type.FullName);
+                                //Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires platform X86.", type.FullName);
                                 return false;
                             }
                             if (dependency.Architecture == ProcessorArchitecture.X64 && !is34BitProcess)
                             {
-                                Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires platform X64.", type.FullName);
+                                //Logger.Write(typeof(ComponentScanner), LogLevel.Debug, "Not loading component \"{0}\": Requires platform X64.", type.FullName);
                                 return false;
                             }
                         }

@@ -92,14 +92,14 @@ namespace FoxTunes
             var values = new List<OnDemandMetaDataValue>();
             foreach (var fileData in fileDatas)
             {
-                Logger.Write(this, LogLevel.Debug, "Looking up lyrics for file \"{0}\"..", fileData.FileName);
+                //Logger.Write(this, LogLevel.Debug, "Looking up lyrics for file \"{0}\"..", fileData.FileName);
                 var result = await provider.Lookup(fileData).ConfigureAwait(false);
                 if (!result.Success)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to look up lyrics for file \"{0}\".", fileData.FileName);
+                    //Logger.Write(this, LogLevel.Warn, "Failed to look up lyrics for file \"{0}\".", fileData.FileName);
                     continue;
                 }
-                Logger.Write(this, LogLevel.Debug, "Looking up lyrics for file \"{0}\": OK.", fileData.FileName);
+                //Logger.Write(this, LogLevel.Debug, "Looking up lyrics for file \"{0}\": OK.", fileData.FileName);
                 values.Add(new OnDemandMetaDataValue(fileData, result.Lyrics));
             }
             var flags = MetaDataUpdateFlags.None;
@@ -121,12 +121,12 @@ namespace FoxTunes
             }
             if (provider == null)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to determine the preferred provider.");
+                //Logger.Write(this, LogLevel.Warn, "Failed to determine the preferred provider.");
                 provider = this.Behaviour.Providers.FirstOrDefault();
             }
             if (provider == null)
             {
-                Logger.Write(this, LogLevel.Warn, "No providers.");
+                //Logger.Write(this, LogLevel.Warn, "No providers.");
             }
             return provider;
         }

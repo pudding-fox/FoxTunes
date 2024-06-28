@@ -84,7 +84,7 @@ namespace FoxTunes
                 var binding = new InputBinding(command, gesture);
                 this.Bindings.GetOrAdd(window, () => new Dictionary<string, InputBinding>(StringComparer.OrdinalIgnoreCase))[id] = binding;
                 window.InputBindings.Add(binding);
-                Logger.Write(this, LogLevel.Debug, "AddCommandBinding: {0}/{1} => {2}", window.GetType().Name, window.Title, id);
+                //Logger.Write(this, LogLevel.Debug, "AddCommandBinding: {0}/{1} => {2}", window.GetType().Name, window.Title, id);
             }
             catch (Exception e)
             {
@@ -140,11 +140,11 @@ namespace FoxTunes
             try
             {
                 window.InputBindings.Remove(binding);
-                Logger.Write(this, LogLevel.Debug, "RemoveCommandBinding: {0}/{1} => {2}", window.GetType().Name, window.Title, id);
+                //Logger.Write(this, LogLevel.Debug, "RemoveCommandBinding: {0}/{1} => {2}", window.GetType().Name, window.Title, id);
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to remove command binding {0}: {1}", id, e.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to remove command binding {0}: {1}", id, e.Message);
             }
         }
 
@@ -202,7 +202,7 @@ namespace FoxTunes
 
         ~KeyBindingsBehaviour()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

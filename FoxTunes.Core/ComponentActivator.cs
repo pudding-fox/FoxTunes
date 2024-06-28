@@ -8,15 +8,7 @@ namespace FoxTunes
 {
     public class ComponentActivator : IComponentActivator
     {
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        private ComponentActivator()
+                private ComponentActivator()
         {
 
         }
@@ -31,7 +23,7 @@ namespace FoxTunes
                 }
                 if (type.GetConstructor(new Type[] { }) == null)
                 {
-                    Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Failed to locate constructor for component {0}.", type.Name);
+                    //Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Failed to locate constructor for component {0}.", type.Name);
                     return default(T);
                 }
                 if (FastActivator.Instance.Activate(type) is T component)
@@ -40,13 +32,13 @@ namespace FoxTunes
                 }
                 else
                 {
-                    Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Component {0} is not of the expected type {1}.", type.Name, typeof(T).Name);
+                    //Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Component {0} is not of the expected type {1}.", type.Name, typeof(T).Name);
                     return default(T);
                 }
             }
             catch (Exception e)
             {
-                Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Failed to activate component {0}: {1}.", type.Name, e.Message);
+                //Logger.Write(typeof(ComponentActivator), LogLevel.Warn, "Failed to activate component {0}: {1}.", type.Name, e.Message);
                 return default(T);
             }
         }

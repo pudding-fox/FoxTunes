@@ -231,7 +231,7 @@ namespace FoxTunes
 
         protected virtual async Task GetRating(LibraryHierarchyNode libraryHierarchyNode, Dictionary<byte, InvocationComponent> invocationComponents)
         {
-            Logger.Write(this, LogLevel.Debug, "Determining rating for library hierarchy node: {0}", libraryHierarchyNode.Id);
+            //Logger.Write(this, LogLevel.Debug, "Determining rating for library hierarchy node: {0}", libraryHierarchyNode.Id);
             var rating = default(byte);
             var ratings = await this.MetaDataBrowser.GetMetaDatas(
                 libraryHierarchyNode,
@@ -242,19 +242,19 @@ namespace FoxTunes
             switch (ratings.Length)
             {
                 case 0:
-                    Logger.Write(this, LogLevel.Debug, "Library hierarchy node {0} tracks have no rating.", libraryHierarchyNode.Id);
+                    //Logger.Write(this, LogLevel.Debug, "Library hierarchy node {0} tracks have no rating.", libraryHierarchyNode.Id);
                     rating = 0;
                     break;
                 case 1:
                     if (!byte.TryParse(ratings[0].Value, out rating))
                     {
-                        Logger.Write(this, LogLevel.Warn, "Library hierarchy node {0} tracks have rating \"{1}\" which is in an unknown format.", libraryHierarchyNode.Id, rating);
+                        //Logger.Write(this, LogLevel.Warn, "Library hierarchy node {0} tracks have rating \"{1}\" which is in an unknown format.", libraryHierarchyNode.Id, rating);
                         return;
                     }
-                    Logger.Write(this, LogLevel.Debug, "Library hierarchy node {0} tracks have rating {1}.", libraryHierarchyNode.Id, rating);
+                    //Logger.Write(this, LogLevel.Debug, "Library hierarchy node {0} tracks have rating {1}.", libraryHierarchyNode.Id, rating);
                     break;
                 default:
-                    Logger.Write(this, LogLevel.Debug, "Library hierarchy node {0} tracks have multiple ratings.", libraryHierarchyNode.Id);
+                    //Logger.Write(this, LogLevel.Debug, "Library hierarchy node {0} tracks have multiple ratings.", libraryHierarchyNode.Id);
                     return;
             }
             foreach (var key in invocationComponents.Keys)
@@ -272,10 +272,10 @@ namespace FoxTunes
             if (playlistItems.Length > ListViewExtensions.MAX_SELECTED_ITEMS)
             {
                 //This would result in too many parameters.
-                Logger.Write(this, LogLevel.Debug, "Cannot determining rating for {0} playlist items, max is {1}.", playlistItems.Length, ListViewExtensions.MAX_SELECTED_ITEMS);
+                //Logger.Write(this, LogLevel.Debug, "Cannot determining rating for {0} playlist items, max is {1}.", playlistItems.Length, ListViewExtensions.MAX_SELECTED_ITEMS);
                 return;
             }
-            Logger.Write(this, LogLevel.Debug, "Determining rating for {0} playlist items.", playlistItems.Length);
+            //Logger.Write(this, LogLevel.Debug, "Determining rating for {0} playlist items.", playlistItems.Length);
             var rating = default(byte);
             var ratings = await this.MetaDataBrowser.GetMetaDatas(
                 playlistItems,
@@ -286,19 +286,19 @@ namespace FoxTunes
             switch (ratings.Length)
             {
                 case 0:
-                    Logger.Write(this, LogLevel.Debug, "{0} playlist items have no rating.", playlistItems.Length);
+                    //Logger.Write(this, LogLevel.Debug, "{0} playlist items have no rating.", playlistItems.Length);
                     rating = 0;
                     break;
                 case 1:
                     if (!byte.TryParse(ratings[0].Value, out rating))
                     {
-                        Logger.Write(this, LogLevel.Warn, "{0} playlist items have rating \"{1}\" which is in an unknown format.", playlistItems.Length, rating);
+                        //Logger.Write(this, LogLevel.Warn, "{0} playlist items have rating \"{1}\" which is in an unknown format.", playlistItems.Length, rating);
                         return;
                     }
-                    Logger.Write(this, LogLevel.Debug, "{0} playlist items have rating {1}.", playlistItems.Length, rating);
+                    //Logger.Write(this, LogLevel.Debug, "{0} playlist items have rating {1}.", playlistItems.Length, rating);
                     break;
                 default:
-                    Logger.Write(this, LogLevel.Debug, "{0} playlist items have multiple ratings.", playlistItems.Length);
+                    //Logger.Write(this, LogLevel.Debug, "{0} playlist items have multiple ratings.", playlistItems.Length);
                     return;
             }
             foreach (var key in invocationComponents.Keys)

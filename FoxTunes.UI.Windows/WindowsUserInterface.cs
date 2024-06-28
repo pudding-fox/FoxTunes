@@ -98,7 +98,7 @@ namespace FoxTunes
                 var window = default(Window);
                 if (registration.TryGetInstance(out window))
                 {
-                    Logger.Write(this, LogLevel.Debug, "Found window instance with role {0}, running.", Enum.GetName(typeof(UserInterfaceWindowRole), UserInterfaceWindowRole.Main));
+                    //Logger.Write(this, LogLevel.Debug, "Found window instance with role {0}, running.", Enum.GetName(typeof(UserInterfaceWindowRole), UserInterfaceWindowRole.Main));
                     this.Application.Run(window);
                     goto done;
                 }
@@ -216,7 +216,7 @@ namespace FoxTunes
 
         protected virtual void OnApplicationDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            Logger.Write(this, LogLevel.Fatal, e.Exception.Message, e);
+            //Logger.Write(this, LogLevel.Fatal, e.Exception.Message, e);
             //Don't crash out.
             e.Handled = true;
         }
@@ -272,7 +272,7 @@ namespace FoxTunes
 
         ~WindowsUserInterface()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

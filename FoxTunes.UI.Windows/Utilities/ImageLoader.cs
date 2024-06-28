@@ -108,7 +108,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(typeof(ImageLoader), LogLevel.Warn, "Failed to load image: {0}", e.Message);
+                //Logger.Write(typeof(ImageLoader), LogLevel.Warn, "Failed to load image: {0}", e.Message);
                 return null;
             }
         }
@@ -150,7 +150,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(typeof(ImageLoader), LogLevel.Warn, "Failed to load image: {0}", e.Message);
+                //Logger.Write(typeof(ImageLoader), LogLevel.Warn, "Failed to load image: {0}", e.Message);
                 return null;
             }
         }

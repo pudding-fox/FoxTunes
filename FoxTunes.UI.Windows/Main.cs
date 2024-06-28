@@ -8,15 +8,7 @@ namespace FoxTunes
 {
     public class Main : ContentControl, IDisposable
     {
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-
+        
         public Main()
         {
             LayoutManager.Instance.ProviderChanged += this.OnProviderChanged;
@@ -85,7 +77,7 @@ namespace FoxTunes
 
         ~Main()
         {
-            Logger.Write(typeof(Main), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(typeof(Main), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

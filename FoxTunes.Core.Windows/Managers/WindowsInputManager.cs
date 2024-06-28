@@ -108,11 +108,11 @@ namespace FoxTunes
                 this.Hook = SetHook(this.Callback);
                 if (this.Hook != IntPtr.Zero)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Added keyboard hook, global keyboard shortcuts are enabled.");
+                    //Logger.Write(this, LogLevel.Debug, "Added keyboard hook, global keyboard shortcuts are enabled.");
                 }
                 else
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to add keyboard hook, global keyboard shortcuts are disabled.");
+                    //Logger.Write(this, LogLevel.Warn, "Failed to add keyboard hook, global keyboard shortcuts are disabled.");
                 }
             }
         }
@@ -123,7 +123,7 @@ namespace FoxTunes
             {
                 UnhookWindowsHookEx(this.Hook);
                 this.Hook = IntPtr.Zero;
-                Logger.Write(this, LogLevel.Debug, "Removed keyboard hook, global keyboard shortcuts are disabled.");
+                //Logger.Write(this, LogLevel.Debug, "Removed keyboard hook, global keyboard shortcuts are disabled.");
             }
         }
 

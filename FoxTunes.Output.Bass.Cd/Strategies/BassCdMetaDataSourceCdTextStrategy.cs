@@ -27,17 +27,17 @@ namespace FoxTunes
 
         public override bool Fetch()
         {
-            Logger.Write(this, LogLevel.Debug, "Querying CD-TEXT for drive {0}...", this.Drive);
+            //Logger.Write(this, LogLevel.Debug, "Querying CD-TEXT for drive {0}...", this.Drive);
             lock (SyncRoot)
             {
                 this.Parser = new CdTextParser(BassCd.GetIDText(this.Drive));
             }
             if (this.Parser.Count > 0)
             {
-                Logger.Write(this, LogLevel.Debug, "CD-TEXT contains {0} records for drive {1}.", this.Parser.Count, this.Drive);
+                //Logger.Write(this, LogLevel.Debug, "CD-TEXT contains {0} records for drive {1}.", this.Parser.Count, this.Drive);
                 return true;
             }
-            Logger.Write(this, LogLevel.Debug, "CD-TEXT was empty for drive {0}.", this.Drive);
+            //Logger.Write(this, LogLevel.Debug, "CD-TEXT was empty for drive {0}.", this.Drive);
             return base.Fetch();
         }
 

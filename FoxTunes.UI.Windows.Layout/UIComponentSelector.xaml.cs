@@ -8,15 +8,7 @@ namespace FoxTunes
 {
     public partial class UIComponentSelector : UserControl, IUIComponent
     {
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        public static readonly DependencyProperty ComponentProperty = DependencyProperty.Register(
+                public static readonly DependencyProperty ComponentProperty = DependencyProperty.Register(
             "Component",
             typeof(UIComponentConfiguration),
             typeof(UIComponentSelector),

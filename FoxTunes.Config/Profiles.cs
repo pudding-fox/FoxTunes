@@ -8,14 +8,6 @@ namespace FoxTunes
 {
     public static class Profiles
     {
-        private static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
         private static readonly string ConfigurationFileName = Path.Combine(
             Publication.StoragePath,
             "Profiles.txt"
@@ -40,16 +32,16 @@ namespace FoxTunes
                         }
                     }
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.Write(typeof(Profiles), LogLevel.Warn, "Failed to read available profiles: {0}", e.Message);
+                    //Logger.Write(typeof(Profiles), LogLevel.Warn, "Failed to read available profiles: {0}", e.Message);
                 }
             }
             if (!profiles.Contains(Strings.Profiles_Default, StringComparer.OrdinalIgnoreCase))
             {
                 profiles.Insert(0, Strings.Profiles_Default);
             }
-            Logger.Write(typeof(Profiles), LogLevel.Debug, "Available profiles: {0}", string.Join(", ", profiles));
+            //Logger.Write(typeof(Profiles), LogLevel.Debug, "Available profiles: {0}", string.Join(", ", profiles));
             return profiles;
         });
 
@@ -111,9 +103,9 @@ namespace FoxTunes
                     }
                 }
             }
-            catch (Exception e)
+            catch
             {
-                Logger.Write(typeof(Profiles), LogLevel.Warn, "Failed to write available profiles: {0}", e.Message);
+                //Logger.Write(typeof(Profiles), LogLevel.Warn, "Failed to write available profiles: {0}", e.Message);
             }
             _AvailableProfiles.Reset();
         }

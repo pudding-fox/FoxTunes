@@ -81,12 +81,12 @@ namespace FoxTunes
                 if (tabItem == null)
                 {
                     //This message removed as it fires a lot.
-                    //Logger.Write(typeof(DragOverSelectionBehaviour), LogLevel.Trace, "No tab under cursor, cancelling selection.");
+                    ////Logger.Write(typeof(DragOverSelectionBehaviour), LogLevel.Trace, "No tab under cursor, cancelling selection.");
                     this.Debouncer.Cancel(this.UpdateSelection);
                 }
                 else if (!object.ReferenceEquals(this.TabItem, tabItem))
                 {
-                    Logger.Write(typeof(DragOverSelectionBehaviour), LogLevel.Trace, "Tab appeared \"{0}\" under cursor, will select in {1}ms.", tabItem.Header, TIMEOUT.TotalMilliseconds);
+                    //Logger.Write(typeof(DragOverSelectionBehaviour), LogLevel.Trace, "Tab appeared \"{0}\" under cursor, will select in {1}ms.", tabItem.Header, TIMEOUT.TotalMilliseconds);
                     this.Debouncer.Exec(this.UpdateSelection);
                 }
                 this.TabItem = tabItem;
@@ -100,7 +100,7 @@ namespace FoxTunes
                     {
                         return;
                     }
-                    Logger.Write(typeof(DragOverSelectionBehaviour), LogLevel.Trace, "Selecting tab \"{0}\".", this.TabItem.Header);
+                    //Logger.Write(typeof(DragOverSelectionBehaviour), LogLevel.Trace, "Selecting tab \"{0}\".", this.TabItem.Header);
                     this.TabItem.IsSelected = true;
                 });
             }

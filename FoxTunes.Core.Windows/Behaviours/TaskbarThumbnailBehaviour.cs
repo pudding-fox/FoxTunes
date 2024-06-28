@@ -141,7 +141,7 @@ namespace FoxTunes
                 //Only create taskbar thumbnail for main windows.
                 return;
             }
-            Logger.Write(this, LogLevel.Debug, "Window created: {0}", e.Window.Handle);
+            //Logger.Write(this, LogLevel.Debug, "Window created: {0}", e.Window.Handle);
             this.Windows.TryAdd(e.Window.Handle, TaskbarThumbnailWindowFlags.None);
         }
 
@@ -152,13 +152,13 @@ namespace FoxTunes
                 //Only create taskbar thumbnail for main windows.
                 return;
             }
-            Logger.Write(this, LogLevel.Debug, "Window destroyed: {0}", e.Window.Handle);
+            //Logger.Write(this, LogLevel.Debug, "Window destroyed: {0}", e.Window.Handle);
             this.AddFlag(e.Window.Handle, TaskbarThumbnailWindowFlags.Destroyed);
         }
 
         protected virtual void OnShuttingDown(object sender, EventArgs e)
         {
-            Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
+            //Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
             this.Windows.Clear();
         }
 
@@ -173,7 +173,7 @@ namespace FoxTunes
                     this.Timer.Elapsed += this.OnElapsed;
                     this.Timer.AutoReset = false;
                     this.Timer.Start();
-                    Logger.Write(this, LogLevel.Debug, "Updater enabled.");
+                    //Logger.Write(this, LogLevel.Debug, "Updater enabled.");
                 }
             }
         }
@@ -188,7 +188,7 @@ namespace FoxTunes
                     this.Timer.Elapsed -= this.OnElapsed;
                     this.Timer.Dispose();
                     this.Timer = null;
-                    Logger.Write(this, LogLevel.Debug, "Updater disabled.");
+                    //Logger.Write(this, LogLevel.Debug, "Updater disabled.");
                 }
             }
             //Perform any cleanup.
@@ -293,17 +293,17 @@ namespace FoxTunes
                 //Handing an event for an unknown window?
                 return;
             }
-            Logger.Write(this, LogLevel.Debug, "Taskbar was created: {0}", handle);
+            //Logger.Write(this, LogLevel.Debug, "Taskbar was created: {0}", handle);
             this.Windows[handle] = TaskbarThumbnailWindowFlags.Registered;
         }
 
         protected virtual void AddHook(IntPtr handle)
         {
-            Logger.Write(this, LogLevel.Debug, "Adding Windows event handler.");
+            //Logger.Write(this, LogLevel.Debug, "Adding Windows event handler.");
             var source = HwndSource.FromHwnd(handle);
             if (source == null)
             {
-                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                //Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                 return;
             }
@@ -313,11 +313,11 @@ namespace FoxTunes
 
         protected virtual void RemoveHook(IntPtr handle)
         {
-            Logger.Write(this, LogLevel.Debug, "Removing Windows event handler.");
+            //Logger.Write(this, LogLevel.Debug, "Removing Windows event handler.");
             var source = HwndSource.FromHwnd(handle);
             if (source == null)
             {
-                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                //Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                 return;
             }
@@ -330,13 +330,13 @@ namespace FoxTunes
             var source = HwndSource.FromHwnd(handle);
             if (source == null)
             {
-                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                //Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 return false;
             }
             var thumbnail = await this.GetThumbnail().ConfigureAwait(false);
             if (!this.HasThumbnail(handle, thumbnail.Name))
             {
-                Logger.Write(this, LogLevel.Debug, "Iconic thumbnail: {0}", thumbnail.Name);
+                //Logger.Write(this, LogLevel.Debug, "Iconic thumbnail: {0}", thumbnail.Name);
                 this.SetThumbnail(handle, thumbnail);
                 var result = default(WindowsIconicThumbnail.HResult);
                 await source.Invoke(
@@ -344,7 +344,7 @@ namespace FoxTunes
                 ).ConfigureAwait(false);
                 if (result != WindowsIconicThumbnail.HResult.Ok)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to invalidate iconic thumbnail: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                    //Logger.Write(this, LogLevel.Warn, "Failed to invalidate iconic thumbnail: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
                     this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                     return false;
                 }
@@ -357,13 +357,13 @@ namespace FoxTunes
             var source = HwndSource.FromHwnd(handle);
             if (source == null)
             {
-                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                //Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 return false;
             }
             int forceIconicRepresentation = enable ? 1 : 0;
             int hasIconicBitmap = enable ? 1 : 0;
             var result = default(WindowsIconicThumbnail.HResult);
-            Logger.Write(this, LogLevel.Debug, "Setting window attribute {0}: DWM_FORCE_ICONIC_REPRESENTATION = {1}", handle, enable ? bool.TrueString : bool.FalseString);
+            //Logger.Write(this, LogLevel.Debug, "Setting window attribute {0}: DWM_FORCE_ICONIC_REPRESENTATION = {1}", handle, enable ? bool.TrueString : bool.FalseString);
             await source.Invoke(
                    () => result = WindowsIconicThumbnail.DwmSetWindowAttribute(
                     handle,
@@ -374,11 +374,11 @@ namespace FoxTunes
             ).ConfigureAwait(false);
             if (result != WindowsIconicThumbnail.HResult.Ok)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to set window attribute DWM_FORCE_ICONIC_REPRESENTATION: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                //Logger.Write(this, LogLevel.Warn, "Failed to set window attribute DWM_FORCE_ICONIC_REPRESENTATION: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
                 this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                 return false;
             }
-            Logger.Write(this, LogLevel.Debug, "Setting window attribute {0}: DWM_HAS_ICONIC_BITMAP = {1}", handle, enable ? bool.TrueString : bool.FalseString);
+            //Logger.Write(this, LogLevel.Debug, "Setting window attribute {0}: DWM_HAS_ICONIC_BITMAP = {1}", handle, enable ? bool.TrueString : bool.FalseString);
             await source.Invoke(
                    () => result = WindowsIconicThumbnail.DwmSetWindowAttribute(
                     handle,
@@ -389,7 +389,7 @@ namespace FoxTunes
             ).ConfigureAwait(false);
             if (result != WindowsIconicThumbnail.HResult.Ok)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to set window attribute DWM_HAS_ICONIC_BITMAP: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                //Logger.Write(this, LogLevel.Warn, "Failed to set window attribute DWM_HAS_ICONIC_BITMAP: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
                 this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                 return false;
             }
@@ -423,21 +423,21 @@ namespace FoxTunes
             var source = HwndSource.FromHwnd(handle);
             if (source == null)
             {
-                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                //Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 return false;
             }
             using (var hdc = WindowsImaging.ScopedDC.Compatible(handle))
             {
                 if (!hdc.IsValid)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to create device context.");
+                    //Logger.Write(this, LogLevel.Warn, "Failed to create device context.");
                     this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                     return false;
                 }
                 var bitmapSection = default(IntPtr);
                 if (!WindowsImaging.CreateDIBSection(hdc.cdc, bitmap, bitmap.Width, -bitmap.Height/* This isn't a mistake, DIB is top down. */, out bitmapSection))
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to create native bitmap.");
+                    //Logger.Write(this, LogLevel.Warn, "Failed to create native bitmap.");
                     this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                     return false;
                 }
@@ -448,7 +448,7 @@ namespace FoxTunes
                 WindowsImaging.DeleteObject(bitmapSection);
                 if (result != WindowsIconicThumbnail.HResult.Ok)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to set iconic thumbnail: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                    //Logger.Write(this, LogLevel.Warn, "Failed to set iconic thumbnail: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
                     this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                     return false;
                 }
@@ -484,7 +484,7 @@ namespace FoxTunes
             var source = HwndSource.FromHwnd(handle);
             if (source == null)
             {
-                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                //Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 return false;
             }
             var bitmap = default(Bitmap);
@@ -499,21 +499,21 @@ namespace FoxTunes
             var source = HwndSource.FromHwnd(handle);
             if (source == null)
             {
-                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                //Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 return false;
             }
             using (var hdc = WindowsImaging.ScopedDC.Compatible(handle))
             {
                 if (!hdc.IsValid)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to create device context.");
+                    //Logger.Write(this, LogLevel.Warn, "Failed to create device context.");
                     this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                     return false;
                 }
                 var bitmapSection = default(IntPtr);
                 if (!WindowsImaging.CreateDIBSection(hdc.cdc, bitmap, bitmap.Width, -bitmap.Height/* This isn't a mistake, DIB is top down. */, out bitmapSection))
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to create native bitmap.");
+                    //Logger.Write(this, LogLevel.Warn, "Failed to create native bitmap.");
                     this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                     return false;
                 }
@@ -525,7 +525,7 @@ namespace FoxTunes
                 WindowsImaging.DeleteObject(bitmapSection);
                 if (result != WindowsIconicThumbnail.HResult.Ok)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to set iconic live preview: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
+                    //Logger.Write(this, LogLevel.Warn, "Failed to set iconic live preview: {0}", Enum.GetName(typeof(WindowsIconicThumbnail.HResult), result));
                     this.AddFlag(handle, TaskbarThumbnailWindowFlags.Error);
                     return false;
                 }
@@ -579,7 +579,7 @@ namespace FoxTunes
 
         ~TaskbarThumbnailBehaviour()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);
@@ -628,7 +628,7 @@ namespace FoxTunes
                 var size = new Size(width, height);
                 return this.ScaledBitmaps.GetOrAdd(size, () =>
                 {
-                    Logger.Write(typeof(TaskbarThumbnail), LogLevel.Debug, "Resizing image {0}: {1}x{2}", this.Name, width, height);
+                    //Logger.Write(typeof(TaskbarThumbnail), LogLevel.Debug, "Resizing image {0}: {1}x{2}", this.Name, width, height);
                     return WindowsImaging.Resize(this.Bitmap, width, height, true);
                 });
             }
@@ -671,7 +671,7 @@ namespace FoxTunes
 
             ~TaskbarThumbnail()
             {
-                Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+                //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
                 try
                 {
                     this.Dispose(true);
@@ -686,7 +686,7 @@ namespace FoxTunes
             {
                 return Store.GetOrAdd(fileName, () =>
                 {
-                    Logger.Write(typeof(TaskbarThumbnail), LogLevel.Debug, "Creating image: {0}", fileName);
+                    //Logger.Write(typeof(TaskbarThumbnail), LogLevel.Debug, "Creating image: {0}", fileName);
                     var stream = File.OpenRead(fileName);
                     return new TaskbarThumbnail(fileName, (Bitmap)Bitmap.FromStream(stream));
                 });
@@ -696,7 +696,7 @@ namespace FoxTunes
 
             private static TaskbarThumbnail GetPlaceholder()
             {
-                Logger.Write(typeof(TaskbarThumbnail), LogLevel.Debug, "Creating image: {0}", PLACEHOLDER);
+                //Logger.Write(typeof(TaskbarThumbnail), LogLevel.Debug, "Creating image: {0}", PLACEHOLDER);
                 var stream = typeof(TaskbarThumbnailBehaviour).Assembly.GetManifestResourceStream(PLACEHOLDER);
                 return new TaskbarThumbnail(PLACEHOLDER, (Bitmap)Bitmap.FromStream(stream));
             }

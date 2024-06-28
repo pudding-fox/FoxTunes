@@ -24,7 +24,7 @@ namespace FoxTunes
 
         protected virtual Process CreateProcess()
         {
-            Logger.Write(this, LogLevel.Debug, "Creating encoder container process: {0}", this.Location);
+            //Logger.Write(this, LogLevel.Debug, "Creating encoder container process: {0}", this.Location);
             var processStartInfo = new ProcessStartInfo()
             {
                 FileName = this.Location,
@@ -41,7 +41,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                Logger.Write(this, LogLevel.Trace, "{0}: {1}", this.Location, e.Data);
+                //Logger.Write(this, LogLevel.Trace, "{0}: {1}", this.Location, e.Data);
             };
             process.BeginErrorReadLine();
             return process;

@@ -59,7 +59,7 @@ namespace FoxTunes
 
             if (libraryHierarchies.Length == 0)
             {
-                Logger.Write(this, LogLevel.Warn, "No library hierarchies are defined (or enabled).");
+                //Logger.Write(this, LogLevel.Warn, "No library hierarchies are defined (or enabled).");
                 return;
             }
 
@@ -199,7 +199,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to parse library item path: {0}", fileName);
+                    //Logger.Write(this, LogLevel.Warn, "Failed to parse library item path: {0}", fileName);
                     return new string[] { };
                 }
             }

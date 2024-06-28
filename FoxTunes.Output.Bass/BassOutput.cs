@@ -89,7 +89,7 @@ namespace FoxTunes
             set
             {
                 this._Rate = value;
-                Logger.Write(this, LogLevel.Debug, "Rate = {0}", this.Rate);
+                //Logger.Write(this, LogLevel.Debug, "Rate = {0}", this.Rate);
                 var task = this.Shutdown();
             }
         }
@@ -105,7 +105,7 @@ namespace FoxTunes
             set
             {
                 this._EnforceRate = value;
-                Logger.Write(this, LogLevel.Debug, "Enforce Rate = {0}", this.EnforceRate);
+                //Logger.Write(this, LogLevel.Debug, "Enforce Rate = {0}", this.EnforceRate);
                 var task = this.Shutdown();
             }
         }
@@ -121,7 +121,7 @@ namespace FoxTunes
             set
             {
                 this._Float = value;
-                Logger.Write(this, LogLevel.Debug, "Float = {0}", this.Float);
+                //Logger.Write(this, LogLevel.Debug, "Float = {0}", this.Float);
                 var task = this.Shutdown();
             }
         }
@@ -137,7 +137,7 @@ namespace FoxTunes
             set
             {
                 this._UpdatePeriod = value;
-                Logger.Write(this, LogLevel.Debug, "UpdatePeriod = {0}", this.UpdatePeriod);
+                //Logger.Write(this, LogLevel.Debug, "UpdatePeriod = {0}", this.UpdatePeriod);
                 var task = this.Shutdown();
             }
         }
@@ -153,7 +153,7 @@ namespace FoxTunes
             set
             {
                 this._UpdateThreads = value;
-                Logger.Write(this, LogLevel.Debug, "UpdateThreads = {0}", this.UpdateThreads);
+                //Logger.Write(this, LogLevel.Debug, "UpdateThreads = {0}", this.UpdateThreads);
                 var task = this.Shutdown();
             }
         }
@@ -169,7 +169,7 @@ namespace FoxTunes
             set
             {
                 this._BufferLength = value;
-                Logger.Write(this, LogLevel.Debug, "BufferLength = {0}", this.BufferLength);
+                //Logger.Write(this, LogLevel.Debug, "BufferLength = {0}", this.BufferLength);
                 var task = this.Shutdown();
             }
         }
@@ -185,7 +185,7 @@ namespace FoxTunes
             set
             {
                 this._MixerBufferLength = value;
-                Logger.Write(this, LogLevel.Debug, "MixerBufferLength = {0}", this.MixerBufferLength);
+                //Logger.Write(this, LogLevel.Debug, "MixerBufferLength = {0}", this.MixerBufferLength);
                 var task = this.Shutdown();
             }
         }
@@ -201,7 +201,7 @@ namespace FoxTunes
             set
             {
                 this._ResamplingQuality = value;
-                Logger.Write(this, LogLevel.Debug, "ResamplingQuality = {0}", this.ResamplingQuality);
+                //Logger.Write(this, LogLevel.Debug, "ResamplingQuality = {0}", this.ResamplingQuality);
                 var task = this.Shutdown();
             }
         }
@@ -247,7 +247,7 @@ namespace FoxTunes
                 var exception = default(Exception);
                 for (var a = 1; a <= START_ATTEMPTS; a++)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Starting BASS, attempt: {0}", a);
+                    //Logger.Write(this, LogLevel.Debug, "Starting BASS, attempt: {0}", a);
                     try
                     {
                         this.OnInit();
@@ -257,14 +257,14 @@ namespace FoxTunes
                     catch (Exception e)
                     {
                         exception = e;
-                        Logger.Write(this, LogLevel.Warn, "Failed to start BASS: {0}", e.Message);
+                        //Logger.Write(this, LogLevel.Warn, "Failed to start BASS: {0}", e.Message);
                     }
                     await this.ShutdownCore(true).ConfigureAwait(false);
                     Thread.Sleep(START_ATTEMPT_INTERVAL);
                 }
                 if (this.IsStarted)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Started BASS.");
+                    //Logger.Write(this, LogLevel.Debug, "Started BASS.");
                     return;
                 }
                 else if (exception != null)
@@ -299,16 +299,16 @@ namespace FoxTunes
             if (force || this.IsStarted)
             {
                 var exception = default(Exception);
-                Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
+                //Logger.Write(this, LogLevel.Debug, "Stopping BASS.");
                 try
                 {
                     await this.PipelineManager.FreePipeline().ConfigureAwait(false);
                     this.OnFree();
-                    Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
+                    //Logger.Write(this, LogLevel.Debug, "Stopped BASS.");
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(this, LogLevel.Error, "Failed to stop BASS: {0}", e.Message);
+                    //Logger.Write(this, LogLevel.Error, "Failed to stop BASS: {0}", e.Message);
                     exception = e;
                 }
                 await this.SetIsStarted(false).ConfigureAwait(false);
@@ -409,7 +409,7 @@ namespace FoxTunes
             {
                 await this.Start().ConfigureAwait(false);
             }
-            Logger.Write(this, LogLevel.Debug, "Loading stream: {0} => {1}", playlistItem.Id, playlistItem.FileName);
+            //Logger.Write(this, LogLevel.Debug, "Loading stream: {0} => {1}", playlistItem.Id, playlistItem.FileName);
             var flags = BassFlags.Default;
             if (this.Float)
             {
@@ -418,7 +418,7 @@ namespace FoxTunes
             var stream = this.StreamFactory.CreateInteractiveStream(playlistItem, immidiate, flags);
             if (stream.IsEmpty)
             {
-                Logger.Write(this, LogLevel.Debug, "Failed to load stream: {0} => {1} => {2}", playlistItem.Id, playlistItem.FileName, Enum.GetName(typeof(Errors), stream.Errors));
+                //Logger.Write(this, LogLevel.Debug, "Failed to load stream: {0} => {1} => {2}", playlistItem.Id, playlistItem.FileName, Enum.GetName(typeof(Errors), stream.Errors));
                 return null;
             }
             var outputStream = new BassOutputStream(this, this.PipelineManager, stream, playlistItem);
@@ -432,10 +432,10 @@ namespace FoxTunes
             var outputStream = stream as BassOutputStream;
             if (outputStream.Provider.Flags.HasFlag(BassStreamProviderFlags.Serial))
             {
-                Logger.Write(this, LogLevel.Warn, "Cannot duplicate stream for file \"{0}\" with serial provider.", stream.FileName);
+                //Logger.Write(this, LogLevel.Warn, "Cannot duplicate stream for file \"{0}\" with serial provider.", stream.FileName);
                 return null;
             }
-            Logger.Write(this, LogLevel.Debug, "Duplicating stream for file \"{0}\".", stream.FileName);
+            //Logger.Write(this, LogLevel.Debug, "Duplicating stream for file \"{0}\".", stream.FileName);
             var flags = BassFlags.Default;
             if (stream.Format == OutputStreamFormat.Float)
             {
@@ -444,7 +444,7 @@ namespace FoxTunes
             var result = this.StreamFactory.CreateBasicStream(stream.PlaylistItem, flags);
             if (result.IsEmpty)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to duplicate stream for file \"{0}\".", stream.FileName);
+                //Logger.Write(this, LogLevel.Warn, "Failed to duplicate stream for file \"{0}\".", stream.FileName);
                 return null;
             }
             outputStream = new BassOutputStream(this, this.PipelineManager, result, stream.PlaylistItem);
@@ -465,7 +465,7 @@ namespace FoxTunes
                         {
                             if (pipeline.Input.Add(outputStream, this.OnStreamAdded))
                             {
-                                Logger.Write(this, LogLevel.Debug, "Pre-empted playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+                                //Logger.Write(this, LogLevel.Debug, "Pre-empted playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
                                 return true;
                             }
                             else
@@ -475,7 +475,7 @@ namespace FoxTunes
                         }
                         else
                         {
-                            Logger.Write(this, LogLevel.Debug, "Properties differ from current configuration, cannot pre-empt playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+                            //Logger.Write(this, LogLevel.Debug, "Properties differ from current configuration, cannot pre-empt playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
                         }
                     }
                     return false;
@@ -483,7 +483,7 @@ namespace FoxTunes
             }
             else
             {
-                Logger.Write(this, LogLevel.Debug, "Not yet started, cannot pre-empt playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+                //Logger.Write(this, LogLevel.Debug, "Not yet started, cannot pre-empt playback of stream from file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -502,7 +502,7 @@ namespace FoxTunes
             var outputStream = stream as BassOutputStream;
             if (this.IsStarted)
             {
-                Logger.Write(this, LogLevel.Debug, "Unloading stream for file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+                //Logger.Write(this, LogLevel.Debug, "Unloading stream for file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
                 await this.PipelineManager.WithPipelineExclusive(pipeline =>
                 {
                     if (pipeline != null)
@@ -512,7 +512,7 @@ namespace FoxTunes
                         {
                             if (!pipeline.Input.PreserveBuffer)
                             {
-                                Logger.Write(this, LogLevel.Debug, "Track was manually skipped, clearing the playback buffer.");
+                                //Logger.Write(this, LogLevel.Debug, "Track was manually skipped, clearing the playback buffer.");
                                 pipeline.Pause();
                                 pipeline.ClearBuffer();
                                 resume = true;
@@ -546,7 +546,7 @@ namespace FoxTunes
         {
             this.OnUnloaded(outputStream);
             outputStream.Dispose();
-            Logger.Write(this, LogLevel.Debug, "Unloaded stream for file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
+            //Logger.Write(this, LogLevel.Debug, "Unloaded stream for file {0}: {1}", outputStream.FileName, outputStream.ChannelHandle);
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
@@ -587,7 +587,7 @@ namespace FoxTunes
 
         ~BassOutput()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

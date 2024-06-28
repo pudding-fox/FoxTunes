@@ -51,14 +51,14 @@ namespace FoxTunes
         {
             if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value) == WriteBehaviour.None)
             {
-                Logger.Write(this, LogLevel.Debug, "Meta data writing is disabled.");
+                //Logger.Write(this, LogLevel.Debug, "Meta data writing is disabled.");
                 return;
             }
             foreach (var libraryItem in this.LibraryItems)
             {
                 if (this.Output.IsLoaded(libraryItem.FileName))
                 {
-                    Logger.Write(this, LogLevel.Debug, "File \"{0}\" could not be written, the update will be retried: The file is in use.", libraryItem.FileName);
+                    //Logger.Write(this, LogLevel.Debug, "File \"{0}\" could not be written, the update will be retried: The file is in use.", libraryItem.FileName);
                     this.AddError(libraryItem, string.Format("File \"{0}\" could not be written, the update will be retried: The file is in use.", libraryItem.FileName));
                     await this.Schedule(libraryItem).ConfigureAwait(false);
                     continue;
@@ -69,13 +69,13 @@ namespace FoxTunes
                 }
                 catch (IOException e)
                 {
-                    Logger.Write(this, LogLevel.Debug, "File \"{0}\" could not be written, the update will be retried: {1}", libraryItem.FileName, e.Message);
+                    //Logger.Write(this, LogLevel.Debug, "File \"{0}\" could not be written, the update will be retried: {1}", libraryItem.FileName, e.Message);
                     this.AddError(libraryItem, string.Format("File \"{0}\" could not be written, the update will be retried: {1}", libraryItem.FileName, e.Message));
                     await this.Schedule(libraryItem).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(this, LogLevel.Debug, "File \"{0}\" could not be written: {1}", libraryItem.FileName, e.Message);
+                    //Logger.Write(this, LogLevel.Debug, "File \"{0}\" could not be written: {1}", libraryItem.FileName, e.Message);
                     this.AddError(libraryItem, string.Format("File \"{0}\" could not be written: {1}", libraryItem.FileName, e.Message));
                     await this.Deschedule(libraryItem).ConfigureAwait(false);
                 }
@@ -86,13 +86,13 @@ namespace FoxTunes
         {
             if (!FileSystemHelper.IsLocalPath(libraryItem.FileName))
             {
-                Logger.Write(this, LogLevel.Debug, "File \"{0}\" is not a local file: Cannot update.", libraryItem.FileName);
+                //Logger.Write(this, LogLevel.Debug, "File \"{0}\" is not a local file: Cannot update.", libraryItem.FileName);
                 return;
             }
 
             if (!File.Exists(libraryItem.FileName))
             {
-                Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", libraryItem.FileName);
+                //Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", libraryItem.FileName);
                 return;
             }
 

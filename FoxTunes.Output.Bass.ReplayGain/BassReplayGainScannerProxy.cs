@@ -37,9 +37,9 @@ namespace FoxTunes
 
         public void Scan()
         {
-            Logger.Write(this, LogLevel.Debug, "Sending {0} items to scanner container process.", this.ScannerItems.Count());
+            //Logger.Write(this, LogLevel.Debug, "Sending {0} items to scanner container process.", this.ScannerItems.Count());
             this.Send(this.ScannerItems.ToArray());
-            Logger.Write(this, LogLevel.Debug, "Waiting for scanner container process to complete.");
+            //Logger.Write(this, LogLevel.Debug, "Waiting for scanner container process to complete.");
             this.Process.WaitForExit();
             this.TerminateCallback.Disable();
             if (this.Process.ExitCode != 0)
@@ -78,7 +78,7 @@ namespace FoxTunes
 
         public void Cancel()
         {
-            Logger.Write(this, LogLevel.Debug, "Sending cancel command to scanner container process.");
+            //Logger.Write(this, LogLevel.Debug, "Sending cancel command to scanner container process.");
             this.Send(new ScannerCommand(ScannerCommandType.Cancel));
             this.Process.StandardInput.Close();
             this.TerminateCallback.Enable();
@@ -86,7 +86,7 @@ namespace FoxTunes
 
         public void Quit()
         {
-            Logger.Write(this, LogLevel.Debug, "Sending quit command to scanner container process.");
+            //Logger.Write(this, LogLevel.Debug, "Sending quit command to scanner container process.");
             this.Send(new ScannerCommand(ScannerCommandType.Quit));
             this.Process.StandardInput.Close();
             this.TerminateCallback.Enable();
@@ -100,12 +100,12 @@ namespace FoxTunes
                 {
                     return;
                 }
-                Logger.Write(this, LogLevel.Warn, "Scanner container process did not exit after {0}ms, terminating it.", TIMEOUT);
+                //Logger.Write(this, LogLevel.Warn, "Scanner container process did not exit after {0}ms, terminating it.", TIMEOUT);
                 this.Process.Kill();
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Error, "Failed to terminate scanner container process: {0}", e.Message);
+                //Logger.Write(this, LogLevel.Error, "Failed to terminate scanner container process: {0}", e.Message);
             }
         }
 
@@ -150,12 +150,12 @@ namespace FoxTunes
 
         protected virtual void UpdateStatus(ScannerStatus status)
         {
-            Logger.Write(this, LogLevel.Debug, "Recieved status from scanner container process: {0}", Enum.GetName(typeof(ScannerStatusType), status.Type));
+            //Logger.Write(this, LogLevel.Debug, "Recieved status from scanner container process: {0}", Enum.GetName(typeof(ScannerStatusType), status.Type));
             switch (status.Type)
             {
                 case ScannerStatusType.Complete:
                 case ScannerStatusType.Error:
-                    Logger.Write(this, LogLevel.Debug, "Fetching final status and shutting down scanner container process.");
+                    //Logger.Write(this, LogLevel.Debug, "Fetching final status and shutting down scanner container process.");
                     this.Update();
                     this.Quit();
                     this.Process.StandardInput.Close();
@@ -193,7 +193,7 @@ namespace FoxTunes
             {
                 if (!this.Process.HasExited)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Process is incomplete.");
+                    //Logger.Write(this, LogLevel.Warn, "Process is incomplete.");
                     this.Process.Kill();
                 }
                 this.Process.Dispose();
@@ -202,7 +202,7 @@ namespace FoxTunes
 
         ~BassScannerProxy()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

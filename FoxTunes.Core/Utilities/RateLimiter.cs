@@ -7,15 +7,7 @@ namespace FoxTunes
 {
     public class RateLimiter : IDisposable
     {
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        public RateLimiter(int interval)
+                public RateLimiter(int interval)
         {
             this.Interval = interval;
             this.WaitHandle = new AutoResetEvent(true);
@@ -92,7 +84,7 @@ namespace FoxTunes
 
         ~RateLimiter()
         {
-            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

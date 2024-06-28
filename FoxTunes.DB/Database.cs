@@ -8,16 +8,7 @@ namespace FoxTunes
 {
     public abstract class Database : global::FoxDb.Database, IDatabaseComponent
     {
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        public Database(IProvider provider)
-            : base(provider)
+        public Database(IProvider provider) : base(provider)
         {
 
         }

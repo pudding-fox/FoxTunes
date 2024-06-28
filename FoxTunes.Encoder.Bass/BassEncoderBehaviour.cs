@@ -275,10 +275,10 @@ namespace FoxTunes
 
             protected override async Task OnRun()
             {
-                Logger.Write(this, LogLevel.Debug, "Creating encoder.");
+                //Logger.Write(this, LogLevel.Debug, "Creating encoder.");
                 using (var encoder = EncoderFactory.CreateEncoder(this.EncoderItems))
                 {
-                    Logger.Write(this, LogLevel.Debug, "Starting encoder.");
+                    //Logger.Write(this, LogLevel.Debug, "Starting encoder.");
                     using (var monitor = new BassEncoderMonitor(encoder, this.Visible, this.CancellationToken))
                     {
                         monitor.StatusChanged += this.OnStatusChanged;
@@ -295,7 +295,7 @@ namespace FoxTunes
                         this.EncoderItems = monitor.EncoderItems.Values.ToArray();
                     }
                 }
-                Logger.Write(this, LogLevel.Debug, "Encoder completed successfully.");
+                //Logger.Write(this, LogLevel.Debug, "Encoder completed successfully.");
             }
 
             protected virtual void OnStatusChanged(object sender, BassEncoderMonitorEventArgs e)
@@ -313,7 +313,7 @@ namespace FoxTunes
             {
                 try
                 {
-                    Logger.Write(this, LogLevel.Debug, "Copying tags from \"{0}\" to \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
+                    //Logger.Write(this, LogLevel.Debug, "Copying tags from \"{0}\" to \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
                     var fileData = this.GetFileData(encoderItem);
                     using (var task = new WriteFileMetaDataTask(encoderItem.OutputFileName, fileData.MetaDatas))
                     {
@@ -323,7 +323,7 @@ namespace FoxTunes
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to copy tags from \"{0}\" to \"{1}\": {2}", encoderItem.InputFileName, encoderItem.OutputFileName, e.Message);
+                    //Logger.Write(this, LogLevel.Warn, "Failed to copy tags from \"{0}\" to \"{1}\": {2}", encoderItem.InputFileName, encoderItem.OutputFileName, e.Message);
                     await this.ErrorEmitter.Send(this, e).ConfigureAwait(false);
                 }
             }

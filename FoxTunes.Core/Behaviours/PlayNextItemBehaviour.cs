@@ -30,7 +30,7 @@ namespace FoxTunes
 
         protected virtual void OnEnded(object sender, EventArgs e)
         {
-            Logger.Write(this, LogLevel.Debug, "Stream was stopped likely due to reaching the end, playing next item.");
+            //Logger.Write(this, LogLevel.Debug, "Stream was stopped likely due to reaching the end, playing next item.");
             this.Dispatch(() => this.PlaylistManager.Next(this.Wrap.Value));
         }
 
@@ -62,7 +62,7 @@ namespace FoxTunes
 
         ~PlayNextItemBehaviour()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

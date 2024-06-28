@@ -37,9 +37,9 @@ namespace FoxTunes
 
         public void Encode()
         {
-            Logger.Write(this, LogLevel.Debug, "Sending {0} items to encoder container process.", this.EncoderItems.Count());
+            //Logger.Write(this, LogLevel.Debug, "Sending {0} items to encoder container process.", this.EncoderItems.Count());
             this.Send(this.EncoderItems.ToArray());
-            Logger.Write(this, LogLevel.Debug, "Waiting for encoder container process to complete.");
+            //Logger.Write(this, LogLevel.Debug, "Waiting for encoder container process to complete.");
             this.Process.WaitForExit();
             this.TerminateCallback.Disable();
             if (this.Process.ExitCode != 0)
@@ -78,7 +78,7 @@ namespace FoxTunes
 
         public void Cancel()
         {
-            Logger.Write(this, LogLevel.Debug, "Sending cancel command to encoder container process.");
+            //Logger.Write(this, LogLevel.Debug, "Sending cancel command to encoder container process.");
             this.Send(new EncoderCommand(EncoderCommandType.Cancel));
             this.Process.StandardInput.Close();
             this.TerminateCallback.Enable();
@@ -86,7 +86,7 @@ namespace FoxTunes
 
         public void Quit()
         {
-            Logger.Write(this, LogLevel.Debug, "Sending quit command to encoder container process.");
+            //Logger.Write(this, LogLevel.Debug, "Sending quit command to encoder container process.");
             this.Send(new EncoderCommand(EncoderCommandType.Quit));
             this.Process.StandardInput.Close();
             this.TerminateCallback.Enable();
@@ -100,12 +100,12 @@ namespace FoxTunes
                 {
                     return;
                 }
-                Logger.Write(this, LogLevel.Warn, "Encoder container process did not exit after {0}ms, terminating it.", TIMEOUT);
+                //Logger.Write(this, LogLevel.Warn, "Encoder container process did not exit after {0}ms, terminating it.", TIMEOUT);
                 this.Process.Kill();
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Error, "Failed to terminate encoder container process: {0}", e.Message);
+                //Logger.Write(this, LogLevel.Error, "Failed to terminate encoder container process: {0}", e.Message);
             }
         }
 
@@ -150,12 +150,12 @@ namespace FoxTunes
 
         protected virtual void UpdateStatus(EncoderStatus status)
         {
-            Logger.Write(this, LogLevel.Debug, "Recieved status from encoder container process: {0}", Enum.GetName(typeof(EncoderStatusType), status.Type));
+            //Logger.Write(this, LogLevel.Debug, "Recieved status from encoder container process: {0}", Enum.GetName(typeof(EncoderStatusType), status.Type));
             switch (status.Type)
             {
                 case EncoderStatusType.Complete:
                 case EncoderStatusType.Error:
-                    Logger.Write(this, LogLevel.Debug, "Fetching final status and shutting down encoder container process.");
+                    //Logger.Write(this, LogLevel.Debug, "Fetching final status and shutting down encoder container process.");
                     this.Update();
                     this.Quit();
                     this.Process.StandardInput.Close();
@@ -193,7 +193,7 @@ namespace FoxTunes
             {
                 if (!this.Process.HasExited)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Process is incomplete.");
+                    //Logger.Write(this, LogLevel.Warn, "Process is incomplete.");
                     this.Process.Kill();
                 }
                 this.Process.Dispose();
@@ -202,7 +202,7 @@ namespace FoxTunes
 
         ~BassEncoderProxy()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

@@ -69,7 +69,7 @@ namespace FoxTunes
 
         public async Task Populate<T>(IEnumerable<T> fileDatas, CancellationToken cancellationToken) where T : IFileData
         {
-            Logger.Write(this, LogLevel.Debug, "Begin populating meta data.");
+            //Logger.Write(this, LogLevel.Debug, "Begin populating meta data.");
 
             if (this.ReportProgress)
             {
@@ -95,7 +95,7 @@ namespace FoxTunes
 
             await AsyncParallel.ForEach(fileDatas, async fileData =>
             {
-                Logger.Write(this, LogLevel.Debug, "Reading meta data from file \"{0}\".", fileData.FileName);
+                //Logger.Write(this, LogLevel.Debug, "Reading meta data from file \"{0}\".", fileData.FileName);
                 try
                 {
                     var metaData = await metaDataSource.GetMetaData(fileData.FileName).ConfigureAwait(false);
@@ -121,7 +121,7 @@ namespace FoxTunes
                             }
                             catch (Exception e)
                             {
-                                Logger.Write(this, LogLevel.Debug, "Failed to write meta data entry from file \"{0}\" with name \"{1}\": {2}", fileData.FileName, metaDataItem.Name, e.Message);
+                                //Logger.Write(this, LogLevel.Debug, "Failed to write meta data entry from file \"{0}\" with name \"{1}\": {2}", fileData.FileName, metaDataItem.Name, e.Message);
                                 this.AddWarning(fileData, e.Message);
                             }
                         }
@@ -139,7 +139,7 @@ namespace FoxTunes
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", fileData.FileName, e.Message);
+                    //Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", fileData.FileName, e.Message);
                     this.AddWarning(fileData, e.Message);
                 }
             }, cancellationToken, this.ParallelOptions).ConfigureAwait(false);

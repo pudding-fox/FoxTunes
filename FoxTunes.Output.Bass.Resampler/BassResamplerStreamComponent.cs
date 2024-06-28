@@ -93,7 +93,7 @@ namespace FoxTunes
                 //We already established that the output does not support the stream rate so use the closest one.
                 rate = this.Query.GetNearestRate(rate);
             }
-            Logger.Write(this, LogLevel.Debug, "Creating BASS SOX stream with rate {0} => {1} and {2} channels.", this.InputRate, rate, channels);
+            //Logger.Write(this, LogLevel.Debug, "Creating BASS SOX stream with rate {0} => {1} and {2} channels.", this.InputRate, rate, channels);
             this.ChannelHandle = BassSox.StreamCreate(rate, flags, previous.ChannelHandle);
             if (this.ChannelHandle == 0)
             {
@@ -105,7 +105,7 @@ namespace FoxTunes
 
         public override void ClearBuffer()
         {
-            Logger.Write(this, LogLevel.Debug, "Clearing BASS SOX buffer: {0}", this.ChannelHandle);
+            //Logger.Write(this, LogLevel.Debug, "Clearing BASS SOX buffer: {0}", this.ChannelHandle);
             BassUtils.OK(BassSox.StreamBufferClear(this.ChannelHandle));
             base.ClearBuffer();
         }
@@ -124,7 +124,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.Background), value);
+                //Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.Background), value);
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.Background, value));
             }
         }
@@ -186,7 +186,7 @@ namespace FoxTunes
         {
             if (this.ChannelHandle != 0)
             {
-                Logger.Write(this, LogLevel.Debug, "Freeing BASS SOX stream: {0}", this.ChannelHandle);
+                //Logger.Write(this, LogLevel.Debug, "Freeing BASS SOX stream: {0}", this.ChannelHandle);
                 BassUtils.OK(Bass.StreamFree(this.ChannelHandle));
             }
         }
@@ -385,17 +385,17 @@ namespace FoxTunes
                 {
                     return;
                 }
-                Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.Quality), Enum.GetName(typeof(SoxChannelQuality), this.Quality));
+                //Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.Quality), Enum.GetName(typeof(SoxChannelQuality), this.Quality));
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.Quality, this.Quality));
-                Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.Phase), Enum.GetName(typeof(SoxChannelPhase), this.Phase));
+                //Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.Phase), Enum.GetName(typeof(SoxChannelPhase), this.Phase));
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.Phase, this.Phase));
-                Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.SteepFilter), this.SteepFilter);
+                //Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.SteepFilter), this.SteepFilter);
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.SteepFilter, this.SteepFilter));
-                Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.InputBufferLength), this.InputBufferLength);
+                //Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.InputBufferLength), this.InputBufferLength);
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.InputBufferLength, this.InputBufferLength));
-                Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.PlaybackBufferLength), this.PlaybackBufferLength);
+                //Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.PlaybackBufferLength), this.PlaybackBufferLength);
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.PlaybackBufferLength, this.PlaybackBufferLength));
-                Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.KeepAlive), true);
+                //Logger.Write(this, LogLevel.Debug, "Setting BASS SOX attribute \"{0}\" = \"{1}\"", Enum.GetName(typeof(SoxChannelAttribute), SoxChannelAttribute.KeepAlive), true);
                 BassUtils.OK(BassSox.ChannelSetAttribute(this.ChannelHandle, SoxChannelAttribute.KeepAlive, true));
             }
         }

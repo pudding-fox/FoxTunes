@@ -164,7 +164,7 @@ namespace FoxTunes
                 Path.GetTempPath(),
                 string.Format("Lyrics-{0}.txt", DateTime.Now.ToFileTimeUtc())
             );
-            Logger.Write(this, LogLevel.Debug, "Editing lyrics for file \"{0}\": \"{1}\"", playlistItem.FileName, fileName);
+            //Logger.Write(this, LogLevel.Debug, "Editing lyrics for file \"{0}\": \"{1}\"", playlistItem.FileName, fileName);
             if (metaDataItem != null)
             {
                 File.WriteAllText(fileName, metaDataItem.Value);
@@ -179,7 +179,7 @@ namespace FoxTunes
                 await process.WaitForExitAsync().ConfigureAwait(false);
                 if (process.ExitCode != 0)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Process does not indicate success: Code = {0}", process.ExitCode);
+                    //Logger.Write(this, LogLevel.Warn, "Process does not indicate success: Code = {0}", process.ExitCode);
                     return;
                 }
                 var flags = MetaDataUpdateFlags.None;
@@ -210,7 +210,7 @@ namespace FoxTunes
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to delete temp file \"{0}\":", fileName, e.Message);
+                    //Logger.Write(this, LogLevel.Warn, "Failed to delete temp file \"{0}\":", fileName, e.Message);
                 }
             }
         }

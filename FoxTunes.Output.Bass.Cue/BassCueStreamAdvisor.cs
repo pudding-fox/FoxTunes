@@ -37,7 +37,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to create stream advice for file \"{0}\": {1}", playlistItem.FileName, e.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to create stream advice for file \"{0}\": {1}", playlistItem.FileName, e.Message);
             }
         }
 

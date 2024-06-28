@@ -45,7 +45,7 @@ namespace FoxTunes
 
         protected virtual void OnStateChanged()
         {
-            Logger.Write(this, LogLevel.Debug, "CD door state changed to {0}.", Enum.GetName(typeof(CdDoorState), this.State));
+            //Logger.Write(this, LogLevel.Debug, "CD door state changed to {0}.", Enum.GetName(typeof(CdDoorState), this.State));
             if (this.StateChanged == null)
             {
                 return;
@@ -94,7 +94,7 @@ namespace FoxTunes
                 this.Timer.Elapsed += this.OnElapsed;
                 this.Timer.Start();
             }
-            Logger.Write(this, LogLevel.Debug, "Started monitoring CD door state.");
+            //Logger.Write(this, LogLevel.Debug, "Started monitoring CD door state.");
             this.UpdateState(false);
         }
 
@@ -114,7 +114,7 @@ namespace FoxTunes
                     this.Timer = null;
                 }
             }
-            Logger.Write(this, LogLevel.Debug, "Stopped monitoring CD door state.");
+            //Logger.Write(this, LogLevel.Debug, "Stopped monitoring CD door state.");
         }
 
         protected virtual void OnElapsed(object sender, ElapsedEventArgs e)
@@ -205,7 +205,7 @@ namespace FoxTunes
 
         ~CdDoorMonitor()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

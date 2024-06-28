@@ -54,18 +54,18 @@ namespace FoxTunes
             {
                 if (this.ProbeWavFiles.Value)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Probing file \"{0}\" for DTS stream..", playlistItem.FileName);
+                    //Logger.Write(this, LogLevel.Debug, "Probing file \"{0}\" for DTS stream..", playlistItem.FileName);
                     var channelHandle = BassDts.CreateStream(playlistItem.FileName);
                     if (channelHandle != 0)
                     {
-                        Logger.Write(this, LogLevel.Debug, "Found DTS stream in file \"{0}\".", playlistItem.FileName);
+                        //Logger.Write(this, LogLevel.Debug, "Found DTS stream in file \"{0}\".", playlistItem.FileName);
                         Bass.StreamFree(channelHandle);
                         return true;
                     }
                 }
                 else
                 {
-                    Logger.Write(this, LogLevel.Debug, "Probing for DTS streams is disabled.");
+                    //Logger.Write(this, LogLevel.Debug, "Probing for DTS streams is disabled.");
                 }
             }
             return false;
@@ -77,7 +77,7 @@ namespace FoxTunes
             var channelHandle = BassDts.CreateStream(fileName, 0, 0, flags);
             if (channelHandle == 0)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to create DTS stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                //Logger.Write(this, LogLevel.Warn, "Failed to create DTS stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
             }
             return this.CreateBasicStream(channelHandle, advice, flags);
         }
@@ -88,7 +88,7 @@ namespace FoxTunes
             var channelHandle = BassDts.CreateStream(fileName, 0, 0, flags);
             if (channelHandle == 0)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to create DTS stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                //Logger.Write(this, LogLevel.Warn, "Failed to create DTS stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
             }
             return this.CreateInteractiveStream(channelHandle, advice, flags);
         }

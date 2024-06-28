@@ -48,7 +48,7 @@ namespace FoxTunes.ViewModel
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(typeof(AsyncCommand), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
+                    //Logger.Write(typeof(AsyncCommand), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
                     await ErrorEmitter.Send(this, string.Format("Failed to execute command: {0}", e.Message), e).ConfigureAwait(false);
                 }
                 return Windows.Invoke(() => this.OnCanExecuteChanged());
@@ -114,7 +114,7 @@ namespace FoxTunes.ViewModel
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(typeof(AsyncCommand), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
+                    //Logger.Write(typeof(AsyncCommand), LogLevel.Warn, "Failed to execute command: {0}", e.Message);
                     await ErrorEmitter.Send(this, string.Format("Failed to execute command: {0}", e.Message), e).ConfigureAwait(false);
                 }
                 return Windows.Invoke(() => this.OnCanExecuteChanged());

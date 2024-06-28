@@ -586,7 +586,7 @@ namespace FoxTunes.ViewModel
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to read property \"{0}\" of file \"{1}\": {2}", name, fileData.FileName, e.Message);
+                    //Logger.Write(this, LogLevel.Warn, "Failed to read property \"{0}\" of file \"{1}\": {2}", name, fileData.FileName, e.Message);
                 }
             }
             var value = aggregator.GetValue(values);

@@ -87,7 +87,7 @@ namespace FoxTunes
                     return;
                 }
             }
-            LogManager.Logger.Write(typeof(CddbTextParser), LogLevel.Trace, "Got CDDB tag for track {0} => {1} => {2}", track, name, value);
+            //Logger.Write(typeof(CddbTextParser), LogLevel.Trace, "Got CDDB tag for track {0} => {1} => {2}", track, name, value);
             values[track][name] = value;
         }
     }

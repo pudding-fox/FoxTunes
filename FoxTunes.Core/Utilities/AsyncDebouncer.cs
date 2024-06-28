@@ -11,15 +11,7 @@ namespace FoxTunes
 {
     public class AsyncDebouncer : IDisposable
     {
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        public static readonly object SyncRoot = new object();
+                public static readonly object SyncRoot = new object();
 
         private AsyncDebouncer()
         {
@@ -107,14 +99,14 @@ namespace FoxTunes
                                 var exception = task.Exception.Unwrap();
                                 if (!pair.Value.TrySetException(exception))
                                 {
-                                    Logger.Write(typeof(AsyncDebouncer), LogLevel.Warn, "Failed to propagate exception: {0}", exception.Message);
+                                    //Logger.Write(typeof(AsyncDebouncer), LogLevel.Warn, "Failed to propagate exception: {0}", exception.Message);
                                 }
                             }
                             else
                             {
                                 if (!pair.Value.TrySetResult(true))
                                 {
-                                    Logger.Write(typeof(AsyncDebouncer), LogLevel.Warn, "Failed to propagate result.");
+                                    //Logger.Write(typeof(AsyncDebouncer), LogLevel.Warn, "Failed to propagate result.");
                                 }
                             }
                         });
@@ -171,7 +163,7 @@ namespace FoxTunes
 
         ~AsyncDebouncer()
         {
-            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

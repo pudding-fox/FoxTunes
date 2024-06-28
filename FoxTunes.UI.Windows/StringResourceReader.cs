@@ -8,14 +8,6 @@ namespace FoxTunes
 {
     public static class StringResourceReader
     {
-        private static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
         public static readonly ConcurrentDictionary<Assembly, ResourceManager> ResourceManagers = new ConcurrentDictionary<Assembly, ResourceManager>();
 
         public static string GetString(Type type, string name)
@@ -28,14 +20,14 @@ namespace FoxTunes
             var resourceManager = GetResourceManager(assembly);
             if (resourceManager == null)
             {
-                Logger.Write(typeof(StringResourceReader), LogLevel.Warn, "Failed to determine ResourceManager for type \"{0}\".", type.FullName);
+                //Logger.Write(typeof(StringResourceReader), LogLevel.Warn, "Failed to determine ResourceManager for type \"{0}\".", type.FullName);
                 return null;
             }
             var result = resourceManager.GetString(string.Format("{0}.{1}", type.Name, name));
             //TODO: We currently have a lot of missing Description strings so don't bother warning for now.
             //if (string.IsNullOrEmpty(result))
             //{
-            //    Logger.Write(typeof(StringResourceReader), LogLevel.Warn, "Failed to locate resource string {0}.{1}.", type.Name, name);
+            //    //Logger.Write(typeof(StringResourceReader), LogLevel.Warn, "Failed to locate resource string {0}.{1}.", type.Name, name);
             //}
             return result;
         }
@@ -62,9 +54,9 @@ namespace FoxTunes
                     }
                     return property.GetValue(null, null) as ResourceManager;
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.Write(typeof(StringResourceReader), LogLevel.Error, "Failed to locate Strings ResourceManager in assembly \"{0}\": {1}", assembly.FullName, e.Message);
+                    //Logger.Write(typeof(StringResourceReader), LogLevel.Error, "Failed to locate Strings ResourceManager in assembly \"{0}\": {1}", assembly.FullName, e.Message);
                     return null;
                 }
             });

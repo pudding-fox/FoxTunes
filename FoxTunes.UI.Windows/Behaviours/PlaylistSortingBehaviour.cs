@@ -98,12 +98,12 @@ namespace FoxTunes
             var changes = await this.PlaylistManager.Sort(playlist, playlistColumn, descending).ConfigureAwait(false);
             if (changes == 0)
             {
-                Logger.Write(this, LogLevel.Debug, "Playlist was already sorted, reversing direction.");
+                //Logger.Write(this, LogLevel.Debug, "Playlist was already sorted, reversing direction.");
                 descending = !descending;
                 changes = await this.PlaylistManager.Sort(playlist, playlistColumn, descending).ConfigureAwait(false);
                 if (changes == 0)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Playlist was already sorted, all values are equal.");
+                    //Logger.Write(this, LogLevel.Debug, "Playlist was already sorted, all values are equal.");
                 }
             }
             if (!descending)
@@ -145,7 +145,7 @@ namespace FoxTunes
 
         ~PlaylistSortingBehaviour()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

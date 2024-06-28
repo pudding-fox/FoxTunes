@@ -6,14 +6,6 @@ namespace FoxTunes
 {
     public static class SnappingHelper
     {
-        private static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
         static SnappingHelper()
         {
             var configuration = ComponentRegistry.Instance.GetComponent<IConfiguration>();
@@ -45,7 +37,7 @@ namespace FoxTunes
                         from.X += -(from.Right - to.Left);
                     }
                     result |= SnapDirection.OutsideLeft;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap outside left.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap outside left.");
                 }
                 else if (Math.Abs(from.Left - to.Left) <= proximity)
                 {
@@ -55,7 +47,7 @@ namespace FoxTunes
                     }
                     from.X += -(from.Left - to.Left);
                     result |= SnapDirection.InsideLeft;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap inside left.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap inside left.");
                 }
                 if (Math.Abs(from.Left - to.Right) <= proximity)
                 {
@@ -65,7 +57,7 @@ namespace FoxTunes
                     }
                     from.X += -(from.Left - to.Right);
                     result |= SnapDirection.OutsideRight;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap outside right.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap outside right.");
                 }
                 else if (Math.Abs(from.Right - to.Right) <= proximity)
                 {
@@ -78,7 +70,7 @@ namespace FoxTunes
                         from.X += -(from.Right - to.Right);
                     }
                     result |= SnapDirection.InsideRight;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap inside right.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap inside right.");
                 }
             }
             if (from.Right >= to.Left - proximity && from.Left <= to.Right + proximity)
@@ -94,7 +86,7 @@ namespace FoxTunes
                         from.Y += -(from.Bottom - to.Top);
                     }
                     result |= SnapDirection.OutsideTop;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap outside top.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap outside top.");
                 }
                 else if (Math.Abs(from.Top - to.Top) <= proximity)
                 {
@@ -104,7 +96,7 @@ namespace FoxTunes
                     }
                     from.Y += -(from.Top - to.Top);
                     result |= SnapDirection.InsideTop;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap inside top.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap inside top.");
                 }
                 if (Math.Abs(from.Top - to.Bottom) <= proximity)
                 {
@@ -114,7 +106,7 @@ namespace FoxTunes
                     }
                     from.Y += -(from.Top - to.Bottom);
                     result |= SnapDirection.OutsideBottom;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap outside bottom.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap outside bottom.");
                 }
                 else if (Math.Abs(from.Bottom - to.Bottom) <= proximity)
                 {
@@ -127,7 +119,7 @@ namespace FoxTunes
                         from.Y += -(from.Bottom - to.Bottom);
                     }
                     result |= SnapDirection.InsideBottom;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap inside bottom.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snap inside bottom.");
                 }
             }
             return result;
@@ -146,22 +138,22 @@ namespace FoxTunes
                 if (Math.Abs(from.Right - to.Left) <= proximity)
                 {
                     result |= SnapDirection.OutsideLeft;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped outside left.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped outside left.");
                 }
                 else if (Math.Abs(from.Left - to.Left) <= proximity)
                 {
                     result |= SnapDirection.InsideLeft;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped inside left.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped inside left.");
                 }
                 if (Math.Abs(from.Left - to.Right) <= proximity)
                 {
                     result |= SnapDirection.OutsideRight;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped outside right.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped outside right.");
                 }
                 else if (Math.Abs(from.Right - to.Right) <= proximity)
                 {
                     result |= SnapDirection.InsideRight;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped inside right.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped inside right.");
                 }
             }
             if (from.Right >= to.Left - proximity && from.Left <= to.Right + proximity)
@@ -169,22 +161,22 @@ namespace FoxTunes
                 if (Math.Abs(from.Bottom - to.Top) <= proximity)
                 {
                     result |= SnapDirection.OutsideTop;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped outside top.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped outside top.");
                 }
                 else if (Math.Abs(from.Top - to.Top) <= proximity)
                 {
                     result |= SnapDirection.InsideTop;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped inside top.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped inside top.");
                 }
                 if (Math.Abs(from.Top - to.Bottom) <= proximity)
                 {
                     result |= SnapDirection.OutsideBottom;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped outside bottom.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped outside bottom.");
                 }
                 else if (Math.Abs(from.Bottom - to.Bottom) <= proximity)
                 {
                     result |= SnapDirection.InsideBottom;
-                    Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped inside bottom.");
+                    //Logger.Write(typeof(SnappingHelper), LogLevel.Debug, "Snapped inside bottom.");
                 }
             }
             return result;

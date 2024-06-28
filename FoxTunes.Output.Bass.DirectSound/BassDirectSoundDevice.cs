@@ -27,8 +27,8 @@ namespace FoxTunes
                 OutputRate.GetRates(Bass.Info.SampleRate, Bass.Info.MinSampleRate, Bass.Info.MaxSampleRate),
                 device == Bass.DefaultDevice
             );
-            LogManager.Logger.Write(typeof(BassDirectSoundDevice), LogLevel.Debug, "Detected DS device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}", Bass.CurrentDevice, Info.Inputs, Info.Outputs, Info.Rate);
-            LogManager.Logger.Write(typeof(BassDirectSoundDevice), LogLevel.Debug, "Detected DS device: {0} => Rates => {1}", Bass.CurrentDevice, string.Join(", ", Info.SupportedRates));
+            //Logger.Write(typeof(BassDirectSoundDevice), LogLevel.Debug, "Detected DS device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}", Bass.CurrentDevice, Info.Inputs, Info.Outputs, Info.Rate);
+            //Logger.Write(typeof(BassDirectSoundDevice), LogLevel.Debug, "Detected DS device: {0} => Rates => {1}", Bass.CurrentDevice, string.Join(", ", Info.SupportedRates));
         }
 
         public static void Free()

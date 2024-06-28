@@ -31,7 +31,7 @@ namespace FoxTunes
                 this.Timer.Interval = UPDATE_INTERVAL;
                 this.Timer.Elapsed += this.OnElapsed;
                 this.Timer.Start();
-                Logger.Write(this, LogLevel.Debug, "Power state manager was started.");
+                //Logger.Write(this, LogLevel.Debug, "Power state manager was started.");
             }
         }
 
@@ -43,7 +43,7 @@ namespace FoxTunes
                 this.Timer.Elapsed -= this.OnElapsed;
                 this.Timer.Dispose();
                 this.Timer = null;
-                Logger.Write(this, LogLevel.Debug, "Power state manager was stopped.");
+                //Logger.Write(this, LogLevel.Debug, "Power state manager was stopped.");
             }
         }
 
@@ -115,7 +115,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Error, "Failed to set thread execution state: {0}", e.Message);
+                //Logger.Write(this, LogLevel.Error, "Failed to set thread execution state: {0}", e.Message);
                 return false;
             }
         }
@@ -150,7 +150,7 @@ namespace FoxTunes
 
         ~ExecutionStateBehaviour()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

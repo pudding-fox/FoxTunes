@@ -253,9 +253,9 @@ namespace FoxTunes
                 catch (Exception e)
                 {
 #if DEBUG
-                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render peaks: {0}", e.Message);
+                    //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render peaks: {0}", e.Message);
 #else
-                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render peaks, disabling: {0}", e.Message);
+                    //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render peaks, disabling: {0}", e.Message);
                     success = false;
 #endif
                 }
@@ -309,10 +309,10 @@ namespace FoxTunes
             catch (Exception exception)
             {
 #if DEBUG
-                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update peak data: {0}", exception.Message);
+                //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update peak data: {0}", exception.Message);
                 this.BeginUpdateData();
 #else
-                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update peak data, disabling: {0}", exception.Message);
+                //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update peak data, disabling: {0}", exception.Message);
 #endif
             }
         }
@@ -334,10 +334,10 @@ namespace FoxTunes
             catch (Exception exception)
             {
 #if DEBUG
-                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render peak data: {0}", exception.Message);
+                //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render peak data: {0}", exception.Message);
                 this.BeginUpdateData();
 #else
-                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render peak data, disabling: {0}", exception.Message);
+                //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render peak data, disabling: {0}", exception.Message);
 #endif
             }
         }

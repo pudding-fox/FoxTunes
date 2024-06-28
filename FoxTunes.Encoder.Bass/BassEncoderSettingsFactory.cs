@@ -16,13 +16,13 @@ namespace FoxTunes
 
         public IBassEncoderSettings CreateSettings(string name)
         {
-            Logger.Write(this, LogLevel.Debug, "Creating settings for profile: {0}", name);
+            //Logger.Write(this, LogLevel.Debug, "Creating settings for profile: {0}", name);
             var format = ComponentRegistry.Instance.GetComponents<IBassEncoderSettings>().FirstOrDefault(
                 settings => string.Equals(settings.Name, name, StringComparison.OrdinalIgnoreCase)
             );
             if (format == null)
             {
-                Logger.Write(this, LogLevel.Debug, "Failed to locate settings for profile: {0}", name);
+                //Logger.Write(this, LogLevel.Debug, "Failed to locate settings for profile: {0}", name);
             }
             return format;
         }

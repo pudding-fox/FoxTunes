@@ -72,10 +72,10 @@ namespace FoxTunes
             }
             if (string.IsNullOrEmpty(value))
             {
-                Logger.Write(this, LogLevel.Debug, "No config to load.");
+                //Logger.Write(this, LogLevel.Debug, "No config to load.");
                 return;
             }
-            Logger.Write(this, LogLevel.Debug, "Loading config..");
+            //Logger.Write(this, LogLevel.Debug, "Loading config..");
             try
             {
                 using (var stream = new MemoryStream(Encoding.Default.GetBytes(value)))
@@ -89,13 +89,13 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to load config: {0}", e.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to load config: {0}", e.Message);
             }
         }
 
         protected virtual async Task<ToolWindow> Load(ToolWindowConfiguration config)
         {
-            Logger.Write(this, LogLevel.Debug, "Loading config: {0}", ToolWindowConfiguration.GetTitle(config));
+            //Logger.Write(this, LogLevel.Debug, "Loading config: {0}", ToolWindowConfiguration.GetTitle(config));
             try
             {
                 if (!ScreenHelper.WindowBoundsVisible(new Rect(config.Left, config.Top, config.Width, config.Height)))
@@ -107,7 +107,7 @@ namespace FoxTunes
                 var window = default(ToolWindow);
                 await global::FoxTunes.Windows.Invoke(() =>
                 {
-                    Logger.Write(this, LogLevel.Debug, "Creating window: {0}", ToolWindowConfiguration.GetTitle(config));
+                    //Logger.Write(this, LogLevel.Debug, "Creating window: {0}", ToolWindowConfiguration.GetTitle(config));
                     window = new ToolWindow();
                     window.Configuration = config;
                     window.ShowActivated = false;
@@ -119,7 +119,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to load config: {0}", e.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to load config: {0}", e.Message);
                 return null;
             }
         }
@@ -145,7 +145,7 @@ namespace FoxTunes
 
         protected virtual Task UpdateVisiblity(ToolWindowConfiguration config, ToolWindow window)
         {
-            Logger.Write(this, LogLevel.Debug, "Updating visiblity: {0}", ToolWindowConfiguration.GetTitle(config));
+            //Logger.Write(this, LogLevel.Debug, "Updating visiblity: {0}", ToolWindowConfiguration.GetTitle(config));
             var show = false;
             var id = default(string);
             if (global::FoxTunes.Windows.ActiveWindow is WindowBase activeWindow)
@@ -169,7 +169,7 @@ namespace FoxTunes
             {
                 action = () =>
                 {
-                    Logger.Write(this, LogLevel.Debug, "Showing window: {0}", ToolWindowConfiguration.GetTitle(config));
+                    //Logger.Write(this, LogLevel.Debug, "Showing window: {0}", ToolWindowConfiguration.GetTitle(config));
                     window.Show();
                 };
             }
@@ -177,7 +177,7 @@ namespace FoxTunes
             {
                 action = () =>
                 {
-                    Logger.Write(this, LogLevel.Debug, "Hiding window: {0}", ToolWindowConfiguration.GetTitle(config));
+                    //Logger.Write(this, LogLevel.Debug, "Hiding window: {0}", ToolWindowConfiguration.GetTitle(config));
                     window.Hide();
                 };
             }
@@ -193,7 +193,7 @@ namespace FoxTunes
 
         protected virtual void Unload(ToolWindowConfiguration config, ToolWindow window)
         {
-            Logger.Write(this, LogLevel.Debug, "Unloading config: {0}", ToolWindowConfiguration.GetTitle(config));
+            //Logger.Write(this, LogLevel.Debug, "Unloading config: {0}", ToolWindowConfiguration.GetTitle(config));
             this.Windows.TryGetValue(config, out window);
             if (!this.Windows.TryRemove(config))
             {
@@ -241,7 +241,7 @@ namespace FoxTunes
             {
                 return;
             }
-            Logger.Write(this, LogLevel.Debug, "Saving config..");
+            //Logger.Write(this, LogLevel.Debug, "Saving config..");
             try
             {
                 var value = default(string);
@@ -259,11 +259,11 @@ namespace FoxTunes
                 {
                     this.IsSaving = false;
                 }
-                Logger.Write(this, LogLevel.Debug, "Saved config for {0} windows.", this.Windows.Count);
+                //Logger.Write(this, LogLevel.Debug, "Saved config for {0} windows.", this.Windows.Count);
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to save config: {0}", e.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to save config: {0}", e.Message);
             }
         }
 
@@ -338,7 +338,7 @@ namespace FoxTunes
 
         protected virtual void OnShuttingDown(object sender, EventArgs e)
         {
-            Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
+            //Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
             if (!this.IsLoaded)
             {
                 return;
@@ -424,7 +424,7 @@ namespace FoxTunes
 
         public async Task<ToolWindowConfiguration> New()
         {
-            Logger.Write(this, LogLevel.Debug, "Creating new config..");
+            //Logger.Write(this, LogLevel.Debug, "Creating new config..");
             var configs = this.Windows.Keys;
             var config = new ToolWindowConfiguration()
             {
@@ -454,11 +454,11 @@ namespace FoxTunes
             this.IsLoaded = false;
             return global::FoxTunes.Windows.Invoke(() =>
             {
-                Logger.Write(this, LogLevel.Debug, "Shutting down..");
+                //Logger.Write(this, LogLevel.Debug, "Shutting down..");
                 global::FoxTunes.Windows.Registrations.Close(ToolWindowManagerWindow.ID);
                 foreach (var pair in this.Windows)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Closing window: {0}", pair.Value.Title);
+                    //Logger.Write(this, LogLevel.Debug, "Closing window: {0}", pair.Value.Title);
                     pair.Value.Closed -= this.OnClosed;
                     pair.Value.Close();
                 }
@@ -476,12 +476,12 @@ namespace FoxTunes
 
         public Task Reset()
         {
-            Logger.Write(this, LogLevel.Debug, "Resetting configuration.");
+            //Logger.Write(this, LogLevel.Debug, "Resetting configuration.");
             return global::FoxTunes.Windows.Invoke(() =>
             {
                 foreach (var pair in this.Windows)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Closing window: {0}", pair.Value.Title);
+                    //Logger.Write(this, LogLevel.Debug, "Closing window: {0}", pair.Value.Title);
                     pair.Value.Closed -= this.OnClosed;
                     pair.Value.Close();
                 }
@@ -527,7 +527,7 @@ namespace FoxTunes
 
         ~ToolWindowBehaviour()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

@@ -163,7 +163,7 @@ namespace FoxTunes
             }
             else if (!this.Pipeline.Input.CheckFormat(stream))
             {
-                Logger.Write(this, LogLevel.Debug, "Current pipeline cannot accept stream, shutting it down: {0}", stream.ChannelHandle);
+                //Logger.Write(this, LogLevel.Debug, "Current pipeline cannot accept stream, shutting it down: {0}", stream.ChannelHandle);
                 this.FreePipelineCore();
                 await this.WithPipeline(stream, action).ConfigureAwait(false);
                 return;
@@ -286,7 +286,7 @@ namespace FoxTunes
         {
             if (this.Pipeline != null)
             {
-                Logger.Write(this, LogLevel.Debug, "Shutting down the pipeline.");
+                //Logger.Write(this, LogLevel.Debug, "Shutting down the pipeline.");
                 this.Pipeline.IsStopping = true;
                 this.Pipeline.Dispose();
                 this.Pipeline.IsStopping = false;
@@ -325,7 +325,7 @@ namespace FoxTunes
 
         ~BassStreamPipelineManager()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

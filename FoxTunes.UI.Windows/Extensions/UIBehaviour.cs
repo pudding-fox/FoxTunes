@@ -76,7 +76,7 @@ namespace FoxTunes
 
         ~UIBehaviour()
         {
-            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);
@@ -89,7 +89,7 @@ namespace FoxTunes
 
         public static void Shutdown()
         {
-            Logger.Write(typeof(UIBehaviour), LogLevel.Debug, "Shutting down..");
+            //Logger.Write(typeof(UIBehaviour), LogLevel.Debug, "Shutting down..");
             foreach (var instance in Active)
             {
                 try
@@ -98,12 +98,12 @@ namespace FoxTunes
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(typeof(UIBehaviour), LogLevel.Warn, "Instance failed to dispose: {0}", e.Message);
+                    //Logger.Write(typeof(UIBehaviour), LogLevel.Warn, "Instance failed to dispose: {0}", e.Message);
                 }
             }
             if (Active.Any())
             {
-                Logger.Write(typeof(UIBehaviour), LogLevel.Warn, "Some instances failed to disposed.");
+                //Logger.Write(typeof(UIBehaviour), LogLevel.Warn, "Some instances failed to disposed.");
             }
         }
     }

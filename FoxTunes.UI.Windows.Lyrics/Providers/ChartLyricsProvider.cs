@@ -53,35 +53,35 @@ namespace FoxTunes
 
         public override async Task<LyricsResult> Lookup(IFileData fileData)
         {
-            Logger.Write(this, LogLevel.Debug, "Getting track information for file \"{0}\"..", fileData.FileName);
+            //Logger.Write(this, LogLevel.Debug, "Getting track information for file \"{0}\"..", fileData.FileName);
             var artist = default(string);
             var song = default(string);
             if (!this.TryGetLookup(fileData, out artist, out song))
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to get track information: The required meta data was not found.");
+                //Logger.Write(this, LogLevel.Warn, "Failed to get track information: The required meta data was not found.");
                 return LyricsResult.Fail;
             }
-            Logger.Write(this, LogLevel.Debug, "Got track information: Artist = \"{0}\", Song = \"{1}\".", artist, song);
+            //Logger.Write(this, LogLevel.Debug, "Got track information: Artist = \"{0}\", Song = \"{1}\".", artist, song);
             var searchResult = default(SearchLyricResult);
             var lyricsResult = default(GetLyricResult);
             try
             {
-                Logger.Write(this, LogLevel.Debug, "Searching for match..");
+                //Logger.Write(this, LogLevel.Debug, "Searching for match..");
                 searchResult = await this.Lookup(artist, song).ConfigureAwait(false);
                 if (searchResult != null)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Got match, fetching lyrics..");
+                    //Logger.Write(this, LogLevel.Debug, "Got match, fetching lyrics..");
                     lyricsResult = await this.Lookup(searchResult).ConfigureAwait(false);
                     if (lyricsResult != null && !string.IsNullOrEmpty(lyricsResult.Lyric))
                     {
-                        Logger.Write(this, LogLevel.Debug, "Success.");
+                        //Logger.Write(this, LogLevel.Debug, "Success.");
                         return new LyricsResult(lyricsResult.Lyric);
                     }
                 }
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to fetch lyrics: {0}", e.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to fetch lyrics: {0}", e.Message);
             }
             finally
             {
@@ -101,13 +101,13 @@ namespace FoxTunes
         protected virtual async Task<SearchLyricResult> Lookup(string artist, string song)
         {
             var url = this.GetUrl(artist, song);
-            Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
+            //Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
             var request = WebRequestFactory.Create(url);
             using (var response = (HttpWebResponse)request.GetResponse())
             {
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Status code does not indicate success.");
+                    //Logger.Write(this, LogLevel.Warn, "Status code does not indicate success.");
                     return null;
                 }
                 using (var stream = response.GetResponseStream())
@@ -174,13 +174,13 @@ namespace FoxTunes
                 Uri.EscapeDataString(searchResult.LyricId),
                 Uri.EscapeDataString(searchResult.LyricChecksum)
             );
-            Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
+            //Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
             var request = WebRequest.Create(url);
             using (var response = (HttpWebResponse)request.GetResponse())
             {
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Status code does not indicate success.");
+                    //Logger.Write(this, LogLevel.Warn, "Status code does not indicate success.");
 #if NET40
                     return TaskEx.FromResult(default(GetLyricResult));
 #else
@@ -448,7 +448,7 @@ namespace FoxTunes
                     {
                         valid = false;
                     }
-                    Logger.Write(typeof(ChartLyricsProvider), LogLevel.Trace, "Lyric search: LyricChecksum = {0}, LyricId = {1}, Artist = \"{2}\", Song = \"{3}\", Valid = {4}.", this.LyricChecksum, this.LyricId, this.Artist, this.Song, valid);
+                    //Logger.Write(typeof(ChartLyricsProvider), LogLevel.Trace, "Lyric search: LyricChecksum = {0}, LyricId = {1}, Artist = \"{2}\", Song = \"{3}\", Valid = {4}.", this.LyricChecksum, this.LyricId, this.Artist, this.Song, valid);
                     return valid;
                 }
             }
@@ -456,7 +456,7 @@ namespace FoxTunes
             public float Similarity(string artist, string song)
             {
                 var similarity = (this.Artist.Similarity(artist, true) + this.Song.Similarity(song, true)) / 2;
-                Logger.Write(typeof(ChartLyricsProvider), LogLevel.Trace, "Lyric search: LyricChecksum = {0}, LyricId = {1}, Confidence = {2}.", this.LyricChecksum, this.LyricId, similarity);
+                //Logger.Write(typeof(ChartLyricsProvider), LogLevel.Trace, "Lyric search: LyricChecksum = {0}, LyricId = {1}, Confidence = {2}.", this.LyricChecksum, this.LyricId, similarity);
                 return similarity;
             }
         }

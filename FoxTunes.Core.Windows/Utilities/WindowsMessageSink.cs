@@ -18,7 +18,7 @@ namespace FoxTunes
             }
             catch
             {
-                Logger.Write(typeof(WindowsMessageSink), LogLevel.Warn, "Failed to register window message: TaskbarCreated");
+                //Logger.Write(typeof(WindowsMessageSink), LogLevel.Warn, "Failed to register window message: TaskbarCreated");
             }
         }
 

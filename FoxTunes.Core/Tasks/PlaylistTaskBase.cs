@@ -173,7 +173,7 @@ namespace FoxTunes
                     var position = 0;
                     foreach (var playlistItem in PlaylistItem.Clone(playlistItems))
                     {
-                        Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
+                        //Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
                         playlistItem.Playlist_Id = this.Playlist.Id;
                         playlistItem.Sequence = this.Sequence + position;
                         playlistItem.Status = PlaylistItemStatus.Import;
@@ -228,7 +228,7 @@ namespace FoxTunes
 
         protected virtual async Task RemoveItems(PlaylistItemStatus status)
         {
-            Logger.Write(this, LogLevel.Debug, "Removing playlist items.");
+            //Logger.Write(this, LogLevel.Debug, "Removing playlist items.");
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
@@ -249,14 +249,14 @@ namespace FoxTunes
                 //Nothing to do.
                 return;
             }
-            Logger.Write(
-                this,
-                LogLevel.Debug,
-                "Shifting playlist items at position {0} {1} by offset {2}.",
-                Enum.GetName(typeof(QueryOperator), @operator),
-                at,
-                by
-            );
+            //Logger.Write(
+            //    this,
+            //    LogLevel.Debug,
+            //    "Shifting playlist items at position {0} {1} by offset {2}.",
+            //    Enum.GetName(typeof(QueryOperator), @operator),
+            //    at,
+            //    by
+            //);
             var query = this.Database.QueryFactory.Build();
             var playlistId = this.Database.Tables.PlaylistItem.Column("Playlist_Id");
             var sequence = this.Database.Tables.PlaylistItem.Column("Sequence");
@@ -295,7 +295,7 @@ namespace FoxTunes
 
         protected virtual async Task SequenceItems()
         {
-            Logger.Write(this, LogLevel.Debug, "Sequencing playlist items.");
+            //Logger.Write(this, LogLevel.Debug, "Sequencing playlist items.");
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 var query = this.Database.Queries.SequencePlaylistItems(this.Sort.Value);
@@ -315,7 +315,7 @@ namespace FoxTunes
 
         protected virtual Task<int> SortItems(PlaylistColumn playlistColumn, bool descending)
         {
-            Logger.Write(this, LogLevel.Debug, "Sorting playlist {0} by column {1}.", this.Playlist.Name, playlistColumn.Name);
+            //Logger.Write(this, LogLevel.Debug, "Sorting playlist {0} by column {1}.", this.Playlist.Name, playlistColumn.Name);
             switch (playlistColumn.Type)
             {
                 case PlaylistColumnType.Script:
@@ -361,7 +361,7 @@ namespace FoxTunes
 
         protected virtual async Task SortItems(IComparer<PlaylistItem> comparer, bool descending)
         {
-            Logger.Write(this, LogLevel.Debug, "Sorting playlist using comparer: \"{0}\"", comparer.GetType().Name);
+            //Logger.Write(this, LogLevel.Debug, "Sorting playlist using comparer: \"{0}\"", comparer.GetType().Name);
             using (var task = new SingletonReentrantTask(this, ComponentSlots.Database, SingletonReentrantTask.PRIORITY_HIGH, async cancellationToken =>
             {
                 using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
@@ -371,7 +371,7 @@ namespace FoxTunes
                     Array.Sort(playlistItems, comparer);
                     if (descending)
                     {
-                        Logger.Write(this, LogLevel.Debug, "Sort is descending, reversing sequence.");
+                        //Logger.Write(this, LogLevel.Debug, "Sort is descending, reversing sequence.");
                         Array.Reverse(playlistItems);
                     }
                     for (var a = 0; a < playlistItems.Length; a++)
@@ -399,7 +399,7 @@ namespace FoxTunes
 
         protected virtual async Task SetPlaylistItemsStatus(PlaylistItemStatus status)
         {
-            Logger.Write(this, LogLevel.Debug, "Setting playlist status: {0}", Enum.GetName(typeof(LibraryItemStatus), LibraryItemStatus.None));
+            //Logger.Write(this, LogLevel.Debug, "Setting playlist status: {0}", Enum.GetName(typeof(LibraryItemStatus), LibraryItemStatus.None));
             var query = this.Database.QueryFactory.Build();
             query.Update.SetTable(this.Database.Tables.PlaylistItem);
             query.Update.AddColumn(this.Database.Tables.PlaylistItem.Column("Status"));

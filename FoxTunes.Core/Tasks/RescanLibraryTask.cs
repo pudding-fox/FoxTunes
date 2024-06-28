@@ -73,7 +73,7 @@ namespace FoxTunes
                 }
                 if (!paths.Any(path => libraryItem.FileName.StartsWith(path)))
                 {
-                    Logger.Write(this, LogLevel.Debug, "Removing unparented file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
+                    //Logger.Write(this, LogLevel.Debug, "Removing unparented file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
                     return true;
                 }
                 if (!string.IsNullOrEmpty(Path.GetPathRoot(libraryItem.FileName)))
@@ -81,12 +81,12 @@ namespace FoxTunes
                     var file = new FileInfo(libraryItem.FileName);
                     if (!file.Exists)
                     {
-                        Logger.Write(this, LogLevel.Debug, "Removing dead file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
+                        //Logger.Write(this, LogLevel.Debug, "Removing dead file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
                         return true;
                     }
                     if (file.LastWriteTimeUtc > libraryItem.GetImportDate())
                     {
-                        Logger.Write(this, LogLevel.Debug, "Refreshing modified file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
+                        //Logger.Write(this, LogLevel.Debug, "Refreshing modified file: {0} => {1}", libraryItem.Id, libraryItem.FileName);
                         return true;
                     }
                 }

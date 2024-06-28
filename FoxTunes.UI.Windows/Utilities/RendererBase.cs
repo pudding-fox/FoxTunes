@@ -26,15 +26,7 @@ namespace FoxTunes
 
         public const DispatcherPriority DISPATCHER_PRIORITY = DispatcherPriority.Render;
 
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        public static readonly Duration LockTimeout = new Duration(TimeSpan.FromMilliseconds(1));
+                public static readonly Duration LockTimeout = new Duration(TimeSpan.FromMilliseconds(1));
 
         public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register(
             "Background",

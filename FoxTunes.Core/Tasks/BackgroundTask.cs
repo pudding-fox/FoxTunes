@@ -208,7 +208,7 @@ namespace FoxTunes
 
         public virtual async Task Run()
         {
-            Logger.Write(this, LogLevel.Debug, "Running background task.");
+            //Logger.Write(this, LogLevel.Debug, "Running background task.");
             await this.OnStarted().ConfigureAwait(false);
             try
             {
@@ -216,7 +216,7 @@ namespace FoxTunes
                 {
                     await this.OnRun().ConfigureAwait(false);
                 }
-                Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
+                //Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
                 await this.OnCompleted().ConfigureAwait(false);
                 return;
             }
@@ -224,13 +224,13 @@ namespace FoxTunes
             {
                 foreach (var innerException in e.InnerExceptions)
                 {
-                    Logger.Write(this, LogLevel.Error, "Background task failed: {0}", innerException.Message);
+                    //Logger.Write(this, LogLevel.Error, "Background task failed: {0}", innerException.Message);
                 }
                 this.Exception = e;
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Error, "Background task failed: {0}", e.Message);
+                //Logger.Write(this, LogLevel.Error, "Background task failed: {0}", e.Message);
                 this.Exception = e;
             }
             await this.OnFaulted().ConfigureAwait(false);
@@ -391,7 +391,7 @@ namespace FoxTunes
 
         ~BackgroundTask()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

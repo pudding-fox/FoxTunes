@@ -24,9 +24,9 @@ namespace FoxTunes
 
         protected override Task OnRun()
         {
-            Logger.Write(this, LogLevel.Debug, "Writing disc..");
+            //Logger.Write(this, LogLevel.Debug, "Writing disc..");
             this.ApplyActions(this.Device, this.Actions);
-            Logger.Write(this, LogLevel.Debug, "Successfully wrote disc.");
+            //Logger.Write(this, LogLevel.Debug, "Successfully wrote disc.");
 #if NET40
             return TaskEx.FromResult(false);
 #else

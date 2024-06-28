@@ -47,7 +47,7 @@ namespace FoxTunes
                 }
                 if (!success && !string.IsNullOrWhiteSpace(filter))
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to parse filter: {0}", filter.Trim());
+                    //Logger.Write(this, LogLevel.Warn, "Failed to parse filter: {0}", filter.Trim());
                 }
                 if (groups.Any())
                 {

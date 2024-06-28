@@ -149,11 +149,11 @@ namespace FoxTunes
                 selectedPlaylist = this.PlaylistBrowser.GetPlaylists().FirstOrDefault(playlist => playlist.Id == this.SelectedPlaylist.Id);
                 if (selectedPlaylist != null)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Refreshed selected playlist: {0} => {1}", this.SelectedPlaylist.Id, this.SelectedPlaylist.Name);
+                    //Logger.Write(this, LogLevel.Debug, "Refreshed selected playlist: {0} => {1}", this.SelectedPlaylist.Id, this.SelectedPlaylist.Name);
                 }
                 else
                 {
-                    Logger.Write(this, LogLevel.Debug, "Failed to refresh selected playlist, it was removed or disabled.");
+                    //Logger.Write(this, LogLevel.Debug, "Failed to refresh selected playlist, it was removed or disabled.");
                 }
             }
             if (selectedPlaylist == null)
@@ -161,11 +161,11 @@ namespace FoxTunes
                 selectedPlaylist = this.PlaylistBrowser.GetPlaylists().FirstOrDefault();
                 if (selectedPlaylist == null)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to select a playlist, perhaps none are enabled?");
+                    //Logger.Write(this, LogLevel.Warn, "Failed to select a playlist, perhaps none are enabled?");
                 }
                 else
                 {
-                    Logger.Write(this, LogLevel.Debug, "Selected first playlist: {0} => {1}", selectedPlaylist.Id, selectedPlaylist.Name);
+                    //Logger.Write(this, LogLevel.Debug, "Selected first playlist: {0} => {1}", selectedPlaylist.Id, selectedPlaylist.Name);
                 }
             }
             if (object.ReferenceEquals(this.SelectedPlaylist, selectedPlaylist))
@@ -183,11 +183,11 @@ namespace FoxTunes
                 currentPlaylist = this.PlaylistBrowser.GetPlaylists().FirstOrDefault(playlist => playlist.Id == currentPlaylist.Id);
                 if (currentPlaylist != null)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Refreshed current playlist: {0} => {1}", currentPlaylist.Id, currentPlaylist.Name);
+                    //Logger.Write(this, LogLevel.Debug, "Refreshed current playlist: {0} => {1}", currentPlaylist.Id, currentPlaylist.Name);
                 }
                 else
                 {
-                    Logger.Write(this, LogLevel.Debug, "Failed to refresh current playlist, it was removed or disabled.");
+                    //Logger.Write(this, LogLevel.Debug, "Failed to refresh current playlist, it was removed or disabled.");
                 }
             }
             if (object.ReferenceEquals(this.CurrentPlaylist, currentPlaylist))
@@ -211,7 +211,7 @@ namespace FoxTunes
                 }
                 if (currentItem == null)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
+                    //Logger.Write(this, LogLevel.Warn, "Failed to refresh current item.");
                 }
             }
             if (object.ReferenceEquals(this.CurrentItem, currentItem))
@@ -223,16 +223,16 @@ namespace FoxTunes
 
         protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
         {
-            Logger.Write(this, LogLevel.Debug, "Playback manager output stream changed, updating current playlist item.");
+            //Logger.Write(this, LogLevel.Debug, "Playback manager output stream changed, updating current playlist item.");
             if (this.PlaybackManager.CurrentStream == null)
             {
                 this.CurrentItem = null;
-                Logger.Write(this, LogLevel.Debug, "Playback manager output stream is empty. Cleared current playlist item.");
+                //Logger.Write(this, LogLevel.Debug, "Playback manager output stream is empty. Cleared current playlist item.");
             }
             else if (this.PlaybackManager.CurrentStream.PlaylistItem != this.CurrentItem)
             {
                 this.CurrentItem = this.PlaybackManager.CurrentStream.PlaylistItem;
-                Logger.Write(this, LogLevel.Debug, "Updated current playlist item: {0} => {1}", this.CurrentItem.Id, this.CurrentItem.FileName);
+                //Logger.Write(this, LogLevel.Debug, "Updated current playlist item: {0} => {1}", this.CurrentItem.Id, this.CurrentItem.FileName);
             }
         }
 
@@ -288,14 +288,14 @@ namespace FoxTunes
 
         public Task Add(Playlist playlist, IEnumerable<string> paths, bool clear)
         {
-            Logger.Write(this, LogLevel.Debug, "Adding paths to playlist.");
+            //Logger.Write(this, LogLevel.Debug, "Adding paths to playlist.");
             var index = this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist);
             return this.Insert(playlist, index, paths, clear);
         }
 
         public async Task Insert(Playlist playlist, int index, IEnumerable<string> paths, bool clear)
         {
-            Logger.Write(this, LogLevel.Debug, "Inserting paths into playlist at index: {0}", index);
+            //Logger.Write(this, LogLevel.Debug, "Inserting paths into playlist at index: {0}", index);
             using (var task = new AddPathsToPlaylistTask(playlist, index, paths, clear))
             {
                 task.InitializeComponent(this.Core);
@@ -306,14 +306,14 @@ namespace FoxTunes
 
         public Task Add(Playlist playlist, LibraryHierarchyNode libraryHierarchyNode, bool clear)
         {
-            Logger.Write(this, LogLevel.Debug, "Adding library node to playlist.");
+            //Logger.Write(this, LogLevel.Debug, "Adding library node to playlist.");
             var index = this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist);
             return this.Insert(playlist, index, libraryHierarchyNode, clear);
         }
 
         public async Task Insert(Playlist playlist, int index, LibraryHierarchyNode libraryHierarchyNode, bool clear)
         {
-            Logger.Write(this, LogLevel.Debug, "Inserting library node into playlist at index: {0}", index);
+            //Logger.Write(this, LogLevel.Debug, "Inserting library node into playlist at index: {0}", index);
             using (var task = new AddLibraryHierarchyNodeToPlaylistTask(playlist, index, libraryHierarchyNode, clear))
             {
                 task.InitializeComponent(this.Core);
@@ -324,14 +324,14 @@ namespace FoxTunes
 
         public Task Add(Playlist playlist, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
         {
-            Logger.Write(this, LogLevel.Debug, "Adding library nodes to playlist.");
+            //Logger.Write(this, LogLevel.Debug, "Adding library nodes to playlist.");
             var index = this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist);
             return this.Insert(playlist, index, libraryHierarchyNodes, clear);
         }
 
         public async Task Insert(Playlist playlist, int index, IEnumerable<LibraryHierarchyNode> libraryHierarchyNodes, bool clear)
         {
-            Logger.Write(this, LogLevel.Debug, "Inserting library nodes into playlist at index: {0}", index);
+            //Logger.Write(this, LogLevel.Debug, "Inserting library nodes into playlist at index: {0}", index);
             using (var task = new AddLibraryHierarchyNodesToPlaylistTask(playlist, index, libraryHierarchyNodes, this.LibraryHierarchyBrowser.Filter, clear))
             {
                 task.InitializeComponent(this.Core);
@@ -342,14 +342,14 @@ namespace FoxTunes
 
         public Task Add(Playlist playlist, IEnumerable<PlaylistItem> playlistItems, bool clear)
         {
-            Logger.Write(this, LogLevel.Debug, "Adding items to playlist.");
+            //Logger.Write(this, LogLevel.Debug, "Adding items to playlist.");
             var index = this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist);
             return this.Insert(playlist, index, playlistItems, clear);
         }
 
         public async Task Insert(Playlist playlist, int index, IEnumerable<PlaylistItem> playlistItems, bool clear)
         {
-            Logger.Write(this, LogLevel.Debug, "Inserting items into playlist at index: {0}", index);
+            //Logger.Write(this, LogLevel.Debug, "Inserting items into playlist at index: {0}", index);
             using (var task = new MovePlaylistItemsTask(playlist, index, playlistItems, clear))
             {
                 task.InitializeComponent(this.Core);
@@ -360,14 +360,14 @@ namespace FoxTunes
 
         public Task Move(Playlist playlist, IEnumerable<PlaylistItem> playlistItems)
         {
-            Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items.");
+            //Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items.");
             var index = this.PlaylistBrowser.GetInsertIndex(this.SelectedPlaylist);
             return this.Move(playlist, index, playlistItems);
         }
 
         public async Task Move(Playlist playlist, int index, IEnumerable<PlaylistItem> playlistItems)
         {
-            Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items at index: {0}", index);
+            //Logger.Write(this, LogLevel.Debug, "Re-ordering playlist items at index: {0}", index);
             using (var task = new MovePlaylistItemsTask(playlist, index, playlistItems, false))
             {
                 task.InitializeComponent(this.Core);
@@ -417,13 +417,13 @@ namespace FoxTunes
         {
             if (this.SelectedPlaylist == null)
             {
-                Logger.Write(this, LogLevel.Debug, "No playlist.");
+                //Logger.Write(this, LogLevel.Debug, "No playlist.");
                 return;
             }
-            Logger.Write(this, LogLevel.Debug, "Navigating to next playlist item.");
+            //Logger.Write(this, LogLevel.Debug, "Navigating to next playlist item.");
             if (this.IsNavigating)
             {
-                Logger.Write(this, LogLevel.Debug, "Already navigating, ignoring request.");
+                //Logger.Write(this, LogLevel.Debug, "Already navigating, ignoring request.");
                 return;
             }
             try
@@ -432,12 +432,12 @@ namespace FoxTunes
                 var playlistItem = this.PlaylistBrowser.GetNextItem(this.CurrentPlaylist, wrap);
                 if (playlistItem == null)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Playlist ended, stopping.");
+                    //Logger.Write(this, LogLevel.Debug, "Playlist ended, stopping.");
                     await this.PlaybackManager.Stop();
                 }
                 else
                 {
-                    Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
+                    //Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                     await this.Play(playlistItem).ConfigureAwait(false);
                 }
             }
@@ -451,13 +451,13 @@ namespace FoxTunes
         {
             if (this.SelectedPlaylist == null)
             {
-                Logger.Write(this, LogLevel.Debug, "No playlist.");
+                //Logger.Write(this, LogLevel.Debug, "No playlist.");
                 return;
             }
-            Logger.Write(this, LogLevel.Debug, "Navigating to previous playlist item.");
+            //Logger.Write(this, LogLevel.Debug, "Navigating to previous playlist item.");
             if (this.IsNavigating)
             {
-                Logger.Write(this, LogLevel.Debug, "Already navigating, ignoring request.");
+                //Logger.Write(this, LogLevel.Debug, "Already navigating, ignoring request.");
                 return;
             }
             try
@@ -468,7 +468,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
+                //Logger.Write(this, LogLevel.Debug, "Playing playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                 await this.Play(playlistItem).ConfigureAwait(false);
             }
             finally

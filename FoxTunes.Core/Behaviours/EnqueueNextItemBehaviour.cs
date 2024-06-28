@@ -68,7 +68,7 @@ namespace FoxTunes
             {
                 if (!this.Output.IsStarted)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Output was stopped, cancelling.");
+                    //Logger.Write(this, LogLevel.Debug, "Output was stopped, cancelling.");
                     break;
                 }
                 playlistItem = this.PlaylistBrowser.GetNextItem(playlistItem, this.Wrap.Value);
@@ -86,7 +86,7 @@ namespace FoxTunes
 #endif
                     continue;
                 }
-                Logger.Write(this, LogLevel.Debug, "Preemptively buffering playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
+                //Logger.Write(this, LogLevel.Debug, "Preemptively buffering playlist item: {0} => {1}", playlistItem.Id, playlistItem.FileName);
                 await this.PlaybackManager.Load(playlistItem, false).ConfigureAwait(false);
             }
         }
@@ -128,7 +128,7 @@ namespace FoxTunes
 
         ~EnqueueNextItemsBehaviour()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

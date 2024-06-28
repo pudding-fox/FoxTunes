@@ -44,7 +44,7 @@ namespace FoxTunes
             {
                 return;
             }
-            Logger.Write(typeof(Resampler), LogLevel.Trace, "{0}: {1}", FileName, e.Data);
+            //Logger.Write(typeof(Resampler), LogLevel.Trace, "{0}: {1}", FileName, e.Data);
         }
 
         public bool IsDisposed { get; private set; }
@@ -76,7 +76,7 @@ namespace FoxTunes
 
         ~Resampler()
         {
-            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);
@@ -93,7 +93,7 @@ namespace FoxTunes
             {
                 throw new InvalidOperationException(string.Format("A required utility was not found: {0}", FileName));
             }
-            Logger.Write(typeof(Resampler), LogLevel.Debug, "Creating resampler process: {0} => {1}", inputFormat, outputFormat);
+            //Logger.Write(typeof(Resampler), LogLevel.Debug, "Creating resampler process: {0} => {1}", inputFormat, outputFormat);
             var arguments = GetArguments(inputFormat, outputFormat);
             var processStartInfo = new ProcessStartInfo()
             {
@@ -115,7 +115,7 @@ namespace FoxTunes
             {
                 //Nothing can be done, probably access denied.
             }
-            Logger.Write(typeof(Resampler), LogLevel.Debug, "Created resampler process: \"{0}\" {1}", FileName, arguments);
+            //Logger.Write(typeof(Resampler), LogLevel.Debug, "Created resampler process: \"{0}\" {1}", FileName, arguments);
             return process;
         }
 

@@ -144,7 +144,7 @@ namespace FoxTunes
             var metaData = new List<MetaDataItem>();
             if (!this.IsSupported(fileName))
             {
-                Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
+                //Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
                 this.AddWarning(fileName, "Unsupported file format.");
                 //Add minimal meta data so library is happy.
                 if (this.FileSystem.Value)
@@ -154,7 +154,7 @@ namespace FoxTunes
                 return metaData;
             }
             var collect = default(bool);
-            Logger.Write(this, LogLevel.Trace, "Reading meta data for file: {0}", fileName);
+            //Logger.Write(this, LogLevel.Trace, "Reading meta data for file: {0}", fileName);
             try
             {
                 using (var file = factory())
@@ -201,20 +201,20 @@ namespace FoxTunes
             }
             catch (UnsupportedFormatException)
             {
-                Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
+                //Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
                 this.AddWarning(fileName, "Unsupported file format.");
             }
             catch (OutOfMemoryException)
             {
                 //This can happen with really big embedded images.
                 //It's tricky to avoid because we can't check InvariantStartPosition without parsing.
-                Logger.Write(this, LogLevel.Warn, "Out of memory: {0}", fileName);
+                //Logger.Write(this, LogLevel.Warn, "Out of memory: {0}", fileName);
                 this.AddWarning(fileName, "Out of memory.");
                 collect = true;
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to read meta data: {0} => {1}", fileName, e.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to read meta data: {0} => {1}", fileName, e.Message);
                 this.AddWarning(fileName, string.Format("Failed to read meta data: {0}", e.Message));
             }
             finally
@@ -232,12 +232,12 @@ namespace FoxTunes
         {
             if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value) == WriteBehaviour.None)
             {
-                Logger.Write(this, LogLevel.Warn, "Writing is disabled: {0}", fileName);
+                //Logger.Write(this, LogLevel.Warn, "Writing is disabled: {0}", fileName);
                 return;
             }
             if (!this.IsSupported(fileName))
             {
-                Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
+                //Logger.Write(this, LogLevel.Warn, "Unsupported file format: {0}", fileName);
                 return;
             }
             var metaDataItems = default(IEnumerable<MetaDataItem>);
@@ -575,7 +575,7 @@ namespace FoxTunes
 
         private void ErrorHandler(Exception e)
         {
-            Logger.Write(this, LogLevel.Error, "Failed to read meta data: {0}", e.Message);
+            //Logger.Write(this, LogLevel.Error, "Failed to read meta data: {0}", e.Message);
         }
     }
 

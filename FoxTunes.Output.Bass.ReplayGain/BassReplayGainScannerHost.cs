@@ -9,14 +9,6 @@ namespace FoxTunes
 {
     public static class BassReplayGainScannerHost
     {
-        private static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
         public static string Location
         {
             get
@@ -74,25 +66,25 @@ namespace FoxTunes
                     });
                     core.Initialize();
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Error, "Failed to initialize core: {0}", e.Message);
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Error, "Failed to initialize core: {0}", e.Message);
                     throw;
                 }
                 try
                 {
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Begin reading items.");
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Begin reading items.");
                     var scannerItems = ReadInput<ScannerItem[]>(input);
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Read {0} items.", scannerItems.Length);
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Read {0} items.", scannerItems.Length);
                     using (var scanner = new BassReplayGainScanner(scannerItems))
                     {
                         scanner.InitializeComponent(core);
                         Scan(scanner, input, output, error);
                     }
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Error, "Failed to scan items: {0}", e.Message);
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Error, "Failed to scan items: {0}", e.Message);
                     throw;
                 }
             }
@@ -104,15 +96,15 @@ namespace FoxTunes
             {
                 try
                 {
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Starting scanner main thread.");
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Starting scanner main thread.");
                     scanner.Scan();
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Finished scanner main thread.");
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Finished scanner main thread.");
                     WriteOutput(output, new ScannerStatus(ScannerStatusType.Complete));
                     error.Flush();
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Error, "Error on scanner main thread: {0}", e.Message);
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Error, "Error on scanner main thread: {0}", e.Message);
                     WriteOutput(output, new ScannerStatus(ScannerStatusType.Error));
                     new StreamWriter(error).Write(e.Message);
                     error.Flush();
@@ -125,18 +117,18 @@ namespace FoxTunes
             {
                 try
                 {
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Starting scanner output thread.");
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Starting scanner output thread.");
                     while (thread1.IsAlive)
                     {
                         ProcessOutput(scanner, output);
                         Thread.Sleep(INTERVAL);
                     }
                     ProcessOutput(scanner, output);
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Finished scanner output thread.");
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Finished scanner output thread.");
                 }
-                catch (Exception e)
+                catch 
                 {
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Error, "Error on scanner output thread: {0}", e.Message);
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Error, "Error on scanner output thread: {0}", e.Message);
                 }
             })
             {
@@ -147,7 +139,7 @@ namespace FoxTunes
                 var exit = default(bool);
                 try
                 {
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Starting scanner input thread.");
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Starting scanner input thread.");
                     while (thread1.IsAlive)
                     {
                         ProcessInput(scanner, input, output, out exit);
@@ -161,11 +153,11 @@ namespace FoxTunes
                     {
                         ProcessInput(scanner, input, output, out exit);
                     }
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Finished scanner input thread.");
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Finished scanner input thread.");
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Error, "Error on scanner input thread: {0}", e.Message);
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Error, "Error on scanner input thread: {0}", e.Message);
                 }
             })
             {
@@ -177,32 +169,32 @@ namespace FoxTunes
             thread1.Join();
             if (!thread2.Join(TIMEOUT))
             {
-                Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Warn, "Scanner output thread did not complete gracefully, aborting.");
+                //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Warn, "Scanner output thread did not complete gracefully, aborting.");
                 thread2.Abort();
             }
             if (!thread3.Join(TIMEOUT))
             {
-                Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Warn, "Scanner input thread did not complete gracefully, aborting.");
+                //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Warn, "Scanner input thread did not complete gracefully, aborting.");
                 thread3.Abort();
             }
         }
 
         private static void ProcessInput(IBassReplayGainScanner scanner, Stream input, Stream output, out bool exit)
         {
-            Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Begin reading command.");
+            //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Begin reading command.");
             var command = ReadInput<ScannerCommand>(input);
-            Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Read command: {0}", Enum.GetName(typeof(ScannerCommandType), command.Type));
+            //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Read command: {0}", Enum.GetName(typeof(ScannerCommandType), command.Type));
             switch (command.Type)
             {
                 case ScannerCommandType.Cancel:
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Sending cancellation signal to scanner.");
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Sending cancellation signal to scanner.");
                     scanner.Cancel();
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Closing stdin.");
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Closing stdin.");
                     input.Close();
                     exit = true;
                     break;
                 case ScannerCommandType.Quit:
-                    Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Closing stdin/stdout.");
+                    //Logger.Write(typeof(BassReplayGainScannerHost), LogLevel.Debug, "Closing stdin/stdout.");
                     input.Close();
                     output.Close();
                     exit = true;

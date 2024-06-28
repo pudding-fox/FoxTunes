@@ -49,11 +49,11 @@ namespace FoxTunes
                 try
                 {
                     BassMemory.Progress(this.Handler);
-                    Logger.Write(this, LogLevel.Debug, "Registered progress handler.");
+                    //Logger.Write(this, LogLevel.Debug, "Registered progress handler.");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to register progress handler: {0}", ex.Message);
+                    //Logger.Write(this, LogLevel.Warn, "Failed to register progress handler: {0}", ex.Message);
                 }
             }
         }
@@ -147,7 +147,7 @@ namespace FoxTunes
 
         ~BassMemoryLoadingBehaviour()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

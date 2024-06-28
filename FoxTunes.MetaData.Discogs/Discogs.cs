@@ -52,13 +52,13 @@ namespace FoxTunes
         public async Task<IEnumerable<Release>> GetReleases(ReleaseLookup releaseLookup, bool master)
         {
             var url = this.GetUrl(releaseLookup, master);
-            Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
+            //Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
             var request = this.CreateRequest(url);
             using (var response = (HttpWebResponse)request.GetResponse())
             {
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Status code does not indicate success.");
+                    //Logger.Write(this, LogLevel.Warn, "Status code does not indicate success.");
                     return Enumerable.Empty<Release>();
                 }
                 return await this.GetReleases(response.GetResponseStream()).ConfigureAwait(false);
@@ -87,13 +87,13 @@ namespace FoxTunes
         public async Task<ReleaseDetails> GetRelease(Release release)
         {
             var url = release.ResourceUrl;
-            Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
+            //Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
             var request = this.CreateRequest(url);
             using (var response = (HttpWebResponse)request.GetResponse())
             {
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Status code does not indicate success.");
+                    //Logger.Write(this, LogLevel.Warn, "Status code does not indicate success.");
                     return null;
                 }
                 return await this.GetRelease(response.GetResponseStream()).ConfigureAwait(false);
@@ -116,13 +116,13 @@ namespace FoxTunes
 
         public Task<byte[]> GetData(string url)
         {
-            Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
+            //Logger.Write(this, LogLevel.Debug, "Querying the API: {0}", url);
             var request = this.CreateRequest(url);
             using (var response = (HttpWebResponse)request.GetResponse())
             {
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    Logger.Write(this, LogLevel.Warn, "Status code does not indicate success.");
+                    //Logger.Write(this, LogLevel.Warn, "Status code does not indicate success.");
 #if NET40
                     return TaskEx.FromResult(default(byte[]));
 #else
@@ -243,7 +243,7 @@ namespace FoxTunes
 
         ~Discogs()
         {
-            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

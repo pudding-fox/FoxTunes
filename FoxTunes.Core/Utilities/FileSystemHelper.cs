@@ -12,14 +12,6 @@ namespace FoxTunes
     {
         const int CACHE_SIZE = 128;
 
-        private static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
         public static HashSet<string> IgnoredNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "FoxTunes.Launcher.exe",
@@ -143,9 +135,9 @@ namespace FoxTunes
                 //Some kind of abstraction.
                 return false;
             }
-            catch (Exception e)
+            catch
             {
-                Logger.Write(typeof(FileSystemHelper), LogLevel.Warn, "Failed to determine whether \"{0}\" is a local path: {1}", fileName, e.Message);
+                //Logger.Write(typeof(FileSystemHelper), LogLevel.Warn, "Failed to determine whether \"{0}\" is a local path: {1}", fileName, e.Message);
                 return false;
             }
         }

@@ -23,15 +23,7 @@ namespace FoxTunes
 
         public static readonly UIComponentFactory Factory = ComponentRegistry.Instance.GetComponent<UIComponentFactory>();
 
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        public static readonly DependencyProperty ConfigurationProperty = DependencyProperty.Register(
+                public static readonly DependencyProperty ConfigurationProperty = DependencyProperty.Register(
             "Configuration",
             typeof(UIComponentConfiguration),
             typeof(UIComponentContainer),
@@ -381,7 +373,7 @@ namespace FoxTunes
         {
             var configuration = new UIComponentConfigurationProvider(this.Configuration);
             configuration.InitializeComponent(Core.Instance);
-            Logger.Write(this, LogLevel.Debug, "Registering configuration for component {0}.", component.GetType().Name);
+            //Logger.Write(this, LogLevel.Debug, "Registering configuration for component {0}.", component.GetType().Name);
             try
             {
                 var sections = component.GetConfigurationSections();
@@ -392,7 +384,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to register configuration for component {0}: {1}", component.GetType().Name, e.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to register configuration for component {0}: {1}", component.GetType().Name, e.Message);
             }
             configuration.Load();
             configuration.ConnectDependencies();

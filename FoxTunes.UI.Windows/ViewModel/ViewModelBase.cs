@@ -8,15 +8,7 @@ namespace FoxTunes.ViewModel
 {
     public abstract class ViewModelBase : Freezable, IBaseComponent, IObservable, IDisposable
     {
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        protected ViewModelBase(bool initialize = true)
+                protected ViewModelBase(bool initialize = true)
         {
             if (initialize && Core.Instance != null)
             {

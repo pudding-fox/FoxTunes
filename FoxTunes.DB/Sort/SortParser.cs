@@ -49,7 +49,7 @@ namespace FoxTunes
                     }
                     if (!success)
                     {
-                        Logger.Write(this, LogLevel.Warn, "Failed to parse sort: {0}", line.Trim());
+                        //Logger.Write(this, LogLevel.Warn, "Failed to parse sort: {0}", line.Trim());
                     }
                 }
                 if (expressions.Any())

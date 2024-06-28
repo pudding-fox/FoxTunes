@@ -78,7 +78,7 @@ namespace FoxTunes
             {
                 values[track] = new Dictionary<string, string>();
             }
-            LogManager.Logger.Write(typeof(CdTextParser), LogLevel.Trace, "Got CD-TEXT tag for track {0} => {1} => {2}", track, name, value);
+            //Logger.Write(typeof(CdTextParser), LogLevel.Trace, "Got CD-TEXT tag for track {0} => {1} => {2}", track, name, value);
             values[track][name] = value;
         }
     }

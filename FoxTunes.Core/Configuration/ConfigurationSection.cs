@@ -8,15 +8,7 @@ namespace FoxTunes
 {
     public class ConfigurationSection : INotifyPropertyChanged
     {
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        public ConfigurationSection()
+                public ConfigurationSection()
         {
             this.Elements = new Dictionary<string, ConfigurationElement>(StringComparer.OrdinalIgnoreCase);
             this.Flags = ConfigurationSectionFlags.None;
@@ -129,20 +121,20 @@ namespace FoxTunes
 
         protected virtual void Add(ConfigurationElement element)
         {
-            Logger.Write(typeof(ConfigurationSection), LogLevel.Debug, "Adding configuration element: {0} => {1}", element.Id, element.Name);
+            //Logger.Write(typeof(ConfigurationSection), LogLevel.Debug, "Adding configuration element: {0} => {1}", element.Id, element.Name);
             this.Elements.Add(element.Id, element);
         }
 
         protected virtual void Update(ConfigurationElement element)
         {
-            Logger.Write(typeof(ConfigurationSection), LogLevel.Debug, "Updating configuration element: {0} => {1}", element.Id, element.Name);
+            //Logger.Write(typeof(ConfigurationSection), LogLevel.Debug, "Updating configuration element: {0} => {1}", element.Id, element.Name);
             var existing = this.GetElement(element.Id);
             existing.Update(element);
         }
 
         private void Hide(ConfigurationElement element)
         {
-            Logger.Write(typeof(ConfigurationSection), LogLevel.Debug, "Hiding configuration element: {0} => {1}", element.Id, element.Name);
+            //Logger.Write(typeof(ConfigurationSection), LogLevel.Debug, "Hiding configuration element: {0} => {1}", element.Id, element.Name);
             var existing = this.GetElement(element.Id);
             existing.Hide();
         }

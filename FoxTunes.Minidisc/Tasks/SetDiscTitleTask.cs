@@ -25,21 +25,21 @@ namespace FoxTunes
 
         protected override Task OnRun()
         {
-            Logger.Write(this, LogLevel.Debug, "Reading disc..");
+            //Logger.Write(this, LogLevel.Debug, "Reading disc..");
             var currentDisc = this.DiscManager.GetDisc(this.Device);
             if (currentDisc != null)
             {
-                Logger.Write(this, LogLevel.Debug, "Current disc \"{0}\" has {1} tracks.", currentDisc.Title, currentDisc.Tracks.Count);
-                Logger.Write(this, LogLevel.Debug, "Setting title: {0}", this.Title);
+                //Logger.Write(this, LogLevel.Debug, "Current disc \"{0}\" has {1} tracks.", currentDisc.Title, currentDisc.Tracks.Count);
+                //Logger.Write(this, LogLevel.Debug, "Setting title: {0}", this.Title);
                 var updatedDisc = currentDisc.Clone();
                 updatedDisc.Title = this.Title;
                 var actions = this.ActionBuilder.GetActions(this.Device, currentDisc, updatedDisc);
                 this.ApplyActions(this.Device, actions);
-                Logger.Write(this, LogLevel.Debug, "Successfully set title.");
+                //Logger.Write(this, LogLevel.Debug, "Successfully set title.");
             }
             else
             {
-                Logger.Write(this, LogLevel.Warn, "Disc could not be read.");
+                //Logger.Write(this, LogLevel.Warn, "Disc could not be read.");
                 throw new Exception(Strings.MinidiscTask_NoDisc);
             }
 #if NET40

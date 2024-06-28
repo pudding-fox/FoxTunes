@@ -167,7 +167,7 @@ namespace FoxTunes.ViewModel
             }
             catch (Exception exception)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to query clipboard contents: {0}", exception.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to query clipboard contents: {0}", exception.Message);
             }
             e.Effects = effects;
         }
@@ -211,7 +211,7 @@ namespace FoxTunes.ViewModel
             }
             catch (Exception exception)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to process clipboard contents: {0}", exception.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to process clipboard contents: {0}", exception.Message);
             }
         }
 

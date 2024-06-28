@@ -71,9 +71,9 @@ namespace FoxTunes
                 catch (Exception e)
                 {
                     metaData = new MetaDataItem[] { };
-                    Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", fileName, e.Message);
+                    //Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", fileName, e.Message);
                 }
-                Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
+                //Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
                 var playlistItem = new PlaylistItem()
                 {
                     DirectoryName = directoryName,

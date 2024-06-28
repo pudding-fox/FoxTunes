@@ -10,15 +10,7 @@ namespace FoxTunes
 {
     public class ComponentResolver : IComponentResolver
     {
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        public static string Location
+                public static string Location
         {
             get
             {
@@ -68,7 +60,7 @@ namespace FoxTunes
             {
                 if (File.Exists(FileName))
                 {
-                    Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Loading component slots from file: {0}", FileName);
+                    //Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Loading component slots from file: {0}", FileName);
                     using (var stream = File.OpenRead(FileName))
                     {
                         var pairs = Serializer.Load(stream);
@@ -83,14 +75,14 @@ namespace FoxTunes
                             {
                                 continue;
                             }
-                            Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Loaded component slot: {0} => {1}", pair.Key, pair.Value);
+                            //Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Loaded component slot: {0} => {1}", pair.Key, pair.Value);
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                Logger.Write(typeof(ComponentResolver), LogLevel.Warn, "Failed to load component slots: {0}", e.Message);
+                //Logger.Write(typeof(ComponentResolver), LogLevel.Warn, "Failed to load component slots: {0}", e.Message);
             }
             foreach (var slot in ComponentSlots.All)
             {
@@ -98,7 +90,7 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Component slot {0} is not configured.", slot);
+                //Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Component slot {0} is not configured.", slot);
             }
         }
 
@@ -106,15 +98,15 @@ namespace FoxTunes
         {
             if (!this.Enabled)
             {
-                Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Cannot save component slots.");
+                //Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Cannot save component slots.");
                 return;
             }
             if (!this.Slots.Any(pair => pair.Value.Flags.HasFlag(ComponentSlotFlags.Modified | ComponentSlotFlags.HasConflicts)))
             {
-                Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Component slots are unmodified or have no conflicts, nothing to save.");
+                //Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Component slots are unmodified or have no conflicts, nothing to save.");
                 return;
             }
-            Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Saving component slots from file: {0}", FileName);
+            //Logger.Write(typeof(ComponentResolver), LogLevel.Debug, "Saving component slots from file: {0}", FileName);
             try
             {
                 using (var stream = File.Create(FileName))
@@ -124,7 +116,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(typeof(ComponentResolver), LogLevel.Warn, "Failed to save component slots: {0}", e.Message);
+                //Logger.Write(typeof(ComponentResolver), LogLevel.Warn, "Failed to save component slots: {0}", e.Message);
             }
         }
 

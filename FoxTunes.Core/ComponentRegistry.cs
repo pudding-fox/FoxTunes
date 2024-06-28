@@ -7,15 +7,7 @@ namespace FoxTunes
 {
     public class ComponentRegistry : IComponentRegistry
     {
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        private ComponentRegistry()
+                private ComponentRegistry()
         {
             this.Clear();
         }
@@ -48,7 +40,7 @@ namespace FoxTunes
             var componentType = component.GetType();
             if (!this.ComponentsByType.TryAdd(componentType, component))
             {
-                Logger.Write(typeof(ComponentRegistry), LogLevel.Warn, "Cannot register component type \"{0}\", it was already registered.", componentType.FullName);
+                //Logger.Write(typeof(ComponentRegistry), LogLevel.Warn, "Cannot register component type \"{0}\", it was already registered.", componentType.FullName);
             }
             foreach (var componentInterface in componentType.GetInterfaces())
             {

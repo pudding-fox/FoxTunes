@@ -27,16 +27,16 @@ namespace FoxTunes
 
         protected virtual void ApplyActions(IDevice device, IActions actions)
         {
-            Logger.Write(this, LogLevel.Debug, "Applying actions..");
+            //Logger.Write(this, LogLevel.Debug, "Applying actions..");
             this.Result = this.DiscManager.ApplyActions(device, actions, this.Status, true);
             if (this.Result.Status != ResultStatus.Success)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to apply actions: {0}", this.Result.Message);
+                //Logger.Write(this, LogLevel.Warn, "Failed to apply actions: {0}", this.Result.Message);
                 throw new Exception(this.Result.Message);
             }
             else
             {
-                Logger.Write(this, LogLevel.Debug, "Successfully applied actions.");
+                //Logger.Write(this, LogLevel.Debug, "Successfully applied actions.");
             }
         }
 

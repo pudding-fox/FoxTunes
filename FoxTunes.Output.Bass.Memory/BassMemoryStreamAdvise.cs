@@ -21,15 +21,15 @@ namespace FoxTunes
                 stream = null;
                 return false;
             }
-            Logger.Write(this, LogLevel.Debug, "Creating memory stream for channel: {0}", channelHandle);
+            //Logger.Write(this, LogLevel.Debug, "Creating memory stream for channel: {0}", channelHandle);
             var memoryChannelHandle = BassMemory.CreateStream(channelHandle, 0, 0, flags);
             if (memoryChannelHandle == 0)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to create memory stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                //Logger.Write(this, LogLevel.Warn, "Failed to create memory stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
                 stream = null;
                 return false;
             }
-            Logger.Write(this, LogLevel.Debug, "Created memory stream: {0}", channelHandle);
+            //Logger.Write(this, LogLevel.Debug, "Created memory stream: {0}", channelHandle);
             stream = new BassStream(
                 provider,
                 memoryChannelHandle,

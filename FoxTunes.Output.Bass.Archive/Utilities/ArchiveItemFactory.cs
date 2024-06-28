@@ -116,7 +116,7 @@ namespace FoxTunes
                                         switch (fileAbstraction.Result)
                                         {
                                             case ArchiveEntry.RESULT_PASSWORD_REQUIRED:
-                                                Logger.Write(this, LogLevel.Warn, "Invalid password for \"{0}\".", path);
+                                                //Logger.Write(this, LogLevel.Warn, "Invalid password for \"{0}\".", path);
                                                 if (this.PasswordBehaviour != null && !this.PasswordBehaviour.WasCancelled(path))
                                                 {
                                                     this.PasswordBehaviour.Reset(path);
@@ -129,7 +129,7 @@ namespace FoxTunes
                             }
                             catch (Exception e)
                             {
-                                Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", path, e.Message);
+                                //Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", path, e.Message);
                             }
                         }
                         this.EnsureMetaData(path, a, entry, item);
@@ -137,13 +137,13 @@ namespace FoxTunes
                     }
                     else
                     {
-                        Logger.Write(this, LogLevel.Warn, "Failed to read archive entry at position {0}.", a);
+                        //Logger.Write(this, LogLevel.Warn, "Failed to read archive entry at position {0}.", a);
                     }
                 }
             }
             else
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to read archive entries.");
+                //Logger.Write(this, LogLevel.Warn, "Failed to read archive entries.");
             }
         }
 

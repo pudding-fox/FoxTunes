@@ -8,14 +8,6 @@ namespace FoxTunes
 {
     public static class BassEncoderHost
     {
-        private static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
         public static string Location
         {
             get
@@ -73,25 +65,25 @@ namespace FoxTunes
                     });
                     core.Initialize();
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Error, "Failed to initialize core: {0}", e.Message);
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Error, "Failed to initialize core: {0}", e.Message);
                     throw;
                 }
                 try
                 {
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Begin reading items.");
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Begin reading items.");
                     var encoderItems = ReadInput<EncoderItem[]>(input);
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Read {0} items.", encoderItems.Length);
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Read {0} items.", encoderItems.Length);
                     using (var encoder = new BassEncoder(encoderItems))
                     {
                         encoder.InitializeComponent(core);
                         Encode(encoder, input, output, error);
                     }
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Error, "Failed to encode items: {0}", e.Message);
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Error, "Failed to encode items: {0}", e.Message);
                     throw;
                 }
             }
@@ -103,15 +95,15 @@ namespace FoxTunes
             {
                 try
                 {
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Starting encoder main thread.");
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Starting encoder main thread.");
                     encoder.Encode();
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Finished encoder main thread.");
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Finished encoder main thread.");
                     WriteOutput(output, new EncoderStatus(EncoderStatusType.Complete));
                     error.Flush();
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Error, "Error on encoder main thread: {0}", e.Message);
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Error, "Error on encoder main thread: {0}", e.Message);
                     WriteOutput(output, new EncoderStatus(EncoderStatusType.Error));
                     new StreamWriter(error).Write(e.Message);
                     error.Flush();
@@ -124,18 +116,18 @@ namespace FoxTunes
             {
                 try
                 {
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Starting encoder output thread.");
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Starting encoder output thread.");
                     while (thread1.IsAlive)
                     {
                         ProcessOutput(encoder, output);
                         Thread.Sleep(INTERVAL);
                     }
                     ProcessOutput(encoder, output);
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Finished encoder output thread.");
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Finished encoder output thread.");
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Error, "Error on encoder output thread: {0}", e.Message);
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Error, "Error on encoder output thread: {0}", e.Message);
                 }
             })
             {
@@ -146,7 +138,7 @@ namespace FoxTunes
                 var exit = default(bool);
                 try
                 {
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Starting encoder input thread.");
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Starting encoder input thread.");
                     while (thread1.IsAlive)
                     {
                         ProcessInput(encoder, input, output, out exit);
@@ -160,11 +152,11 @@ namespace FoxTunes
                     {
                         ProcessInput(encoder, input, output, out exit);
                     }
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Finished encoder input thread.");
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Finished encoder input thread.");
                 }
-                catch (Exception e)
+                catch
                 {
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Error, "Error on encoder input thread: {0}", e.Message);
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Error, "Error on encoder input thread: {0}", e.Message);
                 }
             })
             {
@@ -176,32 +168,32 @@ namespace FoxTunes
             thread1.Join();
             if (!thread2.Join(TIMEOUT))
             {
-                Logger.Write(typeof(BassEncoderHost), LogLevel.Warn, "Encoder output thread did not complete gracefully, aborting.");
+                //Logger.Write(typeof(BassEncoderHost), LogLevel.Warn, "Encoder output thread did not complete gracefully, aborting.");
                 thread2.Abort();
             }
             if (!thread3.Join(TIMEOUT))
             {
-                Logger.Write(typeof(BassEncoderHost), LogLevel.Warn, "Encoder input thread did not complete gracefully, aborting.");
+                //Logger.Write(typeof(BassEncoderHost), LogLevel.Warn, "Encoder input thread did not complete gracefully, aborting.");
                 thread3.Abort();
             }
         }
 
         private static void ProcessInput(IBassEncoder encoder, Stream input, Stream output, out bool exit)
         {
-            Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Begin reading command.");
+            //Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Begin reading command.");
             var command = ReadInput<EncoderCommand>(input);
-            Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Read command: {0}", Enum.GetName(typeof(EncoderCommandType), command.Type));
+            //Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Read command: {0}", Enum.GetName(typeof(EncoderCommandType), command.Type));
             switch (command.Type)
             {
                 case EncoderCommandType.Cancel:
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Sending cancellation signal to encoder.");
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Sending cancellation signal to encoder.");
                     encoder.Cancel();
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Closing stdin.");
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Closing stdin.");
                     input.Close();
                     exit = true;
                     break;
                 case EncoderCommandType.Quit:
-                    Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Closing stdin/stdout.");
+                    //Logger.Write(typeof(BassEncoderHost), LogLevel.Debug, "Closing stdin/stdout.");
                     input.Close();
                     output.Close();
                     exit = true;

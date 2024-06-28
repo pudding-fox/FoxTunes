@@ -8,15 +8,7 @@ namespace FoxTunes
 {
     public abstract class MetaDataBinding : Binding, INotifyPropertyChanged, IValueConverter
     {
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        protected MetaDataBinding()
+                protected MetaDataBinding()
         {
             this.Converter = this;
             this.Formatter = new Lazy<FormatterFactory.FormatterBase>(() => FormatterFactory.Create(this.Format));

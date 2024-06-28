@@ -50,12 +50,12 @@ namespace FoxTunes
             var providerType = stream.Provider.GetType();
             if (!stream.Provider.SupportedInputs.Any(type => type.IsAssignableFrom(inputType)))
             {
-                Logger.Write(this, LogLevel.Debug, "Provider \"{0}\" does not support input \"{1}\".", providerType.Name, inputType.Name);
+                //Logger.Write(this, LogLevel.Debug, "Provider \"{0}\" does not support input \"{1}\".", providerType.Name, inputType.Name);
                 return false;
             }
             if (!this.SupportedProviders.Any(type => type.IsAssignableFrom(providerType)))
             {
-                Logger.Write(this, LogLevel.Debug, "Input \"{0}\" does not support provider \"{1}\".", inputType.Name, providerType.Name);
+                //Logger.Write(this, LogLevel.Debug, "Input \"{0}\" does not support provider \"{1}\".", inputType.Name, providerType.Name);
                 return false;
             }
             return this.OnCheckFormat(stream);

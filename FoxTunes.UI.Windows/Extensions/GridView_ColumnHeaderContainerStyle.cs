@@ -76,7 +76,7 @@ namespace FoxTunes
             {
                 if (Windows.ActiveWindow == null)
                 {
-                    Logger.Write(typeof(ColumnHeaderContainerStyleBehaviour), LogLevel.Warn, "Could not apply, no active window.");
+                    //Logger.Write(typeof(ColumnHeaderContainerStyleBehaviour), LogLevel.Warn, "Could not apply, no active window.");
                     return;
                 }
                 Windows.Registrations.RemoveCreated(

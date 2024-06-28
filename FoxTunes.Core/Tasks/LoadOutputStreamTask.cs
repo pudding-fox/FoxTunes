@@ -57,10 +57,10 @@ namespace FoxTunes
         {
             if (this.OutputStreamQueue.IsQueued(this.PlaylistItem))
             {
-                Logger.Write(this, LogLevel.Debug, "Play list item already exists in the queue:  {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+                //Logger.Write(this, LogLevel.Debug, "Play list item already exists in the queue:  {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
                 if (this.Immediate)
                 {
-                    Logger.Write(this, LogLevel.Debug, "Immediate load was requested, de-queuing: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+                    //Logger.Write(this, LogLevel.Debug, "Immediate load was requested, de-queuing: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
                     await this.OutputStreamQueue.Dequeue(this.PlaylistItem).ConfigureAwait(false);
                 }
                 return;
@@ -69,7 +69,7 @@ namespace FoxTunes
             var outputStream = await this.Output.Load(this.PlaylistItem, this.Immediate).ConfigureAwait(false);
             if (outputStream == null)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to load play list item into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+                //Logger.Write(this, LogLevel.Warn, "Failed to load play list item into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
                 if (this.Immediate)
                 {
                     throw new InvalidOperationException(string.Format("Failed to load stream: {0}", this.PlaylistItem.FileName));
@@ -80,15 +80,15 @@ namespace FoxTunes
                     return;
                 }
             }
-            Logger.Write(this, LogLevel.Debug, "Play list item loaded into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+            //Logger.Write(this, LogLevel.Debug, "Play list item loaded into output stream: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
             await this.OutputStreamQueue.Enqueue(outputStream, this.Immediate).ConfigureAwait(false);
             if (this.Immediate)
             {
-                Logger.Write(this, LogLevel.Debug, "Immediate load was requested, output stream was automatically de-queued: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+                //Logger.Write(this, LogLevel.Debug, "Immediate load was requested, output stream was automatically de-queued: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
             }
             else
             {
-                Logger.Write(this, LogLevel.Debug, "Output stream added to the queue: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
+                //Logger.Write(this, LogLevel.Debug, "Output stream added to the queue: {0} => {1}", this.PlaylistItem.Id, this.PlaylistItem.FileName);
             }
         }
 

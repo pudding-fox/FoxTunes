@@ -64,7 +64,7 @@ namespace FoxTunes
             {
                 var deviceInfo = default(DeviceInfo);
                 BassUtils.OK(Bass.GetDeviceInfo(a, out deviceInfo));
-                LogManager.Logger.Write(typeof(BassDirectSoundStreamOutputConfiguration), LogLevel.Debug, "DS Device: {0} => {1} => {2}", a, deviceInfo.Name, deviceInfo.Driver);
+                //Logger.Write(typeof(BassDirectSoundStreamOutputConfiguration), LogLevel.Debug, "DS Device: {0} => {1} => {2}", a, deviceInfo.Name, deviceInfo.Driver);
                 if (!deviceInfo.IsEnabled)
                 {
                     continue;

@@ -42,7 +42,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                Logger.Write(this, LogLevel.Debug, "explorer.exe was restarted, re-creating notify icon.");
+                //Logger.Write(this, LogLevel.Debug, "explorer.exe was restarted, re-creating notify icon.");
                 this.IsVisible = false;
                 this.Show();
             }
@@ -62,7 +62,7 @@ namespace FoxTunes
                     var data = NotifyIconData.Create(ID, this.MessageSink.Handle, this.Icon);
                     if (ShellNotifyIcon(NotifyCommand.Add, ref data))
                     {
-                        Logger.Write(this, LogLevel.Debug, "Successfully created notify icon.");
+                        //Logger.Write(this, LogLevel.Debug, "Successfully created notify icon.");
                         this.IsVisible = true;
                         return;
                     }
@@ -71,7 +71,7 @@ namespace FoxTunes
                         ID++;
                     }
                 }
-                Logger.Write(this, LogLevel.Error, "Failed to create notify icon, Shell_NotifyIcon reports failure.");
+                //Logger.Write(this, LogLevel.Error, "Failed to create notify icon, Shell_NotifyIcon reports failure.");
             }
         }
 
@@ -86,12 +86,12 @@ namespace FoxTunes
                 var data = NotifyIconData.Create(ID, this.MessageSink.Handle, this.Icon);
                 if (ShellNotifyIcon(NotifyCommand.Modify, ref data))
                 {
-                    Logger.Write(this, LogLevel.Debug, "Successfully updated notify icon.");
+                    //Logger.Write(this, LogLevel.Debug, "Successfully updated notify icon.");
                     return true;
                 }
                 else
                 {
-                    Logger.Write(this, LogLevel.Error, "Failed to update notify icon, Shell_NotifyIcon reports failure.");
+                    //Logger.Write(this, LogLevel.Error, "Failed to update notify icon, Shell_NotifyIcon reports failure.");
                     return false;
                 }
             }
@@ -108,11 +108,11 @@ namespace FoxTunes
                 var data = NotifyIconData.Create(ID, this.MessageSink.Handle, this.Icon);
                 if (ShellNotifyIcon(NotifyCommand.Delete, ref data))
                 {
-                    Logger.Write(this, LogLevel.Debug, "Successfully destroyed notify icon.");
+                    //Logger.Write(this, LogLevel.Debug, "Successfully destroyed notify icon.");
                 }
                 else
                 {
-                    Logger.Write(this, LogLevel.Error, "Failed to destroy notify icon, Shell_NotifyIcon reports failure.");
+                    //Logger.Write(this, LogLevel.Error, "Failed to destroy notify icon, Shell_NotifyIcon reports failure.");
                 }
                 this.IsVisible = false;
             }

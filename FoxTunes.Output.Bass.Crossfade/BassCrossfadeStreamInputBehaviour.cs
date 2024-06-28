@@ -42,7 +42,7 @@ namespace FoxTunes
             set
             {
                 this._Enabled = value;
-                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                //Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
                 var task = this.Output.Shutdown();
             }
         }
@@ -56,7 +56,7 @@ namespace FoxTunes
             set
             {
                 BassCrossfade.Mode = value;
-                Logger.Write(this, LogLevel.Debug, "Mode = {0}", Enum.GetName(typeof(BassCrossfadeMode), this.Mode));
+                //Logger.Write(this, LogLevel.Debug, "Mode = {0}", Enum.GetName(typeof(BassCrossfadeMode), this.Mode));
             }
         }
 
@@ -69,7 +69,7 @@ namespace FoxTunes
             set
             {
                 BassCrossfade.InPeriod = value;
-                Logger.Write(this, LogLevel.Debug, "InPeriod = {0}", this.InPeriod);
+                //Logger.Write(this, LogLevel.Debug, "InPeriod = {0}", this.InPeriod);
             }
         }
 
@@ -82,7 +82,7 @@ namespace FoxTunes
             set
             {
                 BassCrossfade.OutPeriod = value;
-                Logger.Write(this, LogLevel.Debug, "OutPeriod = {0}", this.OutPeriod);
+                //Logger.Write(this, LogLevel.Debug, "OutPeriod = {0}", this.OutPeriod);
             }
         }
 
@@ -95,7 +95,7 @@ namespace FoxTunes
             set
             {
                 BassCrossfade.InType = value;
-                Logger.Write(this, LogLevel.Debug, "InType = {0}", Enum.GetName(typeof(BassCrossfadeType), this.InType));
+                //Logger.Write(this, LogLevel.Debug, "InType = {0}", Enum.GetName(typeof(BassCrossfadeType), this.InType));
             }
         }
 
@@ -108,7 +108,7 @@ namespace FoxTunes
             set
             {
                 BassCrossfade.OutType = value;
-                Logger.Write(this, LogLevel.Debug, "OutType = {0}", Enum.GetName(typeof(BassCrossfadeType), this.OutType));
+                //Logger.Write(this, LogLevel.Debug, "OutType = {0}", Enum.GetName(typeof(BassCrossfadeType), this.OutType));
             }
         }
 
@@ -121,7 +121,7 @@ namespace FoxTunes
             set
             {
                 BassCrossfade.Mix = value;
-                Logger.Write(this, LogLevel.Debug, "Mix = {0}", this.Mix);
+                //Logger.Write(this, LogLevel.Debug, "Mix = {0}", this.Mix);
             }
         }
 
@@ -136,7 +136,7 @@ namespace FoxTunes
             set
             {
                 this._Start = value;
-                Logger.Write(this, LogLevel.Debug, "Start = {0}", this.Start);
+                //Logger.Write(this, LogLevel.Debug, "Start = {0}", this.Start);
             }
         }
 
@@ -151,7 +151,7 @@ namespace FoxTunes
             set
             {
                 this._PauseResume = value;
-                Logger.Write(this, LogLevel.Debug, "Pause/Resume = {0}", this.PauseResume);
+                //Logger.Write(this, LogLevel.Debug, "Pause/Resume = {0}", this.PauseResume);
             }
         }
 
@@ -166,7 +166,7 @@ namespace FoxTunes
             set
             {
                 this._Stop = value;
-                Logger.Write(this, LogLevel.Debug, "Stop = {0}", this.Stop);
+                //Logger.Write(this, LogLevel.Debug, "Stop = {0}", this.Stop);
             }
         }
 
@@ -179,7 +179,7 @@ namespace FoxTunes
             set
             {
                 BassCrossfade.Buffer = value;
-                Logger.Write(this, LogLevel.Debug, "Buffer = {0}", this.Mix);
+                //Logger.Write(this, LogLevel.Debug, "Buffer = {0}", this.Mix);
             }
         }
 
@@ -245,7 +245,7 @@ namespace FoxTunes
             }
             if (!BassCrossfadeStreamInput.CanCreate(this, e.Stream, e.Query))
             {
-                Logger.Write(this, LogLevel.Warn, "Cannot create input, the stream is not supported.");
+                //Logger.Write(this, LogLevel.Warn, "Cannot create input, the stream is not supported.");
                 throw new InvalidOperationException(Strings.BassCrossfadeStreamInputBehaviour_Unsupported);
             }
             e.Input = new BassCrossfadeStreamInput(this, e.Pipeline, e.Stream.Flags);
@@ -285,7 +285,7 @@ namespace FoxTunes
 
         ~BassCrossfadeStreamInputBehaviour()
         {
-            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

@@ -13,15 +13,7 @@ namespace FoxTunes
 
         public const byte PRIORITY_LOW = 255;
 
-        protected static ILogger Logger
-        {
-            get
-            {
-                return LogManager.Logger;
-            }
-        }
-
-        protected OrderedEventArgs()
+                protected OrderedEventArgs()
         {
             this.Actions = new List<KeyValuePair<Action, byte>>();
         }
@@ -64,7 +56,7 @@ namespace FoxTunes
 
         ~OrderedEventArgs()
         {
-            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);
