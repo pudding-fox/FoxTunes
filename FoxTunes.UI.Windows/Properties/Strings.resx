@@ -192,6 +192,9 @@
   <data name="KeyBindingsBehaviourConfiguration.Play" xml:space="preserve">
     <value>Play</value>
   </data>
+  <data name="KeyBindingsBehaviourConfiguration.PlaylistManager" xml:space="preserve">
+    <value>Playlist Manager</value>
+  </data>
   <data name="KeyBindingsBehaviourConfiguration.Previous" xml:space="preserve">
     <value>Previous</value>
   </data>

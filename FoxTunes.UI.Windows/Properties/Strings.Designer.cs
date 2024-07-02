@@ -286,6 +286,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Playlist Manager.
+        /// </summary>
+        internal static string KeyBindingsBehaviourConfiguration_PlaylistManager {
+            get {
+                return ResourceManager.GetString("KeyBindingsBehaviourConfiguration.PlaylistManager", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Previous.
         /// </summary>
         internal static string KeyBindingsBehaviourConfiguration_Previous {

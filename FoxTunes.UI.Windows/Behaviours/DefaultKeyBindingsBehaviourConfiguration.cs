@@ -22,6 +22,8 @@ namespace FoxTunes
 
         public const string FULL_SCREEN_ELEMENT = "IIII9FDD-6588-4BC5-AC6F-735070E770F6";
 
+        public const string PLAYLIST_MANAGER = "JJJJAC36-BE1F-4B67-90C1-1DDFCCB64C8F";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.KeyBindingsBehaviourConfiguration_Section)
@@ -48,7 +50,10 @@ namespace FoxTunes
                         .WithValue("Alt+E"))
                 .WithElement(
                     new TextConfigurationElement(FULL_SCREEN_ELEMENT, Strings.KeyBindingsBehaviourConfiguration_FullScreen)
-                        .WithValue("F11")
+                        .WithValue("F11"))
+                .WithElement(
+                    new TextConfigurationElement(PLAYLIST_MANAGER, Strings.KeyBindingsBehaviourConfiguration_PlaylistManager)
+                        .WithValue("Alt+P")
             );
         }
     }

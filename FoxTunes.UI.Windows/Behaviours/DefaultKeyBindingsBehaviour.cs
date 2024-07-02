@@ -18,6 +18,8 @@ namespace FoxTunes
 
         public global::FoxTunes.ViewModel.FullScreen _FullScreen { get; private set; }
 
+        public global::FoxTunes.ViewModel.PlaylistManager _PlaylistManager { get; private set; }
+
         public ISignalEmitter SignalEmitter { get; private set; }
 
         public IConfiguration Configuration { get; private set; }
@@ -38,6 +40,8 @@ namespace FoxTunes
 
         public TextConfigurationElement FullScreen { get; private set; }
 
+        public TextConfigurationElement PlaylistManager { get; private set; }
+
         public ICommand SearchCommand
         {
             get
@@ -55,6 +59,7 @@ namespace FoxTunes
             this._Settings = new global::FoxTunes.ViewModel.Settings();
             this._Equalizer = new global::FoxTunes.ViewModel.Equalizer();
             this._FullScreen = new global::FoxTunes.ViewModel.FullScreen();
+            this._PlaylistManager = new global::FoxTunes.ViewModel.PlaylistManager();
             this.SignalEmitter = core.Components.SignalEmitter;
             this.Configuration = core.Components.Configuration;
             this.Play = this.Configuration.GetElement<TextConfigurationElement>(
@@ -88,6 +93,10 @@ namespace FoxTunes
             this.FullScreen = this.Configuration.GetElement<TextConfigurationElement>(
                 DefaultKeyBindingsBehaviourConfiguration.SECTION,
                 DefaultKeyBindingsBehaviourConfiguration.FULL_SCREEN_ELEMENT
+            );
+            this.PlaylistManager = this.Configuration.GetElement<TextConfigurationElement>(
+                DefaultKeyBindingsBehaviourConfiguration.SECTION,
+                DefaultKeyBindingsBehaviourConfiguration.PLAYLIST_MANAGER
             );
             if (this.Play != null)
             {
@@ -128,6 +137,11 @@ namespace FoxTunes
             {
                 this.Commands.Add(this.FullScreen, this._FullScreen.ToggleCommand);
                 this.FullScreen.ValueChanged += this.OnValueChanged;
+            }
+            if (this.PlaylistManager != null)
+            {
+                this.Commands.Add(this.PlaylistManager, this._PlaylistManager.WindowState.ShowCommand);
+                this.PlaylistManager.ValueChanged += this.OnValueChanged;
             }
             base.InitializeComponent(core);
         }
