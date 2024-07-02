@@ -83,6 +83,10 @@ namespace FoxTunes
 
         protected virtual IEnumerable<IFilterParserResultGroup> PostProcess(IEnumerable<IFilterParserResultGroup> groups)
         {
+            if (groups.Count() == 1)
+            {
+                return groups;
+            }
             var result = new Dictionary<string, IList<IFilterParserResultEntry>>(StringComparer.OrdinalIgnoreCase);
             foreach (var group in groups)
             {
