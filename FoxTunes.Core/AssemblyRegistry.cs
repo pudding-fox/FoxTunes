@@ -58,12 +58,12 @@ namespace FoxTunes
 
         public Assembly GetOrLoadReflectionAssembly(string fileName)
         {
-            return this.GetOrLoadAssembly(this._ReflectionAssemblies, fileName, () => Assembly.ReflectionOnlyLoadFrom(fileName));
+            return this.GetOrLoadAssembly(this._ReflectionAssemblies, fileName, () => AssemblyLoader.ReflectionOnlyLoader(fileName));
         }
 
         public Assembly GetOrLoadExecutableAssembly(string fileName)
         {
-            return this.GetOrLoadAssembly(this._ExecutableAssemblies, fileName, () => Assembly.LoadFrom(fileName));
+            return this.GetOrLoadAssembly(this._ExecutableAssemblies, fileName, () => AssemblyLoader.ExecutableLoader(fileName));
         }
 
         private Assembly GetOrLoadAssembly(ConcurrentDictionary<string, Assembly> assemblies, string fileName, Func<Assembly> loader)
