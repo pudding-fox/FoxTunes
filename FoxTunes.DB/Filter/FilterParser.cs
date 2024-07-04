@@ -51,7 +51,7 @@ namespace FoxTunes
                 }
                 if (groups.Any())
                 {
-                    return new FilterParserResult(this.PostProcess(groups));
+                    return new FilterParserResult(this.PostProcess(groups).ToArray());
                 }
                 else
                 {
@@ -83,19 +83,23 @@ namespace FoxTunes
 
         protected virtual IEnumerable<IFilterParserResultGroup> PostProcess(IEnumerable<IFilterParserResultGroup> groups)
         {
-            if (groups.Count() == 1)
-            {
-                return groups;
-            }
             var result = new Dictionary<string, IList<IFilterParserResultEntry>>(StringComparer.OrdinalIgnoreCase);
             foreach (var group in groups)
             {
+                if (group.Entries.Count() > 1)
+                {
+                    yield return group;
+                    continue;
+                }
                 foreach (var entry in group.Entries)
                 {
                     result.GetOrAdd(entry.Name, () => new List<IFilterParserResultEntry>()).Add(entry);
                 }
             }
-            return result.Values.Select(entries => new FilterParserResultGroup(entries)).ToArray();
+            foreach (var group in result.Values.Select(entries => new FilterParserResultGroup(entries)))
+            {
+                yield return group;
+            }
         }
 
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
