@@ -12,7 +12,7 @@ namespace FoxTunes
     //Setting PRIORITY_HIGH so the the cache is cleared before being re-queried.
     [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     [WindowsUserInterfaceDependency]
-    //TODO: This was (and technically still is) a StandardFactory, but it overrides the ComponentPriorityAttribute.HIGH.
+    //TODO: This was (and technically still is) a StandardComponent, but it overrides the ComponentPriorityAttribute.HIGH.
     //TODO: I hate the Factory, Manager, Behaviour and Component sub types and they should go away...
     public class ArtworkBrushFactory : StandardComponent, IDisposable
     {

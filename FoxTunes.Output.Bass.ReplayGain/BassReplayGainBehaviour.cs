@@ -11,7 +11,7 @@ namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)] //TODO: Depends on a setting defined by BassReplayGainScannerBehaviour
-    public class BassReplayGainBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class BassReplayGainBehaviour : StandardComponent, IConfigurableComponent, IDisposable
     {
         public static string Location
         {

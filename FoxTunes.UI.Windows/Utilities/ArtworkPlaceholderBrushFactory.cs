@@ -5,7 +5,7 @@ using System.Windows.Media;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class ArtworkPlaceholderBrushFactory : StandardFactory, IDisposable
+    public class ArtworkPlaceholderBrushFactory : StandardComponent, IDisposable
     {
         const int CACHE_SIZE = 32;
 

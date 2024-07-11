@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
-    public class MetaDataBehaviour : StandardBehaviour, IConfigurableComponent
+    public class MetaDataBehaviour : StandardComponent, IConfigurableComponent
     {
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {

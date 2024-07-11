@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class MinidiscBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
+    public class MinidiscBehaviour : StandardComponent, IInvocableComponent, IConfigurableComponent
     {
         public const string VIEW_DISC = "AAAA";
 

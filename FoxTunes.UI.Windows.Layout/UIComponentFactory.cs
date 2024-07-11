@@ -7,7 +7,7 @@ using System.Windows.Shapes;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class UIComponentFactory : StandardFactory
+    public class UIComponentFactory : StandardComponent
     {
         public FrameworkElement CreateControl(UIComponentConfiguration configuration, out UIComponentBase component)
         {

@@ -11,7 +11,7 @@ namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     [PlatformDependency(Major = 6, Minor = 1)]
-    public class TaskbarProgressBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class TaskbarProgressBehaviour : StandardComponent, IConfigurableComponent, IDisposable
     {
         const int UPDATE_INTERVAL = 1000;
 

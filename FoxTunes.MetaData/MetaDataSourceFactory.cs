@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    public abstract class MetaDataSourceFactory : StandardFactory, IMetaDataSourceFactory
+    public abstract class MetaDataSourceFactory : StandardComponent, IMetaDataSourceFactory
     {
         public ICore Core { get; private set; }
 

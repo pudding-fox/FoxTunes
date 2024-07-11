@@ -7,7 +7,7 @@ using System.Windows;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class WindowTitleBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class WindowTitleBehaviour : StandardComponent, IConfigurableComponent, IDisposable
     {
         public IPlaybackManager PlaybackManager { get; private set; }
 

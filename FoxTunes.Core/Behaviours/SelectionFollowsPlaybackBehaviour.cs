@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
-    public class SelectionFollowsPlaybackBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
+    public class SelectionFollowsPlaybackBehaviour : StandardComponent, IInvocableComponent, IConfigurableComponent
     {
         public IPlaylistManager PlaylistManager { get; private set; }
 

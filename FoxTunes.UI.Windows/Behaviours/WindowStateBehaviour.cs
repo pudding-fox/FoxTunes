@@ -8,7 +8,7 @@ using System.Windows.Interop;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class WindowStateBehaviour : StandardBehaviour, IDisposable
+    public class WindowStateBehaviour : StandardComponent, IDisposable
     {
         const int WM_GETMINMAXINFO = 0x0024;
 

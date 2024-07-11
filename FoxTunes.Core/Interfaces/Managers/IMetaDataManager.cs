@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IMetaDataManager : IStandardManager
+    public interface IMetaDataManager : IStandardComponent
     {
         Task Rescan(IEnumerable<IFileData> fileDatas, MetaDataUpdateFlags flags);
 

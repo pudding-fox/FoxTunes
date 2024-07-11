@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class EnqueueNextItemsBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class EnqueueNextItemsBehaviour : StandardComponent, IConfigurableComponent, IDisposable
     {
         const int TIMEOUT = 1000;
 

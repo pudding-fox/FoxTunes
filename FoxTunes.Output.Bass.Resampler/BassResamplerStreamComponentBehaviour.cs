@@ -6,7 +6,7 @@ using System.IO;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassResamplerStreamComponentBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class BassResamplerStreamComponentBehaviour : StandardComponent, IConfigurableComponent, IDisposable
     {
         public static string Location
         {

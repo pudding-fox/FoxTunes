@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IFileActionHandlerManager : IStandardManager
+    public interface IFileActionHandlerManager : IStandardComponent
     {
         void RunCommand(string command);
 

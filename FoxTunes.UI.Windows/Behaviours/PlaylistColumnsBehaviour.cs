@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class PlaylistColumnsBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
+    public class PlaylistColumnsBehaviour : StandardComponent, IInvocableComponent, IDisposable
     {
         const string SETTINGS = "ZZZZ";
 

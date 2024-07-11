@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     [ComponentPriority(ComponentPriorityAttribute.LOW)]
     [WindowsUserInterfaceDependency]
-    public class MiniPlayerBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
+    public class MiniPlayerBehaviour : StandardComponent, IInvocableComponent, IConfigurableComponent
     {
         public const string TOPMOST = "AAAA";
 

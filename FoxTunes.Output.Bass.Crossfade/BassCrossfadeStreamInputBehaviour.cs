@@ -6,8 +6,9 @@ using System.IO;
 
 namespace FoxTunes
 {
+    [ComponentPriority(ComponentPriorityAttribute.LOW)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassCrossfadeStreamInputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class BassCrossfadeStreamInputBehaviour : StandardComponent, IConfigurableComponent, IDisposable
     {
         public static string Location
         {

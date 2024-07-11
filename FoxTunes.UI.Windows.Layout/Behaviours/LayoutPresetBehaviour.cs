@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class LayoutPresetBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
+    public class LayoutPresetBehaviour : StandardComponent, IInvocableComponent, IDisposable
     {
         public const string LOAD = "AAAA";
 

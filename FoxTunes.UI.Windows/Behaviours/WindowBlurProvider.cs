@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    public abstract class WindowBlurProvider : StandardBehaviour, IConfigurableComponent, IDisposable
+    public abstract class WindowBlurProvider : StandardComponent, IConfigurableComponent, IDisposable
     {
         public abstract string Id { get; }
 

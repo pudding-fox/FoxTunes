@@ -7,7 +7,7 @@ using System.IO;
 
 namespace FoxTunes
 {
-    public class BassDsdBehaviour : StandardBehaviour, IConfigurableComponent
+    public class BassDsdBehaviour : StandardComponent, IConfigurableComponent
     {
         public static string Location
         {

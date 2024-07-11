@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassDirectSoundStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class BassDirectSoundStreamOutputBehaviour : StandardComponent, IConfigurableComponent, IDisposable
     {
         public ICore Core { get; private set; }
 

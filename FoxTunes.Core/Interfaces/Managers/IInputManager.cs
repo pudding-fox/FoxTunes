@@ -2,7 +2,7 @@
 
 namespace FoxTunes.Interfaces
 {
-    public interface IInputManager : IBaseManager, IConfigurableComponent
+    public interface IInputManager : IConfigurableComponent
     {
         bool Enabled { get; set; }
 

@@ -6,7 +6,7 @@ namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class BassSkipSilenceStreamAdvisorBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class BassSkipSilenceStreamAdvisorBehaviour : StandardComponent, IConfigurableComponent, IDisposable
     {
         public ICore Core { get; private set; }
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class PlaybackManager : StandardManager, IPlaybackManager
+    public class PlaybackManager : StandardComponent, IPlaybackManager
     {
         public ICore Core { get; private set; }
 
@@ -201,7 +201,25 @@ namespace FoxTunes
             await this.Output.Shutdown().ConfigureAwait(false);
         }
 
-        protected override async void OnDisposing()
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual async void OnDisposing()
         {
             await this.Unload().ConfigureAwait(false);
             if (this.Output != null)
@@ -212,7 +230,19 @@ namespace FoxTunes
             {
                 this.OutputStreamQueue.Dequeued -= this.OutputStreamQueueDequeued;
             }
-            base.OnDisposing();
+        }
+
+        ~PlaybackManager()
+        {
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }

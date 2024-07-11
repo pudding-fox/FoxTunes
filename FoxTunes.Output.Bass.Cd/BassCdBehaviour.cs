@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentPriority(ComponentPriorityAttribute.LOW)]
-    public class BassCdBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IDisposable
+    public class BassCdBehaviour : StandardComponent, IConfigurableComponent, IInvocableComponent, IDisposable
     {
         public const string OPEN_CD = "FFFF";
 

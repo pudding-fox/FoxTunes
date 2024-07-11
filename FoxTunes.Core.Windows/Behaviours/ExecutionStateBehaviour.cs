@@ -7,7 +7,7 @@ using System.Timers;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class ExecutionStateBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class ExecutionStateBehaviour : StandardComponent, IConfigurableComponent, IDisposable
     {
         const int UPDATE_INTERVAL = 10000;
 

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
-    public class LibraryManager : StandardManager, ILibraryManager
+    public class LibraryManager : StandardComponent, ILibraryManager
     {
         public LibraryManager()
         {
@@ -343,7 +343,25 @@ namespace FoxTunes
             throw new NotImplementedException();
         }
 
-        protected override void OnDisposing()
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
         {
             if (this.HierarchyBrowser != null)
             {
@@ -353,7 +371,19 @@ namespace FoxTunes
             {
                 this.SignalEmitter.Signal -= this.OnSignal;
             }
-            base.OnDisposing();
+        }
+
+        ~LibraryManager()
+        {
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
 
         public class LibraryManagerReport : ReportComponent

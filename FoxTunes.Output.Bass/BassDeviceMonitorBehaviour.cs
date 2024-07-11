@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public abstract class BassDeviceMonitorBehaviour : StandardBehaviour, IDisposable
+    public abstract class BassDeviceMonitorBehaviour : StandardComponent, IDisposable
     {
         public static readonly DataFlow[] HandledFlows = new[]
         {

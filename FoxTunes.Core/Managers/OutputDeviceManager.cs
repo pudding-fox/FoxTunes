@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class OutputDeviceManager : StandardManager, IOutputDeviceManager, IDisposable
+    public class OutputDeviceManager : StandardComponent, IOutputDeviceManager, IDisposable
     {
         public static readonly TimeSpan TIMEOUT = TimeSpan.FromMilliseconds(100);
 
@@ -148,7 +148,7 @@ namespace FoxTunes
 
         public void Restart()
         {
-            if (!this.Output.IsStarted)
+            if (this.Output == null || !this.Output.IsStarted)
             {
                 return;
             }
@@ -201,7 +201,25 @@ namespace FoxTunes
             }
         }
 
-        protected override void OnDisposing()
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
         {
             if (this.Selectors != null)
             {
@@ -212,7 +230,19 @@ namespace FoxTunes
                     selector.DeviceChanged -= this.OnDeviceChanged;
                 }
             }
-            base.OnDisposing();
+        }
+
+        ~OutputDeviceManager()
+        {
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }

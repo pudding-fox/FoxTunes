@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class LibraryActionsBehaviour : StandardBehaviour, IInvocableComponent
+    public class LibraryActionsBehaviour : StandardComponent, IInvocableComponent
     {
         public const string APPEND_PLAYLIST = "AAAB";
 

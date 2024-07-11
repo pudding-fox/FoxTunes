@@ -3,7 +3,7 @@
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class FFTDataTransformerFactory : StandardFactory, IFFTDataTransformerFactory
+    public class FFTDataTransformerFactory : StandardComponent, IFFTDataTransformerFactory
     {
         public IFFTDataTransformer Create(int[] bands)
         {

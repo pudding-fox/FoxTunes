@@ -5,7 +5,7 @@ using FoxTunes.Interfaces;
 
 namespace FoxTunes
 {
-    public abstract class DatabaseFactory : StandardFactory, IDatabaseFactory
+    public abstract class DatabaseFactory : StandardComponent, IDatabaseFactory
     {
         protected DatabaseFactory(string id, string name = null, string description = null)
         {

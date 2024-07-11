@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassCueStreamAdvisorBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IFileActionHandler, IDisposable
+    public class BassCueStreamAdvisorBehaviour : StandardComponent, IConfigurableComponent, IInvocableComponent, IFileActionHandler, IDisposable
     {
         public const string CUE = ".cue";
 

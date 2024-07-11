@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class PreemptNextItemBehaviour : StandardBehaviour, IDisposable
+    public class PreemptNextItemBehaviour : StandardComponent, IDisposable
     {
         public IOutput Output { get; private set; }
 

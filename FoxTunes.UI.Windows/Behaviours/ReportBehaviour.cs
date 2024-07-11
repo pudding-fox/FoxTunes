@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class ReportBehaviour : StandardBehaviour, IDisposable
+    public class ReportBehaviour : StandardComponent, IDisposable
     {
         public IReportEmitter ReportEmitter { get; private set; }
 

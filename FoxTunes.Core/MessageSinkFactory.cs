@@ -2,7 +2,7 @@
 
 namespace FoxTunes
 {
-    public abstract class MessageSinkFactory : BaseFactory, IMessageSinkFactory
+    public abstract class MessageSinkFactory : BaseComponent, IMessageSinkFactory
     {
         public abstract IMessageSink Create(uint id);
     }

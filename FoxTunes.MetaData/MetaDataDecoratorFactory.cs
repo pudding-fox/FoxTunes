@@ -5,7 +5,7 @@ using System.Linq;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
-    public class MetaDataDecoratorFactory : StandardFactory, IMetaDataDecoratorFactory
+    public class MetaDataDecoratorFactory : StandardComponent, IMetaDataDecoratorFactory
     {
         public ICore Core { get; private set; }
 

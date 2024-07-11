@@ -2,7 +2,7 @@
 
 namespace FoxTunes.Interfaces
 {
-    public interface IMetaDataDecoratorFactory : IStandardFactory
+    public interface IMetaDataDecoratorFactory : IStandardComponent
     {
         IEnumerable<KeyValuePair<string, MetaDataItemType>> Supported { get; }
 

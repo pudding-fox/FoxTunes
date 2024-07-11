@@ -2,7 +2,7 @@
 
 namespace FoxTunes.Interfaces
 {
-    public interface IPlaylistColumnManager : IStandardManager
+    public interface IPlaylistColumnManager : IStandardComponent
     {
         IEnumerable<IPlaylistColumnProvider> Providers { get; }
 

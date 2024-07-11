@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IOutputDeviceManager : IStandardManager
+    public interface IOutputDeviceManager : IStandardComponent
     {
         IEnumerable<OutputDevice> Devices { get; }
 

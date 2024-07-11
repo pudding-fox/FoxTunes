@@ -12,7 +12,7 @@ using System.Windows;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class ToolWindowBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent, IDisposable
+    public class ToolWindowBehaviour : StandardComponent, IInvocableComponent, IConfigurableComponent, IDisposable
     {
         const string MAIN_WINDOW_ID = MainWindow.ID;
 

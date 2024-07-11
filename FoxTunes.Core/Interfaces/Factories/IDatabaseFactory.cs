@@ -2,7 +2,7 @@
 
 namespace FoxTunes.Interfaces
 {
-    public interface IDatabaseFactory : IStandardFactory
+    public interface IDatabaseFactory : IStandardComponent
     {
         string Id { get; }
 

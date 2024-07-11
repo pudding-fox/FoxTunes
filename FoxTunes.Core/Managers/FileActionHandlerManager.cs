@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class FileActionHandlerManager : StandardManager, IFileActionHandlerManager
+    public class FileActionHandlerManager : StandardComponent, IFileActionHandlerManager
     {
         public FileActionHandlerManager()
         {
@@ -114,14 +114,44 @@ namespace FoxTunes
             return handlers;
         }
 
-        protected override void OnDisposing()
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
         {
             if (this.Queue != null)
             {
                 this.Queue.Complete -= this.OnComplete;
                 this.Queue.Dispose();
             }
-            base.OnDisposing();
+        }
+
+        ~FileActionHandlerManager()
+        {
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
     }
 }

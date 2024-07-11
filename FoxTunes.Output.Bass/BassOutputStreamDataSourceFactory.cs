@@ -3,7 +3,7 @@
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassOutputStreamDataSourceFactory : StandardFactory, IOutputStreamDataSourceFactory
+    public class BassOutputStreamDataSourceFactory : StandardComponent, IOutputStreamDataSourceFactory
     {
         public IOutputStreamDataSource Create(IOutputStream outputStream)
         {

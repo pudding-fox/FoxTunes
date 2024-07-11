@@ -2,12 +2,11 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class WindowsInputManager : InputManager, IStandardManager
+    public class WindowsInputManager : InputManager, IStandardComponent
     {
         const int WH_KEYBOARD_LL = 13;
 
@@ -127,10 +126,40 @@ namespace FoxTunes
             }
         }
 
-        protected override void OnDisposing()
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.IsDisposed || !disposing)
+            {
+                return;
+            }
+            this.OnDisposing();
+            this.IsDisposed = true;
+        }
+
+        protected virtual void OnDisposing()
         {
             this.Disable();
-            base.OnDisposing();
+        }
+
+        ~WindowsInputManager()
+        {
+            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            try
+            {
+                this.Dispose(true);
+            }
+            catch
+            {
+                //Nothing can be done, never throw on GC thread.
+            }
         }
 
         public delegate IntPtr KeyboardProc(int code, IntPtr input, ref KeyboardInput keys);

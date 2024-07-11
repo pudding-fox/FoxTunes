@@ -5,7 +5,7 @@ using TagLib;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.MetaData)]
-    public class TagLibFileFactory : StandardFactory
+    public class TagLibFileFactory : StandardComponent
     {
         public IConfiguration Configuration { get; private set; }
 

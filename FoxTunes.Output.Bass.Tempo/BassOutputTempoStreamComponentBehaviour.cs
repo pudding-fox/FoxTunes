@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class BassOutputTempoStreamComponentBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
+    public class BassOutputTempoStreamComponentBehaviour : StandardComponent, IConfigurableComponent, IDisposable
     {
         public ICore Core { get; private set; }
 

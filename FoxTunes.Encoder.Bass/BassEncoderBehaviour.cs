@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class BassEncoderBehaviour : StandardBehaviour, IEncoder, IInvocableComponent, IConfigurableComponent
+    public class BassEncoderBehaviour : StandardComponent, IEncoder, IInvocableComponent, IConfigurableComponent
     {
         public const string ENCODE = "GGGG";
 

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace FoxTunes
 {
-    public class EncoderItemFactory : BaseFactory
+    public class EncoderItemFactory : BaseComponent
     {
         public static readonly object SyncRoot = new object();
 

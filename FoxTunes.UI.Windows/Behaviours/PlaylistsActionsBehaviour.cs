@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class PlaylistsActionsBehaviour : StandardBehaviour, IInvocableComponent
+    public class PlaylistsActionsBehaviour : StandardComponent, IInvocableComponent
     {
         public const string ADD_PLAYLIST = "QQQQ";
 

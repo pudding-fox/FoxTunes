@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class PlaybackBehaviour : StandardBehaviour, IConfigurableComponent
+    public class PlaybackBehaviour : StandardComponent, IConfigurableComponent
     {
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {

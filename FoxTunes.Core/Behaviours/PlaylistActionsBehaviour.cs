@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class PlaylistActionsBehaviour : StandardBehaviour, IInvocableComponent
+    public class PlaylistActionsBehaviour : StandardComponent, IInvocableComponent
     {
         public const string REMOVE_PLAYLIST_ITEMS = "AAAA";
 

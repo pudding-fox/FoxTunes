@@ -94,6 +94,10 @@ namespace FoxTunes
 
         public Playlist[] GetPlaylists()
         {
+            if (this.PlaylistCache == null)
+            {
+                return new Playlist[] { };
+            }
             return this.PlaylistCache.GetPlaylists(this.GetPlaylistsCore);
         }
 
