@@ -15,7 +15,7 @@ namespace FoxTunes
     //TODO: bass_zipstream.dll does not work on XP.
     //TODO: Unable to avoid linking to CxxFrameHandler3 which does not exist until a later version of msvcrt.dll
     [PlatformDependency(Major = 6, Minor = 0)]
-    public class BassArchiveStreamProviderBehaviour : StandardComponent, IConfigurableComponent, IInvocableComponent, IFileActionHandler
+    public class BassArchiveStreamProviderBehaviour : StandardBehaviour, IConfigurableComponent, IInvocableComponent, IFileActionHandler
     {
         public const string OPEN_ARCHIVE = "FGGG";
 

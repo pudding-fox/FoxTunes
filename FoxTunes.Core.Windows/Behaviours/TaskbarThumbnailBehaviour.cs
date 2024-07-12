@@ -12,7 +12,7 @@ namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
     [PlatformDependency(Major = 6, Minor = 1)]
-    public class TaskbarThumbnailBehaviour : StandardComponent, IConfigurableComponent, IDisposable
+    public class TaskbarThumbnailBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         const int UPDATE_INTERVAL = 1000;
 

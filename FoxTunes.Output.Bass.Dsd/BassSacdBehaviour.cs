@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public class BassSacdBehaviour : StandardComponent, IInvocableComponent, IConfigurableComponent, IFileActionHandler
+    public class BassSacdBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent, IFileActionHandler
     {
         public const string ISO = ".iso";
 

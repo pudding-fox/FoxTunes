@@ -8,7 +8,7 @@ using System.Windows.Input;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class KeyBindingsBehaviour : StandardComponent, IKeyBindingsBehaviour
+    public class KeyBindingsBehaviour : StandardBehaviour, IKeyBindingsBehaviour
     {
         public KeyBindingsBehaviour()
         {

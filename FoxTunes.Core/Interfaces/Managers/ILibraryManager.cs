@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface ILibraryManager : IStandardComponent, IFileActionHandler
+    public interface ILibraryManager : IStandardManager, IFileActionHandler
     {
         LibraryManagerState State { get; }
 

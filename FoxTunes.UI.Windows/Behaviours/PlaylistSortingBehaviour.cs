@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class PlaylistSortingBehaviour : StandardComponent, IInvocableComponent, IConfigurableComponent, IDisposable
+    public class PlaylistSortingBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent, IDisposable
     {
         public const string TOGGLE_SORTING = "NNNN";
 

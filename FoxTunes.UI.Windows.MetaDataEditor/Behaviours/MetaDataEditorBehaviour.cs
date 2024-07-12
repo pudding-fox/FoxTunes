@@ -6,7 +6,7 @@ using System.Linq;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class MetaDataEditorBehaviour : StandardComponent, IInvocableComponent
+    public class MetaDataEditorBehaviour : StandardBehaviour, IInvocableComponent
     {
         public const string EDIT_METADATA = "LLLL";
 

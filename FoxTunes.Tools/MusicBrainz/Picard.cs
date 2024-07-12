@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class Picard : StandardComponent, IInvocableComponent, IConfigurableComponent
+    public class Picard : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string PICARD = "MMMM";
 

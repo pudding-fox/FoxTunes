@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class DiscogsBehaviour : StandardComponent, IInvocableComponent, IConfigurableComponent
+    public class DiscogsBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string LOOKUP_TAGS = "LLMN";
 

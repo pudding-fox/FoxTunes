@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IPlaylistManager : IStandardComponent, IInvocableComponent, IFileActionHandler, IDatabaseInitializer
+    public interface IPlaylistManager : IStandardManager, IInvocableComponent, IFileActionHandler, IDatabaseInitializer
     {
         Task Create(Playlist playlist);
 

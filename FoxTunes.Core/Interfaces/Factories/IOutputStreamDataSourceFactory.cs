@@ -1,6 +1,6 @@
 ﻿namespace FoxTunes.Interfaces
 {
-    public interface IOutputStreamDataSourceFactory : IStandardComponent
+    public interface IOutputStreamDataSourceFactory : IStandardFactory
     {
         IOutputStreamDataSource Create(IOutputStream outputStream);
     }

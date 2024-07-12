@@ -1,6 +1,6 @@
 ﻿namespace FoxTunes.Interfaces
 {
-    public interface IFFTDataTransformerFactory : IStandardComponent
+    public interface IFFTDataTransformerFactory : IStandardFactory
     {
         IFFTDataTransformer Create(int[] bands);
     }

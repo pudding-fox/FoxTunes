@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes
 {
-    public abstract class PlaylistBehaviourBase : StandardComponent, IDisposable
+    public abstract class PlaylistBehaviourBase : StandardBehaviour, IDisposable
     {
         public abstract Func<Playlist, bool> Predicate { get; }
 

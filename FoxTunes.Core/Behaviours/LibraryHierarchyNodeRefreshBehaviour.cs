@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
-    public class LibraryHierarchyNodeRefreshBehaviour : StandardComponent, IDisposable
+    public class LibraryHierarchyNodeRefreshBehaviour : StandardBehaviour, IDisposable
     {
         public ISignalEmitter SignalEmitter { get; private set; }
 

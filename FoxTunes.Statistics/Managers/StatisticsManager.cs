@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class StatisticsManager : StandardComponent
+    public class StatisticsManager : StandardManager
     {
         public ICore Core { get; private set; }
 

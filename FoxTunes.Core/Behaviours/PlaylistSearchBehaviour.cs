@@ -5,7 +5,7 @@ using System.Linq;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
-    public class PlaylistSearchBehaviour : StandardComponent
+    public class PlaylistSearchBehaviour : StandardBehaviour
     {
         public IPlaylistManager PlaylistManager { get; private set; }
 

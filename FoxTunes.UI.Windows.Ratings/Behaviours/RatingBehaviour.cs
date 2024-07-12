@@ -14,7 +14,7 @@ namespace FoxTunes
     [ComponentPriority(ComponentPriorityAttribute.LOW)]
     [Component(ID)]
     [WindowsUserInterfaceDependency]
-    public class RatingBehaviour : StandardComponent, IInvocableComponent, IUIPlaylistColumnProvider, IDatabaseInitializer
+    public class RatingBehaviour : StandardBehaviour, IInvocableComponent, IUIPlaylistColumnProvider, IDatabaseInitializer
     {
         public const string ID = "2681C239-1291-4018-ACED-4933CC395FF6";
 

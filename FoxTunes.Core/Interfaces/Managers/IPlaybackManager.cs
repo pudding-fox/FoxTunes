@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IPlaybackManager : IStandardComponent, IDisposable
+    public interface IPlaybackManager : IStandardManager, IDisposable
     {
         bool IsSupported(string fileName);
 

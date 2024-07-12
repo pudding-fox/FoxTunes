@@ -12,7 +12,7 @@ using Windows.Storage;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class ToastNotificationManagerBehaviour : StandardComponent, IConfigurableComponent, IDisposable
+    public class ToastNotificationManagerBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         const string GROUP = "87854E64-DD46-4C8C-8E29-B97FBF5265BD";
 

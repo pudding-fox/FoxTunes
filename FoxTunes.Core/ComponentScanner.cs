@@ -17,10 +17,13 @@ namespace FoxTunes
 
         private static Type[] STANDARD_COMPONENT_TYPES = new[]
         {
-            typeof(IStandardComponent)
+            typeof(IStandardComponent),
+            typeof(IStandardManager),
+            typeof(IStandardFactory),
+            typeof(IStandardBehaviour)
         };
 
-        public static string Location
+                public static string Location
         {
             get
             {
@@ -69,7 +72,7 @@ namespace FoxTunes
                 //Logger.Write(typeof(ComponentScanner), LogLevel.Trace, "Error was handled while getting exported types for assembly {0}: {1}", fileName, e.Message);
                 return e.Types;
             }
-            catch
+            catch 
             {
                 //Logger.Write(typeof(ComponentScanner), LogLevel.Warn, "Failed to get exported types for assembly {0}: {1}", fileName, e.Message);
                 return Enumerable.Empty<Type>();
@@ -302,12 +305,27 @@ namespace FoxTunes
         {
             public static byte Type(Type type)
             {
+                //TODO: This is awful, basically all component loading goes through this ordering before any other sorting strategies (e.g priority)
+                //TODO: The load order is always: Components, Factories, Managers, Behaviours.
+                //TODO: I don't have the energy to fix it, removing this code causes issues with component inter-dependency during start up.
                 var interfaces = type.GetInterfaces().Select(
                     @interface => @interface.FullName
                 ).ToArray();
                 if (interfaces.Contains(typeof(IStandardComponent).FullName, StringComparer.OrdinalIgnoreCase))
                 {
                     return 0;
+                }
+                if (interfaces.Contains(typeof(IStandardFactory).FullName, StringComparer.OrdinalIgnoreCase))
+                {
+                    return 1;
+                }
+                if (interfaces.Contains(typeof(IStandardManager).FullName, StringComparer.OrdinalIgnoreCase))
+                {
+                    return 2;
+                }
+                if (interfaces.Contains(typeof(IStandardBehaviour).FullName, StringComparer.OrdinalIgnoreCase))
+                {
+                    return 3;
                 }
                 return byte.MaxValue;
             }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class ProfilesBehaviour : StandardComponent, IInvocableComponent, IConfigurableComponent
+    public class ProfilesBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string LOAD = "ZAAA";
 

@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace FoxTunes
 {
-    public abstract class KeyBindingsBehaviourBase : StandardComponent, IConfigurableComponent, IDisposable
+    public abstract class KeyBindingsBehaviourBase : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public KeyBindingsBehaviourBase()
         {

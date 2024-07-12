@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace FoxTunes.Interfaces
 {
-    public interface IKeyBindingsBehaviour : IStandardComponent, IDisposable
+    public interface IKeyBindingsBehaviour : IStandardBehaviour, IDisposable
     {
         bool Add(string id, string keys, ICommand command);
 

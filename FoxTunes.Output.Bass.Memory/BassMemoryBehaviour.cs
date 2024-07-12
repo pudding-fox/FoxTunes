@@ -7,7 +7,7 @@ using System.IO;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassMemoryBehaviour : StandardComponent, IConfigurableComponent, IDisposable
+    public class BassMemoryBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public static string Location
         {

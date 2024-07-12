@@ -7,7 +7,7 @@ using System.Linq;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Database)]
-    public class MetaDataProviderManager : StandardComponent, IMetaDataProviderManager
+    public class MetaDataProviderManager : StandardManager, IMetaDataProviderManager
     {
         public MetaDataProviderManager()
         {

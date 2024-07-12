@@ -4,7 +4,7 @@ using System;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class PlayNextItemBehaviour : StandardComponent, IDisposable
+    public class PlayNextItemBehaviour : StandardBehaviour, IDisposable
     {
         public IPlaybackManager PlaybackManager { get; private set; }
 

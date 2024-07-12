@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class BassDsdMemoryLoadingBehaviour : StandardComponent, IDisposable
+    public class BassDsdMemoryLoadingBehaviour : StandardBehaviour, IDisposable
     {
         public ConcurrentDictionary<string, LoadingTask> Tasks { get; private set; }
 

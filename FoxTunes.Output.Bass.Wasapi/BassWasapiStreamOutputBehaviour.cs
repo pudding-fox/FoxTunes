@@ -8,7 +8,7 @@ namespace FoxTunes
 {
     [ComponentPriority(ComponentPriorityAttribute.LOW)]
     [ComponentDependency(Slot = ComponentSlots.Output)]
-    public class BassWasapiStreamOutputBehaviour : StandardComponent, IConfigurableComponent, IDisposable
+    public class BassWasapiStreamOutputBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public static string Location
         {

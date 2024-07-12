@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class BassReplayGainScannerBehaviour : StandardComponent, IInvocableComponent, IConfigurableComponent
+    public class BassReplayGainScannerBehaviour : StandardBehaviour, IInvocableComponent, IConfigurableComponent
     {
         public const string SCAN_TRACKS = "HHHH";
 

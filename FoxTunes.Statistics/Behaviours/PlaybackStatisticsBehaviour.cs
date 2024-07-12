@@ -7,7 +7,7 @@ namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.Output)]
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class PlaybackStatisticsBehaviour : StandardComponent, IConfigurableComponent, IDisposable
+    public class PlaybackStatisticsBehaviour : StandardBehaviour, IConfigurableComponent, IDisposable
     {
         public StatisticsManager StatisticsManager { get; private set; }
 
@@ -182,6 +182,7 @@ namespace FoxTunes
             {
                 this.Enabled.ValueChanged -= this.OnValueChanged;
             }
+            this.Disable();
         }
 
         ~PlaybackStatisticsBehaviour()

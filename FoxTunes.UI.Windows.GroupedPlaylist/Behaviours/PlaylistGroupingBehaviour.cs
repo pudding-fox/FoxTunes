@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class PlaylistGroupingBehaviour : StandardComponent, IConfigurableComponent
+    public class PlaylistGroupingBehaviour : StandardBehaviour, IConfigurableComponent
     {
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {

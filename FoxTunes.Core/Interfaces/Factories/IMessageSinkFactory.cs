@@ -1,6 +1,6 @@
 ﻿namespace FoxTunes.Interfaces
 {
-    public interface IMessageSinkFactory : IBaseComponent
+    public interface IMessageSinkFactory : IBaseFactory
     {
         IMessageSink Create(uint id);
     }

@@ -1,6 +1,6 @@
 ﻿namespace FoxTunes.Interfaces
 {
-    public interface IMetaDataProviderManager : IStandardComponent, IDatabaseInitializer
+    public interface IMetaDataProviderManager : IStandardManager, IDatabaseInitializer
     {
         IMetaDataProvider GetProvider(MetaDataProvider metaDataProvider);
 

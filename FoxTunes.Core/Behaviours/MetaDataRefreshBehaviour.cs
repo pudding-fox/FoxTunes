@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class MetaDataRefreshBehaviour : StandardComponent, IDisposable
+    public class MetaDataRefreshBehaviour : StandardBehaviour, IDisposable
     {
         public MetaDataRefreshBehaviour()
         {

@@ -12,7 +12,7 @@ using System.Windows.Interop;
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class TrayIconBehaviour : StandardComponent, IInvocableComponent, IDisposable
+    public class TrayIconBehaviour : StandardBehaviour, IInvocableComponent, IDisposable
     {
         public const string QUIT = "ZZZZ";
 

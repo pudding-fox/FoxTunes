@@ -3,7 +3,7 @@
 namespace FoxTunes
 {
     [ComponentDependency(Slot = ComponentSlots.UserInterface)]
-    public class WindowsMessageSinkFactory : MessageSinkFactory, IStandardComponent
+    public class WindowsMessageSinkFactory : MessageSinkFactory, IStandardFactory
     {
         public override IMessageSink Create(uint id)
         {

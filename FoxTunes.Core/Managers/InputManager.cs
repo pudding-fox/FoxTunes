@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace FoxTunes
 {
-    public abstract class InputManager : BaseComponent, IInputManager
+    public abstract class InputManager : BaseManager, IInputManager
     {
         public InputManager()
         {
