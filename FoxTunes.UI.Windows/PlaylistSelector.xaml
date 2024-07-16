@@ -23,7 +23,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <ComboBox Grid.Column="0" Grid.Row="0" ItemsSource="{Binding Items.OrderedItemsSource, Source={StaticResource ViewModel}}" SelectedValue="{Binding Items.SelectedValue, Source={StaticResource ViewModel}}" MinWidth="200">
+        <ComboBox Grid.Column="0" Grid.Row="0" ItemsSource="{Binding Items, Source={StaticResource ViewModel}, IsAsync=True}" SelectedValue="{Binding SelectedItem, Source={StaticResource ViewModel}}" MinWidth="200">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name, Mode=OneWay}" Foreground="{DynamicResource TextBrush}"></TextBlock>
