@@ -34,17 +34,17 @@
             <ListBox 
                     Grid.Column="0" 
                     Grid.Row="0" 
-                    ItemsSource="{Binding Playlists.OrderedItemsSource, Source={StaticResource ViewModel}}" 
-                    SelectedValue="{Binding Playlists.SelectedValue, Source={StaticResource ViewModel}}" 
+                    ItemsSource="{Binding Items, Source={StaticResource ViewModel}, IsAsync=True}" 
+                    SelectedValue="{Binding SelectedItem, Source={StaticResource ViewModel}}" 
                     DisplayMemberPath="Name"
                     Windows:ListBoxExtensions.DragDropReorder="True"
                     Windows:ListBoxExtensions.DragDropReorderCommand="{Binding Playlists.ExchangeCommand, Source={StaticResource ViewModel}}">
             </ListBox>
             <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding Playlists.AddCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
-                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding Playlists.RemoveCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
+                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding AddPlaylistCommand, Mode=OneWay, Source={StaticResource ViewModel}}">New</Button>
+                <Button Width="70" Height="30" Margin="7,7,0,0" Command="{Binding RemovePlaylistCommand, Mode=OneWay, Source={StaticResource ViewModel}}">Delete</Button>
             </StackPanel>
-            <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding Playlists.SelectedValue, Source={StaticResource ViewModel}}" Grid.IsSharedSizeScope="True">
+            <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding SelectedItem, Source={StaticResource ViewModel}}" Grid.IsSharedSizeScope="True">
                 <Grid.Style>
                     <Style TargetType="{x:Type Grid}">
                         <Setter Property="IsEnabled" Value="True"></Setter>

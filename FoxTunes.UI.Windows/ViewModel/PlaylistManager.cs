@@ -1,8 +1,6 @@
 ﻿using FoxDb;
 using FoxTunes.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -10,7 +8,7 @@ using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public class PlaylistManager : ViewModelBase
+    public class PlaylistManager : Playlists
     {
         public PlaylistManager()
         {
@@ -21,121 +19,19 @@ namespace FoxTunes.ViewModel
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
-        public IPlaylistBrowser PlaylistBrowser { get; private set; }
-
-        public ISignalEmitter SignalEmitter { get; private set; }
-
         public IErrorEmitter ErrorEmitter { get; private set; }
-
-        private CollectionManager<Playlist> _Playlists { get; set; }
-
-        public CollectionManager<Playlist> Playlists
-        {
-            get
-            {
-                return this._Playlists;
-            }
-            set
-            {
-                this._Playlists = value;
-                this.OnPlaylistsChanged();
-            }
-        }
-
-        protected virtual void OnPlaylistsChanged()
-        {
-            this.OnPropertyChanged("Playlists");
-        }
 
         protected override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;
             this.DatabaseFactory = core.Factories.Database;
-            this.PlaylistBrowser = core.Components.PlaylistBrowser;
-            this.SignalEmitter = core.Components.SignalEmitter;
-            this.SignalEmitter.Signal += this.OnSignal;
             this.ErrorEmitter = core.Components.ErrorEmitter;
-            this.Playlists = new CollectionManager<Playlist>()
-            {
-                ItemFactory = () => new Playlist()
-                {
-                    Name = Playlist.GetName(this.Playlists.ItemsSource),
-                    Enabled = true
-                },
-                ExchangeHandler = (item1, item2) =>
-                {
-                    var temp = item1.Sequence;
-                    item1.Sequence = item2.Sequence;
-                    item2.Sequence = temp;
-                }
-            };
-            this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
         }
 
         protected virtual async void OnActiveChanged(object sender, EventArgs e)
         {
             await Windows.Invoke(() => this.OnIsSavingChanged()).ConfigureAwait(false);
-        }
-
-        private Task OnSignal(object sender, ISignal signal)
-        {
-            switch (signal.Name)
-            {
-                case CommonSignals.PlaylistUpdated:
-                    return this.OnPlaylistUpdated(signal.State as PlaylistUpdatedSignalState);
-            }
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
-        }
-
-        protected virtual Task OnPlaylistUpdated(PlaylistUpdatedSignalState state)
-        {
-            if (state != null && state.Playlists != null && state.Playlists.Any())
-            {
-                return this.Refresh(state.Playlists);
-            }
-            else
-            {
-                return this.Refresh();
-            }
-        }
-
-        protected virtual Task Refresh()
-        {
-            var playlists = new List<Playlist>();
-            using (var database = this.DatabaseFactory.Create())
-            {
-                using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
-                {
-                    playlists.AddRange(database.Set<Playlist>(transaction));
-                }
-            }
-            //Use the "live" playlist instances where possible.
-            var cached = this.PlaylistBrowser.GetPlaylists().ToDictionary(
-                playlist => playlist.Id
-            );
-            for (var a = 0; a < playlists.Count; a++)
-            {
-                var playlist = default(Playlist);
-                if (cached.TryGetValue(playlists[a].Id, out playlist))
-                {
-                    playlists[a] = playlist;
-                }
-            }
-            return Windows.Invoke(() => this.Playlists.ItemsSource = new ObservableCollection<Playlist>(playlists));
-        }
-
-        protected virtual Task Refresh(IEnumerable<Playlist> playlists)
-        {
-#if NET40
-            return TaskEx.FromResult(false);
-#else
-            return Task.CompletedTask;
-#endif
         }
 
         public bool PlaylistManagerVisible
@@ -209,12 +105,7 @@ namespace FoxTunes.ViewModel
                         using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                         {
                             var playlists = database.Set<Playlist>(transaction);
-                            foreach (var playlist in this.Playlists.Removed)
-                            {
-                                await PlaylistTaskBase.RemovePlaylistItems(database, playlist.Id, PlaylistItemStatus.None, transaction).ConfigureAwait(false);
-                                await playlists.RemoveAsync(playlist).ConfigureAwait(false);
-                            }
-                            playlists.AddOrUpdate(this.Playlists.ItemsSource);
+                            playlists.AddOrUpdate(this.Items);
                             transaction.Commit();
                         }
                     }))
