@@ -10,6 +10,14 @@ namespace FoxTunes
 {
     public abstract class UIComponentPanel : UIComponentBase, IUIComponentPanel
     {
+        public virtual bool IsEditable
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public static readonly DependencyProperty IsInDesignModeProperty = DependencyProperty.Register(
             "IsInDesignMode",
             typeof(bool),

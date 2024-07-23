@@ -289,6 +289,11 @@ namespace FoxTunes
         {
             get
             {
+                var panel = this.FindAncestor<UIComponentPanel>();
+                if (panel != null && !panel.IsEditable)
+                {
+                    yield break;
+                }
                 var attributes = InvocationComponent.ATTRIBUTE_SEPARATOR;
                 if (!this.Configuration.Component.IsEmpty)
                 {

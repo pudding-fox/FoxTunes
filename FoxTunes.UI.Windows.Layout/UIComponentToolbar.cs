@@ -30,6 +30,14 @@ namespace FoxTunes
 
         public Grid Grid { get; private set; }
 
+        public override bool IsEditable
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public IEnumerable<KeyValuePair<UIComponent, UIComponentToolbarAttribute>> GetComponents()
         {
             var components = new Dictionary<UIComponent, UIComponentToolbarAttribute>();
