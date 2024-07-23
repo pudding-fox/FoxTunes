@@ -61,6 +61,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Advanced.
+        /// </summary>
+        internal static string General_Advanced {
+            get {
+                return ResourceManager.GetString("General.Advanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Grouped Playlist.
         /// </summary>
         internal static string GroupedPlaylist_Name {

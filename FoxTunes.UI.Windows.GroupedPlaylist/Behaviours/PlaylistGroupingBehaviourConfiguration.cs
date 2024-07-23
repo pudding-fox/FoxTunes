@@ -10,7 +10,7 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(PlaylistBehaviourConfiguration.SECTION)
                 .WithElement(
-                    new TextConfigurationElement(GROUP_SCRIPT_ELEMENT, Strings.PlaylistGroupingBehaviourConfiguration_Script)
+                    new TextConfigurationElement(GROUP_SCRIPT_ELEMENT, Strings.PlaylistGroupingBehaviourConfiguration_Script, path: Strings.General_Advanced)
                         .WithValue(Resources.Grouping)
                         .WithFlags(ConfigurationElementFlags.MultiLine)
             );
