@@ -73,10 +73,6 @@
                                         <ScrollContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" x:Name="PART_ScrollContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" CanContentScroll="{TemplateBinding CanContentScroll}" KeyboardNavigation.DirectionalNavigation="Local" />
                                     </DockPanel>
                                     <ScrollBar Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Cursor="Arrow" x:Name="PART_VerticalScrollBar" Grid.Column="1" Orientation="Vertical" ViewportSize="{TemplateBinding ViewportHeight}" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0.0" Value="{Binding Path=VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
-                                    <DockPanel Grid.Column="1" Grid.Row="1" Background="{DynamicResource ControlBrush}" LastChildFill="false">
-                                        <Rectangle Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Width="1" Fill="{TemplateBinding BorderBrush}" DockPanel.Dock="Left" />
-                                        <Rectangle Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" Height="1" Fill="{TemplateBinding BorderBrush}" DockPanel.Dock="Top" />
-                                    </DockPanel>
                                 </Grid>
                             </ControlTemplate>
                         </Setter.Value>
