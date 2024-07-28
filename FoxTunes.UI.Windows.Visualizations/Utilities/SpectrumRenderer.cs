@@ -102,7 +102,7 @@ namespace FoxTunes
                 width,
                 height,
                 SpectrumConfiguration.GetBars(this.Bars.Value),
-                VisualizationBehaviourConfiguration.GetFFTSize(this.FFTSize.Value),
+                SpectrumConfiguration.GetFFTSize(this.Bars.Value, this.FFTSize.Value),
                 this.ShowPeaks.Value,
                 this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value), this.ShowPeaks.Value),
                 this.CutOff.Value,
@@ -201,7 +201,7 @@ namespace FoxTunes
                     Render(ref info, data);
                     success = true;
                 }
-                catch 
+                catch
                 {
 #if DEBUG
                     //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum: {0}", e.Message);
@@ -282,7 +282,7 @@ namespace FoxTunes
 
                 this.BeginUpdateDisplay();
             }
-            catch 
+            catch
             {
 #if DEBUG
                 //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum data: {0}", exception.Message);

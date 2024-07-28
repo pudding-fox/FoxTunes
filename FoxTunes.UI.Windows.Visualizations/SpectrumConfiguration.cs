@@ -131,6 +131,38 @@ namespace FoxTunes
             }
         }
 
+        public static int GetFFTSize(SelectionConfigurationOption bars, SelectionConfigurationOption fftSize)
+        {
+            var min = default(int);
+            switch (bars.Id)
+            {
+                case BARS_16_OPTION:
+                    min = 512;
+                    break;
+                default:
+                case BARS_32_OPTION:
+                    min = 512;
+                    break;
+                case BARS_64_OPTION:
+                    min = 1024;
+                    break;
+                case BARS_128_OPTION:
+                    min = 2048;
+                    break;
+                case BARS_256_OPTION:
+                    min = 4096;
+                    break;
+                case BARS_512_OPTION:
+                    min = 8192;
+                    break;
+                case BARS_1024_OPTION:
+                    min = 16384;
+                    break;
+            }
+            var max = VisualizationBehaviourConfiguration.GetFFTSize(fftSize);
+            return Math.Max(min, max);
+        }
+
         public static string GetDefaultColorPalette()
         {
             var builder = new StringBuilder();
