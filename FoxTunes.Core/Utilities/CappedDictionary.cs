@@ -11,51 +11,52 @@ namespace FoxTunes
         public CappedDictionary(int capacity)
         {
             this.Keys = new Queue(capacity);
-            this.Store = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity);
+            this.Store = new ConcurrentDictionary<TKey, Lazy<TValue>>(Environment.ProcessorCount, capacity);
             this.Capacity = capacity;
         }
 
         public CappedDictionary(int capacity, IEqualityComparer<TKey> comparer)
         {
             this.Keys = new Queue(capacity);
-            this.Store = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity, comparer);
+            this.Store = new ConcurrentDictionary<TKey, Lazy<TValue>>(Environment.ProcessorCount, capacity, comparer);
             this.Capacity = capacity;
         }
 
         public Queue Keys { get; private set; }
 
-        public ConcurrentDictionary<TKey, TValue> Store { get; private set; }
+        public ConcurrentDictionary<TKey, Lazy<TValue>> Store { get; private set; }
 
         public int Capacity { get; private set; }
 
         [Obsolete("Please use the concurrent method: GetOrAdd(key, value)")]
         public void Add(TKey key, TValue value)
         {
-            this.Store.AddOrUpdate(key, value);
+            this.Store.AddOrUpdate(key, new Lazy<TValue>(() => value));
         }
 
         public TValue GetOrAdd(TKey key, TValue value)
         {
-            return this.Store.GetOrAdd(key, _key =>
+            return this.Store.GetOrAdd(key, new Lazy<TValue>(() =>
             {
                 this.OnAdd(key, value);
                 return value;
-            });
+            })).Value;
         }
 
         public TValue GetOrAdd(TKey key, Func<TValue> factory)
         {
-            return this.Store.GetOrAdd(key, _key =>
+            return this.Store.GetOrAdd(key, new Lazy<TValue>(() =>
             {
                 var value = factory();
                 this.OnAdd(key, value);
                 return value;
-            });
+            })).Value;
         }
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            var result = this.Store.TryGetValue(key, out value);
+            var lazy = default(Lazy<TValue>);
+            var result = this.Store.TryGetValue(key, out lazy);
             if (result)
             {
                 lock (this.SyncRoot)
@@ -64,6 +65,11 @@ namespace FoxTunes
                     this.Keys.Remove(key);
                     this.Keys.Enqueue(key);
                 }
+                value = lazy.Value;
+            }
+            else
+            {
+                value = default(TValue);
             }
             return result;
         }
@@ -76,10 +82,16 @@ namespace FoxTunes
 
         public bool TryRemove(TKey key, out TValue value)
         {
-            var result = this.Store.TryRemove(key, out value);
+            var lazy = default(Lazy<TValue>);
+            var result = this.Store.TryRemove(key, out lazy);
             if (result)
             {
-                this.OnRemove(key, value);
+                this.OnRemove(key, lazy.Value);
+                value = lazy.Value;
+            }
+            else
+            {
+                value = default(TValue);
             }
             return result;
         }

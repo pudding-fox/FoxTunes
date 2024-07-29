@@ -103,7 +103,7 @@ namespace FoxTunes
                 ), null);
                 this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to enable: {0}", e.Message);
             }
@@ -131,7 +131,7 @@ namespace FoxTunes
                     //Nothing can be done.
                 }
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to disable: {0}", e.Message);
             }
@@ -156,7 +156,7 @@ namespace FoxTunes
                 var notification = await this.CreateNotification(outputStream).ConfigureAwait(false);
                 ToastNotificationHelper.Invoke(new Action(() => this.ToastNotifier.Show(notification)), null);
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Warn, "Failed to show notification: {0}", e.Message);
             }

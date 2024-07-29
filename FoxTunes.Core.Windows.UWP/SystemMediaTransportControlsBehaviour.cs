@@ -205,7 +205,7 @@ namespace FoxTunes
                 }
                 updater.Update();
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Error, "Failed to update music properties: {0}", e.Message);
             }
@@ -229,7 +229,7 @@ namespace FoxTunes
                 }
                 updater.Update();
             }
-            catch (Exception e)
+            catch
             {
                 //Logger.Write(this, LogLevel.Error, "Failed to update music thumbnail: {0}", e.Message);
             }

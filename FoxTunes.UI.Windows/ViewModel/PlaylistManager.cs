@@ -105,7 +105,7 @@ namespace FoxTunes.ViewModel
                         using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                         {
                             var playlists = database.Set<Playlist>(transaction);
-                            playlists.AddOrUpdate(this.Items);
+                            await playlists.AddOrUpdateAsync(this.Items).ConfigureAwait(false);
                             transaction.Commit();
                         }
                     }))
