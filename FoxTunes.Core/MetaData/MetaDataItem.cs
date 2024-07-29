@@ -99,6 +99,39 @@ namespace FoxTunes
             }
         }
 
+        public override int GetHashCode()
+        {
+            //We need a hash code for this type for performance reasons.
+            //base.GetHashCode() returns 0.
+            return this.Id.GetHashCode() * 29;
+        }
+
+        public override bool Equals(IPersistableComponent other)
+        {
+            if (other is MetaDataItem metaDataItem)
+            {
+                return this.Equals(metaDataItem);
+            }
+            return base.Equals(other);
+        }
+
+        public virtual bool Equals(MetaDataItem other)
+        {
+            if (!string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            if (this.Type != other.Type)
+            {
+                return false;
+            }
+            if (!string.Equals(this.Value, other.Value, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            return true;
+        }
+
         public static IEnumerable<string> Update(IFileData source, IFileData destination, IEnumerable<string> names)
         {
             return Update(source.MetaDatas, new[] { destination.MetaDatas }, names);
