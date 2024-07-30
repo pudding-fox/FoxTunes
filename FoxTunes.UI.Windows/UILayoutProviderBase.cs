@@ -31,5 +31,13 @@ namespace FoxTunes
         }
 
         public event EventHandler Updated;
+
+        public virtual UIComponentBase PresetSelector
+        {
+            get
+            {
+                return null;
+            }
+        }
     }
 }

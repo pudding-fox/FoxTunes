@@ -13,6 +13,8 @@ namespace FoxTunes.Interfaces
         UIComponentBase Load(UILayoutTemplate template);
 
         event EventHandler Updated;
+
+        UIComponentBase PresetSelector { get; }
     }
 
     public enum UILayoutTemplate : byte

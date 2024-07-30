@@ -230,6 +230,14 @@ namespace FoxTunes
             }
         }
 
+        public override UIComponentBase PresetSelector
+        {
+            get
+            {
+                return new LayoutSelector();
+            }
+        }
+
         public IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             return UIComponentLayoutProviderConfiguration.GetConfigurationSections();
