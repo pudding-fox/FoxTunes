@@ -1591,6 +1591,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Initial Setup.
+        /// </summary>
+        internal static string WindowsUserInterfaceConfiguration_FirstRun {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.FirstRun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Layout.
         /// </summary>
         internal static string WindowsUserInterfaceConfiguration_Layout {

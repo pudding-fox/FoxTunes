@@ -9,6 +9,8 @@ namespace FoxTunes
     {
         public const string SECTION = "0047011D-7C95-4EDE-A4DE-B839CF05E9AB";
 
+        public const string FIRST_RUN_ELEMENT = "AAAAF713-E8E0-44A5-A7E0-EF6A4448C9B7";
+
         public const string THEME_ELEMENT = "AAAA9DEE-1168-4D96-9355-31ECC0666820";
 
         public const string LAYOUT_ELEMENT = "BBBB9A67-F909-49EA-A4D3-6E26659A5797";
@@ -30,6 +32,8 @@ namespace FoxTunes
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.WindowsUserInterfaceConfiguration_Section)
+                .WithElement(
+                    new BooleanConfigurationElement(FIRST_RUN_ELEMENT, Strings.WindowsUserInterfaceConfiguration_FirstRun).WithValue(true).Hide())
                 .WithElement(
                     new SelectionConfigurationElement(THEME_ELEMENT, Strings.WindowsUserInterfaceConfiguration_Theme).WithOptions(GetThemeOptions()))
                 .WithElement(

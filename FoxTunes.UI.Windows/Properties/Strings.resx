@@ -627,6 +627,9 @@
   <data name="WindowsUserInterfaceConfiguration.Cursors" xml:space="preserve">
     <value>Show Cursor Adorners</value>
   </data>
+  <data name="WindowsUserInterfaceConfiguration.FirstRun" xml:space="preserve">
+    <value>Initial Setup</value>
+  </data>
   <data name="WindowsUserInterfaceConfiguration.Layout" xml:space="preserve">
     <value>Layout</value>
   </data>
