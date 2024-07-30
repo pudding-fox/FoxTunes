@@ -70,11 +70,6 @@ namespace FoxTunes
                 UIComponentLayoutProviderPreset.GetSection(category),
                 UIComponentLayoutProviderPreset.GetLayout(category)
             );
-            if (!string.Equals(preset.Layout, layoutElement.Value, StringComparison.OrdinalIgnoreCase))
-            {
-                //The selected preset has been modified.
-                return null;
-            }
             return preset;
         }
 
@@ -88,15 +83,6 @@ namespace FoxTunes
             if (presetElement.Value == null || !string.Equals(presetElement.Value.Id, preset.Id, StringComparison.OrdinalIgnoreCase))
             {
                 //Preset not selected.
-                return false;
-            }
-            var layoutElement = configuration.GetElement<TextConfigurationElement>(
-                UIComponentLayoutProviderPreset.GetSection(preset.Category),
-                UIComponentLayoutProviderPreset.GetLayout(preset.Category)
-            );
-            if (!string.Equals(preset.Layout, layoutElement.Value, StringComparison.OrdinalIgnoreCase))
-            {
-                //The selected preset has been modified.
                 return false;
             }
             return true;

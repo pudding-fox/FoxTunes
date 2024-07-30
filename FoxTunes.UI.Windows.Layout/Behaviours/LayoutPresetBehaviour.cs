@@ -143,20 +143,6 @@ namespace FoxTunes
 
         public Task Load(string name)
         {
-            var preset = UIComponentLayoutProviderPresets.Instance.GetActivePreset(
-                UIComponentLayoutProviderPreset.CATEGORY_MAIN
-            );
-            if (preset == null)
-            {
-                if (!this.UserInterface.Confirm(Strings.LayoutDesignerBehaviour_Overwrite))
-                {
-#if NET40
-                    return TaskEx.FromResult(false);
-#else
-                    return Task.CompletedTask;
-#endif
-                }
-            }
             //Using SetValue so the ValueChanged event fires even if we're updating to the same selected preset.
             this.MainPreset.SetValue(this.MainPreset.Options.FirstOrDefault(option => string.Equals(option.Name, name)));
 #if NET40
