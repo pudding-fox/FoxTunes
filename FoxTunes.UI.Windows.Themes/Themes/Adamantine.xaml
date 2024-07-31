@@ -851,7 +851,6 @@
                 </MultiTrigger.EnterActions>
                 <MultiTrigger.Conditions>
                     <Condition Property="IsMouseOver" Value="True" />
-                    <Condition Property="IsFocused" Value="False" />
                 </MultiTrigger.Conditions>
             </MultiTrigger>
             <Trigger Property="IsEnabled" Value="False">
