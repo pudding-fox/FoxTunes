@@ -1,4 +1,4 @@
-<Windows:UIComponentBase x:Class="FoxTunes.LayoutSelector"
+<Windows:UIComponentBase
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,21 +6,23 @@
              xmlns:Windows="clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows" 
              xmlns:LocalViewModel="clr-namespace:FoxTunes.ViewModel"
              xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:local="clr-namespace:FoxTunes" x:Class="FoxTunes.LayoutSelector"
              mc:Ignorable="d">
-    <UserControl.Resources>
-        <LocalViewModel:LayoutSelector x:Key="ViewModel"></LocalViewModel:LayoutSelector>
-    </UserControl.Resources>
+    <Windows:UIComponentBase.Resources>
+        <LocalViewModel:LayoutSelector x:Key="ViewModel"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Windows:UIComponentBase.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition></ColumnDefinition>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ComboBox Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Presets, Mode=OneWay, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedPreset, Source={StaticResource ViewModel}}" MinWidth="200" DisplayMemberPath="Name"></ComboBox>
-        <Button Grid.Row="0" Grid.Column="1" Width="30" Height="30" Margin="2,0,0,0" Command="{Binding AddPresetCommand, Mode=OneWay, Source={StaticResource ViewModel}}">
+        <ComboBox Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Presets, Mode=OneWay, Source={StaticResource ViewModel}}" SelectedValue="{Binding SelectedPreset, Source={StaticResource ViewModel}}" MinWidth="200" DisplayMemberPath="Name"/>
+        <Button Grid.Row="0" Grid.Column="1" Width="30" Height="30" Margin="2,0,0,0" Command="{Binding AddPresetCommand, Mode=OneWay, Source={StaticResource ViewModel}}" Visibility="{Binding IsEditable, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:LayoutSelector}}}">
             <Viewbox Width="20" Height="20">
                 <Canvas Width="1024" Height="1024">
                     <Path Fill="{DynamicResource TextBrush}">
@@ -31,7 +33,7 @@
                 </Canvas>
             </Viewbox>
         </Button>
-        <ToggleButton Grid.Row="0" Grid.Column="2" Width="30" Height="30" Margin="2,0,0,0" IsChecked="{Binding IsEditing, Source={StaticResource ViewModel}}">
+        <ToggleButton Grid.Row="0" Grid.Column="2" Width="30" Height="30" Margin="2,0,0,0" IsChecked="{Binding IsEditing, Source={StaticResource ViewModel}}" Visibility="{Binding IsEditable, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:LayoutSelector}}}">
             <Viewbox Width="20" Height="20">
                 <Canvas Width="1000" Height="1000">
                     <Path Fill="{DynamicResource TextBrush}">

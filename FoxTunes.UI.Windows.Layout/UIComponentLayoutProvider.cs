@@ -234,7 +234,10 @@ namespace FoxTunes
         {
             get
             {
-                return new LayoutSelector();
+                return new LayoutSelector()
+                {
+                    IsEditable = false
+                };
             }
         }
 
