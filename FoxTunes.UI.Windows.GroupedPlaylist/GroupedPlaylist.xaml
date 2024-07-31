@@ -45,6 +45,7 @@
                   Windows:ListViewExtensions.EnsureSelectedItemVisible="True"
                   VirtualizingPanel.IsVirtualizing="True"      
                   VirtualizingPanel.IsVirtualizingWhenGrouping="True"     
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   GridViewColumnHeader.Click="OnHeaderClick"
                   SelectionChanged="OnSelectionChanged"
                   Background="{DynamicResource ControlBackgroundBrush}">
