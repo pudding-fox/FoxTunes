@@ -123,6 +123,9 @@
   <data name="GroupedPlaylist.Name" xml:space="preserve">
     <value>Grouped Playlist</value>
   </data>
+  <data name="GroupedPlaylists.Name" xml:space="preserve">
+    <value>Grouped Playlist Tabs</value>
+  </data>
   <data name="PlaylistGroupingBehaviourConfiguration.Script" xml:space="preserve">
     <value>Grouping Script</value>
   </data>

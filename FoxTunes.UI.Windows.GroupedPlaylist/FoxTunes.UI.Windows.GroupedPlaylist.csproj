@@ -69,6 +69,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <UpToDateCheckInput Remove="GroupedPlaylists.xaml" />
+    <UpToDateCheckInput Remove="TabGroupedPlaylist.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FoxTunes.Core\FoxTunes.Core.csproj" />
   </ItemGroup>
 
@@ -82,6 +87,15 @@
 
   <ItemGroup>
     <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="GroupedPlaylists.xaml.cs">
+      <DependentUpon>GroupedPlaylists.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="TabGroupedPlaylist.xaml.cs">
+      <DependentUpon>TabGroupedPlaylist.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>
