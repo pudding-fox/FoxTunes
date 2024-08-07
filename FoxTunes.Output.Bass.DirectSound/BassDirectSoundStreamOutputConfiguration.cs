@@ -23,7 +23,7 @@ namespace FoxTunes
         {
             yield return new ConfigurationSection(SECTION)
                 .WithElement(new SelectionConfigurationElement(OUTPUT_ELEMENT)
-                    .WithOptions(new[] { new SelectionConfigurationOption(OUTPUT_DS_OPTION, Strings.DirectSound).Default() }))
+                    .WithOptions(new[] { new SelectionConfigurationOption(OUTPUT_DS_OPTION, Strings.DirectSound) }))
                 .WithElement(new SelectionConfigurationElement(ELEMENT_DS_DEVICE, "Device", path: Strings.DirectSound)
                     .WithOptions(GetDSDevices())
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_DS_OPTION))
