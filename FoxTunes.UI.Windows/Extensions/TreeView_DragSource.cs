@@ -162,11 +162,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                var dependencyObject = e.OriginalSource as DependencyObject;
-                if (dependencyObject != null && dependencyObject.FindAncestor<TreeViewItem>() != null)
-                {
-                    this.TryInitializeDrag(e.GetPosition(this.TreeView));
-                }
+                this.TryInitializeDrag(e.GetPosition(this.TreeView));
             }
 
             protected virtual void OnTouchMove(object sender, TouchEventArgs e)
