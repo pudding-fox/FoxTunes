@@ -56,7 +56,7 @@ namespace FoxTunes
                     .WithValue(false)
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_WASAPI_OPTION))
                 .WithElement(new BooleanConfigurationElement(MIXER_ELEMENT, Strings.BassWasapiStreamOutputConfiguration_Mixer, path: Strings.WASAPI)
-                    .WithValue(false)
+                    .WithValue(true)
                     .DependsOn(SECTION, OUTPUT_ELEMENT, OUTPUT_WASAPI_OPTION))
                 .WithElement(new BooleanConfigurationElement(DOUBLE_BUFFER_ELEMENT, Strings.BassWasapiStreamOutputConfiguration_DoubleBuffer, path: Strings.WASAPI)
                     .WithValue(true)
