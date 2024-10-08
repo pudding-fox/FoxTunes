@@ -154,7 +154,7 @@ namespace FoxTunes
                 var pattern = string.Format(
                     "{0}{1}{0}",
                     FilterParserResultEntry.UNBOUNDED_WILDCARD,
-                    filter.Trim()
+                    filter.Trim().Replace(" ", FilterParserResultEntry.UNBOUNDED_WILDCARD)
                 );
                 var entries = this.SearchNames.Select(
                     name => new FilterParserResultEntry(name, FilterParserEntryOperator.Match, pattern)
