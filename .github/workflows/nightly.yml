@@ -48,7 +48,7 @@ jobs:
         ./package.sh nightly
       shell: bash
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: packages
         path: |
