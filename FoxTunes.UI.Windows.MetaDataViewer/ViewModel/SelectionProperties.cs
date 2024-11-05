@@ -1,7 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -460,18 +459,12 @@ namespace FoxTunes.ViewModel
             {
                 var task = Windows.Invoke(() =>
                 {
-                    this.FileDatas.Clear();
-                    this.FileDatas.AddRange(fileDatas);
-                    this.Tags.Clear();
-                    this.Tags.AddRange(tags);
-                    this.Properties.Clear();
-                    this.Properties.AddRange(properties);
-                    this.ReplayGain.Clear();
-                    this.ReplayGain.AddRange(replaygain);
-                    this.FileSystem.Clear();
-                    this.FileSystem.AddRange(filesystem);
-                    this.Images.Clear();
-                    this.Images.AddRange(images);
+                    this.FileDatas.ResetSync(fileDatas);
+                    this.Tags.ResetSync(tags);
+                    this.Properties.ResetSync(properties);
+                    this.ReplayGain.ResetSync(replaygain);
+                    this.FileSystem.ResetSync(filesystem);
+                    this.Images.ResetSync(images);
                 });
             });
 #if NET40

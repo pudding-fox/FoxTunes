@@ -100,7 +100,7 @@ namespace FoxTunes.ViewModel
                     switch (type)
                     {
                         case DataSignalType.None:
-                            this.Items.Reset(cached);
+                            this.Items.Reset(cached)();
                             break;
                         case DataSignalType.Added:
                         case DataSignalType.Updated:
