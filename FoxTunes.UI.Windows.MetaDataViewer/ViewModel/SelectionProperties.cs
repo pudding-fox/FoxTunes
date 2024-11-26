@@ -259,6 +259,58 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler ShowLocationChanged;
 
+        private string _StatusMessage { get; set; }
+
+        public string StatusMessage
+        {
+            get
+            {
+                return this._StatusMessage;
+            }
+            set
+            {
+                this._StatusMessage = value;
+                this.OnStatusMessageChanged();
+            }
+        }
+
+        protected virtual void OnStatusMessageChanged()
+        {
+            if (this.StatusMessageChanged != null)
+            {
+                this.StatusMessageChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("StatusMessage");
+        }
+
+        public event EventHandler StatusMessageChanged;
+
+        private bool _HasStatusMessage { get; set; }
+
+        public bool HasStatusMessage
+        {
+            get
+            {
+                return this._HasStatusMessage;
+            }
+            set
+            {
+                this._HasStatusMessage = value;
+                this.OnHasStatusMessageChanged();
+            }
+        }
+
+        protected virtual void OnHasStatusMessageChanged()
+        {
+            if (this.HasStatusMessageChanged != null)
+            {
+                this.HasStatusMessageChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("HasStatusMessage");
+        }
+
+        public event EventHandler HasStatusMessageChanged;
+
         protected override void InitializeComponent(ICore core)
         {
             this.LibraryManager = core.Managers.Library;
@@ -416,19 +468,20 @@ namespace FoxTunes.ViewModel
             this.Dispatch(() => this.Refresh(this.FileDatas.ToArray()));
         }
 
-        protected virtual Task Refresh(LibraryHierarchyNode libraryHierarchyNode)
+        protected virtual async Task Refresh(LibraryHierarchyNode libraryHierarchyNode)
         {
+            await Windows.Invoke(() =>
+            {
+                this.StatusMessage = Strings.SelectionProperties_Loading;
+                this.HasStatusMessage = true;
+            }).ConfigureAwait(false);
             var libraryItems = this.LibraryHierarchyBrowser.GetItems(libraryHierarchyNode);
             if (libraryItems == null || !libraryItems.Any())
             {
-#if NET40
-                return TaskEx.FromResult(false);
-#else
-                return Task.CompletedTask;
-#endif
+                return;
             }
             this.FileDatasSource = libraryHierarchyNode;
-            return this.Refresh(libraryItems);
+            await this.Refresh(libraryItems).ConfigureAwait(false);
         }
 
         protected virtual Task Refresh(Playlist playlist)
@@ -459,6 +512,8 @@ namespace FoxTunes.ViewModel
             {
                 var task = Windows.Invoke(() =>
                 {
+                    this.StatusMessage = string.Empty;
+                    this.HasStatusMessage = false;
                     this.FileDatas.ResetSync(fileDatas);
                     this.Tags.ResetSync(tags);
                     this.Properties.ResetSync(properties);

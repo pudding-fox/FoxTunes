@@ -79,6 +79,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loading....
+        /// </summary>
+        internal static string SelectionProperties_Loading {
+            get {
+                return ResourceManager.GetString("SelectionProperties.Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Location.
         /// </summary>
         internal static string SelectionProperties_Location {

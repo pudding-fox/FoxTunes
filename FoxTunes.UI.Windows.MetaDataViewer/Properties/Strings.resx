@@ -162,4 +162,7 @@
   <data name="SelectionPropertiesConfiguration.ShowTags" xml:space="preserve">
     <value>Tags</value>
   </data>
+  <data name="SelectionProperties.Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
 </root>
