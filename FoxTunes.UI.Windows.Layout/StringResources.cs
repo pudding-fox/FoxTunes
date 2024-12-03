@@ -89,5 +89,13 @@
                 return Strings.ToolWindowManagerWindow_Title;
             }
         }
+
+        public static string LayoutEditingMode_LayoutEditingMode
+        {
+            get
+            {
+                return Strings.LayoutEditingMode_LayoutEditingMode;
+            }
+        }
     }
 }

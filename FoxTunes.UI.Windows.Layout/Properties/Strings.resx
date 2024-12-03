@@ -402,4 +402,13 @@
   <data name="UIComponentVerticalSplitContainer.Name" xml:space="preserve">
     <value>Splitter (left | right)</value>
   </data>
+  <data name="UIComponentGridContainer.Name" xml:space="preserve">
+    <value />
+  </data>
+  <data name="LayoutEditingMode.LayoutEditingMode" xml:space="preserve">
+    <value>Layout Editing Mode</value>
+  </data>
+  <data name="LayoutEditingMode.Name" xml:space="preserve">
+    <value>Layout Editing Mode</value>
+  </data>
 </root>

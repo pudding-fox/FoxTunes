@@ -115,6 +115,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Layout Editing Mode.
+        /// </summary>
+        internal static string LayoutEditingMode_LayoutEditingMode {
+            get {
+                return ResourceManager.GetString("LayoutEditingMode.LayoutEditingMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layout Editing Mode.
+        /// </summary>
+        internal static string LayoutEditingMode_Name {
+            get {
+                return ResourceManager.GetString("LayoutEditingMode.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         internal static string LayoutEditor_Cancel {
@@ -462,6 +480,15 @@ namespace FoxTunes {
         internal static string UIComponentGridContainer_MoveUp {
             get {
                 return ResourceManager.GetString("UIComponentGridContainer.MoveUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string UIComponentGridContainer_Name {
+            get {
+                return ResourceManager.GetString("UIComponentGridContainer.Name", resourceCulture);
             }
         }
         
