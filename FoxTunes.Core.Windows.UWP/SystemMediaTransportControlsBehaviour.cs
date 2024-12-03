@@ -17,6 +17,8 @@ namespace FoxTunes
     {
         const int UPDATE_INTERVAL = 1000;
 
+        public MediaPlayer MediaPlayer { get; private set; }
+
         public SystemMediaTransportControls TransportControls { get; private set; }
 
         public Timer Timer { get; private set; }
@@ -73,9 +75,8 @@ namespace FoxTunes
             {
                 return;
             }
-#pragma warning disable CS0618
-            this.TransportControls = BackgroundMediaPlayer.Current.SystemMediaTransportControls;
-#pragma warning restore CS0618
+            this.MediaPlayer = new MediaPlayer();
+            this.TransportControls = this.MediaPlayer.SystemMediaTransportControls;
             this.TransportControls.IsEnabled = true;
             this.TransportControls.IsPlayEnabled = true;
             this.TransportControls.IsPauseEnabled = true;
