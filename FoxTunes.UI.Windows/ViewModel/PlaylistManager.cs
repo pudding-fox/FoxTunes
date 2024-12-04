@@ -21,6 +21,14 @@ namespace FoxTunes.ViewModel
 
         public IErrorEmitter ErrorEmitter { get; private set; }
 
+        public override bool EnabledOnly
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         protected override void InitializeComponent(ICore core)
         {
             global::FoxTunes.BackgroundTask.ActiveChanged += this.OnActiveChanged;

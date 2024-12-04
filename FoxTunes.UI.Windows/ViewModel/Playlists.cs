@@ -10,6 +10,14 @@ namespace FoxTunes.ViewModel
 {
     public class Playlists : ViewModelBase
     {
+        public virtual bool EnabledOnly
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public IPlaylistManager PlaylistManager { get; private set; }
 
         public IPlaylistBrowser PlaylistBrowser { get; private set; }
@@ -76,6 +84,12 @@ namespace FoxTunes.ViewModel
         protected virtual Task RefreshItems()
         {
             var playlists = this.PlaylistBrowser.GetPlaylists();
+            if (this.EnabledOnly)
+            {
+                playlists = playlists.Where(
+                    playlist => playlist.Enabled
+                ).ToArray();
+            }
             if (this.Items == null)
             {
                 return Windows.Invoke(() => this.Items = new PlaylistCollection(playlists));
@@ -89,6 +103,15 @@ namespace FoxTunes.ViewModel
         protected virtual Task RefreshItems(IEnumerable<Playlist> playlists, DataSignalType type)
         {
             var cached = this.PlaylistBrowser.GetPlaylists();
+            if (this.EnabledOnly)
+            {
+                cached = cached.Where(
+                    playlist => playlist.Enabled
+                ).ToArray();
+                playlists = playlists.Where(
+                    playlist => playlist.Enabled
+                ).ToArray();
+            }
             if (this.Items == null)
             {
                 return Windows.Invoke(() => this.Items = new PlaylistCollection(cached));
