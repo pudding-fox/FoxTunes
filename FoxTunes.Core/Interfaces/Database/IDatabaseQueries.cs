@@ -20,6 +20,8 @@ namespace FoxTunes.Interfaces
 
         IDatabaseQuery GetLibraryMetaData { get; }
 
+        IDatabaseQuery GetLibraryItemMetaData { get; }
+
         IDatabaseQuery GetLibraryHierarchyMetaData(string filter, int limit);
 
         IDatabaseQuery GetLibraryHierarchyNodes(string filter);

@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -157,6 +157,21 @@ namespace FoxTunes {
         ///	JOIN &quot;LibraryItem_MetaDataItem&quot; ON &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot; = &quot;MetaDataItems&quot;.&quot;Id&quot;
         ///WHERE &quot;LibraryItem_MetaDataItem&quot;.&quot;LibraryItem_Id&quot; = @libraryItemId 
         ///	AND (@type &amp; &quot;MetaDataItems&quot;.&quot;Type&quot;) =  &quot;MetaDataItems&quot;.&quot;Type&quot;.
+        /// </summary>
+        internal static string GetLibraryItemMetaData {
+            get {
+                return ResourceManager.GetString("GetLibraryItemMetaData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SELECT &quot;MetaDataItems&quot;.&quot;Value&quot;
+        ///FROM &quot;MetaDataItems&quot;
+        ///	JOIN &quot;LibraryItem_MetaDataItem&quot; ON &quot;LibraryItem_MetaDataItem&quot;.&quot;MetaDataItem_Id&quot; = &quot;MetaDataItems&quot;.&quot;Id&quot;
+        ///WHERE &quot;MetaDataItems&quot;.&quot;Name&quot; = @name
+        ///	AND (@type &amp; &quot;MetaDataItems&quot;.&quot;Type&quot;) =  &quot;MetaDataItems&quot;.&quot;Type&quot;
+        ///GROUP BY &quot;MetaDataItems&quot;.&quot;Value&quot;
+        ///ORDER BY &quot;MetaDataItems&quot;.&quot;Value&quot;.
         /// </summary>
         internal static string GetLibraryMetaData {
             get {

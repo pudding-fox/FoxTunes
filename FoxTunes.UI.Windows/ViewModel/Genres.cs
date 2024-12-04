@@ -21,32 +21,22 @@ namespace FoxTunes.ViewModel
         {
             using (var database = core.Factories.Database.Create())
             {
-#pragma warning disable CS0612 
-                var name = database.Tables.MetaDataItem.Column("Name");
-                var value = database.Tables.MetaDataItem.Column("Value");
-#pragma warning restore CS0612
                 using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
                 {
-                    var builder = database.QueryFactory.Build();
-                    builder.Output.AddColumn(value);
-                    builder.Filter.AddColumn(name);
-                    builder.Source.AddTable(database.Tables.MetaDataItem);
-                    builder.Aggregate.AddColumn(value);
-                    builder.Sort.AddColumn(value);
-                    var query = builder.Build();
-                    using (var reader = database.ExecuteReader(query, (parameters, phase) =>
+                    using (var reader = database.ExecuteReader(database.Queries.GetLibraryMetaData, (parameters, phase) =>
                     {
                         switch (phase)
                         {
                             case DatabaseParameterPhase.Fetch:
-                                parameters[name] = CommonMetaData.Genre;
+                                parameters["name"] = CommonMetaData.Genre;
+                                parameters["type"] = MetaDataItemType.Tag;
                                 break;
                         }
                     }, transaction))
                     {
                         foreach (var record in reader)
                         {
-                            yield return record.Get<string>(value);
+                            yield return record.Get<string>("value");
                         }
                     }
                 }
