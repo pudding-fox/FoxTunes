@@ -70,6 +70,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Blur.
+        /// </summary>
+        internal static string ArtworkConfiguration_Blur {
+            get {
+                return ResourceManager.GetString("ArtworkConfiguration.Blur", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Artwork.
+        /// </summary>
+        internal static string ArtworkConfiguration_Section {
+            get {
+                return ResourceManager.GetString("ArtworkConfiguration.Section", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Background Tasks.
         /// </summary>
         internal static string BackgroundTasks_Name {

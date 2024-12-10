@@ -120,6 +120,12 @@
   <data name="Artwork.Name" xml:space="preserve">
     <value>Artwork</value>
   </data>
+  <data name="ArtworkConfiguration.Blur" xml:space="preserve">
+    <value>Blur</value>
+  </data>
+  <data name="ArtworkConfiguration.Section" xml:space="preserve">
+    <value>Artwork</value>
+  </data>
   <data name="BackgroundTasks.Name" xml:space="preserve">
     <value>Background Tasks</value>
   </data>

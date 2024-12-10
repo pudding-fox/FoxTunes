@@ -10,9 +10,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace FoxTunes
-{    /// <summary>
-     /// Interaction logic for StaticImage.xaml
-     /// </summary>
+{
+    /// <summary>
+    /// Interaction logic for StaticImage.xaml
+    /// </summary>
     [UIComponent("8A4E9DDB-2390-455D-9BA9-57C9A441CD75", role: UIComponentRole.System)]
     public partial class StaticImage : ConfigurableUIComponentBase, IInvocableComponent
     {
@@ -209,7 +210,7 @@ namespace FoxTunes
         protected override Task<bool> ShowSettings()
         {
             return this.ShowSettings(
-                Strings.StaticImageConfiguration_Path,
+                Strings.StaticImage_Name,
                 StaticImageConfiguration.SECTION
             );
         }

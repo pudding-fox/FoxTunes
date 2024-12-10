@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace FoxTunes.ViewModel
 {
-    public class Artwork : ViewModelBase
+    public class Artwork : ConfigurableViewModelBase
     {
         public Artwork()
         {
@@ -101,16 +101,54 @@ namespace FoxTunes.ViewModel
 
         public ISignalEmitter SignalEmitter { get; private set; }
 
+        private bool _Blur { get; set; }
+
+        public bool Blur
+        {
+            get
+            {
+                return this._Blur;
+            }
+            set
+            {
+                this._Blur = value;
+                this.OnBlurChanged();
+            }
+        }
+
+        protected virtual void OnBlurChanged()
+        {
+            if (this.BlurChanged != null)
+            {
+                this.BlurChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Blur");
+        }
+
+        public event EventHandler BlurChanged;
+
         protected override void InitializeComponent(ICore core)
         {
             this.ArtworkProvider = ComponentRegistry.Instance.GetComponent<IArtworkProvider>();
-            this.PlaybackManager = core.Managers.Playback;
+            this.PlaybackManager = Core.Instance.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
             this.LibraryBrowser = core.Components.LibraryBrowser;
             this.SignalEmitter = core.Components.SignalEmitter;
             this.SignalEmitter.Signal += this.OnSignal;
             this.Dispatch(this.Refresh);
             base.InitializeComponent(core);
+        }
+
+        protected override void OnConfigurationChanged()
+        {
+            if (this.Configuration != null)
+            {
+                this.Configuration.GetElement<BooleanConfigurationElement>(
+                    ArtworkConfiguration.SECTION,
+                    ArtworkConfiguration.BLUR
+                ).ConnectValue(value => this.Blur = value);
+            }
+            base.OnConfigurationChanged();
         }
 
         protected virtual Task OnSignal(object sender, ISignal signal)

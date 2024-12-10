@@ -1,5 +1,6 @@
 ﻿using FoxTunes.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,9 +12,11 @@ namespace FoxTunes
     /// Interaction logic for Artwork.xaml
     /// </summary>
     [UIComponent("66C8A9E7-0891-48DD-8086-E40F72D4D030", role: UIComponentRole.Info)]
-    public partial class Artwork : SquareUIComponentBase, IDisposable
+    public partial class Artwork : SquareConfigurableUIComponentBase, IDisposable
     {
         const int TIMEOUT = 100;
+
+        const string CATEGORY = "B40EB21F-0690-4ED0-A628-DECC908E92D0";
 
         public Artwork()
         {
@@ -70,6 +73,27 @@ namespace FoxTunes
             {
                 var task = viewModel.Next();
             }
+        }
+
+        public override IEnumerable<string> InvocationCategories
+        {
+            get
+            {
+                yield return CATEGORY;
+            }
+        }
+
+        protected override Task<bool> ShowSettings()
+        {
+            return this.ShowSettings(
+                Strings.Artwork_Name,
+                ArtworkConfiguration.SECTION
+            );
+        }
+
+        public override IEnumerable<ConfigurationSection> GetConfigurationSections()
+        {
+            return ArtworkConfiguration.GetConfigurationSections();
         }
     }
 }
