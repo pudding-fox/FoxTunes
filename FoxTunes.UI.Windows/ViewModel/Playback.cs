@@ -53,32 +53,6 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler IsPlayingChanged;
 
-        public string Caption
-        {
-            get
-            {
-                if (this.IsPlaying)
-                {
-                    return ";";
-                }
-                else
-                {
-                    return "4";
-                }
-            }
-        }
-
-        protected virtual void OnCaptionChanged()
-        {
-            if (this.CaptionChanged != null)
-            {
-                this.CaptionChanged(this, EventArgs.Empty);
-            }
-            this.OnPropertyChanged("Caption");
-        }
-
-        public event EventHandler CaptionChanged;
-
         public ICommand PlayCommand
         {
             get
@@ -169,15 +143,9 @@ namespace FoxTunes.ViewModel
                     isPlaying = currentStream.IsPlaying;
                 }
             }
-            var refresh = default(bool);
             if (this.IsPlaying != isPlaying)
             {
                 this.IsPlaying = isPlaying;
-                refresh = true;
-            }
-            if (refresh)
-            {
-                this.OnCaptionChanged();
             }
         }
 
