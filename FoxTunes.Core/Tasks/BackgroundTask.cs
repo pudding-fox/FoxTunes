@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -13,12 +12,11 @@ namespace FoxTunes
         static BackgroundTask()
         {
             Instances = new List<WeakReference<IBackgroundTask>>();
-            Semaphores = new ConcurrentDictionary<string, SemaphoreSlim>();
         }
 
         private static IList<WeakReference<IBackgroundTask>> Instances { get; set; }
 
-        private static ConcurrentDictionary<string, SemaphoreSlim> Semaphores { get; set; }
+        public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
 
         public static IEnumerable<IBackgroundTask> Active
         {
@@ -87,14 +85,6 @@ namespace FoxTunes
             get
             {
                 return 1;
-            }
-        }
-
-        public SemaphoreSlim Semaphore
-        {
-            get
-            {
-                return Semaphores.GetOrAdd(this.Id, key => new SemaphoreSlim(this.Concurrency, this.Concurrency));
             }
         }
 
@@ -216,23 +206,11 @@ namespace FoxTunes
         {
             //Logger.Write(this, LogLevel.Debug, "Running background task.");
             await this.OnStarted().ConfigureAwait(false);
-#if NET40
-            Semaphore.Wait();
-#else
-            await Semaphore.WaitAsync().ConfigureAwait(false);
-#endif
             try
             {
-                try
+                using (KeyLock.Lock(this.Id))
                 {
-                	using (KeyLock.Lock(this.Id))
-                	{
-                    	await this.OnRun().ConfigureAwait(false);
-                	}
-                }
-                finally
-                {
-                    this.Semaphore.Release();
+                    await this.OnRun().ConfigureAwait(false);
                 }
                 //Logger.Write(this, LogLevel.Debug, "Background task succeeded.");
                 await this.OnCompleted().ConfigureAwait(false);
