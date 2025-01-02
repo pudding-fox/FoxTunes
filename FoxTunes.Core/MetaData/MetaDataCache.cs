@@ -1,5 +1,4 @@
-﻿using AsyncKeyedLock;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,11 +12,7 @@ namespace FoxTunes
     [ComponentPriority(ComponentPriorityAttribute.HIGH)]
     public class MetaDataCache : StandardComponent, IMetaDataCache, IDisposable
     {
-        public static readonly AsyncKeyedLocker<MetaDataCacheKey> KeyLock = new AsyncKeyedLocker<MetaDataCacheKey>(o =>
-        {
-            o.PoolSize = 20;
-            o.PoolInitialFill = 1;
-        });
+        public static readonly KeyLock<MetaDataCacheKey> KeyLock = new KeyLock<MetaDataCacheKey>();
 
         public IEnumerable<MetaDataCacheKey> Keys
         {

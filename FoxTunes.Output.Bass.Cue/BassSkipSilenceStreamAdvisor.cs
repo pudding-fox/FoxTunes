@@ -1,5 +1,4 @@
-﻿using AsyncKeyedLock;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using System;
 using System.Collections.Generic;
@@ -16,11 +15,7 @@ namespace FoxTunes
         //50ms
         const float WINDOW = 0.05f;
 
-        public static readonly AsyncKeyedLocker<string> KeyLock = new AsyncKeyedLocker<string>(o =>
-        {
-            o.PoolSize = 20;
-            o.PoolInitialFill = 1;
-        }, StringComparer.OrdinalIgnoreCase);
+        public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
 
         public BassSkipSilenceStreamAdvisorBehaviour Behaviour { get; private set; }
 

@@ -1,5 +1,4 @@
-﻿using AsyncKeyedLock;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,11 +14,7 @@ namespace FoxTunes
             "DataStore"
         );
 
-        public static readonly AsyncKeyedLocker<string> KeyLock = new AsyncKeyedLocker<string>(o =>
-        {
-            o.PoolSize = 20;
-            o.PoolInitialFill = 1;
-        }, StringComparer.OrdinalIgnoreCase);
+        public static readonly KeyLock<string> KeyLock = new KeyLock<string>(StringComparer.OrdinalIgnoreCase);
 
         public static readonly object SyncRoot = new object();
 
