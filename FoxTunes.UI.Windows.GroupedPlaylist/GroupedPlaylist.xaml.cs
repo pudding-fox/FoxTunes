@@ -18,6 +18,12 @@ namespace FoxTunes
         public GroupedPlaylist()
         {
             this.InitializeComponent();
+#if NET40
+
+#else
+            VirtualizingPanel.SetIsVirtualizing(this.ListView, true);
+            VirtualizingPanel.SetIsVirtualizingWhenGrouping(this.ListView, true);
+#endif
         }
 
         protected virtual void DragSourceInitialized(object sender, ListViewExtensions.DragSourceInitializedEventArgs e)

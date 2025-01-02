@@ -55,7 +55,6 @@
                         Windows:ListBoxExtensions.DragSource="True"
                         Windows:ListBoxExtensions.DragSourceInitialized="DragSourceInitialized"
                         Windows:ListBoxExtensions.EnsureSelectedItemVisible="True"
-                        VirtualizingPanel.ScrollUnit="Pixel"
                         TextSearch.TextPath="Value"
                         Background="{DynamicResource ControlBackgroundBrush}">
                         <Interactivity:Interaction.Triggers>

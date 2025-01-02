@@ -17,6 +17,9 @@
 		<Reference Include="ManagedBass.Dsd" Condition="'$(TargetFramework)' == 'net40'">
 			<HintPath>..\lib\net40\ManagedBass.Dsd.dll</HintPath>
 		</Reference>
+    <Reference Include="SacdSharp" Condition="'$(TargetFramework)' == 'net40'">
+      <HintPath>..\lib\net40\SacdSharp.dll</HintPath>
+    </Reference>
 	</ItemGroup>
 
 	<ItemGroup>

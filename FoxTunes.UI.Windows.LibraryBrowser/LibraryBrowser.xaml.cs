@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace FoxTunes
 {
@@ -13,6 +14,16 @@ namespace FoxTunes
         public LibraryBrowser()
         {
             this.InitializeComponent();
+        }
+
+        protected override void OnListBoxLoaded(object sender, RoutedEventArgs e)
+        {
+#if NET40
+
+#else
+            VirtualizingPanel.SetScrollUnit(sender as DependencyObject, ScrollUnit.Pixel);
+#endif
+            base.OnListBoxLoaded(sender, e);
         }
 
         protected override ItemsControl GetItemsControl()

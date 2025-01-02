@@ -825,6 +825,7 @@ namespace FoxTunes
         public enum PackageElementFlags : byte
         {
             None = 0,
+            FrameworkNET40 = 1,
             FrameworkNET48 = 4
         }
     }
