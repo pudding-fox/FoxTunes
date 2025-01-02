@@ -125,6 +125,10 @@ namespace FoxTunes.ViewModel.Config
                 {
                     return true;
                 }
+                if (this.Element.Flags.HasFlag(ConfigurationElementFlags.FontFamily))
+                {
+                    return true;
+                }
                 return false;
             }
         }
@@ -149,6 +153,10 @@ namespace FoxTunes.ViewModel.Config
             if (this.Element.Flags.HasFlag(ConfigurationElementFlags.FolderName))
             {
                 this.BrowseFolder();
+            }
+            if (this.Element.Flags.HasFlag(ConfigurationElementFlags.FontFamily))
+            {
+                this.BrowseFont();
             }
         }
 
@@ -192,6 +200,30 @@ namespace FoxTunes.ViewModel.Config
                 return;
             }
             this.Element.Value = result.Paths.FirstOrDefault();
+        }
+
+        protected virtual void BrowseFont()
+        {
+            var fontFamily = default(string);
+            if (!string.IsNullOrEmpty(this.Element.Value))
+            {
+                fontFamily = this.Element.Value;
+            }
+            else
+            {
+                fontFamily = SystemFonts.MessageFontFamily.FamilyNames.Select(familyName => familyName.Value).FirstOrDefault();
+            }
+            //TODO: Use only WPF frameworks.
+            var fontDialog = new global::System.Windows.Forms.FontDialog()
+            {
+                ShowColor = false
+            };
+            fontDialog.Font = new global::System.Drawing.Font(fontFamily, 12);
+            if (fontDialog.ShowDialog() != global::System.Windows.Forms.DialogResult.OK)
+            {
+                return;
+            }
+            this.Element.Value = fontDialog.Font.Name;
         }
 
         public ICommand HelpCommand

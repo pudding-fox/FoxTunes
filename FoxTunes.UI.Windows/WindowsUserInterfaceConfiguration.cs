@@ -49,7 +49,7 @@ namespace FoxTunes
                 .WithElement(
                     new SelectionConfigurationElement(TRANSPARENCY_PROVIDER, Strings.WindowsUserInterfaceConfiguration_TransparencyProvider).DependsOn(SECTION, TRANSPARENCY))
                 .WithElement(
-                    new TextConfigurationElement(FONT_FAMILY, Strings.WindowsUserInterfaceConfiguration_FontFamily)
+                    new TextConfigurationElement(FONT_FAMILY, Strings.WindowsUserInterfaceConfiguration_FontFamily).WithFlags(ConfigurationElementFlags.FontFamily)
             );
         }
 

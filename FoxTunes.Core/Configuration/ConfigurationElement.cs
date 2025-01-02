@@ -8,7 +8,7 @@ namespace FoxTunes
 {
     public abstract class ConfigurationElement : INotifyPropertyChanged
     {
-                private ConfigurationElement()
+        private ConfigurationElement()
         {
             this.IsHidden = false;
             this.Flags = ConfigurationElementFlags.None;
@@ -398,6 +398,7 @@ namespace FoxTunes
         FileName = 2,
         FolderName = 4,
         Secret = 8,
-        Script = 16
+        Script = 16,
+        FontFamily = 32
     }
 }
