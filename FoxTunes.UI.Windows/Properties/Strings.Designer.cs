@@ -1618,6 +1618,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Font Family.
+        /// </summary>
+        internal static string WindowsUserInterfaceConfiguration_FontFamily {
+            get {
+                return ResourceManager.GetString("WindowsUserInterfaceConfiguration.FontFamily", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Layout.
         /// </summary>
         internal static string WindowsUserInterfaceConfiguration_Layout {

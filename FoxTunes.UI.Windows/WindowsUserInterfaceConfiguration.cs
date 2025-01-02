@@ -29,6 +29,8 @@ namespace FoxTunes
 
         public const string TRANSPARENCY_PROVIDER = "NNOOE002-E835-443B-9C30-6E6530215B13";
 
+        public const string FONT_FAMILY = "OOOOA891-8854-484E-B3DF-5E571C9500FB";
+
         public static IEnumerable<ConfigurationSection> GetConfigurationSections()
         {
             yield return new ConfigurationSection(SECTION, Strings.WindowsUserInterfaceConfiguration_Section)
@@ -45,7 +47,9 @@ namespace FoxTunes
                 .WithElement(
                     new BooleanConfigurationElement(TRANSPARENCY, Strings.WindowsUserInterfaceConfiguration_Transparency).WithValue(Publication.ReleaseType == ReleaseType.Default))
                 .WithElement(
-                    new SelectionConfigurationElement(TRANSPARENCY_PROVIDER, Strings.WindowsUserInterfaceConfiguration_TransparencyProvider).DependsOn(SECTION, TRANSPARENCY)
+                    new SelectionConfigurationElement(TRANSPARENCY_PROVIDER, Strings.WindowsUserInterfaceConfiguration_TransparencyProvider).DependsOn(SECTION, TRANSPARENCY))
+                .WithElement(
+                    new TextConfigurationElement(FONT_FAMILY, Strings.WindowsUserInterfaceConfiguration_FontFamily)
             );
         }
 

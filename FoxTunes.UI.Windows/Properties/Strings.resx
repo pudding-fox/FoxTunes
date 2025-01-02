@@ -636,6 +636,9 @@
   <data name="WindowsUserInterfaceConfiguration.FirstRun" xml:space="preserve">
     <value>Initial Setup</value>
   </data>
+  <data name="WindowsUserInterfaceConfiguration.FontFamily" xml:space="preserve">
+    <value>Font Family</value>
+  </data>
   <data name="WindowsUserInterfaceConfiguration.Layout" xml:space="preserve">
     <value>Layout</value>
   </data>

@@ -21,7 +21,7 @@ namespace FoxTunes
 {
     public abstract class WindowBase : Window, IUserInterfaceWindow
     {
-                static WindowBase()
+        static WindowBase()
         {
             Instances = new List<WeakReference<WindowBase>>();
         }
@@ -79,6 +79,7 @@ namespace FoxTunes
             this.WindowStyle = WindowStyle.None;
             this.Background = Brushes.Transparent;
             WindowExtensions.SetAllowsTransparency(this, true);
+            WindowExtensions.SetFontFamily(this, true);
             if (this.ApplyTemplate)
             {
                 this.ShowTemplate();
