@@ -120,7 +120,7 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to (extension(file) || &quot;&quot;).toUpperCase();.
+        ///   Looks up a localized string similar to property.description ? property.description : (extension(file) || &quot;&quot;).toUpperCase();.
         /// </summary>
         internal static string Codec {
             get {

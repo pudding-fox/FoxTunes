@@ -1,1 +1,1 @@
-property.description ?? (extension(file) || "").toUpperCase();
+property.description ? property.description : (extension(file) || "").toUpperCase();
