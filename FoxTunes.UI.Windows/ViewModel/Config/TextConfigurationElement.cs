@@ -216,7 +216,7 @@ namespace FoxTunes.ViewModel.Config
             //TODO: Use only WPF frameworks.
             var fontDialog = new global::System.Windows.Forms.FontDialog()
             {
-                ShowColor = false
+                ShowEffects = false
             };
             fontDialog.Font = new global::System.Drawing.Font(fontFamily, 12);
             if (fontDialog.ShowDialog() != global::System.Windows.Forms.DialogResult.OK)
