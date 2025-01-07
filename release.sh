@@ -1,6 +1,7 @@
 #!/bin/sh
 
 TARGET="
+net40
 net48
 "
 

@@ -16,6 +16,8 @@ namespace FoxTunes
 
         const string PLUGINS = "plugins";
 
+        const string NET40 = "net40";
+
         const string NET48 = "net48";
 
         const string LIB = "lib";
@@ -36,6 +38,7 @@ namespace FoxTunes
                 version = string.Format("{0}-{1}", DateTime.UtcNow.ToString("ddmmyyyy"), NIGHTLY);
             }
             Console.WriteLine("Version: {0}", version);
+            CreateRelease(version, ReleaseFlags.FrameworkNET40 | ReleaseFlags.L10N_FR);
             CreateRelease(version, ReleaseFlags.FrameworkNET48 | ReleaseFlags.L10N_FR);
         }
 
@@ -185,6 +188,10 @@ namespace FoxTunes
                 "..",
                 DISTRIBUTION
             };
+            if (flags.HasFlag(ReleaseFlags.FrameworkNET40))
+            {
+                parts.Add(NET40);
+            }
             if (flags.HasFlag(ReleaseFlags.FrameworkNET48))
             {
                 parts.Add(NET48);
@@ -223,6 +230,10 @@ namespace FoxTunes
         private static string GetTarget(ReleaseFlags flags)
         {
             var parts = new List<string>();
+            if (flags.HasFlag(ReleaseFlags.FrameworkNET40))
+            {
+                parts.Add(NET40);
+            }
             if (flags.HasFlag(ReleaseFlags.FrameworkNET48))
             {
                 parts.Add(NET48);
@@ -762,6 +773,7 @@ namespace FoxTunes
         public enum ReleaseFlags : byte
         {
             None = 0,
+            FrameworkNET40 = 1,
             FrameworkNET48 = 4,
             L10N_FR = 32
         }
