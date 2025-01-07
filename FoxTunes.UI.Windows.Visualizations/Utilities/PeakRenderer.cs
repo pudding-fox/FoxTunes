@@ -250,7 +250,7 @@ namespace FoxTunes
                     Render(ref info, data);
                     success = true;
                 }
-                catch
+                catch (Exception e)
                 {
 #if DEBUG
                     Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render peaks: {0}", e.Message);
@@ -306,7 +306,7 @@ namespace FoxTunes
 
                 this.BeginUpdateData();
             }
-            catch 
+            catch (Exception exception)
             {
 #if DEBUG
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update peak data: {0}", exception.Message);
@@ -331,7 +331,7 @@ namespace FoxTunes
 
                 this.BeginUpdateDisplay();
             }
-            catch 
+            catch (Exception exception)
             {
 #if DEBUG
                 Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render peak data: {0}", exception.Message);

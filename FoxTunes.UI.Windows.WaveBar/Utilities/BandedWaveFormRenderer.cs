@@ -249,7 +249,7 @@ namespace FoxTunes
                 {
                     Render(ref info, data);
                 }
-                catch 
+                catch (Exception e)
                 {
                     Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render wave form: {0}", e.Message);
                 }
