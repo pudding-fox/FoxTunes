@@ -11,6 +11,14 @@ namespace FoxTunes
 {
     public static class Windows
     {
+        private static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         public static bool IsShuttingDown { get; set; }
 
         public static readonly WindowRegistrations Registrations = new WindowRegistrations();
@@ -65,27 +73,27 @@ namespace FoxTunes
 
         public static Task TryShutdown()
         {
-            //Logger.Write(typeof(Windows), LogLevel.Debug, "Looking for main window..");
+            Logger.Write(typeof(Windows), LogLevel.Debug, "Looking for main window..");
             return Invoke(() =>
             {
                 var window = ActiveWindow;
                 if (window != null && window.IsVisible)
                 {
-                    //Logger.Write(typeof(Windows), LogLevel.Debug, "Main window is visible, nothing to do: {0}/{1}", window.GetType().Name, window.Title);
+                    Logger.Write(typeof(Windows), LogLevel.Debug, "Main window is visible, nothing to do: {0}/{1}", window.GetType().Name, window.Title);
 #if NET40
                     return TaskEx.FromResult(false);
 #else
                     return Task.CompletedTask;
 #endif
                 }
-                //Logger.Write(typeof(Windows), LogLevel.Debug, "No visible windows, shutting down..");
+                Logger.Write(typeof(Windows), LogLevel.Debug, "No visible windows, shutting down..");
                 return Shutdown();
             });
         }
 
         public static Task Shutdown()
         {
-            //Logger.Write(typeof(Windows), LogLevel.Debug, "Shutting down..");
+            Logger.Write(typeof(Windows), LogLevel.Debug, "Shutting down..");
             IsShuttingDown = true;
             return Invoke(() =>
             {
@@ -95,12 +103,12 @@ namespace FoxTunes
                 }
                 foreach (var window in Registrations.Windows)
                 {
-                    //Logger.Write(typeof(Windows), LogLevel.Debug, "Closing window: {0}/{1}", window.GetType().Name, window.Title);
+                    Logger.Write(typeof(Windows), LogLevel.Debug, "Closing window: {0}/{1}", window.GetType().Name, window.Title);
                     window.Close();
                 }
                 foreach (var window in WindowBase.Active)
                 {
-                    //Logger.Write(typeof(Windows), LogLevel.Debug, "Closing window: {0}/{1}", window.GetType().Name, window.Title);
+                    Logger.Write(typeof(Windows), LogLevel.Debug, "Closing window: {0}/{1}", window.GetType().Name, window.Title);
                     window.Close();
                 }
                 UIBehaviour.Shutdown();
@@ -141,7 +149,7 @@ namespace FoxTunes
             }
             else
             {
-                //Logger.Write(typeof(Windows), LogLevel.Warn, "Cannot Invoke, Dispatcher is not available.");
+                Logger.Write(typeof(Windows), LogLevel.Warn, "Cannot Invoke, Dispatcher is not available.");
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -182,7 +190,7 @@ namespace FoxTunes
             }
             else
             {
-                //Logger.Write(typeof(Windows), LogLevel.Warn, "Cannot Invoke, Dispatcher is not available.");
+                Logger.Write(typeof(Windows), LogLevel.Warn, "Cannot Invoke, Dispatcher is not available.");
             }
 #if NET40
             return TaskEx.FromResult(false);
@@ -269,7 +277,7 @@ namespace FoxTunes
 
             protected virtual void OnAdded(WindowRegistration registration)
             {
-                //Logger.Write(this, LogLevel.Debug, "Window registered: {0}", registration.Id);
+                Logger.Write(this, LogLevel.Debug, "Window registered: {0}", registration.Id);
                 var callbacks = default(ISet<EventHandler>);
                 if (this.Callbacks.TryGetValue(registration.Id, out callbacks))
                 {
@@ -313,7 +321,7 @@ namespace FoxTunes
                 {
                     return default(Window);
                 }
-                //Logger.Write(this, LogLevel.Debug, "Showing window: {0}", id);
+                Logger.Write(this, LogLevel.Debug, "Showing window: {0}", id);
                 var window = registration.GetInstance();
                 if (!window.IsVisible)
                 {
@@ -331,7 +339,7 @@ namespace FoxTunes
                 {
                     return false;
                 }
-                //Logger.Write(this, LogLevel.Debug, "Hiding window: {0}", id);
+                Logger.Write(this, LogLevel.Debug, "Hiding window: {0}", id);
                 window.Hide();
                 return true;
             }
@@ -343,7 +351,7 @@ namespace FoxTunes
                 {
                     return false;
                 }
-                //Logger.Write(this, LogLevel.Debug, "Closing window: {0}", id);
+                Logger.Write(this, LogLevel.Debug, "Closing window: {0}", id);
                 window.Close();
                 return true;
             }
@@ -530,9 +538,9 @@ namespace FoxTunes
             {
                 return () =>
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Creating window: {0}", this.Id);
+                    Logger.Write(this, LogLevel.Debug, "Creating window: {0}", this.Id);
                     var window = factory();
-                    //Logger.Write(this, LogLevel.Debug, "Created window: {0}/{1}", window.GetType().Name, window.Title);
+                    Logger.Write(this, LogLevel.Debug, "Created window: {0}/{1}", window.GetType().Name, window.Title);
                     window.Owner = Windows.ActiveWindow;
                     window.IsVisibleChanged += this.OnIsVisibleChanged;
                     window.Closed += this.OnClosed;
@@ -555,7 +563,7 @@ namespace FoxTunes
             {
                 if (this.Role == UserInterfaceWindowRole.Main)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Main window visiblity changed, refreshing active window: {0}", this.Id);
+                    Logger.Write(this, LogLevel.Debug, "Main window visiblity changed, refreshing active window: {0}", this.Id);
                     OnActiveWindowChanged();
                 }
                 if (this.IsVisibleChanged != null)
@@ -568,7 +576,7 @@ namespace FoxTunes
 
             protected virtual void OnClosed(object sender, EventArgs e)
             {
-                //Logger.Write(this, LogLevel.Debug, "Window was closed: {0}", this.Id);
+                Logger.Write(this, LogLevel.Debug, "Window was closed: {0}", this.Id);
                 this.Reset();
                 if (this.Closed != null)
                 {
@@ -576,7 +584,7 @@ namespace FoxTunes
                 }
                 if (this.Role == UserInterfaceWindowRole.Main)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Main window was closed, attempting shutdown: {0}", this.Id);
+                    Logger.Write(this, LogLevel.Debug, "Main window was closed, attempting shutdown: {0}", this.Id);
                     var task = TryShutdown();
                 }
             }

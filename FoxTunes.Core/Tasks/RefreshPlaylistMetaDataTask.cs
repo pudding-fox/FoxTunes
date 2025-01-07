@@ -83,7 +83,7 @@ namespace FoxTunes
 
                     if (!File.Exists(playlistItem.FileName))
                     {
-                        //Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot refresh.", playlistItem.FileName);
+                        Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot refresh.", playlistItem.FileName);
                         continue;
                     }
 

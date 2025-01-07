@@ -12,7 +12,15 @@ namespace FoxTunes
 {
     public class VirtualizingWrapPanel : VirtualizingPanel, IScrollInfo
     {
-                public VirtualizingWrapPanel()
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
+        public VirtualizingWrapPanel()
         {
             this.ContainerLayouts = new Dictionary<int, Rect>();
             this.PreviousSize = new Size(16, 16);
@@ -507,7 +515,7 @@ namespace FoxTunes
 
             ~ChildGenerator()
             {
-                //Logger.Write(typeof(ChildGenerator), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+                Logger.Write(typeof(ChildGenerator), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
                 try
                 {
                     this.Dispose(true);

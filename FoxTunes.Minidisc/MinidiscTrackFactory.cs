@@ -71,7 +71,7 @@ namespace FoxTunes
 
         protected virtual async Task<IDictionary<IFileData, string>> GetWaveFiles(IFileData[] fileDatas)
         {
-            //Logger.Write(this, LogLevel.Debug, "Preparing WAVE files..");
+            Logger.Write(this, LogLevel.Debug, "Preparing WAVE files..");
             var fileNames = default(IDictionary<IFileData, string>);
             using (var task = new ValidateInputFormatsTask(fileDatas))
             {
@@ -90,23 +90,23 @@ namespace FoxTunes
 
         protected virtual async Task<IDictionary<IFileData, string>> GetWaveFiles(IFileData[] fileDatas, IDictionary<IFileData, string> fileNames)
         {
-            //Logger.Write(this, LogLevel.Debug, "Encoding {0} items: WAVE 16 bit, 44.1kHz.", fileDatas.Length);
+            Logger.Write(this, LogLevel.Debug, "Encoding {0} items: WAVE 16 bit, 44.1kHz.", fileDatas.Length);
             var encoderItems = await this.Encoder.Encode(
                 fileDatas,
                 this.Encoder.GetOutputPath(TempPath),
                 ENCODER_PROFILE,
                 false
             ).ConfigureAwait(false);
-            //Logger.Write(this, LogLevel.Debug, "Encoder completed.");
+            Logger.Write(this, LogLevel.Debug, "Encoder completed.");
             foreach (var encoderItem in encoderItems)
             {
                 if (EncoderItem.WasSkipped(encoderItem))
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Encoder skipped \"{0}\": Re-using existing file: \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
+                    Logger.Write(this, LogLevel.Warn, "Encoder skipped \"{0}\": Re-using existing file: \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
                 }
                 else if (encoderItem.Status != EncoderItemStatus.Complete)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "At least one file failed to encode, aborting.");
+                    Logger.Write(this, LogLevel.Warn, "At least one file failed to encode, aborting.");
                     var report = this.Encoder.GetReport(encoderItems);
                     await this.ReportEmitter.Send(report).ConfigureAwait(false);
                     return null;
@@ -114,13 +114,13 @@ namespace FoxTunes
                 var fileData = fileDatas.FirstOrDefault(_fileData => string.Equals(_fileData.FileName, encoderItem.InputFileName, StringComparison.OrdinalIgnoreCase));
                 if (fileData == null)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to determine input file for encoder item: {0}", encoderItem.InputFileName);
+                    Logger.Write(this, LogLevel.Warn, "Failed to determine input file for encoder item: {0}", encoderItem.InputFileName);
                     continue;
                 }
-                //Logger.Write(this, LogLevel.Warn, "Encoded \"{0}\": \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
+                Logger.Write(this, LogLevel.Warn, "Encoded \"{0}\": \"{1}\".", encoderItem.InputFileName, encoderItem.OutputFileName);
                 fileNames[fileData] = encoderItem.OutputFileName;
             }
-            //Logger.Write(this, LogLevel.Debug, "Encoded {0} items.", fileNames.Count);
+            Logger.Write(this, LogLevel.Debug, "Encoded {0} items.", fileNames.Count);
             return fileNames;
         }
 
@@ -138,7 +138,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Disc title is ambiguous, falling back to : {0}", global::MD.Net.Constants.UNTITLED);
+                    Logger.Write(this, LogLevel.Warn, "Disc title is ambiguous, falling back to : {0}", global::MD.Net.Constants.UNTITLED);
                     return global::MD.Net.Constants.UNTITLED;
                 }
             }
@@ -185,14 +185,14 @@ namespace FoxTunes
                 //Nothing to do.
                 return;
             }
-            //Logger.Write(typeof(MinidiscBehaviour), LogLevel.Debug, "Cleaning up temp files: {0}", TempPath);
+            Logger.Write(typeof(MinidiscBehaviour), LogLevel.Debug, "Cleaning up temp files: {0}", TempPath);
             try
             {
                 Directory.Delete(TempPath, true);
             }
-            catch 
+            catch (Exception e)
             {
-                //Logger.Write(typeof(MinidiscBehaviour), LogLevel.Warn, "Failed to cleanup temp files: {0}", e.Message);
+                Logger.Write(typeof(MinidiscBehaviour), LogLevel.Warn, "Failed to cleanup temp files: {0}", e.Message);
             }
         }
 
@@ -235,11 +235,11 @@ namespace FoxTunes
                         var length = default(TimeSpan);
                         FormatValidator.Default.Validate(fileData.FileName, out length);
                         this.FileNames[fileData] = fileData.FileName;
-                        //Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is supported.", fileData.FileName);
+                        Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is supported.", fileData.FileName);
                     }
                     catch
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is not supported, it requires conversion.", fileData.FileName);
+                        Logger.Write(this, LogLevel.Debug, "Input file \"{0}\" is not supported, it requires conversion.", fileData.FileName);
                     }
                     this.Position++;
                 }

@@ -58,7 +58,7 @@ namespace FoxTunes
 
         public virtual async Task Run()
         {
-            //Logger.Write(this, LogLevel.Trace, "Begin executing task: {0} with priority {1}.", this.Instance.Id, this.Priority);
+            Logger.Write(this, LogLevel.Trace, "Begin executing task: {0} with priority {1}.", this.Instance.Id, this.Priority);
             do
             {
 #if NET40
@@ -67,38 +67,38 @@ namespace FoxTunes
                 if (!await this.Instance.Semaphore.WaitAsync(this.Timeout).ConfigureAwait(false))
 #endif
                 {
-                    //Logger.Write(this, LogLevel.Trace, "Failed to acquire lock after {0}ms", this.Timeout);
+                    Logger.Write(this, LogLevel.Trace, "Failed to acquire lock after {0}ms", this.Timeout);
                     if (object.ReferenceEquals(this, this.Instance.Instances.OrderBy(instance => instance.Priority).FirstOrDefault()))
                     {
-                        //Logger.Write(this, LogLevel.Trace, "Cancelling other tasks.");
+                        Logger.Write(this, LogLevel.Trace, "Cancelling other tasks.");
                         this.Instance.CancellationToken.Cancel();
                     }
                     else
                     {
-                        //Logger.Write(this, LogLevel.Trace, "Yielding to other tasks.");
+                        Logger.Write(this, LogLevel.Trace, "Yielding to other tasks.");
                     }
                     continue;
                 }
-                //Logger.Write(this, LogLevel.Trace, "Acquired lock.");
+                Logger.Write(this, LogLevel.Trace, "Acquired lock.");
                 var success = true;
                 try
                 {
                     if (this.Cancellable.IsCancellationRequested)
                     {
-                        //Logger.Write(this, LogLevel.Trace, "Task was cancelled.");
+                        Logger.Write(this, LogLevel.Trace, "Task was cancelled.");
                         return;
                     }
                     this.Instance.CancellationToken.Reset();
                     await this.Factory(this.Instance.CancellationToken).ConfigureAwait(false);
                     if (this.Instance.CancellationToken.IsCancellationRequested)
                     {
-                        //Logger.Write(this, LogLevel.Trace, "Task was cancelled.");
+                        Logger.Write(this, LogLevel.Trace, "Task was cancelled.");
                         success = false;
                     }
                 }
                 finally
                 {
-                    //Logger.Write(this, LogLevel.Trace, "Releasing lock.");
+                    Logger.Write(this, LogLevel.Trace, "Releasing lock.");
                     this.Instance.Semaphore.Release();
                 }
                 if (success)
@@ -107,7 +107,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    //Logger.Write(this, LogLevel.Trace, "Retrying in {0}ms", this.Timeout);
+                    Logger.Write(this, LogLevel.Trace, "Retrying in {0}ms", this.Timeout);
 #if NET40
                     await TaskEx.Delay(this.Timeout).ConfigureAwait(false);
 #else
@@ -115,7 +115,7 @@ namespace FoxTunes
 #endif
                 }
             } while (true);
-            //Logger.Write(this, LogLevel.Trace, "Task was executed successfully.");
+            Logger.Write(this, LogLevel.Trace, "Task was executed successfully.");
         }
 
         protected virtual void OnCancellationRequested(object sender, EventArgs e)
@@ -156,7 +156,7 @@ namespace FoxTunes
 
         ~SingletonReentrantTask()
         {
-            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

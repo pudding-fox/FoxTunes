@@ -61,7 +61,7 @@ namespace FoxTunes
                             {
                                 return;
                             }
-                            //Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
+                            Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", fileName);
                             var success = await this.AddPlaylistItem(playlist, writer, fileName).ConfigureAwait(false);
                             if (success && this.ReportProgress)
                             {
@@ -71,7 +71,7 @@ namespace FoxTunes
                     }
                     else if (File.Exists(path))
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", path);
+                        Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", path);
                         var success = await this.AddPlaylistItem(playlist, writer, path).ConfigureAwait(false);
                         if (success && this.ReportProgress)
                         {
@@ -88,10 +88,10 @@ namespace FoxTunes
             {
                 if (!this.PlaybackManager.IsSupported(fileName))
                 {
-                    //Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
+                    Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
                     return false;
                 }
-                //Logger.Write(this, LogLevel.Trace, "Adding file to playlist: {0}", fileName);
+                Logger.Write(this, LogLevel.Trace, "Adding file to playlist: {0}", fileName);
                 var playlistItem = new PlaylistItem()
                 {
                     Playlist_Id = playlist.Id,
@@ -104,9 +104,9 @@ namespace FoxTunes
                 this.Offset++;
                 return true;
             }
-            catch 
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Debug, "Failed to add file \"{0}\" to playlist: {0}", fileName, e.Message);
+                Logger.Write(this, LogLevel.Debug, "Failed to add file \"{0}\" to playlist: {0}", fileName, e.Message);
                 return false;
             }
         }

@@ -28,7 +28,7 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            //Logger.Write(this, LogLevel.Debug, "Initializing BASS (NoSound).");
+            Logger.Write(this, LogLevel.Debug, "Initializing BASS (NoSound).");
             BassUtils.OK(Bass.Init(Bass.NoSoundDevice));
             base.InitializeComponent(core);
         }
@@ -44,7 +44,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Warn, "Cancellation requested, shutting down.");
+            Logger.Write(this, LogLevel.Warn, "Cancellation requested, shutting down.");
             this.CancellationToken.Cancel();
         }
 
@@ -101,7 +101,7 @@ namespace FoxTunes
             );
             if (stream.IsPending)
             {
-                //Logger.Write(this, LogLevel.Trace, "Failed to create decoder stream for file \"{0}\": Device is already in use.", fileName);
+                Logger.Write(this, LogLevel.Trace, "Failed to create decoder stream for file \"{0}\": Device is already in use.", fileName);
                 Thread.Sleep(INTERVAL);
                 goto retry;
             }
@@ -176,13 +176,13 @@ namespace FoxTunes
 
         protected virtual void OnDisposing()
         {
-            //Logger.Write(this, LogLevel.Debug, "Releasing BASS (NoSound).");
+            Logger.Write(this, LogLevel.Debug, "Releasing BASS (NoSound).");
             Bass.Free();
         }
 
         ~BassTool()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

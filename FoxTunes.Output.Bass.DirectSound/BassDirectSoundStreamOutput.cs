@@ -80,13 +80,13 @@ namespace FoxTunes
             var channels = default(int);
             var flags = default(BassFlags);
             this.ConfigureDirectSound(previous, out rate, out channels, out flags);
-            //Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", rate, channels);
+            Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", rate, channels);
             this.ChannelHandle = BassMix.CreateMixerStream(rate, channels, flags);
             if (this.ChannelHandle == 0)
             {
                 BassUtils.Throw();
             }
-            //Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
             BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default | BassFlags.MixerBuffer | BassFlags.MixerDownMix));
             this.MixerChannelHandles.Add(previous.ChannelHandle);
             this.UpdateVolume();
@@ -107,7 +107,7 @@ namespace FoxTunes
                     if (!BassDirectSoundDevice.Info.SupportedRates.Contains(targetRate))
                     {
                         var nearestRate = BassDirectSoundDevice.Info.GetNearestRate(targetRate);
-                        //Logger.Write(this, LogLevel.Warn, "Enforced rate {0} isn't supposed by the device, falling back to {1}.", targetRate, nearestRate);
+                        Logger.Write(this, LogLevel.Warn, "Enforced rate {0} isn't supposed by the device, falling back to {1}.", targetRate, nearestRate);
                         rate = nearestRate;
                     }
                     else
@@ -120,13 +120,13 @@ namespace FoxTunes
                     if (!BassDirectSoundDevice.Info.SupportedRates.Contains(rate))
                     {
                         var nearestRate = BassDirectSoundDevice.Info.GetNearestRate(rate);
-                        //Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", rate, nearestRate);
+                        Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", rate, nearestRate);
                         rate = nearestRate;
                     }
                 }
                 if (BassDirectSoundDevice.Info.Outputs < channels)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Stream channel count {0} isn't supported by the device, falling back to {1} channels.", channels, BassDirectSoundDevice.Info.Outputs);
+                    Logger.Write(this, LogLevel.Debug, "Stream channel count {0} isn't supported by the device, falling back to {1} channels.", channels, BassDirectSoundDevice.Info.Outputs);
                     channels = BassDirectSoundDevice.Info.Outputs;
                 }
             }
@@ -135,7 +135,7 @@ namespace FoxTunes
 
         public override void ClearBuffer()
         {
-            //Logger.Write(this, LogLevel.Debug, "Clearing mixer buffer.");
+            Logger.Write(this, LogLevel.Debug, "Clearing mixer buffer.");
             Bass.ChannelSetPosition(this.ChannelHandle, 0);
             base.ClearBuffer();
         }
@@ -171,7 +171,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Playing channel: {0}", this.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Playing channel: {0}", this.ChannelHandle);
             try
             {
                 BassUtils.OK(Bass.ChannelPlay(this.ChannelHandle, true));
@@ -189,7 +189,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Pausing channel: {0}", this.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Pausing channel: {0}", this.ChannelHandle);
             try
             {
                 BassUtils.OK(Bass.ChannelPause(this.ChannelHandle));
@@ -207,7 +207,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Resuming channel: {0}", this.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Resuming channel: {0}", this.ChannelHandle);
             try
             {
                 BassUtils.OK(Bass.ChannelPlay(this.ChannelHandle, false));
@@ -225,7 +225,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Stopping channel: {0}", this.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Stopping channel: {0}", this.ChannelHandle);
             try
             {
                 BassUtils.OK(Bass.ChannelStop(this.ChannelHandle));
@@ -268,7 +268,7 @@ namespace FoxTunes
         {
             if (this.ChannelHandle != 0)
             {
-                //Logger.Write(this, LogLevel.Debug, "Freeing BASS stream: {0}", this.ChannelHandle);
+                Logger.Write(this, LogLevel.Debug, "Freeing BASS stream: {0}", this.ChannelHandle);
                 Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
             }
             base.OnDisposing();

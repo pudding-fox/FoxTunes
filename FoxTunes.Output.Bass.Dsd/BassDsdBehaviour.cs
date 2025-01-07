@@ -47,7 +47,7 @@ namespace FoxTunes
             set
             {
                 BassDsd.DefaultFrequency = value;
-                //Logger.Write(this, LogLevel.Debug, "DSD to PCM sample rate: {0}", MetaDataInfo.SampleRateDescription(BassDsd.DefaultFrequency));
+                Logger.Write(this, LogLevel.Debug, "DSD to PCM sample rate: {0}", MetaDataInfo.SampleRateDescription(BassDsd.DefaultFrequency));
             }
         }
 
@@ -60,7 +60,7 @@ namespace FoxTunes
             set
             {
                 BassDsd.DefaultGain = value;
-                //Logger.Write(this, LogLevel.Debug, "DSD to PCM gain: {0}{1}dB", BassDsd.DefaultGain > 0 ? "+" : string.Empty, BassDsd.DefaultGain);
+                Logger.Write(this, LogLevel.Debug, "DSD to PCM gain: {0}{1}dB", BassDsd.DefaultGain > 0 ? "+" : string.Empty, BassDsd.DefaultGain);
             }
         }
 
@@ -75,7 +75,7 @@ namespace FoxTunes
             set
             {
                 this._Memory = value;
-                //Logger.Write(this, LogLevel.Debug, "Play DSD from memory: {0}", value ? bool.TrueString : bool.FalseString);
+                Logger.Write(this, LogLevel.Debug, "Play DSD from memory: {0}", value ? bool.TrueString : bool.FalseString);
             }
         }
 

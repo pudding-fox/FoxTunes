@@ -15,13 +15,21 @@ namespace FoxTunes
 
         static readonly Regex Base64 = new Regex("^([a-z0-9+/]{4})*([a-z0-9+/]{3}=|[a-z0-9+/]{2}==)?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+        private static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         public static void Read(TagLibMetaDataSource source, IList<MetaDataItem> metaDatas, File file)
         {
             try
             {
                 if (file.InvariantStartPosition > TagLibMetaDataSource.MAX_TAG_SIZE)
                 {
-                    //Logger.Write(typeof(ImageManager), LogLevel.Warn, "Not importing documents from file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, TagLibMetaDataSource.MAX_TAG_SIZE);
+                    Logger.Write(typeof(ImageManager), LogLevel.Warn, "Not importing documents from file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, TagLibMetaDataSource.MAX_TAG_SIZE);
                     return;
                 }
 
@@ -45,15 +53,15 @@ namespace FoxTunes
                             });
                         }
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        //Logger.Write(typeof(DocumentManager), LogLevel.Warn, "Failed to read document: {0} => {1} => {2}", file.Name, picture.Description, e.Message);
+                        Logger.Write(typeof(DocumentManager), LogLevel.Warn, "Failed to read document: {0} => {1} => {2}", file.Name, picture.Description, e.Message);
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(typeof(DocumentManager), LogLevel.Warn, "Failed to read documents: {0} => {1}", file.Name, e.Message);
+                Logger.Write(typeof(DocumentManager), LogLevel.Warn, "Failed to read documents: {0} => {1}", file.Name, e.Message);
             }
         }
 
@@ -123,7 +131,7 @@ namespace FoxTunes
             var parts = metaDataItem.Value.Split(new[] { ':' }, 2);
             if (parts.Length != 2)
             {
-                //Logger.Write(typeof(DocumentManager), LogLevel.Warn, "Failed to parse document: {0}", metaDataItem.Value);
+                Logger.Write(typeof(DocumentManager), LogLevel.Warn, "Failed to parse document: {0}", metaDataItem.Value);
                 return null;
             }
             var mimeType = parts[0];

@@ -43,7 +43,7 @@ namespace FoxTunes
             set
             {
                 this._Enabled = value;
-                //Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
                 var task = this.Output.Shutdown();
             }
         }
@@ -110,7 +110,7 @@ namespace FoxTunes
 
         ~BassResamplerStreamComponentBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

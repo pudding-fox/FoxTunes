@@ -77,7 +77,7 @@ namespace FoxTunes
                         var provider = PlaylistColumnProviderManager.GetProvider(column.Plugin) as IUIPlaylistColumnProvider;
                         if (provider == null)
                         {
-                            //Logger.Write(this, LogLevel.Warn, "Playlist column plugin \"{0}\" was not found, has it been uninstalled?", column.Plugin);
+                            Logger.Write(this, LogLevel.Warn, "Playlist column plugin \"{0}\" was not found, has it been uninstalled?", column.Plugin);
                         }
                         else
                         {
@@ -200,7 +200,7 @@ namespace FoxTunes
 
         ~PlaylistGridViewColumnFactory()
         {
-            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

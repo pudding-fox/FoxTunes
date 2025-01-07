@@ -7,7 +7,15 @@ namespace FoxTunes
 {
     public abstract class BaseComponent : IBaseComponent, IInitializable, IObservable
     {
-                public bool IsInitialized { get; private set; }
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
+        public bool IsInitialized { get; private set; }
 
         public virtual void InitializeComponent(ICore core)
         {

@@ -10,7 +10,15 @@ namespace FoxTunes
 {
     public abstract class UIComponentBase : UserControl, IUIComponent, IObservable, IDisposable
     {
-                public static readonly DependencyProperty IsComponentEnabledProperty = DependencyProperty.Register(
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
+        public static readonly DependencyProperty IsComponentEnabledProperty = DependencyProperty.Register(
            "IsComponentEnabled",
            typeof(bool),
            typeof(UIComponentBase),

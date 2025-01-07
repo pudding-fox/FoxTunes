@@ -32,7 +32,7 @@ namespace FoxTunes
             set
             {
                 this._Enabled = value;
-                //Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -48,7 +48,7 @@ namespace FoxTunes
             set
             {
                 this._DirectSoundDevice = value;
-                //Logger.Write(this, LogLevel.Debug, "Direct Sound Device = {0}", this.DirectSoundDevice);
+                Logger.Write(this, LogLevel.Debug, "Direct Sound Device = {0}", this.DirectSoundDevice);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -88,7 +88,7 @@ namespace FoxTunes
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.MixerBufferLength, this.Output.MixerBufferLength));
             BassUtils.OK(Bass.Configure(global::ManagedBass.Configuration.SRCQuality, this.Output.ResamplingQuality));
             BassUtils.OK(Bass.Init(this.DirectSoundDevice, this.Output.Rate));
-            //Logger.Write(this, LogLevel.Debug, "BASS Initialized.");
+            Logger.Write(this, LogLevel.Debug, "BASS Initialized.");
         }
 
         protected virtual void OnInitDevice()
@@ -107,7 +107,7 @@ namespace FoxTunes
                 return;
             }
             this.OnFreeDevice();
-            //Logger.Write(this, LogLevel.Debug, "Releasing BASS.");
+            LogManager.Logger.Write(this, LogLevel.Debug, "Releasing BASS.");
             Bass.Free();
             this.IsInitialized = false;
         }
@@ -182,7 +182,7 @@ namespace FoxTunes
 
         ~BassDirectSoundStreamOutputBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

@@ -65,7 +65,7 @@ namespace FoxTunes
             }
             if (channelHandle == 0)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to create CD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                Logger.Write(this, LogLevel.Warn, "Failed to create CD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
             }
             return this.CreateBasicStream(channelHandle, advice, flags);
         }
@@ -118,7 +118,7 @@ namespace FoxTunes
             }
             if (channelHandle == 0)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to create CD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                Logger.Write(this, LogLevel.Warn, "Failed to create CD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
             }
             return this.CreateInteractiveStream(channelHandle, advice, flags);
         }

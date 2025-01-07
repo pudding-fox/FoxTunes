@@ -73,9 +73,9 @@ namespace FoxTunes
                 ComponentRegistry.Instance.AddComponents(components);
                 this.LoadConfiguration();
             }
-            catch 
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Debug, "Failed to load the core, we will crash soon: {0}", e.Message);
+                Logger.Write(this, LogLevel.Debug, "Failed to load the core, we will crash soon: {0}", e.Message);
                 throw;
             }
         }
@@ -86,9 +86,9 @@ namespace FoxTunes
             {
                 this.InitializeComponents();
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Debug, "Failed to initialize the core, we will crash soon: {0}", e.Message);
+                Logger.Write(this, LogLevel.Debug, "Failed to initialize the core, we will crash soon: {0}", e.Message);
                 throw;
             }
         }
@@ -106,7 +106,7 @@ namespace FoxTunes
             );
 #if DEBUG
             stopwatch.Stop();
-            //Logger.Write(this, LogLevel.Trace, "Components loaded in {0}ms.", stopwatch.ElapsedMilliseconds);
+            Logger.Write(this, LogLevel.Trace, "Components loaded in {0}ms.", stopwatch.ElapsedMilliseconds);
 #endif
         }
 
@@ -120,14 +120,14 @@ namespace FoxTunes
             var sections = new ConcurrentBag<ConfigurationSection>();
             Parallel.ForEach(components, component =>
             {
-                //Logger.Write(this, LogLevel.Debug, "Getting configuration for component {0}.", component.GetType().Name);
+                Logger.Write(this, LogLevel.Debug, "Getting configuration for component {0}.", component.GetType().Name);
                 try
                 {
                     sections.AddRange(component.GetConfigurationSections());
                 }
-                catch
+                catch (Exception e)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to get configuration for component {0}: {1}", component.GetType().Name, e.Message);
+                    Logger.Write(this, LogLevel.Warn, "Failed to get configuration for component {0}: {1}", component.GetType().Name, e.Message);
                 }
             });
             foreach (var section in sections)
@@ -138,7 +138,7 @@ namespace FoxTunes
             this.Components.Configuration.ConnectDependencies();
 #if DEBUG
             stopwatch.Stop();
-            //Logger.Write(this, LogLevel.Trace, "Configuration loaded in {0}ms.", stopwatch.ElapsedMilliseconds);
+            Logger.Write(this, LogLevel.Trace, "Configuration loaded in {0}ms.", stopwatch.ElapsedMilliseconds);
 #endif
         }
 
@@ -150,9 +150,9 @@ namespace FoxTunes
                 {
                     component.InitializeComponent(this);
                 }
-                catch
+                catch (Exception e)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to initialize component {0}: {1}", component.GetType().Name, e.Message);
+                    Logger.Write(this, LogLevel.Warn, "Failed to initialize component {0}: {1}", component.GetType().Name, e.Message);
                 }
             });
         }
@@ -165,9 +165,9 @@ namespace FoxTunes
                 {
                     component.InitializeDatabase(database, type);
                 }
-                catch 
+                catch (Exception e)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to initialize database {0}: {1}", component.GetType().Name, e.Message);
+                    Logger.Write(this, LogLevel.Warn, "Failed to initialize database {0}: {1}", component.GetType().Name, e.Message);
                 }
             });
         }
@@ -213,9 +213,9 @@ namespace FoxTunes
                 {
                     component.Dispose();
                 }
-                catch 
+                catch (Exception e)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to dispose component {0}: {1}", component.GetType().Name, e.Message);
+                    Logger.Write(this, LogLevel.Warn, "Failed to dispose component {0}: {1}", component.GetType().Name, e.Message);
                 }
             });
             Instance = null;
@@ -223,7 +223,7 @@ namespace FoxTunes
 
         ~Core()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

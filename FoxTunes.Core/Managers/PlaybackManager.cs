@@ -44,12 +44,12 @@ namespace FoxTunes
                 var exception = default(Exception);
                 try
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Output stream is about to change, pre-empting the next stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
+                    Logger.Write(this, LogLevel.Debug, "Output stream is about to change, pre-empting the next stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
                     if (!await this.Output.Preempt(e.OutputStream).ConfigureAwait(false))
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Preempt failed for stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
+                        Logger.Write(this, LogLevel.Debug, "Preempt failed for stream: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
                     }
-                    //Logger.Write(this, LogLevel.Debug, "Output stream de-queued, loading it: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
+                    Logger.Write(this, LogLevel.Debug, "Output stream de-queued, loading it: {0} => {1}", e.OutputStream.Id, e.OutputStream.FileName);
                     await this.SetCurrentStream(e.OutputStream).ConfigureAwait(false);
                 }
                 catch (Exception ex)
@@ -87,7 +87,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                //Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", currentStream.Id, currentStream.FileName);
+                Logger.Write(this, LogLevel.Debug, "Unloading current stream: {0} => {1}", currentStream.Id, currentStream.FileName);
                 this.OnCurrentStreamChanging();
                 this._CurrentStream = stream;
                 await this.Unload(currentStream).ConfigureAwait(false);
@@ -99,7 +99,7 @@ namespace FoxTunes
             }
             if (stream != null)
             {
-                //Logger.Write(this, LogLevel.Debug, "Playing stream: {0} => {1}", stream.Id, stream.FileName);
+                Logger.Write(this, LogLevel.Debug, "Playing stream: {0} => {1}", stream.Id, stream.FileName);
                 try
                 {
                     await stream.Play().ConfigureAwait(false);

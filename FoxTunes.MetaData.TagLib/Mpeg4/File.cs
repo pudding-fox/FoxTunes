@@ -10,7 +10,15 @@ namespace FoxTunes.Mpeg4
 {
     public class File : global::TagLib.Mpeg4.File, IMetaDataSource
     {
-                public File(string path) : base(path)
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
+        public File(string path) : base(path)
         {
 
         }

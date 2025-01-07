@@ -30,7 +30,7 @@ namespace FoxTunes
 
         protected virtual ImageBrush Create(int width, int height, bool cache)
         {
-            //Logger.Write(this, LogLevel.Debug, "Creating brush: {0}x{1}", width, height);
+            Logger.Write(this, LogLevel.Debug, "Creating brush: {0}x{1}", width, height);
             var source = ImageLoader.Load(
                this.ThemeLoader.Theme.Id,
                this.ThemeLoader.Theme.GetArtworkPlaceholder,
@@ -64,7 +64,7 @@ namespace FoxTunes
 
         protected virtual void OnThemeChanged(object sender, EventArgs e)
         {
-            //Logger.Write(this, LogLevel.Debug, "Theme was changed, resetting cache.");
+            Logger.Write(this, LogLevel.Debug, "Theme was changed, resetting cache.");
             this.Store.Clear();
         }
 
@@ -96,7 +96,7 @@ namespace FoxTunes
 
         ~ArtworkPlaceholderBrushFactory()
         {
-            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

@@ -137,7 +137,15 @@ namespace FoxTunes
 
         public class Writer : IDisposable
         {
-                        public Writer(IEnumerable<PlaylistItem> content, StreamWriter writer)
+            protected static ILogger Logger
+            {
+                get
+                {
+                    return LogManager.Logger;
+                }
+            }
+
+            public Writer(IEnumerable<PlaylistItem> content, StreamWriter writer)
             {
                 this.Content = content;
                 this.StreamWriter = writer;
@@ -218,7 +226,7 @@ namespace FoxTunes
 
             ~Writer()
             {
-                //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+                Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
                 try
                 {
                     this.Dispose(true);
@@ -270,9 +278,9 @@ namespace FoxTunes
                             var metaData = await metaDataSource.GetMetaData(playlistItem.FileName).ConfigureAwait(false);
                             playlistItem.AddOrUpdate(metaData, out names);
                         }
-                        catch 
+                        catch (Exception e)
                         {
-                            //Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", fileName, e.Message);
+                            Logger.Write(this, LogLevel.Debug, "Failed to read meta data from file \"{0}\": {1}", fileName, e.Message);
                         }
                     }
                 }

@@ -107,10 +107,10 @@ namespace FoxTunes
             var element = default(ConfigurationElement);
             if (!this.Elements.TryGetValue(id, out element))
             {
-                //Logger.Write(this, LogLevel.Warn, "Configuration element \"{0}\" no longer exists.", id);
+                Logger.Write(this, LogLevel.Warn, "Configuration element \"{0}\" no longer exists.", id);
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Loading configuration element: \"{0}\".", id);
+            Logger.Write(this, LogLevel.Debug, "Loading configuration element: \"{0}\".", id);
             element.SetPersistentValue(value);
         }
 
@@ -220,7 +220,7 @@ namespace FoxTunes
         public void Save(string profile)
         {
             this.OnSaving();
-            //Logger.Write(this, LogLevel.Debug, "Saving configuration.");
+            Logger.Write(this, LogLevel.Debug, "Saving configuration.");
             try
             {
                 foreach (var element in this.Elements.Values)
@@ -231,7 +231,7 @@ namespace FoxTunes
                         var value = default(string);
                         if (this.Component.MetaData.TryRemove(key, out value))
                         {
-                            //Logger.Write(this, LogLevel.Debug, "Removing config: {0}", key);
+                            Logger.Write(this, LogLevel.Debug, "Removing config: {0}", key);
                         }
                     }
                     else
@@ -240,14 +240,14 @@ namespace FoxTunes
                         this.Component.MetaData.AddOrUpdate(key,
                             (_key) =>
                             {
-                                //Logger.Write(this, LogLevel.Debug, "Adding config: {0}", key);
+                                Logger.Write(this, LogLevel.Debug, "Adding config: {0}", key);
                                 return value;
                             },
                             (_key, _value) =>
                             {
                                 if (!string.Equals(value, _value, StringComparison.OrdinalIgnoreCase))
                                 {
-                                    //Logger.Write(this, LogLevel.Debug, "Updating config: {0}", key);
+                                    Logger.Write(this, LogLevel.Debug, "Updating config: {0}", key);
                                 }
                                 return value;
                             }
@@ -255,9 +255,9 @@ namespace FoxTunes
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
+                Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
             }
             this.OnSaved();
         }
@@ -282,14 +282,14 @@ namespace FoxTunes
 
         private void Add(ConfigurationSection section)
         {
-            //Logger.Write(this, LogLevel.Debug, "Adding configuration section: {0} => {1}", section.Id, section.Name);
+            Logger.Write(this, LogLevel.Debug, "Adding configuration section: {0} => {1}", section.Id, section.Name);
             section = new ConfigurationSectionWrapper(this, section);
             this.Sections.Add(section.Id, section);
         }
 
         private void Update(ConfigurationSection section)
         {
-            //Logger.Write(this, LogLevel.Debug, "Updating configuration section: {0} => {1}", section.Id, section.Name);
+            Logger.Write(this, LogLevel.Debug, "Updating configuration section: {0} => {1}", section.Id, section.Name);
             var existing = this.GetSection(section.Id);
             existing.Update(section);
         }
@@ -324,7 +324,7 @@ namespace FoxTunes
 
         ~UIComponentConfigurationProvider()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

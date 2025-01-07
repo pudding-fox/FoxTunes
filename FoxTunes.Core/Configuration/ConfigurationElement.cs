@@ -8,6 +8,14 @@ namespace FoxTunes
 {
     public abstract class ConfigurationElement : INotifyPropertyChanged
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         private ConfigurationElement()
         {
             this.IsHidden = false;
@@ -319,16 +327,16 @@ namespace FoxTunes
                 {
                     action(this.Value);
                 }
-                catch
+                catch (Exception exception)
                 {
-                    //Logger.Write(
-                    //    typeof(ConfigurationElement),
-                    //    LogLevel.Warn,
-                    //    "Failed to connect configuration value \"{0}\" = \"{1}\": {2}",
-                    //    this.Id,
-                    //    Convert.ToString(this.Value),
-                    //    exception.Message
-                    //);
+                    Logger.Write(
+                        typeof(ConfigurationElement),
+                        LogLevel.Warn,
+                        "Failed to connect configuration value \"{0}\" = \"{1}\": {2}",
+                        this.Id,
+                        Convert.ToString(this.Value),
+                        exception.Message
+                    );
                 }
             });
             handler(this, EventArgs.Empty);
@@ -339,7 +347,7 @@ namespace FoxTunes
         public override void InitializeComponent()
         {
             //TODO: This log message is noisy.
-            ////Logger.Write(typeof(ConfigurationSection), LogLevel.Trace, "Setting default value for configuration element \"{0}\": {1}", this.Name, Convert.ToString(this.Value));
+            //Logger.Write(typeof(ConfigurationSection), LogLevel.Trace, "Setting default value for configuration element \"{0}\": {1}", this.Name, Convert.ToString(this.Value));
             this.DefaultValue = this.Value;
             base.InitializeComponent();
         }

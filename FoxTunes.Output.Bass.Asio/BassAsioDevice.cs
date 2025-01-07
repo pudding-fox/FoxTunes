@@ -13,6 +13,14 @@ namespace FoxTunes
 
         public const int PRIMARY_CHANNEL = 0;
 
+        private static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         static BassAsioDevice()
         {
             //Perhaps we shouldn't Reset each time the output is started.
@@ -39,7 +47,7 @@ namespace FoxTunes
 
             IsInitialized = true;
 
-            //Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Initializing BASS ASIO.");
+            Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Initializing BASS ASIO.");
 
             try
             {
@@ -48,7 +56,7 @@ namespace FoxTunes
                 BassAsioUtils.OK(BassAsioHandler.ChannelEnable(false, PRIMARY_CHANNEL));
                 for (var channel = 1; channel < channels; channel++)
                 {
-                    //Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Joining channel: {0} => {1}", channel, PRIMARY_CHANNEL);
+                    Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Joining channel: {0} => {1}", channel, PRIMARY_CHANNEL);
                     BassAsioUtils.OK(BassAsio.ChannelJoin(false, channel, PRIMARY_CHANNEL));
                 }
 
@@ -63,7 +71,7 @@ namespace FoxTunes
 
                 BassAsio.Rate = rate;
 
-                //Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Initialized BASS ASIO.");
+                Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Initialized BASS ASIO.");
             }
             catch
             {
@@ -117,7 +125,7 @@ namespace FoxTunes
 
             IsInitialized = true;
 
-            //Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detecting ASIO device.");
+            Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detecting ASIO device.");
 
             try
             {
@@ -133,8 +141,8 @@ namespace FoxTunes
                     GetSupportedRates(),
                     info.Format
                 );
-                //Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}, Format = {4}", BassAsio.CurrentDevice, Info.Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(AsioSampleFormat), Info.Format));
-                //Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Rates => {1}", BassAsio.CurrentDevice, string.Join(", ", Info.SupportedRates));
+                Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Inputs => {1}, Outputs = {2}, Rate = {3}, Format = {4}", BassAsio.CurrentDevice, Info.Inputs, Info.Outputs, Info.Rate, Enum.GetName(typeof(AsioSampleFormat), Info.Format));
+                Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Detected ASIO device: {0} => Rates => {1}", BassAsio.CurrentDevice, string.Join(", ", Info.SupportedRates));
             }
             finally
             {
@@ -170,14 +178,14 @@ namespace FoxTunes
                     AsioChannelResetFlags.Join |
                     AsioChannelResetFlags.Format |
                     AsioChannelResetFlags.Rate;
-                //Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Resetting BASS ASIO channel attributes.");
+                Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Resetting BASS ASIO channel attributes.");
                 for (var channel = 0; channel < Info.Outputs; channel++)
                 {
                     BassAsio.ChannelReset(false, channel, flags);
                 }
             }
 
-            //Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Releasing BASS ASIO.");
+            Logger.Write(typeof(BassAsioDevice), LogLevel.Debug, "Releasing BASS ASIO.");
             BassAsio.Free();
             BassAsioHandler.Free();
             IsInitialized = false;
@@ -219,7 +227,7 @@ namespace FoxTunes
             {
                 if (!BassAsio.ChannelSetVolume(false, MASTER_CHANNEL, value))
                 {
-                    //Logger.Write(typeof(BassAsioDevice), LogLevel.Warn, "Cannot set volume, the device or driver probably doesn't support it.");
+                    Logger.Write(typeof(BassAsioDevice), LogLevel.Warn, "Cannot set volume, the device or driver probably doesn't support it.");
                 }
             }
         }

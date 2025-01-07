@@ -31,17 +31,17 @@ namespace FoxTunes
             var release = default(Discogs.ReleaseDetails);
             try
             {
-                //Logger.Write(this, LogLevel.Debug, "Fetching release details: {0}", releaseLookup.Release.ResourceUrl);
+                Logger.Write(this, LogLevel.Debug, "Fetching release details: {0}", releaseLookup.Release.ResourceUrl);
                 release = await this.Discogs.GetRelease(releaseLookup.Release).ConfigureAwait(false);
                 if (release == null)
                 {
-                    //Logger.Write(this, LogLevel.Error, "Failed to fetch release details \"{0}\": Unknown error.", releaseLookup.Release.ResourceUrl);
+                    Logger.Write(this, LogLevel.Error, "Failed to fetch release details \"{0}\": Unknown error.", releaseLookup.Release.ResourceUrl);
                     return false;
                 }
             }
             catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Error, "Failed to fetch release details \"{0}\": {1}", releaseLookup.Release.ResourceUrl, e.Message);
+                Logger.Write(this, LogLevel.Error, "Failed to fetch release details \"{0}\": {1}", releaseLookup.Release.ResourceUrl, e.Message);
                 releaseLookup.AddError(e.Message);
             }
             var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -162,7 +162,7 @@ namespace FoxTunes
                     return track;
                 }
             }
-            //Logger.Write(this, LogLevel.Warn, "No track number found: {0}", fileData.FileName);
+            Logger.Write(this, LogLevel.Warn, "No track number found: {0}", fileData.FileName);
             return default(int);
         }
 
@@ -173,7 +173,7 @@ namespace FoxTunes
             {
                 return metaDataItem.Value;
             }
-            //Logger.Write(this, LogLevel.Warn, "No track title found: {0}", fileData.FileName);
+            Logger.Write(this, LogLevel.Warn, "No track title found: {0}", fileData.FileName);
             return string.Empty;
         }
 
@@ -224,7 +224,7 @@ namespace FoxTunes
                     }
                 }
             }
-            //Logger.Write(this, LogLevel.Warn, "No track details found: {0}", fileData.FileName);
+            Logger.Write(this, LogLevel.Warn, "No track details found: {0}", fileData.FileName);
             return default(Discogs.TrackDetails);
         }
     }

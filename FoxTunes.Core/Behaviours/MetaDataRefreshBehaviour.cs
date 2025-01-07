@@ -42,7 +42,7 @@ namespace FoxTunes
         {
             this.SignalEmitter.Signal += this.OnSignal;
             this.Configuration.Saved += this.OnSaved;
-            //Logger.Write(this, LogLevel.Info, "Enabled.");
+            Logger.Write(this, LogLevel.Info, "Enabled.");
         }
 
         public void Disable()
@@ -55,7 +55,7 @@ namespace FoxTunes
             {
                 this.Configuration.Saved -= this.OnSaved;
             }
-            //Logger.Write(this, LogLevel.Info, "Disabled.");
+            Logger.Write(this, LogLevel.Info, "Disabled.");
         }
 
         public void Monitor()
@@ -126,7 +126,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Info, "Configuration was changed, updating meta data.");
+            Logger.Write(this, LogLevel.Info, "Configuration was changed, updating meta data.");
             var task = this.Refresh();
         }
 
@@ -168,7 +168,7 @@ namespace FoxTunes
 
         ~MetaDataRefreshBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

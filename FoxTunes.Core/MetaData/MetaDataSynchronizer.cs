@@ -67,7 +67,7 @@ namespace FoxTunes
                     this.Timer.AutoReset = false;
                     this.Timer.Elapsed += this.OnElapsed;
                     this.Timer.Start();
-                    //Logger.Write(this, LogLevel.Debug, "Background meta data synchronization enabled.");
+                    Logger.Write(this, LogLevel.Debug, "Background meta data synchronization enabled.");
                 }
             }
         }
@@ -82,7 +82,7 @@ namespace FoxTunes
                     this.Timer.Elapsed -= this.OnElapsed;
                     this.Timer.Dispose();
                     this.Timer = null;
-                    //Logger.Write(this, LogLevel.Debug, "Background meta data synchronization disabled.");
+                    Logger.Write(this, LogLevel.Debug, "Background meta data synchronization disabled.");
                 }
             }
         }
@@ -98,7 +98,7 @@ namespace FoxTunes
             {
                 if (global::FoxTunes.BackgroundTask.Active.Any())
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Other tasks are running, deferring.");
+                    Logger.Write(this, LogLevel.Debug, "Other tasks are running, deferring.");
                 }
                 else
                 {
@@ -154,7 +154,7 @@ namespace FoxTunes
 
         ~MetaDataSynchronizer()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             this.Dispose(true);
         }
     }

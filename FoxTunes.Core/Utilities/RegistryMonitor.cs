@@ -182,7 +182,7 @@ namespace FoxTunes
 
         ~RegistryMonitor()
         {
-            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

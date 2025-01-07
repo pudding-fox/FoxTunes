@@ -39,7 +39,7 @@ namespace FoxTunes
                     }
                     else
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Providers were updated, resetting cache.");
+                        Logger.Write(this, LogLevel.Debug, "Providers were updated, resetting cache.");
                         this.Providers = null;
                     }
                     break;
@@ -93,7 +93,7 @@ namespace FoxTunes
 
         ~MetaDataProviderCache()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

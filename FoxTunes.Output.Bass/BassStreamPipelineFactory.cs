@@ -44,16 +44,19 @@ namespace FoxTunes
             try
             {
                 pipeline.Connect(stream);
-                //Logger.Write(
-                //    this,
-                //    LogLevel.Debug,
-                //    "Connected pipeline: {0}",
-                //    string.Join(" => ", pipeline.All.Select(component => string.Format("\"{0}\"", component.GetType().Name)))
-                //);
+                if (Logger.IsDebugEnabled(this))
+                {
+                    Logger.Write(
+                        this,
+                        LogLevel.Debug,
+                        "Connected pipeline: {0}",
+                        string.Join(" => ", pipeline.All.Select(component => string.Format("\"{0}\"", component.GetType().Name)))
+                    );
+                }
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Error, "Failed to create pipeline: {0}", e.Message);
+                Logger.Write(this, LogLevel.Error, "Failed to create pipeline: {0}", e.Message);
                 pipeline.Dispose();
                 throw;
             }

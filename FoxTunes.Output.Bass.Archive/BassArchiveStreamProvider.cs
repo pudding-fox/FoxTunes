@@ -48,7 +48,7 @@ namespace FoxTunes
                 switch (ArchiveError.GetLastError())
                 {
                     case ArchiveError.E_PASSWORD_REQUIRED:
-                        //Logger.Write(this, LogLevel.Warn, "Invalid password for \"{0}\".", fileName);
+                        Logger.Write(this, LogLevel.Warn, "Invalid password for \"{0}\".", fileName);
                         if (this.PasswordBehaviour != null)
                         {
                             var cancelled = this.PasswordBehaviour.WasCancelled(fileName);
@@ -60,7 +60,7 @@ namespace FoxTunes
                         }
                         break;
                 }
-                //Logger.Write(this, LogLevel.Warn, "Failed to create archive stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                Logger.Write(this, LogLevel.Warn, "Failed to create archive stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
             }
             return this.CreateBasicStream(channelHandle, advice, flags);
         }
@@ -87,7 +87,7 @@ namespace FoxTunes
                 switch (ArchiveError.GetLastError())
                 {
                     case ArchiveError.E_PASSWORD_REQUIRED:
-                        //Logger.Write(this, LogLevel.Warn, "Invalid password for \"{0}\".", fileName);
+                        Logger.Write(this, LogLevel.Warn, "Invalid password for \"{0}\".", fileName);
                         if (this.PasswordBehaviour != null)
                         {
                             var cancelled = this.PasswordBehaviour.WasCancelled(fileName);
@@ -99,7 +99,7 @@ namespace FoxTunes
                         }
                         break;
                 }
-                //Logger.Write(this, LogLevel.Warn, "Failed to create archive stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                Logger.Write(this, LogLevel.Warn, "Failed to create archive stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
             }
             return this.CreateInteractiveStream(channelHandle, advice, flags);
         }

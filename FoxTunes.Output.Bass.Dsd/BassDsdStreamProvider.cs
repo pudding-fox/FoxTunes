@@ -40,7 +40,7 @@ namespace FoxTunes
                 channelHandle = this.CreateDsdRawStream(playlistItem, advice, flags);
                 if (channelHandle == 0)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to create DSD RAW stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                    Logger.Write(this, LogLevel.Warn, "Failed to create DSD RAW stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
                 }
                 return this.CreateInteractiveStream(channelHandle, advice, flags | BassFlags.DSDRaw);
             }
@@ -49,7 +49,7 @@ namespace FoxTunes
                 channelHandle = this.CreateDsdStream(playlistItem, advice, flags);
                 if (channelHandle == 0)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to create DSD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                    Logger.Write(this, LogLevel.Warn, "Failed to create DSD stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
                 }
                 return this.CreateInteractiveStream(channelHandle, advice, flags);
             }
@@ -61,15 +61,15 @@ namespace FoxTunes
             var channelHandle = default(int);
             if (this.Behaviour != null && this.Behaviour.Memory)
             {
-                //Logger.Write(this, LogLevel.Debug, "Creating memory stream for file: {0}", fileName);
+                Logger.Write(this, LogLevel.Debug, "Creating memory stream for file: {0}", fileName);
                 channelHandle = BassMemory.Dsd.CreateStream(fileName, 0, 0, flags);
                 if (channelHandle != 0)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Created memory stream: {0}", channelHandle);
+                    Logger.Write(this, LogLevel.Debug, "Created memory stream: {0}", channelHandle);
                 }
                 else
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to create memory stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                    Logger.Write(this, LogLevel.Warn, "Failed to create memory stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
                 }
             }
             if (channelHandle == 0)
@@ -85,15 +85,15 @@ namespace FoxTunes
             var channelHandle = default(int);
             if (this.Behaviour != null && this.Behaviour.Memory)
             {
-                //Logger.Write(this, LogLevel.Debug, "Creating memory stream for file: {0}", fileName);
+                Logger.Write(this, LogLevel.Debug, "Creating memory stream for file: {0}", fileName);
                 channelHandle = BassMemory.Dsd.CreateStream(fileName, 0, 0, flags | BassFlags.DSDRaw);
                 if (channelHandle != 0)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Created memory stream: {0}", channelHandle);
+                    Logger.Write(this, LogLevel.Debug, "Created memory stream: {0}", channelHandle);
                 }
                 else
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to create memory stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                    Logger.Write(this, LogLevel.Warn, "Failed to create memory stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
                 }
             }
             if (channelHandle == 0)
@@ -137,7 +137,7 @@ namespace FoxTunes
             var rate = BassUtils.GetChannelDsdRate(channelHandle);
             if (query.OutputChannels < channels || !query.OutputRates.Contains(rate))
             {
-                //Logger.Write(this, LogLevel.Warn, "DSD format {0}:{1} is unsupported, the stream will be unloaded. This warning is expensive, please don't attempt to play unsupported DSD.", rate, channels);
+                Logger.Write(this, LogLevel.Warn, "DSD format {0}:{1} is unsupported, the stream will be unloaded. This warning is expensive, please don't attempt to play unsupported DSD.", rate, channels);
                 return false;
             }
             return true;

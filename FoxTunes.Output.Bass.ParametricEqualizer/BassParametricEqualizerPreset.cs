@@ -20,6 +20,14 @@ namespace FoxTunes
         const string BAND_8000 = "BAND_8000";
         const string BAND_16000 = "BAND_16000";
 
+        public static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         public static string Location
         {
             get
@@ -78,14 +86,14 @@ namespace FoxTunes
             };
             if (Directory.Exists(SystemPresetsFolder))
             {
-                //Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Debug, "Loading system presets..");
+                Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Debug, "Loading system presets..");
                 LoadPresets(presets, SystemPresetsFolder);
             }
             if (!string.Equals(SystemPresetsFolder, UserPresetsFolder, StringComparison.OrdinalIgnoreCase))
             {
                 if (Directory.Exists(UserPresetsFolder))
                 {
-                    //Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Debug, "Loading user presets..");
+                    Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Debug, "Loading user presets..");
                     LoadPresets(presets, UserPresetsFolder);
                 }
             }
@@ -100,9 +108,9 @@ namespace FoxTunes
                 {
                     LoadPreset(presets, fileName);
                 }
-                catch
+                catch (Exception e)
                 {
-                    //Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Warn, "Failed to load preset from file \"{0}\": {1}", fileName, e.Message);
+                    Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Warn, "Failed to load preset from file \"{0}\": {1}", fileName, e.Message);
                 }
             }
         }
@@ -170,11 +178,11 @@ namespace FoxTunes
                 }
                 else
                 {
-                    //Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Warn, "Warning while loading preset from file \"{0}\": Unrecognized expression: {1} = {2}", fileName, key, value);
+                    Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Warn, "Warning while loading preset from file \"{0}\": Unrecognized expression: {1} = {2}", fileName, key, value);
                 }
             }
             presets[name] = bands;
-            //Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Debug, "Loaded preset from file \"{0}\".", fileName);
+            Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Debug, "Loaded preset from file \"{0}\".", fileName);
         }
 
         public static void SavePreset(string name)
@@ -223,9 +231,9 @@ namespace FoxTunes
             {
                 LoadPreset(PRESETS, fileName);
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Warn, "Failed to load preset from file \"{0}\": {1}", fileName, e.Message);
+                Logger.Write(typeof(BassParametricEqualizerPreset), LogLevel.Warn, "Failed to load preset from file \"{0}\": {1}", fileName, e.Message);
             }
         }
 

@@ -180,7 +180,7 @@ namespace FoxTunes
                 var percentUsed = updatedDisc.GetCapacity().PercentUsed;
                 if (percentUsed > 100)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "The disc capactiy will be exceeded: {0}", percentUsed);
+                    Logger.Write(this, LogLevel.Warn, "The disc capactiy will be exceeded: {0}", percentUsed);
                     if (!this.UserInterface.Confirm(string.Format(Strings.MinidiscBehaviour_ConfirmWriteDiscWithoutCapacity, percentUsed)))
                     {
                         return false;
@@ -191,7 +191,7 @@ namespace FoxTunes
                 var percentUsed = updatedDisc.GetUTOC().PercentUsed;
                 if (percentUsed > 100)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "The disc UTOC will be exceeded: {0}", percentUsed);
+                    Logger.Write(this, LogLevel.Warn, "The disc UTOC will be exceeded: {0}", percentUsed);
                     if (!this.UserInterface.Confirm(string.Format(Strings.MinidiscBehaviour_ConfirmWriteDiscWithoutUTOC, percentUsed)))
                     {
                         return false;
@@ -258,16 +258,16 @@ namespace FoxTunes
                 if (!string.Equals(updatedDisc.Title, tracks.Title, StringComparison.OrdinalIgnoreCase))
                 {
                     updatedDisc.Title = tracks.Title;
-                    //Logger.Write(this, LogLevel.Debug, "Setting the disc title: {0}", updatedDisc.Title);
+                    Logger.Write(this, LogLevel.Debug, "Setting the disc title: {0}", updatedDisc.Title);
                 }
                 else
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Keeping existing disc title: {0}", updatedDisc.Title);
+                    Logger.Write(this, LogLevel.Debug, "Keeping existing disc title: {0}", updatedDisc.Title);
                 }
             }
             else
             {
-                //Logger.Write(this, LogLevel.Debug, "Keeping existing disc title: {0}", updatedDisc.Title);
+                Logger.Write(this, LogLevel.Debug, "Keeping existing disc title: {0}", updatedDisc.Title);
             }
             foreach (var minidiscTrack in tracks.Tracks)
             {
@@ -303,7 +303,7 @@ namespace FoxTunes
                 //Match track name (ignore some characters) and equal (ish) duration.
                 if (MinidiscTrackFactory.StringComparer.Instance.Equals(track.Name, minidiscTrack.TrackName) && Convert.ToInt32(track.Time.TotalSeconds) == Convert.ToInt32(minidiscTrack.TrackTime.TotalSeconds))
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Found existing track \"{0}\" at position {1}.", minidiscTrack.TrackName, minidiscTrack.TrackNumber);
+                    Logger.Write(this, LogLevel.Debug, "Found existing track \"{0}\" at position {1}.", minidiscTrack.TrackName, minidiscTrack.TrackNumber);
                     return true;
                 }
                 //TODO: I was using this to update missing titles, match track on a missing title and equal (ish) duration.
@@ -311,7 +311,7 @@ namespace FoxTunes
 #if DEBUG
                 else if (string.IsNullOrEmpty(track.Name) && Convert.ToInt32(track.Time.TotalSeconds) == Convert.ToInt32(minidiscTrack.TrackTime.TotalSeconds))
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Found existing track \"{0}\" at position {1}.", minidiscTrack.TrackName, minidiscTrack.TrackNumber);
+                    Logger.Write(this, LogLevel.Debug, "Found existing track \"{0}\" at position {1}.", minidiscTrack.TrackName, minidiscTrack.TrackNumber);
                     return true;
                 }
 #endif
@@ -327,20 +327,20 @@ namespace FoxTunes
             {
                 track = disc.Tracks.Add(minidiscTrack.FileName, compression);
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Error, "Error adding track \"{0}\" to disc: {1}", minidiscTrack.FileName, e.Message);
+                Logger.Write(this, LogLevel.Error, "Error adding track \"{0}\" to disc: {1}", minidiscTrack.FileName, e.Message);
                 throw;
             }
             track.Name = minidiscTrack.TrackName;
-            //Logger.Write(this, LogLevel.Debug, "Adding track \"{0}\": Name: {1}, Compression: {2}", track.Location, track.Name, Enum.GetName(typeof(Compression), compression));
+            Logger.Write(this, LogLevel.Debug, "Adding track \"{0}\": Name: {1}, Compression: {2}", track.Location, track.Name, Enum.GetName(typeof(Compression), compression));
         }
 
         protected virtual void UpdateTrack(IDisc updatedDisc, MinidiscTrackFactory.MinidiscTrack minidiscTrack, ITrack track, Compression compression)
         {
             if (!MinidiscTrackFactory.StringComparer.Instance.Equals(minidiscTrack.TrackName, track.Name))
             {
-                //Logger.Write(this, LogLevel.Debug, "Updating track \"{0}\": Name: {1} => {2}", track.Location, track.Name, minidiscTrack.TrackName);
+                Logger.Write(this, LogLevel.Debug, "Updating track \"{0}\": Name: {1} => {2}", track.Location, track.Name, minidiscTrack.TrackName);
                 track.Name = minidiscTrack.TrackName;
             }
         }

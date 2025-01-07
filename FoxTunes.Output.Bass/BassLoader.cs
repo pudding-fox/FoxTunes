@@ -163,7 +163,7 @@ namespace FoxTunes
                     }
                     catch 
                     {
-                        //Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", path, e.Message);
+                        Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", path, e.Message);
                     }
                     failures.Add(path);
                 }
@@ -180,7 +180,7 @@ namespace FoxTunes
                         }
                         catch 
                         {
-                            //Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", fileName, e.Message);
+                            Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", fileName, e.Message);
                         }
                         failures.Add(fileName);
                     }
@@ -189,16 +189,16 @@ namespace FoxTunes
             //We don't have anything to handle plugin inter-dependency, hopefully the second attempt will work.
             if (failures.Any())
             {
-                //Logger.Write(this, LogLevel.Warn, "At least one plugin failed to load, retrying..");
+                Logger.Write(this, LogLevel.Warn, "At least one plugin failed to load, retrying..");
                 foreach (var fileName in failures)
                 {
                     try
                     {
                         this.Load(fileName);
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        //Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", fileName, e.Message);
+                        Logger.Write(this, LogLevel.Warn, "Failed to load plugin \"{0}\": {1}", fileName, e.Message);
                     }
                 }
             }
@@ -210,11 +210,11 @@ namespace FoxTunes
             var handle = Bass.PluginLoad(fileName);
             if (handle == 0)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to load plugin: {0}", fileName);
+                Logger.Write(this, LogLevel.Warn, "Failed to load plugin: {0}", fileName);
                 return false;
             }
             var info = Bass.PluginGetInfo(handle);
-            //Logger.Write(this, LogLevel.Debug, "Plugin loaded \"{0}\": {1}", fileName, info.Version);
+            Logger.Write(this, LogLevel.Debug, "Plugin loaded \"{0}\": {1}", fileName, info.Version);
             this.Plugins.Add(new BassPlugin(
                 fileName,
                 info,
@@ -261,7 +261,7 @@ namespace FoxTunes
 
         ~BassLoader()
         {
-            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

@@ -251,7 +251,7 @@ namespace FoxTunes
                 }
                 catch 
                 {
-                    //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render wave form: {0}", e.Message);
+                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render wave form: {0}", e.Message);
                 }
                 finally
                 {
@@ -278,9 +278,9 @@ namespace FoxTunes
                             rendererData
                         );
                     }
-                    catch 
+                    catch (Exception e)
                     {
-                        //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update wave form data: {0}", e.Message);
+                        Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update wave form data: {0}", e.Message);
                         return;
                     }
                     var task = this.Render(rendererData);

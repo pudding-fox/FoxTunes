@@ -31,7 +31,7 @@ namespace FoxTunes
             }
             else
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to download artwork for album {0} - {1}: Releases don't contain images or they count not be downloaded.", releaseLookup.Artist, releaseLookup.Album);
+                Logger.Write(this, LogLevel.Warn, "Failed to download artwork for album {0} - {1}: Releases don't contain images or they count not be downloaded.", releaseLookup.Artist, releaseLookup.Album);
                 releaseLookup.AddError(Strings.DiscogsFetchArtworkTask_NotFound);
                 return false;
             }
@@ -52,11 +52,11 @@ namespace FoxTunes
                     {
                         var fileName = await FileMetaDataStore.IfNotExistsAsync(PREFIX, url, async result =>
                         {
-                            //Logger.Write(this, LogLevel.Debug, "Downloading data from url: {0}", url);
+                            Logger.Write(this, LogLevel.Debug, "Downloading data from url: {0}", url);
                             var data = await this.Discogs.GetData(url).ConfigureAwait(false);
                             if (data == null)
                             {
-                                //Logger.Write(this, LogLevel.Error, "Failed to download data from url \"{0}\": Unknown error.", url);
+                                Logger.Write(this, LogLevel.Error, "Failed to download data from url \"{0}\": Unknown error.", url);
                                 return string.Empty;
                             }
                             return await FileMetaDataStore.WriteAsync(PREFIX, url, data).ConfigureAwait(false);
@@ -68,7 +68,7 @@ namespace FoxTunes
                     }
                     catch (Exception e)
                     {
-                        //Logger.Write(this, LogLevel.Error, "Failed to download data from url \"{0}\": {1}", url, e.Message);
+                        Logger.Write(this, LogLevel.Error, "Failed to download data from url \"{0}\": {1}", url, e.Message);
                         releaseLookup.AddError(e.Message);
                     }
                 }

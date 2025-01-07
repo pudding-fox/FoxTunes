@@ -14,6 +14,14 @@ namespace FoxTunes
         const string Name = "Name";
         const string Value = "Value";
 
+        private static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         public static void Save(Stream stream, IEnumerable<ToolWindowConfiguration> configs)
         {
             using (var writer = new XmlTextWriter(stream, Encoding.Default))
@@ -209,7 +217,7 @@ namespace FoxTunes
                     }
                     else
                     {
-                        //Logger.Write(typeof(Serializer), LogLevel.Warn, "Element \"{0}\" was not recognized.", reader.Name);
+                        Logger.Write(typeof(Serializer), LogLevel.Warn, "Element \"{0}\" was not recognized.", reader.Name);
                         break;
                     }
                 }

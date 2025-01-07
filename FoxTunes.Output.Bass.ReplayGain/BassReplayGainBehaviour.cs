@@ -59,7 +59,7 @@ namespace FoxTunes
             set
             {
                 this._Enabled = value;
-                //Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
                 var task = this.Output.Shutdown();
             }
         }
@@ -147,7 +147,7 @@ namespace FoxTunes
                     {
                         if (duplicated == null)
                         {
-                            //Logger.Write(this, LogLevel.Warn, "Failed to duplicate stream for file \"{0}\", cannot calculate.", stream.FileName);
+                            Logger.Write(this, LogLevel.Warn, "Failed to duplicate stream for file \"{0}\", cannot calculate.", stream.FileName);
                             return;
                         }
                         if (!this.TryCalculateReplayGain(duplicated, out gain, out peak, out mode))
@@ -195,7 +195,7 @@ namespace FoxTunes
                             }
                             if (this.Mode == ReplayGainMode.Album)
                             {
-                                //Logger.Write(this, LogLevel.Debug, "Found preferred replay gain data for album:  \"{0}\" => {1}", stream.FileName, albumGain);
+                                Logger.Write(this, LogLevel.Debug, "Found preferred replay gain data for album:  \"{0}\" => {1}", stream.FileName, albumGain);
                                 mode = ReplayGainMode.Album;
                                 replayGain = albumGain;
                                 return true;
@@ -213,7 +213,7 @@ namespace FoxTunes
                             }
                             if (this.Mode == ReplayGainMode.Track)
                             {
-                                //Logger.Write(this, LogLevel.Debug, "Found preferred replay gain data for track:  \"{0}\" => {1}", stream.FileName, trackGain);
+                                Logger.Write(this, LogLevel.Debug, "Found preferred replay gain data for track:  \"{0}\" => {1}", stream.FileName, trackGain);
                                 mode = ReplayGainMode.Track;
                                 replayGain = trackGain;
                                 return true;
@@ -224,19 +224,19 @@ namespace FoxTunes
             }
             if (this.IsValidReplayGain(albumGain))
             {
-                //Logger.Write(this, LogLevel.Debug, "Using album replay gain data: \"{0}\" => {1}", stream.FileName, albumGain);
+                Logger.Write(this, LogLevel.Debug, "Using album replay gain data: \"{0}\" => {1}", stream.FileName, albumGain);
                 mode = ReplayGainMode.Album;
                 replayGain = albumGain;
                 return true;
             }
             if (this.IsValidReplayGain(trackGain))
             {
-                //Logger.Write(this, LogLevel.Debug, "Using track replay gain data: \"{0}\" => {1}", stream.FileName, trackGain);
+                Logger.Write(this, LogLevel.Debug, "Using track replay gain data: \"{0}\" => {1}", stream.FileName, trackGain);
                 mode = ReplayGainMode.Track;
                 replayGain = trackGain;
                 return true;
             }
-            //Logger.Write(this, LogLevel.Debug, "No replay gain data: \"{0}\".", stream.FileName);
+            Logger.Write(this, LogLevel.Debug, "No replay gain data: \"{0}\".", stream.FileName);
             mode = ReplayGainMode.None;
             replayGain = 0;
             return false;
@@ -250,13 +250,13 @@ namespace FoxTunes
 
         protected virtual bool TryCalculateReplayGain(BassOutputStream stream, out float gain, out float peak, out ReplayGainMode mode)
         {
-            //Logger.Write(this, LogLevel.Debug, "Attempting to calculate track replay gain for file \"{0}\".", stream.FileName);
+            Logger.Write(this, LogLevel.Debug, "Attempting to calculate track replay gain for file \"{0}\".", stream.FileName);
             try
             {
                 var info = default(ReplayGainInfo);
                 if (BassReplayGain.Process(stream.ChannelHandle, out info))
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Calculated track replay gain for file \"{0}\": {1}dB", stream.FileName, ReplayGainEffect.GetVolume(info.gain));
+                    Logger.Write(this, LogLevel.Debug, "Calculated track replay gain for file \"{0}\": {1}dB", stream.FileName, ReplayGainEffect.GetVolume(info.gain));
                     gain = info.gain;
                     peak = info.peak;
                     mode = ReplayGainMode.Track;
@@ -264,12 +264,12 @@ namespace FoxTunes
                 }
                 else
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to calculate track replay gain for file \"{0}\".", stream.FileName);
+                    Logger.Write(this, LogLevel.Warn, "Failed to calculate track replay gain for file \"{0}\".", stream.FileName);
                 }
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to calculate track replay gain for file \"{0}\": {1}", stream.FileName, e.Message);
+                Logger.Write(this, LogLevel.Warn, "Failed to calculate track replay gain for file \"{0}\": {1}", stream.FileName, e.Message);
             }
             gain = 0;
             peak = 0;
@@ -379,7 +379,7 @@ namespace FoxTunes
 
         ~BassReplayGainBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

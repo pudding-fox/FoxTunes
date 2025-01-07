@@ -5,7 +5,15 @@ namespace FoxTunes
 {
     public class ChannelReader
     {
-                const int BUFFER_SIZE = 102400;
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
+        const int BUFFER_SIZE = 102400;
 
         const int BASS_ERROR_UNKNOWN = -1;
 
@@ -26,7 +34,7 @@ namespace FoxTunes
             try
             {
                 this.CopyTo(writer.Write, cancellationToken);
-                //Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}, closing process input.", this.Stream.ChannelHandle);
+                Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}, closing process input.", this.Stream.ChannelHandle);
             }
             finally
             {
@@ -39,7 +47,7 @@ namespace FoxTunes
             try
             {
                 this.CopyTo(writer.Write, cancellationToken);
-                //Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}, closing writer input.", this.Stream.ChannelHandle);
+                Logger.Write(this.GetType(), LogLevel.Debug, "Finished reading data from channel {0}, closing writer input.", this.Stream.ChannelHandle);
             }
             finally
             {
@@ -49,7 +57,7 @@ namespace FoxTunes
 
         public void CopyTo(Writer writer, CancellationToken cancellationToken)
         {
-            //Logger.Write(this.GetType(), LogLevel.Debug, "Begin reading data from channel {0} with {1} byte buffer.", this.Stream.ChannelHandle, BUFFER_SIZE);
+            Logger.Write(this.GetType(), LogLevel.Debug, "Begin reading data from channel {0} with {1} byte buffer.", this.Stream.ChannelHandle, BUFFER_SIZE);
             var buffer = new byte[BUFFER_SIZE];
             while (Bass.ChannelIsActive(this.Stream.ChannelHandle) != PlaybackState.Stopped)
             {

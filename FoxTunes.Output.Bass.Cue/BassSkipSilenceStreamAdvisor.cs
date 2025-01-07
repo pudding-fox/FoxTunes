@@ -45,9 +45,9 @@ namespace FoxTunes
                 }
                 advice.Add(new BassSkipSilenceStreamAdvice(playlistItem.FileName, leadIn, leadOut));
             }
-            catch 
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to create stream advice for file \"{0}\": {1}", playlistItem.FileName, e.Message);
+                Logger.Write(this, LogLevel.Warn, "Failed to create stream advice for file \"{0}\": {1}", playlistItem.FileName, e.Message);
             }
         }
 
@@ -70,7 +70,7 @@ namespace FoxTunes
 
         protected virtual Task UpdateMetaData(PlaylistItem playlistItem, TimeSpan leadIn, TimeSpan leadOut)
         {
-            //Logger.Write(this, LogLevel.Debug, "Updating lead in/out meta data for file \"{0}\".", playlistItem.FileName);
+            Logger.Write(this, LogLevel.Debug, "Updating lead in/out meta data for file \"{0}\".", playlistItem.FileName);
 
             var leadInMetaDataItem = default(MetaDataItem);
             var leadOutMetaDataItem = default(MetaDataItem);
@@ -111,19 +111,19 @@ namespace FoxTunes
         {
             if (provider.Flags.HasFlag(BassStreamProviderFlags.Serial))
             {
-                //Logger.Write(this, LogLevel.Debug, "Cannot calculate lead in/out for file \"{0}\": The provider does not support this action.", playlistItem.FileName);
+                Logger.Write(this, LogLevel.Debug, "Cannot calculate lead in/out for file \"{0}\": The provider does not support this action.", playlistItem.FileName);
 
                 leadIn = default(TimeSpan);
                 leadOut = default(TimeSpan);
                 return false;
             }
 
-            //Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead in/out for file \"{0}\".", playlistItem.FileName);
+            Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead in/out for file \"{0}\".", playlistItem.FileName);
 
             var stream = provider.CreateBasicStream(playlistItem, advice, BassFlags.Decode | BassFlags.Byte);
             if (stream.IsEmpty)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to create stream for file \"{0}\": {1}", playlistItem.FileName, Enum.GetName(typeof(Errors), Bass.LastError));
+                Logger.Write(this, LogLevel.Warn, "Failed to create stream for file \"{0}\": {1}", playlistItem.FileName, Enum.GetName(typeof(Errors), Bass.LastError));
 
                 leadIn = default(TimeSpan);
                 leadOut = default(TimeSpan);
@@ -134,7 +134,7 @@ namespace FoxTunes
                 var leadInBytes = this.GetLeadIn(stream, this.Behaviour.Threshold);
                 if (leadInBytes == -1)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to calculate lead in for file \"{0}\": Track was considered silent.", playlistItem.FileName);
+                    Logger.Write(this, LogLevel.Warn, "Failed to calculate lead in for file \"{0}\": Track was considered silent.", playlistItem.FileName);
 
                     leadIn = default(TimeSpan);
                     leadOut = default(TimeSpan);
@@ -143,7 +143,7 @@ namespace FoxTunes
                 var leadOutBytes = this.GetLeadOut(stream, this.Behaviour.Threshold);
                 if (leadOutBytes == -1)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to calculate lead out for file \"{0}\": Track was considered silent.", playlistItem.FileName);
+                    Logger.Write(this, LogLevel.Warn, "Failed to calculate lead out for file \"{0}\": Track was considered silent.", playlistItem.FileName);
 
                     leadIn = default(TimeSpan);
                     leadOut = default(TimeSpan);
@@ -162,7 +162,7 @@ namespace FoxTunes
                     )
                 );
 
-                //Logger.Write(this, LogLevel.Debug, "Successfully calculated lead in/out for file \"{0}\": {1}/{2}", playlistItem.FileName, leadIn, leadOut);
+                Logger.Write(this, LogLevel.Debug, "Successfully calculated lead in/out for file \"{0}\": {1}/{2}", playlistItem.FileName, leadIn, leadOut);
 
                 return true;
             }
@@ -174,7 +174,7 @@ namespace FoxTunes
 
         protected virtual long GetLeadIn(IBassStream stream, int threshold)
         {
-            //Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead in for channel {0} with window of {1} seconds and threshold of {2}dB.", stream.ChannelHandle, WINDOW, threshold);
+            Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead in for channel {0} with window of {1} seconds and threshold of {2}dB.", stream.ChannelHandle, WINDOW, threshold);
 
             var length = Bass.ChannelSeconds2Bytes(
                 stream.ChannelHandle,
@@ -183,7 +183,7 @@ namespace FoxTunes
             var position = 0;
             if (!this.TrySetPosition(stream, position))
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to synchronize channel {0}, bad plugin? This is very expensive!", stream.ChannelHandle);
+                Logger.Write(this, LogLevel.Warn, "Failed to synchronize channel {0}, bad plugin? This is very expensive!", stream.ChannelHandle);
 
                 //Track won't synchronize. MOD files seem to have this problem.                
                 return -1;
@@ -193,7 +193,7 @@ namespace FoxTunes
                 var levels = new float[1];
                 if (!Bass.ChannelGetLevel(stream.ChannelHandle, levels, WINDOW, LevelRetrievalFlags.Mono | LevelRetrievalFlags.RMS))
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to get levels for channel {0}: {1}", stream.ChannelHandle, Enum.GetName(typeof(Errors), Bass.LastError));
+                    Logger.Write(this, LogLevel.Warn, "Failed to get levels for channel {0}: {1}", stream.ChannelHandle, Enum.GetName(typeof(Errors), Bass.LastError));
 
                     break;
                 }
@@ -207,11 +207,11 @@ namespace FoxTunes
 
                     if (leadIn > 0)
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Successfully calculated lead in for channel {0}: {1} bytes.", stream.ChannelHandle, leadIn);
+                        Logger.Write(this, LogLevel.Debug, "Successfully calculated lead in for channel {0}: {1} bytes.", stream.ChannelHandle, leadIn);
                     }
                     else
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Successfully calculated lead in for channel {0}: None.", stream.ChannelHandle);
+                        Logger.Write(this, LogLevel.Debug, "Successfully calculated lead in for channel {0}: None.", stream.ChannelHandle);
                     }
 
                     return leadIn;
@@ -223,7 +223,7 @@ namespace FoxTunes
 
         protected virtual long GetLeadOut(IBassStream stream, int threshold)
         {
-            //Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead out for channel {0} with window of {1} seconds and threshold of {2}dB.", stream.ChannelHandle, WINDOW, threshold);
+            Logger.Write(this, LogLevel.Debug, "Attempting to calculate lead out for channel {0} with window of {1} seconds and threshold of {2}dB.", stream.ChannelHandle, WINDOW, threshold);
 
             var length = Bass.ChannelSeconds2Bytes(
                 stream.ChannelHandle,
@@ -231,7 +231,7 @@ namespace FoxTunes
             );
             if (!this.TrySetPosition(stream, stream.Length - (length * 2)))
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to synchronize channel {0}, bad plugin? This is very expensive!", stream.ChannelHandle);
+                Logger.Write(this, LogLevel.Warn, "Failed to synchronize channel {0}, bad plugin? This is very expensive!", stream.ChannelHandle);
 
                 //Track won't synchronize. MOD files seem to have this problem.
                 return -1;
@@ -241,7 +241,7 @@ namespace FoxTunes
                 var levels = new float[1];
                 if (!Bass.ChannelGetLevel(stream.ChannelHandle, levels, WINDOW, LevelRetrievalFlags.Mono | LevelRetrievalFlags.RMS))
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to get levels for channel {0}: {1}", stream.ChannelHandle, Enum.GetName(typeof(Errors), Bass.LastError));
+                    Logger.Write(this, LogLevel.Warn, "Failed to get levels for channel {0}: {1}", stream.ChannelHandle, Enum.GetName(typeof(Errors), Bass.LastError));
 
                     break;
                 }
@@ -255,11 +255,11 @@ namespace FoxTunes
 
                     if (leadOut > 0)
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Successfully calculated lead out for channel {0}: {1} bytes.", stream.ChannelHandle, leadOut);
+                        Logger.Write(this, LogLevel.Debug, "Successfully calculated lead out for channel {0}: {1} bytes.", stream.ChannelHandle, leadOut);
                     }
                     else
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Successfully calculated lead out for channel {0}: None.", stream.ChannelHandle);
+                        Logger.Write(this, LogLevel.Debug, "Successfully calculated lead out for channel {0}: None.", stream.ChannelHandle);
                     }
 
                     return leadOut;
@@ -288,7 +288,7 @@ namespace FoxTunes
                 return false;
             }
 
-            //Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Attempting to fetch lead in/out for file \"{0}\" from meta data.", playlistItem.FileName);
+            Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Attempting to fetch lead in/out for file \"{0}\" from meta data.", playlistItem.FileName);
 
             var leadInMetaDataItem = default(MetaDataItem);
             var leadOutMetaDataItem = default(MetaDataItem);
@@ -302,7 +302,7 @@ namespace FoxTunes
                 metaDatas.TryGetValue(CustomMetaData.LeadOut, out leadOutMetaDataItem);
                 if (leadInMetaDataItem == null && leadOutMetaDataItem == null)
                 {
-                    //Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Lead in/out meta data does not exist for file \"{0}\".", playlistItem.FileName);
+                    Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Lead in/out meta data does not exist for file \"{0}\".", playlistItem.FileName);
 
                     leadIn = default(TimeSpan);
                     leadOut = default(TimeSpan);
@@ -316,7 +316,7 @@ namespace FoxTunes
             }
             else if (!this.TryParseDuration(behaviour, leadInMetaDataItem.Value, out leadIn))
             {
-                //Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Lead in meta data value \"{0}\" for file \"{1}\" is not valid.", leadInMetaDataItem.Value, playlistItem.FileName);
+                Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Lead in meta data value \"{0}\" for file \"{1}\" is not valid.", leadInMetaDataItem.Value, playlistItem.FileName);
 
                 leadIn = default(TimeSpan);
                 leadOut = default(TimeSpan);
@@ -329,14 +329,14 @@ namespace FoxTunes
             }
             else if (!this.TryParseDuration(behaviour, leadOutMetaDataItem.Value, out leadOut))
             {
-                //Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Lead out meta data value \"{0}\" for file \"{1}\" is not valid.", leadOutMetaDataItem.Value, playlistItem.FileName);
+                Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Lead out meta data value \"{0}\" for file \"{1}\" is not valid.", leadOutMetaDataItem.Value, playlistItem.FileName);
 
                 leadIn = default(TimeSpan);
                 leadOut = default(TimeSpan);
                 return false;
             }
 
-            //Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Successfully fetched lead in/out from meta data for file \"{0}\": {1}/{2}", playlistItem.FileName, leadIn, leadOut);
+            Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Debug, "Successfully fetched lead in/out from meta data for file \"{0}\": {1}/{2}", playlistItem.FileName, leadIn, leadOut);
 
             return true;
         }
@@ -357,14 +357,14 @@ namespace FoxTunes
             var threshold = default(int);
             if (!int.TryParse(parts[0], out threshold) || behaviour.Threshold != threshold)
             {
-                //Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Warn, "Ignoring lead in/out value \"{0}\": Invalid threshold.", parts[0]);
+                Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Warn, "Ignoring lead in/out value \"{0}\": Invalid threshold.", parts[0]);
 
                 duration = TimeSpan.Zero;
                 return false;
             }
             if (!TimeSpan.TryParse(parts[1], out duration))
             {
-                //Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Warn, "Ignoring lead in/out value \"{0}\": Invalid duration.", parts[1]);
+                Logger.Write(typeof(BassSkipSilenceStreamAdvisor), LogLevel.Warn, "Ignoring lead in/out value \"{0}\": Invalid duration.", parts[1]);
 
                 duration = TimeSpan.Zero;
                 return false;

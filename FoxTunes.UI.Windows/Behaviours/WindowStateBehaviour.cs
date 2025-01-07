@@ -101,7 +101,7 @@ namespace FoxTunes
 
         ~WindowStateBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);
@@ -237,7 +237,7 @@ namespace FoxTunes
 
             ~MinMaxBehaviour()
             {
-                //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+                Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
                 try
                 {
                     this.Dispose(true);

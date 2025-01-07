@@ -75,7 +75,7 @@ namespace FoxTunes
                     this.OnMetaDataUpdated(signal.State as MetaDataUpdatedSignalState);
                     break;
                 case CommonSignals.HierarchiesUpdated:
-                    //Logger.Write(this, LogLevel.Debug, "Hierarchies were updated, resetting cache.");
+                    Logger.Write(this, LogLevel.Debug, "Hierarchies were updated, resetting cache.");
                     this.Reset();
                     break;
             }
@@ -138,7 +138,7 @@ namespace FoxTunes
 
         public void Evict(LibraryHierarchyCacheKey key)
         {
-            //Logger.Write(this, LogLevel.Debug, "Evicting cache entry: {0}", key);
+            Logger.Write(this, LogLevel.Debug, "Evicting cache entry: {0}", key);
             this.Nodes.TryRemove(key);
             this.Items.TryRemove(key);
         }
@@ -171,7 +171,7 @@ namespace FoxTunes
 
         ~LibraryHierarchyCache()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

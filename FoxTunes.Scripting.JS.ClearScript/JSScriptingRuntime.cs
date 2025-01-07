@@ -43,7 +43,7 @@ namespace FoxTunes
 
         public override IScriptingContext CreateContext()
         {
-            //Logger.Write(this, LogLevel.Debug, "Creating javascript scripting context.");
+            Logger.Write(this, LogLevel.Debug, "Creating javascript scripting context.");
             var context = new JSScriptingContext(new V8ScriptEngine());
             context.InitializeComponent(this.Core);
             return context;

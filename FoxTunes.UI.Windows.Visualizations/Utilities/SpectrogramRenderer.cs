@@ -137,9 +137,9 @@ namespace FoxTunes
                         }
                     }
                 }
-                catch 
+                catch (Exception e)
                 {
-                    //Logger.Write(this, LogLevel.Error, "Failed to restore spectrogram from history: {0}", e.Message);
+                    Logger.Write(this, LogLevel.Error, "Failed to restore spectrogram from history: {0}", e.Message);
                 }
             }
             else
@@ -196,12 +196,12 @@ namespace FoxTunes
                         success = true;
                     }
                 }
-                catch
+                catch (Exception e)
                 {
 #if DEBUG
-                    //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrogram: {0}", e.Message);
+                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrogram: {0}", e.Message);
 #else
-                    //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrogram, disabling: {0}", e.Message);
+                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrogram, disabling: {0}", e.Message);
                     success = false;
 #endif
                 }
@@ -248,13 +248,13 @@ namespace FoxTunes
 
                 this.BeginUpdateData();
             }
-            catch
+            catch (Exception exception)
             {
 #if DEBUG
-                //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrogram data: {0}", exception.Message);
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrogram data: {0}", exception.Message);
                 this.BeginUpdateData();
 #else
-                //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrogram data, disabling: {0}", exception.Message);
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrogram data, disabling: {0}", exception.Message);
 #endif
             }
         }
@@ -273,13 +273,13 @@ namespace FoxTunes
 
                 this.BeginUpdateDisplay();
             }
-            catch
+            catch (Exception exception)
             {
 #if DEBUG
-                //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrogram data: {0}", exception.Message);
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrogram data: {0}", exception.Message);
                 this.BeginUpdateData();
 #else
-                //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrogram data, disabling: {0}", exception.Message);
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrogram data, disabling: {0}", exception.Message);
 #endif
             }
         }

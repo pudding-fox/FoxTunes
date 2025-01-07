@@ -71,18 +71,18 @@ namespace FoxTunes
             {
                 if (duplicated == null)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to duplicate stream for file \"{0}\", cannot generate.", stream.FileName);
+                    Logger.Write(this, LogLevel.Warn, "Failed to duplicate stream for file \"{0}\", cannot generate.", stream.FileName);
                     return;
                 }
                 var dataSource = this.Factory.Create(duplicated);
                 switch (duplicated.Format)
                 {
                     case OutputStreamFormat.Short:
-                        //Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Creating 16 bit wave form for file \"{0}\" with resolution of {1}ms", stream.FileName, data.Resolution);
+                        Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Creating 16 bit wave form for file \"{0}\" with resolution of {1}ms", stream.FileName, data.Resolution);
                         PopulateShort(this.Output, dataSource, data);
                         break;
                     case OutputStreamFormat.Float:
-                        //Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Creating 32 bit wave form for file \"{0}\" with resolution of {1}ms", stream.FileName, data.Resolution);
+                        Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Creating 32 bit wave form for file \"{0}\" with resolution of {1}ms", stream.FileName, data.Resolution);
                         PopulateFloat(this.Output, dataSource, data);
                         break;
                     default:
@@ -90,7 +90,7 @@ namespace FoxTunes
                 }
                 if (data.Position < data.Capacity)
                 {
-                    //Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Wave form generation for file \"{0}\" failed to complete.", stream.FileName);
+                    Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Wave form generation for file \"{0}\" failed to complete.", stream.FileName);
                     this.Cache.Remove(stream, data.Resolution);
                     return;
                 }
@@ -98,22 +98,22 @@ namespace FoxTunes
 
             if (data.CancellationToken.IsCancellationRequested)
             {
-                //Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Wave form generation for file \"{0}\" was cancelled.", stream.FileName);
+                Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Wave form generation for file \"{0}\" was cancelled.", stream.FileName);
                 this.Cache.Remove(stream, data.Resolution);
                 return;
             }
 
             data.Update();
 
-            //Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Wave form generated for file \"{0}\" with {1} elements: Peak = {2:0.00}", stream.FileName, data.Capacity, data.Peak);
+            Logger.Write(typeof(WaveFormGenerator), LogLevel.Debug, "Wave form generated for file \"{0}\" with {1} elements: Peak = {2:0.00}", stream.FileName, data.Capacity, data.Peak);
 
             try
             {
                 this.Cache.Save(stream, data);
             }
-            catch 
+            catch (Exception e)
             {
-                //Logger.Write(typeof(WaveFormGenerator), LogLevel.Warn, "Failed to save wave form data for file \"{0}\": {1}", stream.FileName, e.Message);
+                Logger.Write(typeof(WaveFormGenerator), LogLevel.Warn, "Failed to save wave form data for file \"{0}\": {1}", stream.FileName, e.Message);
             }
         }
 

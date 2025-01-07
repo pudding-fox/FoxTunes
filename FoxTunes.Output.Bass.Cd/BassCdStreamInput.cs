@@ -82,7 +82,7 @@ namespace FoxTunes
             }
             if (BassCd.StreamGetTrack(channelHandle) != track)
             {
-                //Logger.Write(this, LogLevel.Debug, "Switching CD track: {0}", track);
+                Logger.Write(this, LogLevel.Debug, "Switching CD track: {0}", track);
                 BassUtils.OK(BassCd.StreamSetTrack(channelHandle, track));
             }
             return true;
@@ -94,7 +94,7 @@ namespace FoxTunes
             BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.RecycleStream, true));
             BassUtils.OK(BassGapless.ChannelEnqueue(stream.ChannelHandle));
             BassUtils.OK(BassGapless.Cd.Enable(this.Drive, stream.Flags));
-            //Logger.Write(this, LogLevel.Debug, "Creating BASS GAPLESS stream with rate {0} and {1} channels.", stream.Rate, stream.Channels);
+            Logger.Write(this, LogLevel.Debug, "Creating BASS GAPLESS stream with rate {0} and {1} channels.", stream.Rate, stream.Channels);
             this.ChannelHandle = BassGapless.StreamCreate(stream.Rate, stream.Channels, stream.Flags);
             if (this.ChannelHandle == 0)
             {
@@ -129,10 +129,10 @@ namespace FoxTunes
 
         public override void Reset()
         {
-            //Logger.Write(this, LogLevel.Debug, "Resetting the queue.");
+            Logger.Write(this, LogLevel.Debug, "Resetting the queue.");
             foreach (var channelHandle in this.Queue)
             {
-                //Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", channelHandle);
+                Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", channelHandle);
                 BassGapless.ChannelRemove(channelHandle);
                 Bass.StreamFree(channelHandle);
             }
@@ -143,7 +143,7 @@ namespace FoxTunes
             if (this.ChannelHandle != 0)
             {
                 this.Reset();
-                //Logger.Write(this, LogLevel.Debug, "Freeing BASS GAPLESS stream: {0}", this.ChannelHandle);
+                Logger.Write(this, LogLevel.Debug, "Freeing BASS GAPLESS stream: {0}", this.ChannelHandle);
                 Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
             }
             BassGapless.Cd.Disable();

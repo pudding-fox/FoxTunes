@@ -34,14 +34,14 @@ namespace FoxTunes
 
         public override void InitializeComponent(ICore core)
         {
-            //Logger.Write(this, LogLevel.Debug, "Initializing MD.Net framework..");
+            Logger.Write(this, LogLevel.Debug, "Initializing MD.Net framework..");
             this.ToolManager = new ToolManager();
             this.DeviceManager = new DeviceManager(this.ToolManager);
             this.FormatValidator = new FormatValidator();
             this.DiscManager = new DiscManager(this.ToolManager, this.FormatValidator);
             this.FormatManager = new FormatManager(this.ToolManager);
             this.ActionBuilder = new ActionBuilder(this.FormatManager);
-            //Logger.Write(this, LogLevel.Debug, "Initialized MD.Net framework.");
+            Logger.Write(this, LogLevel.Debug, "Initialized MD.Net framework.");
             base.InitializeComponent(core);
         }
     }

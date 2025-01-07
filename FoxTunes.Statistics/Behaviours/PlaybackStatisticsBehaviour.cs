@@ -146,9 +146,9 @@ namespace FoxTunes
             {
                 await this.StatisticsManager.IncrementPlayCount(playlistItem).ConfigureAwait(false);
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Error, "Failed to update play count for file \"{0}\": {1}", playlistItem.FileName, e.Message);
+                Logger.Write(this, LogLevel.Error, "Failed to update play count for file \"{0}\": {1}", playlistItem.FileName, e.Message);
             }
         }
 
@@ -187,7 +187,7 @@ namespace FoxTunes
 
         ~PlaybackStatisticsBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

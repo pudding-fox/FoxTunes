@@ -9,6 +9,14 @@ namespace FoxTunes
 {
     public static class ImageManager
     {
+        private static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         private static readonly string PREFIX = typeof(TagLibMetaDataSource).Name;
 
         public static ArtworkType ArtworkTypes = ArtworkType.FrontCover;
@@ -68,7 +76,7 @@ namespace FoxTunes
             {
                 if (file.InvariantStartPosition > TagLibMetaDataSource.MAX_TAG_SIZE)
                 {
-                    //Logger.Write(typeof(ImageManager), LogLevel.Warn, "Not importing images from file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, TagLibMetaDataSource.MAX_TAG_SIZE);
+                    Logger.Write(typeof(ImageManager), LogLevel.Warn, "Not importing images from file \"{0}\" due to size: {1} > {2}", file.Name, file.InvariantStartPosition, TagLibMetaDataSource.MAX_TAG_SIZE);
                     return false;
                 }
 
@@ -90,27 +98,27 @@ namespace FoxTunes
                                 if (!string.IsNullOrEmpty(picture.Description))
                                 {
                                     //If we're in fallback (i.e the picture type isn't right) then ignore "pictures" with a description as it likely means the data has a specific purpose.
-                                    //Logger.Write(typeof(ImageManager), LogLevel.Warn, "Not importing image from file \"{0}\" due to description: {1}", file.Name, picture.Description);
+                                    Logger.Write(typeof(ImageManager), LogLevel.Warn, "Not importing image from file \"{0}\" due to description: {1}", file.Name, picture.Description);
                                     continue;
                                 }
-                                //Logger.Write(typeof(ImageManager), LogLevel.Warn, "Importing image from file \"{0}\" with bad type: {1}.", file.Name, Enum.GetName(typeof(PictureType), picture.Type));
+                                Logger.Write(typeof(ImageManager), LogLevel.Warn, "Importing image from file \"{0}\" with bad type: {1}.", file.Name, Enum.GetName(typeof(PictureType), picture.Type));
                                 source.AddWarning(file.Name, string.Format("Image has bad type: {0}.", Enum.GetName(typeof(PictureType), picture.Type)));
                             }
 
                             if (string.IsNullOrEmpty(picture.MimeType))
                             {
-                                //Logger.Write(typeof(ImageManager), LogLevel.Warn, "Importing image from file \"{0}\" with empty mime type.", file.Name);
+                                Logger.Write(typeof(ImageManager), LogLevel.Warn, "Importing image from file \"{0}\" with empty mime type.", file.Name);
                                 source.AddWarning(file.Name, "Image has empty mime type.");
                             }
                             else if (!MimeMapping.Instance.IsImage(picture.MimeType))
                             {
-                                //Logger.Write(typeof(ImageManager), LogLevel.Warn, "Importing image from file \"{0}\" with bad mime type: {1}", file.Name, picture.MimeType);
+                                Logger.Write(typeof(ImageManager), LogLevel.Warn, "Importing image from file \"{0}\" with bad mime type: {1}", file.Name, picture.MimeType);
                                 source.AddWarning(file.Name, string.Format("Image has bad mime type: {0}", picture.MimeType));
                             }
 
                             if (picture.Data.Count > source.MaxImageSize.Value * 1024000)
                             {
-                                //Logger.Write(typeof(ImageManager), LogLevel.Warn, "Not importing image from file \"{0}\" due to size: {1} > {2}", file.Name, picture.Data.Count, source.MaxImageSize.Value * 1024000);
+                                Logger.Write(typeof(ImageManager), LogLevel.Warn, "Not importing image from file \"{0}\" due to size: {1} > {2}", file.Name, picture.Data.Count, source.MaxImageSize.Value * 1024000);
                                 source.AddWarning(file.Name, string.Format("Image was not imported due to size: {0} > {1}", picture.Data.Count, source.MaxImageSize.Value * 1024000));
                                 continue;
                             }
@@ -128,9 +136,9 @@ namespace FoxTunes
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(typeof(ImageManager), LogLevel.Warn, "Failed to read pictures: {0} => {1}", file.Name, e.Message);
+                Logger.Write(typeof(ImageManager), LogLevel.Warn, "Failed to read pictures: {0} => {1}", file.Name, e.Message);
             }
             return types != ArtworkType.None;
         }
@@ -167,9 +175,9 @@ namespace FoxTunes
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(typeof(ImageManager), LogLevel.Warn, "Failed to read pictures: {0} => {1}", file.Name, e.Message);
+                Logger.Write(typeof(ImageManager), LogLevel.Warn, "Failed to read pictures: {0} => {1}", file.Name, e.Message);
             }
             return types != ArtworkType.None;
         }

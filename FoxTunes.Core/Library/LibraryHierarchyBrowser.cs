@@ -133,7 +133,7 @@ namespace FoxTunes
                     return Task.CompletedTask;
 #endif
                 }
-                //Logger.Write(this, LogLevel.Debug, "Meta data was updated and there is an active filter which applies to it, refreshing.");
+                Logger.Write(this, LogLevel.Debug, "Meta data was updated and there is an active filter which applies to it, refreshing.");
                 return this.SignalEmitter.Send(new Signal(this, CommonSignals.HierarchiesUpdated));
             }
 #if NET40
@@ -372,7 +372,7 @@ namespace FoxTunes
 
         ~LibraryHierarchyBrowser()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

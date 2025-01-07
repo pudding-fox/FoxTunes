@@ -54,7 +54,7 @@ namespace FoxTunes
         {
             if (channelHandle == 0)
             {
-                //Logger.Write(this, LogLevel.Debug, "Failed to create stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                Logger.Write(this, LogLevel.Debug, "Failed to create stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
                 return BassStream.Error(this, Bass.LastError);
             }
             try
@@ -84,7 +84,7 @@ namespace FoxTunes
         {
             if (channelHandle == 0)
             {
-                //Logger.Write(this, LogLevel.Debug, "Failed to create stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
+                Logger.Write(this, LogLevel.Debug, "Failed to create stream: {0}", Enum.GetName(typeof(Errors), Bass.LastError));
                 return BassStream.Error(this, Bass.LastError);
             }
             try
@@ -125,7 +125,7 @@ namespace FoxTunes
                 {
                     if (stream.ChannelHandle != channelHandle)
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Stream was wrapped by advice \"{0}\": {1} => {1}", advisory.GetType().Name, channelHandle, stream.ChannelHandle);
+                        Logger.Write(this, LogLevel.Debug, "Stream was wrapped by advice \"{0}\": {1} => {1}", advisory.GetType().Name, channelHandle, stream.ChannelHandle);
                         channelHandle = stream.ChannelHandle;
                     }
                 }
@@ -144,7 +144,7 @@ namespace FoxTunes
 
         public virtual void FreeStream(int channelHandle)
         {
-            //Logger.Write(this, LogLevel.Debug, "Freeing stream: {0}", channelHandle);
+            Logger.Write(this, LogLevel.Debug, "Freeing stream: {0}", channelHandle);
             Bass.StreamFree(channelHandle); //Not checking result code as it contains an error if the application is shutting down.
         }
 
@@ -173,7 +173,7 @@ namespace FoxTunes
 
         ~BassStreamProvider()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

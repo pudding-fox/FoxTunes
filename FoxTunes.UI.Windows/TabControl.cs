@@ -13,7 +13,15 @@ namespace FoxTunes
 {
     public class TabControl : Control, IDisposable
     {
-                public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
+        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
             "ItemsSource",
             typeof(IEnumerable),
             typeof(TabControl),
@@ -470,7 +478,7 @@ namespace FoxTunes
 
         ~TabControl()
         {
-            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

@@ -259,7 +259,7 @@ namespace FoxTunes
                     var set = this.Database.Set<PlaylistItem>(transaction);
                     foreach (var playlistItem in playlistItems)
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
+                        Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
                         playlistItem.Playlist_Id = this.Playlist.Id;
                         playlistItem.Sequence = this.Sequence;
                         playlistItem.Status = PlaylistItemStatus.Import;

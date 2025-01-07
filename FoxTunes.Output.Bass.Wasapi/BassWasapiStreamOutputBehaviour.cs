@@ -47,7 +47,7 @@ namespace FoxTunes
             set
             {
                 this._Enabled = value;
-                //Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -63,7 +63,7 @@ namespace FoxTunes
             set
             {
                 this._WasapiDevice = value;
-                //Logger.Write(this, LogLevel.Debug, "WASAPI Device = {0}", this.WasapiDevice);
+                Logger.Write(this, LogLevel.Debug, "WASAPI Device = {0}", this.WasapiDevice);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -79,7 +79,7 @@ namespace FoxTunes
             private set
             {
                 this._Exclusive = value;
-                //Logger.Write(this, LogLevel.Debug, "Exclusive = {0}", this.Exclusive);
+                Logger.Write(this, LogLevel.Debug, "Exclusive = {0}", this.Exclusive);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -103,7 +103,7 @@ namespace FoxTunes
             private set
             {
                 this._DoubleBuffer = value;
-                //Logger.Write(this, LogLevel.Debug, "DoubleBuffer = {0}", this.DoubleBuffer);
+                Logger.Write(this, LogLevel.Debug, "DoubleBuffer = {0}", this.DoubleBuffer);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -119,7 +119,7 @@ namespace FoxTunes
             private set
             {
                 this._EventDriven = value;
-                //Logger.Write(this, LogLevel.Debug, "EventDriven = {0}", this.EventDriven);
+                Logger.Write(this, LogLevel.Debug, "EventDriven = {0}", this.EventDriven);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -135,7 +135,7 @@ namespace FoxTunes
             private set
             {
                 this._Async = value;
-                //Logger.Write(this, LogLevel.Debug, "Async = {0}", this.Async);
+                Logger.Write(this, LogLevel.Debug, "Async = {0}", this.Async);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -151,7 +151,7 @@ namespace FoxTunes
             private set
             {
                 this._Dither = value;
-                //Logger.Write(this, LogLevel.Debug, "Dither = {0}", this.Dither);
+                Logger.Write(this, LogLevel.Debug, "Dither = {0}", this.Dither);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -167,7 +167,7 @@ namespace FoxTunes
             private set
             {
                 this._Mixer = value;
-                //Logger.Write(this, LogLevel.Debug, "Mixer = {0}", this.Mixer);
+                Logger.Write(this, LogLevel.Debug, "Mixer = {0}", this.Mixer);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -183,7 +183,7 @@ namespace FoxTunes
             private set
             {
                 this._BufferLength = value;
-                //Logger.Write(this, LogLevel.Debug, "BufferLength = {0}", this.BufferLength);
+                Logger.Write(this, LogLevel.Debug, "BufferLength = {0}", this.BufferLength);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -199,7 +199,7 @@ namespace FoxTunes
             private set
             {
                 this._Raw = value;
-                //Logger.Write(this, LogLevel.Debug, "Raw = {0}", this.Raw);
+                Logger.Write(this, LogLevel.Debug, "Raw = {0}", this.Raw);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -276,7 +276,7 @@ namespace FoxTunes
             {
                 BassWasapiDevice.Detect(this.WasapiDevice, this.Exclusive, this.AutoFormat, this.BufferLength, this.DoubleBuffer, this.EventDriven, this.Async, this.Dither, this.Raw);
             }
-            //Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
+            Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
         }
 
         protected virtual void OnFree(object sender, EventArgs e)
@@ -286,7 +286,7 @@ namespace FoxTunes
                 return;
             }
             this.OnFreeDevice();
-            //Logger.Write(this, LogLevel.Debug, "Releasing BASS.");
+            LogManager.Logger.Write(this, LogLevel.Debug, "Releasing BASS.");
             Bass.Free();
             this.IsInitialized = false;
         }
@@ -360,7 +360,7 @@ namespace FoxTunes
 
         ~BassWasapiStreamOutputBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

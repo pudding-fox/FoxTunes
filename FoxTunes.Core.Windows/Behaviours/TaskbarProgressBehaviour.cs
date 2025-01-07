@@ -106,7 +106,7 @@ namespace FoxTunes
                 //Only create taskbar progress for main windows.
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Window created: {0}", e.Window.Handle);
+            Logger.Write(this, LogLevel.Debug, "Window created: {0}", e.Window.Handle);
             this.Windows.TryAdd(e.Window.Handle, TaskbarProgressWindowFlags.None);
         }
 
@@ -117,13 +117,13 @@ namespace FoxTunes
                 //Only create taskbar progress for main windows.
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Window destroyed: {0}", e.Window.Handle);
+            Logger.Write(this, LogLevel.Debug, "Window destroyed: {0}", e.Window.Handle);
             this.AddFlag(e.Window.Handle, TaskbarProgressWindowFlags.Destroyed);
         }
 
         protected virtual void OnShuttingDown(object sender, EventArgs e)
         {
-            //Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
+            Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
             this.Windows.Clear();
         }
 
@@ -138,7 +138,7 @@ namespace FoxTunes
                     this.Timer.Elapsed += this.OnElapsed;
                     this.Timer.AutoReset = false;
                     this.Timer.Start();
-                    //Logger.Write(this, LogLevel.Debug, "Updater enabled.");
+                    Logger.Write(this, LogLevel.Debug, "Updater enabled.");
                 }
             }
         }
@@ -153,7 +153,7 @@ namespace FoxTunes
                     this.Timer.Elapsed -= this.OnElapsed;
                     this.Timer.Dispose();
                     this.Timer = null;
-                    //Logger.Write(this, LogLevel.Debug, "Updater disabled.");
+                    Logger.Write(this, LogLevel.Debug, "Updater disabled.");
                 }
             }
             //Perform any cleanup.
@@ -248,17 +248,17 @@ namespace FoxTunes
                 //Handing an event for an unknown window?
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Taskbar was created: {0}", handle);
+            Logger.Write(this, LogLevel.Debug, "Taskbar was created: {0}", handle);
             this.Windows[handle] = TaskbarProgressWindowFlags.Registered;
         }
 
         protected virtual void AddHook(IntPtr handle)
         {
-            //Logger.Write(this, LogLevel.Debug, "Adding Windows event handler.");
+            Logger.Write(this, LogLevel.Debug, "Adding Windows event handler.");
             var source = HwndSource.FromHwnd(handle);
             if (source == null)
             {
-                //Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 this.AddFlag(handle, TaskbarProgressWindowFlags.Error);
                 return;
             }
@@ -268,11 +268,11 @@ namespace FoxTunes
 
         protected virtual void RemoveHook(IntPtr handle)
         {
-            //Logger.Write(this, LogLevel.Debug, "Removing Windows event handler.");
+            Logger.Write(this, LogLevel.Debug, "Removing Windows event handler.");
             var source = HwndSource.FromHwnd(handle);
             if (source == null)
             {
-                //Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 this.AddFlag(handle, TaskbarProgressWindowFlags.Error);
                 return;
             }
@@ -307,7 +307,7 @@ namespace FoxTunes
             var source = HwndSource.FromHwnd(handle);
             if (source == null)
             {
-                //Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 return false;
             }
             var result = default(WindowsTaskbarList.HResult);
@@ -333,7 +333,7 @@ namespace FoxTunes
             ).ConfigureAwait(false);
             if (result != WindowsTaskbarList.HResult.Ok)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to update taskbar progress: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
+                Logger.Write(this, LogLevel.Warn, "Failed to update taskbar progress: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
                 this.AddFlag(handle, TaskbarProgressWindowFlags.Error);
                 return false;
             }
@@ -354,7 +354,7 @@ namespace FoxTunes
             var source = HwndSource.FromHwnd(handle);
             if (source == null)
             {
-                //Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 return false;
             }
             var result = default(WindowsTaskbarList.HResult);
@@ -384,7 +384,7 @@ namespace FoxTunes
             ).ConfigureAwait(false);
             if (result != WindowsTaskbarList.HResult.Ok)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to update taskbar progress: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
+                Logger.Write(this, LogLevel.Warn, "Failed to update taskbar progress: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
                 this.AddFlag(handle, TaskbarProgressWindowFlags.Error);
                 return false;
             }
@@ -400,7 +400,7 @@ namespace FoxTunes
             var source = HwndSource.FromHwnd(handle);
             if (source == null)
             {
-                //Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
+                Logger.Write(this, LogLevel.Warn, "No such window for handle: {0}", handle);
                 return false;
             }
             var result = default(WindowsTaskbarList.HResult);
@@ -412,7 +412,7 @@ namespace FoxTunes
             ).ConfigureAwait(false);
             if (result != WindowsTaskbarList.HResult.Ok)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to update taskbar progress: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
+                Logger.Write(this, LogLevel.Warn, "Failed to update taskbar progress: {0}", Enum.GetName(typeof(WindowsTaskbarList.HResult), result));
                 this.AddFlag(handle, TaskbarProgressWindowFlags.Error);
                 return false;
             }
@@ -456,7 +456,7 @@ namespace FoxTunes
 
         ~TaskbarProgressBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

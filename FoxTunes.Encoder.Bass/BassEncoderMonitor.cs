@@ -49,7 +49,7 @@ namespace FoxTunes
             {
                 if (this.CancellationToken.IsCancellationRequested)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Requesting cancellation from encoder.");
+                    Logger.Write(this, LogLevel.Debug, "Requesting cancellation from encoder.");
                     this.Encoder.Cancel();
                     this.Name = "Cancelling";
                     break;
@@ -90,7 +90,7 @@ namespace FoxTunes
             }
             while (!task.IsCompleted)
             {
-                //Logger.Write(this, LogLevel.Debug, "Waiting for encoder to complete.");
+                Logger.Write(this, LogLevel.Debug, "Waiting for encoder to complete.");
                 this.Encoder.Update();
 #if NET40
                 await TaskEx.Delay(INTERVAL).ConfigureAwait(false);
@@ -105,7 +105,7 @@ namespace FoxTunes
             var currentEncoderItem = default(EncoderItem);
             if (this.EncoderItems.TryGetValue(encoderItem.Id, out currentEncoderItem) && currentEncoderItem.Status != encoderItem.Status)
             {
-                //Logger.Write(this, LogLevel.Debug, "Encoder status changed for file \"{0}\": {1}", encoderItem.InputFileName, Enum.GetName(typeof(EncoderItemStatus), encoderItem.Status));
+                Logger.Write(this, LogLevel.Debug, "Encoder status changed for file \"{0}\": {1}", encoderItem.InputFileName, Enum.GetName(typeof(EncoderItemStatus), encoderItem.Status));
                 this.OnStatusChanged(encoderItem);
             }
             this.EncoderItems[encoderItem.Id] = encoderItem;

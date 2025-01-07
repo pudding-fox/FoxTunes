@@ -127,7 +127,7 @@ namespace FoxTunes
         {
             window.StateChanged += this.OnStateChanged;
             window.Closing += this.OnClosing;
-            //Logger.Write(this, LogLevel.Debug, "Registered window events: {0}/{1}", window.GetType().Name, window.Title);
+            Logger.Write(this, LogLevel.Debug, "Registered window events: {0}/{1}", window.GetType().Name, window.Title);
         }
 
         protected virtual void RemoveWindowHooks()
@@ -145,7 +145,7 @@ namespace FoxTunes
         {
             window.StateChanged -= this.OnStateChanged;
             window.Closing -= this.OnClosing;
-            //Logger.Write(this, LogLevel.Debug, "Unregistered window events: {0}/{1}", window.GetType().Name, window.Title);
+            Logger.Write(this, LogLevel.Debug, "Unregistered window events: {0}/{1}", window.GetType().Name, window.Title);
         }
 
         protected virtual void OnWindowCreated(object sender, EventArgs e)
@@ -173,7 +173,7 @@ namespace FoxTunes
             {
                 this.NotifyIcon.MessageSink.MouseLeftButtonUp += this.OnMouseLeftButtonUp;
                 this.NotifyIcon.MessageSink.MouseRightButtonUp += this.OnMouseRightButtonUp;
-                //Logger.Write(this, LogLevel.Debug, "Registered message sink events.");
+                Logger.Write(this, LogLevel.Debug, "Registered message sink events.");
             }
             this.AddWindowHooks();
         }
@@ -188,7 +188,7 @@ namespace FoxTunes
                 {
                     this.NotifyIcon.MessageSink.MouseLeftButtonUp -= this.OnMouseLeftButtonUp;
                     this.NotifyIcon.MessageSink.MouseRightButtonUp -= this.OnMouseRightButtonUp;
-                    //Logger.Write(this, LogLevel.Debug, "Unregistered message sink events.");
+                    Logger.Write(this, LogLevel.Debug, "Unregistered message sink events.");
                 }
             }
             this.RemoveWindowHooks();
@@ -196,7 +196,7 @@ namespace FoxTunes
 
         protected virtual void OnShuttingDown(object sender, EventArgs e)
         {
-            //Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
+            Logger.Write(this, LogLevel.Debug, "Shutdown signal recieved.");
             this.Disable();
         }
 
@@ -205,13 +205,13 @@ namespace FoxTunes
             var window = this.Window ?? Windows.ActiveWindow;
             if (window == null)
             {
-                //Logger.Write(this, LogLevel.Warn, "No window to restore.");
+                Logger.Write(this, LogLevel.Warn, "No window to restore.");
                 return;
             }
             this.Window = null;
             var task = Windows.Invoke(() =>
             {
-                //Logger.Write(this, LogLevel.Debug, "Restoring window: {0}/{1}", window.GetType().Name, window.Title);
+                Logger.Write(this, LogLevel.Debug, "Restoring window: {0}/{1}", window.GetType().Name, window.Title);
                 window.Show();
                 if (window.WindowState == WindowState.Minimized)
                 {
@@ -261,7 +261,7 @@ namespace FoxTunes
                 {
                     if (window.WindowState == WindowState.Minimized)
                     {
-                        //Logger.Write(this, LogLevel.Debug, "MinimizeToTray: Hiding window: {0}/{1}", window.GetType().Name, window.Title);
+                        Logger.Write(this, LogLevel.Debug, "MinimizeToTray: Hiding window: {0}/{1}", window.GetType().Name, window.Title);
                         window.Hide();
                         this.Window = window;
                         return;
@@ -278,7 +278,7 @@ namespace FoxTunes
                 if (sender is Window window)
                 {
                     e.Cancel = true;
-                    //Logger.Write(this, LogLevel.Debug, "CloseToTray: Hiding window: {0}/{1}", window.GetType().Name, window.Title);
+                    Logger.Write(this, LogLevel.Debug, "CloseToTray: Hiding window: {0}/{1}", window.GetType().Name, window.Title);
                     window.Hide();
                     this.Window = window;
                     return;
@@ -349,7 +349,7 @@ namespace FoxTunes
 
         ~TrayIconBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

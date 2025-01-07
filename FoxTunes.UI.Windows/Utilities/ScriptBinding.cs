@@ -8,7 +8,15 @@ namespace FoxTunes
 {
     public abstract class ScriptBinding : Binding, INotifyPropertyChanged, IValueConverter
     {
-                protected ScriptBinding()
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
+        protected ScriptBinding()
         {
             this.Converter = this;
         }

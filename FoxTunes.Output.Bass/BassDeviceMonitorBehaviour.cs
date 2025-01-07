@@ -79,7 +79,7 @@ namespace FoxTunes
             this.NotificationClient.DefaultDeviceChanged += this.OnDefaultDeviceChanged;
             this.NotificationClient.PropertyValueChanged += this.OnPropertyValueChanged;
             this.IsInitialized = true;
-            //Logger.Write(this, LogLevel.Debug, "BASS Device Monitor Initialized.");
+            Logger.Write(this, LogLevel.Debug, "BASS Device Monitor Initialized.");
         }
 
         protected virtual void OnFree(object sender, EventArgs e)
@@ -122,8 +122,8 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "The default playback device was changed: {0} => {1} => {2}", e.Flow.Value, e.Role.Value, e.Device);
-            //Logger.Write(this, LogLevel.Debug, "Restarting the output.");
+            Logger.Write(this, LogLevel.Debug, "The default playback device was changed: {0} => {1} => {2}", e.Flow.Value, e.Role.Value, e.Device);
+            Logger.Write(this, LogLevel.Debug, "Restarting the output.");
             this.OutputDeviceManager.Restart();
         }
 
@@ -179,7 +179,7 @@ namespace FoxTunes
 
         ~BassDeviceMonitorBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             this.Dispose(true);
         }
     }

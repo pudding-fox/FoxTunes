@@ -48,7 +48,7 @@ namespace FoxTunes
             {
                 if (this.CancellationToken.IsCancellationRequested)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Requesting cancellation from scanner.");
+                    Logger.Write(this, LogLevel.Debug, "Requesting cancellation from scanner.");
                     this.Scanner.Cancel();
                     this.Name = "Cancelling";
                     break;
@@ -89,7 +89,7 @@ namespace FoxTunes
             }
             while (!task.IsCompleted)
             {
-                //Logger.Write(this, LogLevel.Debug, "Waiting for scanner to complete.");
+                Logger.Write(this, LogLevel.Debug, "Waiting for scanner to complete.");
                 this.Scanner.Update();
 #if NET40
                 await TaskEx.Delay(INTERVAL).ConfigureAwait(false);

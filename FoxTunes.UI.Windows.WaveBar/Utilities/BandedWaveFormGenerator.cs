@@ -95,7 +95,7 @@ namespace FoxTunes
             {
                 if (duplicated == null)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to duplicate stream for file \"{0}\", cannot generate.", stream.FileName);
+                    Logger.Write(this, LogLevel.Warn, "Failed to duplicate stream for file \"{0}\", cannot generate.", stream.FileName);
                     return;
                 }
                 var dataSource = this.DataSourceFactory.Create(duplicated);
@@ -105,7 +105,7 @@ namespace FoxTunes
 
                 if (data.Position < data.Capacity)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Wave form generation for file \"{0}\" failed to complete.", stream.FileName);
+                    Logger.Write(this, LogLevel.Debug, "Wave form generation for file \"{0}\" failed to complete.", stream.FileName);
                     this.Cache.Remove(stream, data.Resolution);
                     return;
                 }
@@ -113,22 +113,22 @@ namespace FoxTunes
 
             if (data.CancellationToken.IsCancellationRequested)
             {
-                //Logger.Write(this, LogLevel.Debug, "Wave form generation for file \"{0}\" was cancelled.", stream.FileName);
+                Logger.Write(this, LogLevel.Debug, "Wave form generation for file \"{0}\" was cancelled.", stream.FileName);
                 this.Cache.Remove(stream, data.Resolution);
                 return;
             }
 
             data.Update();
 
-            //Logger.Write(this, LogLevel.Debug, "Wave form generated for file \"{0}\" with {1} elements: Peak = {2:0.00}", stream.FileName, data.Capacity, data.Peak);
+            Logger.Write(this, LogLevel.Debug, "Wave form generated for file \"{0}\" with {1} elements: Peak = {2:0.00}", stream.FileName, data.Capacity, data.Peak);
 
             try
             {
                 this.Cache.Save(stream, data);
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to save wave form data for file \"{0}\": {1}", stream.FileName, e.Message);
+                Logger.Write(this, LogLevel.Warn, "Failed to save wave form data for file \"{0}\": {1}", stream.FileName, e.Message);
             }
         }
 

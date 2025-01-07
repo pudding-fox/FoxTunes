@@ -62,7 +62,7 @@ namespace FoxTunes
         {
             BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.KeepAlive, true));
             BassUtils.OK(BassGapless.SetConfig(BassGaplessAttriubute.RecycleStream, true));
-            //Logger.Write(this, LogLevel.Debug, "Creating BASS GAPLESS stream with rate {0} and {1} channels.", stream.Rate, stream.Channels);
+            Logger.Write(this, LogLevel.Debug, "Creating BASS GAPLESS stream with rate {0} and {1} channels.", stream.Rate, stream.Channels);
             this.ChannelHandle = BassGapless.StreamCreate(stream.Rate, stream.Channels, stream.Flags | BassFlags.MixerNonStop);
             if (this.ChannelHandle == 0)
             {
@@ -86,10 +86,10 @@ namespace FoxTunes
         {
             if (this.Queue.Contains(stream.ChannelHandle))
             {
-                //Logger.Write(this, LogLevel.Debug, "Stream is already enqueued: {0}", stream.ChannelHandle);
+                Logger.Write(this, LogLevel.Debug, "Stream is already enqueued: {0}", stream.ChannelHandle);
                 return false;
             }
-            //Logger.Write(this, LogLevel.Debug, "Adding stream to the queue: {0}", stream.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Adding stream to the queue: {0}", stream.ChannelHandle);
             BassUtils.OK(BassGapless.ChannelEnqueue(stream.ChannelHandle));
             if (callBack != null)
             {
@@ -102,10 +102,10 @@ namespace FoxTunes
         {
             if (!this.Queue.Contains(stream.ChannelHandle))
             {
-                //Logger.Write(this, LogLevel.Debug, "Stream is not enqueued: {0}", stream.ChannelHandle);
+                Logger.Write(this, LogLevel.Debug, "Stream is not enqueued: {0}", stream.ChannelHandle);
                 return false;
             }
-            //Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", stream.ChannelHandle);
+            Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", stream.ChannelHandle);
             BassUtils.OK(BassGapless.ChannelRemove(stream.ChannelHandle));
             if (callBack != null)
             {
@@ -116,10 +116,10 @@ namespace FoxTunes
 
         public override void Reset()
         {
-            //Logger.Write(this, LogLevel.Debug, "Resetting the queue.");
+            Logger.Write(this, LogLevel.Debug, "Resetting the queue.");
             foreach (var channelHandle in this.Queue)
             {
-                //Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", channelHandle);
+                Logger.Write(this, LogLevel.Debug, "Removing stream from the queue: {0}", channelHandle);
                 BassGapless.ChannelRemove(channelHandle);
             }
         }
@@ -129,7 +129,7 @@ namespace FoxTunes
             if (this.ChannelHandle != 0)
             {
                 this.Reset();
-                //Logger.Write(this, LogLevel.Debug, "Freeing BASS GAPLESS stream: {0}", this.ChannelHandle);
+                Logger.Write(this, LogLevel.Debug, "Freeing BASS GAPLESS stream: {0}", this.ChannelHandle);
                 Bass.StreamFree(this.ChannelHandle); //Not checking result code as it contains an error if the application is shutting down.
             }
         }

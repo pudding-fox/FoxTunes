@@ -67,11 +67,11 @@ namespace FoxTunes
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 var set = this.Database.Set<LibraryRoot>(transaction);
-                //Logger.Write(this, LogLevel.Debug, "Clearing library roots.");
+                Logger.Write(this, LogLevel.Debug, "Clearing library roots.");
                 await set.ClearAsync().ConfigureAwait(false);
                 foreach (var path in roots)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Creating library root: {0}", path);
+                    Logger.Write(this, LogLevel.Debug, "Creating library root: {0}", path);
                     await set.AddAsync(
                         set.Create().With(
                             libraryRoot => libraryRoot.DirectoryName = path
@@ -96,7 +96,7 @@ namespace FoxTunes
             using (var transaction = this.Database.BeginTransaction(this.Database.PreferredIsolationLevel))
             {
                 var set = this.Database.Set<LibraryRoot>(transaction);
-                //Logger.Write(this, LogLevel.Debug, "Clearing library roots.");
+                Logger.Write(this, LogLevel.Debug, "Clearing library roots.");
                 await set.ClearAsync().ConfigureAwait(false);
                 transaction.Commit();
             }

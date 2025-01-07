@@ -84,7 +84,7 @@ namespace FoxTunes
                 }
                 if (releaseLookup.Type == Discogs.ReleaseLookupType.None)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Cannot fetch releases, search requires at least artist/album or title tags.");
+                    Logger.Write(this, LogLevel.Warn, "Cannot fetch releases, search requires at least artist/album or title tags.");
                     releaseLookup.AddError(Strings.DiscogsLookupTask_InsufficiantData);
                     releaseLookup.Status = Discogs.ReleaseLookupStatus.Failed;
                     continue;
@@ -105,7 +105,7 @@ namespace FoxTunes
                 }
                 catch (Exception e)
                 {
-                    //Logger.Write(this, LogLevel.Error, "Failed to lookup artwork: {0}", e.Message);
+                    Logger.Write(this, LogLevel.Error, "Failed to lookup artwork: {0}", e.Message);
                     releaseLookup.AddError(e.Message);
                     releaseLookup.Status = Discogs.ReleaseLookupStatus.Failed;
                 }
@@ -121,28 +121,28 @@ namespace FoxTunes
         protected virtual async Task<bool> Lookup(Discogs.ReleaseLookup releaseLookup)
         {
             var description = releaseLookup.ToString();
-            //Logger.Write(this, LogLevel.Debug, "Fetching master releases: {0}", description);
+            Logger.Write(this, LogLevel.Debug, "Fetching master releases: {0}", description);
             var releases = await this.Discogs.GetReleases(releaseLookup, true).ConfigureAwait(false);
             if (!releases.Any())
             {
-                //Logger.Write(this, LogLevel.Warn, "No master releases: {0}, fetching others", description);
+                Logger.Write(this, LogLevel.Warn, "No master releases: {0}, fetching others", description);
                 releases = await this.Discogs.GetReleases(releaseLookup, false).ConfigureAwait(false);
                 if (!releases.Any())
                 {
-                    //Logger.Write(this, LogLevel.Warn, "No releases: {0}", description);
+                    Logger.Write(this, LogLevel.Warn, "No releases: {0}", description);
                     return false;
                 }
             }
-            //Logger.Write(this, LogLevel.Debug, "Selecting releases: {0}", description);
+            Logger.Write(this, LogLevel.Debug, "Selecting releases: {0}", description);
             releaseLookup.Release = await this.ConfirmRelease(releaseLookup, releases.ToArray()).ConfigureAwait(false);
             if (releaseLookup.Release != null)
             {
-                //Logger.Write(this, LogLevel.Debug, "Selected {0}: {1}", description, releaseLookup.Release.Url);
+                Logger.Write(this, LogLevel.Debug, "Selected {0}: {1}", description, releaseLookup.Release.Url);
                 return await this.OnLookupSuccess(releaseLookup).ConfigureAwait(false);
             }
             else
             {
-                //Logger.Write(this, LogLevel.Warn, "No matches: {0}", description);
+                Logger.Write(this, LogLevel.Warn, "No matches: {0}", description);
             }
             return false;
         }
@@ -203,7 +203,7 @@ namespace FoxTunes
                 {
                     fileData.AddOrUpdate(CustomMetaData.DiscogsRelease, MetaDataItemType.Tag, value);
                 }
-                //Logger.Write(this, LogLevel.Debug, "Discogs release: {0} => {1}", fileData.FileName, value);
+                Logger.Write(this, LogLevel.Debug, "Discogs release: {0} => {1}", fileData.FileName, value);
             }
             await this.MetaDataManager.Save(
                 releaseLookup.FileDatas,

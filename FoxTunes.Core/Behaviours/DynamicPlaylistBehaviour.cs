@@ -108,7 +108,7 @@ namespace FoxTunes
             var libraryHierarchyNodes = this.LibraryHierarchyBrowser.GetNodes(libraryHierarchy, expression);
             if (!libraryHierarchyNodes.Any())
             {
-                //Logger.Write(this, LogLevel.Debug, "Library search returned no results: {0}", expression);
+                Logger.Write(this, LogLevel.Debug, "Library search returned no results: {0}", expression);
                 using (var task = new ClearPlaylistTask(playlist))
                 {
                     task.InitializeComponent(this.Core);

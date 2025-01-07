@@ -39,12 +39,12 @@ namespace FoxTunes
                 if (value)
                 {
                     this.Enable();
-                    //Logger.Write(this, LogLevel.Debug, "Archive password handler enabled.");
+                    Logger.Write(this, LogLevel.Debug, "Archive password handler enabled.");
                 }
                 else
                 {
                     this.Disable();
-                    //Logger.Write(this, LogLevel.Debug, "Archive password handler disabled.");
+                    Logger.Write(this, LogLevel.Debug, "Archive password handler disabled.");
                 }
             });
             base.InitializeComponent(core);
@@ -143,7 +143,7 @@ namespace FoxTunes
 
         ~BassArchiveStreamPasswordBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

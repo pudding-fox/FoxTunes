@@ -46,7 +46,7 @@ namespace FoxTunes
                     this.OnMetaDataUpdated(signal.State as MetaDataUpdatedSignalState);
                     break;
                 case CommonSignals.HierarchiesUpdated:
-                    //Logger.Write(this, LogLevel.Debug, "Hierarchies were updated, resetting cache.");
+                    Logger.Write(this, LogLevel.Debug, "Hierarchies were updated, resetting cache.");
                     this.Reset();
                     break;
             }
@@ -61,7 +61,7 @@ namespace FoxTunes
         {
             if (state == null)
             {
-                //Logger.Write(this, LogLevel.Debug, "Meta data was updated, resetting cache.");
+                Logger.Write(this, LogLevel.Debug, "Meta data was updated, resetting cache.");
                 this.Reset();
             }
             else
@@ -128,7 +128,7 @@ namespace FoxTunes
 
         public void Evict(MetaDataCacheKey key)
         {
-            //Logger.Write(this, LogLevel.Debug, "Evicting cache entry: {0}", key);
+            Logger.Write(this, LogLevel.Debug, "Evicting cache entry: {0}", key);
             this.Values.TryRemove(key);
         }
 
@@ -160,7 +160,7 @@ namespace FoxTunes
 
         ~MetaDataCache()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

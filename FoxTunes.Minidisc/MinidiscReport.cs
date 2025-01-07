@@ -340,42 +340,42 @@ namespace FoxTunes
 
         public static IDisc GetUpdatedDisc(IDisc currentDisc, string title, IDictionary<ITrack, TrackAction> tracks)
         {
-            //Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Getting updated disc..");
+            Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Getting updated disc..");
             var updatedDisc = currentDisc.Clone();
             if (!string.Equals(updatedDisc.Title, title, StringComparison.OrdinalIgnoreCase))
             {
-                //Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Updating title: {0}", title);
+                Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Updating title: {0}", title);
                 updatedDisc.Title = title;
             }
             else
             {
-                //Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Keeping title: {0}", title);
+                Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Keeping title: {0}", title);
             }
             foreach (var pair in tracks.OrderBy(_pair => _pair.Key.Position))
             {
                 switch (pair.Value.Action)
                 {
                     case TrackAction.NONE:
-                        //Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Keeping track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
+                        Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Keeping track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
                         break;
                     case TrackAction.ADD:
-                        //Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Adding track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
+                        Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Adding track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
                         updatedDisc.Tracks.Add(pair.Key);
                         break;
                     case TrackAction.UPDATE:
                         var track = updatedDisc.Tracks.GetTrack(pair.Key);
                         if (track == null)
                         {
-                            //Logger.Write(typeof(MinidiscReport), LogLevel.Warn, "Failed to update track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
+                            Logger.Write(typeof(MinidiscReport), LogLevel.Warn, "Failed to update track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
                         }
                         else if (!string.Equals(track.Name, pair.Value.Name, StringComparison.OrdinalIgnoreCase))
                         {
-                            //Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Updating track ({0}, {1}): {2} => {3}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name, pair.Value.Name);
+                            Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Updating track ({0}, {1}): {2} => {3}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name, pair.Value.Name);
                             track.Name = pair.Value.Name;
                         }
                         break;
                     case TrackAction.REMOVE:
-                        //Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Removing track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
+                        Logger.Write(typeof(MinidiscReport), LogLevel.Debug, "Removing track ({0}, {1}): {2}", pair.Key.Position, Enum.GetName(typeof(Compression), pair.Key.Compression), pair.Key.Name);
                         updatedDisc.Tracks.Remove(pair.Key);
                         break;
                 }

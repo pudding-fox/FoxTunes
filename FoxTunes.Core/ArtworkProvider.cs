@@ -196,9 +196,9 @@ namespace FoxTunes
                         }
                     }
                 }
-                catch
+                catch (Exception e)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Error locating artwork of type {0} in {1}: {2}", Enum.GetName(typeof(ArtworkType), type), path, e.Message);
+                    Logger.Write(this, LogLevel.Warn, "Error locating artwork of type {0} in {1}: {2}", Enum.GetName(typeof(ArtworkType), type), path, e.Message);
                 }
                 return null;
             });

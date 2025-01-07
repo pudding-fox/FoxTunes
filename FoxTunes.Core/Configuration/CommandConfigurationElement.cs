@@ -36,15 +36,15 @@ namespace FoxTunes
                 {
                     action();
                 }
-                catch
+                catch (Exception exception)
                 {
-                    //Logger.Write(
-                    //    typeof(CommandConfigurationElement),
-                    //    LogLevel.Warn,
-                    //    "Failed to invoke command handler \"{0}\": {1}",
-                    //    this.Id,
-                    //    exception.Message
-                    //);
+                    Logger.Write(
+                        typeof(CommandConfigurationElement),
+                        LogLevel.Warn,
+                        "Failed to invoke command handler \"{0}\": {1}",
+                        this.Id,
+                        exception.Message
+                    );
                 }
             });
             this.Invoked += handler;

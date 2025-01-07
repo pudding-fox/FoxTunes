@@ -88,20 +88,20 @@ namespace FoxTunes
             this.ConfigureWASAPI(previous, out rate, out channels, out flags);
             if (this.ShouldCreateMixer(previous, rate, channels, flags))
             {
-                //Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", rate, channels);
+                Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", rate, channels);
                 this.ChannelHandle = BassMix.CreateMixerStream(rate, channels, flags);
                 if (this.ChannelHandle == 0)
                 {
                     BassUtils.Throw();
                 }
-                //Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
+                Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
                 BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default | BassFlags.MixerBuffer | BassFlags.MixerDownMix));
                 BassUtils.OK(BassWasapiHandler.StreamSet(this.ChannelHandle));
                 this.MixerChannelHandles.Add(previous.ChannelHandle);
             }
             else
             {
-                //Logger.Write(this, LogLevel.Debug, "The stream properties match the device, playing directly.");
+                Logger.Write(this, LogLevel.Debug, "The stream properties match the device, playing directly.");
                 BassUtils.OK(BassWasapiHandler.StreamSet(previous.ChannelHandle));
                 this.ChannelHandle = previous.ChannelHandle;
             }
@@ -123,7 +123,7 @@ namespace FoxTunes
                     if (!BassWasapiDevice.Info.SupportedRates.Contains(targetRate))
                     {
                         var nearestRate = BassWasapiDevice.Info.GetNearestRate(targetRate);
-                        //Logger.Write(this, LogLevel.Warn, "Enforced rate {0} isn't supposed by the device, falling back to {1}.", targetRate, nearestRate);
+                        Logger.Write(this, LogLevel.Warn, "Enforced rate {0} isn't supposed by the device, falling back to {1}.", targetRate, nearestRate);
                         rate = nearestRate;
                     }
                     else
@@ -136,13 +136,13 @@ namespace FoxTunes
                     if (!BassWasapiDevice.Info.SupportedRates.Contains(rate))
                     {
                         var nearestRate = BassWasapiDevice.Info.GetNearestRate(rate);
-                        //Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", rate, nearestRate);
+                        Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", rate, nearestRate);
                         rate = nearestRate;
                     }
                 }
                 if (BassWasapiDevice.Info.Outputs < channels)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Stream channel count {0} isn't supported by the device, falling back to {1} channels.", channels, BassWasapiDevice.Info.Outputs);
+                    Logger.Write(this, LogLevel.Debug, "Stream channel count {0} isn't supported by the device, falling back to {1} channels.", channels, BassWasapiDevice.Info.Outputs);
                     channels = BassWasapiDevice.Info.Outputs;
                 }
             }
@@ -165,10 +165,10 @@ namespace FoxTunes
         {
             if (BassWasapi.IsStarted)
             {
-                //Logger.Write(this, LogLevel.Debug, "WASAPI has already been started.");
+                Logger.Write(this, LogLevel.Debug, "WASAPI has already been started.");
                 return false;
             }
-            //Logger.Write(this, LogLevel.Debug, "Starting WASAPI.");
+            Logger.Write(this, LogLevel.Debug, "Starting WASAPI.");
             BassUtils.OK(BassWasapi.Start());
             return true;
         }
@@ -177,10 +177,10 @@ namespace FoxTunes
         {
             if (!BassWasapi.IsStarted)
             {
-                //Logger.Write(this, LogLevel.Debug, "WASAPI has not been started.");
+                Logger.Write(this, LogLevel.Debug, "WASAPI has not been started.");
                 return false;
             }
-            //Logger.Write(this, LogLevel.Debug, "Stopping WASAPI.");
+            Logger.Write(this, LogLevel.Debug, "Stopping WASAPI.");
             BassUtils.OK(BassWasapi.Stop(reset));
             return true;
         }
@@ -213,7 +213,7 @@ namespace FoxTunes
         {
             foreach (var channelHandle in this.MixerChannelHandles)
             {
-                //Logger.Write(this, LogLevel.Debug, "Clearing mixer buffer.");
+                Logger.Write(this, LogLevel.Debug, "Clearing mixer buffer.");
                 Bass.ChannelSetPosition(channelHandle, 0);
             }
             base.ClearBuffer();
@@ -251,7 +251,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Starting WASAPI.");
+            Logger.Write(this, LogLevel.Debug, "Starting WASAPI.");
             try
             {
                 BassUtils.OK(this.StartWASAPI());
@@ -270,7 +270,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Pausing WASAPI.");
+            Logger.Write(this, LogLevel.Debug, "Pausing WASAPI.");
             try
             {
                 BassUtils.OK(this.StopWASAPI(false));
@@ -335,7 +335,7 @@ namespace FoxTunes
         {
             foreach (var channelHandle in this.MixerChannelHandles)
             {
-                //Logger.Write(this, LogLevel.Debug, "Freeing BASS stream: {0}", channelHandle);
+                Logger.Write(this, LogLevel.Debug, "Freeing BASS stream: {0}", channelHandle);
                 Bass.StreamFree(channelHandle); //Not checking result code as it contains an error if the application is shutting down.
             }
             this.Stop();

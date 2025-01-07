@@ -112,7 +112,7 @@ namespace FoxTunes
 
         protected virtual void SetWindowTitle(Window window, string title)
         {
-            //Logger.Write(this, LogLevel.Debug, "Setting window title {0}: {1}", window.GetType().Name, title);
+            Logger.Write(this, LogLevel.Debug, "Setting window title {0}: {1}", window.GetType().Name, title);
             window.Title = title;
         }
 
@@ -157,7 +157,7 @@ namespace FoxTunes
 
         ~WindowTitleBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

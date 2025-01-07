@@ -24,7 +24,7 @@ namespace FoxTunes
 
         protected virtual Task OnError(object sender, ComponentErrorEventArgs e)
         {
-            //Logger.Write(this, LogLevel.Error, e.Message);
+            Logger.Write(this, LogLevel.Error, e.Message);
             if (this.Error == null)
             {
 #if NET40

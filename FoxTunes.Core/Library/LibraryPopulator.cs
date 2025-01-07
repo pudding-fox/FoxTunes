@@ -78,10 +78,10 @@ namespace FoxTunes
             {
                 if (!this.PlaybackManager.IsSupported(fileName))
                 {
-                    //Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
+                    Logger.Write(this, LogLevel.Debug, "File is not supported: {0}", fileName);
                     return false;
                 }
-                //Logger.Write(this, LogLevel.Trace, "Adding file to library: {0}", fileName);
+                Logger.Write(this, LogLevel.Trace, "Adding file to library: {0}", fileName);
                 var libraryItem = new LibraryItem()
                 {
                     DirectoryName = Path.GetDirectoryName(fileName),
@@ -92,9 +92,9 @@ namespace FoxTunes
                 await writer.Write(libraryItem).ConfigureAwait(false);
                 return true;
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Debug, "Failed to add file \"{0}\" to library: {0}", fileName, e.Message);
+                Logger.Write(this, LogLevel.Debug, "Failed to add file \"{0}\" to library: {0}", fileName, e.Message);
                 return false;
             }
         }

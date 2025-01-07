@@ -9,7 +9,15 @@ namespace FoxTunes
 {
     public class TrackingThreadLocal<T> : IDisposable
     {
-                public TrackingThreadLocal()
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
+        public TrackingThreadLocal()
         {
             this.ThreadLocal = new ThreadLocal<T>();
             this.Values = new ConcurrentBag<T>();
@@ -65,7 +73,7 @@ namespace FoxTunes
 
         ~TrackingThreadLocal()
         {
-            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

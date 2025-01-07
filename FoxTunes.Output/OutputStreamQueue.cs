@@ -30,7 +30,7 @@ namespace FoxTunes
                 {
                     if (this.Queue.Count > 0)
                     {
-                        //Logger.Write(this, LogLevel.Warn, "Output state changed, disposing queued output streams.");
+                        Logger.Write(this, LogLevel.Warn, "Output state changed, disposing queued output streams.");
                         this.Clear();
                     }
                 };
@@ -117,7 +117,7 @@ namespace FoxTunes
                     {
                         return;
                     }
-                    //Logger.Write(this, LogLevel.Debug, "Evicting output stream from the queue due to exceeded capacity: {0} => {1}", key.Id, key.FileName);
+                    Logger.Write(this, LogLevel.Debug, "Evicting output stream from the queue due to exceeded capacity: {0} => {1}", key.Id, key.FileName);
                     var value = default(OutputStreamQueueValue);
                     if (!this.Queue.TryRemove(key, out value))
                     {
@@ -165,10 +165,10 @@ namespace FoxTunes
                 foreach (var pair in this.Queue)
                 {
                     var outputStream = pair.Value.OutputStream;
-                    //Logger.Write(this, LogLevel.Debug, "Disposing queued output stream: {0} => {1}", outputStream.Id, outputStream.FileName);
+                    Logger.Write(this, LogLevel.Debug, "Disposing queued output stream: {0} => {1}", outputStream.Id, outputStream.FileName);
                     outputStream.Dispose();
                 }
-                //Logger.Write(this, LogLevel.Debug, "Clearing output stream queue.");
+                Logger.Write(this, LogLevel.Debug, "Clearing output stream queue.");
                 this.Queue.Clear();
             }
         }
@@ -198,7 +198,7 @@ namespace FoxTunes
 
         ~OutputStreamQueue()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

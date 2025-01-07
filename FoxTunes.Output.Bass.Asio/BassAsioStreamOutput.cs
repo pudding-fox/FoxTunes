@@ -90,20 +90,20 @@ namespace FoxTunes
             this.ConfigureASIO(previous, out rate, out channels, out flags);
             if (this.ShouldCreateMixer(previous, rate, channels, flags))
             {
-                //Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", rate, channels);
+                Logger.Write(this, LogLevel.Debug, "Creating BASS MIX stream with rate {0} and {1} channels.", rate, channels);
                 this.ChannelHandle = BassMix.CreateMixerStream(rate, channels, flags);
                 if (this.ChannelHandle == 0)
                 {
                     BassUtils.Throw();
                 }
-                //Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
+                Logger.Write(this, LogLevel.Debug, "Adding stream to the mixer: {0}", previous.ChannelHandle);
                 BassUtils.OK(BassMix.MixerAddChannel(this.ChannelHandle, previous.ChannelHandle, BassFlags.Default | BassFlags.MixerBuffer | BassFlags.MixerDownMix));
                 BassUtils.OK(BassAsioHandler.StreamSet(this.ChannelHandle));
                 this.MixerChannelHandles.Add(previous.ChannelHandle);
             }
             else
             {
-                //Logger.Write(this, LogLevel.Debug, "The stream properties match the device, playing directly.");
+                Logger.Write(this, LogLevel.Debug, "The stream properties match the device, playing directly.");
                 BassUtils.OK(BassAsioHandler.StreamSet(previous.ChannelHandle));
                 this.ChannelHandle = previous.ChannelHandle;
             }
@@ -125,7 +125,7 @@ namespace FoxTunes
                     if (!BassAsioDevice.Info.SupportedRates.Contains(targetRate))
                     {
                         var nearestRate = BassAsioDevice.Info.GetNearestRate(targetRate);
-                        //Logger.Write(this, LogLevel.Warn, "Enforced rate {0} isn't supposed by the device, falling back to {1}.", targetRate, nearestRate);
+                        Logger.Write(this, LogLevel.Warn, "Enforced rate {0} isn't supposed by the device, falling back to {1}.", targetRate, nearestRate);
                         rate = nearestRate;
                     }
                     else
@@ -138,13 +138,13 @@ namespace FoxTunes
                     if (!BassAsioDevice.Info.SupportedRates.Contains(rate))
                     {
                         var nearestRate = BassAsioDevice.Info.GetNearestRate(rate);
-                        //Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", rate, nearestRate);
+                        Logger.Write(this, LogLevel.Debug, "Stream rate {0} isn't supposed by the device, falling back to {1}.", rate, nearestRate);
                         rate = nearestRate;
                     }
                 }
                 if (BassAsioDevice.Info.Outputs < channels)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Stream channel count {0} isn't supported by the device, falling back to {1} channels.", channels, BassAsioDevice.Info.Outputs);
+                    Logger.Write(this, LogLevel.Debug, "Stream channel count {0} isn't supported by the device, falling back to {1} channels.", channels, BassAsioDevice.Info.Outputs);
                     channels = BassAsioDevice.Info.Outputs;
                 }
             }
@@ -160,10 +160,10 @@ namespace FoxTunes
         {
             if (BassAsio.IsStarted)
             {
-                //Logger.Write(this, LogLevel.Debug, "ASIO has already been started.");
+                Logger.Write(this, LogLevel.Debug, "ASIO has already been started.");
                 return false;
             }
-            //Logger.Write(this, LogLevel.Debug, "Starting ASIO.");
+            Logger.Write(this, LogLevel.Debug, "Starting ASIO.");
             BassUtils.OK(BassAsio.Start(BassAsio.Info.PreferredBufferLength));
             return true;
         }
@@ -172,10 +172,10 @@ namespace FoxTunes
         {
             if (!BassAsio.IsStarted)
             {
-                //Logger.Write(this, LogLevel.Debug, "ASIO has not been started.");
+                Logger.Write(this, LogLevel.Debug, "ASIO has not been started.");
                 return false;
             }
-            //Logger.Write(this, LogLevel.Debug, "Stopping ASIO.");
+            Logger.Write(this, LogLevel.Debug, "Stopping ASIO.");
             BassAsioUtils.OK(BassAsio.Stop());
             return true;
         }
@@ -208,7 +208,7 @@ namespace FoxTunes
         {
             foreach (var channelHandle in this.MixerChannelHandles)
             {
-                //Logger.Write(this, LogLevel.Debug, "Clearing mixer buffer.");
+                Logger.Write(this, LogLevel.Debug, "Clearing mixer buffer.");
                 Bass.ChannelSetPosition(channelHandle, 0);
             }
             base.ClearBuffer();
@@ -244,7 +244,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Starting ASIO.");
+            Logger.Write(this, LogLevel.Debug, "Starting ASIO.");
             try
             {
                 BassAsioUtils.OK(this.StartASIO());
@@ -262,7 +262,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Pausing ASIO.");
+            Logger.Write(this, LogLevel.Debug, "Pausing ASIO.");
             try
             {
                 BassAsioUtils.OK(BassAsio.ChannelPause(false, BassAsioDevice.PRIMARY_CHANNEL));
@@ -280,7 +280,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Resuming ASIO.");
+            Logger.Write(this, LogLevel.Debug, "Resuming ASIO.");
             try
             {
                 BassAsioUtils.OK(BassAsio.ChannelReset(false, BassAsioDevice.PRIMARY_CHANNEL, AsioChannelResetFlags.Pause));
@@ -298,7 +298,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Stopping ASIO.");
+            Logger.Write(this, LogLevel.Debug, "Stopping ASIO.");
             try
             {
                 BassAsioUtils.OK(this.StopASIO());
@@ -336,7 +336,7 @@ namespace FoxTunes
         {
             foreach (var channelHandle in this.MixerChannelHandles)
             {
-                //Logger.Write(this, LogLevel.Debug, "Freeing BASS stream: {0}", channelHandle);
+                Logger.Write(this, LogLevel.Debug, "Freeing BASS stream: {0}", channelHandle);
                 Bass.StreamFree(channelHandle); //Not checking result code as it contains an error if the application is shutting down.
             }
             this.Stop();

@@ -60,7 +60,7 @@ namespace FoxTunes
             set
             {
                 this._Enabled = value;
-                //Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
             }
         }
 
@@ -246,7 +246,7 @@ namespace FoxTunes
 
         ~BassCueStreamAdvisorBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);
@@ -312,7 +312,7 @@ namespace FoxTunes
                     var position = 0;
                     foreach (var playlistItem in playlistItems)
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
+                        Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
                         playlistItem.Playlist_Id = this.Playlist.Id;
                         playlistItem.Sequence = this.Sequence + position;
                         playlistItem.Status = PlaylistItemStatus.Import;
@@ -397,7 +397,7 @@ namespace FoxTunes
                     var libraryItems = set.Where(libraryItem => libraryItem.DirectoryName == this.FileName);
                     foreach (var libraryItem in libraryItems)
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Removing file from library: {0}", libraryItem.FileName);
+                        Logger.Write(this, LogLevel.Debug, "Removing file from library: {0}", libraryItem.FileName);
                         libraryItem.Status = LibraryItemStatus.Remove;
                         await set.AddOrUpdateAsync(libraryItem).ConfigureAwait(false);
                         cleanup = true;
@@ -420,7 +420,7 @@ namespace FoxTunes
                     var set = this.Database.Set<LibraryItem>(transaction);
                     foreach (var libraryItem in libraryItems)
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Adding file to library: {0}", libraryItem.FileName);
+                        Logger.Write(this, LogLevel.Debug, "Adding file to library: {0}", libraryItem.FileName);
                         libraryItem.Status = LibraryItemStatus.Import;
                         libraryItem.SetImportDate(DateTime.UtcNow);
                         await set.AddAsync(libraryItem).ConfigureAwait(false);

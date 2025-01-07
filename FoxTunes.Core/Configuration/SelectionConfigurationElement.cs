@@ -44,7 +44,7 @@ namespace FoxTunes
                 {
                     if (value != null)
                     {
-                        //Logger.Write(typeof(SelectionConfigurationElement), LogLevel.Debug, "New default value \"{0}\" superseeds current value \"{1}\".", option.Id, value.Id);
+                        Logger.Write(typeof(SelectionConfigurationElement), LogLevel.Debug, "New default value \"{0}\" superseeds current value \"{1}\".", option.Id, value.Id);
                     }
                     value = option;
                 }
@@ -84,7 +84,7 @@ namespace FoxTunes
             var option = this.GetOption(value);
             if (option == null)
             {
-                //Logger.Write(typeof(SelectionConfigurationElement), LogLevel.Warn, "Cannot restore value: Option \"{0}\" no longer exists.", value);
+                Logger.Write(typeof(SelectionConfigurationElement), LogLevel.Warn, "Cannot restore value: Option \"{0}\" no longer exists.", value);
                 return;
             }
             this.Value = option;

@@ -106,7 +106,7 @@ namespace FoxTunes
             }
             if (success)
             {
-                //Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Sending SHChangeNotify.");
+                Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Sending SHChangeNotify.");
                 SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_FLUSH, IntPtr.Zero, IntPtr.Zero);
             }
         }
@@ -120,7 +120,7 @@ namespace FoxTunes
             }
             if (success)
             {
-                //Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Sending SHChangeNotify.");
+                Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Sending SHChangeNotify.");
                 SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_FLUSH, IntPtr.Zero, IntPtr.Zero);
             }
         }
@@ -135,7 +135,7 @@ namespace FoxTunes
             {
                 global::System.IO.File.Delete(fileName);
             }
-            //Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Creating \"SendTo\" link for program \"{0}\": {1}", association.ProgId, fileName);
+            Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Creating \"SendTo\" link for program \"{0}\": {1}", association.ProgId, fileName);
             Shell.CreateShortcut(fileName, association.ExecutableFilePath);
         }
 
@@ -149,7 +149,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Removing \"SendTo\" link for program \"{0}\".", association.ProgId);
+            Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Removing \"SendTo\" link for program \"{0}\".", association.ProgId);
             global::System.IO.File.Delete(fileName);
         }
 
@@ -157,28 +157,28 @@ namespace FoxTunes
         {
             var path = string.Format(@"Software\Classes\{0}\shell\open\command", association.ProgId);
             var command = GetOpenString(association.ExecutableFilePath);
-            //Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Creating shell command for program \"{0}\": {1}", association.ProgId, command);
+            Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Creating shell command for program \"{0}\": {1}", association.ProgId, command);
             return SetKeyValue(path, command);
         }
 
         private static bool RemoveProgram(IFileAssociation association)
         {
             var path = @"Software\Classes\" + association.ProgId;
-            //Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Removing shell command for program \"{0}\".", association.ProgId);
+            Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Removing shell command for program \"{0}\".", association.ProgId);
             return DeleteKey(path);
         }
 
         private static bool AddAssociation(IFileAssociation association)
         {
             var path = @"Software\Classes\" + association.Extension;
-            //Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Creating file association for program \"{0}\": {1}", association.ProgId, association.Extension);
+            Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Creating file association for program \"{0}\": {1}", association.ProgId, association.Extension);
             return SetKeyValue(path, association.ProgId);
         }
 
         private static bool RemoveAssociation(IFileAssociation association)
         {
             var path = @"Software\Classes\" + association.Extension;
-            //Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Removing file association for program \"{0}\": {1}", association.ProgId, association.Extension);
+            Logger.Write(typeof(FileAssociations), LogLevel.Debug, "Removing file association for program \"{0}\": {1}", association.ProgId, association.Extension);
             return DeleteKey(path);
         }
 

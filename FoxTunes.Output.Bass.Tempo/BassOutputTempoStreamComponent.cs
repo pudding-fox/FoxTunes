@@ -127,15 +127,15 @@ namespace FoxTunes
         protected virtual void Update()
         {
             var rate = GetTempoFrequency(BassUtils.GetChannelPcmRate(this.ChannelHandle), this.OutputEffects.Tempo.Rate);
-            //Logger.Write(
-            //    this,
-            //    LogLevel.Debug,
-            //    "Tempo effect enabled: Tempo {0}%, Pitch {1} semitones, Rate {2}{3}",
-            //    this.OutputEffects.Tempo.Value,
-            //    this.OutputEffects.Tempo.Pitch,
-            //    MetaDataInfo.SampleRateDescription(rate),
-            //    this.AAFilter.Value ? string.Format(", aa filter {0} taps", this.AAFilterLength) : string.Empty
-            //);
+            Logger.Write(
+                this,
+                LogLevel.Debug,
+                "Tempo effect enabled: Tempo {0}%, Pitch {1} semitones, Rate {2}{3}",
+                this.OutputEffects.Tempo.Value,
+                this.OutputEffects.Tempo.Pitch,
+                MetaDataInfo.SampleRateDescription(rate),
+                this.AAFilter.Value ? string.Format(", aa filter {0} taps", this.AAFilterLength) : string.Empty
+            );
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Tempo, this.OutputEffects.Tempo.Value));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Pitch, this.OutputEffects.Tempo.Pitch));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, rate));
@@ -147,7 +147,7 @@ namespace FoxTunes
         protected virtual void Stop()
         {
             var rate = BassUtils.GetChannelPcmRate(this.ChannelHandle);
-            //Logger.Write(this, LogLevel.Debug, "Tempo effect disabled.");
+            Logger.Write(this, LogLevel.Debug, "Tempo effect disabled.");
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Tempo, 0));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.Pitch, 0));
             BassUtils.OK(Bass.ChannelSetAttribute(this.ChannelHandle, ChannelAttribute.TempoFrequency, rate));

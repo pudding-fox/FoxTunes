@@ -70,15 +70,15 @@ namespace FoxTunes
                             file.Duration = TimeSpan.FromMilliseconds(this.GetDuration(metaData));
                             if (TimeSpan.Zero.Equals(file.Duration))
                             {
-                                //Logger.Write(this, LogLevel.Debug, "Failed to get duration for file \"{0}\".", target);
+                                Logger.Write(this, LogLevel.Debug, "Failed to get duration for file \"{0}\".", target);
                             }
                         }
                     }
                 }
-                catch
+                catch (Exception e)
                 {
                     metaData = Enumerable.Empty<MetaDataItem>();
-                    //Logger.Write(this, LogLevel.Warn, "Failed to read meta data from file \"{0}\": {1}", target, e.Message);
+                    Logger.Write(this, LogLevel.Warn, "Failed to read meta data from file \"{0}\": {1}", target, e.Message);
                 }
                 for (var b = 0; b < file.Tracks.Length; b++)
                 {
@@ -184,7 +184,7 @@ namespace FoxTunes
                     {
                         return fileName;
                     }
-                    //Logger.Write(this, LogLevel.Warn, "Cue sheet references non existant file \"{0}\", attempting to resolve it...", fileName);
+                    Logger.Write(this, LogLevel.Warn, "Cue sheet references non existant file \"{0}\", attempting to resolve it...", fileName);
                     return this.Resolve(directoryName, Directory.GetFiles(directoryName), Path.GetFileNameWithoutExtension(name));
                 }
             );
@@ -202,14 +202,14 @@ namespace FoxTunes
                 {
                     continue;
                 }
-                //Logger.Write(this, LogLevel.Warn, "Located a suitable file \"{0}\".", fileName);
+                Logger.Write(this, LogLevel.Warn, "Located a suitable file \"{0}\".", fileName);
                 return fileName;
             }
             fileNames = fileNames.Where(fileName => this.Output.IsSupported(fileName)).ToArray();
             if (fileNames.Length == 1)
             {
                 var fileName = fileNames[0];
-                //Logger.Write(this, LogLevel.Warn, "Only \"{0}\" is supported for playback.", fileName);
+                Logger.Write(this, LogLevel.Warn, "Only \"{0}\" is supported for playback.", fileName);
                 return fileName;
             }
             if (this.FileSystemBrowser != null)

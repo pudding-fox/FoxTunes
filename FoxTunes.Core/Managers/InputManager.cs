@@ -70,7 +70,7 @@ namespace FoxTunes
             {
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Executing global keyboard shortcut: {0} => {1}", modifiers, keys);
+            Logger.Write(this, LogLevel.Debug, "Executing global keyboard shortcut: {0} => {1}", modifiers, keys);
             value();
         }
 

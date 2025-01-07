@@ -40,7 +40,7 @@ namespace FoxTunes
                     this.OnMetaDataUpdated(signal.State as MetaDataUpdatedSignalState);
                     break;
                 case CommonSignals.ImagesUpdated:
-                    //Logger.Write(this, LogLevel.Debug, "Images were updated, resetting cache.");
+                    Logger.Write(this, LogLevel.Debug, "Images were updated, resetting cache.");
                     this.ClearCache();
                     break;
             }
@@ -65,12 +65,12 @@ namespace FoxTunes
                 var libraryHierarchyNodes = state.FileDatas.GetParents();
                 foreach (var libraryHierarchyNode in libraryHierarchyNodes)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Meta data was updated for item {0}, resetting cache.", libraryHierarchyNode.Id);
+                    Logger.Write(this, LogLevel.Debug, "Meta data was updated for item {0}, resetting cache.", libraryHierarchyNode.Id);
                     this.ClearCache(libraryHierarchyNode);
                 }
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Meta data was updated, resetting cache.");
+            Logger.Write(this, LogLevel.Debug, "Meta data was updated, resetting cache.");
             this.ClearCache();
         }
 
@@ -93,9 +93,9 @@ namespace FoxTunes
                 }
                 return this.CreateImageSourceCore(libraryHierarchyNode, metaDataItems, width, height, mode, cache);
             }
-            catch 
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Error, "Error creating image source: {0}", e.Message);
+                Logger.Write(this, LogLevel.Error, "Error creating image source: {0}", e.Message);
                 return null;
             }
         }
@@ -325,9 +325,9 @@ namespace FoxTunes
                     this.GetCachePrefix(libraryHierarchyNode)
                 );
             }
-            catch 
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to clear storage \"{0}\": {1}", this.GetCachePrefix(libraryHierarchyNode), e.Message);
+                Logger.Write(this, LogLevel.Warn, "Failed to clear storage \"{0}\": {1}", this.GetCachePrefix(libraryHierarchyNode), e.Message);
             }
         }
 
@@ -337,9 +337,9 @@ namespace FoxTunes
             {
                 FileMetaDataStore.Clear(PREFIX);
             }
-            catch 
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to clear storage \"{0}\": {1}", PREFIX, e.Message);
+                Logger.Write(this, LogLevel.Warn, "Failed to clear storage \"{0}\": {1}", PREFIX, e.Message);
             }
         }
 
@@ -371,7 +371,7 @@ namespace FoxTunes
 
         ~LibraryBrowserTileProvider()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

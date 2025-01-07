@@ -381,7 +381,7 @@ namespace FoxTunes
                         {
                             this.StickyWindows.Remove(snappingWindow);
                             snappingWindow.StickyWindows.Remove(this);
-                            //Logger.Write(this, LogLevel.Debug, "Unstick.");
+                            Logger.Write(this, LogLevel.Debug, "Unstick.");
                         }
                         continue;
                     }
@@ -659,7 +659,7 @@ namespace FoxTunes
 
         ~SnappingWindow()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

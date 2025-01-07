@@ -69,13 +69,13 @@ namespace FoxTunes
 
         private void Add(ConfigurationSection section)
         {
-            //Logger.Write(this, LogLevel.Debug, "Adding configuration section: {0} => {1}", section.Id, section.Name);
+            Logger.Write(this, LogLevel.Debug, "Adding configuration section: {0} => {1}", section.Id, section.Name);
             this.Sections.Add(section.Id, section);
         }
 
         private void Update(ConfigurationSection section)
         {
-            //Logger.Write(this, LogLevel.Debug, "Updating configuration section: {0} => {1}", section.Id, section.Name);
+            Logger.Write(this, LogLevel.Debug, "Updating configuration section: {0} => {1}", section.Id, section.Name);
             var existing = this.GetSection(section.Id);
             existing.Update(section);
         }
@@ -103,10 +103,10 @@ namespace FoxTunes
             }
             if (!File.Exists(fileName))
             {
-                //Logger.Write(this, LogLevel.Debug, "Configuration file \"{0}\" does not exist.", fileName);
+                Logger.Write(this, LogLevel.Debug, "Configuration file \"{0}\" does not exist.", fileName);
                 return;
             }
-            //Logger.Write(this, LogLevel.Debug, "Loading configuration from file \"{0}\".", fileName);
+            Logger.Write(this, LogLevel.Debug, "Loading configuration from file \"{0}\".", fileName);
             this.OnLoading();
             try
             {
@@ -121,18 +121,18 @@ namespace FoxTunes
                         {
                             //If config was created by a component that is no longer loaded then it will be lost here.
                             //TODO: Add the config but hide it so it's preserved but not displayed.
-                            //Logger.Write(this, LogLevel.Warn, "Configuration section \"{0}\" no longer exists.", section.Key);
+                            Logger.Write(this, LogLevel.Warn, "Configuration section \"{0}\" no longer exists.", section.Key);
                             continue;
                         }
                         var existing = this.GetSection(section.Key);
                         try
                         {
-                            //Logger.Write(this, LogLevel.Debug, "Loading configuration section \"{0}\".", section.Key);
+                            Logger.Write(this, LogLevel.Debug, "Loading configuration section \"{0}\".", section.Key);
                             restoredElements.AddRange(this.Load(existing, section.Value));
                         }
-                        catch
+                        catch (Exception e)
                         {
-                            //Logger.Write(this, LogLevel.Warn, "Failed to load configuration section \"{0}\": {1}", existing.Id, e.Message);
+                            Logger.Write(this, LogLevel.Warn, "Failed to load configuration section \"{0}\": {1}", existing.Id, e.Message);
                         }
                     }
                 }
@@ -142,14 +142,14 @@ namespace FoxTunes
                     {
                         continue;
                     }
-                    //Logger.Write(this, LogLevel.Debug, "Resetting configuration element: \"{0}\".", modifiedElement.Id);
+                    Logger.Write(this, LogLevel.Debug, "Resetting configuration element: \"{0}\".", modifiedElement.Id);
                     modifiedElement.Reset();
                 }
                 Profiles.Profile = profile;
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to load configuration: {0}", e.Message);
+                Logger.Write(this, LogLevel.Warn, "Failed to load configuration: {0}", e.Message);
             }
             this.OnLoaded();
         }
@@ -163,10 +163,10 @@ namespace FoxTunes
                 {
                     //If config was created by a component that is no longer loaded then it will be lost here.
                     //TODO: Add the config but hide it so it's preserved but not displayed.
-                    //Logger.Write(this, LogLevel.Warn, "Configuration element \"{0}\" no longer exists.", element.Key);
+                    Logger.Write(this, LogLevel.Warn, "Configuration element \"{0}\" no longer exists.", element.Key);
                     continue;
                 }
-                //Logger.Write(this, LogLevel.Debug, "Loading configuration element: \"{0}\".", element.Key);
+                Logger.Write(this, LogLevel.Debug, "Loading configuration element: \"{0}\".", element.Key);
                 var existing = section.GetElement(element.Key);
                 existing.SetPersistentValue(element.Value);
                 restoredElements.Add(existing);
@@ -211,7 +211,7 @@ namespace FoxTunes
             }
             var fileName = Profiles.GetFileName(profile);
             this.OnSaving();
-            //Logger.Write(this, LogLevel.Debug, "Saving configuration to file \"{0}\".", fileName);
+            Logger.Write(this, LogLevel.Debug, "Saving configuration to file \"{0}\".", fileName);
             try
             {
                 //Use a temp file so the settings aren't lost if something goes wrong.
@@ -226,9 +226,9 @@ namespace FoxTunes
                 }
                 Profiles.Profile = profile;
             }
-            catch 
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
+                Logger.Write(this, LogLevel.Warn, "Failed to save configuration: {0}", e.Message);
             }
             this.OnSaved();
         }
@@ -251,9 +251,9 @@ namespace FoxTunes
                 }
                 Profiles.Profile = profile;
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to copy configuration: {0}", e.Message);
+                Logger.Write(this, LogLevel.Warn, "Failed to copy configuration: {0}", e.Message);
             }
         }
 
@@ -299,9 +299,9 @@ namespace FoxTunes
                 }
                 this.Load();
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to delete configuration: {0}", e.Message);
+                Logger.Write(this, LogLevel.Warn, "Failed to delete configuration: {0}", e.Message);
             }
             this.OnSaved();
         }

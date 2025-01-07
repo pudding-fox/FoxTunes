@@ -122,12 +122,12 @@ namespace FoxTunes
         {
             this.Columns.AddOrUpdate(column, notify);
             this.Debouncer.Exec(this.Update);
-            //Logger.Write(this, LogLevel.Debug, "Queued update for column {0} => {1}.", column.Id, column.Name);
+            Logger.Write(this, LogLevel.Debug, "Queued update for column {0} => {1}.", column.Id, column.Name);
         }
 
         protected virtual async Task Update()
         {
-            //Logger.Write(this, LogLevel.Debug, "Updating {0} columns...", this.Columns.Count);
+            Logger.Write(this, LogLevel.Debug, "Updating {0} columns...", this.Columns.Count);
             var columns = new List<PlaylistColumn>();
             using (var database = this.DatabaseFactory.Create())
             {
@@ -138,7 +138,7 @@ namespace FoxTunes
                         var set = database.Set<PlaylistColumn>(transaction);
                         foreach (var pair in this.Columns)
                         {
-                            //Logger.Write(this, LogLevel.Debug, "Updating column {0} => {1}.", pair.Key.Id, pair.Key.Name);
+                            Logger.Write(this, LogLevel.Debug, "Updating column {0} => {1}.", pair.Key.Id, pair.Key.Name);
                             await set.AddOrUpdateAsync(pair.Key).ConfigureAwait(false);
                             if (pair.Value)
                             {
@@ -192,7 +192,7 @@ namespace FoxTunes
 
         ~PlaylistColumnsBehaviour()
         {
-            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

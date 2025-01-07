@@ -59,7 +59,7 @@ namespace FoxTunes
             set
             {
                 BassZipStream.SetConfig(BassZipStreamAttribute.BufferMin, value);
-                //Logger.Write(this, LogLevel.Debug, "BufferMin = {0}", this.BufferMin);
+                Logger.Write(this, LogLevel.Debug, "BufferMin = {0}", this.BufferMin);
             }
         }
 
@@ -77,7 +77,7 @@ namespace FoxTunes
             set
             {
                 BassZipStream.SetConfig(BassZipStreamAttribute.BufferTimeout, value);
-                //Logger.Write(this, LogLevel.Debug, "BufferTimeout = {0}", this.BufferTimeout);
+                Logger.Write(this, LogLevel.Debug, "BufferTimeout = {0}", this.BufferTimeout);
             }
         }
 
@@ -95,7 +95,7 @@ namespace FoxTunes
             set
             {
                 BassZipStream.SetConfig(BassZipStreamAttribute.DoubleBuffer, value);
-                //Logger.Write(this, LogLevel.Debug, "DoubleBuffer = {0}", this.DoubleBuffer);
+                Logger.Write(this, LogLevel.Debug, "DoubleBuffer = {0}", this.DoubleBuffer);
             }
         }
 
@@ -110,7 +110,7 @@ namespace FoxTunes
             set
             {
                 this._Enabled = value;
-                //Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
             }
         }
 
@@ -353,7 +353,7 @@ namespace FoxTunes
                     var set = this.Database.Set<PlaylistItem>(transaction);
                     foreach (var playlistItem in playlistItems)
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
+                        Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
                         playlistItem.Playlist_Id = this.Playlist.Id;
                         playlistItem.Sequence = this.Sequence;
                         playlistItem.Status = PlaylistItemStatus.Import;
@@ -459,7 +459,7 @@ namespace FoxTunes
                         var libraryItems = set.Where(libraryItem => libraryItem.DirectoryName == root);
                         foreach (var libraryItem in libraryItems)
                         {
-                            //Logger.Write(this, LogLevel.Debug, "Removing file from library: {0}", libraryItem.FileName);
+                            Logger.Write(this, LogLevel.Debug, "Removing file from library: {0}", libraryItem.FileName);
                             libraryItem.Status = LibraryItemStatus.Remove;
                             await set.AddOrUpdateAsync(libraryItem).ConfigureAwait(false);
                             cleanup = true;
@@ -483,7 +483,7 @@ namespace FoxTunes
                     var set = this.Database.Set<LibraryItem>(transaction);
                     foreach (var libraryItem in libraryItems)
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Adding file to library: {0}", libraryItem.FileName);
+                        Logger.Write(this, LogLevel.Debug, "Adding file to library: {0}", libraryItem.FileName);
                         libraryItem.Status = LibraryItemStatus.Import;
                         libraryItem.SetImportDate(DateTime.UtcNow);
                         await set.AddAsync(libraryItem).ConfigureAwait(false);

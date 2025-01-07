@@ -35,9 +35,9 @@ namespace FoxTunes
                     }
                 }
             }
-            catch 
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to retrieve checksum from database: {0}", e.Message);
+                Logger.Write(this, LogLevel.Warn, "Failed to retrieve checksum from database: {0}", e.Message);
                 return null;
             }
         }
@@ -63,7 +63,7 @@ namespace FoxTunes
             var actual = this.Get(database);
             if (!string.Equals(expected, actual, StringComparison.OrdinalIgnoreCase))
             {
-                //Logger.Write(this, LogLevel.Warn, "Database checksum does not match. Expected \"{0}\" but found \"{1}\".", expected, actual);
+                Logger.Write(this, LogLevel.Warn, "Database checksum does not match. Expected \"{0}\" but found \"{1}\".", expected, actual);
                 return false;
             }
             return true;

@@ -85,12 +85,12 @@ namespace FoxTunes
                     var result = this.FileSystemBrowser.Browse(options);
                     if (!result.Success)
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Save As folder browse dialog was cancelled.");
+                        Logger.Write(this, LogLevel.Debug, "Save As folder browse dialog was cancelled.");
                         directoryName = null;
                         return false;
                     }
                     this._BrowseFolder = result.Paths.FirstOrDefault();
-                    //Logger.Write(this, LogLevel.Debug, "Browse folder: {0}", this._BrowseFolder);
+                    Logger.Write(this, LogLevel.Debug, "Browse folder: {0}", this._BrowseFolder);
                 }
             }
             directoryName = this._BrowseFolder;

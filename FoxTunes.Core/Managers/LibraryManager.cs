@@ -165,11 +165,11 @@ namespace FoxTunes
                 selectedHierarchy = this.HierarchyBrowser.GetHierarchies().FirstOrDefault(libraryHierarchy => libraryHierarchy.Id == selectedHierarchy.Id);
                 if (selectedHierarchy != null)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Refreshed selected hierarchy: {0} => {1}", selectedHierarchy.Id, selectedHierarchy.Name);
+                    Logger.Write(this, LogLevel.Debug, "Refreshed selected hierarchy: {0} => {1}", selectedHierarchy.Id, selectedHierarchy.Name);
                 }
                 else
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Failed to refresh selected hierarchy, it was removed or disabled.");
+                    Logger.Write(this, LogLevel.Debug, "Failed to refresh selected hierarchy, it was removed or disabled.");
                 }
             }
             if (selectedHierarchy == null)
@@ -177,11 +177,11 @@ namespace FoxTunes
                 selectedHierarchy = this.HierarchyBrowser.GetHierarchies().FirstOrDefault();
                 if (selectedHierarchy != null)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Selected first hierarchy: {0} => {1}", selectedHierarchy.Id, selectedHierarchy.Name);
+                    Logger.Write(this, LogLevel.Debug, "Selected first hierarchy: {0} => {1}", selectedHierarchy.Id, selectedHierarchy.Name);
                 }
                 else
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to select a hierarchy, perhaps none are enabled?");
+                    Logger.Write(this, LogLevel.Warn, "Failed to select a hierarchy, perhaps none are enabled?");
                 }
             }
             if (object.ReferenceEquals(this.SelectedHierarchy, selectedHierarchy))
@@ -221,11 +221,11 @@ namespace FoxTunes
                 selectedItem = this.HierarchyBrowser.GetNode(libraryHierarchy, selectedItem);
                 if (selectedItem != null)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Refreshed selected item: {0} => {1}", selectedItem.Id, selectedItem.Value);
+                    Logger.Write(this, LogLevel.Debug, "Refreshed selected item: {0} => {1}", selectedItem.Id, selectedItem.Value);
                 }
                 else
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Failed to refresh selected item, it was removed.");
+                    Logger.Write(this, LogLevel.Debug, "Failed to refresh selected item, it was removed.");
                 }
             }
             if (selectedItem == null)
@@ -233,11 +233,11 @@ namespace FoxTunes
                 selectedItem = this.HierarchyBrowser.GetNodes(libraryHierarchy).FirstOrDefault();
                 if (selectedItem != null)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Selected first item: {0} => {1}", selectedItem.Id, selectedItem.Value);
+                    Logger.Write(this, LogLevel.Debug, "Selected first item: {0} => {1}", selectedItem.Id, selectedItem.Value);
                 }
                 else
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to select an item, perhaps none are available?");
+                    Logger.Write(this, LogLevel.Warn, "Failed to select an item, perhaps none are available?");
                 }
             }
             if (object.ReferenceEquals(this._SelectedItem[libraryHierarchy], selectedItem))

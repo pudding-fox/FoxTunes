@@ -338,10 +338,10 @@ namespace FoxTunes
 
             protected override async Task OnRun()
             {
-                //Logger.Write(this, LogLevel.Debug, "Creating scanner.");
+                Logger.Write(this, LogLevel.Debug, "Creating scanner.");
                 using (var scanner = ScannerFactory.CreateScanner(this.ScannerItems))
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Starting scanner.");
+                    Logger.Write(this, LogLevel.Debug, "Starting scanner.");
                     using (var monitor = new BassReplayGainScannerMonitor(scanner, this.Visible, this.CancellationToken))
                     {
                         await this.WithSubTask(monitor,
@@ -350,7 +350,7 @@ namespace FoxTunes
                         this.ScannerItems = monitor.ScannerItems.Values.ToArray();
                     }
                 }
-                //Logger.Write(this, LogLevel.Debug, "Scanner completed successfully.");
+                Logger.Write(this, LogLevel.Debug, "Scanner completed successfully.");
             }
 
             protected override async Task OnCompleted()

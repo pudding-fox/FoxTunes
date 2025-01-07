@@ -63,7 +63,7 @@ namespace FoxTunes
                     this.Reset();
                     break;
                 case CommonSignals.ImagesUpdated:
-                    //Logger.Write(this, LogLevel.Debug, "Images were updated, resetting cache.");
+                    Logger.Write(this, LogLevel.Debug, "Images were updated, resetting cache.");
                     this.Reset();
                     break;
             }
@@ -119,7 +119,7 @@ namespace FoxTunes
 
         protected virtual ImageBrush Create(LibraryHierarchyNode libraryHierarchyNode, Func<MetaDataItem[]> metaDataItems, int width, int height, LibraryBrowserImageMode mode, bool cache)
         {
-            //Logger.Write(this, LogLevel.Debug, "Creating brush: {0}x{1}", width, height);
+            Logger.Write(this, LogLevel.Debug, "Creating brush: {0}x{1}", width, height);
             var source = this.LibraryBrowserTileProvider.CreateImageSource(
                 libraryHierarchyNode,
                 metaDataItems,
@@ -145,7 +145,7 @@ namespace FoxTunes
 
         protected virtual void CreateTaskFactory(int threads)
         {
-            //Logger.Write(this, LogLevel.Debug, "Creating task factory for {0} threads.", threads);
+            Logger.Write(this, LogLevel.Debug, "Creating task factory for {0} threads.", threads);
             this.Factory = new TaskFactory(new TaskScheduler(new ParallelOptions()
             {
                 MaxDegreeOfParallelism = threads
@@ -154,7 +154,7 @@ namespace FoxTunes
 
         protected virtual void CreateCache(int capacity)
         {
-            //Logger.Write(this, LogLevel.Debug, "Creating cache for {0} items.", capacity);
+            Logger.Write(this, LogLevel.Debug, "Creating cache for {0} items.", capacity);
             this.Store = new ImageBrushCache<Tuple<LibraryHierarchyNode, LibraryBrowserImageMode>>(capacity);
         }
 
@@ -167,7 +167,7 @@ namespace FoxTunes
                     return;
                 }
             }
-            //Logger.Write(this, LogLevel.Debug, "Meta data was updated, resetting cache.");
+            Logger.Write(this, LogLevel.Debug, "Meta data was updated, resetting cache.");
             this.Reset();
         }
 
@@ -204,7 +204,7 @@ namespace FoxTunes
 
         ~LibraryBrowserTileBrushFactory()
         {
-            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

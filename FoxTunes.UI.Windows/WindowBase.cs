@@ -21,6 +21,14 @@ namespace FoxTunes
 {
     public abstract class WindowBase : Window, IUserInterfaceWindow
     {
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
         static WindowBase()
         {
             Instances = new List<WeakReference<WindowBase>>();

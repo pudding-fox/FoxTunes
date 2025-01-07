@@ -145,12 +145,12 @@ namespace FoxTunes
             var depth = base.GetDepth(encoderItem, stream);
             if (depth < DEPTH_16)
             {
-                //Logger.Write(this.GetType(), LogLevel.Warn, "Requsted bit depth {0} is invalid, using minimum: 16 bit", depth);
+                Logger.Write(this.GetType(), LogLevel.Warn, "Requsted bit depth {0} is invalid, using minimum: 16 bit", depth);
                 return DEPTH_16;
             }
             if (depth > DEPTH_32)
             {
-                //Logger.Write(this.GetType(), LogLevel.Warn, "Requsted bit depth {0} is invalid, using maximum: 32 bit", depth);
+                Logger.Write(this.GetType(), LogLevel.Warn, "Requsted bit depth {0} is invalid, using maximum: 32 bit", depth);
                 return DEPTH_32;
             }
             return depth;

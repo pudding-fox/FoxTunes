@@ -201,12 +201,12 @@ namespace FoxTunes
                     Render(ref info, data);
                     success = true;
                 }
-                catch
+                catch (Exception e)
                 {
 #if DEBUG
-                    //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum: {0}", e.Message);
+                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum: {0}", e.Message);
 #else
-                    //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum, disabling: {0}", e.Message);
+                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum, disabling: {0}", e.Message);
                     success = false;
 #endif
                 }
@@ -257,13 +257,13 @@ namespace FoxTunes
 
                 this.BeginUpdateData();
             }
-            catch
+            catch (Exception exception)
             {
 #if DEBUG
-                //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data: {0}", exception.Message);
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data: {0}", exception.Message);
                 this.BeginUpdateData();
 #else
-                //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data, disabling: {0}", exception.Message);
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update spectrum data, disabling: {0}", exception.Message);
 #endif
             }
         }
@@ -282,13 +282,13 @@ namespace FoxTunes
 
                 this.BeginUpdateDisplay();
             }
-            catch
+            catch (Exception exception)
             {
 #if DEBUG
-                //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum data: {0}", exception.Message);
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum data: {0}", exception.Message);
                 this.BeginUpdateData();
 #else
-                //Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum data, disabling: {0}", exception.Message);
+                Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render spectrum data, disabling: {0}", exception.Message);
 #endif
             }
         }

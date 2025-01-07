@@ -230,7 +230,7 @@ namespace FoxTunes
                 var format = default(OutputStreamFormat);
                 if (!this.GetDataFormat(out rate, out channels, out format))
                 {
-                    //Logger.Write(this, LogLevel.Error, "Failed to determine channel count while creating interleaved FFT buffer.");
+                    Logger.Write(this, LogLevel.Error, "Failed to determine channel count while creating interleaved FFT buffer.");
                     return null;
                 }
                 length *= channels;
@@ -288,7 +288,7 @@ namespace FoxTunes
 
         ~BassOutputDataSource()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

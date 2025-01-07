@@ -52,14 +52,14 @@ namespace FoxTunes
         {
             if (MetaDataBehaviourConfiguration.GetWriteBehaviour(this.Write.Value) == WriteBehaviour.None)
             {
-                //Logger.Write(this, LogLevel.Debug, "Meta data writing is disabled.");
+                Logger.Write(this, LogLevel.Debug, "Meta data writing is disabled.");
                 return;
             }
             foreach (var playlistItem in this.PlaylistItems)
             {
                 if (this.Output.IsLoaded(playlistItem.FileName))
                 {
-                    //Logger.Write(this, LogLevel.Debug, "File \"{0}\" could not be written, the update will be retried: The file is in use.", playlistItem.FileName);
+                    Logger.Write(this, LogLevel.Debug, "File \"{0}\" could not be written, the update will be retried: The file is in use.", playlistItem.FileName);
                     this.AddError(playlistItem, string.Format("File \"{0}\" could not be written, the update will be retried: The file is in use.", playlistItem.FileName));
                     await this.Schedule(playlistItem).ConfigureAwait(false);
                     continue;
@@ -70,13 +70,13 @@ namespace FoxTunes
                 }
                 catch (IOException e)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "File \"{0}\" could not be written, the update will be retried: {1}", playlistItem.FileName, e.Message);
+                    Logger.Write(this, LogLevel.Debug, "File \"{0}\" could not be written, the update will be retried: {1}", playlistItem.FileName, e.Message);
                     this.AddError(playlistItem, string.Format("File \"{0}\" could not be written, the update will be retried: {1}", playlistItem.FileName, e.Message));
                     await this.Schedule(playlistItem).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "File \"{0}\" could not be written: {1}", playlistItem.FileName, e.Message);
+                    Logger.Write(this, LogLevel.Debug, "File \"{0}\" could not be written: {1}", playlistItem.FileName, e.Message);
                     this.AddError(playlistItem, string.Format("File \"{0}\" could not be written: {1}", playlistItem.FileName, e.Message));
                 }
             }
@@ -86,13 +86,13 @@ namespace FoxTunes
         {
             if (!FileSystemHelper.IsLocalPath(playlistItem.FileName))
             {
-                //Logger.Write(this, LogLevel.Debug, "File \"{0}\" is not a local file: Cannot update.", playlistItem.FileName);
+                Logger.Write(this, LogLevel.Debug, "File \"{0}\" is not a local file: Cannot update.", playlistItem.FileName);
                 return;
             }
 
             if (!File.Exists(playlistItem.FileName))
             {
-                //Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName);
+                Logger.Write(this, LogLevel.Debug, "File \"{0}\" no longer exists: Cannot update.", playlistItem.FileName);
                 return;
             }
 

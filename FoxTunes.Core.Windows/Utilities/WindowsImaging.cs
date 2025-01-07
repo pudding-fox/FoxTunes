@@ -128,7 +128,15 @@ namespace FoxTunes
 
         public class ScopedDC : IDisposable
         {
-                        public ScopedDC(IntPtr hwnd, IntPtr dc, IntPtr cdc)
+            protected static ILogger Logger
+            {
+                get
+                {
+                    return LogManager.Logger;
+                }
+            }
+
+            public ScopedDC(IntPtr hwnd, IntPtr dc, IntPtr cdc)
             {
                 this.hwnd = hwnd;
                 this.dc = dc;
@@ -181,7 +189,7 @@ namespace FoxTunes
 
             ~ScopedDC()
             {
-                //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+                Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
                 try
                 {
                     this.Dispose(true);

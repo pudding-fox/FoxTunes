@@ -115,7 +115,7 @@ namespace FoxTunes
                 {
                     return;
                 }
-                //Logger.Write(this, LogLevel.Debug, "Layout was modified, reloading.");
+                Logger.Write(this, LogLevel.Debug, "Layout was modified, reloading.");
                 var task = this.Load();
             }
         }
@@ -135,11 +135,11 @@ namespace FoxTunes
             {
                 if (string.IsNullOrEmpty(this.Main.Value))
                 {
-                    //Logger.Write(this, LogLevel.Debug, "No component to load.");
+                    Logger.Write(this, LogLevel.Debug, "No component to load.");
                     this.MainComponent = null;
                     return;
                 }
-                //Logger.Write(this, LogLevel.Debug, "Loading component..");
+                Logger.Write(this, LogLevel.Debug, "Loading component..");
                 try
                 {
                     using (var stream = new MemoryStream(Encoding.Default.GetBytes(this.Main.Value)))
@@ -147,9 +147,9 @@ namespace FoxTunes
                         this.MainComponent = Serializer.LoadComponent(stream);
                     }
                 }
-                catch
+                catch (Exception e)
                 {
-                    //Logger.Write(this, LogLevel.Warn, "Failed to load component: {0}", e.Message);
+                    Logger.Write(this, LogLevel.Warn, "Failed to load component: {0}", e.Message);
                 }
             });
         }
@@ -214,7 +214,7 @@ namespace FoxTunes
                     return;
                 }
                 this.IsSaving = true;
-                //Logger.Write(this, LogLevel.Debug, "Saving config.");
+                Logger.Write(this, LogLevel.Debug, "Saving config.");
                 try
                 {
                     this.Main.Value = value;
@@ -224,9 +224,9 @@ namespace FoxTunes
                     this.IsSaving = false;
                 }
             }
-            catch
+            catch (Exception e)
             {
-                //Logger.Write(this, LogLevel.Warn, "Failed to save config: {0}", e.Message);
+                Logger.Write(this, LogLevel.Warn, "Failed to save config: {0}", e.Message);
             }
         }
 
@@ -279,7 +279,7 @@ namespace FoxTunes
 
         ~UIComponentLayoutProvider()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

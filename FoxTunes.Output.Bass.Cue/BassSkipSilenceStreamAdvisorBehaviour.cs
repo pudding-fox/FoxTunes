@@ -27,7 +27,7 @@ namespace FoxTunes
             set
             {
                 this._Enabled = value;
-                //Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
             }
         }
 
@@ -42,7 +42,7 @@ namespace FoxTunes
             set
             {
                 this._Threshold = value;
-                //Logger.Write(this, LogLevel.Debug, "Threshold = {0}", this.Threshold);
+                Logger.Write(this, LogLevel.Debug, "Threshold = {0}", this.Threshold);
             }
         }
 
@@ -104,7 +104,7 @@ namespace FoxTunes
 
         ~BassSkipSilenceStreamAdvisorBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

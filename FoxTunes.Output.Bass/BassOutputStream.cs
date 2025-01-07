@@ -287,7 +287,7 @@ namespace FoxTunes
                         //We should follow this with a second call to BASS_ChannelSetPosition with the BASS_POS_DECODETO flag set.
                         position = this.Length - 1;
                     }
-                    //Logger.Write(this, LogLevel.Debug, "Seeking to position {0}", position);
+                    Logger.Write(this, LogLevel.Debug, "Seeking to position {0}", position);
                     if (this.IsPlaying)
                     {
                         if (bufferLength > 0)

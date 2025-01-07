@@ -91,12 +91,12 @@ namespace FoxTunes
             }
             if (PlaybackStateNotifier.IsPlaying && !this.Enabled)
             {
-                //Logger.Write(this, LogLevel.Debug, "Playback was started, starting renderer.");
+                Logger.Write(this, LogLevel.Debug, "Playback was started, starting renderer.");
                 this.Start();
             }
             else if (!PlaybackStateNotifier.IsPlaying && this.Enabled)
             {
-                //Logger.Write(this, LogLevel.Debug, "Playback was stopped, stopping renderer.");
+                Logger.Write(this, LogLevel.Debug, "Playback was stopped, stopping renderer.");
                 this.Stop();
             }
         }

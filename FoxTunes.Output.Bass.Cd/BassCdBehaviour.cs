@@ -53,7 +53,7 @@ namespace FoxTunes
             set
             {
                 this._Enabled = value;
-                //Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
             }
         }
 
@@ -68,7 +68,7 @@ namespace FoxTunes
             private set
             {
                 this._CdLookup = value;
-                //Logger.Write(this, LogLevel.Debug, "CD Lookup = {0}", this.CdLookup);
+                Logger.Write(this, LogLevel.Debug, "CD Lookup = {0}", this.CdLookup);
             }
         }
 
@@ -87,7 +87,7 @@ namespace FoxTunes
                 {
                     foreach (var cdLookupHost in value)
                     {
-                        //Logger.Write(this, LogLevel.Debug, "CD Lookup Host = {0}", cdLookupHost);
+                        Logger.Write(this, LogLevel.Debug, "CD Lookup Host = {0}", cdLookupHost);
                     }
                 }
             }
@@ -150,7 +150,7 @@ namespace FoxTunes
             }
             if (e.Input != null)
             {
-                //Logger.Write(this, LogLevel.Debug, "Overriding the default pipeline input: {0}", e.Input.GetType().Name);
+                Logger.Write(this, LogLevel.Debug, "Overriding the default pipeline input: {0}", e.Input.GetType().Name);
                 e.Input.Dispose();
             }
             e.Input = new BassCdStreamInput(this, drive, e.Pipeline, e.Stream.Flags);
@@ -161,7 +161,7 @@ namespace FoxTunes
         {
             if (this.Output.IsStarted && this.DoorMonitor.State == CdDoorState.Open)
             {
-                //Logger.Write(this, LogLevel.Debug, "CD door was opened, shutting down the output.");
+                Logger.Write(this, LogLevel.Debug, "CD door was opened, shutting down the output.");
                 this.Output.Shutdown();
             }
         }
@@ -255,7 +255,7 @@ namespace FoxTunes
 
         ~BassCdBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);
@@ -344,7 +344,7 @@ namespace FoxTunes
                     var position = 0;
                     foreach (var playlistItem in playlistItems)
                     {
-                        //Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
+                        Logger.Write(this, LogLevel.Debug, "Adding file to playlist: {0}", playlistItem.FileName);
                         playlistItem.Playlist_Id = playlist.Id;
                         playlistItem.Sequence = this.Sequence + position;
                         playlistItem.Status = PlaylistItemStatus.Import;

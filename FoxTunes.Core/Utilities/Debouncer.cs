@@ -8,7 +8,15 @@ namespace FoxTunes
 {
     public class Debouncer : IDisposable
     {
-                public static readonly object SyncRoot = new object();
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
+        public static readonly object SyncRoot = new object();
 
         private Debouncer()
         {
@@ -115,7 +123,7 @@ namespace FoxTunes
 
         ~Debouncer()
         {
-            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

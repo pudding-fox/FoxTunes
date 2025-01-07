@@ -62,13 +62,13 @@ namespace FoxTunes
             {
                 foreach (var playlist in state.Playlists)
                 {
-                    //Logger.Write(this, LogLevel.Debug, "Playlist \"{0}\" was updated, resetting cache.", playlist.Name);
+                    Logger.Write(this, LogLevel.Debug, "Playlist \"{0}\" was updated, resetting cache.", playlist.Name);
                     this.Reset(playlist);
                 }
             }
             else
             {
-                //Logger.Write(this, LogLevel.Debug, "Playlists were updated, resetting cache.");
+                Logger.Write(this, LogLevel.Debug, "Playlists were updated, resetting cache.");
                 this.Reset();
             }
         }
@@ -81,7 +81,7 @@ namespace FoxTunes
             }
             else
             {
-                //Logger.Write(this, LogLevel.Debug, "Columns were updated, resetting cache.");
+                Logger.Write(this, LogLevel.Debug, "Columns were updated, resetting cache.");
                 this.Columns = null;
             }
         }
@@ -222,7 +222,7 @@ namespace FoxTunes
 
         ~PlaylistCache()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

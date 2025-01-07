@@ -50,7 +50,7 @@ namespace FoxTunes
             set
             {
                 this._Enabled = value;
-                //Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -66,7 +66,7 @@ namespace FoxTunes
             set
             {
                 this._AsioDevice = value;
-                //Logger.Write(this, LogLevel.Debug, "ASIO Device = {0}", this.AsioDevice);
+                Logger.Write(this, LogLevel.Debug, "ASIO Device = {0}", this.AsioDevice);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -82,7 +82,7 @@ namespace FoxTunes
             private set
             {
                 this._DsdDirect = value;
-                //Logger.Write(this, LogLevel.Debug, "DSD = {0}", this.DsdDirect);
+                Logger.Write(this, LogLevel.Debug, "DSD = {0}", this.DsdDirect);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -98,7 +98,7 @@ namespace FoxTunes
             private set
             {
                 this._Mixer = value;
-                //Logger.Write(this, LogLevel.Debug, "Mixer = {0}", this.Mixer);
+                Logger.Write(this, LogLevel.Debug, "Mixer = {0}", this.Mixer);
                 this.OutputDeviceManager.Restart();
             }
         }
@@ -151,7 +151,7 @@ namespace FoxTunes
             {
                 BassAsioDevice.Detect(this.AsioDevice);
             }
-            //Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
+            Logger.Write(this, LogLevel.Debug, "BASS (No Sound) Initialized.");
         }
 
         protected virtual void OnFree(object sender, EventArgs e)
@@ -161,7 +161,7 @@ namespace FoxTunes
                 return;
             }
             this.OnFreeDevice();
-            //Logger.Write(this, LogLevel.Debug, "Releasing BASS.");
+            LogManager.Logger.Write(this, LogLevel.Debug, "Releasing BASS.");
             Bass.Free();
             this.IsInitialized = false;
         }
@@ -276,7 +276,7 @@ namespace FoxTunes
 
         ~BassAsioStreamOutputBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

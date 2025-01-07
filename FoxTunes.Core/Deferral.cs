@@ -5,7 +5,15 @@ namespace FoxTunes
 {
     public class Deferral<T> : IDisposable
     {
-                public Deferral(Action<T> action)
+        protected static ILogger Logger
+        {
+            get
+            {
+                return LogManager.Logger;
+            }
+        }
+
+        public Deferral(Action<T> action)
         {
             this.Action = action;
         }
@@ -39,7 +47,7 @@ namespace FoxTunes
 
         ~Deferral()
         {
-            //Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this.GetType(), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

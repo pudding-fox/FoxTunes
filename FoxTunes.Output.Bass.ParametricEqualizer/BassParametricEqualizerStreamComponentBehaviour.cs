@@ -30,7 +30,7 @@ namespace FoxTunes
             set
             {
                 this._Enabled = value;
-                //Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
+                Logger.Write(this, LogLevel.Debug, "Enabled = {0}", this.Enabled);
             }
         }
 
@@ -69,7 +69,7 @@ namespace FoxTunes
         {
             if (!BassParametricEqualizerStreamComponent.ShouldCreate(this, e.Stream, e.Query))
             {
-                //Logger.Write(this, LogLevel.Debug, "Cannot create component, the stream is not supported.");
+                Logger.Write(this, LogLevel.Debug, "Cannot create component, the stream is not supported.");
                 return;
             }
             var component = new BassParametricEqualizerStreamComponent(this, e.Pipeline, e.Stream.Flags);
@@ -115,7 +115,7 @@ namespace FoxTunes
 
         ~BassParametricEqualizerStreamComponentBehaviour()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);

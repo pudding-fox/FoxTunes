@@ -133,7 +133,7 @@ namespace FoxTunes
 
         ~UIComponentDesignerOverlay()
         {
-            //Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+            Logger.Write(this, LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
             try
             {
                 this.Dispose(true);
@@ -301,7 +301,7 @@ namespace FoxTunes
 
             ~UIComponentDesignerAdorner()
             {
-                //Logger.Write(typeof(UIComponentDesignerAdorner), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
+                Logger.Write(typeof(UIComponentDesignerAdorner), LogLevel.Error, "Component was not disposed: {0}", this.GetType().Name);
                 try
                 {
                     this.Dispose(true);
