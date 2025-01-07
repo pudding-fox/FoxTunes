@@ -12,6 +12,7 @@ RAIMUSOFT_CER="$(realpath ./.msix/RaimuSoft.cer)"
 RAIMUSOFT_PFX="$(realpath ./.msix/RaimuSoft.pfx)"
 
 TARGET="
+net40
 net48
 "
 
