@@ -13,8 +13,16 @@
     </UserControl.Resources>
     <Button Width="30" Height="30" Command="{Binding NextCommand, Mode=OneWay, Source={StaticResource ViewModel}}">
         <StackPanel Orientation="Horizontal">
-            <TextBlock FontSize="20" FontFamily="Webdings" >4</TextBlock>
-            <TextBlock FontSize="14" FontWeight="Bold" Margin="-6,0,0,0">?</TextBlock>
+            <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Width="15" Height="15">
+                <Canvas Width="16" Height="16">
+                    <Path Fill="{DynamicResource TextBrush}">
+                        <Path.Data>
+                            <PathGeometry Figures="M5 16L7 16L15 8L7 -2.7818e-08L5 0L5 16Z" />
+                        </Path.Data>
+                    </Path>
+                </Canvas>
+            </Viewbox>
+            <TextBlock FontSize="14" FontWeight="Bold" Margin="0,-2,0,0">?</TextBlock>
         </StackPanel>
     </Button>
 </Windows:UIComponentBase>

@@ -30,6 +30,16 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <Button Grid.Column="1" Content="r" Margin="2,0,0,0" Command="{Binding ClearCommand, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:SearchBox}}}" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" FontSize="10" FontFamily="Webdings"></Button>
+        <Button Grid.Column="1" Margin="2,0,0,0" Command="{Binding ClearCommand, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Windows:SearchBox}}}" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
+            <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Width="10" Height="10">
+                <Canvas Width="16" Height="16">
+                    <Path Fill="{DynamicResource TextBrush}">
+                        <Path.Data>
+                            <PathGeometry Figures="M0 14.545L1.455 16 8 9.455 14.545 16 16 14.545 9.455 8 16 1.455 14.545 0 8 6.545 1.455 0 0 1.455 6.545 8z" />
+                        </Path.Data>
+                    </Path>
+                </Canvas>
+            </Viewbox>
+        </Button>
     </Grid>
 </UserControl>
