@@ -141,6 +141,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoxTunes.UI.Windows.Grouped
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.Scripting.JS.Noesis", "FoxTunes.Scripting.JS.Noesis\FoxTunes.Scripting.JS.Noesis.csproj", "{7DBE06A7-E0DA-43CB-89F8-CE349BB718BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoxTunes.UI.Windows.MoodBar", "FoxTunes.UI.Windows.MoodBar\FoxTunes.UI.Windows.MoodBar.csproj", "{D7CF8B90-2160-4AF8-A995-DB05FCCA6E5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -391,6 +393,10 @@ Global
 		{7DBE06A7-E0DA-43CB-89F8-CE349BB718BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DBE06A7-E0DA-43CB-89F8-CE349BB718BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DBE06A7-E0DA-43CB-89F8-CE349BB718BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7CF8B90-2160-4AF8-A995-DB05FCCA6E5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7CF8B90-2160-4AF8-A995-DB05FCCA6E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7CF8B90-2160-4AF8-A995-DB05FCCA6E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7CF8B90-2160-4AF8-A995-DB05FCCA6E5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -457,6 +463,7 @@ Global
 		{7B371DBA-8ADB-41EB-BE80-B7D4FCB14944} = {05C1FA04-4070-44A7-9DFC-38B48FEFA3C2}
 		{9D87B2DB-E7F7-4508-9A0F-8936CAF77A0C} = {05C1FA04-4070-44A7-9DFC-38B48FEFA3C2}
 		{7DBE06A7-E0DA-43CB-89F8-CE349BB718BA} = {B084C572-A727-4879-A10F-0C2ECFB86E3C}
+		{D7CF8B90-2160-4AF8-A995-DB05FCCA6E5C} = {05C1FA04-4070-44A7-9DFC-38B48FEFA3C2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9293982D-B2F3-4C86-A307-057EE1CFA115}
