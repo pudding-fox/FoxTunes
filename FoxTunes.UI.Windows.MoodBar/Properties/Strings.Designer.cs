@@ -106,15 +106,6 @@ namespace FoxTunes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Color Palette.
-        /// </summary>
-        internal static string MoodBarStreamPositionConfiguration_ColorPalette {
-            get {
-                return ResourceManager.GetString("MoodBarStreamPositionConfiguration.ColorPalette", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Mood Bar.
         /// </summary>
         internal static string MoodBarStreamPositionConfiguration_Section {

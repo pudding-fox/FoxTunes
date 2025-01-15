@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net40;net48</TargetFrameworks>
-    <AssemblyName>FoxTunes.UI.Windows.WaveBar</AssemblyName>
+    <AssemblyName>FoxTunes.UI.Windows.MoodBar</AssemblyName>
     <OutputPath>..\distribution\</OutputPath>
     <SkipEnsureBindingRedirects>true</SkipEnsureBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>

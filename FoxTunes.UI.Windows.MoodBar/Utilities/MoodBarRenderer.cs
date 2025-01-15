@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 
 namespace FoxTunes
 {
@@ -24,33 +26,19 @@ namespace FoxTunes
 
         public IntegerConfigurationElement Resolution { get; private set; }
 
-        public TextConfigurationElement ColorPalette { get; private set; }
-
         public override void InitializeComponent(ICore core)
         {
             this.Generator = ComponentRegistry.Instance.GetComponent<MoodBarGenerator>();
             this.PlaybackManager = core.Managers.Playback;
             this.PlaybackManager.CurrentStreamChanged += this.OnCurrentStreamChanged;
+            this.Configuration = core.Components.Configuration;
+            this.Resolution = this.Configuration.GetElement<IntegerConfigurationElement>(
+                MoodBarGeneratorConfiguration.SECTION,
+                MoodBarGeneratorConfiguration.RESOLUTION_ELEMENT
+            );
+            this.Resolution.ValueChanged += this.OnValueChanged;
+            this.OnCurrentStreamChanged(this, EventArgs.Empty);
             base.InitializeComponent(core);
-        }
-
-        protected override void OnConfigurationChanged()
-        {
-            if (this.Configuration != null)
-            {
-                this.Resolution = this.Configuration.GetElement<IntegerConfigurationElement>(
-                    MoodBarGeneratorConfiguration.SECTION,
-                    MoodBarGeneratorConfiguration.RESOLUTION_ELEMENT
-                );
-                this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
-                    MoodBarStreamPositionConfiguration.SECTION,
-                    MoodBarStreamPositionConfiguration.COLOR_PALETTE_ELEMENT
-                );
-                this.Resolution.ValueChanged += this.OnValueChanged;
-                this.ColorPalette.ValueChanged += this.OnValueChanged;
-                this.OnCurrentStreamChanged(this, EventArgs.Empty);
-            }
-            base.OnConfigurationChanged();
         }
 
         protected virtual void OnCurrentStreamChanged(object sender, EventArgs e)
@@ -103,10 +91,6 @@ namespace FoxTunes
 
         protected override bool CreateData(int width, int height)
         {
-            if (this.Configuration == null)
-            {
-                return false;
-            }
             var generatorData = this.GeneratorData;
             if (generatorData == null)
             {
@@ -116,7 +100,7 @@ namespace FoxTunes
                 generatorData,
                 width,
                 height,
-                this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value))
+                this.GetColorPalettes(this.GetColorPaletteOrDefault(string.Empty))
             );
             if (this.RendererData == null)
             {
@@ -135,23 +119,6 @@ namespace FoxTunes
                     MoodBarStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND,
                     () => DefaultColors.GetBackground()
                 );
-                //Switch the default colors to the VALUE palette if one was provided.
-                var colors = palettes.GetOrAdd(
-                    MoodBarStreamPositionConfiguration.COLOR_PALETTE_VALUE,
-                    () => DefaultColors.GetValue(new[] { this.ForegroundColor })
-                );
-                palettes.GetOrAdd(
-                    MoodBarStreamPositionConfiguration.COLOR_PALETTE_LOW,
-                    () => DefaultColors.GetLow(background, colors)
-                );
-                palettes.GetOrAdd(
-                    MoodBarStreamPositionConfiguration.COLOR_PALETTE_MID,
-                    () => DefaultColors.GetMid(background, colors)
-                );
-                palettes.GetOrAdd(
-                    MoodBarStreamPositionConfiguration.COLOR_PALETTE_HIGH,
-                    () => DefaultColors.GetHigh(colors)
-                );
             }
             return palettes.ToDictionary(
                 pair => pair.Key,
@@ -162,16 +129,7 @@ namespace FoxTunes
                         return IntPtr.Zero;
                     }
                     flags = 0;
-                    var colors = pair.Value;
-                    if (colors.Length > 1)
-                    {
-                        flags |= BitmapHelper.COLOR_FROM_Y;
-                        if (new[] { MoodBarStreamPositionConfiguration.COLOR_PALETTE_LOW, MoodBarStreamPositionConfiguration.COLOR_PALETTE_MID, MoodBarStreamPositionConfiguration.COLOR_PALETTE_HIGH }.Contains(pair.Key, StringComparer.OrdinalIgnoreCase))
-                        {
-                            colors = colors.MirrorGradient(false);
-                        }
-                    }
-                    return BitmapHelper.CreatePalette(flags, GetAlphaBlending(pair.Key, colors), colors);
+                    return BitmapHelper.CreatePalette(flags, GetAlphaBlending(pair.Key, pair.Value), pair.Value);
                 },
                 StringComparer.OrdinalIgnoreCase
             );
@@ -200,7 +158,7 @@ namespace FoxTunes
                 }
                 else
                 {
-                    var palettes = this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value));
+                    var palettes = this.GetColorPalettes(this.GetColorPaletteOrDefault(string.Empty));
                     info = BitmapHelper.CreateRenderInfo(bitmap, palettes[MoodBarStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND]);
                 }
                 BitmapHelper.DrawRectangle(ref info, 0, 0, data.Width, data.Height);
@@ -311,17 +269,12 @@ namespace FoxTunes
             {
                 this.Resolution.ValueChanged -= this.OnValueChanged;
             }
-            if (this.ColorPalette != null)
-            {
-                this.ColorPalette.ValueChanged -= this.OnValueChanged;
-            }
             base.OnDisposing();
         }
 
         private static void Update(MoodBarGenerator.MoodBarGeneratorData generatorData, MoodBarRendererData rendererData)
         {
             UpdateView(generatorData, rendererData);
-            UpdateElements(rendererData);
         }
 
         private static void UpdateView(MoodBarGenerator.MoodBarGeneratorData generatorData, MoodBarRendererData rendererData)
@@ -370,79 +323,12 @@ namespace FoxTunes
             }
         }
 
-        private static void UpdateElements(MoodBarRendererData rendererData)
-        {
-            var center = rendererData.Height / 2.0f;
-            var low = rendererData.View.Low;
-            var mid = rendererData.View.Mid;
-            var high = rendererData.View.High;
-            var peak = rendererData.View.Peak;
-            var lowElements = rendererData.LowElements;
-            var midElements = rendererData.MidElements;
-            var highElements = rendererData.HighElements;
-
-            if (peak == 0)
-            {
-                peak = 1;
-            }
-
-            while (rendererData.Position < rendererData.View.Position)
-            {
-                {
-                    var value = low[rendererData.Position] / peak;
-                    var y = Convert.ToInt32(center - (value * center));
-                    var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
-
-                    lowElements[rendererData.Position].X = rendererData.Position;
-                    lowElements[rendererData.Position].Y = y;
-                    lowElements[rendererData.Position].Width = 1;
-                    lowElements[rendererData.Position].Height = height;
-                }
-
-                {
-                    var value = mid[rendererData.Position] / peak;
-                    var y = Convert.ToInt32(center - (value * center));
-                    var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
-
-                    midElements[rendererData.Position].X = rendererData.Position;
-                    midElements[rendererData.Position].Y = y;
-                    midElements[rendererData.Position].Width = 1;
-                    midElements[rendererData.Position].Height = height;
-                }
-
-                {
-                    var value = high[rendererData.Position] / peak;
-                    var y = Convert.ToInt32(center - (value * center));
-                    var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
-
-                    highElements[rendererData.Position].X = rendererData.Position;
-                    highElements[rendererData.Position].Y = y;
-                    highElements[rendererData.Position].Width = 1;
-                    highElements[rendererData.Position].Height = height;
-                }
-
-                rendererData.Position++;
-            }
-        }
-
         private static MoodBarRenderInfo GetRenderInfo(WriteableBitmap bitmap, MoodBarRendererData data)
         {
             var info = new MoodBarRenderInfo()
             {
                 Background = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[MoodBarStreamPositionConfiguration.COLOR_PALETTE_BACKGROUND])
             };
-            if (data.LowElements != null)
-            {
-                info.Low = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[MoodBarStreamPositionConfiguration.COLOR_PALETTE_LOW]);
-            }
-            if (data.MidElements != null)
-            {
-                info.Mid = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[MoodBarStreamPositionConfiguration.COLOR_PALETTE_MID]);
-            }
-            if (data.HighElements != null)
-            {
-                info.High = BitmapHelper.CreateRenderInfo(bitmap, data.Colors[MoodBarStreamPositionConfiguration.COLOR_PALETTE_HIGH]);
-            }
             return info;
         }
 
@@ -455,23 +341,32 @@ namespace FoxTunes
             }
             BitmapHelper.DrawRectangle(ref info.Background, 0, 0, data.Width, data.Height);
 
-            if (data.Position == 0)
+            if (data.View.Position == 0)
             {
                 //No data.
                 return;
             }
 
-            if (data.LowElements != null)
+            for (var a = 0; a < data.View.Position; a++)
             {
-                BitmapHelper.DrawRectangles(ref info.Low, data.LowElements, data.LowElements.Length);
-            }
-            if (data.MidElements != null)
-            {
-                BitmapHelper.DrawRectangles(ref info.Mid, data.MidElements, data.MidElements.Length);
-            }
-            if (data.HighElements != null)
-            {
-                BitmapHelper.DrawRectangles(ref info.High, data.HighElements, data.HighElements.Length);
+                var palette = BitmapHelper.CreatePalette(new[]
+                {
+                    new Int32Color(
+                        (byte)((data.View.High[a] / data.View.Peak) * byte.MaxValue),
+                        (byte)((data.View.Mid[a] / data.View.Peak) * byte.MaxValue),
+                        (byte)((data.View.Low[a] / data.View.Peak) * byte.MaxValue),
+                        0
+                    )
+                }, 1, 0);
+                try
+                {
+                    var value = BitmapHelper.CreateRenderInfo(info.Background, palette);
+                    BitmapHelper.DrawRectangle(ref value, a, 0, 1, data.Height);
+                }
+                finally
+                {
+                    BitmapHelper.DestroyPalette(ref palette);
+                }
             }
         }
 
@@ -488,10 +383,6 @@ namespace FoxTunes
                 Height = height,
                 ValuesPerElement = valuesPerElement,
                 Colors = colors,
-                LowElements = new Int32Rect[width],
-                MidElements = new Int32Rect[width],
-                HighElements = new Int32Rect[width],
-                Capacity = width,
                 View = new MoodBarGeneratorDataView()
                 {
                     Low = new float[width],
@@ -525,16 +416,6 @@ namespace FoxTunes
 
             public IDictionary<string, IntPtr> Colors;
 
-            public Int32Rect[] LowElements;
-
-            public Int32Rect[] MidElements;
-
-            public Int32Rect[] HighElements;
-
-            public int Position;
-
-            public int Capacity;
-
             public MoodBarGeneratorDataView View;
 
             ~MoodBarRendererData()
@@ -561,12 +442,6 @@ namespace FoxTunes
         [StructLayout(LayoutKind.Sequential)]
         public struct MoodBarRenderInfo
         {
-            public BitmapHelper.RenderInfo Low;
-
-            public BitmapHelper.RenderInfo Mid;
-
-            public BitmapHelper.RenderInfo High;
-
             public BitmapHelper.RenderInfo Background;
         }
 
@@ -578,44 +453,6 @@ namespace FoxTunes
                 {
                     global::System.Windows.Media.Colors.Black
                 };
-            }
-
-            public static Color[] GetLow(Color[] background, Color[] colors)
-            {
-                var transparency = background.Length > 1 || background.FirstOrDefault().A != 255;
-                if (transparency)
-                {
-                    return colors.WithAlpha(-200);
-                }
-                else
-                {
-                    var color = background.FirstOrDefault();
-                    return colors.Interpolate(color, 0.8f);
-                }
-            }
-
-            public static Color[] GetMid(Color[] background, Color[] colors)
-            {
-                var transparency = background.Length > 1 || background.FirstOrDefault().A != 255;
-                if (transparency)
-                {
-                    return colors.WithAlpha(-100);
-                }
-                else
-                {
-                    var color = background.FirstOrDefault();
-                    return colors.Interpolate(color, 0.4f);
-                }
-            }
-
-            public static Color[] GetHigh(Color[] colors)
-            {
-                return colors;
-            }
-
-            public static Color[] GetValue(Color[] colors)
-            {
-                return colors;
             }
         }
     }

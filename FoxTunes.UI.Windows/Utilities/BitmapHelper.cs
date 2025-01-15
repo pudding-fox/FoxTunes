@@ -96,6 +96,19 @@ namespace FoxTunes
             };
         }
 
+        public static RenderInfo CreateRenderInfo(RenderInfo renderInfo, IntPtr palette)
+        {
+            return new RenderInfo
+            {
+                BytesPerPixel = renderInfo.BytesPerPixel,
+                Width = renderInfo.Width,
+                Height = renderInfo.Height,
+                Stride = renderInfo.Stride,
+                Buffer = renderInfo.Buffer,
+                Palette = palette
+            };
+        }
+
         public static IntPtr CreatePalette(int flags, bool alphaBlending, params Color[] colors)
         {
             return CreatePalette(flags, alphaBlending, colors.Select(color => new Int32Color(color)).ToArray());

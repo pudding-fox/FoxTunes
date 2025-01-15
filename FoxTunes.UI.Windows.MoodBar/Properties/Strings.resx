@@ -132,9 +132,6 @@
   <data name="MoodBarStreamPosition.Name" xml:space="preserve">
     <value>Mood Bar</value>
   </data>
-  <data name="MoodBarStreamPositionConfiguration.ColorPalette" xml:space="preserve">
-    <value>Color Palette</value>
-  </data>
   <data name="MoodBarStreamPositionConfiguration.Section" xml:space="preserve">
     <value>Mood Bar</value>
   </data>
