@@ -618,6 +618,14 @@ namespace FoxTunes
                     }
                 ),
                 new Package(
+                    "moodbar",
+                    new PackageElement[]
+                    {
+                        "FoxTunes.UI.Windows.MoodBar.dll"
+                    },
+                    PackageFlags.Default
+                ),
+                new Package(
                     "ratings",
                     new PackageElement[]
                     {
