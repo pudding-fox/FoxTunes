@@ -1,6 +1,8 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxTunes.Config;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FoxTunes
@@ -31,6 +33,8 @@ namespace FoxTunes
 
         public IntegerConfigurationElement Smoothing { get; private set; }
 
+        public SelectionConfigurationElement Mode { get; private set; }
+
         public TextConfigurationElement ColorPalette { get; private set; }
 
         protected override void OnConfigurationChanged()
@@ -44,6 +48,10 @@ namespace FoxTunes
                 this.Smoothing = this.Configuration.GetElement<IntegerConfigurationElement>(
                     BandedWaveFormStreamPositionConfiguration.SECTION,
                     BandedWaveFormStreamPositionConfiguration.SMOOTHING_ELEMENT
+                );
+                this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
+                    BandedWaveFormStreamPositionConfiguration.SECTION,
+                    BandedWaveFormStreamPositionConfiguration.MODE_ELEMENT
                 );
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     BandedWaveFormStreamPositionConfiguration.SECTION,
@@ -103,6 +111,16 @@ namespace FoxTunes
                     path: this.Smoothing.Name,
                     attributes: this.Smoothing.Value == BandedWaveFormStreamPositionConfiguration.SMOOTHING_MAX ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
                 );
+                foreach (var option in this.Mode.Options)
+                {
+                    yield return new InvocationComponent(
+                        CATEGORY,
+                        option.Id,
+                        option.Name,
+                        path: this.Mode.Name,
+                        attributes: this.Mode.Value == option ? InvocationComponent.ATTRIBUTE_SELECTED : InvocationComponent.ATTRIBUTE_NONE
+                    );
+                }
                 foreach (var invocationComponent in base.Invocations)
                 {
                     yield return invocationComponent;
@@ -134,6 +152,10 @@ namespace FoxTunes
                 {
                     this.Smoothing.Value = BandedWaveFormStreamPositionConfiguration.SMOOTHING_MAX;
                 }
+            }
+            else if (string.Equals(this.Mode.Name, component.Path))
+            {
+                this.Mode.Value = this.Mode.Options.FirstOrDefault(option => string.Equals(option.Id, component.Id));
             }
             else if (this.ThemeLoader.SelectColorPalette(this.ColorPalette, component))
             {

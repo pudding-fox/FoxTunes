@@ -195,4 +195,13 @@
   <data name="BandedWaveFormStreamPositionConfiguration.Smoothing.Off" xml:space="preserve">
     <value>Off</value>
   </data>
+  <data name="BandedWaveFormStreamPositionConfiguration.Mode" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="BandedWaveFormStreamPositionConfiguration.Mode.Combined" xml:space="preserve">
+    <value>Combined</value>
+  </data>
+  <data name="BandedWaveFormStreamPositionConfiguration.Mode.Seperate" xml:space="preserve">
+    <value>Seperate</value>
+  </data>
 </root>

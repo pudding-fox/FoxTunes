@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,6 +28,8 @@ namespace FoxTunes
         public BooleanConfigurationElement Logarithmic { get; private set; }
 
         public IntegerConfigurationElement Smoothing { get; private set; }
+
+        public SelectionConfigurationElement Mode { get; private set; }
 
         public TextConfigurationElement ColorPalette { get; private set; }
 
@@ -54,6 +57,10 @@ namespace FoxTunes
                     BandedWaveFormStreamPositionConfiguration.SECTION,
                     BandedWaveFormStreamPositionConfiguration.SMOOTHING_ELEMENT
                 );
+                this.Mode = this.Configuration.GetElement<SelectionConfigurationElement>(
+                    BandedWaveFormStreamPositionConfiguration.SECTION,
+                    BandedWaveFormStreamPositionConfiguration.MODE_ELEMENT
+                );
                 this.ColorPalette = this.Configuration.GetElement<TextConfigurationElement>(
                     BandedWaveFormStreamPositionConfiguration.SECTION,
                     BandedWaveFormStreamPositionConfiguration.COLOR_PALETTE_ELEMENT
@@ -61,6 +68,7 @@ namespace FoxTunes
                 this.Resolution.ValueChanged += this.OnValueChanged;
                 this.Logarithmic.ValueChanged += this.OnValueChanged;
                 this.Smoothing.ValueChanged += this.OnValueChanged;
+                this.Mode.ValueChanged += this.OnValueChanged;
                 this.ColorPalette.ValueChanged += this.OnValueChanged;
                 this.OnCurrentStreamChanged(this, EventArgs.Empty);
             }
@@ -132,6 +140,7 @@ namespace FoxTunes
                 height,
                 this.Logarithmic.Value,
                 this.Smoothing.Value,
+                this.Mode.Value.Id == BandedWaveFormStreamPositionConfiguration.MODE_SEPERATE_OPTION,
                 this.GetColorPalettes(this.GetColorPaletteOrDefault(this.ColorPalette.Value))
             );
             if (this.RendererData == null)
@@ -335,6 +344,10 @@ namespace FoxTunes
             {
                 this.Smoothing.ValueChanged -= this.OnValueChanged;
             }
+            if (this.Mode != null)
+            {
+                this.Mode.ValueChanged -= this.OnValueChanged;
+            }
             if (this.ColorPalette != null)
             {
                 this.ColorPalette.ValueChanged -= this.OnValueChanged;
@@ -423,6 +436,7 @@ namespace FoxTunes
             var mid = rendererData.View.Mid;
             var high = rendererData.View.High;
             var peak = rendererData.View.Peak;
+            var elements = rendererData.Elements;
             var lowElements = rendererData.LowElements;
             var midElements = rendererData.MidElements;
             var highElements = rendererData.HighElements;
@@ -434,6 +448,25 @@ namespace FoxTunes
 
             while (rendererData.Position < rendererData.View.Position)
             {
+                if (elements != null)
+                {
+                    var value = Math.Max(
+                        low[rendererData.Position],
+                        Math.Max(
+                            mid[rendererData.Position],
+                            high[rendererData.Position]
+                        )
+                    ) / peak;
+                    var y = Convert.ToInt32(center - (value * center));
+                    var height = Math.Max(Convert.ToInt32((center - y) + (value * center)), 1);
+
+                    elements[rendererData.Position].X = rendererData.Position;
+                    elements[rendererData.Position].Y = y;
+                    elements[rendererData.Position].Width = 1;
+                    elements[rendererData.Position].Height = height;
+                }
+
+                if (lowElements != null)
                 {
                     var value = low[rendererData.Position] / peak;
                     var y = Convert.ToInt32(center - (value * center));
@@ -445,6 +478,7 @@ namespace FoxTunes
                     lowElements[rendererData.Position].Height = height;
                 }
 
+                if (midElements != null)
                 {
                     var value = mid[rendererData.Position] / peak;
                     var y = Convert.ToInt32(center - (value * center));
@@ -456,6 +490,7 @@ namespace FoxTunes
                     midElements[rendererData.Position].Height = height;
                 }
 
+                if (highElements != null)
                 {
                     var value = high[rendererData.Position] / peak;
                     var y = Convert.ToInt32(center - (value * center));
@@ -506,7 +541,30 @@ namespace FoxTunes
                 //No data.
                 return;
             }
-
+            if (data.Elements != null)
+            {
+                for (var a = 0; a < data.View.Position; a++)
+                {
+                    var palette = BitmapHelper.CreatePalette(new[]
+                    {
+                    new Int32Color(
+                        (byte)((data.View.High[a] / data.View.Peak) * byte.MaxValue),
+                        (byte)((data.View.Mid[a] / data.View.Peak) * byte.MaxValue),
+                        (byte)((data.View.Low[a] / data.View.Peak) * byte.MaxValue),
+                        0
+                    )
+                }, 1, 0);
+                    try
+                    {
+                        var value = BitmapHelper.CreateRenderInfo(info.Background, palette);
+                        BitmapHelper.DrawRectangle(ref value, data.Elements[a].X, data.Elements[a].Y, data.Elements[a].Width, data.Elements[a].Height);
+                    }
+                    finally
+                    {
+                        BitmapHelper.DestroyPalette(ref palette);
+                    }
+                }
+            }
             if (data.LowElements != null)
             {
                 BitmapHelper.DrawRectangles(ref info.Low, data.LowElements, data.LowElements.Length);
@@ -521,7 +579,7 @@ namespace FoxTunes
             }
         }
 
-        public static WaveFormRendererData Create(BandedWaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height, bool logarithmic, int smoothing, IDictionary<string, IntPtr> colors)
+        public static WaveFormRendererData Create(BandedWaveFormGenerator.WaveFormGeneratorData generatorData, int width, int height, bool logarithmic, int smoothing, bool seperate, IDictionary<string, IntPtr> colors)
         {
             var valuesPerElement = generatorData.Capacity / width;
             if (valuesPerElement == 0)
@@ -536,9 +594,6 @@ namespace FoxTunes
                 Smoothing = smoothing,
                 ValuesPerElement = valuesPerElement,
                 Colors = colors,
-                LowElements = new Int32Rect[width],
-                MidElements = new Int32Rect[width],
-                HighElements = new Int32Rect[width],
                 Capacity = width,
                 View = new WaveFormGeneratorDataView()
                 {
@@ -547,6 +602,16 @@ namespace FoxTunes
                     High = new float[width]
                 }
             };
+            if (seperate)
+            {
+                data.LowElements = new Int32Rect[width];
+                data.MidElements = new Int32Rect[width];
+                data.HighElements = new Int32Rect[width];
+            }
+            else
+            {
+                data.Elements = new Int32Rect[width];
+            }
             return data;
         }
 
@@ -576,6 +641,8 @@ namespace FoxTunes
             public int ValuesPerElement;
 
             public IDictionary<string, IntPtr> Colors;
+
+            public Int32Rect[] Elements;
 
             public Int32Rect[] LowElements;
 

@@ -88,6 +88,33 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mode.
+        /// </summary>
+        internal static string BandedWaveFormStreamPositionConfiguration_Mode {
+            get {
+                return ResourceManager.GetString("BandedWaveFormStreamPositionConfiguration.Mode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Combined.
+        /// </summary>
+        internal static string BandedWaveFormStreamPositionConfiguration_Mode_Combined {
+            get {
+                return ResourceManager.GetString("BandedWaveFormStreamPositionConfiguration.Mode.Combined", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Seperate.
+        /// </summary>
+        internal static string BandedWaveFormStreamPositionConfiguration_Mode_Seperate {
+            get {
+                return ResourceManager.GetString("BandedWaveFormStreamPositionConfiguration.Mode.Seperate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wave Form (Three Band).
         /// </summary>
         internal static string BandedWaveFormStreamPositionConfiguration_Section {
