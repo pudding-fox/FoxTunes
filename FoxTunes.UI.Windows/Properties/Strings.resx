@@ -477,6 +477,15 @@
   <data name="PlaylistSelector.Name" xml:space="preserve">
     <value>Playlist Selector</value>
   </data>
+  <data name="PlaylistSelectorList.Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="PlaylistSelectorList.Name" xml:space="preserve">
+    <value>Playlist Selector (List)</value>
+  </data>
+  <data name="PlaylistSelectorList.Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
   <data name="PlaylistSettingsDialog.Help" xml:space="preserve">
     <value>Help</value>
   </data>

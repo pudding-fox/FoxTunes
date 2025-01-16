@@ -413,5 +413,21 @@
                 return Strings.PluginsDialog_NotAvailable;
             }
         }
+
+        public static string PlaylistSelectorList_Add
+        {
+            get
+            {
+                return Strings.PlaylistSelectorList_Add;
+            }
+        }
+
+        public static string PlaylistSelectorList_Remove
+        {
+            get
+            {
+                return Strings.PlaylistSelectorList_Remove;
+            }
+        }
     }
 }

@@ -1141,6 +1141,33 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        internal static string PlaylistSelectorList_Add {
+            get {
+                return ResourceManager.GetString("PlaylistSelectorList.Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Playlist Selector (List).
+        /// </summary>
+        internal static string PlaylistSelectorList_Name {
+            get {
+                return ResourceManager.GetString("PlaylistSelectorList.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        internal static string PlaylistSelectorList_Remove {
+            get {
+                return ResourceManager.GetString("PlaylistSelectorList.Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Help.
         /// </summary>
         internal static string PlaylistSettingsDialog_Help {
