@@ -10,12 +10,17 @@ namespace FoxTunes.ViewModel
 {
     public class PlaylistManager : Playlists
     {
+        const int TIMEOUT = 100;
+
         public PlaylistManager()
         {
             this.WindowState = new WindowState(PlaylistManagerWindow.ID);
+            this.Debouncer = new AsyncDebouncer(TIMEOUT);
         }
 
         public WindowState WindowState { get; private set; }
+
+        public AsyncDebouncer Debouncer { get; private set; }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
@@ -71,6 +76,42 @@ namespace FoxTunes.ViewModel
         }
 
         public event EventHandler PlaylistManagerVisibleChanged;
+
+        public ICommand ExchangeCommand
+        {
+            get
+            {
+                return new Command<object[]>(items => this.Exchange(items), items => this.CanExchange(items));
+            }
+        }
+
+        public bool CanExchange(object[] items)
+        {
+            if (items == null || items.Length != 2)
+            {
+                return false;
+            }
+            if (!(items[0] is Playlist) || !(items[1] is Playlist))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public void Exchange(object[] items)
+        {
+            var playlist1 = (Playlist)items[0];
+            var playlist2 = (Playlist)items[1];
+            this.Exchange(playlist1, playlist2);
+        }
+
+        public void Exchange(Playlist playlist1, Playlist playlist2)
+        {
+            var temp = playlist1.Sequence;
+            playlist1.Sequence = playlist2.Sequence;
+            playlist2.Sequence = temp;
+            this.Debouncer.Exec(this.Save);
+        }
 
         public bool IsSaving
         {
@@ -147,6 +188,10 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
+            if (this.Debouncer != null)
+            {
+                this.Debouncer.Dispose();
+            }
             if (this.SignalEmitter != null)
             {
                 this.SignalEmitter.Signal -= this.OnSignal;

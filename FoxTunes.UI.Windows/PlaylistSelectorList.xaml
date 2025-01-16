@@ -19,12 +19,9 @@
         SelectedValue="{Binding SelectedItem, Source={StaticResource ViewModel}}" 
         DisplayMemberPath="Name"
         Windows:ListBoxExtensions.DragDropReorder="True"
-        Windows:ListBoxExtensions.DragDropReorderCommand="{Binding Playlists.ExchangeCommand, Source={StaticResource ViewModel}}">
+        Windows:ListBoxExtensions.DragDropReorderCommand="{Binding ExchangeCommand, Source={StaticResource ViewModel}}">
         <ListBox.ContextMenu>
-            <ContextMenu>
-                <MenuItem Header="{x:Static ViewModel:StringResources.PlaylistSelectorList_Add}" Command="{Binding AddPlaylistCommand, Mode=OneWay, Source={StaticResource ViewModel}}"></MenuItem>
-                <MenuItem Header="{x:Static ViewModel:StringResources.PlaylistSelectorList_Remove}" Command="{Binding RemovePlaylistCommand, Mode=OneWay, Source={StaticResource ViewModel}}"></MenuItem>
-            </ContextMenu>
+            <Windows:Menu Category="{Binding Source={x:Static Core:InvocationComponent.CATEGORY_PLAYLISTS}}"></Windows:Menu>
         </ListBox.ContextMenu>
     </ListBox>
 </Windows:UIComponentBase>
