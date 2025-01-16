@@ -128,7 +128,7 @@ namespace FoxTunes
             }
             catch (Exception e)
             {
-                Logger.Write(this, LogLevel.Warn, "Failed to save wave form data for file \"{0}\": {1}", stream.FileName, e.Message);
+                Logger.Write(this, LogLevel.Warn, "Failed to save mood bar data for file \"{0}\": {1}", stream.FileName, e.Message);
             }
         }
 

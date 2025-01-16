@@ -2,13 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
 
 namespace FoxTunes
 {
@@ -193,7 +191,7 @@ namespace FoxTunes
                 }
                 catch (Exception e)
                 {
-                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render wave form: {0}", e.Message);
+                    Logger.Write(this.GetType(), LogLevel.Warn, "Failed to render mood bar: {0}", e.Message);
                 }
                 finally
                 {
@@ -222,7 +220,7 @@ namespace FoxTunes
                     }
                     catch (Exception e)
                     {
-                        Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update wave form data: {0}", e.Message);
+                        Logger.Write(this.GetType(), LogLevel.Warn, "Failed to update mood bar data: {0}", e.Message);
                         return;
                     }
                     var task = this.Render(rendererData);
