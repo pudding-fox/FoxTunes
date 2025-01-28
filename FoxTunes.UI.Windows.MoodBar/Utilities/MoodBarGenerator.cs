@@ -141,7 +141,7 @@ namespace FoxTunes
             visualizationData.Peak = new float[1];
 
             var length = dataSource.GetData(visualizationData.Samples, FFT_SIZE);
-            var interval = data.Capacity / 100;
+            var interval = Math.Max(data.Capacity / 100, 1);
             var values = new float[BANDS.Length];
             var samplesPerValue = (dataSource.Stream.Length / length) / data.Capacity;
 

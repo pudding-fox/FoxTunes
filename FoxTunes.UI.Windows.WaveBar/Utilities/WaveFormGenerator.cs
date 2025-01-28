@@ -126,7 +126,7 @@ namespace FoxTunes
         {
             var duration = TimeSpan.FromMilliseconds(data.Resolution);
             var buffer = dataSource.GetBuffer<short>(duration);
-            var interval = data.Capacity / 100;
+            var interval = Math.Max(data.Capacity / 100, 1);
 
             do
             {
@@ -190,7 +190,7 @@ namespace FoxTunes
         {
             var duration = TimeSpan.FromMilliseconds(data.Resolution);
             var buffer = dataSource.GetBuffer<float>(duration);
-            var interval = data.Capacity / 100;
+            var interval = Math.Max(data.Capacity / 100, 1);
 
             do
             {
