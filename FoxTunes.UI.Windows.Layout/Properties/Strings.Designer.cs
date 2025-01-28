@@ -682,6 +682,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Development 3.
+        /// </summary>
+        internal static string UIComponentLayoutProviderPresets_Main_7 {
+            get {
+                return ResourceManager.GetString("UIComponentLayoutProviderPresets.Main.7", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Simple.
         /// </summary>
         internal static string UIComponentLayoutProviderPresets_Simple_1 {

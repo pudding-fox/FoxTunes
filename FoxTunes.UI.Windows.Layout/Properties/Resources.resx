@@ -136,6 +136,9 @@
   <data name="Main_6" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Main_6.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="Main_7" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Main_7.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
   <data name="Simple_1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Simple_1.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
