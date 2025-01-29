@@ -10,17 +10,12 @@ namespace FoxTunes.ViewModel
 {
     public class PlaylistManager : Playlists
     {
-        const int TIMEOUT = 100;
-
         public PlaylistManager()
         {
             this.WindowState = new WindowState(PlaylistManagerWindow.ID);
-            this.Debouncer = new AsyncDebouncer(TIMEOUT);
         }
 
         public WindowState WindowState { get; private set; }
-
-        public AsyncDebouncer Debouncer { get; private set; }
 
         public IDatabaseFactory DatabaseFactory { get; private set; }
 
@@ -77,40 +72,56 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler PlaylistManagerVisibleChanged;
 
-        public ICommand ExchangeCommand
+        public ICommand MoveUpCommand
         {
             get
             {
-                return new Command<object[]>(items => this.Exchange(items), items => this.CanExchange(items));
+                return CommandFactory.Instance.CreateCommand<Playlist>(this.MoveUp);
             }
         }
 
-        public bool CanExchange(object[] items)
+        public Task MoveUp(Playlist playlist)
         {
-            if (items == null || items.Length != 2)
+            var playlist1 = playlist;
+            var playlist2 = this.Items.BySequence(playlist1.Sequence - 1);
+            if (playlist2 == null)
             {
-                return false;
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
             }
-            if (!(items[0] is Playlist) || !(items[1] is Playlist))
-            {
-                return false;
-            }
-            return true;
-        }
-
-        public void Exchange(object[] items)
-        {
-            var playlist1 = (Playlist)items[0];
-            var playlist2 = (Playlist)items[1];
-            this.Exchange(playlist1, playlist2);
-        }
-
-        public void Exchange(Playlist playlist1, Playlist playlist2)
-        {
             var temp = playlist1.Sequence;
             playlist1.Sequence = playlist2.Sequence;
             playlist2.Sequence = temp;
-            this.Debouncer.Exec(this.Save);
+            return this.Save();
+        }
+
+        public ICommand MoveDownCommand
+        {
+            get
+            {
+                return CommandFactory.Instance.CreateCommand<Playlist>(this.MoveDown);
+            }
+        }
+
+        public Task MoveDown(Playlist playlist)
+        {
+            var playlist1 = playlist;
+            var playlist2 = this.Items.BySequence(playlist1.Sequence + 1);
+            if (playlist2 == null)
+            {
+#if NET40
+                return TaskEx.FromResult(false);
+#else
+                return Task.CompletedTask;
+#endif
+            }
+            var temp = playlist1.Sequence;
+            playlist1.Sequence = playlist2.Sequence;
+            playlist2.Sequence = temp;
+            return this.Save();
         }
 
         public bool IsSaving
@@ -188,10 +199,6 @@ namespace FoxTunes.ViewModel
 
         protected override void OnDisposing()
         {
-            if (this.Debouncer != null)
-            {
-                this.Debouncer.Dispose();
-            }
             if (this.SignalEmitter != null)
             {
                 this.SignalEmitter.Signal -= this.OnSignal;

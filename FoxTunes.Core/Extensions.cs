@@ -684,6 +684,11 @@ namespace FoxTunes
                 bag.Add(value);
             }
         }
+
+        public static T BySequence<T>(this IEnumerable<T> components, int sequence) where T : ISequenceableComponent
+        {
+            return components.Where(component => component.Sequence == sequence).FirstOrDefault();
+        }
     }
 
     public class NumericFallbackComparer : IComparer<string>
