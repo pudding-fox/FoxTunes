@@ -43,7 +43,7 @@
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type Core:Playlist}">
-                        <Grid IsHitTestVisible="True">
+                        <Grid IsHitTestVisible="True" Background="Transparent">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition></ColumnDefinition>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
