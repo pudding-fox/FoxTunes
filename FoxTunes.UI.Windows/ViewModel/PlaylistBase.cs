@@ -7,6 +7,14 @@ namespace FoxTunes.ViewModel
 {
     public abstract class PlaylistBase : ViewModelBase
     {
+        protected virtual int MaxItems
+        {
+            get
+            {
+                return -1;
+            }
+        }
+
         protected virtual string LOADING
         {
             get
@@ -239,6 +247,11 @@ namespace FoxTunes.ViewModel
                 return;
             }
             var items = this.PlaylistBrowser.GetItems(playlist);
+            if (this.MaxItems > 0 && items.Length > this.MaxItems)
+            {
+                Logger.Write(this, LogLevel.Warn, "Max items for playlist type {0} exceeded, results will be limited.", this.GetType().Name);
+                items = items.Take(this.MaxItems).ToArray();
+            }
             await Windows.Invoke(() => this.Items = items).ConfigureAwait(false);
             await this.RefreshStatus().ConfigureAwait(false);
         }
