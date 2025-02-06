@@ -1,11 +1,9 @@
-﻿using FoxTunes;
-using FoxTunes.Interfaces;
+﻿using FoxTunes.Interfaces;
 using ManagedBass;
 using ManagedBass.Dts;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace FoxTunes
 {
