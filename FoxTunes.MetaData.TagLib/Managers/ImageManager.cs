@@ -19,7 +19,7 @@ namespace FoxTunes
 
         private static readonly string PREFIX = typeof(TagLibMetaDataSource).Name;
 
-        public static ArtworkType ArtworkTypes = ArtworkType.FrontCover;
+        public static ArtworkType ArtworkTypes = ArtworkType.FrontCover | ArtworkType.BackCover;
 
         public static readonly IDictionary<ArtworkType, PictureType> ArtworkTypeMapping = new Dictionary<ArtworkType, PictureType>()
         {
