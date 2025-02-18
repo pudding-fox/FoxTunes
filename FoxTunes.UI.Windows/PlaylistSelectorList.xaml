@@ -6,6 +6,7 @@
         xmlns:Core="clr-namespace:FoxTunes;assembly=FoxTunes.Core" 
         xmlns:Windows="clr-namespace:FoxTunes" 
         xmlns:ViewModel="clr-namespace:FoxTunes.ViewModel"
+        xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         x:Class="FoxTunes.PlaylistSelectorList"
         mc:Ignorable="d">
     <Windows:UIComponentBase.Resources>
@@ -28,6 +29,11 @@
         <ListBox.ItemTemplate>
             <DataTemplate DataType="{x:Type Core:Playlist}">
                 <Grid IsHitTestVisible="True" Background="Transparent">
+                    <Interactivity:Interaction.Triggers>
+                        <Interactivity:EventTrigger EventName="MouseDown">
+                            <Interactivity:InvokeCommandAction Command="{Binding PlaylistSelectedCommand, Source={StaticResource ViewModel}}"/>
+                        </Interactivity:EventTrigger>
+                    </Interactivity:Interaction.Triggers>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
