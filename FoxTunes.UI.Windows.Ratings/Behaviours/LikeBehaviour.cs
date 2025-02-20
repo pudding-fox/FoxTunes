@@ -1,18 +1,119 @@
-﻿using FoxTunes.Interfaces;
+﻿using FoxDb;
+using FoxTunes.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
+using System.Windows;
+using System.Windows.Markup;
 
 namespace FoxTunes
 {
     [WindowsUserInterfaceDependency]
-    public class LikeBehaviour : StandardBehaviour, IInvocableComponent
+    public class LikeBehaviour : StandardBehaviour, IInvocableComponent, IUIPlaylistColumnProvider, IDatabaseInitializer
     {
+        public const string ID = "E85038A2-A724-4046-BA64-3A5CEC6976AC";
+
         public const string SET_LIBRARY_LIKE = "AAAE";
 
         public const string SET_PLAYLIST_LIKE = "CCCC";
+
+        #region IPlaylistColumnProvider
+
+        public string Id
+        {
+            get
+            {
+                return ID;
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return "Like";
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public bool DependsOn(IEnumerable<string> names)
+        {
+            //ViewModel.Like tracks updates.
+            return false;
+        }
+
+        public string GetValue(PlaylistItem playlistItem)
+        {
+            lock (playlistItem.MetaDatas)
+            {
+                var metaDataItem = playlistItem.MetaDatas.FirstOrDefault(
+                    _metaDataItem => string.Equals(_metaDataItem.Name, CommonStatistics.Like)
+                );
+                if (metaDataItem != null)
+                {
+                    return metaDataItem.Value;
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region IUIPlaylistColumnProvider
+
+        public DataTemplate CellTemplate
+        {
+            get
+            {
+                return TemplateFactory.Template;
+            }
+        }
+
+        #endregion
+
+        #region IDatabaseInitializer
+
+        string IDatabaseInitializer.Checksum
+        {
+            get
+            {
+                return "92A00CED-B3B5-42A1-BF1B-7EC71BB530CB";
+            }
+        }
+
+        void IDatabaseInitializer.InitializeDatabase(IDatabaseComponent database, DatabaseInitializeType type)
+        {
+            //IMPORTANT: When editing this function remember to change the checksum.
+            if (!type.HasFlag(DatabaseInitializeType.Playlist))
+            {
+                return;
+            }
+            using (var transaction = database.BeginTransaction(database.PreferredIsolationLevel))
+            {
+                var set = database.Set<PlaylistColumn>(transaction);
+                set.Add(new PlaylistColumn()
+                {
+                    Name = "Like",
+                    Type = PlaylistColumnType.Plugin,
+                    Sequence = 100,
+                    Plugin = ID,
+                    Enabled = false
+                });
+                transaction.Commit();
+            }
+        }
+
+        #endregion
 
         public ILibraryManager LibraryManager { get; private set; }
 
@@ -166,6 +267,29 @@ namespace FoxTunes
         {
             var like = await this.GetPlaylistLike(this.PlaylistManager.SelectedItems).ConfigureAwait(false);
             await this.LikeManager.SetLike(this.PlaylistManager.SelectedItems, !like).ConfigureAwait(false);
+        }
+
+        private static class TemplateFactory
+        {
+            private static Lazy<DataTemplate> _Template = new Lazy<DataTemplate>(GetTemplate);
+
+            public static DataTemplate Template
+            {
+                get
+                {
+                    return _Template.Value;
+                }
+            }
+
+            private static DataTemplate GetTemplate()
+            {
+                using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(Resources.Like)))
+                {
+                    var template = (DataTemplate)XamlReader.Load(stream);
+                    template.Seal();
+                    return template;
+                }
+            }
         }
     }
 }

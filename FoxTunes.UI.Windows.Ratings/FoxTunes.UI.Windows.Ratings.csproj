@@ -56,11 +56,14 @@
 
 	<ItemGroup>
 	  <Page Remove="Resources\Rating.xaml" />
+    <Page Remove="Resources\Like.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <UpToDateCheckInput Remove="RatingBase.xaml" />
 	  <UpToDateCheckInput Remove="Resources\Rating.xaml" />
+    <UpToDateCheckInput Remove="LikeBase.xaml" />
+    <UpToDateCheckInput Remove="Resources\Like.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -88,6 +91,9 @@
 	  <None Update="RatingBase.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </None>
+    <None Update="LikeBase.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
 	</ItemGroup>
 
 	<Import Project="$(UserProfile)\.nuget\packages\Microsoft.Bcl.Build\1.0.21\build\Microsoft.Bcl.Build.targets" Condition="'$(TargetFramework)' == 'net40'" />

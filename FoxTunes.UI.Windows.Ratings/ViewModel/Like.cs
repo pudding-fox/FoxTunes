@@ -7,11 +7,11 @@ using System.Windows;
 
 namespace FoxTunes.ViewModel
 {
-    public class Rating : ViewModelBase
+    public class Like : ViewModelBase
     {
-        static Rating()
+        static Like()
         {
-            Instances = new List<WeakReference<Rating>>();
+            Instances = new List<WeakReference<Like>>();
             SignalEmitter = ComponentRegistry.Instance.GetComponent<ISignalEmitter>();
             if (SignalEmitter != null)
             {
@@ -19,7 +19,7 @@ namespace FoxTunes.ViewModel
             }
         }
 
-        private static readonly IList<WeakReference<Rating>> Instances;
+        private static readonly IList<WeakReference<Like>> Instances;
 
         private static readonly ISignalEmitter SignalEmitter;
 
@@ -40,16 +40,16 @@ namespace FoxTunes.ViewModel
 
         private static void OnMetaDataUpdated(MetaDataUpdatedSignalState state)
         {
-            if (state == null || state.Names == null || state.Names.Contains(CommonStatistics.Rating, StringComparer.OrdinalIgnoreCase))
+            if (state == null || state.Names == null || state.Names.Contains(CommonStatistics.Like, StringComparer.OrdinalIgnoreCase))
             {
-                foreach (var rating in Active)
+                foreach (var like in Active)
                 {
-                    rating.Refresh();
+                    like.Refresh();
                 }
             }
         }
 
-        public static IEnumerable<Rating> Active
+        public static IEnumerable<Like> Active
         {
             get
             {
@@ -66,159 +66,64 @@ namespace FoxTunes.ViewModel
         public static readonly DependencyProperty FileDataProperty = DependencyProperty.Register(
             "FileData",
             typeof(IFileData),
-            typeof(Rating),
+            typeof(Like),
             new PropertyMetadata(new PropertyChangedCallback(OnFileDataChanged))
         );
 
-        public static IFileData GetFileData(Rating source)
+        public static IFileData GetFileData(Like source)
         {
             return (IFileData)source.GetValue(FileDataProperty);
         }
 
-        public static void SetFileData(Rating source, IFileData value)
+        public static void SetFileData(Like source, IFileData value)
         {
             source.SetValue(FileDataProperty, value);
         }
 
         public static void OnFileDataChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var rating = sender as Rating;
-            if (rating == null)
+            var like = sender as Like;
+            if (like == null)
             {
                 return;
             }
-            rating.OnFileDataChanged();
+            like.OnFileDataChanged();
         }
 
-        public Rating()
+        public Like()
         {
-            Instances.Add(new WeakReference<Rating>(this));
+            Instances.Add(new WeakReference<Like>(this));
         }
 
-        public bool Star1
-        {
-            get
-            {
-                return this.Value >= 1;
-            }
-            set
-            {
-                if (value || this.Value > 1)
-                {
-                    this.SetValue(1);
-                }
-                else
-                {
-                    this.SetValue(0);
-                }
-            }
-        }
-
-        public bool Star2
-        {
-            get
-            {
-                return this.Value >= 2;
-            }
-            set
-            {
-                if (value || this.Value > 1)
-                {
-                    this.SetValue(2);
-                }
-                else
-                {
-                    this.SetValue(1);
-                }
-            }
-        }
-
-        public bool Star3
-        {
-            get
-            {
-                return this.Value >= 3;
-            }
-            set
-            {
-                if (value || this.Value > 2)
-                {
-                    this.SetValue(3);
-                }
-                else
-                {
-                    this.SetValue(2);
-                }
-            }
-        }
-
-        public bool Star4
-        {
-            get
-            {
-                return this.Value >= 4;
-            }
-            set
-            {
-                if (value || this.Value > 3)
-                {
-                    this.SetValue(4);
-                }
-                else
-                {
-                    this.SetValue(3);
-                }
-            }
-        }
-
-        public bool Star5
-        {
-            get
-            {
-                return this.Value >= 5;
-            }
-            set
-            {
-                if (value || this.Value > 4)
-                {
-                    this.SetValue(5);
-                }
-                else
-                {
-                    this.SetValue(4);
-                }
-            }
-        }
-
-        protected virtual void OnValueChanged(byte value)
+        protected virtual void OnValueChanged(bool value)
         {
             if (this.ValueChanged == null)
             {
                 return;
             }
-            this.ValueChanged(this, new RatingEventArgs(this.FileData, value));
+            this.ValueChanged(this, new LikeEventArgs(this.FileData, value));
         }
 
-        public event RatingEventHandler ValueChanged;
+        public event LikeEventHandler ValueChanged;
 
-        protected virtual byte GetValue()
+        protected virtual bool GetValue()
         {
             var fileData = this.FileData;
             if (fileData == null)
             {
-                return 0;
+                return false;
             }
             if (this.FileData != null)
             {
                 lock (this.FileData.MetaDatas)
                 {
-                    return this.FileData.GetValueOrDefault<byte>(CommonStatistics.Rating, MetaDataItemType.Tag, default(byte));
+                    return this.FileData.GetValueOrDefault<bool>(CommonStatistics.Like, MetaDataItemType.Tag, default(bool));
                 }
             }
-            return 0;
+            return false;
         }
 
-        protected virtual void SetValue(byte value)
+        protected virtual void SetValue(bool value)
         {
             this.OnValueChanged(value);
         }
@@ -247,7 +152,25 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler FileDataChanged;
 
-        private byte Value { get; set; }
+        private bool _Value { get; set; }
+
+        public bool Value
+        {
+            get
+            {
+                return this._Value;
+            }
+            set
+            {
+                this._Value = value;
+                this.OnValueChanged();
+            }
+        }
+
+        protected virtual void OnValueChanged()
+        {
+            this.SetValue(this.Value);
+        }
 
         public void Refresh()
         {
@@ -258,17 +181,14 @@ namespace FoxTunes.ViewModel
                 {
                     return;
                 }
-                this.Value = value;
-                for (var a = 1; a <= 5; a++)
-                {
-                    this.OnPropertyChanged("Star" + a);
-                }
+                this._Value = value;
+                this.OnPropertyChanged("Value");
             });
         }
 
         protected override Freezable CreateInstanceCore()
         {
-            return new Rating();
+            return new Like();
         }
 
         protected override void OnDisposing()

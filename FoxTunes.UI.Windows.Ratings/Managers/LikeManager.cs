@@ -41,7 +41,7 @@ namespace FoxTunes
                 fileDatas,
                 new[] { CommonStatistics.Like },
                 MetaDataUpdateType.User,
-                MetaDataUpdateFlags.All
+                MetaDataUpdateFlags.ShowReport | MetaDataUpdateFlags.RefreshHierarchies
             ).ConfigureAwait(false);
         }
     }

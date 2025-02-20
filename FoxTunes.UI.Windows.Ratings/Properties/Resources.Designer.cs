@@ -19,7 +19,7 @@ namespace FoxTunes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -57,6 +57,22 @@ namespace FoxTunes {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;DataTemplate 
+        ///    xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        ///    xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+        ///    xmlns:Core=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.Core&quot; 
+        ///    xmlns:LocalWindows=&quot;clr-namespace:FoxTunes;assembly=FoxTunes.UI.Windows.Ratings&quot;
+        ///    DataType=&quot;{x:Type Core:PlaylistItem}&quot;&gt;
+        ///    &lt;LocalWindows:LikeBase Height=&quot;15&quot; FileData=&quot;{Binding}&quot;  LocalWindows:LikeExtensions.UpdatePlaylistItems=&quot;True&quot;&gt;&lt;/LocalWindows:LikeBase&gt;
+        ///&lt;/DataTemplate&gt;.
+        /// </summary>
+        internal static string Like {
+            get {
+                return ResourceManager.GetString("Like", resourceCulture);
             }
         }
         
