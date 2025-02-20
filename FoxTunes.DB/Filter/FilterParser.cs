@@ -283,6 +283,46 @@ namespace FoxTunes
 
         [ComponentPriority(ComponentPriorityAttribute.HIGH)]
         [ComponentDependency(Slot = ComponentSlots.Database)]
+        public class LikeFilterParserProvider : FilterParserProvider
+        {
+            const string LIKE = "LIKE";
+
+            public LikeFilterParserProvider()
+            {
+                this.Regex = new Regex(
+                    "(like|love)",
+                    RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture
+                );
+            }
+
+            public Regex Regex { get; private set; }
+
+            public override bool TryParse(ref string filter, out IFilterParserResultGroup result)
+            {
+                if (string.IsNullOrWhiteSpace(filter))
+                {
+                    result = default(IFilterParserResultGroup);
+                    return false;
+                }
+                var match = this.Regex.Match(filter);
+                if (!match.Success)
+                {
+                    result = default(IFilterParserResultGroup);
+                    return false;
+                }
+                result = this.Parse(match);
+                this.OnParsed(ref filter, match.Index, match.Length);
+                return true;
+            }
+
+            protected virtual IFilterParserResultGroup Parse(Match match)
+            {
+                return new FilterParserResultGroup(new FilterParserResultEntry(CommonStatistics.Like, FilterParserEntryOperator.Equal, bool.TrueString));
+            }
+        }
+
+        [ComponentPriority(ComponentPriorityAttribute.HIGH)]
+        [ComponentDependency(Slot = ComponentSlots.Database)]
         public class HighDefFilterParserProvider : FilterParserProvider
         {
             public HighDefFilterParserProvider()

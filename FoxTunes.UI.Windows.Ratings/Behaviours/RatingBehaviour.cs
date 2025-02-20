@@ -248,7 +248,7 @@ namespace FoxTunes
                 case 1:
                     if (!byte.TryParse(ratings[0].Value, out rating))
                     {
-                        Logger.Write(this, LogLevel.Warn, "Library hierarchy node {0} tracks have rating \"{1}\" which is in an unknown format.", libraryHierarchyNode.Id, rating);
+                        Logger.Write(this, LogLevel.Warn, "Library hierarchy node {0} tracks have rating \"{1}\" which is in an unknown format.", libraryHierarchyNode.Id, ratings[0].Value);
                         return;
                     }
                     Logger.Write(this, LogLevel.Debug, "Library hierarchy node {0} tracks have rating {1}.", libraryHierarchyNode.Id, rating);
@@ -292,7 +292,7 @@ namespace FoxTunes
                 case 1:
                     if (!byte.TryParse(ratings[0].Value, out rating))
                     {
-                        Logger.Write(this, LogLevel.Warn, "{0} playlist items have rating \"{1}\" which is in an unknown format.", playlistItems.Length, rating);
+                        Logger.Write(this, LogLevel.Warn, "{0} playlist items have rating \"{1}\" which is in an unknown format.", playlistItems.Length, ratings[0].Value);
                         return;
                     }
                     Logger.Write(this, LogLevel.Debug, "{0} playlist items have rating {1}.", playlistItems.Length, rating);

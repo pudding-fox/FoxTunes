@@ -61,6 +61,24 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Like.
+        /// </summary>
+        internal static string Like_Name {
+            get {
+                return ResourceManager.GetString("Like.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update likes for {0} tracks?.
+        /// </summary>
+        internal static string LikeManager_Confirm {
+            get {
+                return ResourceManager.GetString("LikeManager.Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Rating.
         /// </summary>
         internal static string Rating_Name {

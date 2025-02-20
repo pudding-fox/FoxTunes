@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Like.Name" xml:space="preserve">
+    <value>Like</value>
+  </data>
+  <data name="LikeManager.Confirm" xml:space="preserve">
+    <value>Update likes for {0} tracks?</value>
+  </data>
   <data name="Rating.Name" xml:space="preserve">
     <value>Rating</value>
   </data>

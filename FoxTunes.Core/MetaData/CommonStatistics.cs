@@ -9,6 +9,7 @@ namespace FoxTunes
         public const string Rating = "Rating";
         public const string LastPlayed = "LastPlayed";
         public const string PlayCount = "PlayCount";
+        public const string Like = "__FT_Like";
 
         public static IDictionary<string, string> Lookup = GetLookup();
 
