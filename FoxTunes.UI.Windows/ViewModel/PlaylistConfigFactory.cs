@@ -101,6 +101,31 @@ namespace FoxTunes.ViewModel
 
         public event EventHandler GenresChanged;
 
+        public bool Like
+        {
+            get
+            {
+                return Convert.ToBoolean(this.Config.GetValueOrDefault(nameof(Like), Convert.ToString(SmartPlaylistBehaviour.DefaultLike)));
+            }
+            set
+            {
+                this.Config[nameof(Like)] = Convert.ToString(value);
+                this.OnLikeChanged();
+            }
+        }
+
+        protected virtual void OnLikeChanged()
+        {
+            this.Config.Save();
+            if (this.LikeChanged != null)
+            {
+                this.LikeChanged(this, EventArgs.Empty);
+            }
+            this.OnPropertyChanged("Like");
+        }
+
+        public event EventHandler LikeChanged;
+
         public int MinRating
         {
             get

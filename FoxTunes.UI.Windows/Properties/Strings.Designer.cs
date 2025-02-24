@@ -1042,6 +1042,15 @@ namespace FoxTunes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Like.
+        /// </summary>
+        internal static string PlaylistConfigDialog_Like {
+            get {
+                return ResourceManager.GetString("PlaylistConfigDialog.Like", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Min Age (Days).
         /// </summary>
         internal static string PlaylistConfigDialog_MinAge {

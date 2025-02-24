@@ -444,6 +444,9 @@
   <data name="PlaylistConfigDialog.Genres" xml:space="preserve">
     <value>Genres</value>
   </data>
+  <data name="PlaylistConfigDialog.Like" xml:space="preserve">
+    <value>Like</value>
+  </data>
   <data name="PlaylistConfigDialog.MinAge" xml:space="preserve">
     <value>Min Age (Days)</value>
   </data>

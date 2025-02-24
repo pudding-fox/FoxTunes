@@ -358,6 +358,14 @@
             }
         }
 
+        public static string PlaylistConfigDialog_Like
+        {
+            get
+            {
+                return Strings.PlaylistConfigDialog_Like;
+            }
+        }
+
         public static string PlaylistConfigDialog_MinRating
         {
             get

@@ -1,6 +1,5 @@
 ﻿using FoxTunes.Interfaces;
 using System;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,6 +10,8 @@ namespace FoxTunes
     {
         public const string Genres = "Genres";
 
+        public const string Like = "Like";
+
         public const string MinRating = "MinRating";
 
         public const string MinAge = "MinAge";
@@ -18,6 +19,8 @@ namespace FoxTunes
         public const string Count = "Count";
 
         public const string DefaultGenres = "";
+
+        public const bool DefaultLike = false;
 
         public const int DefaultMinRating = 4;
 
@@ -37,11 +40,16 @@ namespace FoxTunes
         {
             var config = this.GetConfig(playlist);
             var genres = default(string);
+            var like = default(bool);
             var minRating = default(int);
             var minAge = default(int);
             if (!config.TryGetValue(Genres, out genres))
             {
                 genres = DefaultGenres;
+            }
+            if (!bool.TryParse(config.GetValueOrDefault(Like), out like))
+            {
+                like = DefaultLike;
             }
             if (!int.TryParse(config.GetValueOrDefault(MinRating), out minRating))
             {
@@ -55,29 +63,37 @@ namespace FoxTunes
             {
                 count = DefaultCount;
             }
+
             var builder = new StringBuilder();
             if (!string.IsNullOrEmpty(genres))
             {
                 foreach (var genre in genres.Split('\t'))
                 {
-                    builder.Append(
-                        string.Concat(
-                            "genre:",
-                            genre,
-                            " "
-                        )
-                    );
+                    this.Append(builder, string.Concat("genre:", genre));
                 }
             }
-            builder.Append(
-                string.Concat(
-                    "rating>:",
-                    minRating,
-                    " lastplayed<",
-                    DateTimeHelper.ToShortString(DateTime.Now.AddDays(minAge * -1).Date)
-                )
-            );
+            if (like)
+            {
+                this.Append(builder, "like");
+            }
+            if (minRating > 0)
+            {
+                this.Append(builder, string.Concat("rating>:", minRating));
+            }
+            if (minAge > 0)
+            {
+                this.Append(builder, string.Concat("lastplayed<", DateTimeHelper.ToShortString(DateTime.Now.AddDays(minAge * -1).Date)));
+            }
             expression = builder.ToString();
+        }
+
+        protected virtual void Append(StringBuilder builder, string filter)
+        {
+            if (builder.Length > 0)
+            {
+                builder.Append(" ");
+            }
+            builder.Append(filter);
         }
 
         public ICore Core { get; private set; }

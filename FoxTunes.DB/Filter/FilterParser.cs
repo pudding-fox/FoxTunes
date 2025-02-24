@@ -28,8 +28,9 @@ namespace FoxTunes
             {
                 var success = default(bool);
                 var groups = new List<IFilterParserResultGroup>();
-                while (!string.IsNullOrWhiteSpace(filter))
+                while (!string.IsNullOrEmpty(filter))
                 {
+                    filter = filter.Trim();
                     foreach (var provider in this.Providers.Value)
                     {
                         var currentGroups = default(IEnumerable<IFilterParserResultGroup>);
@@ -45,9 +46,9 @@ namespace FoxTunes
                         break;
                     }
                 }
-                if (!success && !string.IsNullOrWhiteSpace(filter))
+                if (!success && !string.IsNullOrEmpty(filter))
                 {
-                    Logger.Write(this, LogLevel.Warn, "Failed to parse filter: {0}", filter.Trim());
+                    Logger.Write(this, LogLevel.Warn, "Failed to parse filter: {0}", filter);
                 }
                 if (groups.Any())
                 {
@@ -249,7 +250,7 @@ namespace FoxTunes
             public RatingFilterParserProvider()
             {
                 this.Regex = new Regex(
-                    "(?:(?<" + RATING + ">[0-5])\\*)",
+                    @"(?:(?:^|\s+)(?:(?<" + RATING + @">[0-5])\\*)(?:$|\s+))",
                     RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture
                 );
             }
@@ -285,12 +286,10 @@ namespace FoxTunes
         [ComponentDependency(Slot = ComponentSlots.Database)]
         public class LikeFilterParserProvider : FilterParserProvider
         {
-            const string LIKE = "LIKE";
-
             public LikeFilterParserProvider()
             {
                 this.Regex = new Regex(
-                    "(like|love)",
+                    @"(?:(?:^|\s+)(like|love)(?:$|\s+))",
                     RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture
                 );
             }
