@@ -150,7 +150,7 @@ namespace FoxTunes
             var list = new List<PlaylistItem>();
             foreach (var pair in this.Items)
             {
-                list.AddRange(this.ItemsById.GetOrAdd(
+                list.AddRange(this.ItemsByLibraryId.GetOrAdd(
                     pair.Key,
                     key => new Lazy<IndexedCollection<PlaylistItem>.Index<int>>(() => pair.Value.Value.By(playlistItem => playlistItem.LibraryItem_Id.GetValueOrDefault(), IndexedCollection.IndexType.Multiple))
                 ).Value.FindAll(id));

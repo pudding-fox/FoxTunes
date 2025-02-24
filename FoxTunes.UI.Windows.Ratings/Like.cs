@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 namespace FoxTunes
 {
     [UIComponent("4956029D-6075-4896-9CA3-75156203CFC3", role: UIComponentRole.Info)]
+    [UIComponentToolbar(250, UIComponentToolbarAlignment.Left, true)]
     public class Like : LikeBase
     {
         public static IPlaybackManager PlaybackManager = ComponentRegistry.Instance.GetComponent<IPlaybackManager>();
@@ -19,7 +20,9 @@ namespace FoxTunes
         );
 
         public Like()
-        {
+        {            
+            //TODO: I can't work out how to make the star paths size to fit their parent.
+            //TODO: This is a common size and will look OK in most cases.
             this.MaxHeight = 30;
             Popularimeter.ConnectValue(value =>
             {

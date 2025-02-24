@@ -243,10 +243,10 @@ namespace FoxTunes
     [Flags]
     public enum MetaDataUpdateFlags : byte
     {
-        None,
-        WriteToFiles,
-        ShowReport,
-        RefreshHierarchies,
+        None = 0,
+        WriteToFiles = 1,
+        ShowReport = 2,
+        RefreshHierarchies = 4,
         All = WriteToFiles | ShowReport | RefreshHierarchies
     }
 }
