@@ -386,7 +386,7 @@ namespace FoxTunes
         {
             foreach (var tabItem in this._TabControl.Items.Cast<TabItem>())
             {
-                if (this.GetContent(tabItem) == content)
+                if (object.Equals(this.GetContent(tabItem), content))
                 {
                     return tabItem;
                 }
@@ -414,7 +414,7 @@ namespace FoxTunes
             if (this._TabControl.SelectedItem is TabItem tabItem)
             {
                 var content = this.GetContent(tabItem);
-                if (content != null && this.SelectedItem != content)
+                if (content != null && !object.Equals(this.SelectedItem, content))
                 {
                     this.SelectedItem = content;
                 }
@@ -428,7 +428,7 @@ namespace FoxTunes
                 return;
             }
             var tabItem = this.GetTabItem(this.SelectedItem);
-            if (tabItem != null && this._TabControl.SelectedItem != tabItem)
+            if (tabItem != null && !object.Equals(this._TabControl.SelectedItem, tabItem))
             {
                 this._TabControl.SelectedItem = tabItem;
             }
