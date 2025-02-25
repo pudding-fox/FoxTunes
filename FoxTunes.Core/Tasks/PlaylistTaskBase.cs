@@ -472,12 +472,32 @@ namespace FoxTunes
             var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var playlistItem in playlistItems)
             {
-                var cachedPlaylistItem = default(PlaylistItem);
-                if (playlistCache.TryGetItemById(playlistItem.Id, out cachedPlaylistItem))
+                //Phase 1: Update related PlaylistItem -> PlaylistItem
                 {
-                    if (!object.ReferenceEquals(playlistItem, cachedPlaylistItem))
+                    var cachedPlaylistItem = default(PlaylistItem);
+                    if (playlistCache.TryGetItemById(playlistItem.Id, out cachedPlaylistItem))
                     {
-                        result.AddRange(MetaDataItem.Update(playlistItem, cachedPlaylistItem, names));
+                        if (!object.ReferenceEquals(playlistItem, cachedPlaylistItem))
+                        {
+                            result.AddRange(MetaDataItem.Update(playlistItem, cachedPlaylistItem, names));
+                        }
+                    }
+                }
+                //Phase 2: Update related PlaylistItem -> LibraryItem -> PlaylistItem
+                {
+                    if (playlistItem.LibraryItem_Id.HasValue)
+                    {
+                        var cachedPlaylistItems = default(PlaylistItem[]);
+                        if (playlistCache.TryGetItemsByLibraryId(playlistItem.LibraryItem_Id.Value, out cachedPlaylistItems))
+                        {
+                            foreach (var cachedPlaylistItem in cachedPlaylistItems)
+                            {
+                                if (!playlistItems.Contains(cachedPlaylistItem))
+                                {
+                                    result.AddRange(MetaDataItem.Update(playlistItem, cachedPlaylistItem, names));
+                                }
+                            }
+                        }
                     }
                 }
             }

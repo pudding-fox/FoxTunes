@@ -160,6 +160,10 @@ namespace FoxTunes
                 {
                     lock (destination)
                     {
+                        if (object.ReferenceEquals(source, destination))
+                        {
+                            continue;
+                        }
                         var destinationMetaData = destination.ToDictionary(
                             metaDataItem => metaDataItem.Name,
                             StringComparer.OrdinalIgnoreCase
